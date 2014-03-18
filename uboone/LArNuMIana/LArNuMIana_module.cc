@@ -211,8 +211,6 @@ namespace LArNuMIana {
   {
     fGenieGenModuleLabel     = p.get< std::string >("GenieGenModuleLabel");
     fSimulationProducerLabel = p.get< std::string >("SimulationLabel");
-    fHitProducerLabel        = p.get< std::string >("HitLabel");
-    fClusterProducerLabel    = p.get< std::string >("ClusterLabel");
     fPOTModuleLabel          = p.get< std::string >("POTModuleLabel");
     return;
   }

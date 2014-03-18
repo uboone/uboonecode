@@ -134,8 +134,8 @@ physics:
 
  #simulate: [ generator, largeant, daq, backtrack, caldata, gaushit, hitcheat, apahit, rns ] 
 
-  mode0: [ generator, largeant, daq, backtrack, caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns ] 
-  mode1: [ generator, largeant, daq, backtrack, caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns, selectMode1 ] # 
+  mode0: [ generator, largeant, daq, backtrack, caldata, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns ] 
+  mode1: [ generator, largeant, daq, backtrack, caldata, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns, selectMode1 ] # 
  
  larana: [ largana, analysistree, analysisexample]
 
@@ -150,6 +150,7 @@ physics:
 
  #end_paths is a keyword and contains the paths that do not modify the art::Event, 
  #ie analyzers and output streams.  these all run simultaneously
+
 # end_paths:     [larana, stream1] 
  end_paths:     [larana, stream] 
 }
