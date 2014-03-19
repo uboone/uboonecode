@@ -70,17 +70,17 @@ microboone_genie_simple_numi_bott.FluxFiles:      ["numi_gsimple_fluxes_02.27.20
 
 microboone_genie_simple_numi_long_dirt:                @local::microboone_genie_numi
 microboone_genie_simple_numi_long_dirt.FluxType:       "simple_flux"
-microboone_genie_simple_numi_long_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/length_window_dirt/*.root"]
+microboone_genie_simple_numi_long_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/length_window_dirt/second_try/*.root"]
 ###############################################################
 
 microboone_genie_simple_numi_norm_dirt:                @local::microboone_genie_numi
 microboone_genie_simple_numi_norm_dirt.FluxType:       "simple_flux"
-microboone_genie_simple_numi_norm_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/normal_window_dirt/*.root"]
+microboone_genie_simple_numi_norm_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/normal_window_dirt/second_try/*.root"]
 ###############################################################
 
 microboone_genie_simple_numi_bott_dirt:                @local::microboone_genie_numi
 microboone_genie_simple_numi_bott_dirt.FluxType:       "simple_flux"
-microboone_genie_simple_numi_bott_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/bottom_window_dirt/*.root"]
+microboone_genie_simple_numi_bott_dirt.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/bottom_window_dirt/second_try/*.root"]
 ###############################################################
 
 

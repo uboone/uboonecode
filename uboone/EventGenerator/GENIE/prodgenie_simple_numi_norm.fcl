@@ -62,23 +62,9 @@ physics:
  #ie filters and producers
  trigger_paths: [ simulate ] 
 
- analyzers:
- {
-   larnumiana: 
-    {
-      # LArNuMIana_module.cc.
-      module_type:     LArNuMIana
-      GenieGenModuleLabel: "generator"
-      SimulationLabel: "largeant"
-      POTModuleLabel: "generator"
-    }
- }
- 
- ana: [larnumiana]
-
  #end_paths is a keyword and contains the paths that do not modify the art::Event, 
  #ie analyzers and output streams.  these all run simultaneously
- end_paths:     [ ana, stream1 ]  
+ end_paths:     [ stream1 ]  
 
 }
 
