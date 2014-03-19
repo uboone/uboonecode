@@ -5,7 +5,7 @@
 #include "opticaldetectormodules_microboone.fcl"
 
 process_name: GenieGen
-# lar -c prodgenie_simple_numi_long.fcl 
+# lar -c prodgenie_simple_numi_bott.fcl 
 
 services:
 {
@@ -49,7 +49,7 @@ physics:
 {
  producers:
  {
-   generator: @local::microboone_genie_simple_numi_long
+   generator: @local::microboone_genie_simple_numi_bott_dirt
    largeant:  @local::microboone_largeant
    rns:       { module_type: "RandomNumberSaver" }
  }
@@ -90,7 +90,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "long_genie_gen.root"
+   fileName:    "bott_dirt_genie_gen.root"
    dataTier:    "generated"
  }
 }
@@ -98,8 +98,8 @@ outputs:
 
 physics.producers.generator.GlobalTimeOffset: 0.
 physics.producers.generator.RandomTimeOffset: 0.
-physics.producers.generator.TopVolume: "volTPC"
+physics.producers.generator.TopVolume: "volWorld"
 
 #physics.producers.generator:                @local::microboone_genie_numi
 #physics.producers.generator.FluxType:       "simple_flux"
-#physics.producers.generator.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/longom_window/*.root"]
+#physics.producers.generator.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/bottom_window/*.root"]

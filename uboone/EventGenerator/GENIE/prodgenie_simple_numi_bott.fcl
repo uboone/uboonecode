@@ -37,7 +37,7 @@ services.user.FileCatalogMetadataExtras.Metadata: [ "group",      "uboone",
 source:
 {
   module_type: EmptyEvent
-  maxEvents:   500         # Number of events to create
+  maxEvents:   5           # Number of events to create
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -98,7 +98,7 @@ outputs:
 
 physics.producers.generator.GlobalTimeOffset: 0.
 physics.producers.generator.RandomTimeOffset: 0.
-physics.producers.generator.TopVolume: "volWorld"
+physics.producers.generator.TopVolume: "volTPC"
 
 #physics.producers.generator:                @local::microboone_genie_numi
 #physics.producers.generator.FluxType:       "simple_flux"

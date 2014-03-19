@@ -5,6 +5,7 @@
 #include "opticaldetectormodules_microboone.fcl"
 
 process_name: GenieGen
+# lar -c prodgenie_simple_numi_norm.fcl 
 
 services:
 {
@@ -36,7 +37,7 @@ services.user.FileCatalogMetadataExtras.Metadata: [ "group",      "uboone",
 source:
 {
   module_type: EmptyEvent
-  maxEvents:   500         # Number of events to create
+  maxEvents:   5           # Number of events to create
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -61,9 +62,24 @@ physics:
  #ie filters and producers
  trigger_paths: [ simulate ] 
 
+ analyzers:
+ {
+   larnumiana: 
+    {
+      # LArNuMIana_module.cc.
+      module_type:     LArNuMIana
+      GenieGenModuleLabel: "generator"
+      SimulationLabel: "largeant"
+      POTModuleLabel: "generator"
+    }
+ }
+ 
+ ana: [larnumiana]
+
  #end_paths is a keyword and contains the paths that do not modify the art::Event, 
  #ie analyzers and output streams.  these all run simultaneously
- end_paths:     [ stream1 ]  
+ end_paths:     [ ana, stream1 ]  
+
 }
 
 #block to define where the output goes.  if you defined a filter in the physics
@@ -79,7 +95,11 @@ outputs:
  }
 }
 
-physics.producers.generator: @local::microboone_genie_simple_numi_norm
+
 physics.producers.generator.GlobalTimeOffset: 0.
 physics.producers.generator.RandomTimeOffset: 0.
-physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.TopVolume: "volTPC"
+
+#physics.producers.generator:                @local::microboone_genie_numi
+#physics.producers.generator.FluxType:       "simple_flux"
+#physics.producers.generator.FluxFiles:      ["numi_gsimple_fluxes_02.27.2014/normom_window/*.root"]
