@@ -16,8 +16,11 @@
 #include "SimpleTypesAndConstants/geo_types.h"
 #include "MCCheater/BackTracker.h"
 #include "SummaryData/POTSummary.h"
+#include "Simulation/ParticleList.h"
+#include "Simulation/sim.h"
 
 // Framework includes
+#include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
@@ -28,6 +31,9 @@
 #include "art/Framework/Core/FindManyP.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "art/Persistency/Common/Ptr.h"
+#include "art/Persistency/Common/PtrVector.h"
+#include "cetlib/exception.h"
 
 // ROOT includes
 #include "TH1.h"
@@ -54,9 +60,7 @@ namespace LArNuMIana {
     virtual ~LArNuMIana();
     
     void beginJob();
-    //    void beginRun(const art::Run& run);
     void beginSubRun(const art::SubRun& sr);
-    void reconfigure(fhicl::ParameterSet const& pset);
     void analyze (const art::Event& evt); 
     
   private:
@@ -109,25 +113,32 @@ namespace LArNuMIana {
     int    flux_ndecay;
     int    flux_ppmedium;
 
-    std::vector<int>    fPdgCode;
-    std::vector<int>    fTrackID;
-    std::vector<double> fStartVx;
-    std::vector<double> fStartVy;
-    std::vector<double> fStartVz;
-    std::vector<double> fStartPx;
-    std::vector<double> fStartPy;
-    std::vector<double> fStartPz;
-    std::vector<double> fStartE;
+    std::vector<std::string> fProcess;
+    std::vector<std::string> fProdVolume;
+    std::vector<std::string> fEndVolume;
+    std::vector<std::string> fProdMaterial;
+    std::vector<std::string> fEndMaterial;
+    std::vector<int>         fParentID;
+    std::vector<int>         fPdgCode;
+    std::vector<int>         fTrackID;
+    std::vector<double>      fStartVx;
+    std::vector<double>      fStartVy;
+    std::vector<double>      fStartVz;
+    std::vector<double>      fStartPx;
+    std::vector<double>      fStartPy;
+    std::vector<double>      fStartPz;
+    std::vector<double>      fStartE;
 
     art::ServiceHandle<geo::Geometry> fGeometry;      
     double                            fElectronsToGeV;
 
   };
-
-  LArNuMIana::LArNuMIana(fhicl::ParameterSet const& parameterSet)
-    : EDAnalyzer(parameterSet)
+  
+  LArNuMIana::LArNuMIana(fhicl::ParameterSet const& p) : EDAnalyzer(p)
   {
-    this->reconfigure(parameterSet);
+    fGenieGenModuleLabel     = p.get< std::string >("GenieGenModuleLabel");
+    fSimulationProducerLabel = p.get< std::string >("SimulationLabel");
+    fPOTModuleLabel          = p.get< std::string >("POTModuleLabel","generator");
   }
   
   LArNuMIana::~LArNuMIana() {}
@@ -166,7 +177,13 @@ namespace LArNuMIana {
     fNuMIEventNtuple->Branch("SubRun",        &fSubRun,        "SubRun/I");
     fNuMIEventNtuple->Branch("Run",           &fRun,           "Run/I");
     fNuMIEventNtuple->Branch("POT",           &fPOT,           "POT/D");
+    fNuMIEventNtuple->Branch("Process",       &fProcess);
+    fNuMIEventNtuple->Branch("ProdMaterial",  &fProdMaterial);
+    fNuMIEventNtuple->Branch("EndMaterial",   &fEndMaterial);
+    fNuMIEventNtuple->Branch("ProdVolume",    &fProdVolume);
+    fNuMIEventNtuple->Branch("EndVolume",     &fEndVolume);
     fNuMIEventNtuple->Branch("TrackID",       &fTrackID);
+    fNuMIEventNtuple->Branch("ParentID",      &fParentID);
     fNuMIEventNtuple->Branch("PdgCode",       &fPdgCode);
     fNuMIEventNtuple->Branch("StartVx",       &fStartVx);
     fNuMIEventNtuple->Branch("StartVy",       &fStartVy);
@@ -175,7 +192,7 @@ namespace LArNuMIana {
     fNuMIEventNtuple->Branch("StartPy",       &fStartPy);
     fNuMIEventNtuple->Branch("StartPz",       &fStartPz);
     fNuMIEventNtuple->Branch("StartE",        &fStartE);
-    
+
     fNuMIEventNtuple->Branch("flux_run",     &flux_run,     "flux_run/I");
     fNuMIEventNtuple->Branch("flux_evtno",   &flux_evtno,   "flux_evtno/I");
     fNuMIEventNtuple->Branch("flux_tpx",     &flux_tpx,     "flux_tpx/D");
@@ -190,13 +207,6 @@ namespace LArNuMIana {
 
   }
    
-  /*
-  void LArNuMIana::beginRun(const art::Run& run)
-  {
-    art::ServiceHandle<sim::LArG4Parameters> larParameters;
-    fElectronsToGeV = 1./larParameters->GeVToElectrons();
-  }
-  */
 
   void LArNuMIana::beginSubRun(const art::SubRun& sr)
   {
@@ -204,19 +214,14 @@ namespace LArNuMIana {
     if ( sr.getByLabel(fPOTModuleLabel,potListHandle) )
       fPOT = potListHandle->totpot;
     else
-      fPOT = 0;
+      fPOT = 0.;
   }
-  
-  void LArNuMIana::reconfigure(fhicl::ParameterSet const& p)
-  {
-    fGenieGenModuleLabel     = p.get< std::string >("GenieGenModuleLabel");
-    fSimulationProducerLabel = p.get< std::string >("SimulationLabel");
-    fPOTModuleLabel          = p.get< std::string >("POTModuleLabel");
-    return;
-  }
+
 
   void LArNuMIana::analyze(const art::Event& event) 
   {
+    art::ServiceHandle<geo::Geometry> geom;
+      
     art::Handle< std::vector<simb::MCTruth> > mctruthListHandle;
     std::vector< art::Ptr<simb::MCTruth> > mclist;
     if ( event.getByLabel(fGenieGenModuleLabel,mctruthListHandle) )
@@ -284,30 +289,45 @@ namespace LArNuMIana {
 	if ( mctruth->GetNeutrino().Mode() == 0 )
 	  fNCQEint = true;
       }
+      
 
       art::Handle< std::vector<simb::MCParticle> > particleHandle;
       event.getByLabel(fSimulationProducerLabel, particleHandle);
       std::map< int, const simb::MCParticle* > particleMap;
-      
-      for ( auto const& particle : (*particleHandle) ) {
-	if ( particle.Process() == "primary" ) {
-	  fTrackID.push_back(particle.TrackId());
-	  particleMap[particle.TrackId()] = &particle; 
-	  fPdgCode.push_back(particle.PdgCode());
-	  fStartVx.push_back(particle.Vx(0));
-	  fStartVy.push_back(particle.Vy(0));
-	  fStartVz.push_back(particle.Vz(0));
-	  fStartPx.push_back(particle.Px(0));
-	  fStartPy.push_back(particle.Py(0));
-	  fStartPz.push_back(particle.Pz(0));
-	  fStartE.push_back(particle.E(0));
-	}
-      } // loop over all particles in the event. 
-    } // if neutrino set
 
+      for ( auto const& particle : (*particleHandle) ) {
+	particleMap[particle.TrackId()] = &particle; 
+
+	fProcess.push_back(particle.Process());
+	fProdMaterial.push_back(geom->MaterialName(particle.Position(0).Vect()));
+	fProdVolume.push_back(geom->VolumeName(particle.Position(0).Vect()));
+	fEndMaterial.push_back(geom->MaterialName(particle.EndPosition().Vect()));
+	fEndVolume.push_back(geom->VolumeName(particle.EndPosition().Vect()));
+
+	fTrackID.push_back(particle.TrackId());
+	fPdgCode.push_back(particle.PdgCode());
+	fStartVx.push_back(particle.Vx(0));
+	fStartVy.push_back(particle.Vy(0));
+	fStartVz.push_back(particle.Vz(0));
+	fStartPx.push_back(particle.Px(0));
+	fStartPy.push_back(particle.Py(0));
+	fStartPz.push_back(particle.Pz(0));
+	fStartE.push_back(particle.E(0));
+
+      } // loop over all particles in the event. 
+      
+    } // if neutrino set
+    
     fNuMIEventNtuple->Fill();
-    fPdgCode.clear();
+
+    fProcess.clear();
+    fProdMaterial.clear();
+    fEndMaterial.clear();
+    fProdVolume.clear();
+    fEndVolume.clear();
     fTrackID.clear();
+    fParentID.clear();
+    fPdgCode.clear();
     fStartVx.clear();
     fStartVy.clear();
     fStartVz.clear();

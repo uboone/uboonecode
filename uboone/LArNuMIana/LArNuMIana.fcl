@@ -105,15 +105,15 @@ physics:
       # this name will change either, but the LArSoft reconstruction
       # processs is still evolving; it doesn't hurt to check.
 
-      HitLabel:        "ffthit"
+      #HitLabel:        "ffthit"
 
       # The same for clusters:
 
-      ClusterLabel:    "dbcluster"
+      #ClusterLabel:    "dbcluster"
 
       # In this example, which primary particle(s) we'll focus on in an event.
       # PDG code 13 = mu-.
-      PDGcode:          13
+      #PDGcode:          13
 
     }
   }
