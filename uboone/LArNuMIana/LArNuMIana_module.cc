@@ -60,8 +60,8 @@ namespace LArNuMIana {
     virtual ~LArNuMIana();
     
     void beginJob();
-    void beginSubRun(const art::SubRun& sr);
-    void analyze (const art::Event& evt); 
+    void beginSubRun(const art::SubRun& r);
+    void analyze (const art::Event& evt);
     
   private:
     
@@ -70,6 +70,8 @@ namespace LArNuMIana {
     std::string fHitProducerLabel;       
     std::string fClusterProducerLabel;   
     std::string fPOTModuleLabel;
+
+    TH1D  *fPOT;
 
     TTree *fNuMIEventNtuple;
     int    fEvent;
@@ -99,7 +101,6 @@ namespace LArNuMIana {
     double fLeptonThetaXZ;
     double fLeptonThetaYZ2;
     double fLeptonThetaXZ2;
-    double fPOT;
 
     int    flux_run;
     int    flux_evtno;
@@ -147,6 +148,8 @@ namespace LArNuMIana {
   {
     art::ServiceHandle<art::TFileService> tfs;
 
+    fPOT             = tfs->make<TH1D>("POT",";POT;",10000,0,1e22);
+
     fNuMIEventNtuple = tfs->make<TTree>("LArNuMIanaSimulation","LArNuMIanaSimulation");
 
     fNuMIEventNtuple->Branch("NuPdgCode",     &fNuPdgCode,     "NuPdgCode/I");
@@ -176,7 +179,6 @@ namespace LArNuMIana {
     fNuMIEventNtuple->Branch("Event",         &fEvent,         "Event/I");
     fNuMIEventNtuple->Branch("SubRun",        &fSubRun,        "SubRun/I");
     fNuMIEventNtuple->Branch("Run",           &fRun,           "Run/I");
-    fNuMIEventNtuple->Branch("POT",           &fPOT,           "POT/D");
     fNuMIEventNtuple->Branch("Process",       &fProcess);
     fNuMIEventNtuple->Branch("ProdMaterial",  &fProdMaterial);
     fNuMIEventNtuple->Branch("EndMaterial",   &fEndMaterial);
@@ -207,16 +209,14 @@ namespace LArNuMIana {
 
   }
    
-
-  void LArNuMIana::beginSubRun(const art::SubRun& sr)
+  void LArNuMIana::beginSubRun(const art::SubRun& r)
   {
     art::Handle< sumdata::POTSummary > potListHandle;
-    if ( sr.getByLabel(fPOTModuleLabel,potListHandle) )
-      fPOT = potListHandle->totpot;
+    if ( r.getByLabel(fPOTModuleLabel,potListHandle) )
+      fPOT->Fill(potListHandle->totpot);
     else
-      fPOT = 0.;
+      std::cout << "POT BAD" << std::endl;
   }
-
 
   void LArNuMIana::analyze(const art::Event& event) 
   {
