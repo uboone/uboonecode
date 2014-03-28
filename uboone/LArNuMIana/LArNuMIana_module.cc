@@ -129,6 +129,7 @@ namespace LArNuMIana {
     std::vector<double>      fStartPy;
     std::vector<double>      fStartPz;
     std::vector<double>      fStartE;
+    std::vector<bool>        fInTPC;
 
     art::ServiceHandle<geo::Geometry> fGeometry;      
     double                            fElectronsToGeV;
@@ -194,6 +195,7 @@ namespace LArNuMIana {
     fNuMIEventNtuple->Branch("StartPy",       &fStartPy);
     fNuMIEventNtuple->Branch("StartPz",       &fStartPz);
     fNuMIEventNtuple->Branch("StartE",        &fStartE);
+    fNuMIEventNtuple->Branch("InTPC",         &fInTPC);
 
     fNuMIEventNtuple->Branch("flux_run",     &flux_run,     "flux_run/I");
     fNuMIEventNtuple->Branch("flux_evtno",   &flux_evtno,   "flux_evtno/I");
@@ -293,11 +295,28 @@ namespace LArNuMIana {
 
       art::Handle< std::vector<simb::MCParticle> > particleHandle;
       event.getByLabel(fSimulationProducerLabel, particleHandle);
-      std::map< int, const simb::MCParticle* > particleMap;
+      //      std::map< int, const simb::MCParticle* > particleMap;
+      
+      int n_traj_points;      
+      std::string tpc_string = "TPC";
+      std::string vol_string;
+      bool in_tpc = false;
 
       for ( auto const& particle : (*particleHandle) ) {
-	particleMap[particle.TrackId()] = &particle; 
+	//	particleMap[particle.TrackId()] = &particle; 
 
+	n_traj_points = particle.NumberTrajectoryPoints();
+      
+	in_tpc = false;
+	for ( int ii = 0; ii < n_traj_points; ++ii ) {
+	  vol_string = geom->VolumeName(particle.Position(ii).Vect());
+	  //std::cout << vol_string      << std::endl;
+	  if ( vol_string.find(tpc_string) != std::string::npos )
+	    in_tpc = true;
+	}
+
+	fInTPC.push_back(in_tpc);
+		
 	fProcess.push_back(particle.Process());
 	fProdMaterial.push_back(geom->MaterialName(particle.Position(0).Vect()));
 	fProdVolume.push_back(geom->VolumeName(particle.Position(0).Vect()));
@@ -335,7 +354,7 @@ namespace LArNuMIana {
     fStartPy.clear();
     fStartPz.clear();
     fStartE.clear(); 
-
+    fInTPC.clear();
   }
 
   DEFINE_ART_MODULE(LArNuMIana)
