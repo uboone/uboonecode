@@ -1,0 +1,169 @@
+////////////////////////////////////////////////////////////////////////
+// Class:       GeoLooter
+// Module Type: analyzer
+// File:        GeoLooter_module.cc
+//
+// Generated at Wed Jan 30 14:54:31 2013 by Nathaniel Tagg using artmod
+// from art v1_02_06.
+////////////////////////////////////////////////////////////////////////
+
+// LArSoft includes
+#include "Simulation/SimChannel.h"
+#include "Simulation/LArG4Parameters.h"
+#include "RecoBase/Hit.h"
+#include "RecoBase/Cluster.h"
+#include "Geometry/Geometry.h"
+#include "Geometry/WireGeo.h"
+#include "Geometry/OpDetGeo.h"
+// #include "SimulationBase/MCParticle.h"
+// #include "SimulationBase/MCTruth.h"
+#include "SimpleTypesAndConstants/geo_types.h"
+
+// Framework includes
+#include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Core/FindManyP.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
+#include "fhiclcpp/ParameterSet.h"
+
+#include "JsonElement.h"
+#include <fstream>
+#include <TNtuple.h>
+#include <TFile.h>
+
+namespace mp {
+  class GeoLooter;
+}
+
+class mp::GeoLooter : public art::EDAnalyzer {
+public:
+  explicit GeoLooter(fhicl::ParameterSet const & p);
+  virtual ~GeoLooter();
+
+  void analyze(art::Event const & e) override;
+
+  void beginJob() override;
+  void endJob() override;
+  void reconfigure(fhicl::ParameterSet const & p) override;
+
+private:
+  art::ServiceHandle<geo::Geometry> fGeo;       // pointer to Geometry service
+
+  // Declare member data here.
+
+};
+
+
+mp::GeoLooter::GeoLooter(fhicl::ParameterSet const & p)
+// :
+// Initialize member data here.
+{
+  JsonElement::SetPrettyPrint(true);
+}
+
+mp::GeoLooter::~GeoLooter()
+{
+  // Clean up dynamic memory and other resources here.
+}
+
+using std::endl;
+
+void mp::GeoLooter::analyze(art::Event const & event)
+{
+  
+  // int thisEvent  = event.id().event(); 
+  // int thisRun    = event.run();
+  // int thisSubRun = event.subRun();
+
+  ofstream dump("geodump.json");
+  TFile f("geodump.root","RECREATE");
+  TNtuple nt("geo","geo",
+    "plane:wire:chan:x:y:z:rmax:rmin:halfl:thetaz:view");
+  
+  JsonElement::SetPrettyPrint(false);
+  JsonObject geo;
+  JsonArray wires;
+  JsonArray jops;
+  for(UInt_t icryo = 0;icryo<fGeo->Ncryostats();icryo++) {
+    const geo::CryostatGeo& cryoGeo = fGeo->Cryostat(icryo);
+    unsigned int nOpDet = cryoGeo.NOpDet();
+    for(unsigned int iOpDet = 0; iOpDet < nOpDet; iOpDet++) {
+      unsigned int chan = fGeo->OpDetCryoToOpChannel(iOpDet,icryo);
+      const geo::OpDetGeo& opDetGeo = cryoGeo.OpDet(iOpDet);
+      JsonObject jOpDet;
+      // jOpDet.add("cryo",icryo);
+      jOpDet.add("opdet",iOpDet);
+      jOpDet.add("chan",chan);
+      double xyz[3];
+      opDetGeo.GetCenter(xyz);
+      jOpDet.add("x",xyz[0]);
+      jOpDet.add("y",xyz[1]);
+      jOpDet.add("z",xyz[2]);
+      jops.add(jOpDet);
+    }
+    for(UInt_t itpc = 0; itpc<fGeo->NTPC();itpc++){
+      for(UInt_t iplane = 0; iplane<fGeo->Nplanes(itpc,icryo); iplane++){
+        
+        for(UInt_t iwire = 0; iwire<fGeo->Nwires(iplane,itpc,icryo); iwire++ ) {
+          geo::WireID wid(icryo,itpc,iplane,iwire); 
+          unsigned int ichan = fGeo->PlaneWireToChannel(wid);
+          // dump << ichan << "\t" << iplane << "\t" << iwire << endl;
+          const geo::WireGeo& wiregeo = fGeo->WireIDToWireGeo(wid);
+          JsonObject jwire;
+          jwire.add("Cryostat",icryo);
+          jwire.add("TPC",itpc);
+          jwire.add("Plane",iplane);
+          jwire.add("Wire",iwire);
+          jwire.add("Channel",ichan);
+          JsonArray center;
+          double vec[3];
+          wiregeo.GetCenter(vec);
+          center.add(vec[0]);
+          center.add(vec[1]);
+          center.add(vec[2]);
+          jwire.add("center",center);
+          jwire.add("RMax",wiregeo.RMax());
+          jwire.add("RMin",wiregeo.RMin());
+          jwire.add("HalfL",wiregeo.HalfL());
+          jwire.add("ThetaZ",wiregeo.ThetaZ(true));
+          wires.add(jwire);
+          geo::View_t view = fGeo->View(ichan);
+          nt.Fill(iplane,iwire,ichan,vec[0],vec[1],vec[2],wiregeo.RMax(),wiregeo.RMin(),wiregeo.HalfL(),wiregeo.ThetaZ(),view);
+        }
+        
+        
+        
+      }      
+    }
+  }
+  nt.Write();
+  f.Close();
+  dump << wires.str();
+  
+  ofstream opdump("geo_opdet.json");
+  opdump << jops.str();
+  
+  
+  // Implementation of required member function here.
+}
+
+void mp::GeoLooter::beginJob()
+{
+  // Implementation of optional member function here.
+}
+
+void mp::GeoLooter::endJob()
+{
+  // Implementation of optional member function here.
+}
+
+void mp::GeoLooter::reconfigure(fhicl::ParameterSet const & p)
+{
+  // Implementation of optional member function here.
+}
+
+DEFINE_ART_MODULE(mp::GeoLooter)
