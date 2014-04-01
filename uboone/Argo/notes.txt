@@ -1,0 +1,27 @@
+The idea here is to try to improve Argo by tying directly into the framework.
+
+Problems to solve:  
+1 - Speed!  some events e.g. prodcosmics_3window_uboone_15319002_1_gen_..._reco3D.root can take ~10 minutes to build on the backend.
+
+2 - Associations.  They are hard to parse from within Argo.  I'd prefer something easier to work with
+
+3 - Maintainability. Easier to add new data products.
+
+
+ArgoLinked:
+  - Build the argo executable, but include a call to link in the ART/Larsoft/Uboone libraries.  
+  - Works: the ROOT warnings about unrecognized objects do indeed go away
+  - Doesn't work: there is no speed increase in reading the event. Trial events are not significantly faster.
+  
+exec:
+  - An attempt to build an exetubable of my own from scratch. Runs, but crashes in various places with exceptions; it's difficult to get all the default services and singletons to work
+  
+Looter:
+  - Various experients. ArgoCatalog_service is the best attempt, to try to subvert/use the existing ART framework
+  through a dual use of the file catalog and Service callbacks, along with a sneaky grab of the original InputSource.
+  - Discusssion with ChrisBackhouse indicates that even this might hit problems if I try to load different files...
+  - Loads an event from my test file (prodcosmics) in about 1.3 seconds. Only looking at hit data, but this indicates that some speedup may be possible by using the framework. Or, at least, some speedup may be possible by doing TBranch->GetEntry() instead of TTree->GetEntry in argo!
+  - But... can't seem to fake up the input loop. Hooks in the ArgoCatalog_service don't allow for subversion of both the file and the event-within-the-file selection.  Notably, rootInput->skipEvents() fails with "Random access is not implemented for this type of Input Source"
+  
+ArgoEventProcessor:
+ - An attempt to hack the existing EventProcessor

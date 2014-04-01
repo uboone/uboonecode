@@ -16,6 +16,7 @@ art_make( BASENAME_ONLY
                             art_Framework_IO_Root
                             art_Framework_IO_Root_RootInput_source
                             art_Framework_Services_System_FileCatalogMetadata_service
+                            art_Framework_Services_FileServiceInterfaces
                             art_Utilities ${CETLIB} art_Framework_Art
                             ${SIMULATIONBASE}
                             ${LARRECO_LIB}

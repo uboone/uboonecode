@@ -104,7 +104,7 @@ void Looter::analyze(art::Event const & event)
 
   hitHandle_t hitHandle;
   try {
-    event.getByLabel("ffthit", hitHandle);
+    if(!event.getByLabel("rffhit", hitHandle)) return;
   }
   catch (...){
       return;

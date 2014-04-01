@@ -1,0 +1,42 @@
+//#include "services.fcl"
+//#include "lootermodule.fcl"
+
+process_name: ArgoLooter
+
+services:
+{
+  #Load the service that manages root files for histograms.
+  #TFileService: { fileName: "standard_reco_hist.root" }
+  #Timing:       {}
+  #SimpleMemoryCheck:     { ignoreTotal: 1 }     #default is one
+  #RandomNumberGenerator: {}                     #ART native random number generator
+  #user:         @local::microboone_services
+  #message:      @local::standard_error
+  user: { Pillage: { blah: "blah" } }
+
+}
+
+source:
+{
+  module_type: EmptyEvent
+  maxEvents:   1        # Number of events to create
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
+
+outputs:{}
+
+physics:
+{
+ producers: {}
+ filters:  {} 
+ analyzers:{}
+ ana:  [  ]
+ end_paths:     [ ]
+
+}
+
+
+#physics.analyzers.looter.module_type:              "Looter"
+
+

@@ -1,0 +1,26 @@
+
+services:
+{
+ user: {
+  CatalogInterface:     { service_provider: "ArgoCatalog" }
+ }
+}
+
+source: 
+{
+	maxEvents: -1
+	module_type: RootInput
+	fileNames:  [ "2932" ]
+}
+
+physics:
+{
+# ana:  [ looter ]
+
+# end_paths:     [ ana ]
+}
+
+# define the list of LArSoft modules to run through the simulate path
+
+
+#physics.analyzers.looter.module_type:              "Looter"
