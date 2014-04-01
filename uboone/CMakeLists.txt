@@ -15,7 +15,12 @@ add_subdirectory(EventGenerator)
 add_subdirectory(CalData)
 add_subdirectory(TriggerAlgo)
 add_subdirectory(AnalysisTree)
+add_subdirectory(Calibrations)
+
 add_subdirectory(Argo)
+
+
+
 
 # Respect the order specified in lar_build, which is:
 #
