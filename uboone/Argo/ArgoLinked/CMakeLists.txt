@@ -12,6 +12,7 @@ JsonElement.cpp       RootToJson.cpp        TreeReader.cpp
               LIBRARIES
               ${AE_LIBRARIES}
               # art_Version
+              art_Framework_Core
               art_Framework_IO
               art_Framework_IO_Root
               art_Framework_IO_Root_RootInput_source
@@ -30,7 +31,6 @@ JsonElement.cpp       RootToJson.cpp        TreeReader.cpp
               ${BOOST_SYSTEM}
               RecoBase
               RecoBase_dict
-              RecoBase_map
               Geometry
               Geometry_service
               LArProperties_service
@@ -40,6 +40,44 @@ JsonElement.cpp       RootToJson.cpp        TreeReader.cpp
               png
               )
 
+
+art_make_exec(NAME argoroot
+              SOURCE myroot-main.cc
+ColorMap.cpp          MakePng.cpp           SocketServer.cpp      cencode.cpp
+FormString.cpp        RecordComposer.cpp    Timer.cpp
+FormulaLooter.cpp     ResultComposer.cpp    TreeElementLooter.cpp
+JsonElement.cpp       RootToJson.cpp        TreeReader.cpp
+              ${AE_DEFAULT_ARGS}
+              LIBRARIES
+              ${AE_LIBRARIES}
+              # art_Version
+              art_Framework_Core
+              art_Framework_IO
+              art_Framework_IO_Root
+              art_Framework_IO_Root_RootInput_source
+              art_Framework_Services_System_FileCatalogMetadata_service
+              art_Framework_Services_System_CurrentModule_service
+              art_Framework_Services_Registry
+              art_Framework_Services_FileServiceInterfaces
+              art_Utilities ${CETLIB} art_Framework_Art
+              
+              ${ART_EXEC_ROOT_LIBS}
+              ${MF_MESSAGELOGGER}
+              ${ROOT_BASIC_LIB_LIST}
+              ${ROOT_GEOM}
+              ${ROOT_TREE}
+              ${ROOT_TREEPLAYER}
+              ${BOOST_SYSTEM}
+              RecoBase
+              RecoBase_dict
+              Geometry
+              Geometry_service
+              LArProperties_service
+              DetectorProperties_service
+              Utilities
+              Simulation
+              png
+              )
 
 install_headers()
 install_source()
