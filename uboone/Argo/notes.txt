@@ -22,6 +22,25 @@ Looter:
   - Discusssion with ChrisBackhouse indicates that even this might hit problems if I try to load different files...
   - Loads an event from my test file (prodcosmics) in about 1.3 seconds. Only looking at hit data, but this indicates that some speedup may be possible by using the framework. Or, at least, some speedup may be possible by doing TBranch->GetEntry() instead of TTree->GetEntry in argo!
   - But... can't seem to fake up the input loop. Hooks in the ArgoCatalog_service don't allow for subversion of both the file and the event-within-the-file selection.  Notably, rootInput->skipEvents() fails with "Random access is not implemented for this type of Input Source"
+
+
+ArgoPhoenixLoop
+  - Try to build an executable version that uses all the standard parts, including the standard EventProcessor.
+  But, instead of just running the EventProcessor once and then quitting, create one, run it until the end (one event)
+  then delete it and start another one!
+  - Again, this fails miserably, with:
+    ProductMetaData::create_instance called more than once.
+    The ProductMetaData is the singleton which is the very thing I wanted to circumvent, I think: it remembers which
+    input branches have been read in the last file. Apparently, it's a singleton (!) which of course violates all of 
+    ART's philosophy, and effectively blocks the very thing I've been doing. 
+   
   
 ArgoEventProcessor:
  - An attempt to hack the existing EventProcessor
+
+
+
+It looks like the only way forward is to hack the ProductMetaData class itself to allow for desctruction and re-intialization
+Which can't hapen unless I rebuild ART from the GROUND-FUCKING-UP.
+
+Sigh.
