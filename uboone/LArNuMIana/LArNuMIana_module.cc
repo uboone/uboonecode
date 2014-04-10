@@ -72,6 +72,9 @@ namespace LArNuMIana {
     std::string fPOTModuleLabel;
 
     TH1D  *fPOT;
+    TH1D  *fWorldMass;
+    TH1D  *fTPCMass;
+    TH1D  *fTPCActiveMass;
 
     TTree *fNuMIEventNtuple;
     int    fEvent;
@@ -85,6 +88,7 @@ namespace LArNuMIana {
     double fNuVx;
     double fNuVy;
     double fNuVz;
+    bool   fVertexInTPC;
     double fNuE;
     double fNuPx;
     double fNuPy;
@@ -149,7 +153,10 @@ namespace LArNuMIana {
   {
     art::ServiceHandle<art::TFileService> tfs;
 
-    fPOT             = tfs->make<TH1D>("POT",";POT;",10000,0,1e22);
+    fPOT             = tfs->make<TH1D>("POT",          ";POT;",          10000,0,1e22);
+    fWorldMass       = tfs->make<TH1D>("WorldMass",    ";WorldMass;",    10000,0,1e8);
+    fTPCMass         = tfs->make<TH1D>("TPCMass",      ";TPCMass;",      10000,0,1e7);
+    fTPCActiveMass   = tfs->make<TH1D>("TPCActiveMass",";TPCActiveMass;",10000,0,1e7);
 
     fNuMIEventNtuple = tfs->make<TTree>("LArNuMIanaSimulation","LArNuMIanaSimulation");
 
@@ -160,6 +167,7 @@ namespace LArNuMIana {
     fNuMIEventNtuple->Branch("NuVx",          &fNuVx,          "NuVx/D");
     fNuMIEventNtuple->Branch("NuVy",          &fNuVy,          "NuVy/D");
     fNuMIEventNtuple->Branch("NuVz",          &fNuVz,          "NuVz/D");
+    fNuMIEventNtuple->Branch("VertexInTPC",   &fVertexInTPC,   "VertexInTPC/O");
     fNuMIEventNtuple->Branch("NuE",           &fNuE,           "NuE/D");
     fNuMIEventNtuple->Branch("LeptonPdgCode", &fLeptonPdgCode, "LeptonPdgCode/I");
     fNuMIEventNtuple->Branch("LeptonVx",      &fLeptonVx,      "LeptonVx/D");
@@ -223,7 +231,13 @@ namespace LArNuMIana {
   void LArNuMIana::analyze(const art::Event& event) 
   {
     art::ServiceHandle<geo::Geometry> geom;
-      
+    fWorldMass->Fill(geom->TotalMass("volWorld"));
+    fTPCMass->Fill(geom->TotalMass("volTPC"));
+    fTPCActiveMass->Fill(geom->TotalMass("volTPCActive"));
+
+    std::string vertex_vol;
+    std::string tpc_string1 = "TPC";
+
     art::Handle< std::vector<simb::MCTruth> > mctruthListHandle;
     std::vector< art::Ptr<simb::MCTruth> > mclist;
     if ( event.getByLabel(fGenieGenModuleLabel,mctruthListHandle) )
@@ -241,23 +255,28 @@ namespace LArNuMIana {
       fRun    = event.run();
       fSubRun = event.subRun();
       
+      fVertexInTPC = false;
+      vertex_vol = geom->VolumeName(mctruth->GetNeutrino().Nu().Position(0).Vect());
+      if ( vertex_vol.find(tpc_string1) != std::string::npos )
+	fVertexInTPC = true;
+      
       fNuPdgCode = mctruth->GetNeutrino().Nu().PdgCode();
-      fNuVx      = mctruth->GetNeutrino().Nu().Vx();
-      fNuVy      = mctruth->GetNeutrino().Nu().Vy();
-      fNuVz      = mctruth->GetNeutrino().Nu().Vz();
-      fNuPx      = mctruth->GetNeutrino().Nu().Px();
-      fNuPy      = mctruth->GetNeutrino().Nu().Py();
-      fNuPz      = mctruth->GetNeutrino().Nu().Pz();
+      fNuVx      = mctruth->GetNeutrino().Nu().Vx(0);
+      fNuVy      = mctruth->GetNeutrino().Nu().Vy(0);
+      fNuVz      = mctruth->GetNeutrino().Nu().Vz(0);
+      fNuPx      = mctruth->GetNeutrino().Nu().Px(0);
+      fNuPy      = mctruth->GetNeutrino().Nu().Py(0);
+      fNuPz      = mctruth->GetNeutrino().Nu().Pz(0);
       fNuE       = mctruth->GetNeutrino().Nu().E();
 
       fLeptonPdgCode  = mctruth->GetNeutrino().Lepton().PdgCode();
-      fLeptonPx       = mctruth->GetNeutrino().Lepton().Px();
-      fLeptonPy       = mctruth->GetNeutrino().Lepton().Py();
-      fLeptonPz       = mctruth->GetNeutrino().Lepton().Pz();
+      fLeptonPx       = mctruth->GetNeutrino().Lepton().Px(0);
+      fLeptonPy       = mctruth->GetNeutrino().Lepton().Py(0);
+      fLeptonPz       = mctruth->GetNeutrino().Lepton().Pz(0);
       fLeptonE        = mctruth->GetNeutrino().Lepton().E();
-      fLeptonVx       = mctruth->GetNeutrino().Lepton().Vx();
-      fLeptonVy       = mctruth->GetNeutrino().Lepton().Vy();
-      fLeptonVz       = mctruth->GetNeutrino().Lepton().Vz();
+      fLeptonVx       = mctruth->GetNeutrino().Lepton().Vx(0);
+      fLeptonVy       = mctruth->GetNeutrino().Lepton().Vy(0);
+      fLeptonVz       = mctruth->GetNeutrino().Lepton().Vz(0);
       fLeptonThetaXZ2 = std::atan2(fLeptonPy,fLeptonPz);
       fLeptonThetaYZ2 = std::atan2(fLeptonPx,fLeptonPz);
       fLeptonThetaXZ  = std::atan(fLeptonPy/fLeptonPz);

@@ -84,7 +84,7 @@ outputs:
 
 physics.producers.generator.GlobalTimeOffset: 0.
 physics.producers.generator.RandomTimeOffset: 0.
-physics.producers.generator.TopVolume: "volTPC"
+physics.producers.generator.TopVolume: "volTPCActive"
 
 #physics.producers.generator:                @local::microboone_genie_numi
 #physics.producers.generator.FluxType:       "simple_flux"
