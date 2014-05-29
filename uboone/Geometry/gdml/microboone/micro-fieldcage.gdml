@@ -13,6 +13,19 @@
   deltaphi="360" 
   aunit="deg" 
   lunit="cm"/> 
+
+
+  <box name="TPCFrameA" x="11" y="254" z="1070.19" lunit="cm"/> 
+  <box name="TPCFrameB" x="11.1" y="230.29" z="1036.32" lunit="cm"/>
+  <box name="TPCVertBar" x="9" y="230.29" z="6" lunit="cm"/>
+  <box name="TPCCrossBeam" lunit="cm" x="9" y="309.826" z="7"/>
+
+ 
+ <subtraction name="TPCFrame">
+   <first ref="TPCFrameA"/> <second ref="TPCFrameB"/>
+   <position name="posTPCSubtraction" x="0" y="0" z="0"/>
+ </subtraction> 
+ 
 </solids> 
 <structure> 
  <volume name="volFieldCageTubeTop"> 
@@ -31,4 +44,17 @@
   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/> 
   <solidref ref="FieldCageTubeY"/> 
  </volume> 
+ <volume name="volTPCFrame">
+   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
+   <solidref ref="TPCFrame"/>
+ </volume>
+ <volume name="volTPCCrossBeam">
+   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
+   <solidref ref="TPCCrossBeam"/>
+ </volume>
+ <volume name="volTPCVertBar">
+    <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
+    <solidref ref="TPCVertBar"/>
+ </volume>
+
 </structure>

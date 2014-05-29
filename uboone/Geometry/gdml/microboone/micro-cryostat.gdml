@@ -45,7 +45,7 @@
   <physvol>
    <volumeref ref="volTPC"/>
    <position name="posTPC" unit="cm" x="0.0" y="0.97" z="0"/>
-  </physvol>
+  </physvol> 
   <physvol>
    <volumeref ref="volPMT"/>
    <position name="posPMT0" unit="cm"  x="-147.8"  y="3.21654"  z="-472"/>

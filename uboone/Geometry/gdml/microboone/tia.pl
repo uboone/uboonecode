@@ -93,7 +93,7 @@ my $pmt_switch="on";		#turn on or off depending on pmts wanted
 my $NumberOfTestBoxes=30;
 my $granite_block="off";
 my $enclosureExtras="on";       #turn on or off depending on whether you'd like to generate the external things around the cryostat (ie. insulation, platform, stands, etc.) in the gdml file
-my $vetoWall_switch="off";  #turn on or off a proposed scintillator wall infront of the cryostat
+my $vetoWall_switch="on";  #turn on or off a proposed scintillator wall infront of the cryostat
 
 
 # The routines that create the GDML sub-files. Most of the explanatory
@@ -250,8 +250,6 @@ sub gen_rotations()
    <rotation name="rPlus90AboutXMinus90AboutZ" unit="deg" x="90" y="0"   z="-90"/>
    <rotation name="rPlus90AboutXPlus90AboutY"  unit="deg"  x="90" y="90" z="0"/>
    <rotation name="rPMTRotation1"  unit="deg" x="90"  y="270"   z="0"/>
-   <rotation name="rMinus40AboutX" unit="deg" x="-41.99" y="0" z="0" />
-   <rotation name="rPlus40AboutX" unit="deg" x="41.99" y="0" z="0" />
    <position name="posCenter" unit="mm" x="0" y="0" z="0"/>
 
 </define>
@@ -536,19 +534,6 @@ sub gen_fieldcage() {
   deltaphi="360" 
   aunit="deg" 
   lunit="cm"/> 
-
-
-  <box name="TPCFrameA" x="11" y="254" z="1070.19" lunit="cm"/> 
-  <box name="TPCFrameB" x="11.1" y="230.29" z="1036.32" lunit="cm"/>
-  <box name="TPCVertBar" x="9" y="230.29" z="6" lunit="cm"/>
-  <box name="TPCCrossBeam" lunit="cm" x="9" y="309.826" z="7"/>
-
- 
- <subtraction name="TPCFrame">
-   <first ref="TPCFrameA"/> <second ref="TPCFrameB"/>
-   <position name="posTPCSubtraction" x="0" y="0" z="0"/>
- </subtraction> 
- 
 </solids> 
 EOF
 
@@ -571,19 +556,6 @@ EOF
   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/> 
   <solidref ref="FieldCageTubeY"/> 
  </volume> 
- <volume name="volTPCFrame">
-   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
-   <solidref ref="TPCFrame"/>
- </volume>
- <volume name="volTPCCrossBeam">
-   <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
-   <solidref ref="TPCCrossBeam"/>
- </volume>
- <volume name="volTPCVertBar">
-    <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
-    <solidref ref="TPCVertBar"/>
- </volume>
-
 </structure>
 EOF
 
@@ -724,77 +696,6 @@ EOF
    <volumeref ref="volCathodePlate"/>
    <position name="posCathodePlate" unit="cm" x="$Cathode_X" y="0" z="0"/>
   </physvol>
-  <physvol>
-    <volumeref ref="volTPCFrame"/>
-    <position name="posTPCFrame2" unit="cm" x="-256/2-11/2" y="0" z="0"/>
-  </physvol>
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam" unit="cm" x="-256/2-11/2" y="0" z="0" />
-      <rotationref ref="rMinus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam2" unit="cm" x="-256/2-11/2" y="0" z="207.264" />
-      <rotationref ref="rMinus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam3" unit="cm" x="-256/2-11/2" y="0" z="2*207.264" />
-      <rotationref ref="rMinus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam4" unit="cm" x="-256/2-11/2" y="0" z="-207.264" />
-      <rotationref ref="rMinus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam5" unit="cm" x="-256/2-11/2" y="0" z="-2*207.264" />
-      <rotationref ref="rMinus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam6" unit="cm" x="-256/2-11/2" y="0" z="0" />
-      <rotationref ref="rPlus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam7" unit="cm" x="-256/2-11/2" y="0" z="207.264" />
-      <rotationref ref="rPlus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam8" unit="cm" x="-256/2-11/2" y="0" z="2*207.264" />
-      <rotationref ref="rPlus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam9" unit="cm" x="-256/2-11/2" y="0" z="-2*207.264" />
-      <rotationref ref="rPlus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam10" unit="cm" x="-256/2-11/2" y="0" z="-207.264" />
-      <rotationref ref="rPlus40AboutX"/> 
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar" unit="cm" x="-256/2-11/2" y="0" z="-207.264/2" />
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar1" unit="cm" x="-256/2-11/2" y="0" z="-207.264*3/2" />
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar2" unit="cm" x="-256/2-11/2" y="0" z="207.264/2" />
-   </physvol>  
-  <physvol>
-      <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar3" unit="cm" x="-256/2-11/2" y="0" z="207.264*3/2" />
-   </physvol>  
-
 EOF
 
 
@@ -1461,7 +1362,7 @@ EOF
   <physvol>
    <volumeref ref="volTPC"/>
    <position name="posTPC" unit="cm" x="0.0" y="0.97" z="0"/>
-  </physvol> 
+  </physvol>
 EOF
 
 
@@ -1537,26 +1438,10 @@ sub gen_vetoWall()
   push (@gdmlFiles, $VW); # Add file to list of GDML fragments
   $VW = ">" . $VW;
   open(VW) or die("Could not open file $VW for writing");
-  
-  print VW <<EOF;
-  <?xml version='1.0'?>
-  <gdml>
-    <solids>
-      <box lunit="cm" name="AuxDet0"    x="10"    y="20"    z="2" />
-      <box lunit="cm" name="AuxDet1"    x="10"    y="20"    z="1" />
-  
-  </solids>
-  <structure>
-    <volume name="volAuxDet0">
-      <materialref ref="Polystyrene"/>
-      <solidref ref="AuxDet0"/>
-    </volume>
-    <volume name="volAuxDet1">
-      <materialref ref="Polystyrene"/>
-      <solidref ref="AuxDet1"/>
-    </volume>
-  </structure>
-EOF
+  my $subroutineFile = 'gdml_vetoWall_subroutine_file.gdml';
+  open( FILE, "< $subroutineFile" ) or die "Can't open $subroutineFile : $!";
+  print VW <FILE>;
+  close FILE;
 }
 
 # Parameterize the cryostat's surroundings.
@@ -1589,10 +1474,10 @@ EOF
 #if the extra pieces in the enclosure are desired, put them in the correct places within volEnclosure
   if ( $enclosureExtras eq "on" ) {
     print GDML <<EOF;
-     <physvol>
+      <physvol>
         <volumeref ref="volInsulation"/>
         <position name="posInsulation" unit="cm" x="0" y="0" z="0"/>
-      </physvol> 
+      </physvol>
       <physvol>
         <volumeref ref="volPlatform"/>
         <position name="posPlatform" unit="cm" x="0" y="292.74" z="0"/>
@@ -1621,10 +1506,10 @@ EOF
          <volumeref ref="volStandSubtraction"/>
        <position name="posStand2" unit="cm" x="0" y="-236" z="-335.28"/>
       </physvol>
-     <physvol>
+      <physvol>
        <volumeref ref="volStandConcrete"/>
        <position name="posConcreteStand1" unit="cm" x="0" y="-424" z="335.28"/>
-      </physvol> 
+      </physvol>
       <physvol>
          <volumeref ref="volStandConcrete"/>
        <position name="posConcreteStand2" unit="cm" x="0" y="-424" z="-335.28"/>
@@ -1709,7 +1594,7 @@ EOF
       <physvol>
          <volumeref ref="volPump"/>
          <position name="posPump" unit="cm" x="0" y="-424" z="200"/>
-      </physvol> 
+      </physvol>
 EOF
 }
 
@@ -1752,20 +1637,9 @@ EOF
   }
   
   if ( $vetoWall_switch eq "on" ) {
-    print GDML <<EOF;
-    
-    <physvol>
-    <volumeref ref="volAuxDet0"/>
-    <position name="posAuxDet0" unit="cm" x="0" y="0" z="-800"/>
-    <rotation name="rAuxDet0" unit="deg" x="0" y="0" z="0"/>
-    </physvol>
-    <physvol>
-    <volumeref ref="volAuxDet1"/>
-    <position name="posAuxDet1" unit="cm" x="0" y="0" z="-805"/>
-    <rotation name="rAuxDet1" unit="deg" x="0" y="0" z="0"/>
-    </physvol>
-    
-EOF
+    my $volumePlacementFile = 'gdml_vetoWall_volumePlacement_file.gdml';
+    open VPF, "< $volumePlacementFile" or die "Can't open $volumePlacementFile : $!";
+    print GDML <VPF>;
   }
 
     print GDML <<EOF;
@@ -1797,7 +1671,7 @@ sub gen_world()
     y="$WorldHeight" 
     z="$WorldLength"/>
   <tube name="Ground"
-    rmin="312*2.54"
+    rmin="310*2.54"
     rmax="((50*12)+310)*2.54"
     z="41*12*2.54"
     deltaphi="360" 
@@ -1877,9 +1751,14 @@ sub gen_world()
   <volume name="volWorld" >
     <materialref ref="Air"/> 
     <solidref ref="World"/>
-   <physvol>
+    <physvol>
       <volumeref ref="volConcreteEnclosure"/>
       <position name="posConcreteEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="36*2.54/2" z="0.5*$TPCWirePlaneLength"/>
+      <rotationref ref="rPlus90AboutX"/>
+    </physvol>
+    <physvol>
+      <volumeref ref="volPolystyreneEnclosure"/>
+      <position name="posPolystyreneEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
     </physvol>  
     <physvol>
@@ -1887,16 +1766,11 @@ sub gen_world()
       <position name="posConcreteEnclosureBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-38*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
     </physvol>
-    <physvol>
-      <volumeref ref="volPolystyreneEnclosure"/>
-      <position name="posPolystyreneEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
-      <rotationref ref="rPlus90AboutX"/>
-    </physvol>   
-<!--   <physvol>
+   <physvol>
       <volumeref ref="volPolystyreneEnclosureBottom"/>
       <position name="posPolystyreneEnclosureBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-(38*12 - 36)*2.54/2" z="0.5*$TPCWirePlaneLength"/>
-      <rotationref ref="rPlus90AboutX"/>  
-    </physvol> -->
+      <rotationref ref="rPlus90AboutX"/>
+    </physvol>
     <physvol>
        <volumeref ref="volGround"/>
       <position name="posGround" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
@@ -1906,7 +1780,8 @@ sub gen_world()
        <volumeref ref="volGroundBottom"/>
       <position name="posGroundBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-41*12*2.54/2 -50*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>  
+    </physvol> 
+ 
     <!--physvol>
       <volumeref ref="volOverburden"/>
       <position name="posOverburden" unit="cm" x="0.5*$TPCActiveDepth" y="(41-10)*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
