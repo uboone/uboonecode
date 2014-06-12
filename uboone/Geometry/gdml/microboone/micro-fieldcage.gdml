@@ -12,19 +12,35 @@
   z="238.08-2*(6.35+1.27)"  
   deltaphi="360" 
   aunit="deg" 
-  lunit="cm"/> 
+  lunit="cm"/>
 
-
-  <box name="TPCFrameA" x="11" y="254" z="1070.19" lunit="cm"/> 
-  <box name="TPCFrameB" x="11.1" y="230.29" z="1036.32" lunit="cm"/>
-  <box name="TPCVertBar" x="9" y="230.29" z="6" lunit="cm"/>
-  <box name="TPCCrossBeam" lunit="cm" x="9" y="309.826" z="7"/>
-
+ 
+  <box name="TPCFrameA" x="11" y="254" z="1040" lunit="cm"/> 
+  <box name="TPCFrameB" x="11.1" y="86*2.54" z="1003.52" lunit="cm"/>
+  <box name="TPCVertBar" x="2.5*2.54" y="86*2.54" z="2.5*2.54" lunit="cm"/>
+  <box name="TPCCrossBeam" lunit="cm" x="9" y="301.12" z="7"/>
+  <box name="G10SideBeam" lunit="cm" x="256" y="2" z="5"/>
+  <box name="G10TopBeam" lunit="cm" x="256" y="4*2.54" z="2.54"/>
+  <box name="G10SideCross" lunit="cm" x="10" y="43*2.54" z=".75*2.54"/>
+  <box name="G10TopCrossBeamA" lunit="cm" x="10" y=".75*2.54" z="49.9*2.54"/>
+  <box name="G10TopCrossBeamB" lunit="cm" x="10" y=".75*2.54" z="38*2.54"/>
  
  <subtraction name="TPCFrame">
    <first ref="TPCFrameA"/> <second ref="TPCFrameB"/>
    <position name="posTPCSubtraction" x="0" y="0" z="0"/>
  </subtraction> 
+ 
+ <union name="G10TopCross">
+   <first ref="G10TopCrossBeamA"/> <second ref="G10TopCrossBeamA"/>
+   <rotationref ref="rPlus60AboutY"/>
+   <position name="posG10TopCross" unit="cm" x="0" y="0" z="0"/>
+ </union>
+ <union name="G10TopCrossOuter">
+   <first ref="G10TopCrossBeamB"/> <second ref="G10TopCrossBeamB"/>
+   <rotationref ref="rPlus76AboutY"/>
+   <position name="posG10TopCrossOut" unit="cm" x="0" y="0" z="0"/>
+ </union>
+ 
  
 </solids> 
 <structure> 
@@ -52,9 +68,30 @@
    <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
    <solidref ref="TPCCrossBeam"/>
  </volume>
+ <volume name="volG10SideBeam">
+   <materialref ref="G10"/>
+   <solidref ref="G10SideBeam"/>
+ </volume>
  <volume name="volTPCVertBar">
     <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
     <solidref ref="TPCVertBar"/>
  </volume>
+<volume name="volG10TopBeam">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopBeam"/>
+ </volume>
+ <volume name="volG10SideCross">
+    <materialref ref="G10"/>
+    <solidref ref="G10SideCross"/>
+  </volume>
+ <volume name="volG10TopCross">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopCross"/>
+ </volume>
+ <volume name="volG10TopCrossOuter">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopCrossOuter"/>
+ </volume>
+
 
 </structure>

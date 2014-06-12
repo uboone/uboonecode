@@ -250,8 +250,17 @@ sub gen_rotations()
    <rotation name="rPlus90AboutXMinus90AboutZ" unit="deg" x="90" y="0"   z="-90"/>
    <rotation name="rPlus90AboutXPlus90AboutY"  unit="deg"  x="90" y="90" z="0"/>
    <rotation name="rPMTRotation1"  unit="deg" x="90"  y="270"   z="0"/>
-   <rotation name="rMinus40AboutX" unit="deg" x="-41.99" y="0" z="0" />
-   <rotation name="rPlus40AboutX" unit="deg" x="41.99" y="0" z="0" />
+   <rotation name="rMinus40AboutX" unit="deg" x="-42.58" y="0" z="0" />
+   <rotation name="rPlus40AboutX" unit="deg" x="42.58" y="0" z="0" />
+   <rotation name="rMinus30AboutZ" unit="deg" x="0" y="0" z="-30"/>
+   <rotation name="rMinus30AboutY" unit="deg" x="0" y="-30" z="0"/>
+   <rotation name="rPlus30AboutZ" unit="deg" x="0" y="0" z="30"/>
+   <rotation name="rPlus76AboutY" unit="deg" x="0" y="76.88" z="0"/>
+   <rotation name="rPlus38AboutY" unit="deg" x="0" y="38.44" z="0"/>
+   <rotation name="rPlus28AboutY" unit="deg" x="0" y="28.25" z="0"/>
+   <rotation name="rPlus56AboutY" unit="deg" x="0" y="56.5" z="0"/>
+   <rotation name="rPlus33AboutZ" unit="deg" x="0" y="0" z="33.32"/>
+   <rotation name="rMinus33AboutZ" unit="deg" x="0" y="0" z="-33.32"/>
    <position name="posCenter" unit="mm" x="0" y="0" z="0"/>
 
 </define>
@@ -535,19 +544,35 @@ sub gen_fieldcage() {
   z="$FieldCageLoopHeight-2*($FieldCageCornerRadius+$FieldCageTubeRadius)"  
   deltaphi="360" 
   aunit="deg" 
-  lunit="cm"/> 
+  lunit="cm"/>
 
-
-  <box name="TPCFrameA" x="11" y="254" z="1070.19" lunit="cm"/> 
-  <box name="TPCFrameB" x="11.1" y="230.29" z="1036.32" lunit="cm"/>
-  <box name="TPCVertBar" x="9" y="230.29" z="6" lunit="cm"/>
-  <box name="TPCCrossBeam" lunit="cm" x="9" y="309.826" z="7"/>
-
+ 
+  <box name="TPCFrameA" x="11" y="254" z="1040" lunit="cm"/> 
+  <box name="TPCFrameB" x="11.1" y="86*2.54" z="1003.52" lunit="cm"/>
+  <box name="TPCVertBar" x="2.5*2.54" y="86*2.54" z="2.5*2.54" lunit="cm"/>
+  <box name="TPCCrossBeam" lunit="cm" x="9" y="301.12" z="7"/>
+  <box name="G10SideBeam" lunit="cm" x="256" y="2" z="5"/>
+  <box name="G10TopBeam" lunit="cm" x="256" y="4*2.54" z="2.54"/>
+  <box name="G10SideCross" lunit="cm" x="10" y="43*2.54" z=".75*2.54"/>
+  <box name="G10TopCrossBeamA" lunit="cm" x="10" y=".75*2.54" z="49.9*2.54"/>
+  <box name="G10TopCrossBeamB" lunit="cm" x="10" y=".75*2.54" z="38*2.54"/>
  
  <subtraction name="TPCFrame">
    <first ref="TPCFrameA"/> <second ref="TPCFrameB"/>
    <position name="posTPCSubtraction" x="0" y="0" z="0"/>
  </subtraction> 
+ 
+ <union name="G10TopCross">
+   <first ref="G10TopCrossBeamA"/> <second ref="G10TopCrossBeamA"/>
+   <rotationref ref="rPlus60AboutY"/>
+   <position name="posG10TopCross" unit="cm" x="0" y="0" z="0"/>
+ </union>
+ <union name="G10TopCrossOuter">
+   <first ref="G10TopCrossBeamB"/> <second ref="G10TopCrossBeamB"/>
+   <rotationref ref="rPlus76AboutY"/>
+   <position name="posG10TopCrossOut" unit="cm" x="0" y="0" z="0"/>
+ </union>
+ 
  
 </solids> 
 EOF
@@ -579,10 +604,31 @@ EOF
    <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
    <solidref ref="TPCCrossBeam"/>
  </volume>
+ <volume name="volG10SideBeam">
+   <materialref ref="G10"/>
+   <solidref ref="G10SideBeam"/>
+ </volume>
  <volume name="volTPCVertBar">
     <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
     <solidref ref="TPCVertBar"/>
  </volume>
+<volume name="volG10TopBeam">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopBeam"/>
+ </volume>
+ <volume name="volG10SideCross">
+    <materialref ref="G10"/>
+    <solidref ref="G10SideCross"/>
+  </volume>
+ <volume name="volG10TopCross">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopCross"/>
+ </volume>
+ <volume name="volG10TopCrossOuter">
+    <materialref ref="G10"/>
+    <solidref ref="G10TopCrossOuter"/>
+ </volume>
+
 
 </structure>
 EOF
@@ -735,22 +781,22 @@ EOF
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam2" unit="cm" x="-256/2-11/2" y="0" z="207.264" />
+      <position name="posTPCCrossBeam2" unit="cm" x="-256/2-11/2" y="0" z="200.70" />
       <rotationref ref="rMinus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam3" unit="cm" x="-256/2-11/2" y="0" z="2*207.264" />
+      <position name="posTPCCrossBeam3" unit="cm" x="-256/2-11/2" y="0" z="2*200.70" />
       <rotationref ref="rMinus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam4" unit="cm" x="-256/2-11/2" y="0" z="-207.264" />
+      <position name="posTPCCrossBeam4" unit="cm" x="-256/2-11/2" y="0" z="-200.70" />
       <rotationref ref="rMinus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam5" unit="cm" x="-256/2-11/2" y="0" z="-2*207.264" />
+      <position name="posTPCCrossBeam5" unit="cm" x="-256/2-11/2" y="0" z="-2*200.70" />
       <rotationref ref="rMinus40AboutX"/> 
    </physvol>  
   <physvol>
@@ -760,40 +806,284 @@ EOF
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam7" unit="cm" x="-256/2-11/2" y="0" z="207.264" />
+      <position name="posTPCCrossBeam7" unit="cm" x="-256/2-11/2" y="0" z="200.70" />
       <rotationref ref="rPlus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam8" unit="cm" x="-256/2-11/2" y="0" z="2*207.264" />
+      <position name="posTPCCrossBeam8" unit="cm" x="-256/2-11/2" y="0" z="2*200.70" />
       <rotationref ref="rPlus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam9" unit="cm" x="-256/2-11/2" y="0" z="-2*207.264" />
+      <position name="posTPCCrossBeam9" unit="cm" x="-256/2-11/2" y="0" z="-2*200.70" />
       <rotationref ref="rPlus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCCrossBeam"/>
-      <position name="posTPCCrossBeam10" unit="cm" x="-256/2-11/2" y="0" z="-207.264" />
+      <position name="posTPCCrossBeam10" unit="cm" x="-256/2-11/2" y="0" z="-200.70" />
       <rotationref ref="rPlus40AboutX"/> 
    </physvol>  
   <physvol>
       <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar" unit="cm" x="-256/2-11/2" y="0" z="-207.264/2" />
+      <position name="posTPCVertBar" unit="cm" x="-256/2-11/2" y="0" z="-200.70/2" />
    </physvol>  
   <physvol>
       <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar1" unit="cm" x="-256/2-11/2" y="0" z="-207.264*3/2" />
+      <position name="posTPCVertBar1" unit="cm" x="-256/2-11/2" y="0" z="-200.70*3/2" />
    </physvol>  
   <physvol>
       <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar2" unit="cm" x="-256/2-11/2" y="0" z="207.264/2" />
+      <position name="posTPCVertBar2" unit="cm" x="-256/2-11/2" y="0" z="200.70/2" />
    </physvol>  
   <physvol>
       <volumeref ref="volTPCVertBar"/>
-      <position name="posTPCVertBar3" unit="cm" x="-256/2-11/2" y="0" z="207.264*3/2" />
-   </physvol>  
+      <position name="posTPCVertBar3" unit="cm" x="-256/2-11/2" y="0" z="200.70*3/2" />
+   </physvol> 
+  <physvol>
+      <volumeref ref="volG10SideBeam"/>
+      <position name="posG10SideBeam1" unit="cm" x="0" y="45.63" z="-1050.19/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10SideBeam"/>
+      <position name="posG10SideBeam2" unit="cm" x="0" y="-45.63" z="-1050.19/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10SideBeam"/>
+      <position name="posG10SideBeam3" unit="cm" x="0" y="45.63" z="1050.19/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10SideBeam"/>
+      <position name="posG10SideBeam4" unit="cm" x="0" y="-45.63" z="1050.19/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam" unit="cm" x="0" y="256/2" z="111.64/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam1" unit="cm" x="0" y="256/2" z="-111.64/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam2" unit="cm" x="0" y="256/2" z="111.64*3/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam3" unit="cm" x="0" y="256/2" z="-111.64*3/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam4" unit="cm" x="0" y="256/2" z="111.64*5/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam5" unit="cm" x="0" y="256/2" z="-111.64*5/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam6" unit="cm" x="0" y="256/2" z="111.64*7/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam7" unit="cm" x="0" y="256/2" z="-111.64*7/2"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam8" unit="cm" x="0" y="256/2" z="111.64*7/2 + 75.6"/>
+  </physvol>
+  <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeam9" unit="cm" x="0" y="256/2" z="-111.64*7/2 - 75.6"/>
+  </physvol>
+  
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom" unit="cm" x="0" y="-256/2" z="111.64/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom1" unit="cm" x="0" y="-256/2" z="-111.64/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom2" unit="cm" x="0" y="-256/2" z="111.64*3/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom3" unit="cm" x="0" y="-256/2" z="-111.64*3/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom4" unit="cm" x="0" y="-256/2" z="111.64*5/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom5" unit="cm" x="0" y="-256/2" z="-111.64*5/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom6" unit="cm" x="0" y="-256/2" z="111.64*7/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom7" unit="cm" x="0" y="-256/2" z="-111.64*7/2"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom8" unit="cm" x="0" y="-256/2" z="111.64*7/2 + 75.6"/>
+  </physvol>
+ <physvol>
+      <volumeref ref="volG10TopBeam"/>
+      <position name="posG10TopBeamBottom9" unit="cm" x="0" y="-256/2" z="-111.64*7/2 - 75.6"/>
+  </physvol>
+
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="-256/4" y="0" z="-1050.19/2"/>
+      <rotationref ref="rPlus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="256/4" y="0" z="-1050.19/2"/>
+      <rotationref ref="rPlus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="-256/4" y="0" z="-1050.19/2"/>
+      <rotationref ref="rMinus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="256/4" y="0" z="-1050.19/2"/>
+      <rotationref ref="rMinus33AboutZ"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="-256/4" y="0" z="1050.19/2"/>
+      <rotationref ref="rPlus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="256/4" y="0" z="1050.19/2"/>
+      <rotationref ref="rPlus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="-256/4" y="0" z="1050.19/2"/>
+      <rotationref ref="rMinus33AboutZ"/>
+ </physvol> 
+ <physvol>
+      <volumeref ref="volG10SideCross"/>
+      <position name="posG10SideCross" unit="cm" x="256/4" y="0" z="1050.19/2"/>
+      <rotationref ref="rMinus33AboutZ"/>
+ </physvol>
+ 
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross1" unit="cm" x="64" y="256/2" z="0"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross2" unit="cm" x="-64" y="256/2" z="0"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross3" unit="cm" x="64" y="256/2" z="111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross4" unit="cm" x="-64" y="256/2" z="111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross5" unit="cm" x="64" y="256/2" z="-111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross6" unit="cm" x="-64" y="256/2" z="-111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross1" unit="cm" x="64" y="-256/2" z="0"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross2" unit="cm" x="-64" y="-256/2" z="0"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross3" unit="cm" x="64" y="-256/2" z="111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross4" unit="cm" x="-64" y="-256/2" z="111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross5" unit="cm" x="64" y="-256/2" z="-111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCross"/>
+      <position name="posG10TopCross6" unit="cm" x="-64" y="-256/2" z="-111.64*2"/>
+      <rotationref ref="rPlus30AboutY"/>
+ </physvol>
+
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10TopCrossOuter1" unit="cm" x="-64" y="256/2" z="111.64*7/2 + 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10TopCrossOuter2" unit="cm" x="64" y="256/2" z="111.64*7/2 + 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10TopCrossOuter3" unit="cm" x="-64" y="256/2" z="-111.64*7/2 - 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10TopCrossOuter4" unit="cm" x="64" y="256/2" z="-111.64*7/2 - 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10BottomCrossOuter1" unit="cm" x="-64" y="-256/2" z="111.64*7/2 + 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10BottomCrossOuter2" unit="cm" x="64" y="-256/2" z="111.64*7/2 + 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10BottomCrossOuter3" unit="cm" x="-64" y="-256/2" z="-111.64*7/2 - 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+ <physvol>
+      <volumeref ref="volG10TopCrossOuter"/>
+      <position name="posG10BottomCrossOuter4" unit="cm" x="64" y="-256/2" z="-111.64*7/2 - 75.6/2"/>
+      <rotationref ref="rPlus38AboutY"/>
+ </physvol>
+
+
+
 
 EOF
 
@@ -1445,7 +1735,7 @@ EOF
  <volume name="volCryostat">
   <materialref ref="LAr"/>
   <solidref ref="Cryostat"/>
-  <physvol>
+<!--  <physvol>
    <volumeref ref="volSteelTube"/>
    <position name="posSteelTube" unit="cm" x="0" y="0" z="0"/>
   </physvol>
@@ -1457,7 +1747,7 @@ EOF
     <volumeref ref="volEndCap"/>
     <position name="posEndCap2" unit="cm" x="0" y="0" z="-(427.75*2.54/2 - 2.54*sqrt(144.5^2-75.5^2))"/>
     <rotationref ref="rPlus180AboutY"/>
-  </physvol>
+  </physvol> -->
   <physvol>
    <volumeref ref="volTPC"/>
    <position name="posTPC" unit="cm" x="0.0" y="0.97" z="0"/>
@@ -1589,10 +1879,10 @@ EOF
 #if the extra pieces in the enclosure are desired, put them in the correct places within volEnclosure
   if ( $enclosureExtras eq "on" ) {
     print GDML <<EOF;
-     <physvol>
+<!--     <physvol>
         <volumeref ref="volInsulation"/>
         <position name="posInsulation" unit="cm" x="0" y="0" z="0"/>
-      </physvol> 
+      </physvol>  
       <physvol>
         <volumeref ref="volPlatform"/>
         <position name="posPlatform" unit="cm" x="0" y="292.74" z="0"/>
@@ -1604,7 +1894,7 @@ EOF
       <physvol>
         <volumeref ref="volColumn"/>
         <position name="posColumn2" unit="cm" x="-266" y="-121.261" z="0"/>
-      </physvol>
+      </physvol> -->
       <physvol>
         <volumeref ref="volTankBox1"/>
         <position name="posTank1_1" unit="cm" x="50" y="419" z="-600"/>
@@ -1690,14 +1980,14 @@ EOF
          <volumeref ref="volFloorTankBox1"/>
          <position name="posfloortankbox1_5" unit="cm" x="360+60" y="100+.001-530" z="-335.28-60"/>
       </physvol>
-      <physvol>
+   <!--   <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posExtraPlatform" unit="cm" x="0" y="268" z="0"/>
       </physvol>
       <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posWalkway" unit="cm" x="-212" y="181.74" z="0"/>
-      </physvol>
+      </physvol>  -->
       <physvol>
          <volumeref ref="volFloorTankBox2"/>
          <position name="posfloortankbox2_1" unit="cm" x="-20" y="100+.001-530" z="-500"/>
@@ -1877,7 +2167,7 @@ sub gen_world()
   <volume name="volWorld" >
     <materialref ref="Air"/> 
     <solidref ref="World"/>
-   <physvol>
+<!--   <physvol>
       <volumeref ref="volConcreteEnclosure"/>
       <position name="posConcreteEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="36*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
@@ -1891,13 +2181,13 @@ sub gen_world()
       <volumeref ref="volPolystyreneEnclosure"/>
       <position name="posPolystyreneEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>   
+    </physvol>   -->
 <!--   <physvol>
       <volumeref ref="volPolystyreneEnclosureBottom"/>
       <position name="posPolystyreneEnclosureBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-(38*12 - 36)*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>  
     </physvol> -->
-    <physvol>
+<!--    <physvol>
        <volumeref ref="volGround"/>
       <position name="posGround" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
@@ -1906,7 +2196,7 @@ sub gen_world()
        <volumeref ref="volGroundBottom"/>
       <position name="posGroundBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-41*12*2.54/2 -50*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>  
+    </physvol> --> 
     <!--physvol>
       <volumeref ref="volOverburden"/>
       <position name="posOverburden" unit="cm" x="0.5*$TPCActiveDepth" y="(41-10)*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
@@ -2162,7 +2452,7 @@ sub gen_enclosureExtras()
     <volume name="volRack">
       <materialref ref="Air"/>
       <solidref ref="rackBox"/>
-      <physvol>
+<!--      <physvol>
         <volumeref ref="volRackX"/>
         <position name="posRackX1" unit="cm" x="0" y="($RackY-$RackThickness)/2" z="($RackZ-$RackThickness)/2"/>
       </physvol>
@@ -2209,7 +2499,7 @@ sub gen_enclosureExtras()
       <physvol>
         <volumeref ref="volRackZ"/>
         <position name="posRackZ4" unit="cm" z="0" y="-($RackY-$RackThickness)/2" x="-($RackX-$RackThickness)/2"/>
-      </physvol>  
+      </physvol> --> 
     </volume>
 
   <volume name="volFloorTank1">

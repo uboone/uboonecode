@@ -14,10 +14,10 @@
    <volumeref ref="volCryostat"/>
    <position name="posCryostat" unit="cm" x="0" y="0" z="0"/>
   </physvol>
-     <physvol>
+<!--     <physvol>
         <volumeref ref="volInsulation"/>
         <position name="posInsulation" unit="cm" x="0" y="0" z="0"/>
-      </physvol> 
+      </physvol>  
       <physvol>
         <volumeref ref="volPlatform"/>
         <position name="posPlatform" unit="cm" x="0" y="292.74" z="0"/>
@@ -29,7 +29,7 @@
       <physvol>
         <volumeref ref="volColumn"/>
         <position name="posColumn2" unit="cm" x="-266" y="-121.261" z="0"/>
-      </physvol>
+      </physvol> -->
       <physvol>
         <volumeref ref="volTankBox1"/>
         <position name="posTank1_1" unit="cm" x="50" y="419" z="-600"/>
@@ -115,14 +115,14 @@
          <volumeref ref="volFloorTankBox1"/>
          <position name="posfloortankbox1_5" unit="cm" x="360+60" y="100+.001-530" z="-335.28-60"/>
       </physvol>
-      <physvol>
+   <!--   <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posExtraPlatform" unit="cm" x="0" y="268" z="0"/>
       </physvol>
       <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posWalkway" unit="cm" x="-212" y="181.74" z="0"/>
-      </physvol>
+      </physvol>  -->
       <physvol>
          <volumeref ref="volFloorTankBox2"/>
          <position name="posfloortankbox2_1" unit="cm" x="-20" y="100+.001-530" z="-500"/>
