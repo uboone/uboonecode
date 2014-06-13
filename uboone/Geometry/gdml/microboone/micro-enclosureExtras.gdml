@@ -196,7 +196,7 @@
     <volume name="volRack">
       <materialref ref="Air"/>
       <solidref ref="rackBox"/>
-<!--      <physvol>
+     <physvol>
         <volumeref ref="volRackX"/>
         <position name="posRackX1" unit="cm" x="0" y="(212.7-5.8)/2" z="(60.7-5.8)/2"/>
       </physvol>
@@ -243,7 +243,7 @@
       <physvol>
         <volumeref ref="volRackZ"/>
         <position name="posRackZ4" unit="cm" z="0" y="-(212.7-5.8)/2" x="-(90.5-5.8)/2"/>
-      </physvol> --> 
+      </physvol>  
     </volume>
 
   <volume name="volFloorTank1">

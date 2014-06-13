@@ -1735,7 +1735,7 @@ EOF
  <volume name="volCryostat">
   <materialref ref="LAr"/>
   <solidref ref="Cryostat"/>
-<!--  <physvol>
+<physvol>
    <volumeref ref="volSteelTube"/>
    <position name="posSteelTube" unit="cm" x="0" y="0" z="0"/>
   </physvol>
@@ -1747,7 +1747,7 @@ EOF
     <volumeref ref="volEndCap"/>
     <position name="posEndCap2" unit="cm" x="0" y="0" z="-(427.75*2.54/2 - 2.54*sqrt(144.5^2-75.5^2))"/>
     <rotationref ref="rPlus180AboutY"/>
-  </physvol> -->
+  </physvol> 
   <physvol>
    <volumeref ref="volTPC"/>
    <position name="posTPC" unit="cm" x="0.0" y="0.97" z="0"/>
@@ -1879,7 +1879,7 @@ EOF
 #if the extra pieces in the enclosure are desired, put them in the correct places within volEnclosure
   if ( $enclosureExtras eq "on" ) {
     print GDML <<EOF;
-<!--     <physvol>
+    <physvol>
         <volumeref ref="volInsulation"/>
         <position name="posInsulation" unit="cm" x="0" y="0" z="0"/>
       </physvol>  
@@ -1894,7 +1894,7 @@ EOF
       <physvol>
         <volumeref ref="volColumn"/>
         <position name="posColumn2" unit="cm" x="-266" y="-121.261" z="0"/>
-      </physvol> -->
+      </physvol> 
       <physvol>
         <volumeref ref="volTankBox1"/>
         <position name="posTank1_1" unit="cm" x="50" y="419" z="-600"/>
@@ -1980,14 +1980,14 @@ EOF
          <volumeref ref="volFloorTankBox1"/>
          <position name="posfloortankbox1_5" unit="cm" x="360+60" y="100+.001-530" z="-335.28-60"/>
       </physvol>
-   <!--   <physvol>
+     <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posExtraPlatform" unit="cm" x="0" y="268" z="0"/>
       </physvol>
       <physvol>
         <volumeref ref="volWalkway"/>
         <position name="posWalkway" unit="cm" x="-212" y="181.74" z="0"/>
-      </physvol>  -->
+      </physvol>  
       <physvol>
          <volumeref ref="volFloorTankBox2"/>
          <position name="posfloortankbox2_1" unit="cm" x="-20" y="100+.001-530" z="-500"/>
@@ -2167,7 +2167,7 @@ sub gen_world()
   <volume name="volWorld" >
     <materialref ref="Air"/> 
     <solidref ref="World"/>
-<!--   <physvol>
+   <physvol>
       <volumeref ref="volConcreteEnclosure"/>
       <position name="posConcreteEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="36*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
@@ -2181,13 +2181,13 @@ sub gen_world()
       <volumeref ref="volPolystyreneEnclosure"/>
       <position name="posPolystyreneEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>   -->
+    </physvol>   
 <!--   <physvol>
       <volumeref ref="volPolystyreneEnclosureBottom"/>
       <position name="posPolystyreneEnclosureBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-(38*12 - 36)*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>  
     </physvol> -->
-<!--    <physvol>
+    <physvol>
        <volumeref ref="volGround"/>
       <position name="posGround" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
@@ -2196,7 +2196,7 @@ sub gen_world()
        <volumeref ref="volGroundBottom"/>
       <position name="posGroundBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-41*12*2.54/2 -50*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol> --> 
+    </physvol>  
     <!--physvol>
       <volumeref ref="volOverburden"/>
       <position name="posOverburden" unit="cm" x="0.5*$TPCActiveDepth" y="(41-10)*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
@@ -2452,7 +2452,7 @@ sub gen_enclosureExtras()
     <volume name="volRack">
       <materialref ref="Air"/>
       <solidref ref="rackBox"/>
-<!--      <physvol>
+     <physvol>
         <volumeref ref="volRackX"/>
         <position name="posRackX1" unit="cm" x="0" y="($RackY-$RackThickness)/2" z="($RackZ-$RackThickness)/2"/>
       </physvol>
@@ -2499,7 +2499,7 @@ sub gen_enclosureExtras()
       <physvol>
         <volumeref ref="volRackZ"/>
         <position name="posRackZ4" unit="cm" z="0" y="-($RackY-$RackThickness)/2" x="-($RackX-$RackThickness)/2"/>
-      </physvol> --> 
+      </physvol>  
     </volume>
 
   <volume name="volFloorTank1">
