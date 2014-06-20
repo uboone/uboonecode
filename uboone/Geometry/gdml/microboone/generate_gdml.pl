@@ -719,7 +719,6 @@ sub gen_tpc()
     $TPCActiveHeight = $TPCWirePlaneWidth;   #  
     $TPCActiveLength = $TPCWirePlaneLength-0.2;   # extra subtraction to arrive at TPCActive values in the TDR
 
-if( $cryostat_on ==1){    
     print GDML <<EOF;
 <?xml version='1.0'?>
 <gdml>
@@ -1171,14 +1170,12 @@ EOF
 EOF
 
    close(GDML);
-  }#if cryostat_on 
 }
 
 
 # Generates Ben Jones's PMT micro-pmtdef (with temporary edit to ellipsoid shapes
 sub gen_pmt {
 
-    if( $cryostat_on ==1 ){
     $PMT = "micro-pmtdef" . $suffix . ".gdml";
     push (@gdmlFiles, $PMT); # Add file to list of GDML fragments
     $PMT = ">" . $PMT;
@@ -1217,6 +1214,13 @@ sub gen_pmt {
   deltaphi="360"
   aunit="deg"
   lunit="cm"/>
+
+  <box name="Paddle_PMT"
+  lunit="cm"
+  x="1/8*2.54"
+  y="20*2.54"
+  z="(7+1/3)*2.54"/> 
+
 EOF
 	print PMT <<EOF;
  <tube name="PMT_Lens"
@@ -1249,7 +1253,12 @@ EOF
  <volume name="vol_PMT_Underside">
   <materialref ref="Glass"/>
   <solidref ref="PMT_Underside"/>
- </volume>
+ </volume> 
+ <volume name="volPaddle_PMT">
+   <materialref ref="Acrylic"/>
+   <solidref ref="Paddle_PMT"/>
+  </volume>
+
 EOF
 	print PMT <<EOF;
  <volume name="vol_PMT_Lens">
@@ -1291,7 +1300,6 @@ EOF
  </volume>
 </structure>
 EOF
-  }#if cryostat_on
 }
 
 
@@ -1691,7 +1699,6 @@ EOF
 #Parameterize the steel cryostat that encloses the TPC.
 sub gen_cryostat()
 {
-  if($cryostat_on==1){
 
     # Set up the output file.
     $CRYOSTAT = "micro-cryostat" . $suffix . ".gdml";
@@ -1735,7 +1742,7 @@ EOF
  <volume name="volCryostat">
   <materialref ref="LAr"/>
   <solidref ref="Cryostat"/>
-<physvol>
+<!-- <physvol>
    <volumeref ref="volSteelTube"/>
    <position name="posSteelTube" unit="cm" x="0" y="0" z="0"/>
   </physvol>
@@ -1747,7 +1754,7 @@ EOF
     <volumeref ref="volEndCap"/>
     <position name="posEndCap2" unit="cm" x="0" y="0" z="-(427.75*2.54/2 - 2.54*sqrt(144.5^2-75.5^2))"/>
     <rotationref ref="rPlus180AboutY"/>
-  </physvol> 
+  </physvol> -->
   <physvol>
    <volumeref ref="volTPC"/>
    <position name="posTPC" unit="cm" x="0.0" y="0.97" z="0"/>
@@ -1755,39 +1762,47 @@ EOF
 EOF
 
 
-  @pmt_pos = ( ' x="-147.8"  y="3.21654"  z="-472"',
-               ' x="-147.76" y="-52.6635" z="-420"',
-               ' x="-147.8"  y="59.0965"  z="-420"',
-               ' x="-147.76" y="-52.6635" z="-380"',
-               ' x="-147.8"  y="59.0965"  z="-380"',
-               ' x="-147.8"  y="3.21654"  z="-328"',
-               ' x="-147.8"  y="3.21654"  z="-272"',
-               ' x="-147.76" y="-52.6635" z="-220"',
-               ' x="-147.8"  y="59.0965"  z="-220"',
-               ' x="-147.76" y="-52.6635" z="-180"',
-               ' x="-147.8"  y="59.0965"  z="-180"',
-               ' x="-147.8"  y="3.21654"  z="-128"',
-               ' x="-147.8"  y="3.21654"  z="-72"',
-               ' x="-147.76" y="-52.6635" z="-20"',
-               ' x="-147.8"  y="59.0965"  z="-20"',
-               ' x="-147.76" y="-52.6635" z="20"',
-               ' x="-147.8"  y="59.0965"  z="20"',
-               ' x="-147.8"  y="3.21654"  z="72"',
-               ' x="-147.8"  y="3.21654"  z="128"',
-               ' x="-147.76" y="-52.6635" z="180"',
-               ' x="-147.8"  y="59.0965"  z="180"',
-               ' x="-147.76" y="-52.6635" z="220"',
-               ' x="-147.8"  y="59.0965"  z="220"',
-               ' x="-147.8"  y="3.21654"  z="272"',
-               ' x="-147.8"  y="3.21654"  z="328"',
-               ' x="-147.76" y="-52.6635" z="380"',
-               ' x="-147.8"  y="59.0965"  z="380"',
-               ' x="-147.76" y="-52.6635" z="420"',
-               ' x="-147.8"  y="59.0965"  z="420"',
-               ' x="-147.8"  y="3.21654"  z="472"' );
+
+ @pmt_pos = ( ' x="-141.487" y="55.249" z="108.693 - 424.75*2.54*.5"',
+                ' x="-141.342" y="55.249" z="149.287-424.75*2.54*.5"',
+                ' x="-141.380" y="27.431"  z="72.034 - 424.75*2.54*.5"',
+                ' x="-141.387" y="-0.303" z="194.676 - 424.75*2.54*.5"',
+                ' x="-141.098"  y="-28.576"  z="71.407 - 424.75*2.54*.5"',
+                ' x="-141.183"  y="-56.615"  z="108.802 - 424.75*2.54*.5"',
+                ' x="-141.2239"  y="-56.203"  z="149.112- 424.75*2.54*.5"',
+                ' x="-141.363" y="54.646" z="308.909 - 424.75*2.54*.5"',
+                ' x="-141.132"  y="54.693"  z="349.145 - 424.75*2.54*.5"',
+                ' x="-141.096" y="-0.829" z="262.947 - 424.75*2.54*.5"',
+                ' x="-141.031"  y="-0.706"  z="394.771 - 424.75*2.54*.5"',
+                ' x="-140.953"  y="-56.261"  z="308.572 - 424.75*2.54*.5"',
+                ' x="-140.594"  y="-57.022"  z="349.273 - 424.75*2.54*.5"',
+                ' x="-140.929" y="55.771" z="521.066 - 424.75*2.54*.5"',
+                ' x="-140.819"  y="55.822"  z="561.862 - 424.75*2.54*.5"',
+                ' x="-140.564" y="-0.875" z="474.028 - 424.75*2.54*.5"',
+                ' x="-140.597"  y="-0.549"  z="606.217 - 424.75*2.54*.5"',
+                ' x="-140.540"  y="-56.323"  z="521.153 - 424.75*2.54*.5"',
+                ' x="-140.566"  y="-56.205"  z="561.549 - 424.75*2.54*.5"',
+                ' x="-140.607" y="55.800" z="732.006 - 424.75*2.54*.5"',
+                ' x="-140.486"  y="55.625"  z="772.816 - 424.75*2.54*.5"',
+                ' x="-140.570" y="-0.051" z="685.136 - 424.75*2.54*.5"',
+                ' x="-140.250"  y="-0.502"  z="817.141 - 424.75*2.54*.5"',
+                ' x="-140.558"  y="-56.408"  z="732.207 - 424.75*2.54*.5"',
+                ' x="-140.550"  y="-56.284"  z="772.838 - 424.75*2.54*.5"',
+                ' x="-139.780" y="55.822" z="931.998 - 424.75*2.54*.5"',
+                ' x="-139.587"  y="55.313"  z="972.794 - 424.75*2.54*.5"',
+                ' x="-139.363" y="27.607" z="1010.644 - 424.75*2.54*.5"',
+                ' x="-140.122"  y="-0.722"  z="886.531 - 424.75*2.54*.5"',
+                ' x="-139.400"  y="-28.625"  z="1011.288 - 424.75*2.54*.5"',
+            ' x="-140.004" y="-56.309" z="932.872 - 424.75*2.54*.5"',
+            ' x="-139.721" y="-56.514" z="972.797 - 424.75*2.54*.5"',
+            ' x="-161.341" y="-28.201 + 20/2*2.54" z="287.161 - 424.75*2.54*.5"',
+            ' x="-160.858" y="-27.994 + 20/2*2.54" z="498.501 - 424.75*2.54*.5"',
+            ' x="-160.882" y="-28.100 + 20/2*2.54" z="583.333 - 424.75*2.54*.5"',
+            ' x="-160.654" y="-27.755 + 20/2*2.54" z="794.575 - 424.75*2.54*.5"' );
+
 
   if ( $pmt_switch eq "on" ) {
-    for ( $i=0; $i<30; ++$i ){
+    for ( $i=0; $i<32; ++$i ){
       print CRYOSTAT <<EOF;
   <physvol>
    <volumeref ref="volPMT"/>
@@ -1796,7 +1811,10 @@ EOF
   </physvol>
 EOF
     }
-  }
+
+
+   }
+
 
   if ( $test_switch eq "on" ) {
     for ( $i=0; $i<$NumberOfTestBoxes; ++$i ){
@@ -1810,16 +1828,35 @@ EOF
     }
   }
 	print CRYOSTAT <<EOF;
+	<physvol>
+	  <volumeref ref="volPaddle_PMT"/>
+	  <position name="posPMT32" unit="cm" @pmt_pos[32]/>
+	 </physvol>
+	<physvol>
+	  <volumeref ref="volPaddle_PMT"/>
+	  <position name="posPMT33" unit="cm" @pmt_pos[33]/>
+	 </physvol>
+	<physvol>
+	  <volumeref ref="volPaddle_PMT"/>
+	  <position name="posPMT34" unit="cm" @pmt_pos[34]/>
+	 </physvol>
+	<physvol>
+	  <volumeref ref="volPaddle_PMT"/>
+	  <position name="posPMT35" unit="cm" @pmt_pos[35]/>
+	 </physvol>
+	<physvol>
+	  <volumeref ref="volPaddle_PMT"/>
+	  <position name="posPMT36" unit="cm" @pmt_pos[36]/>
+	 </physvol>
  </volume>
 </structure>
 </gdml>
 EOF
 
    close(CRYOSTAT);
-  } #if cryostat_on
 }
 
-#Generates Tia Miceli's scintillator veto wall
+#Generates TiaMiceli's scintillator veto wall
 sub gen_vetoWall()
 {
   # Set up the output file.
@@ -1882,7 +1919,7 @@ EOF
     <physvol>
         <volumeref ref="volInsulation"/>
         <position name="posInsulation" unit="cm" x="0" y="0" z="0"/>
-      </physvol>  
+      </physvol>   
       <physvol>
         <volumeref ref="volPlatform"/>
         <position name="posPlatform" unit="cm" x="0" y="292.74" z="0"/>
@@ -2181,7 +2218,7 @@ sub gen_world()
       <volumeref ref="volPolystyreneEnclosure"/>
       <position name="posPolystyreneEnclosure" unit="cm" x="0.5*$TPCActiveDepth" y="0" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>   
+    </physvol>    
 <!--   <physvol>
       <volumeref ref="volPolystyreneEnclosureBottom"/>
       <position name="posPolystyreneEnclosureBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-(38*12 - 36)*2.54/2" z="0.5*$TPCWirePlaneLength"/>
@@ -2196,7 +2233,7 @@ sub gen_world()
        <volumeref ref="volGroundBottom"/>
       <position name="posGroundBottom" unit="cm" x="0.5*$TPCActiveDepth" y="-41*12*2.54/2 -50*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
       <rotationref ref="rPlus90AboutX"/>
-    </physvol>  
+    </physvol>   
     <!--physvol>
       <volumeref ref="volOverburden"/>
       <position name="posOverburden" unit="cm" x="0.5*$TPCActiveDepth" y="(41-10)*12*2.54/2" z="0.5*$TPCWirePlaneLength"/>
