@@ -3,11 +3,13 @@ cet_find_library( BOOST_PROGRAM_OPTIONS     NAMES boost_program_options     PATH
 cet_find_library( BOOST_REGEX               NAMES boost_regex     PATHS ENV BOOST_LIB NO_DEFAULT_PATH )
 cet_find_library( FHCIL                     NAMES fhiclcpp     PATHS ENV FHICLCPP_LIB NO_DEFAULT_PATH )
 
+
 # cet_parse_args(AE "LIBRARIES" "" ${ARGN})
 art_make_exec(NAME argophoenix
-              SOURCE argo_phoenix_main.cc
+              SOURCE argo_phoenix_main.cc SocketServer.cpp Timer.cpp
               ${AE_DEFAULT_ARGS}
               LIBRARIES
+              Looter
               ${AE_LIBRARIES}
               # art_Version
               art_Framework_Core              

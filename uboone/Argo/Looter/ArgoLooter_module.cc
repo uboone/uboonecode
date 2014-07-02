@@ -30,11 +30,12 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "JsonElement.h"
+#include "LooterGlobals.h"
 #include <fstream>
+
 
 namespace microboone {
 
-extern std::string gLooterOutput;
 
 class ArgoLooter : public art::EDAnalyzer {
 public:
@@ -66,7 +67,7 @@ private:
 ArgoLooter::ArgoLooter(fhicl::ParameterSet const & p)
   : EDAnalyzer(p)
 {
-  JsonElement::SetPrettyPrint(true);
+  JsonElement::SetPrettyPrint(false);
   reconfigure(p);
 }
 
@@ -155,8 +156,8 @@ void ArgoLooter::analyze(art::Event const & event)
   of << fOutput.str();
   of.close();
   
-  gLooterOutput = fOutput.str();
-  
+  looterOutput() = fOutput.str();
+  std::cout << "Output: " << looterOutput() << std::endl;
   // Loot the wire info.
 
     

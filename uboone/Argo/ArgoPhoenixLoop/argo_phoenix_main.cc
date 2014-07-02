@@ -1,3 +1,8 @@
+///
+/// Notes:
+/// This is the main() function for the new argo backend.
+/// It requires 
+
 #include "art/Framework/Art/artapp.h"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -12,8 +17,7 @@
 #include "art/Framework/Art/BasicOptionsHandler.h"
 #include "art/Framework/Art/BasicPostProcessor.h"
 #include "art/Framework/Art/InitRootHandlers.h"
-// #include "art/Framework/EventProcessor/EventProcessor.h"
-#include "EventProcessor.h"
+#include "art/Framework/EventProcessor/EventProcessor.h"
 #include "art/Framework/Core/RootDictionaryManager.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceRegistry.h"
@@ -33,6 +37,8 @@
 #include "boost/program_options.hpp"
 #include "boost/regex.hpp"
 #include "TError.h"
+#include "TTimeStamp.h"
+#include "TSystem.h"
 
 
 #include <exception>
@@ -42,21 +48,151 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <signal.h>
+
+
+#include "SocketServer.h"
+
+#include "../Looter/LooterGlobals.h"
+
+int run_larsoft(std::string filename,int event,std::string options);
 
 namespace bpo = boost::program_options;
 
-namespace art {
-  int run_phoenix(int argc, char* argv[]);
+class MySocketServer : public SocketServer{
+public:
+  MySocketServer( int port ) : SocketServer(port) {};
+  virtual ~MySocketServer() {};
+  
+  size_t SufficientData( const unsigned char* inData, size_t inSize, size_t inMaxSize) 
+  { 
+    static char options[100];
+    static char filename[990];
+    static char selection[990];
+    Long64_t entrystart;
+    Long64_t entryend;
+    int bytes;
+    int r =  sscanf((char*)inData,"%99[^,\n],%900[^,\n],%900[^,\n],%lld,%lld\n%n",options,filename,selection,&entrystart,&entryend,&bytes);
+    if(r==5) return bytes;
+    return 0;
+  };
+};
 
-  int onePhoenix(fhicl::ParameterSet& main_pset);
-}
+MySocketServer* ss = 0;
+
+int gEventsServed = 0;
+TTime gTimeStart;
+
+// static std::string gLooterOutput = "";
+// extern std::string gLooterOutput;
+
 
 
 
 int main( int argc, char* argv[] ) {
-  return art::run_phoenix(argc,argv);
-}
+  signal(SIGCHLD, SIG_IGN); // Tell system to kill zombie processes immediately, no need to wait()  
+    int tcpPortNumber = 9092;
+    if(argc>1) {
+      sscanf(argv[1],"%d",&tcpPortNumber);
+    }
+    std::cout << argv[0] << " starting up at " <<  TTimeStamp().AsString() << " on port " << tcpPortNumber << std::endl;
+  
+    ss = new MySocketServer(tcpPortNumber);
+    if(ss->Setup()) exit(1);  // Quit if socket won't bind.
 
+    // write a PID file.
+    {
+      std::string pidfilename(argv[0]);
+      pidfilename+=".pid";
+      ofstream pidfile(pidfilename.c_str());
+      pidfile << gSystem->GetPid();
+      pidfile.close();
+    }
+
+    gTimeStart = gSystem->Now();
+    
+    // Do a manual load of libraries before we fork. This will help forking speed, I think.
+    std::cout << "Loading libraries." << std::endl;
+    art::RootDictionaryManager rdm;
+    art::completeRootHandlers();
+    std::cout << "...done" << std::endl;
+    
+    // run_larsoft("/Users/tagg/Argo/server/prod_piminus_0.1-2.0GeV_isotropic_3window_uboone_15314288_17_gen_15314703_17_g4_15342663_17_detsim_tpc_15368710_17_reco2D.root",0,"_NoPreSpill_NoPostSpill_");
+    
+    
+    
+    
+    while (1) {
+      //cout << ".";
+      //cout.flush();
+      ss->CheckForBadClients();
+    
+      unsigned char* dataRecvd;
+      int   client;
+      bool  newClient;
+      ss->Listen(100., // seconds timeout
+                1000, // bytes max
+                dataRecvd, // data recieved in message
+                client,    // fd number of client.
+                newClient  // true if a new client connected.
+                );
+      if(newClient) {
+        std::cout << "New client " << client << std::endl;
+      }
+    
+      if(dataRecvd) {
+        // Try to parse format of FILENAME,GATE\n
+        char options[100];
+        char filename[990];
+        char selection[990];
+        Long64_t entrystart;
+        Long64_t entryend;
+        int r =  sscanf((char*)dataRecvd,"%99[^,\n],%900[^,\n],%900[^,\n],%lld,%lld\n",options,filename,selection,&entrystart,&entryend);
+        if(r==5) {
+          //Successful conversion. Give it a try.
+          std::cout << "Got a valid request at " << TTimeStamp().AsString() << std::endl;
+          std::cout << "    Filename: --" << filename << "--" << std::endl;
+          std::cout << "    Selection:--" << selection << "--" << std::endl;
+          std::cout << "    From:     --" << entrystart << " to " << entryend << std::endl;
+          std::cout << "    Options:  --" << options << std::endl;
+          
+          // fork a process to cope.
+          pid_t pid = fork();
+          if(pid ==0) {
+            // Child process
+            std::cout << "Child process: " << getpid() << std::endl;
+            long t1 = gSystem->Now();
+            // Now do your stuff.
+
+            // FIXME: Correctly use the event file to convert the entrystart and entryend and selection variables into a unique event id.
+
+            // Run Larsoft once.
+            run_larsoft(filename,entrystart,options);            
+            std::cout << "Sending: " << looterOutput() << std::endl;
+
+            looterOutput().append("\n");
+            long t2 = gSystem->Now();
+            // Send it out.
+            ss->SendTo(client, (unsigned char*)looterOutput().c_str(),  looterOutput().length() );
+            std::cout << "Request served." << std::endl;
+            long t3 = gSystem->Now();
+          
+            ss->Close(client);
+            long t4 = gSystem->Now();
+
+            std::cout << "Time to compose: " << t2-t1 << "  Time to Serve: " << t3-t2 << " Total: " << t4-t1 << std::endl;
+            _exit(0);
+          }
+          
+          gEventsServed++;
+        }
+
+      }
+    }
+    delete ss;
+}
+ 
+ 
 // -----------------------------------------------
 namespace {
   struct RootErrorHandlerSentry {
@@ -116,131 +252,64 @@ namespace {
 
 
 
-namespace art{
 
-  int run_phoenix(int argc, char* argv[])
-  {
+int run_larsoft(std::string filename, int event, std::string options)
+{
+  using namespace art;
     //
     // from   // int result = artapp(argc,argv);
     //
-
-    // Configuration file lookup policy.
-    char const * fhicl_env = getenv("FHICL_FILE_PATH");
-    std::string search_path;
-    if (fhicl_env == nullptr) {
-      std::cerr
-        << "Expected environment variable FHICL_FILE_PATH is "
-          << "missing or empty: using \".\"\n";
-      search_path = ".:";
-    }
-    else {
-      search_path = std::string(fhicl_env) + ":";
-    }
+    
+    
+    // Do our own custom FCL file, hardcoded here.
+    std::string myfcl = "\
+      outputs: {}                                                                          \
+      physics: { ana: [ looter ]                                                           \
+                 analyzers: { looter: { module_label: looter                               \
+                                        module_type: ArgoLooter                                \
+                                      }                                                    \
+                            }                                                              \
+                 end_paths: [ ana ]                                                        \
+                 filters: {}                                                               \
+                 producers: {}                                                             \
+               }                                                                           \
+      process_name: ArgoLooter                                                             \
+      services: {                                                                          \
+        message: { destinations: { STDOUT: { categories: { ArtReport: { limit: 100 }       \
+                                                           default:   { limit: -1 }        \
+                                                         }                                 \
+                                             threshold: INFO                               \
+                                             type: cout                                    \
+                                           }                                               \
+                                }                                                          \
+                 }                                                                         \
+       scheduler: { defaultExceptions: false }                                             \
+       user: { CatalogInterface: { service_provider: TrivialFileDelivery }                 \
+               FileTransfer: { service_provider: TrivialFileTransfer }                     \
+             }                                                                             \
+      }                                                                                    \
+      ";
+    
+    std::string search_path = ".:";
     art::FirstAbsoluteOrLookupWithDotPolicy lookupPolicy(search_path);
-    // Empty options_description.
-    bpo::options_description in_desc;
-    // Create and store options handlers.
-    art::OptionsHandlers handlers;
-    handlers.reserve(4); // -ish.
-    // Add new handlers here. Do *not* add a BasicOptionsHandler: it will
-    // be done for you.
-    handlers.emplace_back(new art::BasicSourceOptionsHandler(in_desc));
-    handlers.emplace_back(new art::BasicOutputOptionsHandler(in_desc));
-    handlers.emplace_back(new art::DebugOptionsHandler(in_desc, true));
-    handlers.emplace_back(new art::FileCatalogOptionsHandler(in_desc));
-  
-    // 
-    // from 
-    //   return art::run_art(argc, argv, all_desc, lookupPolicy, std::move(handlers));
-    //
-    std::ostringstream descstr;
-    descstr << "Usage: "
-      << argv[0]
-        << " <-c <config-file>> <other-options> [<source-file>]+\n\n"
-          << "Allowed options";
-    bpo::options_description all_desc(descstr.str());
-    all_desc.add(in_desc);
-    // BasicOptionsHandler should always be first in the list!
-    handlers.emplace(handlers.begin(),
-    new BasicOptionsHandler(all_desc, lookupPolicy));
-    handlers.emplace_back(new BasicPostProcessor);
-    // This must be added separately: how to deal with any non-option arguments.
-    bpo::positional_options_description pd;
-    // A single non-option argument will be taken to be the source data file.
-    pd.add("source", -1);
-    // Parse the command line.
-    bpo::variables_map vm;
-    try {
-      bpo::store(bpo::command_line_parser(argc, argv).options(all_desc).positional(pd).run(),
-      vm);
-      bpo::notify(vm);
-    }
-    catch (bpo::error const & e) {
-      std::cerr << "Exception from command line processing in " << argv[0]
-        << ": " << e.what() << "\n";
-      return 7000;
-    }
-    // Preliminary argument checking.
-    for (auto & handler : handlers) {
-      auto result = handler->checkOptions(vm);
-      if (result != 0) {
-        return result;
-      }
-    }
-    // Processing of arguments and post-processing of config.
+    
     fhicl::intermediate_table raw_config;
-    for (auto & handler : handlers) {
-      auto result = handler->processOptions(vm, raw_config);
-      if (result != 0) {
-        return result;
-      }
-    }
-    //
-    // Make the parameter set from the intermediate table:
-    //
-    // fhicl::ParameterSet main_pset;
-    // try {
-    //   make_ParameterSet(raw_config, main_pset);
-    // }
-    // catch (cet::exception & e) {
-    //   std::cerr << "ERROR: Failed to create a parameter set from parsed configuration with exception "
-    //     << e.what()
-    //       << ".\n";
-    //   std::cerr << "       Intermediate configuration state follows:\n"
-    //     << "------------------------------------"
-    //       << "------------------------------------"
-    //         << "\n";
-    //   for (auto const & item : raw_config) {
-    //     std::cerr << item.first << ": " << item.second.to_string() << "\n";
-    //   }
-    //   std::cerr
-    //     << "------------------------------------"
-    //       << "------------------------------------"
-    //         << "\n";
-    //   return 7003;
-    // }
-    // // Main parameter set must be placed in registry manually.
-    // try {
-    //   fhicl::ParameterSetRegistry::put(main_pset);
-    // }
-    // catch (...) {
-    //   std::cerr << "Uncaught exception while inserting main parameter set into registry.\n";
-    //   throw;
-    // }
-    //   
-    // 
-    // from 
-    //  return run_art_common_(main_pset);
-    //
-  
-  
-    // fhicl::ParameterSet
-    //   services_pset(main_pset.get<fhicl::ParameterSet>("services",
-    // fhicl::ParameterSet()));
-    // fhicl::ParameterSet
-    //   scheduler_pset(services_pset.get<fhicl::ParameterSet>("scheduler",
-    // fhicl::ParameterSet()));
-    //
+    fhicl::parse_document(myfcl, raw_config);
+    
+    // Configure the input source and the event to read.
+    std::vector<std::string> source_list;
+    source_list.push_back(filename);
+    raw_config.put("source.module_type","RootInput");
+    raw_config.put("source.module_label","source");
+    raw_config.put("source.fileNames",source_list);
+    // raw_config.put("source.firstEvent",event);
+    raw_config.put("source.skipEvents",event);
+    raw_config.put("source.maxEvents",1);
+    
+    raw_config.put("physics.analyzers.looter.options",options);
+    
+    
+    
     // Start the messagefacility
     //
     mf::MessageDrop::instance()->jobMode = std::string("analysis");
@@ -249,74 +318,23 @@ namespace art{
     // services_pset.get<fhicl::ParameterSet>("message",
     // fhicl::ParameterSet()));
     mf::LogInfo("MF_INIT_OK") << "Messagelogger initialization complete.";
-    //
-    // Initialize:
-    //   unix signal facility
-    // art::setupSignals(scheduler_pset.get<bool>("enableSigInt", true));
-    // //   init root handlers facility
-    // if (scheduler_pset.get<bool>("unloadRootSigHandler", true)) {
-    //   art::unloadRootSigHandler();
-    // }
-    // RootErrorHandlerSentry re_sentry(scheduler_pset.get<bool>("resetRootErrHandler", true));
-    // Load all dictionaries.
-    art::RootDictionaryManager rdm;
-    art::completeRootHandlers();
-    art::ServiceToken dummyToken;
-    //
+
     // Now create the EventProcessor
     //
-    int rc;
-    while(1) {
+    int rc = 1;
             
-      std::string filename;
-      int event;
-      std::cout << "Filename: ";
-      std::cin >> filename;
-      std::cout << std::endl << "Event: ";
-      std::cin >> event;
-      std::cout << std::endl << "Trying filename " << filename << std::endl;
-      std::vector<std::string> source_list;
-      source_list.push_back(filename);
-      raw_config.put("source.module_type","RootInput");
-      raw_config.put("source.module_label","source");
-      raw_config.put("source.fileNames",source_list);
-      raw_config.put("source.firstEvent",event);
-      raw_config.put("source.maxEvents",1);
-      
-            
-      fhicl::ParameterSet main_pset;
-      make_ParameterSet(raw_config, main_pset);
-      fhicl::ParameterSetRegistry::put(main_pset);
-      
-      std::cout << main_pset.to_indented_string() << "\n";
-
-      rc = onePhoenix(main_pset);
-    }
+          
+    fhicl::ParameterSet main_pset;
+    make_ParameterSet(raw_config, main_pset);
+    fhicl::ParameterSetRegistry::put(main_pset);
     
-    
-    // Make sure the message logger is shut down so our message really is
-    // the last one put out.
-    mf::MessageFacilityService::instance().MFPresence.reset();
-    // End message.
-    std::cout
-      << "Art has completed and will exit with status "
-        << rc
-          << "."
-            << std::endl;
-    return rc;
-  }
+    std::cout << main_pset.to_indented_string() << "\n";
 
-
-
-
-  int onePhoenix(fhicl::ParameterSet& the_pset)
-  {
     EventProcessorWithSentry proc;
-    int rc = -1;
     try {
       std::unique_ptr<art::EventProcessor>
         procP(new
-          art::EventProcessor(the_pset));
+          art::EventProcessor(main_pset));
       EventProcessorWithSentry procTmp(std::move(procP));
       proc = std::move(procTmp);
       proc->beginJob();
@@ -350,10 +368,17 @@ namespace art{
       rc = 8003;
       art::printUnknownException("art"); // , "Thing5", rc);
     }
+
+    // Make sure the message logger is shut down so our message really is
+    // the last one put out.
+    mf::MessageFacilityService::instance().MFPresence.reset();
+    // End message.
+    std::cout
+      << "Art has completed and will exit with status "
+        << rc
+          << "."
+            << std::endl;
     return rc;
-  }
+}
 
-
-
-} // namespace
 

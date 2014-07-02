@@ -48,7 +48,7 @@ only_for_build  cetbuildtools   v3_11_00
 # Make a table by adding columns before "notes". 
 # e5  - with gcc 4.8.1 and -std=c++11
 qualifier	larsoft		postgresql	gcc	notes
-e5:debug	e5:debug	-nq-		-nq-
+e5:debug	e5:debug:noifdh	-nq-		-nq-
 e5:opt		e5:opt		-nq-		-nq-
 e5:prof		e5:prof		-nq-		-nq-
 e5:noifdh:debug	e5:noifdh:debug	-nq-		-nq-

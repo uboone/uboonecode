@@ -2,7 +2,8 @@
 art_make( BASENAME_ONLY
           LIBRARY_NAME  Looter 
           
-          LIB_LIBRARIES     Geometry
+          LIB_LIBRARIES     Looter
+                            Geometry
                             Geometry_service
                       			Simulation
                       			BackTracker_service
@@ -35,20 +36,39 @@ art_make( BASENAME_ONLY
 	                          ${FHICLCPP}
 			                       ${CETLIB}
                              ${ART_EXEC_ROOT_LIBS}
-                             
 			                       ${ROOT_BASIC_LIB_LIST}
                              ${ROOT_TREE}
                              ${ROOT_GEOM}
                              ${ROOT_XMLIO}
                              ${ROOT_GDML}
-            MODULE_LIBRARIES Looter
-            SERVICE_LIBRARIES Looter
- 			                       ${ROOT_BASIC_LIB_LIST}
+            MODULE_LIBRARIES  Looter
+#            SERVICE_LIBRARIES Looter
+# 			                       ${ROOT_BASIC_LIB_LIST}
                               
 
         )
 
-# install_headers()
+# simple_plugin(ArgoLooter "module"
+#                         # Looter
+#                         Geometry_service
+#                         Geometry
+#                         ${SIMULATIONBASE}
+#                         ${ART_FRAMEWORK_CORE}
+#                         ${ART_FRAMEWORK_PRINCIPAL}
+#                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
+#                         ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+#                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+#                         ${ART_PERSISTENCY_COMMON}
+#                         ${ART_PERSISTENCY_PROVENANCE}
+#                         ${ART_UTILITIES}
+#                         ${MF_MESSAGELOGGER}
+#                         ${MF_UTILITIES}
+#                         ${CETLIB}
+#                         ${ROOT_BASIC_LIB_LIST}
+#               BASENAME_ONLY
+# )
+
+install_headers()
 install_fhicl()
 install_source()
-
+install_scripts()
