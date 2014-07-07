@@ -55,7 +55,7 @@
 
 #include "../Looter/LooterGlobals.h"
 
-int run_larsoft(std::string filename,int event,std::string options);
+int run_larsoft(std::string filename,std::string selection,int entrystart,int entryend, int event,std::string options);
 
 namespace bpo = boost::program_options;
 
@@ -167,8 +167,8 @@ int main( int argc, char* argv[] ) {
             // FIXME: Correctly use the event file to convert the entrystart and entryend and selection variables into a unique event id.
 
             // Run Larsoft once.
-            run_larsoft(filename,entrystart,options);            
-            std::cout << "Sending: " << looterOutput() << std::endl;
+            run_larsoft(filename,selection,entrystart,entryend,entrystart,options);            
+            // std::cout << "Sending: " << looterOutput() << std::endl;
 
             looterOutput().append("\n");
             long t2 = gSystem->Now();
@@ -253,7 +253,7 @@ namespace {
 
 
 
-int run_larsoft(std::string filename, int event, std::string options)
+int run_larsoft(std::string filename,std::string selection,int entrystart,int entryend, int entry,std::string options)
 {
   using namespace art;
     //
@@ -303,11 +303,21 @@ int run_larsoft(std::string filename, int event, std::string options)
     raw_config.put("source.module_label","source");
     raw_config.put("source.fileNames",source_list);
     // raw_config.put("source.firstEvent",event);
-    raw_config.put("source.skipEvents",event);
+    raw_config.put("source.skipEvents",entry);
     raw_config.put("source.maxEvents",1);
     
+
+    raw_config.put("physics.analyzers.looter.fileStoragePath","../datacache");
+    raw_config.put("physics.analyzers.looter.fileStorageUrl" ,"datacache");
+
     raw_config.put("physics.analyzers.looter.options",options);
-    
+    raw_config.put("physics.analyzers.looter.selection",selection);
+    raw_config.put("physics.analyzers.looter.entrystart",entrystart);
+    raw_config.put("physics.analyzers.looter.entryend",entryend);
+    raw_config.put("physics.analyzers.looter.entry",entry);
+    raw_config.put("physics.analyzers.looter.events_served",gEventsServed);
+    raw_config.put("physics.analyzers.looter.thisEventTimeStart",(long)gSystem->Now());
+
     
     
     // Start the messagefacility

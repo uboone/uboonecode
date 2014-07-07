@@ -41,6 +41,7 @@ art_make( BASENAME_ONLY
                              ${ROOT_GEOM}
                              ${ROOT_XMLIO}
                              ${ROOT_GDML}
+                             png
             MODULE_LIBRARIES  Looter
 #            SERVICE_LIBRARIES Looter
 # 			                       ${ROOT_BASIC_LIB_LIST}
