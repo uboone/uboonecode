@@ -26,6 +26,7 @@
 #include <set>
 #include <vector>
 #include <sstream>
+#include <algorithm> // std::binary_search()
 
 // ROOT
 #include <TString.h>
@@ -52,7 +53,7 @@ namespace sim
     TLorentzVector _end_vtx;
     TLorentzVector _end_mom;
     std::vector<std::pair<TLorentzVector,TLorentzVector> > _det_path;
-    std::set<unsigned int> _daughters;
+    std::vector<unsigned int> _daughters; // assumed sorted!
     ::simb::Origin_t _origin;
 
     void Reset(){
@@ -72,6 +73,9 @@ namespace sim
       _daughters.clear();
       _det_path.clear();
     }
+    
+    bool HasDaughter(unsigned int id) const
+      { return std::binary_search(_daughters.begin(), _daughters.end(), id); }
 
   };
 

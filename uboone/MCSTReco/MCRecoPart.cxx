@@ -50,9 +50,7 @@ namespace sim {
     
     for(auto const& part : *this) {
 
-      if(part._daughters.find(daughter_id) != part._daughters.end())
-
-	return part._track_id;
+      if(part.HasDaughter(daughter_id)) return part._track_id;
 
     }
     return result;
@@ -90,7 +88,7 @@ namespace sim {
 	auto const old_result = result;
 	for(auto const& p : *this) {
 	  
-	  if(p._daughters.find(result) != p._daughters.end()) {
+	  if(p.HasDaughter(result)) {
 	    result = p._track_id;
 	    break;
 	  }
@@ -125,6 +123,7 @@ namespace sim {
     if(orig_v.size() != mcp_v.size()) throw cet::exception(__FUNCTION__) << "MCParticle and Origin_t vector size not same!";
 
     this->clear();
+    this->reserve(mcp_v.size());
     _track_index.clear();
 
     for(size_t i=0; i < mcp_v.size(); ++i) {
@@ -135,12 +134,17 @@ namespace sim {
 
       _track_index.insert(std::make_pair((size_t)(mcp.TrackId()),(size_t)(this->size())));
 
-      this->push_back(MCMiniPart());
+      this->emplace_back();
 
-      auto& mini_mcp = (*this->rbegin());
+      auto& mini_mcp = this->back();
 
+      mini_mcp._daughters.reserve(mcp.NumberDaughters());
       for(size_t i=0; i<(size_t)(mcp.NumberDaughters()); ++i)
-	mini_mcp._daughters.insert(mcp.Daughter(i));
+        mini_mcp._daughters.push_back(mcp.Daughter(i));
+      // MCMiniPart::_daughters must be sorted;
+      // since simb::MCParticle stores them in a std::set<>,
+      // that is already the case
+    //  mini_mcp._daughters.sort();
 
       mini_mcp._track_id  = mcp.TrackId();
       mini_mcp._pdgcode   = mcp.PdgCode();

@@ -9,6 +9,9 @@
 
 #include "MCShowerRecoAlg.h"
 
+// C/C++ standard libraries
+#include <utility> // std::move()
+
 namespace sim {
 
   //##################################################################
@@ -31,6 +34,9 @@ namespace sim {
 
     fMCShower.clear();
 
+    // backup objects used when the actual particles are invalid
+    MCMiniPart invalid_mother_part, invalid_ancestor_part;
+
     // Get shower info from grouped particles
     const std::vector<unsigned int> shower_index_v = fPartAlg.ShowerMothers();
     fMCShower.reserve(shower_index_v.size());
@@ -47,17 +53,23 @@ namespace sim {
 
 	throw cet::exception(__FUNCTION__) << "LOGIC ERROR: mother/ancestor track ID is invalid!";
 
-      MCMiniPart mother_part;
-      MCMiniPart ancestor_part;
+      MCMiniPart const* mother_part;
+      MCMiniPart const* ancestor_part;
 
       unsigned int mother_index   = part_v.TrackToParticleIndex(mother_track);
       unsigned int ancestor_index = part_v.TrackToParticleIndex(ancestor_track);
 
-      if(mother_index != kINVALID_UINT)   mother_part   = part_v[mother_index];
-      else mother_part._track_id = mother_track;
+      if(mother_index != kINVALID_UINT)   mother_part   = &(part_v[mother_index]);
+      else {
+        invalid_mother_part._track_id = mother_track;
+        mother_part = &invalid_mother_part;
+      }
 
-      if(ancestor_index != kINVALID_UINT) ancestor_part = part_v[ancestor_index];
-      else ancestor_part._track_id = ancestor_track;
+      if(ancestor_index != kINVALID_UINT) ancestor_part = &(part_v[ancestor_index]);
+      else {
+        invalid_ancestor_part._track_id = ancestor_track;
+        ancestor_part = &invalid_ancestor_part;
+      }
 
       auto mcs_index_iter = stored_mcs_index.insert(std::make_pair(shower_index,-1));
 
@@ -96,20 +108,20 @@ namespace sim {
       shower_prof.TrackID ( shower_part._track_id );
       shower_prof.Process ( shower_part._process  );
 
-      shower_prof.MotherPdgCode ( mother_part._pdgcode  );
-      shower_prof.MotherTrackID ( mother_part._track_id );
-      shower_prof.MotherProcess ( mother_part._process  );
+      shower_prof.MotherPdgCode ( mother_part->_pdgcode  );
+      shower_prof.MotherTrackID ( mother_part->_track_id );
+      shower_prof.MotherProcess ( mother_part->_process  );
 
-      shower_prof.AncestorPdgCode ( ancestor_part._pdgcode  );
-      shower_prof.AncestorTrackID ( ancestor_part._track_id );
-      shower_prof.AncestorProcess ( ancestor_part._process  );
+      shower_prof.AncestorPdgCode ( ancestor_part->_pdgcode  );
+      shower_prof.AncestorTrackID ( ancestor_part->_track_id );
+      shower_prof.AncestorProcess ( ancestor_part->_process  );
 
       shower_prof.Start         ( MCStep ( shower_part._start_vtx, shower_part._start_mom ) );
       shower_prof.End           ( MCStep ( shower_part._end_vtx,   shower_part._end_mom   ) );
-      shower_prof.MotherStart   ( MCStep ( mother_part._start_vtx, mother_part._start_mom ) );
-      shower_prof.MotherEnd     ( MCStep ( mother_part._end_vtx,   mother_part._end_mom   ) );
-      shower_prof.AncestorStart ( MCStep ( mother_part._start_vtx, mother_part._start_mom ) );
-      shower_prof.AncestorEnd   ( MCStep ( mother_part._end_vtx,   mother_part._end_mom   ) );
+      shower_prof.MotherStart   ( MCStep ( mother_part->_start_vtx, mother_part->_start_mom ) );
+      shower_prof.MotherEnd     ( MCStep ( mother_part->_end_vtx,   mother_part->_end_mom   ) );
+      shower_prof.AncestorStart ( MCStep ( mother_part->_start_vtx, mother_part->_start_mom ) );
+      shower_prof.AncestorEnd   ( MCStep ( mother_part->_end_vtx,   mother_part->_end_mom   ) );
 
       std::vector<unsigned int> daughter_track_id;
       daughter_track_id.reserve( fPartAlg.ShowerDaughters(shower_index).size() );
@@ -120,7 +132,7 @@ namespace sim {
 
       shower_prof.DaughterTrackID(daughter_track_id);
 
-      fMCShower.push_back(shower_prof);
+      fMCShower.push_back(std::move(shower_prof));
     }
 
     if(fDebugMode)
@@ -146,7 +158,7 @@ namespace sim {
       
     }
 
-    std::map<unsigned int,size_t> edep_index_map     (edep_v.TrackIndexMap());
+    std::map<unsigned int,size_t> const& edep_index_map     (edep_v.TrackIndexMap());
     for(auto track_iter = edep_index_map.begin();
 	track_iter != edep_index_map.end();
 	++track_iter) {
