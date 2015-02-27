@@ -171,14 +171,6 @@ namespace opdet {
     wfs->at(logic_index).SetTimeSlice(clock.Sample());
 
     art::ServiceHandle< opdet::UBOptDetChannelMap > uboptdetmap;
-    if ( uboptdetmap->isLowGainChannel( 1 ) )
-      std::cout << "Test worked. Channel 1 is low gain." << std::endl;
-    else
-      std::cout << "Test failed. Channel 1 registered as high gain." << std::endl;
-    if ( uboptdetmap->isHighGainChannel( 310 ) )
-      std::cout << "Test worked. Channel 310 is high gain." << std::endl;
-    else
-      std::cout << "Test failed. Channel 310 is low gain." << std::endl;
 
     //
     // Read-in data
