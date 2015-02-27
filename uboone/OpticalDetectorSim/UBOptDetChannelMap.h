@@ -73,6 +73,7 @@ namespace opdet {
     int kNDetectors;
     bool kDumpG4OptDetPos;
     bool kWriteMapToTFile;
+    std::string kunits;
     std::vector< G4ThreeVector > kDetPositions;
     std::map< int, int > g4opdet2pmt; //< [ g4, pmtid ]
     std::map< int, int > pmt2g4opdet; //< [ pmtid, g4 ]

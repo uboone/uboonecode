@@ -5,6 +5,7 @@ microboone_optdetchannelmap_service:
     module_type:       "UBOptDetChannelMap"
     dumpG4OptDetPos:   true
     numberOfDetectors: 32
+    units: "cm"
 
     # center of opdet centers used to map opdet channel
     # Group 1: P01-P07
@@ -40,7 +41,7 @@ microboone_optdetchannelmap_service:
     OpDet26: [ 2.27, 55.82, 911.07 ]
     OpDet27: [ 2.46, 55.31, 951.86 ]
     OpDet28: [ 2.68, 27.61, 989.71 ]
-    OpDet29: [ 1.92, -0.72, 865.60
+    OpDet29: [ 1.92, -0.72, 865.60 ]
     OpDet30: [ 2.65, -28.63, 990.36 ]
     OpDet31: [ 2.04, -56.31, 911.94 ]
     OpDet32: [ 2.32, -56.51, 951.86 ]

@@ -24,6 +24,7 @@ namespace opdet {
     
     kNDetectors      = pset.get< int >("numberOfDetectors");
     kDumpG4OptDetPos = pset.get< bool >("dumpG4OptDetPos");
+    kunits           = pset.get< std::string >( "units", "cm" );
 
     // sanity check
     art::ServiceHandle<geo::Geometry> geom;
@@ -37,24 +38,31 @@ namespace opdet {
       
       sprintf(entryname,"OpDet%d",iop+1);
       std::vector< double > inputpos = pset.get< std::vector<double> >( entryname );
-      kDetPositions.push_back( G4ThreeVector( inputpos.at(0), inputpos.at(1), inputpos.at(2) ) );
+      if ( kunits=="cm")
+	kDetPositions.push_back( G4ThreeVector( inputpos.at(0)*cm, inputpos.at(1)*cm, inputpos.at(2)*cm ) );
+      else if (kunits=="mm")
+	kDetPositions.push_back( G4ThreeVector( inputpos.at(0)*mm, inputpos.at(1)*mm, inputpos.at(2)*mm ) );
+      else
+	throw UBOpticalException(Form("Units of detector coordinates invalid. choose either 'cm' or 'mm'."));
       
       sprintf(entryname,"OpDet%d_name",iop+1);
       std::string inputname = pset.get< std::string >( entryname );
-      pmtname2index[ inputname ] = iop;
-      pmtindex2name[ iop ] = inputname;
+      pmtname2index[ inputname ] = iop+1;
+      pmtindex2name[ iop+1 ] = inputname;
       
     }
 
     // read in low gain, high gain ranges
     std::vector< int > lorange_input = pset.get< std::vector<int> >( "ReadoutLowChannelRange" );
     std::vector< int > hirange_input = pset.get< std::vector<int> >( "ReadoutHighChannelRange" );
-    for (int i=0; i++; i+=2 ) {
+    for (int i=0; i<(int)lorange_input.size(); i+=2 ) {
       int lo[2] = { lorange_input.at(i), lorange_input.at(i+1) };
-      int hi[2] = { hirange_input.at(i), hirange_input.at(i+1) };
       std::vector< int > vlo( lo, lo+2 );
-      std::vector< int > vhi( hi, hi+2 );
       lowgain_channel_ranges.push_back( vlo );
+    }
+    for (int i=0; i<(int)hirange_input.size(); i+=2 ) {
+      int hi[2] = { hirange_input.at(i), hirange_input.at(i+1) };
+      std::vector< int > vhi( hi, hi+2 );
       highgain_channel_ranges.push_back( vhi );
     }
 
@@ -63,35 +71,38 @@ namespace opdet {
       char entryname[50];
       sprintf(entryname,"OpDet%d_channels",iop+1);
       std::vector< int > chinput =  pset.get< std::vector<int> >( entryname );
-      pmt2channel[ iop ] = chinput;
+      pmt2channel[ iop+1 ] = chinput;
       for (std::vector<int>::iterator it_ch=chinput.begin(); it_ch!=chinput.end(); it_ch++) {
-	channel2pmt[ *it_ch ] = iop;
+	channel2pmt[ *it_ch ] = iop+1;
       }
     }
 
     // we get the geo service to get access to the G4 OpDets.
     // we want their positions
     int icryo = 0;
-    std::cout << "Matching positions" << std::endl;
     larg4::OpDetLookup* odlookup = larg4::OpDetLookup::Instance();
     for (int iop=0; iop<(int)geom->NOpChannels(); iop++) {
-      //if ( kDumpG4OptDetPos ) {
-      double xyz[3];
-      geom->Cryostat(icryo).OpDet(iop).GetCenter(xyz);
-      char out[1000];
-      sprintf( out, "G4OptDet ID%d: center=(%.2f, %.2f, %.2f)",iop,xyz[0], xyz[1], xyz[2]);
-      //std::cout << Form("G4OptDet ID%d: center=(%.2f, %.2f, %.2f)",iop,xyz[0], xyz[1], xyz[2]) << std::endl;
-      std::cout << out << std::endl;
-      //}
+      if ( kDumpG4OptDetPos ) {
+	double xyz[3];
+	geom->Cryostat(icryo).OpDet(iop).GetCenter(xyz);
+	char out[1000];
+	sprintf( out, "G4OptDet ID%d: center=(%.2f, %.2f, %.2f)",iop+1,xyz[0], xyz[1], xyz[2]);
+	std::cout << out << std::endl;
+      }
       // use listed position 
       G4ThreeVector pos = kDetPositions.at(iop);
       double dist = 0.;
       int closest_cryo = 0;
       int g4opid = odlookup->FindClosestOpDet( pos, dist, closest_cryo);
-      g4opdet2pmt[g4opid] = iop;
-      pmt2g4opdet[iop] = g4opid;
+      g4opdet2pmt[g4opid] = iop+1;
+      pmt2g4opdet[iop+1] = g4opid;
     }
 
+    if ( kDumpG4OptDetPos ) {
+      for (int iop=0; iop<(int)geom->NOpChannels(); iop++) {
+	std::cout << "G4OptDet ID" << iop << " = Physical PMT ID" << PMTIDfromG4OptDet( iop ) << std::endl;
+      }
+    }
   }
 
   // ===============================================================
@@ -164,15 +175,17 @@ namespace opdet {
 
   bool UBOptDetChannelMap::isLowGainChannel( int ich ) {
     for ( std::vector< std::vector<int> >::iterator it=lowgain_channel_ranges.begin(); it!=lowgain_channel_ranges.end(); it++ ) {
-      if ( (*it).at(0)>=ich && ich<=(*it).at(1) )
+      std::cout << "Low gain range: " << (*it).at(0) << ", " << (*it).at(1) << std::endl;
+      if ( (*it).at(0)<=ich && ich<=(*it).at(1) )
 	return true;
     }
     return false;
   }
 
   bool UBOptDetChannelMap::isHighGainChannel( int ich ) {
-    for ( std::vector< std::vector<int> >::iterator it=highgain_channel_ranges.begin(); it!=highgain_channel_ranges.end(); it++ ) {
-      if ( (*it).at(0)>=ich && ich<=(*it).at(1) )
+    for ( std::vector< std::vector<int> >::iterator it=highgain_channel_ranges.begin(); it!=highgain_channel_ranges.end(); it++ ) { 
+      std::cout << "High gain range: " << (*it).at(0) << ", " << (*it).at(1) << std::endl;
+      if ( (*it).at(0)<=ich && ich<=(*it).at(1) )
 	return true;
     }
     return false;
