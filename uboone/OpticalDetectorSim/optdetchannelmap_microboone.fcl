@@ -1,0 +1,135 @@
+BEGIN_PROLOG
+
+microboone_optdetchannelmap_service: 
+{
+    module_type:       "UBOptDetChannelMap"
+    dumpG4OptDetPos:   true
+    numberOfDetectors: 32
+
+    # center of opdet centers used to map opdet channel
+    # Group 1: P01-P07
+    OpDet1:  [ 0.56, 55.25, 87.76 ]
+    OpDet2:  [ 0.70, 55.25, 128.35 ]
+    OpDet3:  [ 0.82, -56.20, 128.18 ]
+    OpDet4:  [ 0.67, 27.43, 51.10 ]
+    OpDet5:  [ 0.95, -28.58, 50.47 ]
+    OpDet6:  [ 0.86, -56.62, 87.87 ]
+    OpDet7:  [ 0.66, -0.30, 173.74 ]
+    # Group 2: 
+    OpDet8:  [ 0.68, 54.65, 287.98 ]
+    OpDet9:  [ 0.91, 54.69, 328.21 ]
+    OpDet10: [ 0.95, -0.83, 242.01 ]
+    OpDet11: [ 1.01, -0.71, 373.84 ]
+    OpDet12: [ 1.09, -56.26, 287.64 ]
+    OpDet13: [ 1.45, -57.02, 328.34 ]
+    # Group 3
+    OpDet14: [ 1.12, 55.77, 500.13 ]
+    OpDet15: [ 1.23, 55.82, 540.93 ]
+    OpDet16: [ 1.48, -0.88, 453.10 ]
+    OpDet17: [ 1.45, -0.55, 585.28 ]
+    OpDet18: [ 1.51, -56.32, 500.22 ]
+    OpDet19: [ 1.48, -56.20, 540.62 ]
+    # Gorup 4
+    OpDet20: [ 1.44, 55.80, 711.07 ]
+    OpDet21: [ 1.56, 55.62, 751.88 ]
+    OpDet22: [ 1.48, -0.05, 664.20 ]
+    OpDet23: [ 1.80, -0.50, 796.21 ]
+    OpDet24: [ 1.49, -56.41, 711.27 ]
+    OpDet25: [ 1.50, -56.28, 751.91 ]
+    # Group 5
+    OpDet26: [ 2.27, 55.82, 911.07 ]
+    OpDet27: [ 2.46, 55.31, 951.86 ]
+    OpDet28: [ 2.68, 27.61, 989.71 ]
+    OpDet29: [ 1.92, -0.72, 865.60
+    OpDet30: [ 2.65, -28.63, 990.36 ]
+    OpDet31: [ 2.04, -56.31, 911.94 ]
+    OpDet32: [ 2.32, -56.51, 951.86 ]
+    # Paddles
+    OpDet33: [ 1.0, -25.0, 265.0 ] # L01
+    OpDet34: [ 1.0, -25.0, 475.0 ]
+    OpDet35: [ 1.0, -25.0, 565.0 ]
+    OpDet36: [ 1.0, -25.0, 775.0 ]
+
+    # name of optdet
+    OpDet1_name:  "P01"
+    OpDet2_name:  "P02"
+    OpDet3_name:  "P03"
+    OpDet4_name:  "P04"
+    OpDet5_name:  "P05"
+    OpDet6_name:  "P06"
+    OpDet7_name:  "P07"
+    OpDet8_name:  "P08"
+    OpDet9_name:  "P09"
+    OpDet10_name: "P10"
+    OpDet11_name: "P11"
+    OpDet12_name: "P12"
+    OpDet13_name: "P13"
+    OpDet14_name: "P14"
+    OpDet15_name: "P15"
+    OpDet16_name: "P16"
+    OpDet17_name: "P17"
+    OpDet18_name: "P18"
+    OpDet19_name: "P19"
+    OpDet20_name: "P20"
+    OpDet21_name: "P21"
+    OpDet22_name: "P22"
+    OpDet23_name: "P23"
+    OpDet24_name: "P24"
+    OpDet25_name: "P25"
+    OpDet26_name: "P26"
+    OpDet27_name: "P27"
+    OpDet28_name: "P28"
+    OpDet29_name: "P29"
+    OpDet30_name: "P30"
+    OpDet31_name: "P31"
+    OpDet32_name: "P32"
+    OpDet33_name: "L01"
+    OpDet34_name: "L02"
+    OpDet35_name: "L03"
+    OpDet36_name: "L04"
+
+    ReadoutLowChannelRange:  [0,199]
+    ReadoutHighChannelRange: [200,399]
+
+    # ADC/FEM channel number
+    # Low 1, Low 2, High 1, High 2
+    OpDet1_channels:  [ 0, 100, 200, 300 ]
+    OpDet2_channels:  [ 1, 101, 201, 301 ]
+    OpDet3_channels:  [ 2, 102, 202, 302 ]
+    OpDet4_channels:  [ 3, 103, 203, 303 ]
+    OpDet5_channels:  [ 4, 104, 204, 304 ]
+    OpDet6_channels:  [ 5, 105, 205, 305 ]
+    OpDet7_channels:  [ 6, 106, 206, 306 ]
+    OpDet8_channels:  [ 7, 107, 207, 307 ]
+    OpDet9_channels:  [ 8, 108, 208, 308 ]
+    OpDet10_channels: [ 9, 109, 209, 309 ]
+    OpDet11_channels: [10, 110, 210, 310 ]
+    OpDet12_channels: [11, 111, 211, 311 ]
+    OpDet13_channels: [12, 112, 212, 312 ]
+    OpDet14_channels: [13, 113, 213, 313 ]
+    OpDet15_channels: [14, 114, 214, 314 ]
+    OpDet16_channels: [15, 115, 215, 315 ]
+    OpDet17_channels: [16, 116, 216, 316 ]
+    OpDet18_channels: [17, 117, 217, 317 ]
+    OpDet19_channels: [18, 118, 218, 318 ]
+    OpDet20_channels: [19, 119, 219, 319 ]
+    OpDet21_channels: [20, 120, 220, 320 ]
+    OpDet22_channels: [21, 121, 221, 321 ]
+    OpDet23_channels: [22, 122, 222, 322 ]
+    OpDet24_channels: [23, 123, 223, 323 ]
+    OpDet25_channels: [24, 124, 224, 324 ]
+    OpDet26_channels: [25, 125, 225, 325 ]
+    OpDet27_channels: [26, 126, 226, 326 ]
+    OpDet28_channels: [27, 127, 227, 327 ]
+    OpDet29_channels: [28, 128, 228, 328 ]
+    OpDet30_channels: [29, 129, 229, 329 ]
+    OpDet31_channels: [30, 130, 230, 330 ]
+    OpDet32_channels: [31, 131, 231, 331 ]
+    OpDet33_channels: [32, 132, 232, 332 ]
+    OpDet34_channels: [33, 133, 233, 333 ]
+    OpDet35_channels: [34, 134, 234, 334 ] 
+    OpDet36_channels: [35, 135, 235, 335 ]
+
+}
+
+END_PROLOG

@@ -1,4 +1,7 @@
+include_directories ( $ENV{GEANT4_FQ_DIR}/include )
+
 art_make( EXCLUDE UBOpticalChConfig_service.cc
+	  	  UBOptDetChannelMap_service.cc
 	  #NO_PLUGINS
 	  BASENAME_ONLY
 	  LIBRARY_NAME  uboonecode_uboone_OpticalDetectorSim
@@ -25,9 +28,10 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc
           MODULE_LIBRARIES Simulation
 			OpticalDetectorData
 			UBOpticalChConfig_service
+			UBOptDetChannelMap_service
 			uboonecode_uboone_OpticalDetectorSim
 			TimeService_service
-			Utilities
+			Utilities			
                         ${SIMULATIONBASE}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -49,6 +53,19 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc
 simple_plugin(UBOpticalChConfig "service"
 	      Geometry_service
 	      Geometry
+	      ${ART_UTILITIES}
+	      ${MF_MESSAGELOGGER}
+	      ${MF_UTILITIES}
+	      ${FHICLCPP}
+	      ${CETLIB}
+	      ${ROOT_BASIC_LIB_LIST}
+              BASENAME_ONLY
+)
+
+simple_plugin(UBOptDetChannelMap "service"
+	      Geometry_service
+	      Geometry
+	      LArG4	      
 	      ${ART_UTILITIES}
 	      ${MF_MESSAGELOGGER}
 	      ${MF_UTILITIES}

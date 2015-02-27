@@ -33,12 +33,15 @@
 /// LArSoft
 #include "UBOpticalADC.h"
 #include "UBLogicPulseADC.h"
+#include "UBOptDetChannelMap.h"
 #include "OpticalDetectorData/ChannelDataGroup.h"
 #include "Simulation/SimPhotons.h"
 #include "Geometry/Geometry.h"
 
 /// nutools
 #include "Simulation/BeamGateInfo.h"
+
+#include <iostream>
 
 namespace opdet {
   /**
@@ -167,6 +170,12 @@ namespace opdet {
     wfs->at(logic_index).SetFrame(clock.Frame());
     wfs->at(logic_index).SetTimeSlice(clock.Sample());
 
+    std::cout << "Loading Channel Map." << std::endl;
+    art::ServiceHandle< opdet::UBOptDetChannelMap > uboptdetmap;
+    int channel = 0;
+    if ( uboptdetmap->isLowGainChannel( channel ) )
+      std::cout << "Test worked." << std::endl;
+
     //
     // Read-in data
     //
@@ -198,6 +207,7 @@ namespace opdet {
     //
     // Loop over channels, process photons, & store waveform 
     //
+
     for(size_t ch=0; ch<geom->NOpChannels(); ++ch) {
       
       wfs->at(hg_index).push_back(optdata::ChannelData(ch));
