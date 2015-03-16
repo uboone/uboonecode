@@ -194,9 +194,7 @@ namespace opdet {
 	
 	if(store){
 	  
-	  wf_array->push_back(optdata::OpticalRawDigit(fifo_ptr->Category(),
-						       fifo_ptr->TimeSlice(),
-						       fifo_ptr->Frame(),
+	  wf_array->push_back(optdata::OpticalRawDigit(fifo_ptr->TimeSlice(),
 						       fifo_ptr->ChannelNumber(),
 						       fifo_ptr->size()
 						       )
