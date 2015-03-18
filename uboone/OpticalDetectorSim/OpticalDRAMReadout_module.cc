@@ -84,7 +84,7 @@ namespace opdet {
   OpticalDRAMReadout::OpticalDRAMReadout(fhicl::ParameterSet const& parameterSet)
   {
     // Describe the data products we can write.
-    produces< std::vector< optdata::OpticalRawDigit > >();
+    produces< std::vector< optdata::FIFOChannel > >();
 
     // Read in the parameters from the .fcl file.
     this->reconfigure(parameterSet);
@@ -116,7 +116,7 @@ namespace opdet {
     ts->preProcessEvent(event);
     ::util::ElecClock clock = ts->OpticalClock();
 
-    std::unique_ptr< std::vector<optdata::OpticalRawDigit> > wf_array( new std::vector<optdata::OpticalRawDigit> );
+    std::unique_ptr< std::vector<optdata::FIFOChannel> > wf_array( new std::vector<optdata::FIFOChannel> );
 
     // Check if trigger data product exists or not. If not, throw a warning
     art::Handle< std::vector<raw::Trigger> > trig_array;
@@ -194,7 +194,9 @@ namespace opdet {
 	
 	if(store){
 	  
-	  wf_array->push_back(optdata::OpticalRawDigit(fifo_ptr->TimeSlice(),
+	  wf_array->push_back(optdata::FIFOChannel(    fifo_ptr->Category(),
+						       fifo_ptr->TimeSlice(),
+						       fifo_ptr->Frame(),
 						       fifo_ptr->ChannelNumber(),
 						       fifo_ptr->size()
 						       )
