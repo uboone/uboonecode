@@ -21,6 +21,7 @@ add_subdirectory(OpticalDetectorSim)
 add_subdirectory(SpaceCharge)
 #add_subdirectory(DataScanner)
 #add_subdirectory(LiteMaker)
+add_subdirectory(EventWeight)
 
 # Respect the order specified in lar_build, which is:
 #
