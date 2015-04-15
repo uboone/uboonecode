@@ -57,7 +57,7 @@ namespace evwgh {
      public:
        %(funcname)sWeightCalc();
        void Configure(fhicl::ParameterSet const& p);
-       std::vector<double> GetWeight(art::Event & e);
+       std::vector<std::vector<double> > GetWeight(art::Event & e);
      private:
        CLHEP::RandGaussQ *fGaussRandom;
        
@@ -80,7 +80,7 @@ namespace evwgh {
   std::vector<double> %(funcname)sWeightCalc::GetWeight(art::Event & e)
   {
     //calculate weight(s) here 
-    std::vector<double> weight;
+    std::vector<std::vector<double> > weight;
     return weight;
   }
   REGISTER_WEIGHTCALC(%(funcname)sWeightCalc)
