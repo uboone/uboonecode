@@ -77,7 +77,7 @@ namespace evwgh {
     fGaussRandom = new CLHEP::RandGaussQ(rng->getEngine(GetName()));    
   }
 
-  std::vector<double> %(funcname)sWeightCalc::GetWeight(art::Event & e)
+  std::vector<std::vector<double> > %(funcname)sWeightCalc::GetWeight(art::Event & e)
   {
     //calculate weight(s) here 
     std::vector<std::vector<double> > weight;
