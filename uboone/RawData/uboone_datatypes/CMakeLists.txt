@@ -23,6 +23,7 @@ windowHeaderPMT.cpp
 eventRecord.cpp
 beamData.cpp
 beamHeader.cpp
+MuCSData.cpp
 )
 
 include_directories ( $ENV{WINDRIVER_INC} )
@@ -48,6 +49,7 @@ set_source_files_properties(cardDataPMT.cpp PROPERTIES COMPILE_FLAGS "-Wno-unuse
 set_source_files_properties(windowHeaderPMT.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-function -Wno-sign-compare -Wno-unused-parameter -Wno-format -Wno-format-y2k -Wno-unused-but-set-variable -Wno-return-type")
 set_source_files_properties(triggerHeader.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-function -Wno-sign-compare -Wno-unused-parameter -Wno-format -Wno-format-y2k -Wno-unused-but-set-variable -Wno-return-type")
 set_source_files_properties(triggerData.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-function -Wno-sign-compare -Wno-unused-parameter -Wno-format -Wno-format-y2k -Wno-unused-but-set-variable -Wno-return-type")
+set_source_files_properties(MuCSData.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-function -Wno-sign-compare -Wno-unused-parameter -Wno-format -Wno-format-y2k -Wno-unused-but-set-variable -Wno-return-type")
 
 set_source_files_properties(eventRecord.cpp PROPERTIES COMPILE_FLAGS "-Wno-unused-variable -Wno-deprecated-declarations -Wno-unused-function -Wno-sign-compare -Wno-unused-parameter -Wno-format -Wno-format-y2k -Wno-unused-but-set-variable -Wno-return-type")
 
