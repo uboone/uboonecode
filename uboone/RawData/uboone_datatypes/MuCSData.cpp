@@ -1,9 +1,10 @@
 
 ////////////////////////////////////////////////////////////////////////
-// 
-// Definition of basic digits for auxiliary detectors
 //
-// brebel@fnal.gov
+//    trivia : Class to hold the Muon Counter System (MuCS) data, 
+//             a.k.a. the best class there's ever been, May 2015 
+//    author : Odysseas Kanenas
+//    e-mail : kalousis@vt.edu
 //
 ////////////////////////////////////////////////////////////////////////
 

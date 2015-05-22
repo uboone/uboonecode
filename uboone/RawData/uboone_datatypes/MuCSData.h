@@ -1,8 +1,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//    trivia : Class to hold the Muon Counter System (MuCS), May 2015
-//             a.k.a. the best class there's ever been !
+//    trivia : Class to hold the Muon Counter System (MuCS) data, 
+//             a.k.a. the best class there's ever been, May 2015 
 //    author : Odysseas Kanenas
 //    e-mail : kalousis@vt.edu
 //
