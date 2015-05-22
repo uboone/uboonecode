@@ -1,0 +1,10 @@
+
+BEGIN_PROLOG
+
+standard_mucsmerger:
+{
+  module_type:            "MuCSMerger"
+
+}
+
+END_PROLOG
