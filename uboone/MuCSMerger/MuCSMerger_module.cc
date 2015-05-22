@@ -68,7 +68,7 @@ void MuCSMerger::produce( art::Event &evt )
   
   std::vector< short > fADC; fADC.clear(); fADC.push_back( 6 );
     
-  unsigned short fChannel = 1;
+  unsigned short fChannel = 9;
   
   std::string  fAuxDetName = "MUCS";
   
