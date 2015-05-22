@@ -20,7 +20,8 @@ add_subdirectory(Calibrations)
 add_subdirectory(OpticalDetectorSim)
 add_subdirectory(SpaceCharge)
 #add_subdirectory(DataScanner)
-#add_subdirectory(LiteMaker)
+#add_subdirectory(LiteMaker
+add_subdirectory(MuCSMerger)
 
 # Respect the order specified in lar_build, which is:
 #
