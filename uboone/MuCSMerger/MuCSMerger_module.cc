@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////
 // Class:       MuCSMerger
 // Module Type: producer
@@ -32,8 +33,10 @@
 #include <memory>
 #include <iostream>
 #include "RawData/AuxDetDigit.h"
+#include "uboone/RawData/uboone_datatypes/MuCSData.h"
 
 using namespace std;
+// using namespace gov::fnal::uboone::datatypes;
 
 class MuCSMerger;
 
@@ -53,8 +56,8 @@ MuCSMerger::MuCSMerger( fhicl::ParameterSet const &pset )
 // :
 // Initialize member data here.
 {
-  produces< std::vector<raw::AuxDetDigit> >();  
-      
+  produces< std::vector<gov::fnal::uboone::datatypes::MuCSData> >();  
+  
 }
 
 MuCSMerger::~MuCSMerger()
@@ -63,28 +66,22 @@ MuCSMerger::~MuCSMerger()
 void MuCSMerger::produce( art::Event &evt )
 {
   cout << " ( 2 ) ----> " << endl; // getchar();
+  
+  std::unique_ptr< std::vector<gov::fnal::uboone::datatypes::MuCSData> > mucsdatacol(new std::vector<gov::fnal::uboone::datatypes::MuCSData>);
     
-  std::unique_ptr< std::vector<raw::AuxDetDigit> > mucsdatacol( new std::vector<raw::AuxDetDigit> );
+  Int_t fadc = 0;
   
-  std::vector< short > fADC; fADC.clear(); fADC.push_back( 6 );
-    
-  unsigned short fChannel = 9;
-  
-  std::string  fAuxDetName = "MUCS";
-  
-  unsigned long long fTimeStamp = 1000;
-  
-  raw::AuxDetDigit mucsevt( fChannel, fADC, fAuxDetName, fTimeStamp ); 
+  gov::fnal::uboone::datatypes::MuCSData mucsevt( fadc ); 
     
   mucsdatacol->push_back( mucsevt );
-  
+
   evt.put( std::move( mucsdatacol ) );
   
   return;
   
 }
 
-DEFINE_ART_MODULE(MuCSMerger)
+DEFINE_ART_MODULE( MuCSMerger )
 
 #endif
 

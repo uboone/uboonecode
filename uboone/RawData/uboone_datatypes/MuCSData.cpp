@@ -10,10 +10,33 @@
 
 #include "MuCSData.h"
 
-using namespace gov::fnal::uboone::datatypes;
+#include "cetlib/exception.h"
+
+namespace gov {
+namespace fnal {
+namespace uboone {
+namespace datatypes {
+
 
 MuCSData::MuCSData()
 {
-  Int_t cha = 1;
+  cha = 1;
     
 }
+
+MuCSData::~MuCSData()
+{}
+
+MuCSData::MuCSData( Int_t fadc )
+{
+  cha = fadc;
+    
+}
+
+}}}}
+
+////////////////////////////////////////////////////////////////////////
+//
+//    The end !
+//
+////////////////////////////////////////////////////////////////////////

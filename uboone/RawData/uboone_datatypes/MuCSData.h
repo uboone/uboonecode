@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <iosfwd>
 
 #include "TMath.h"
 
@@ -22,18 +23,17 @@ namespace gov {
 namespace fnal {
 namespace uboone {
 namespace datatypes {
-
-using namespace gov::fnal::uboone;
  
 class MuCSData 
 {
 
  public:
-  
   MuCSData();
+  virtual ~MuCSData();  
+  
+  MuCSData( Int_t fadc );
   
  private:
-  
   Int_t cha;
   
 };
@@ -42,5 +42,8 @@ class MuCSData
 
 #endif 
 
-
-
+////////////////////////////////////////////////////////////////////////
+//
+//    The end !
+//
+////////////////////////////////////////////////////////////////////////
