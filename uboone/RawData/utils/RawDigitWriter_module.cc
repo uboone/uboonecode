@@ -108,9 +108,19 @@ namespace zmqds {
     int fOpSlot;
     int fOpFemCH;
     int fOpReadoutCH;
+    int fOpDetEntry;
     TTree* fTOpDetWaveforms;
     std::vector< short > opdetwaveforms;
     void GetOpticalRawDigits(const art::Event& evt);
+
+    // Optical Raw Digits Meta Data
+    TTree* fTOpDetMeta;
+    int fFirstEntry;
+    int fLastEntry;
+    int fFirstFrame;
+    int fLastFrame;
+    int fTicksPerFrame;
+    double fFirstTickTimeStamp;
 
   }; // class RawDigitWriter
   
@@ -151,8 +161,19 @@ namespace zmqds {
       fTOpDetWaveforms->Branch( "gaintype", &fType, "gaintype/I" );
       fTOpDetWaveforms->Branch( "adcs", &opdetwaveforms );
 
+      fTOpDetMeta = tfbeamdir.make<TTree>("OpDetMeta","Event meta-data on PMT Readout Waveforms");
+      fTOpDetMeta->Branch( "run", &fRun, "run/I" );
+      fTOpDetMeta->Branch( "subrun", &fSubRun, "subrun/I" );
+      fTOpDetMeta->Branch( "event", &fEvent, "event/I" );
+      fTOpDetMeta->Branch( "firstentry", &fFirstEntry, "firstentry/I" );
+      fTOpDetMeta->Branch( "lastentry", &fLastEntry, "lastentry/I" );
+      fTOpDetMeta->Branch( "firstframe", &fFirstFrame, "firstframe/I" );
+      fTOpDetMeta->Branch( "lastframe", &fLastFrame, "lastframe/I" );
+      fTOpDetMeta->Branch( "ticksperframe", &fTicksPerFrame, "ticksperframe/I" );
+      fTOpDetMeta->Branch( "firstticktime", &fFirstTickTimeStamp, "firstticktime/D" );
+
       mf::LogInfo("")<<"Fetched channel map from DB";
-      
+      fOpDetEntry = -1;
     }
 
   RawDigitWriter::~RawDigitWriter() {
@@ -215,7 +236,6 @@ namespace zmqds {
       rawdigits = digitVec->ADCs();
 
       fTRawDigits->Fill();
-
     }// end of wire loop
 
   }
@@ -232,6 +252,11 @@ namespace zmqds {
     art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
     art::ServiceHandle<util::TimeService> ts;
     std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
+    fFirstEntry  = fOpDetEntry+1; //meta data
+    fFirstFrame = -1;
+    fLastFrame = -1;
+    fTicksPerFrame = ts->OpticalClock().FrameTicks();
+    fFirstTickTimeStamp = ts->OpticalClock().Time( 0, 0 );
     
     for ( unsigned int cat=0; cat<(unsigned int)opdet::NumUBOpticalChannelCategories; cat++ ) {
       //std::stringstream ss;
@@ -259,12 +284,20 @@ namespace zmqds {
 	fFrame = ts->OpticalClock().Frame( fTimeStamp );
 	fSample = ts->OpticalClock().Sample( fTimeStamp );
 
+	if ( fFirstFrame<0 || fFirstFrame>fFrame )
+	  fFirstFrame = fFrame;
+	if ( fFrame>fLastFrame )
+	  fLastFrame = fFrame;
+
 	opdetwaveforms.clear();
 	for ( auto &adc : wfm )
 	  opdetwaveforms.push_back( (short)adc );
 	fTOpDetWaveforms->Fill();
+	fOpDetEntry++;
       }
     }// end of category loop
+    fLastEntry = fOpDetEntry;
+    fTOpDetMeta->Fill();
   }
 
   DEFINE_ART_MODULE(RawDigitWriter)

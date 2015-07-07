@@ -285,7 +285,7 @@ namespace opdet {
 
 	for(size_t photon_index=0; photon_index<nphotons_in_pulse; ++photon_index) {
 	  double t = fRand->Gaus( pulse_start, 1.0 );
-	  //photon_time.push_back( pulse_start );
+	  photon_time.push_back( t );
 	}
       }//end of pulse loop
       
