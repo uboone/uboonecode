@@ -7,6 +7,9 @@
 // from cetpkgsupport v1_08_05.
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+#include <string>
+
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -18,12 +21,19 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
-
-#include "RawData/OpDetWaveform.h"
-#include "OpDetWaveformAna.h"
 #include "Utilities/TimeService.h"
-#include <vector>
-#include <string>
+
+// RawDigits
+#include "RawData/raw.h" // raw::Uncompress()
+#include "RawData/RawDigit.h"
+#include "RawData/OpDetWaveform.h"
+
+// Optical Channel Maps
+#include "uboone/Geometry/UBOpChannelTypes.h"
+#include "uboone/Geometry/UBOpReadoutMap.h"
+
+// TPC Channel Map
+#include "Utilities/DatabaseUtil.h" // lardata
 
 #include "TTree.h"
 
@@ -47,11 +57,6 @@ public:
   void beginJob() override;
 
 private:
-  std::vector< std::string      > _module_v;    
-  std::vector< bool             > _do_hitana_v;
-  std::vector< bool             > _do_wfana_v;
-  std::vector< bool             > _store_wf_v;
-  std::vector< ::pmtana::OpDetWaveformAna > _ana_v;
 
   std::vector< std::pair< int, int > > fPulserPeakList;
   int fPulserSearchDelay;
@@ -60,6 +65,7 @@ private:
 
 
   // Declare member data here.
+  std::string fInputWfmModule;
   int fPulserTTLCh; ///< We use this channel to define integration windows
   int fDTicksStart; ///< ticks after TTL to start
   int fDTicksWindow; ///< length of window in ticks
@@ -87,17 +93,10 @@ UBFlasherAna::UBFlasherAna(fhicl::ParameterSet const & p)
   EDAnalyzer(p)  // ,
  // More initializers here.
 {
-  _module_v    = p.get< std::vector< std::string > > ( "InputModule"  );
-  _do_hitana_v = p.get< std::vector< bool        > > ( "AnaHit"       );
-  _do_wfana_v  = p.get< std::vector< bool        > > ( "AnaWaveform"  );
-  _store_wf_v  = p.get< std::vector< bool        > > ( "SaveWaveform" );
-  assert( _module_v.size () == _do_hitana_v.size () );
-  assert( _module_v.size () == _do_wfana_v.size  () );
-  assert( _module_v.size () == _store_wf_v.size  () );
 
-  for(auto const& name : _module_v)
-    _ana_v.emplace_back( name );
+  fInputWfmModule = p.get<std::string>("InputModule","pmtreadout");
   
+
 }
 
 void UBFlasherAna::initTree() {
@@ -112,37 +111,30 @@ void UBFlasherAna::initTree() {
 
 void UBFlasherAna::beginJob()
 {
-  art::ServiceHandle<art::TFileService> fs;
-  for(size_t i=0; i<_ana_v.size(); ++i) {
-   
-    
-    if( _do_hitana_v [i] ) _ana_v[i].AnaHit       ( fs->make<TTree> ( Form( "hitana_%s_tree", _module_v[i].c_str() ), "" ) );
-    if( _do_wfana_v  [i] ) _ana_v[i].AnaWaveform  ( fs->make<TTree> ( Form( "hitwf_%s_tree",  _module_v[i].c_str() ), "" ) );
-    if( _store_wf_v  [i] ) _ana_v[i].SaveWaveform ( fs->make<TTree> ( Form( "wf_%s_tree",     _module_v[i].c_str() ), "" ) );
 
-  }    
+  initTree();
+
 }
 
-void UBFlasherAna::analyze(art::Event const & e)
+void UBFlasherAna::searchForPulserTLLPulses() {
+  
+}
+
+void UBFlasherAna::analyze(art::Event const & evt)
 {
   art::ServiceHandle< util::TimeService > ts;
+  art::Handle< std::vector< raw::OpDetWaveform > > wf_handle;
 
-  // Implementation of required member function here.
-  for(size_t i=0; i<_module_v.size(); ++i) {
-   
-    _ana_v[i].TickPeriod(ts->OpticalClock().TickPeriod());
- 
-    art::Handle< std::vector< raw::OpDetWaveform > > wf_handle;
-    e.getByLabel( _module_v[i], wf_handle );
+  std::map< std::string, std::vector< raw::OpDetWaveform > > waveforms;
 
+  for ( unsigned int cat=0; cat<(unsigned int)opdet::NumUBOpticalChannelCategories; cat++ ) {
+
+    evt.getByLabel( fInputWfmModule, opdet::UBOpChannelEnumName( (opdet::UBOpticalChannelCategory_t)cat ), wf_handle);
     if(!wf_handle.isValid()) continue;
-
-    for(auto const& wf : *wf_handle) {
-      if(!wf.size()) continue;
-      _ana_v[i].AnaWaveform( wf.ChannelNumber(),
-			     wf.TimeStamp() - ts->TriggerTime(),
-			     wf );
-    }
+    
+    std::vector<raw::OpDetWaveform> const& opwfms(*wf_handle);
+    waveforms[ opdet::UBOpChannelEnumName( (opdet::UBOpticalChannelCategory_t)cat ) ] = opwfms;
+    
   }
 }
 
