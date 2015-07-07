@@ -1,0 +1,14 @@
+BEGIN_PROLOG
+
+flashermcana:
+{
+
+    module_type: "UBFlasherAna"
+    InputModule: "pmtreadout"
+
+}
+
+microboone_flashermcana: @local::flashermcana
+
+
+END_PROLOG
