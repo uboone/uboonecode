@@ -1,4 +1,3 @@
-
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES Geometry
 			Geometry_service

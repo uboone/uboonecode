@@ -3,8 +3,10 @@ BEGIN_PROLOG
 
 standard_mucsmerger:
 {
-  module_type:            "MuCSMerger"
-
+  module_type: "MuCSMerger"
+  
+  group: 10
+  
 }
 
 END_PROLOG
