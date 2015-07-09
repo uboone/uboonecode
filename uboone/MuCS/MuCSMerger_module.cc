@@ -96,7 +96,7 @@ void MuCSMerger::produce( art::Event &evt )
   hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);
     
   MuCS::MuCSData mucsevt( t0, adc1, adc2, adc3, adc7, hits1, hits2, hits3, hits7 ); 
-    
+  
   
   mucsdatacol->push_back( mucsevt );
 

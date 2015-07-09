@@ -5,5 +5,6 @@
   </class>
  <class name="std::vector< MuCS::MuCSData>     "               />
  <class name="art::Wrapper< MuCS::MuCSData                   >"/>
+ <class name="art::Wrapper< std::vector< MuCS::MuCSData >                  >"/>
   
 </lcgdict>
