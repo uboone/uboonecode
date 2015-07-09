@@ -1,0 +1,9 @@
+
+<lcgdict>
+  <class name="MuCS::MuCSData 	  " ClassVersion="10"           >
+  <version ClassVersion="10" checksum="706961932"/>
+  </class>
+ <class name="std::vector< MuCS::MuCSData>     "               />
+ <class name="art::Wrapper< MuCS::MuCSData                   >"/>
+  
+</lcgdict>
