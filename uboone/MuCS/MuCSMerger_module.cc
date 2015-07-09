@@ -32,11 +32,9 @@
 
 #include <memory>
 #include <iostream>
-#include "RawData/AuxDetDigit.h"
-#include "uboone/RawData/uboone_datatypes/MuCSData.h"
+#include "MuCSData.h"
 
 using namespace std;
-// using namespace gov::fnal::uboone::datatypes;
 
 class MuCSMerger;
 
@@ -66,7 +64,7 @@ MuCSMerger::MuCSMerger( fhicl::ParameterSet const &pset )
 {
   this->reconfigure( pset );
   
-  produces< std::vector<gov::fnal::uboone::datatypes::MuCSData> >();  
+  produces< std::vector<MuCS::MuCSData> >();  
   
 }
 
@@ -77,7 +75,7 @@ void MuCSMerger::produce( art::Event &evt )
 {
   cout << " ( 0 ) ----> " << group << endl; getchar();
   
-  std::unique_ptr< std::vector<gov::fnal::uboone::datatypes::MuCSData> > mucsdatacol(new std::vector<gov::fnal::uboone::datatypes::MuCSData>);
+  std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
   
   Float_t t0 = 0;
   
@@ -97,7 +95,7 @@ void MuCSMerger::produce( art::Event &evt )
   hits3.push_back(-1.0);hits3.push_back(-1.0);hits3.push_back(-1.0);
   hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);
     
-  gov::fnal::uboone::datatypes::MuCSData mucsevt( t0, adc1, adc2, adc3, adc7, hits1, hits2, hits3, hits7 ); 
+  MuCS::MuCSData mucsevt( t0, adc1, adc2, adc3, adc7, hits1, hits2, hits3, hits7 ); 
     
   
   mucsdatacol->push_back( mucsevt );
