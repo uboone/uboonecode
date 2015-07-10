@@ -30,6 +30,12 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
+#include "EventDisplay/HeaderDrawer.h"
+#include "EventDisplayBase/View2D.h"
+#include "EventDisplayBase/EventHolder.h"
+#include "TText.h"
+#include "TTimeStamp.h"
+
 #include <memory>
 #include <iostream>
 #include "MuCSData.h"
@@ -73,6 +79,13 @@ MuCSMerger::~MuCSMerger()
 
 void MuCSMerger::produce( art::Event &evt )
 {
+  int run = evt.run();
+  int srun = evt.subRun();
+  int event = evt.id().event();
+
+  cout << run << ", " << srun << ", " << event << endl;
+  cout << "" << endl;
+
   cout << " ( 0 ) ----> " << group << endl; getchar();
   
   std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
