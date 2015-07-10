@@ -8,3 +8,4 @@ template class std::vector<MuCS::MuCSData>;
 template class art::Wrapper< MuCS::MuCSData >; 
 
 template class art::Wrapper< std::vector<MuCS::MuCSData>  >;
+
