@@ -1,82 +1,265 @@
-////////////////////////////////////////////////////////////////////////
-// $Id: DBSCANfinderAna.cxx,v 1.36 2010/09/15  bpage Exp $
-//
-// module to create a TTree for analysis
-//
-// \author tjyang@fnal.gov, sowjanyag@phys.ksu.edu
-//
-////////////////////////////////////////////////////////////////////////
-// To reduce memory usage:
-// [x] create the data structure connected to the tree only when needed
-// [x] reduce the size of the elemental items (Double_t => Float_t could damage precision)
-// [x] create a different structure for each tracker, allocate only what needed
-// [x] use variable size array buffers for each tracker datum instead of [kMaxTrack]
-// [x] turn the truth/GEANT information into vectors
-// [ ] move hit_trkid into the track information, remove kMaxTrackers
-// [ ] turn the hit information into vectors (~1 MB worth), remove kMaxHits
-// [ ] fill the tree branch by branch
-// 
-// Current implementation:
-// There is one tree only, with one set of branches for each tracking algorithm.
-// The data structure which hosts the addresses of the tree branches is
-// dynamically allocated on demand, and it can be optionally destroyed at the
-// end of each event.
-// The data structure (AnalysisTreeDataStruct) firectly contains the truth and
-// simulation information as C arrays. The data from tracking algorithms is the
-// largest, and it is contained in a C++ vector of structures (TrackDataStruct),
-// one per algorithm. These structures can also be allocated on demand.
-// Each of these structures is connected to a set of branches, one branch per
-// data member. Data members are vectors of numbers or vectors of fixed-size
-// C arrays. The vector index represents the tracks reconstructed by the
-// algorithm, and each has a fixed size pool for hits (do ROOT t3rees support
-// branches with more than one dimension with variable size?).
-// The data structures can assign default values to their data, connect to a
-// ROOT tree (creating the branches they need) and resize.
-// The AnalysisTreeDataStruct is constructed with as many tracking algorithms as
-// there are named in the module configuration (even if they are not backed by
-// any available tracking data).
-// By default construction, TrackDataStruct is initialized in a state which does
-// not allow any track (maximum tracks number is zero), and in such state trying
-// to connect to a tree has no effect. This is done so that the
-// AnalysisTreeDataStruct can be initialized first (and with unusable track data
-// structures), and then the TrackDataStruct instances are initialized one by
-// one when the number of tracks needed is known.
-// A similar mechanism is implemented for the truth information.
-// 
-// The "UseBuffers: false" mode assumes that on each event a new
-// AnalysisTreeDataStruct is created with unusable tracker data, connected to
-// the ROOT tree (the addresses of the available branches are assigned), then
-// each of the tracking algorithm data is resized to host the correct number
-// of reconstructed tracks and connected to the tree. Then the normal process of
-// filling the event data and then the tree take place. Finally, the whole
-// data structure is freed and the tree is left in a invalid state (branch
-// addresses are invalid). It could be possible to make the tree in a valid
-// state by resetting the addresses, but there is no advantage in that.
-// 
-// The "UseBuffers: true" mode assumes that on the first event a new
-// AnalysisTreeDataStruct is created and used just as in the other mode
-// described above. At the end of the first event, the data structure is left
-// around (and the tree is in a valid state). On the next event, all the
-// addresses are checked, then for each tracker the data is resized to
-// accomodate the right number of tracks for tis event. If the memory is
-// increased, the address will be changed. All the branches are reconnected to
-// the data structure, and the procedure goes on as normal.
-// 
-// Note that reducing the maximum number of tracks in a TrackDataStruct does not
-// necessarily make memory available, because of how std::vector::resize()
-// works; that feature can be implemented, but it currently has not been.
-// 
-// The BoxedArray<> class is a wrapper around a normal C array; it is needed
-// to be able to include such structure in a std::vector. This container
-// requires its objects to be default-constructable and copy-constructable,
-// and a C array is neither. BoxedArray<> is: the default construction leaves it
-// uninitialized (for speed reasons) while the copy construction is performed
-// as in a Plain Old Data structure (memcpy; really!).
-// 
-////////////////////////////////////////////////////////////////////////
+/**
+ * @file    AnalysisTree_module.cc
+ * @brief   Module to create a TTree for analysis
+ * @authors tjyang@fnal.gov, sowjanyag@phys.ksu.edu
+ *
+ *
+ * Current implementation
+ * =======================
+ * 
+ * There is one tree only, with one set of branches for each tracking algorithm.
+ * The data structure which hosts the addresses of the tree branches is
+ * dynamically allocated on demand, and it can be optionally destroyed at the
+ * end of each event.
+ * The data structure (AnalysisTreeDataStruct) directly contains the truth and
+ * simulation information as C arrays. The data from tracking algorithms is the
+ * largest, and it is contained in a C++ vector of structures (TrackDataStruct),
+ * one per algorithm. These structures can also be allocated on demand.
+ * Each of these structures is connected to a set of branches, one branch per
+ * data member. Data members are vectors of numbers or vectors of fixed-size
+ * C arrays. The vector index represents the tracks reconstructed by the
+ * algorithm, and each has a fixed size pool for hits (do ROOT trees support
+ * branches with more than one dimension with variable size?).
+ * The data structures can assign default values to their data, connect to a
+ * ROOT tree (creating the branches they need) and resize.
+ * The AnalysisTreeDataStruct is constructed with as many tracking algorithms as
+ * there are named in the module configuration (even if they are not backed by
+ * any available tracking data).
+ * By default construction, TrackDataStruct is initialized in a state which does
+ * not allow any track (maximum tracks number is zero), and in such state trying
+ * to connect to a tree has no effect. This is done so that the
+ * AnalysisTreeDataStruct can be initialized first (and with unusable track data
+ * structures), and then the TrackDataStruct instances are initialized one by
+ * one when the number of tracks needed is known.
+ * A similar mechanism is implemented for the truth information.
+ * 
+ * The "UseBuffers: false" mode assumes that on each event a new
+ * AnalysisTreeDataStruct is created with unusable tracker data, connected to
+ * the ROOT tree (the addresses of the available branches are assigned), then
+ * each of the tracking algorithm data is resized to host the correct number
+ * of reconstructed tracks and connected to the tree. Then the normal process of
+ * filling the event data and then the tree take place. Finally, the whole
+ * data structure is freed and the tree is left in a invalid state (branch
+ * addresses are invalid). It could be possible to make the tree in a valid
+ * state by resetting the addresses, but there is no advantage in that.
+ * 
+ * The "UseBuffers: true" mode assumes that on the first event a new
+ * AnalysisTreeDataStruct is created and used just as in the other mode
+ * described above. At the end of the first event, the data structure is left
+ * around (and the tree is in a valid state). On the next event, all the
+ * addresses are checked, then for each tracker the data is resized to
+ * accommodate the right number of tracks for tis event. If the memory is
+ * increased, the address will be changed. All the branches are reconnected to
+ * the data structure, and the procedure goes on as normal.
+ * 
+ * Note that reducing the maximum number of tracks in a TrackDataStruct does not
+ * necessarily make memory available, because of how std::vector::resize()
+ * works; that feature can be implemented, but it currently has not been.
+ * 
+ * The BoxedArray<> class is a wrapper around a normal C array; it is needed
+ * to be able to include such structure in a std::vector. This container
+ * requires its objects to be default-constructible and copy-constructible,
+ * and a C array is neither. BoxedArray<> is: the default construction leaves it
+ * uninitialized (for speed reasons) while the copy construction is performed
+ * as in a Plain Old Data structure (memcpy; really!).
+ * 
+ * 
+ * Steps to reduce memory usage
+ * -----------------------------
+ * 
+ * [x] create the data structure connected to the tree only when needed
+ * [x] reduce the size of the elemental items (Double_t => Float_t could damage precision)
+ * [x] create a different structure for each tracker, allocate only what needed
+ * [x] use variable size array buffers for each tracker datum instead of [kMaxTrack]
+ * [x] turn the truth/GEANT information into vectors
+ * [ ] move hit_trkid into the track information, remove kMaxTrackers
+ * [ ] turn the hit information into vectors (~1 MB worth), remove kMaxHits
+ * [ ] fill the tree branch by branch
+ * 
+ * 
+ * Quick guide to addition of branches
+ * ====================================
+ * 
+ * A number of steps need to be taken to add an entry to the tree:
+ * -# declare a variable for the datum
+ * -# create a branch in the tree
+ * -# assign the address of that branch to the datum
+ * -# on each event: update all the data
+ * -# on each event: fill the tree with the updated data
+ * 
+ * Depending on the data type, the following "reference guide" describes the
+ * concrete implementation of each of the concepts explained here.
+ * 
+ * 
+ * Declare a variable
+ * -------------------
+ * 
+ * If the variable is a track variable, add a data member with the proper
+ * "Data structure" in AnalysisTreeDataStruct::TrackDataStruct; if it is a
+ * shower variable, add it to AnalysisTreeDataStruct::ShowerDataStruct.
+ * Otherwise, add it directly to AnalysisTreeDataStruct.
+ * 
+ * | category of variable | where to add the variable                 |
+ * | -------------------- | ----------------------------------------- |
+ * | track                | AnalysisTreeDataStruct::TrackDataStruct   |
+ * | shower               | AnalysisTreeDataStruct::ShowerDataStruct  |
+ * | other                | AnalysisTreeDataStruct                    |
+ * 
+ * 
+ * Create a branch/assign the branch address
+ * ------------------------------------------
+ * 
+ * Assigning a branch an address is done by adding in the location described
+ * in this table the "Create branch" command shown below.
+ * The BranchCreator creates the branch if it does not exist, and then reassigns
+ * the address.
+ * 
+ * | category of variable | where to add the variable                                 |
+ * | -------------------- | --------------------------------------------------------- |
+ * | track                | AnalysisTreeDataStruct::TrackDataStruct::SetAddresses()   |
+ * | shower               | AnalysisTreeDataStruct::ShowerDataStruct::SetAddresses()  |
+ * | other                | AnalysisTreeDataStruct::SetAddresses()                    |
+ * 
+ * 
+ * Prepare to update the content
+ * ------------------------------
+ * 
+ * If the variable is a vector (like most of them are), add a proper resize()
+ * call for it. This is needed for the track and shower variables.
+ * The variables of simple `std::vector<>` types can be resized anywhere.
+ * 
+ * | category | where to add the call                              | call to be added              |
+ * | -------- | -------------------------------------------------- | ----------------------------- |
+ * | track    | AnalysisTreeDataStruct::TrackDataStruct::Resize()  | `VarName.resize(MaxTracks);`  |
+ * | shower   | AnalysisTreeDataStruct::ShowerDataStruct::Resize() | `VarName.resize(MaxShowers);` |
+ * | other    | AnalysisTreeDataStruct::ClearLocalData()           | specific to the type          |
+ * 
+ * 
+ * Then, assign the variable with an "invalid" value (e.g., -9999.); using a
+ * FillWith() call (see below).
+ * 
+ * | category | where to add the call                             |
+ * | -------- | ------------------------------------------------- |
+ * | track    | AnalysisTreeDataStruct::TrackDataStruct::Clear()  |
+ * | shower   | AnalysisTreeDataStruct::ShowerDataStruct::Clear() |
+ * | other    | AnalysisTreeDataStruct::ClearLocalData()          |
+ * 
+ * Finally, do what you need to fill the data, in the AnalysisTree::analyze()
+ * method.
+ * 
+ * 
+ * Fill the tree with the data event
+ * ----------------------------------
+ * 
+ * This is already done. No need to be explicit about that.
+ * 
+ * 
+ * 
+ * Reference guide to addition of branches
+ * ========================================
+ * 
+ * In template expressions, the type `T` is a type that can properly represent
+ * the single value being stored in the branch (e.g., UInt_t, Double_t, etc.).
+ * 
+ * The `CreateBranch` in the "create branch" row is an instance of
+ * BranchCreator constructed with a pointer to the ROOT tree; in its arguments,
+ * "/T" must be replaced with the correct ROOT branch code.
+ * 
+ * 
+ * Simple data types
+ * ------------------
+ * 
+ * | Example        | number of generated particles                           |
+ * | Data structure | `T`                                                     |
+ * | Indices        | none                                                    |
+ * | Fill call      | `VarName = Value;`                                      |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + "/T")` |
+ * 
+ * 
+ * One-dimension vectors
+ * ----------------------
+ * 
+ * | Example        | energy of the generated particles            |
+ * | Data structure | `std::vector<T>`                             |
+ * | Indices        | first: index of the item in the list         |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + "/T")` |
+ * 
+ * 
+ * Track/shower information
+ * -------------------------
+ * 
+ * Multiple track and shower collections (from different algorithms or algorithm
+ * settings) live in different branches.
+ * 
+ * ### track/shower collection information
+ * 
+ * | Example        | Track ID                                                                  |
+ * | Data structure | `TrackData_t<T>` / `ShowerData<T>`                                        |
+ * | Index          | first: index of the track                                                 |
+ * | Fill call      | `FillWith(VarName, Value);`                                               |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + NTracksIndexStr + "/T")` |
+ * |                | `CreateBranch(BranchName, &VarName, BranchName + NShowerIndexStr + "/T")` |
+ * 
+ * 
+ * ### plane-wide information for a track/shower
+ * 
+ * | Example        | Number of hits in the plane                                                  |
+ * | Data structure | `PlaneData_t<T>`                                                             |
+ * | Indices (2)    | first: index of the track/shower                                             |
+ * |                | second: index of the plane (fixed dimension kNplanes)                        |
+ * | Fill call      | `for (auto& elem: VarName) FillWith(elem, Value);`                           |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + NTracksIndexStr + "[3]/T")` |
+ * |                | `CreateBranch(BranchName, &VarName, BranchName + NShowerIndexStr + "[3]/T")` |
+ * 
+ * 
+ * ### information about hits in a track/shower
+ * 
+ * | Example        | dE/dX of a single hit                                                                                     |
+ * | Data structure | `HitData_t<T>`                                                                                            |
+ * | Indices (3)    | first: index of the track/shower                                                                          |
+ * |                | second: index of the plane (fixed dimension kNplanes)                                                     |
+ * |                | third: index of the hit (fixed dimension kMaxTrackHits/kMaxShowerHits)                                    |
+ * | Fill call      | `for (auto& elem: VarName) FillWith(elem, Value);`                                                        |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + NTracksIndexStr + "[3]" + MaxTrackHitsIndexStr + "/T")`  |
+ * |                | `CreateBranch(BranchName, &VarName, BranchName + NShowerIndexStr + "[3]" + MaxShowerHitsIndexStr + "/T")` |
+ * 
+ * 
+ * ### 3D coordinates of hits in a track/shower
+ * 
+ * | Example        | position coordinates of a hit                                                                                |
+ * | Data structure | `HitCoordData_t<T>`                                                                                          |
+ * | Indices (4)    | first: index of the track/shower                                                                             |
+ * |                | second: index of the plane (fixed dimension kNplanes)                                                        |
+ * |                | third: index of the hit (fixed dimension kMaxTrackHits/kMaxShowerHits)                                       |
+ * |                | fourth: coordinate index (0 = x, 1 = y, 2 = z)                                                               |
+ * | Fill call      | `for (auto& elem: VarName) FillWith(elem, Value);`                                                           |
+ * | Create branch  | `CreateBranch(BranchName, &VarName, BranchName + NTracksIndexStr + "[3]" + MaxTrackHitsIndexStr + "[3]/T")`  |
+ * |                | `CreateBranch(BranchName, &VarName, BranchName + NShowerIndexStr + "[3]" + MaxShowerHitsIndexStr + "[3]/T")` |
+ * 
+ * 
+ * Auxiliary detector information
+ * -------------------------------
+ * 
+ * ### per-true-particle data
+ * 
+ * | Example        | number of auxiliary detectors a particle crossed                         |
+ * | Data structure | `std::vector<T>`                                                         |
+ * | Index          | first: index of the particle                                             |
+ * | Fill call      | `FillWith(VarName, Value);`                                              |
+ * | Create branch  | `CreateBranch(BranchName, VarName, BranchName + "[geant_list_size]/T");` |
+ * 
+ * ### detector data for a given particle
+ * 
+ * | Example        | energy observed by the detector                                                                   |
+ * | Data structure | `AuxDetMCData_t<T>`                                                                               |
+ * | Indices (2)    | first: index of the particle                                                                      |
+ * |                | second: index of the detector                                                                     |
+ * | Fill call      | `for (auto& elem: VarName) FillWith(elem, Value);`                                                |
+ * | Create branch  | `CreateBranch(BranchName, VarName, BranchName + "[geant_list_size]" + MaxAuxDetIndexStr + "/T");` |
+ * 
+ * 
+ ******************************************************************************/
 
-#ifndef ANALYSISTREE_H
-#define ANALYSISTREE_H
 
 // Framework includes
 #include "art/Framework/Core/ModuleMacros.h"
@@ -91,11 +274,14 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
 #include "art/Framework/Core/FindMany.h"
+#include "art/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "Geometry/Geometry.h"
 #include "SimulationBase/MCTruth.h"
+#include "MCBase/MCShower.h"
+#include "MCBase/MCStep.h"
 #include "SimulationBase/MCFlux.h"
 #include "Simulation/SimChannel.h"
 #include "Simulation/AuxDetSimChannel.h"
@@ -122,6 +308,7 @@
 #include "AnalysisBase/FlashMatch.h"
 	
 
+#include <cstddef> // std::ptrdiff_t
 #include <cstring> // std::memcpy()
 #include <vector>
 #include <map>
@@ -132,6 +319,7 @@
 #include <algorithm>
 #include <functional> // std::mem_fun_ref
 #include <typeinfo>
+#include <memory> // std::unique_ptr<>
 
 #include "TTree.h"
 #include "TTimeStamp.h"
@@ -143,7 +331,7 @@ constexpr int kMaxTrackers   = 15;    //number of trackers passed into fTrackMod
 constexpr unsigned short kMaxVertices   = 100;    //max number of 3D vertices
 constexpr unsigned short kMaxAuxDets = 4; ///< max number of auxiliary detector cells per MC particle
 constexpr int kMaxFlashes    = 1000;   //maximum number of flashes
-constexpr int kMaxShowers    = 1000;   //maximum number of showers
+constexpr int kMaxShowerHits = 10000;  //maximum number of hits on a shower
 constexpr int kMaxTruth      = 10;     //maximum number of neutrino truth interactions
 
 /// total_extent\<T\>::value has the total number of elements of an array
@@ -305,7 +493,75 @@ namespace microboone {
       
     }; // class TrackDataStruct
     
- 
+    
+    /// Shower algorithm result
+    /// 
+    /// Can connect to a tree, clear its fields and resize its data.
+    class ShowerDataStruct {
+        public:
+      /* Data structure size:
+       *
+       * ShowerData_t<Short_t>                   :  2  bytes/shower
+       * ShowerData_t<Float_t>                   :  4  bytes/shower
+       * PlaneData_t<Float_t>, PlaneData_t<Int_t>: 12  bytes/shower
+       * HitData_t<Float_t>                      : 24k bytes/shower
+       * HitCoordData_t<Float_t>                 : 72k bytes/shower
+       */
+      template <typename T>
+      using ShowerData_t = std::vector<T>;
+      template <typename T>
+      using PlaneData_t = std::vector<BoxedArray<T[kNplanes]>>;
+      template <typename T>
+      using HitData_t = std::vector<BoxedArray<T[kNplanes][kMaxShowerHits]>>;
+      template <typename T>
+      using HitCoordData_t = std::vector<BoxedArray<T[kNplanes][kMaxShowerHits][3]>>;
+      
+      std::string name; ///< name of the shower algorithm (for branch names)
+      
+      size_t MaxShowers; ///< maximum number of storable showers
+      
+      /// @{
+      /// @name Branch data structures
+      Short_t  nshowers;                      ///< number of showers
+      ShowerData_t<Int_t>    showerID;        ///< Shower ID
+      ShowerData_t<Short_t>  shwr_bestplane;  ///< Shower best plane
+      ShowerData_t<Float_t>  shwr_length;     ///< Shower length
+      ShowerData_t<Float_t>  shwr_startdcosx; ///< X directional cosine at start of shower
+      ShowerData_t<Float_t>  shwr_startdcosy; ///< Y directional cosine at start of shower
+      ShowerData_t<Float_t>  shwr_startdcosz; ///< Z directional cosine at start of shower
+      ShowerData_t<Float_t>  shwr_startx;     ///< startx of shower
+      ShowerData_t<Float_t>  shwr_starty;     ///< starty of shower
+      ShowerData_t<Float_t>  shwr_startz;     ///< startz of shower
+      PlaneData_t<Float_t>   shwr_totEng;     ///< Total energy of the shower per plane
+      PlaneData_t<Float_t>   shwr_dedx;       ///< dE/dx of the shower per plane
+      PlaneData_t<Float_t>   shwr_mipEng;     ///< Total MIP energy of the shower per plane
+      /// @}
+      
+      /// Creates a shower data structure allowing up to maxShowers showers
+      ShowerDataStruct(std::string new_name = "", size_t maxShowers = 0):
+        name(new_name), MaxShowers(maxShowers) { Clear(); }
+      
+      std::string Name() const { return name; }
+      
+      void Clear();
+      
+      /// Applies a special prescription to mark shower information as missing
+      void MarkMissing(TTree* pTree);
+      void SetName(std::string new_name) { name = new_name; }
+      void SetMaxShowers(size_t maxShowers)
+        { MaxShowers = maxShowers; Resize(MaxShowers); }
+      void Resize(size_t nShowers);
+      void SetAddresses(TTree* pTree);
+      
+      size_t GetMaxShowers() const { return MaxShowers; }
+      size_t GetMaxPlanesPerShower(int /* iShower */ = 0) const
+        { return (size_t) kNplanes; }
+      size_t GetMaxHitsPerShower(int /* iShower */ = 0, int /* ipl */ = 0) const
+        { return (size_t) kMaxShowerHits; }
+      
+    }; // class ShowerDataStruct
+    
+    
     enum DataBits_t: unsigned int {
       tdAuxDet = 0x01,
       tdCry = 0x02,
@@ -316,6 +572,7 @@ namespace microboone {
       tdVtx = 0x40,
       tdFlash = 0x80,
       tdShower = 0x100,
+      tdMCshwr = 0x200,
       tdDefault = 0
     }; // DataBits_t
     
@@ -367,21 +624,6 @@ namespace microboone {
     Short_t  nvtx;                     //number of vertices
     Float_t  vtx[kMaxVertices][3];     //vtx[3] 
     
-    // shower information
-    Short_t  nshowers;                     //number of showers
-    Int_t    showerID[kMaxShowers];        //Shower ID
-    Int_t    shwr_bestplane[kMaxShowers];  //Shower best plane 
-    Float_t  shwr_length[kMaxShowers];     //Shower length  
-    Float_t  shwr_startdcosx[kMaxShowers]; //X directional cosine at start of shower 
-    Float_t  shwr_startdcosy[kMaxShowers]; //Y directional cosine at start of shower 
-    Float_t  shwr_startdcosz[kMaxShowers]; //Z directional cosine at start of shower 
-    Float_t  shwr_startx[kMaxShowers];     //startx of shower 
-    Float_t  shwr_starty[kMaxShowers];     //starty of shower 
-    Float_t  shwr_startz[kMaxShowers];     //startz of shower 
-    Float_t  shwr_totEng[kMaxShowers][3];  //Total energy of the shower per plane 
-    Float_t  shwr_dedx[kMaxShowers][3];    //dedx of the shower per plane
-    Float_t  shwr_mipEng[kMaxShowers][3];   //Total MIP energy of the shower per plane
-
     // flash information
     Int_t    no_flashes;                //number of flashes
     Float_t  flash_time[kMaxFlashes];   //flash time
@@ -392,6 +634,10 @@ namespace microboone {
     //track information
     Char_t   kNTracker;
     std::vector<TrackDataStruct> TrackData;
+    
+    // shower information
+    Char_t   kNShowerAlgos;
+    std::vector<ShowerDataStruct> ShowerData;
     
     //mctruth information
     Int_t     mcevts_truth;    //number of neutrino Int_teractions in the spill
@@ -416,9 +662,44 @@ namespace microboone {
     Float_t  lep_dcosz_truth[kMaxTruth]; //lepton dcos z
 
     //flux information
-    Float_t  tpx_flux[kMaxTruth];        //Px of parent particle leaving BNB target
-    Float_t  tpy_flux[kMaxTruth];        //Py of parent particle leaving BNB target
-    Float_t  tpz_flux[kMaxTruth];        //Pz of parent particle leaving BNB target
+    Float_t  vx_flux[kMaxTruth];          //X position of hadron/muon decay (cm)
+    Float_t  vy_flux[kMaxTruth];          //Y position of hadron/muon decay (cm)
+    Float_t  vz_flux[kMaxTruth];          //Z position of hadron/muon decay (cm)
+    Float_t  pdpx_flux[kMaxTruth];        //Parent X momentum at decay point (GeV)
+    Float_t  pdpy_flux[kMaxTruth];        //Parent Y momentum at decay point (GeV)
+    Float_t  pdpz_flux[kMaxTruth];        //Parent Z momentum at decay point (GeV)
+    Float_t  ppdxdz_flux[kMaxTruth];      //Parent dxdz direction at production
+    Float_t  ppdydz_flux[kMaxTruth];      //Parent dydz direction at production
+    Float_t  pppz_flux[kMaxTruth];        //Parent Z momentum at production (GeV)
+    
+    Int_t    ptype_flux[kMaxTruth];        //Parent GEANT code particle ID
+    Float_t  ppvx_flux[kMaxTruth];        //Parent production vertex X (cm)
+    Float_t  ppvy_flux[kMaxTruth];        //Parent production vertex Y (cm)
+    Float_t  ppvz_flux[kMaxTruth];        //Parent production vertex Z (cm)
+    Float_t  muparpx_flux[kMaxTruth];     //Muon neutrino parent production vertex X (cm)
+    Float_t  muparpy_flux[kMaxTruth];     //Muon neutrino parent production vertex Y (cm)
+    Float_t  muparpz_flux[kMaxTruth];     //Muon neutrino parent production vertex Z (cm)
+    Float_t  mupare_flux[kMaxTruth];      //Muon neutrino parent energy (GeV)
+    
+    Int_t    tgen_flux[kMaxTruth];        //Parent generation in cascade. (1 = primary proton, 
+    					  //2=particles produced by proton interaction, 3 = particles 
+					  //produced by interactions of the 2's, ...
+    Int_t    tgptype_flux[kMaxTruth];     //Type of particle that created a particle flying of the target  
+    Float_t  tgppx_flux[kMaxTruth];       //X Momentum of a particle, that created a particle that flies 
+    					  //off the target, at the interaction point. (GeV)
+    Float_t  tgppy_flux[kMaxTruth];       //Y Momentum of a particle, that created a particle that flies  
+					  //off the target, at the interaction point. (GeV)
+    Float_t  tgppz_flux[kMaxTruth];       //Z Momentum of a particle, that created a particle that flies
+					  //off the target, at the interaction point. (GeV)
+    Float_t  tprivx_flux[kMaxTruth];      //Primary particle interaction vertex X (cm)  
+    Float_t  tprivy_flux[kMaxTruth];      //Primary particle interaction vertex Y (cm)  
+    Float_t  tprivz_flux[kMaxTruth];      //Primary particle interaction vertex Z (cm) 
+    Float_t  dk2gen_flux[kMaxTruth];      //distance from decay to ray origin (cm) 
+    Float_t  gen2vtx_flux[kMaxTruth];     //distance from ray origin to event vtx (cm)
+ 
+    Float_t  tpx_flux[kMaxTruth];        //Px of parent particle leaving BNB/NuMI target (GeV)
+    Float_t  tpy_flux[kMaxTruth];        //Py of parent particle leaving BNB/NuMI target (GeV)
+    Float_t  tpz_flux[kMaxTruth];        //Pz of parent particle leaving BNB/NuMI target (GeV)
     Int_t    tptype_flux[kMaxTruth];     //Type of parent particle leaving BNB target
      
     //genie information
@@ -454,7 +735,7 @@ namespace microboone {
     std::vector<Int_t>    cry_ND;
     std::vector<Int_t>    cry_mother;
     
-    //geant information
+    //G4 MC Particle information
     size_t MaxGEANTparticles = 0; ///! how many particles there is currently room for
     Int_t     no_primaries;      //number of primary geant particles
     Int_t     geant_list_size;  //number of all geant particles
@@ -497,6 +778,50 @@ namespace microboone {
     std::vector<Int_t>    origin;   ////0: unknown, 1: cosmic, 2: neutrino, 3: supernova, 4: singles 
     std::vector<Int_t>    MCTruthIndex; //this geant particle comes from the neutrino interaction of the _truth variables with this index
 
+    //MC Shower information
+    Int_t     no_mcshowers;                         //number of MC Showers in this event.
+    //MC Shower particle information
+    std::vector<Int_t>       mcshwr_origin;	    //MC Shower origin information.  
+    std::vector<Int_t>       mcshwr_pdg;	    //MC Shower particle PDG code.   
+    std::vector<Int_t>       mcshwr_TrackId;        //MC Shower particle G4 track ID.
+    std::vector<std::string> mcshwr_Process;	    //MC Shower particle's creation process. 
+    std::vector<Float_t>     mcshwr_startX;	    //MC Shower particle G4 startX 
+    std::vector<Float_t>     mcshwr_startY;	    //MC Shower particle G4 startY 
+    std::vector<Float_t>     mcshwr_startZ;	    //MC Shower particle G4 startZ 
+    std::vector<Float_t>     mcshwr_endX;	    //MC Shower particle G4 endX 
+    std::vector<Float_t>     mcshwr_endY;	    //MC Shower particle G4 endY 
+    std::vector<Float_t>     mcshwr_endZ;	    //MC Shower particle G4 endZ 
+    std::vector<Float_t>    mcshwr_CombEngX;	    //MC Shower Combined energy deposition information, Start Point X Position. 
+    std::vector<Float_t>    mcshwr_CombEngY;	    //MC Shower Combined energy deposition information, Start Point Y Position.
+    std::vector<Float_t>    mcshwr_CombEngZ;	    //MC Shower Combined energy deposition information, Start Point Z Position.
+    std::vector<Float_t>     mcshwr_CombEngPx;	    //MC Shower Combined energy deposition information, Momentum X direction.
+    std::vector<Float_t>     mcshwr_CombEngPy;	    //MC Shower Combined energy deposition information, Momentum X direction.
+    std::vector<Float_t>     mcshwr_CombEngPz;	    //MC Shower Combined energy deposition information, Momentum X direction.
+    std::vector<Float_t>     mcshwr_CombEngE;	    //MC Shower Combined energy deposition information, Energy
+    std::vector<Int_t>       mcshwr_isEngDeposited;  //tells whether if this shower deposited energy in the detector or not.
+    						    //yes = 1; no =0;	
+    //MC Shower mother information
+    std::vector<Int_t>       mcshwr_Motherpdg;       //MC Shower's mother PDG code. 
+    std::vector<Int_t>       mcshwr_MotherTrkId;     //MC Shower's mother G4 track ID.
+    std::vector<std::string> mcshwr_MotherProcess;   //MC Shower's mother creation process. 
+    std::vector<Float_t>     mcshwr_MotherstartX;    //MC Shower's mother  G4 startX .
+    std::vector<Float_t>     mcshwr_MotherstartY;    //MC Shower's mother  G4 startY .
+    std::vector<Float_t>     mcshwr_MotherstartZ;    //MC Shower's mother  G4 startZ .
+    std::vector<Float_t>     mcshwr_MotherendX;	     //MC Shower's mother  G4 endX   .
+    std::vector<Float_t>     mcshwr_MotherendY;	     //MC Shower's mother  G4 endY   .
+    std::vector<Float_t>     mcshwr_MotherendZ;	     //MC Shower's mother  G4 endZ   .
+    //MC Shower ancestor information
+    std::vector<Int_t>       mcshwr_Ancestorpdg;       //MC Shower's ancestor PDG code. 
+    std::vector<Int_t>       mcshwr_AncestorTrkId;     //MC Shower's ancestor G4 track ID.
+    std::vector<std::string> mcshwr_AncestorProcess;   //MC Shower's ancestor creation process. 
+    std::vector<Float_t>     mcshwr_AncestorstartX;    //MC Shower's ancestor  G4 startX
+    std::vector<Float_t>     mcshwr_AncestorstartY;    //MC Shower's ancestor  G4 startY
+    std::vector<Float_t>     mcshwr_AncestorstartZ;    //MC Shower's ancestor  G4 startZ
+    std::vector<Float_t>     mcshwr_AncestorendX;      //MC Shower's ancestor  G4 endX  
+    std::vector<Float_t>     mcshwr_AncestorendY;      //MC Shower's ancestor  G4 endY  
+    std::vector<Float_t>     mcshwr_AncestorendZ;      //MC Shower's ancestor  G4 endZ  
+						       
+
     // Auxiliary detector variables saved for each geant track
     // This data is saved as a vector (one item per GEANT particle) of C arrays
     // (wrapped in a BoxedArray for technical reasons), one item for each
@@ -530,11 +855,17 @@ namespace microboone {
     /// Returns whether we have Genie data
     bool hasGenieInfo() const { return bits & tdGenie; }
     
+    /// Returns whether we have MCShower data
+    bool hasMCShowerInfo() const { return bits & tdMCshwr; }
+    
     /// Returns whether we have Hit data
     bool hasHitInfo() const { return bits & tdHit; }
 
     /// Returns whether we have Track data
     bool hasTrackInfo() const { return bits & tdTrack; }
+    
+    /// Returns whether we have Shower data
+    bool hasShowerInfo() const { return bits & tdShower; }
     
     /// Returns whether we have Vertex data
     bool hasVertexInfo() const { return bits & tdVtx; }
@@ -545,21 +876,25 @@ namespace microboone {
     /// Returns whether we have Flash data
     bool hasFlashInfo() const { return bits & tdFlash; }
     
-    /// Returns whether we have Shower data
-    bool hasShowerInfo() const { return bits & tdShower; }
-
     /// Sets the specified bits
     void SetBits(unsigned int setbits, bool unset = false)
       { if (unset) bits &= ~setbits; else bits |= setbits; }
       
     /// Constructor; clears all fields
-    AnalysisTreeDataStruct(size_t nTrackers = 0): bits(tdDefault) 
-      { SetTrackers(nTrackers); Clear(); }
+    AnalysisTreeDataStruct(size_t nTrackers = 0,
+      std::vector<std::string> const& ShowerAlgos = {}):
+      bits(tdDefault) 
+      { SetTrackers(nTrackers); SetShowerAlgos(ShowerAlgos); Clear(); }
 
     TrackDataStruct& GetTrackerData(size_t iTracker)
       { return TrackData.at(iTracker); }
     const TrackDataStruct& GetTrackerData(size_t iTracker) const
       { return TrackData.at(iTracker); }
+    
+    ShowerDataStruct& GetShowerData(size_t iShower)
+      { return ShowerData.at(iShower); }
+    ShowerDataStruct const& GetShowerData(size_t iShower) const
+      { return ShowerData.at(iShower); }
     
     
     /// Clear all fields if this object (not the tracker algorithm data)
@@ -572,6 +907,9 @@ namespace microboone {
     /// Allocates data structures for the given number of trackers (no Clear())
     void SetTrackers(size_t nTrackers) { TrackData.resize(nTrackers); }
     
+    /// Allocates data structures for the given number of trackers (no Clear())
+    void SetShowerAlgos(std::vector<std::string> const& ShowerAlgos);
+    
     /// Resize the data strutcure for GEANT particles
     void ResizeGEANT(int nParticles);
     
@@ -581,18 +919,32 @@ namespace microboone {
     /// Resize the data strutcure for Cry primaries
     void ResizeCry(int nPrimaries);
     
+    /// Resize the data strutcure for  MC Showers
+    void ResizeMCShower(int nMCShowers);
+    
     /// Connect this object with a tree
-    void SetAddresses(TTree* pTree, const std::vector<std::string>& trackers, bool isCosmics);
+    void SetAddresses(
+      TTree* pTree,
+      std::vector<std::string> const& trackers,
+      std::vector<std::string> const& showeralgos,
+      bool isCosmics
+      );
     
     
     /// Returns the number of trackers for which data structures are allocated
     size_t GetNTrackers() const { return TrackData.size(); }
+    
+    /// Returns the number of trackers for which data structures are allocated
+    size_t GetNShowerAlgos() const { return ShowerData.size(); }
     
     /// Returns the number of hits for which memory is allocated
     size_t GetMaxHits() const { return kMaxHits; }
     
     /// Returns the number of trackers for which memory is allocated
     size_t GetMaxTrackers() const { return TrackData.capacity(); }
+    
+    /// Returns the number of trackers for which memory is allocated
+    size_t GetMaxShowers() const { return ShowerData.capacity(); }
     
     /// Returns the number of GEANT particles for which memory is allocated
     size_t GetMaxGEANTparticles() const { return MaxGEANTparticles; }
@@ -679,6 +1031,26 @@ namespace microboone {
   }; // class AnalysisTreeDataStruct
   
   
+  /// Contains ROOTTreeCode<>::code, ROOT tree character for branch of type T
+  template <typename T> struct ROOTTreeCode; // generally undefined
+  
+  template<> struct ROOTTreeCode<Short_t>  { static constexpr char code = 'S'; };
+  template<> struct ROOTTreeCode<Int_t>    { static constexpr char code = 'I'; };
+  template<> struct ROOTTreeCode<Double_t> { static constexpr char code = 'D'; };
+  
+  
+  /// Class whose "type" contains the base data type of the container
+  template <typename C> struct ContainerValueType; // generally undefined
+  
+  template <typename A>
+  struct ContainerValueType<std::vector<AnalysisTreeDataStruct::BoxedArray<A>>>
+    { using type = typename AnalysisTreeDataStruct::BoxedArray<A>::value_type; };
+  
+  template <typename T>
+  struct ContainerValueType<std::vector<T>>
+    { using type = typename std::vector<T>::value_type; };
+  
+  
   /**
    * @brief Creates a simple ROOT tree with tracking and calorimetry information
    * 
@@ -714,7 +1086,7 @@ namespace microboone {
     // event information is huge and dynamic;
     // run information is much smaller and we still store it statically
     // in the event
-    AnalysisTreeDataStruct* fData;
+    std::unique_ptr<AnalysisTreeDataStruct> fData;
 //    AnalysisTreeDataStruct::RunData_t RunData;
     AnalysisTreeDataStruct::SubRunData_t SubRunData;
 
@@ -726,9 +1098,10 @@ namespace microboone {
     std::string fCryGenModuleLabel;
     std::string fG4ModuleLabel;
     std::string fVertexModuleLabel;
-    std::string fShowerModuleLabel;
     std::string fOpFlashModuleLabel;
+    std::string fMCShowerModuleLabel;
     std::vector<std::string> fTrackModuleLabel;
+    std::vector<std::string> fShowerModuleLabel;
     std::vector<std::string> fCalorimetryModuleLabel;
     std::vector<std::string> fParticleIDModuleLabel;
     std::string fPOTModuleLabel;
@@ -737,6 +1110,7 @@ namespace microboone {
     bool fSaveCryInfo; ///whether to extract and save CRY particle data
     bool fSaveGenieInfo; ///whether to extract and save Genie information
     bool fSaveGeantInfo; ///whether to extract and save Geant information
+    bool fSaveMCShowerInfo; ///whether to extract and save MC Shower information
     bool fSaveHitInfo; ///whether to extract and save Hit information
     bool fSaveTrackInfo; ///whether to extract and save Track information
     bool fSaveVertexInfo; ///whether to extract and save Vertex information
@@ -746,29 +1120,40 @@ namespace microboone {
     std::vector<std::string> fCosmicTaggerAssocLabel;
     std::vector<std::string> fFlashMatchAssocLabel;
 
+    bool bIgnoreMissingShowers; ///< whether to ignore missing shower information
+    
     bool isCosmics;      ///< if it contains cosmics
     bool fSaveCaloCosmics; ///< save calorimetry information for cosmics
     float fG4minE;         ///< Energy threshold to save g4 particle info
     /// Returns the number of trackers configured
     size_t GetNTrackers() const { return fTrackModuleLabel.size(); }
        
+    /// Returns the number of shower algorithms configured
+    size_t GetNShowerAlgos() const { return fShowerModuleLabel.size(); }
+    
+    /// Returns the name of configured shower algorithms (converted to string)
+    std::vector<std::string> GetShowerAlgos() const
+      { return { fShowerModuleLabel.begin(), fShowerModuleLabel.end() }; }
+    
     /// Creates the structure for the tree data; optionally initializes it
     void CreateData(bool bClearData = false)
       {
         if (!fData) {
-          fData = new AnalysisTreeDataStruct(GetNTrackers());
+          fData.reset
+            (new AnalysisTreeDataStruct(GetNTrackers(), GetShowerAlgos()));
+          fData->SetBits(AnalysisTreeDataStruct::tdCry,    !fSaveCryInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdGenie,  !fSaveGenieInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdGeant,  !fSaveGeantInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdMCshwr, !fSaveMCShowerInfo); 
+          fData->SetBits(AnalysisTreeDataStruct::tdHit,    !fSaveHitInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdShower, !fSaveShowerInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdTrack,  !fSaveTrackInfo);
+          fData->SetBits(AnalysisTreeDataStruct::tdVtx,    !fSaveVertexInfo);
           fData->SetBits(AnalysisTreeDataStruct::tdAuxDet, !fSaveAuxDetInfo);
-	  fData->SetBits(AnalysisTreeDataStruct::tdCry, !fSaveCryInfo);	  
-	  fData->SetBits(AnalysisTreeDataStruct::tdGenie, !fSaveGenieInfo);
-	  fData->SetBits(AnalysisTreeDataStruct::tdGeant, !fSaveGeantInfo); 
         }
         else {
-          fData->SetBits(AnalysisTreeDataStruct::tdHit, !fSaveHitInfo);	
-	  fData->SetBits(AnalysisTreeDataStruct::tdTrack, !fSaveTrackInfo);	
-	  fData->SetBits(AnalysisTreeDataStruct::tdVtx, !fSaveVertexInfo);
-	  fData->SetTrackers(GetNTrackers());
-          fData->SetBits(AnalysisTreeDataStruct::tdFlash, !fSaveFlashInfo);	
-          fData->SetBits(AnalysisTreeDataStruct::tdShower, !fSaveShowerInfo);	
+          fData->SetTrackers(GetNTrackers());
+          fData->SetShowerAlgos(GetShowerAlgos());
           if (bClearData) fData->Clear();
         }
       } // CreateData()
@@ -776,29 +1161,43 @@ namespace microboone {
     /// Sets the addresses of all the tree branches, creating the missing ones
     void SetAddresses()
       {
-        CheckData("SetAddress()"); CheckTree("SetAddress()");
-        fData->SetAddresses(fTree, fTrackModuleLabel, isCosmics);
+        CheckData(__func__); CheckTree(__func__);
+        fData->SetAddresses
+          (fTree, fTrackModuleLabel, fShowerModuleLabel, isCosmics);
       } // SetAddresses()
     
     /// Sets the addresses of all the tree branches of the specified tracking algo,
     /// creating the missing ones
     void SetTrackerAddresses(size_t iTracker)
       {
-        CheckData("SetTrackerAddresses()"); CheckTree("SetTrackerAddresses()");
+        CheckData(__func__); CheckTree(__func__);
         if (iTracker >= fData->GetNTrackers()) {
           throw art::Exception(art::errors::LogicError)
             << "AnalysisTree::SetTrackerAddresses(): no tracker #" << iTracker
             << " (" << fData->GetNTrackers() << " available)";
         }
-        fData->GetTrackerData(iTracker) \
+        fData->GetTrackerData(iTracker)
           .SetAddresses(fTree, fTrackModuleLabel[iTracker], isCosmics);
       } // SetTrackerAddresses()
+    
+    /// Sets the addresses of all the tree branches of the specified shower algo,
+    /// creating the missing ones
+    void SetShowerAddresses(size_t iShower)
+      {
+        CheckData(__func__); CheckTree(__func__);
+        if (iShower >= fData->GetNShowerAlgos()) {
+          throw art::Exception(art::errors::LogicError)
+            << "AnalysisTree::SetShowerAddresses(): no shower algo #" << iShower
+            << " (" << fData->GetNShowerAlgos() << " available)";
+        }
+        fData->GetShowerData(iShower).SetAddresses(fTree);
+      } // SetShowerAddresses()
     
     /// Create the output tree and the data structures, if needed
     void CreateTree(bool bClearData = false);
     
     /// Destroy the local buffers (existing branches will point to invalid address!)
-    void DestroyData() { if (fData) { delete fData; fData = nullptr; } }
+    void DestroyData() { fData.reset(); }
     
     /// Helper function: throws if no data structure is available
     void CheckData(std::string caller) const
@@ -814,6 +1213,20 @@ namespace microboone {
         throw art::Exception(art::errors::LogicError)
           << "AnalysisTree::" << caller << ": no tree";
       } // CheckData()
+    
+    
+    /// Stores the information of shower in slot iShower of showerData
+    void FillShower(
+      AnalysisTreeDataStruct::ShowerDataStruct& showerData,
+      size_t iShower, recob::Shower const& showers
+      ) const;
+    
+    /// Stores the information of all showers into showerData
+    void FillShowers(
+      AnalysisTreeDataStruct::ShowerDataStruct& showerData,
+      std::vector<recob::Shower> const& showers
+      ) const;
+    
   }; // class microboone::AnalysisTree
 } // namespace microboone
 
@@ -1162,6 +1575,138 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::SetAddresses(
 } // microboone::AnalysisTreeDataStruct::TrackDataStruct::SetAddresses()
 
 //------------------------------------------------------------------------------
+//---  AnalysisTreeDataStruct::ShowerDataStruct
+//---
+
+void microboone::AnalysisTreeDataStruct::ShowerDataStruct::Resize
+  (size_t nShowers)
+{
+  MaxShowers = nShowers;
+  
+  showerID.resize(MaxShowers);
+  shwr_bestplane.resize(MaxShowers);
+  shwr_length.resize(MaxShowers);
+  shwr_startdcosx.resize(MaxShowers);
+  shwr_startdcosy.resize(MaxShowers);
+  shwr_startdcosz.resize(MaxShowers);
+  shwr_startx.resize(MaxShowers);
+  shwr_starty.resize(MaxShowers);
+  shwr_startz.resize(MaxShowers);
+  shwr_totEng.resize(MaxShowers);
+  shwr_dedx.resize(MaxShowers);
+  shwr_mipEng.resize(MaxShowers);
+  
+} // microboone::AnalysisTreeDataStruct::ShowerDataStruct::Resize()
+
+void microboone::AnalysisTreeDataStruct::ShowerDataStruct::Clear() {
+  Resize(MaxShowers);
+  nshowers = 0;
+  
+  FillWith(showerID,         -9999 );
+  FillWith(shwr_bestplane,   -9999 );
+  FillWith(shwr_length,     -99999.);
+  FillWith(shwr_startdcosx, -99999.);
+  FillWith(shwr_startdcosy, -99999.);
+  FillWith(shwr_startdcosz, -99999.);
+  FillWith(shwr_startx,     -99999.);
+  FillWith(shwr_starty,     -99999.);
+  FillWith(shwr_startz,     -99999.);
+ 
+  for (size_t iShw = 0; iShw < MaxShowers; ++iShw){
+    // the following are BoxedArray's;
+    // their iterators traverse all the array dimensions
+    FillWith(shwr_totEng[iShw], -99999.);
+    FillWith(shwr_dedx[iShw],   -99999.);
+    FillWith(shwr_mipEng[iShw], -99999.);
+  } // for shower
+  
+} // microboone::AnalysisTreeDataStruct::ShowerDataStruct::Clear()
+
+
+void microboone::AnalysisTreeDataStruct::ShowerDataStruct::MarkMissing
+  (TTree* pTree)
+{
+  // here we implement the policy prescription for a missing set of showers;
+  // this means that no shower data product was found in the event,
+  // yet the user has accepted to go on.
+  // We now need to mark this product in a unmistakably clear way, so that it
+  // is not confused with a valid collection of an event where no showers
+  // were reconstructed, not as a list of valid showers.
+  // The prescription currently implemented is:
+  // - have only one shower in the list;
+  // - set the ID of that shower as -9999
+  //
+  
+  // first set the data structures to contain one invalid shower:
+  SetMaxShowers(1); // includes resize to a set of one shower
+  Clear(); // initializes all the showers in the set (one) as invalid
+  // now set the tree addresses to the newly allocated memory;
+  // this creates the tree branches in case they are not there yet
+  SetAddresses(pTree);
+  
+  // then, set the variables so that ROOT tree knows there is one shower only
+  nshowers = 1;
+  
+} // microboone::AnalysisTreeDataStruct::ShowerDataStruct::MarkMissing()
+
+
+void microboone::AnalysisTreeDataStruct::ShowerDataStruct::SetAddresses
+  (TTree* pTree)
+{
+  if (MaxShowers == 0) return; // no showers, no tree!
+  
+  microboone::AnalysisTreeDataStruct::BranchCreator CreateBranch(pTree);
+
+  AutoResettingStringSteam sstr;
+  sstr() << kMaxShowerHits;
+  std::string MaxShowerHitsIndexStr("[" + sstr.str() + "]");
+  
+  std::string ShowerLabel = Name();
+  std::string BranchName;
+
+  BranchName = "nshowers_" + ShowerLabel;
+  CreateBranch(BranchName, &nshowers, BranchName + "/S");
+  std::string NShowerIndexStr = "[" + BranchName + "]";
+  
+  BranchName = "showerID_" + ShowerLabel;
+  CreateBranch(BranchName, showerID, BranchName + NShowerIndexStr + "/I");
+  
+  BranchName = "shwr_bestplane_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_bestplane, BranchName + NShowerIndexStr + "/S");
+  
+  BranchName = "shwr_length_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_length, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_startdcosx_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_startdcosx, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_startdcosy_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_startdcosy, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_startdcosz_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_startdcosz, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_startx_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_startx, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_starty_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_starty, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_startz_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_startz, BranchName + NShowerIndexStr + "/F");
+  
+  BranchName = "shwr_totEng_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_totEng, BranchName + NShowerIndexStr + "[3]/F");
+  
+  BranchName = "shwr_dedx_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_dedx, BranchName + NShowerIndexStr + "[3]/F");
+  
+  BranchName = "shwr_mipEng_" + ShowerLabel;
+  CreateBranch(BranchName, shwr_mipEng, BranchName + NShowerIndexStr + "[3]/F");
+  
+} // microboone::AnalysisTreeDataStruct::ShowerDataStruct::SetAddresses()
+
+//------------------------------------------------------------------------------
 //---  AnalysisTreeDataStruct
 //---
 
@@ -1206,22 +1751,6 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   std::fill(flash_ycenter, flash_ycenter + sizeof(flash_ycenter)/sizeof(flash_ycenter[0]), -9999);
   std::fill(flash_zcenter, flash_zcenter + sizeof(flash_zcenter)/sizeof(flash_zcenter[0]), -9999);
 
-  nshowers = 0;
-  std::fill(showerID, showerID + sizeof(showerID)/sizeof(showerID[0]), -9999);
-  std::fill(shwr_bestplane, shwr_bestplane + sizeof(shwr_bestplane)/sizeof(shwr_bestplane[0]), -9999);
-  std::fill(shwr_length, shwr_length + sizeof(shwr_length)/sizeof(shwr_length[0]), -99999.);
-  std::fill(shwr_startdcosx, shwr_startdcosx + sizeof(shwr_startdcosx)/sizeof(shwr_startdcosx[0]), -99999.);
-  std::fill(shwr_startdcosy, shwr_startdcosy + sizeof(shwr_startdcosy)/sizeof(shwr_startdcosy[0]), -99999.);
-  std::fill(shwr_startdcosz, shwr_startdcosz + sizeof(shwr_startdcosz)/sizeof(shwr_startdcosz[0]), -99999.);
-  std::fill(shwr_startx, shwr_startx + sizeof(shwr_startx)/sizeof(shwr_startx[0]), -99999.);
-  std::fill(shwr_starty, shwr_starty + sizeof(shwr_starty)/sizeof(shwr_starty[0]), -99999.);
-  std::fill(shwr_startz, shwr_startz + sizeof(shwr_startz)/sizeof(shwr_startz[0]), -99999.);
-  for (size_t ishwr = 0; ishwr < kMaxShowers; ++ishwr) {
-     std::fill(shwr_totEng[ishwr], shwr_totEng[ishwr]+3, -99999.);
-     std::fill(shwr_dedx[ishwr], shwr_dedx[ishwr]+3, -99999.);
-     std::fill(shwr_mipEng[ishwr], shwr_mipEng[ishwr]+3, -99999.);
-  }   
-  
 
   mcevts_truth = -99999;
   mcevts_truthcry = -99999;
@@ -1244,6 +1773,35 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   std::fill(lep_dcosx_truth, lep_dcosx_truth + sizeof(lep_dcosx_truth)/sizeof(lep_dcosx_truth[0]), -99999.);
   std::fill(lep_dcosy_truth, lep_dcosy_truth + sizeof(lep_dcosy_truth)/sizeof(lep_dcosy_truth[0]), -99999.);
   std::fill(lep_dcosz_truth, lep_dcosz_truth + sizeof(lep_dcosz_truth)/sizeof(lep_dcosz_truth[0]), -99999.);
+
+  //Flux information
+  std::fill(vx_flux, vx_flux + sizeof(vx_flux)/sizeof(vx_flux[0]), -99999.);
+  std::fill(vy_flux, vy_flux + sizeof(vy_flux)/sizeof(vy_flux[0]), -99999.);
+  std::fill(vz_flux, vz_flux + sizeof(vz_flux)/sizeof(vz_flux[0]), -99999.);
+  std::fill(pdpx_flux, pdpx_flux + sizeof(pdpx_flux)/sizeof(pdpx_flux[0]), -99999.);
+  std::fill(pdpy_flux, pdpy_flux + sizeof(pdpy_flux)/sizeof(pdpy_flux[0]), -99999.);
+  std::fill(pdpz_flux, pdpz_flux + sizeof(pdpz_flux)/sizeof(pdpz_flux[0]), -99999.);
+  std::fill(ppdxdz_flux, ppdxdz_flux + sizeof(ppdxdz_flux)/sizeof(ppdxdz_flux[0]), -99999.);
+  std::fill(ppdydz_flux, ppdydz_flux + sizeof(ppdydz_flux)/sizeof(ppdydz_flux[0]), -99999.);
+  std::fill(pppz_flux, pppz_flux + sizeof(pppz_flux)/sizeof(pppz_flux[0]), -99999.);
+  std::fill(ptype_flux, ptype_flux + sizeof(ptype_flux)/sizeof(ptype_flux[0]), -9999);
+  std::fill(ppvx_flux, ppvx_flux + sizeof(ppvx_flux)/sizeof(ppvx_flux[0]), -99999.);
+  std::fill(ppvy_flux, ppvy_flux + sizeof(ppvy_flux)/sizeof(ppvy_flux[0]), -99999.);
+  std::fill(ppvz_flux, ppvz_flux + sizeof(ppvz_flux)/sizeof(ppvz_flux[0]), -99999.);
+  std::fill(muparpx_flux, muparpx_flux + sizeof(muparpx_flux)/sizeof(muparpx_flux[0]), -99999.);
+  std::fill(muparpy_flux, muparpy_flux + sizeof(muparpy_flux)/sizeof(muparpy_flux[0]), -99999.);
+  std::fill(muparpz_flux, muparpz_flux + sizeof(muparpz_flux)/sizeof(muparpz_flux[0]), -99999.);
+  std::fill(mupare_flux, mupare_flux + sizeof(mupare_flux)/sizeof(mupare_flux[0]), -99999.);
+  std::fill(tgen_flux, tgen_flux + sizeof(tgen_flux)/sizeof(tgen_flux[0]), -9999);
+  std::fill(tgptype_flux, tgptype_flux + sizeof(tgptype_flux)/sizeof(tgptype_flux[0]), -9999);
+  std::fill(tgppx_flux, tgppx_flux + sizeof(tgppx_flux)/sizeof(tgppx_flux[0]), -99999.);
+  std::fill(tgppy_flux, tgppy_flux + sizeof(tgppy_flux)/sizeof(tgppy_flux[0]), -99999.);
+  std::fill(tgppz_flux, tgppz_flux + sizeof(tgppz_flux)/sizeof(tgppz_flux[0]), -99999.);
+  std::fill(tprivx_flux, tprivx_flux + sizeof(tprivx_flux)/sizeof(tprivx_flux[0]), -99999.);
+  std::fill(tprivy_flux, tprivy_flux + sizeof(tprivy_flux)/sizeof(tprivy_flux[0]), -99999.);
+  std::fill(tprivz_flux, tprivz_flux + sizeof(tprivz_flux)/sizeof(tprivz_flux[0]), -99999.);
+  std::fill(dk2gen_flux, dk2gen_flux + sizeof(dk2gen_flux)/sizeof(dk2gen_flux[0]), -99999.);
+  std::fill(gen2vtx_flux, gen2vtx_flux + sizeof(gen2vtx_flux)/sizeof(gen2vtx_flux[0]), -99999.);
   std::fill(tpx_flux, tpx_flux + sizeof(tpx_flux)/sizeof(tpx_flux[0]), -99999.);
   std::fill(tpy_flux, tpy_flux + sizeof(tpy_flux)/sizeof(tpy_flux[0]), -99999.);
   std::fill(tpz_flux, tpz_flux + sizeof(tpz_flux)/sizeof(tpz_flux[0]), -99999.);
@@ -1254,6 +1812,7 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   no_primaries = 0;
   geant_list_size=0;
   geant_list_size_in_tpcAV = 0;
+  no_mcshowers = 0;
   
   FillWith(pdg, -99999);
   FillWith(status, -99999);
@@ -1317,7 +1876,43 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   FillWith(cry_mass, -99999.);
   FillWith(cry_trackID, -99999);
   FillWith(cry_ND, -99999);
-  FillWith(cry_mother, -99999);
+  FillWith(cry_mother, -99999); 
+  FillWith(mcshwr_origin, -1);   
+  FillWith(mcshwr_pdg, -99999);
+  FillWith(mcshwr_TrackId, -99999);
+  FillWith(mcshwr_Process, "noname");
+  FillWith(mcshwr_startX, -99999.);
+  FillWith(mcshwr_startY, -99999.);
+  FillWith(mcshwr_startZ, -99999.);
+  FillWith(mcshwr_endX, -99999.);
+  FillWith(mcshwr_endY, -99999.);
+  FillWith(mcshwr_endZ, -99999.);
+  FillWith(mcshwr_CombEngX, -99999.);
+  FillWith(mcshwr_CombEngY, -99999.);
+  FillWith(mcshwr_CombEngZ, -99999.);
+  FillWith(mcshwr_CombEngPx, -99999.);
+  FillWith(mcshwr_CombEngPy, -99999.);
+  FillWith(mcshwr_CombEngPz, -99999.);
+  FillWith(mcshwr_CombEngE, -99999.);
+  FillWith(mcshwr_isEngDeposited, -9999);  
+  FillWith(mcshwr_Motherpdg, -99999);
+  FillWith(mcshwr_MotherTrkId, -99999);
+  FillWith(mcshwr_MotherProcess, "noname");
+  FillWith(mcshwr_MotherstartX, -99999.);
+  FillWith(mcshwr_MotherstartY, -99999.);
+  FillWith(mcshwr_MotherstartZ, -99999.);
+  FillWith(mcshwr_MotherendX, -99999.);
+  FillWith(mcshwr_MotherendY, -99999.);
+  FillWith(mcshwr_MotherendZ, -99999.);
+  FillWith(mcshwr_Ancestorpdg, -99999);
+  FillWith(mcshwr_AncestorTrkId, -99999);  
+  FillWith(mcshwr_AncestorProcess, "noname");
+  FillWith(mcshwr_AncestorstartX, -99999.);
+  FillWith(mcshwr_AncestorstartY, -99999.);
+  FillWith(mcshwr_AncestorstartZ, -99999.);
+  FillWith(mcshwr_AncestorendX, -99999.);
+  FillWith(mcshwr_AncestorendY, -99999.);
+  FillWith(mcshwr_AncestorendZ, -99999.);
   
   // auxiliary detector information;
   FillWith(NAuxDets, 0);
@@ -1342,8 +1937,22 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
 void microboone::AnalysisTreeDataStruct::Clear() {
   ClearLocalData();
   std::for_each
-    (TrackData.begin(), TrackData.end(), std::mem_fun_ref(&TrackDataStruct::Clear));
+    (TrackData.begin(), TrackData.end(), std::mem_fn(&TrackDataStruct::Clear));
+  std::for_each
+    (ShowerData.begin(), ShowerData.end(), std::mem_fn(&ShowerDataStruct::Clear));
 } // microboone::AnalysisTreeDataStruct::Clear()
+
+
+void microboone::AnalysisTreeDataStruct::SetShowerAlgos
+  (std::vector<std::string> const& ShowerAlgos)
+{
+  
+  size_t const nShowerAlgos = ShowerAlgos.size();
+  ShowerData.resize(nShowerAlgos);
+  for (size_t iAlgo = 0; iAlgo < nShowerAlgos; ++iAlgo)
+    ShowerData[iAlgo].SetName(ShowerAlgos[iAlgo]);
+  
+} // microboone::AnalysisTreeDataStruct::SetShowerAlgos()
 
 
 void microboone::AnalysisTreeDataStruct::ResizeGEANT(int nParticles) {
@@ -1444,9 +2053,50 @@ void microboone::AnalysisTreeDataStruct::ResizeCry(int nPrimaries) {
 
 } // microboone::AnalysisTreeDataStruct::ResizeCry()
 
+void microboone::AnalysisTreeDataStruct::ResizeMCShower(int nMCShowers) {
+  mcshwr_origin.resize(nMCShowers);		
+  mcshwr_pdg.resize(nMCShowers);		
+  mcshwr_TrackId.resize(nMCShowers); 	
+  mcshwr_Process.resize(nMCShowers); 
+  mcshwr_startX.resize(nMCShowers); 	
+  mcshwr_startY.resize(nMCShowers);	 
+  mcshwr_startZ.resize(nMCShowers);	 
+  mcshwr_endX.resize(nMCShowers);	 
+  mcshwr_endY.resize(nMCShowers);	 
+  mcshwr_endZ.resize(nMCShowers);	 
+  mcshwr_CombEngX.resize(nMCShowers);	 
+  mcshwr_CombEngY.resize(nMCShowers);	 
+  mcshwr_CombEngZ.resize(nMCShowers);	 
+  mcshwr_CombEngPx.resize(nMCShowers);	 
+  mcshwr_CombEngPy.resize(nMCShowers);	 
+  mcshwr_CombEngPz.resize(nMCShowers);	 
+  mcshwr_CombEngE.resize(nMCShowers);
+  mcshwr_isEngDeposited.resize(nMCShowers);	   	
+  mcshwr_Motherpdg.resize(nMCShowers);	
+  mcshwr_MotherTrkId.resize(nMCShowers);	
+  mcshwr_MotherProcess.resize(nMCShowers);
+  mcshwr_MotherstartX.resize(nMCShowers);	 
+  mcshwr_MotherstartY.resize(nMCShowers);	 
+  mcshwr_MotherstartZ.resize(nMCShowers);	 
+  mcshwr_MotherendX.resize(nMCShowers);	 
+  mcshwr_MotherendY.resize(nMCShowers);	 
+  mcshwr_MotherendZ.resize(nMCShowers);	   	
+  mcshwr_Ancestorpdg.resize(nMCShowers);	
+  mcshwr_AncestorTrkId.resize(nMCShowers);	
+  mcshwr_AncestorProcess.resize(nMCShowers); 
+  mcshwr_AncestorstartX.resize(nMCShowers);	 
+  mcshwr_AncestorstartY.resize(nMCShowers);	 
+  mcshwr_AncestorstartZ.resize(nMCShowers);	 
+  mcshwr_AncestorendX.resize(nMCShowers);	 
+  mcshwr_AncestorendY.resize(nMCShowers);	 
+  mcshwr_AncestorendZ.resize(nMCShowers);	 	
+
+} // microboone::AnalysisTreeDataStruct::ResizeMCShower()
+
 void microboone::AnalysisTreeDataStruct::SetAddresses(
   TTree* pTree,
   const std::vector<std::string>& trackers,
+  const std::vector<std::string>& showeralgos,
   bool isCosmics
 ) {
   BranchCreator CreateBranch(pTree);
@@ -1493,38 +2143,27 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
     CreateBranch("flash_zcenter",flash_zcenter,"flash_zcenter[no_flashes]/F");
   }
   
-  if (hasShowerInfo()){
-    CreateBranch("nshowers",&nshowers,"nshowers/S");
-    CreateBranch("showerID",showerID,"showerID[nshowers]/I");
-    CreateBranch("shwr_bestplane",shwr_bestplane,"shwr_bestplane[nshowers]/I");
-    CreateBranch("shwr_length",shwr_length,"shwr_length[nshowers]/F");
-    CreateBranch("shwr_startdcosx",shwr_startdcosx,"shwr_startdcosx[nshowers]/F");
-    CreateBranch("shwr_startdcosy",shwr_startdcosy,"shwr_startdcosy[nshowers]/F");
-    CreateBranch("shwr_startdcosz",shwr_startdcosz,"shwr_startdcosz[nshowers]/F");
-    CreateBranch("shwr_startx",shwr_startx,"shwr_startx[nshowers]/F");
-    CreateBranch("shwr_starty",shwr_starty,"shwr_starty[nshowers]/F");
-    CreateBranch("shwr_startz",shwr_startz,"shwr_startz[nshowers]/F");
-    CreateBranch("shwr_totEng",shwr_totEng,"shwr_totEng[nshowers][3]/F");
-    CreateBranch("shwr_dedx",shwr_dedx,"shwr_dedx[nshowers][3]/F");
-    CreateBranch("shwr_mipEng",shwr_mipEng,"shwr_mipEng[nshowers][3]/F");
-  }  
-
   if (hasTrackInfo()){
-    AutoResettingStringSteam sstr;
-    sstr() << kMaxTrackHits;
-    std::string MaxTrackHitsIndexStr("[" + sstr.str() + "]");
-
     kNTracker = trackers.size();
     CreateBranch("kNTracker",&kNTracker,"kNTracker/B");
     for(int i=0; i<kNTracker; i++){
       std::string TrackLabel = trackers[i];
-      std::string BranchName;
 
       // note that if the tracker data has maximum number of tracks 0,
       // nothing is initialized (branches are not even created)
-      TrackData[i].SetAddresses(pTree, TrackLabel, isCosmics);    
+      TrackData[i].SetAddresses(pTree, TrackLabel, isCosmics);
     } // for trackers
   } 
+
+  if (hasShowerInfo()){
+    kNShowerAlgos = showeralgos.size();
+    CreateBranch("kNShowerAlgos",&kNShowerAlgos,"kNShowerAlgos/B");
+    for(int i=0; i<kNShowerAlgos; i++){
+      // note that if the shower data has maximum number of showers 0,
+      // nothing is initialized (branches are not even created)
+      ShowerData[i].SetAddresses(pTree);
+    } // for showers
+  } // if we have shower algos
 
   if (hasGenieInfo()){
     CreateBranch("mcevts_truth",&mcevts_truth,"mcevts_truth/I");
@@ -1548,6 +2187,33 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
     CreateBranch("lep_dcosy_truth",lep_dcosy_truth,"lep_dcosy_truth[mcevts_truth]/F");
     CreateBranch("lep_dcosz_truth",lep_dcosz_truth,"lep_dcosz_truth[mcevts_truth]/F");
 
+    CreateBranch("vx_flux",vx_flux,"vx_flux[mcevts_truth]/F");
+    CreateBranch("vy_flux",vy_flux,"vy_flux[mcevts_truth]/F");
+    CreateBranch("vz_flux",vz_flux,"vz_flux[mcevts_truth]/F");
+    CreateBranch("pdpx_flux",pdpx_flux,"pdpx_flux[mcevts_truth]/F");
+    CreateBranch("pdpy_flux",pdpy_flux,"pdpy_flux[mcevts_truth]/F");
+    CreateBranch("pdpz_flux",pdpz_flux,"pdpz_flux[mcevts_truth]/F");
+    CreateBranch("ppdxdz_flux",ppdxdz_flux,"ppdxdz_flux[mcevts_truth]/F");
+    CreateBranch("ppdydz_flux",ppdydz_flux,"ppdydz_flux[mcevts_truth]/F");
+    CreateBranch("pppz_flux",pppz_flux,"pppz_flux[mcevts_truth]/F");
+    CreateBranch("ptype_flux",ptype_flux,"ptype_flux[mcevts_truth]/I");
+    CreateBranch("ppvx_flux",ppvx_flux,"ppvx_flux[mcevts_truth]/F");
+    CreateBranch("ppvy_flux",ppvy_flux,"ppvy_flux[mcevts_truth]/F");
+    CreateBranch("ppvz_flux",ppvz_flux,"ppvz_flux[mcevts_truth]/F");
+    CreateBranch("muparpx_flux",muparpx_flux,"muparpx_flux[mcevts_truth]/F");
+    CreateBranch("muparpy_flux",muparpy_flux,"muparpy_flux[mcevts_truth]/F");
+    CreateBranch("muparpz_flux",muparpz_flux,"muparpz_flux[mcevts_truth]/F");   
+    CreateBranch("mupare_flux",mupare_flux,"mupare_flux[mcevts_truth]/F");
+    CreateBranch("tgen_flux",tgen_flux,"tgen_flux[mcevts_truth]/I");
+    CreateBranch("tgptype_flux",tgptype_flux,"tgptype_flux[mcevts_truth]/I");
+    CreateBranch("tgppx_flux",tgppx_flux,"tgppx_flux[mcevts_truth]/F");
+    CreateBranch("tgppy_flux",tgppy_flux,"tgppy_flux[mcevts_truth]/F");
+    CreateBranch("tgppz_flux",tgppz_flux,"tgppz_flux[mcevts_truth]/F");
+    CreateBranch("tprivx_flux",tprivx_flux,"tprivx_flux[mcevts_truth]/F");
+    CreateBranch("tprivy_flux",tprivy_flux,"tprivy_flux[mcevts_truth]/F");
+    CreateBranch("tprivz_flux",tprivz_flux,"tprivz_flux[mcevts_truth]/F");
+    CreateBranch("dk2gen_flux",dk2gen_flux,"dk2gen_flux[mcevts_truth]/F");
+    CreateBranch("gen2vtx_flux",gen2vtx_flux,"gen2vtx_flux[mcevts_truth]/F");
     CreateBranch("tpx_flux",tpx_flux,"tpx_flux[mcevts_truth]/F");
     CreateBranch("tpy_flux",tpy_flux,"tpy_flux[mcevts_truth]/F");
     CreateBranch("tpz_flux",tpz_flux,"tpz_flux[mcevts_truth]/F");
@@ -1629,6 +2295,46 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
     CreateBranch("processname", processname);
   }
 
+  if (hasMCShowerInfo()){
+    CreateBranch("no_mcshowers",&no_mcshowers,"no_mcshowers/I");  
+    CreateBranch("mcshwr_origin",mcshwr_origin,"mcshwr_origin[no_mcshowers]/I");
+    CreateBranch("mcshwr_pdg",mcshwr_pdg,"mcshwr_pdg[no_mcshowers]/I");
+    CreateBranch("mcshwr_TrackId",mcshwr_TrackId,"mcshwr_TrackId[no_mcshowers]/I");
+    CreateBranch("mcshwr_Process",mcshwr_Process);
+    CreateBranch("mcshwr_startX",mcshwr_startX,"mcshwr_startX[no_mcshowers]/F");
+    CreateBranch("mcshwr_startY",mcshwr_startY,"mcshwr_startY[no_mcshowers]/F");
+    CreateBranch("mcshwr_startZ",mcshwr_startZ,"mcshwr_startZ[no_mcshowers]/F");
+    CreateBranch("mcshwr_endX",mcshwr_endX,"mcshwr_endX[no_mcshowers]/F");
+    CreateBranch("mcshwr_endY",mcshwr_endY,"mcshwr_endY[no_mcshowers]/F");
+    CreateBranch("mcshwr_endZ",mcshwr_endZ,"mcshwr_endZ[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngX",mcshwr_CombEngX,"mcshwr_CombEngX[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngY",mcshwr_CombEngY,"mcshwr_CombEngY[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngZ",mcshwr_CombEngZ,"mcshwr_CombEngZ[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngPx",mcshwr_CombEngPx,"mcshwr_CombEngPx[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngPy",mcshwr_CombEngPy,"mcshwr_CombEngPy[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngPz",mcshwr_CombEngPz,"mcshwr_CombEngPz[no_mcshowers]/F");
+    CreateBranch("mcshwr_CombEngE",mcshwr_CombEngE,"mcshwr_CombEngE[no_mcshowers]/F");
+    CreateBranch("mcshwr_isEngDeposited",mcshwr_isEngDeposited,"mcshwr_isEngDeposited[no_mcshowers]/I");
+    CreateBranch("mcshwr_Motherpdg",mcshwr_Motherpdg,"mcshwr_Motherpdg[no_mcshowers]/I");
+    CreateBranch("mcshwr_MotherTrkId",mcshwr_MotherTrkId,"mcshwr_MotherTrkId[no_mcshowers]/I");
+    CreateBranch("mcshwr_MotherProcess",mcshwr_MotherProcess);
+    CreateBranch("mcshwr_MotherstartX",mcshwr_MotherstartX,"mcshwr_MotherstartX[no_mcshowers]/F");
+    CreateBranch("mcshwr_MotherstartY",mcshwr_MotherstartY,"mcshwr_MotherstartY[no_mcshowers]/F");
+    CreateBranch("mcshwr_MotherstartZ",mcshwr_MotherstartZ,"mcshwr_MotherstartZ[no_mcshowers]/F");
+    CreateBranch("mcshwr_MotherendX",mcshwr_MotherendX,"mcshwr_MotherendX[no_mcshowers]/F");
+    CreateBranch("mcshwr_MotherendY",mcshwr_MotherendY,"mcshwr_MotherendY[no_mcshowers]/F");
+    CreateBranch("mcshwr_MotherendZ",mcshwr_MotherendZ,"mcshwr_MotherendZ[no_mcshowers]/F");    
+    CreateBranch("mcshwr_Ancestorpdg",mcshwr_Ancestorpdg,"mcshwr_Ancestorpdg[no_mcshowers]/I");
+    CreateBranch("mcshwr_AncesotorTrkId",mcshwr_AncestorTrkId,"mcshwr_AncestorTrkId[no_mcshowers]/I");
+    CreateBranch("mcshwr_AncesotorProcess",mcshwr_AncestorProcess);   
+    CreateBranch("mcshwr_AncestorstartX",mcshwr_AncestorstartX,"mcshwr_AncestorstartX[no_mcshowers]/F");
+    CreateBranch("mcshwr_AncestorstartY",mcshwr_AncestorstartY,"mcshwr_AncestorstartY[no_mcshowers]/F");
+    CreateBranch("mcshwr_AncestorstartZ",mcshwr_AncestorstartZ,"mcshwr_AncestorstartZ[no_mcshowers]/F");
+    CreateBranch("mcshwr_AncestorendX",mcshwr_AncestorendX,"mcshwr_AncestorendX[no_mcshowers]/F");
+    CreateBranch("mcshwr_AncestorendY",mcshwr_AncestorendY,"mcshwr_AncestorendY[no_mcshowers]/F");
+    CreateBranch("mcshwr_AncestorendZ",mcshwr_AncestorendZ,"mcshwr_AncestorendZ[no_mcshowers]/F");
+  }   
+
   if (hasAuxDetector()) {
     // Geant information is required to fill aux detector information.
     // if fSaveGeantInfo is not set to true, show an error message and quit!
@@ -1666,7 +2372,7 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
 
 microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   EDAnalyzer(pset),
-  fTree(nullptr), fPOT(nullptr), fData(nullptr),
+  fTree(nullptr), fPOT(nullptr),
   fDigitModuleLabel         (pset.get< std::string >("DigitModuleLabel")        ),
   fHitsModuleLabel          (pset.get< std::string >("HitsModuleLabel")         ),
   fLArG4ModuleLabel         (pset.get< std::string >("LArGeantModuleLabel")     ),
@@ -1675,9 +2381,10 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fCryGenModuleLabel        (pset.get< std::string >("CryGenModuleLabel")       ), 
   fG4ModuleLabel            (pset.get< std::string >("G4ModuleLabel")           ),
   fVertexModuleLabel        (pset.get< std::string >("VertexModuleLabel")       ),
-  fShowerModuleLabel        (pset.get< std::string >("ShowerModuleLabel")       ),
   fOpFlashModuleLabel       (pset.get< std::string >("OpFlashModuleLabel")      ),
+  fMCShowerModuleLabel      (pset.get< std::string >("MCShowerModuleLabel")      ),  
   fTrackModuleLabel         (pset.get< std::vector<std::string> >("TrackModuleLabel")),
+  fShowerModuleLabel        (pset.get< std::vector<std::string> >("ShowerModuleLabel")),
   fCalorimetryModuleLabel   (pset.get< std::vector<std::string> >("CalorimetryModuleLabel")),
   fParticleIDModuleLabel    (pset.get< std::vector<std::string> >("ParticleIDModuleLabel")   ),
   fPOTModuleLabel           (pset.get< std::string >("POTModuleLabel")          ),
@@ -1686,6 +2393,7 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fSaveCryInfo              (pset.get< bool >("SaveCryInfo", false)),  
   fSaveGenieInfo	    (pset.get< bool >("SaveGenieInfo", false)), 
   fSaveGeantInfo	    (pset.get< bool >("SaveGeantInfo", false)), 
+  fSaveMCShowerInfo	    (pset.get< bool >("SaveMCShowerInfo", false)), 
   fSaveHitInfo	            (pset.get< bool >("SaveHitInfo", false)), 
   fSaveTrackInfo	    (pset.get< bool >("SaveTrackInfo", false)), 
   fSaveVertexInfo	    (pset.get< bool >("SaveVertexInfo", false)),
@@ -1693,6 +2401,7 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fSaveShowerInfo            (pset.get< bool >("SaveShowerInfo", false)),
   fCosmicTaggerAssocLabel  (pset.get<std::vector< std::string > >("CosmicTaggerAssocLabel") ),
   fFlashMatchAssocLabel (pset.get<std::vector< std::string > >("FlashMatchAssocLabel") ),
+  bIgnoreMissingShowers     (pset.get< bool >("IgnoreMissingShowers", false)),
   isCosmics(false),
   fSaveCaloCosmics          (pset.get< bool >("SaveCaloCosmics",false)),
   fG4minE                   (pset.get< float>("G4minE",0.01))
@@ -1790,12 +2499,6 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   if (evt.getByLabel(fVertexModuleLabel,vtxListHandle))
     art::fill_ptr_vector(vtxlist, vtxListHandle);
     
-   // * showers 
-  art::Handle< std::vector<recob::Shower> > showerListHandle;
-  std::vector<art::Ptr<recob::Shower> > showerlist;
-  if (evt.getByLabel(fShowerModuleLabel,showerListHandle))
-    art::fill_ptr_vector(showerlist, showerListHandle);   
-
   // * flashes
   art::Handle< std::vector<recob::OpFlash> > flashListHandle;
   std::vector<art::Ptr<recob::OpFlash> > flashlist;
@@ -1805,17 +2508,28 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   // * MC truth information
   art::Handle< std::vector<simb::MCTruth> > mctruthListHandle;
   std::vector<art::Ptr<simb::MCTruth> > mclist;
-  if (evt.getByLabel(fGenieGenModuleLabel,mctruthListHandle))
-    art::fill_ptr_vector(mclist, mctruthListHandle);
+  if (isMC){
+    if (evt.getByLabel(fGenieGenModuleLabel,mctruthListHandle))
+      art::fill_ptr_vector(mclist, mctruthListHandle);
+  }    
 
   // *MC truth cosmic generator information
   art::Handle< std::vector<simb::MCTruth> > mctruthcryListHandle;
   std::vector<art::Ptr<simb::MCTruth> > mclistcry;
-  if (fSaveCryInfo){
+  if (isMC && fSaveCryInfo){
     if (evt.getByLabel(fCryGenModuleLabel,mctruthcryListHandle))
       art::fill_ptr_vector(mclistcry, mctruthcryListHandle);
   }       
-    
+  
+  // *MC Shower information
+  art::Handle< std::vector<sim::MCShower> > mcshowerh;
+  if (isMC)
+    evt.getByLabel(fMCShowerModuleLabel, mcshowerh);
+  
+  int nMCShowers = 0;
+  if (fSaveMCShowerInfo)
+  	nMCShowers = mcshowerh->size();
+	
   art::Ptr<simb::MCTruth> mctruthcry;
   int nCryPrimaries = 0;
    
@@ -1888,14 +2602,17 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   if (fSaveCryInfo)
     fData->ResizeCry(nCryPrimaries);
   if (fSaveGeantInfo)    
-    fData->ResizeGEANT(nGEANTparticles);
+    fData->ResizeGEANT(nGEANTparticles);  
+  if (fSaveMCShowerInfo)
+    fData->ResizeMCShower(nMCShowers);   
+    
   fData->ClearLocalData(); // don't bother clearing tracker data yet
   
 //  const size_t Nplanes       = 3; // number of wire planes; pretty much constant...
   const size_t NTrackers = GetNTrackers(); // number of trackers passed into fTrackModuleLabel
+  const size_t NShowerAlgos = GetNShowerAlgos(); // number of shower algorithms into fShowerModuleLabel
   const size_t NHits     = hitlist.size(); // number of hits
   const size_t NVertices = vtxlist.size(); // number of vertices
-  const size_t NShowers  = showerlist.size(); //number of showers
   const size_t NFlashes  = flashlist.size(); // number of flashes
   // make sure there is the data, the tree and everything;
   CreateTree();
@@ -1906,6 +2623,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 
   fData->isdata = int(!isMC);
   
+  // * tracks
   std::vector< art::Handle< std::vector<recob::Track> > > trackListHandle(NTrackers);
   std::vector< std::vector<art::Ptr<recob::Track> > > tracklist(NTrackers);
   for (unsigned int it = 0; it < NTrackers; ++it){
@@ -1913,6 +2631,37 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       art::fill_ptr_vector(tracklist[it], trackListHandle[it]);
   }
 
+  // * showers
+  // It seems that sometimes the shower data product does not exist;
+  // in that case, we store a nullptr in place of the pointer to the vector;
+  // the data structure itself is owned by art::Event and we should not try
+  // to manage its memory
+  std::vector<std::vector<recob::Shower> const*> showerList;
+  showerList.reserve(fShowerModuleLabel.size());
+  for (art::InputTag ShowerInputTag: fShowerModuleLabel) {
+    art::Handle<std::vector<recob::Shower>> ShowerHandle;
+    if (!evt.getByLabel(ShowerInputTag, ShowerHandle)) {
+      showerList.push_back(nullptr);
+      if (!bIgnoreMissingShowers) {
+        throw art::Exception(art::errors::ProductNotFound)
+          << "Showers with input tag '" << ShowerInputTag.encode()
+          << "' were not found in the event."
+            " If you really know what you are doing,"
+            " set AnalysisTree's configuration parameter IgnoreMissingShowers"
+            " to \"true\"; the lack of any shower set will be tolerated,"
+            " and the shower list in the corresponding event will be set to"
+            " a list of one shower, with an invalid ID.\n";
+      } // if bIgnoreMissingShowers
+      else {
+        // this message is more alarming than strictly necessary; by design.
+        mf::LogError("AnalysisTree")
+          << "No showers found for input tag '" << ShowerInputTag.encode()
+          << "' ; FILLING WITH FAKE DATA AS FOR USER'S REQUEST";
+      }
+    }
+    else showerList.push_back(ShowerHandle.product());
+  } // for shower input tag
+  
   art::Handle< std::vector<simb::MCFlux> > mcfluxListHandle;
   std::vector<art::Ptr<simb::MCFlux> > fluxlist;
   if (evt.getByLabel(fGenieGenModuleLabel,mcfluxListHandle))
@@ -1924,7 +2673,8 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   }
 
   std::vector<const sim::SimChannel*> fSimChannels;
-  evt.getView(fLArG4ModuleLabel, fSimChannels);
+  if (isMC)
+     evt.getView(fLArG4ModuleLabel, fSimChannels);
 
   fData->run = evt.run();
   fData->subrun = evt.subRun();
@@ -1969,12 +2719,14 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       //when the size of simIDEs is zero, the above function throws an exception
       //and crashes, so check that the simIDEs have non-zero size before 
       //extracting hit true XYZ from simIDEs
-      std::vector<sim::IDE> ides;
-      bt->HitToSimIDEs(hitlist[i], ides);
-      if (ides.size()>0){
-         std::vector<double> xyz = bt->SimIDEsToXYZ(ides);
-         fData->hit_trueX[i] = xyz[0];
-      } 
+      if (isMC){
+        std::vector<sim::IDE> ides;
+        bt->HitToSimIDEs(hitlist[i], ides);
+        if (ides.size()>0){
+          std::vector<double> xyz = bt->SimIDEsToXYZ(ides);
+          fData->hit_trueX[i] = xyz[0];
+        }
+      }	 
       
       /*
       for (unsigned int it=0; it<fTrackModuleLabel.size();++it){
@@ -2056,32 +2808,17 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   }
   
   if (fSaveShowerInfo){
-    fData->nshowers = NShowers;
-    if (NShowers > kMaxShowers) {
-      // got this error? consider increasing kMaxShowers
-      // (or ask for a redesign using vectors)
-      mf::LogError("AnalysisTree:limits") << "event has " << NShowers
-        << " showers, only kMaxShowers=" << kMaxShowers << " stored in tree";
-    }
-    for (size_t i = 0; i < NShowers && i < kMaxShowers ; ++i){
-      TVector3 dir_start, pos_start;         
-      dir_start = showerlist[i]->Direction();
-      pos_start = showerlist[i]->ShowerStart();
-      
-      fData->showerID[i]        = showerlist[i]->ID();
-      fData->shwr_bestplane[i]  = showerlist[i]->best_plane();
-      fData->shwr_length[i]     = showerlist[i]->Length();
-      fData->shwr_startdcosx[i] = dir_start.X();
-      fData->shwr_startdcosy[i] = dir_start.Y();
-      fData->shwr_startdcosz[i] = dir_start.Z();   
-      fData->shwr_startx[i]     = pos_start.X();
-      fData->shwr_starty[i]     = pos_start.Y();
-      fData->shwr_startz[i]     = pos_start.Z();  
-      for (size_t j = 0; j<3; ++j) fData->shwr_totEng[i][j] = showerlist[i]->Energy()[j];
-      for (size_t j = 0; j<3; ++j) fData->shwr_dedx[i][j]   = showerlist[i]->dEdx()[j];
-      for (size_t j = 0; j<3; ++j) fData->shwr_mipEng[i][j] = showerlist[i]->MIPEnergy()[j];                 
-    }
-  }  
+    
+    // fill data from all the shower algorithms
+    for (size_t iShowerAlgo = 0; iShowerAlgo < NShowerAlgos; ++iShowerAlgo) {
+      AnalysisTreeDataStruct::ShowerDataStruct& ShowerData
+        = fData->GetShowerData(iShowerAlgo);
+      std::vector<recob::Shower> const* pShowers = showerList[iShowerAlgo];
+      if (pShowers) FillShowers(ShowerData, *pShowers);
+      else ShowerData.MarkMissing(fTree); // tree should reflect lack of data
+    } // for iShowerAlgo
+    
+  } // if fSaveShowerInfo
   
   //track information for multiple trackers
   if (fSaveTrackInfo){
@@ -2436,11 +3173,41 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
           }
 
           //flux information
-          fData->tpx_flux[neutrino_i]    = fluxlist[iList]->ftpx;
+	  fData->vx_flux[neutrino_i]        = fluxlist[iList]->fvx;
+	  fData->vy_flux[neutrino_i]        = fluxlist[iList]->fvy;
+	  fData->vz_flux[neutrino_i]        = fluxlist[iList]->fvz;
+	  fData->pdpx_flux[neutrino_i]      = fluxlist[iList]->fpdpx;
+	  fData->pdpy_flux[neutrino_i]      = fluxlist[iList]->fpdpy;
+	  fData->pdpz_flux[neutrino_i]      = fluxlist[iList]->fpdpz;
+	  fData->ppdxdz_flux[neutrino_i]    = fluxlist[iList]->fppdxdz;
+	  fData->ppdydz_flux[neutrino_i]    = fluxlist[iList]->fppdydz;
+	  fData->pppz_flux[neutrino_i]      = fluxlist[iList]->fpppz;
+	  
+	  fData->ptype_flux[neutrino_i]      = fluxlist[iList]->fptype;
+          fData->ppvx_flux[neutrino_i]       = fluxlist[iList]->fppvx;
+	  fData->ppvy_flux[neutrino_i]       = fluxlist[iList]->fppvy;
+	  fData->ppvz_flux[neutrino_i]       = fluxlist[iList]->fppvz;
+	  fData->muparpx_flux[neutrino_i]    = fluxlist[iList]->fmuparpx;
+	  fData->muparpy_flux[neutrino_i]    = fluxlist[iList]->fmuparpy;
+	  fData->muparpz_flux[neutrino_i]    = fluxlist[iList]->fmuparpz;
+	  fData->mupare_flux[neutrino_i]     = fluxlist[iList]->fmupare;
+	  
+	  fData->tgen_flux[neutrino_i]     = fluxlist[iList]->ftgen;
+	  fData->tgptype_flux[neutrino_i]  = fluxlist[iList]->ftgptype;
+	  fData->tgppx_flux[neutrino_i]    = fluxlist[iList]->ftgppx;
+	  fData->tgppy_flux[neutrino_i]    = fluxlist[iList]->ftgppy;
+	  fData->tgppz_flux[neutrino_i]    = fluxlist[iList]->ftgppz;
+	  fData->tprivx_flux[neutrino_i]   = fluxlist[iList]->ftprivx;
+	  fData->tprivy_flux[neutrino_i]   = fluxlist[iList]->ftprivy;
+	  fData->tprivz_flux[neutrino_i]   = fluxlist[iList]->ftprivz;
+
+	  fData->dk2gen_flux[neutrino_i]   = fluxlist[iList]->fdk2gen;
+	  fData->gen2vtx_flux[neutrino_i]   = fluxlist[iList]->fgen2vtx;
+
+	  fData->tpx_flux[neutrino_i]    = fluxlist[iList]->ftpx;
           fData->tpy_flux[neutrino_i]    = fluxlist[iList]->ftpy;
           fData->tpz_flux[neutrino_i]    = fluxlist[iList]->ftpz;
           fData->tptype_flux[neutrino_i] = fluxlist[iList]->ftptype;
-
           neutrino_i++;
         }//mclist is NeutrinoSet()
       }//loop over mclist
@@ -2474,6 +3241,60 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
         const simb::MCNeutrino& nu(mctruth->GetNeutrino());
       } //if neutrino set
     }// end (fSaveGenieInfo)  
+
+    //Extract MC Shower information and fill the Shower branches
+    if (fSaveMCShowerInfo){
+       fData->no_mcshowers = nMCShowers;       
+       size_t shwr = 0;
+       for(std::vector<sim::MCShower>::const_iterator imcshwr = mcshowerh->begin();    
+    	 imcshwr != mcshowerh->end(); ++imcshwr) {
+    	  const sim::MCShower& mcshwr = *imcshwr;
+	  fData->mcshwr_origin[shwr]          = mcshwr.Origin();
+    	  fData->mcshwr_pdg[shwr]	      = mcshwr.PdgCode();	   
+    	  fData->mcshwr_TrackId[shwr]	      = mcshwr.TrackID();	   
+    	  fData->mcshwr_Process[shwr]	      = mcshwr.Process();	   
+    	  fData->mcshwr_startX[shwr]          = mcshwr.Start().X();	    
+    	  fData->mcshwr_startY[shwr]          = mcshwr.Start().Y();      	 
+    	  fData->mcshwr_startZ[shwr]          = mcshwr.Start().Z();      	 
+    	  fData->mcshwr_endX[shwr]            = mcshwr.End().X();      	 
+    	  fData->mcshwr_endY[shwr]            = mcshwr.End().Y();      	 
+    	  fData->mcshwr_endZ[shwr]            = mcshwr.End().Z();
+	  if (mcshwr.DetProfile().E()!= 0){   
+	        fData->mcshwr_isEngDeposited[shwr] = 1;	
+    	  	fData->mcshwr_CombEngX[shwr]        = mcshwr.DetProfile().X();      	 
+    	  	fData->mcshwr_CombEngY[shwr]        = mcshwr.DetProfile().Y();       	 
+    	  	fData->mcshwr_CombEngZ[shwr]        = mcshwr.DetProfile().Z();      	 
+    	  	fData->mcshwr_CombEngPx[shwr]       = mcshwr.DetProfile().Px();     	 
+    	  	fData->mcshwr_CombEngPy[shwr]       = mcshwr.DetProfile().Py();       	 
+    	  	fData->mcshwr_CombEngPz[shwr]       = mcshwr.DetProfile().Pz();       	 
+    	  	fData->mcshwr_CombEngE[shwr]        = mcshwr.DetProfile().E();
+	  }
+	  else
+	  	fData->mcshwr_isEngDeposited[shwr] = 0;
+    	  fData->mcshwr_Motherpdg[shwr]       = mcshwr.MotherPdgCode(); 
+    	  fData->mcshwr_MotherTrkId[shwr]     = mcshwr.MotherTrackID();    
+    	  fData->mcshwr_MotherProcess[shwr]   = mcshwr.MotherProcess(); 
+	  fData->mcshwr_MotherstartX[shwr]    = mcshwr.MotherStart().X();     
+    	  fData->mcshwr_MotherstartY[shwr]    = mcshwr.MotherStart().Y();	  
+    	  fData->mcshwr_MotherstartZ[shwr]    = mcshwr.MotherStart().Z();	  
+    	  fData->mcshwr_MotherendX[shwr]      = mcshwr.MotherEnd().X(); 	  
+    	  fData->mcshwr_MotherendY[shwr]      = mcshwr.MotherEnd().Y(); 	  
+    	  fData->mcshwr_MotherendZ[shwr]      = mcshwr.MotherEnd().Z();  
+    	  fData->mcshwr_Ancestorpdg[shwr]     = mcshwr.AncestorPdgCode();  
+    	  fData->mcshwr_AncestorTrkId[shwr]   = mcshwr.AncestorTrackID();  
+    	  fData->mcshwr_AncestorProcess[shwr] = mcshwr.AncestorProcess();
+	  fData->mcshwr_AncestorstartX[shwr]  = mcshwr.AncestorStart().X();	  
+    	  fData->mcshwr_AncestorstartY[shwr]  = mcshwr.AncestorStart().Y();		 
+    	  fData->mcshwr_AncestorstartZ[shwr]  = mcshwr.AncestorStart().Z();		 
+    	  fData->mcshwr_AncestorendX[shwr]    = mcshwr.AncestorEnd().X();	 
+    	  fData->mcshwr_AncestorendY[shwr]    = mcshwr.AncestorEnd().Y();	 
+    	  fData->mcshwr_AncestorendZ[shwr]    = mcshwr.AncestorEnd().Z();
+    	  ++shwr; 
+       }
+       fData->mcshwr_Process.resize(shwr);
+       fData->mcshwr_MotherProcess.resize(shwr);
+       fData->mcshwr_AncestorProcess.resize(shwr);
+    }//End if (fSaveMCShowerInfo){   
 
       //GEANT particles information
       if (fSaveGeantInfo){ 
@@ -2717,6 +3538,77 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   }
 } // microboone::AnalysisTree::analyze()
 
+
+void microboone::AnalysisTree::FillShower(
+  AnalysisTreeDataStruct::ShowerDataStruct& showerData, size_t iShower,
+  recob::Shower const& shower
+) const {
+  
+  showerData.showerID[iShower]        = shower.ID();
+  showerData.shwr_bestplane[iShower]  = shower.best_plane();
+  showerData.shwr_length[iShower]     = shower.Length();
+  
+  TVector3 const& dir_start = shower.Direction();
+  showerData.shwr_startdcosx[iShower] = dir_start.X();
+  showerData.shwr_startdcosy[iShower] = dir_start.Y();
+  showerData.shwr_startdcosz[iShower] = dir_start.Z();
+  
+  TVector3 const& pos_start = shower.ShowerStart();
+  showerData.shwr_startx[iShower]     = pos_start.X();
+  showerData.shwr_starty[iShower]     = pos_start.Y();
+  showerData.shwr_startz[iShower]     = pos_start.Z();
+  
+  std::copy_n
+    (shower.Energy().begin(),    kNplanes, &showerData.shwr_totEng[iShower][0]);
+  std::copy_n
+    (shower.dEdx().begin(),      kNplanes, &showerData.shwr_dedx[iShower][0]);
+  std::copy_n
+    (shower.MIPEnergy().begin(), kNplanes, &showerData.shwr_mipEng[iShower][0]);
+  
+} // microboone::AnalysisTree::FillShower()
+
+
+void microboone::AnalysisTree::FillShowers(
+  AnalysisTreeDataStruct::ShowerDataStruct& showerData,
+  std::vector<recob::Shower> const& showers
+) const {
+  
+  const size_t NShowers = showers.size();
+  
+  //
+  // prepare the data structures, the tree and the connection between them
+  //
+  
+  // allocate enough space for this number of showers
+  // (but at least for one of them!)
+  showerData.SetMaxShowers(std::max(NShowers, (size_t) 1));
+  showerData.Clear(); // clear all the data
+  
+  // now set the tree addresses to the newly allocated memory;
+  // this creates the tree branches in case they are not there yet
+  showerData.SetAddresses(fTree);
+  if (NShowers > showerData.GetMaxShowers()) {
+    // got this error? it might be a bug,
+    // since we are supposed to have allocated enough space to fit all showers
+    mf::LogError("AnalysisTree:limits") << "event has " << NShowers
+      << " " << showerData.Name() << " showers, only "
+      << showerData.GetMaxShowers() << " stored in tree";
+  }
+  
+  //
+  // now set the data
+  //
+  // set the record of the number of showers
+  // (data structures are already properly resized)
+  showerData.nshowers = (Short_t) NShowers;
+  
+  // set all the showers one by one
+  for (size_t i = 0; i < NShowers; ++i) FillShower(showerData, i, showers[i]);
+  
+} // microboone::AnalysisTree::FillShowers()
+
+
+
 void microboone::AnalysisTree::HitsPurity(std::vector< art::Ptr<recob::Hit> > const& hits, Int_t& trackid, Float_t& purity, double& maxe){
 
   trackid = -1;
@@ -2888,6 +3780,3 @@ namespace microboone{
   DEFINE_ART_MODULE(AnalysisTree)
 
 }
-
-#endif
-
