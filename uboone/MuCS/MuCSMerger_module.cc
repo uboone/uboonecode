@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 //
 //    trivia : The main routine developed to merge data from the TPC 
-//             and the Muon Counter System (MuCS), May 2015
+//             and the Muon Counter System (MuCS), August 2015
 //    author : Odysseas Kanenas
 //    e-mail : kalousis@vt.edu
 //
@@ -30,9 +30,9 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "EventDisplay/HeaderDrawer.h"
-#include "EventDisplayBase/View2D.h"
-#include "EventDisplayBase/EventHolder.h"
+// #include "EventDisplay/HeaderDrawer.h"
+// #include "EventDisplayBase/View2D.h"
+// #include "EventDisplayBase/EventHolder.h"
 #include "TText.h"
 #include "TTimeStamp.h"
 
