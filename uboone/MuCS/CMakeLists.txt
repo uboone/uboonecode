@@ -9,6 +9,7 @@ art_make( BASENAME_ONLY
 			Geometry_service
 			Simulation
 			BackTracker_service
+			EventDisplay
 	                Utilities
 			Filters
 			RawData
