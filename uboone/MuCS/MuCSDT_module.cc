@@ -64,6 +64,8 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
+#include "EventDisplay/HeaderDrawer.h"
+
 
 #include "TH1.h"
 
@@ -115,8 +117,19 @@ namespace MuCSDT
   private:
     
     Int_t trigID = 0;
-    
     TH1F *hDT;
+    Int_t run0;
+    Int_t srun0;
+    TFile *f1;
+        
+    Int_t seq;
+    Float_t time_sec_low;
+    Float_t time_sec_high;
+    Float_t time_16ns_low;
+    Float_t time_16ns_high;
+    Double_t t0;
+    
+    Int_t my_entries;
     
   }; 
   
@@ -133,7 +146,6 @@ namespace MuCSDT
   void MuCSDT::beginJob()
   {
     art::ServiceHandle<art::TFileService> tfs;
-    
     hDT = tfs->make<TH1F>( "hDT", "", 100, -100, 100 );
         
   }
@@ -152,21 +164,72 @@ namespace MuCSDT
     if ( trigID==0 )
       {
 	cout << "" << endl;
-	
 	cout << " starting ... " << endl;
-	
 	cout << "" << endl;
 	
-	getchar();
+	run0 = evt.run();
+	srun0 = evt.subRun();
+	
+	f1 = new TFile( Form( "/uboone/data/users/kalousis/MuCS/muons/mega_micro_ana_669_0.333_0.root" ), "read" );  
+	if ( f1->IsZombie() ) 
+	  {
+	    cout << " - mucs file not existing ! " << endl;
+	    return;
+	    
+	  }
+	
+	else
+	  {
+	    TTree *my_tree = (TTree*)f1->Get( "preselected" );
+	    
+	    my_tree->SetBranchStatus( "*", 0 ); 
+	    my_tree->SetBranchStatus( "seq", 1 );
+	    my_tree->SetBranchStatus( "time_sec_low", 1 );
+	    my_tree->SetBranchStatus( "time_sec_high", 1 );
+	    my_tree->SetBranchStatus( "time_16ns_low", 1 );
+	    my_tree->SetBranchStatus( "time_16ns_high", 1 );
+	    my_tree->SetBranchStatus( "t0", 1 );
+	    
+	    my_tree->SetBranchAddress( "seq", &seq );
+	    my_tree->SetBranchAddress( "time_sec_low", &time_sec_low );
+	    my_tree->SetBranchAddress( "time_sec_high", &time_sec_high );
+	    my_tree->SetBranchAddress( "time_16ns_low", &time_16ns_low );
+	    my_tree->SetBranchAddress( "time_16ns_high", &time_16ns_high );
+	    my_tree->SetBranchAddress( "t0", &t0 );
+	    
+	    my_entries = my_tree->GetEntries();
+	    cout << " - events in mucs : " << my_entries << endl;
+	    cout << "" << endl;
+	    cout << "" << endl;
+	    getchar();
+	    
+	  }
+	
 	
       }
     
-    cout << " - event no. : " << trigID << endl;
-    
+    Int_t event = evt.id().event();
+    cout << "" << endl;
+    cout << " - run : " << run0 << ", sub. run : " << srun0 << ", event : " << event << endl;
     cout << "" << endl;
     
-    trigID++;
+    unsigned long long int tsval = evt.time().value();
+    const unsigned long int mask32 = 0xFFFFFFFFUL;
+    unsigned long int lup = ( tsval >> 32 ) & mask32;
+    // unsigned long int llo = tsval & mask32;
+    // TTimeStamp ts(lup, (int)llo);
     
+    cout << " - unix timestamp : " << lup << endl;
+    cout << "" << endl;
+    /*
+    art::ServiceHandle< util::TimeService > ts;
+    Double_t trigT = ts->TriggerClock().Time();
+    cout << " - " << trigT-10.0 << endl;
+    cout << "" << endl;
+    */
+        
+    getchar();
+    trigID++;
     return;
     
   }
@@ -174,13 +237,9 @@ namespace MuCSDT
   void MuCSDT::endJob()
   {
     cout << "" << endl; 
-    
     cout << " - events processed : " << trigID << endl;
-    
     cout << "" << endl;
-        
     cout << " ... ending ! " << endl;
-    
     cout << "" << endl;
     
   }
