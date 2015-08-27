@@ -152,6 +152,7 @@ namespace MuCSDT
     hDT = tfs->make<TH1F>( "hDT", "", 100, -100, 100 );
     
     f1 = new TFile( Form( "/uboone/data/users/kalousis/MuCS/muons/mega_micro_ana_134_0.333_0.root" ), "read" );  
+    
     if ( f1->IsZombie() ) 
       {
 	cout << " - mucs file not existing ! " << endl;
@@ -225,17 +226,14 @@ namespace MuCSDT
     for ( Int_t i=0; i<my_entries; i++ )
       {
 	my_tree->GetEntry( i );
-	Float_t DTunix = TMath::Abs( time_sec_high*65536.0+time_sec_low-unix_time_stamp );
-	// cout << " - unix timestamp : " << unix_time_stamp << ", i : " << i << ", mucs_unix_timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
-	// cout << "" << endl;
-	// getchar();
-	    
 	
-	if ( DTunix<11.0 ) 
+	Float_t DTunix = TMath::Abs( time_sec_high*65536.0+time_sec_low-unix_time_stamp );
+		
+	if ( DTunix<=10.0 ) 
 	  {
 	    // cout << " Gotcha !!! " << endl;
 	    // cout << "" << endl;
-	    cout << " - unix timestamp : " << unix_time_stamp << ", i : " << i << ", mucs_unix_timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
+	    cout << " - unix timestamp : " << unix_time_stamp << ", i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
 	    cout << "" << endl;
 	    getchar();
 	    	    
@@ -265,11 +263,3 @@ namespace MuCSDT
 } 
 
 #endif 
-
-/*
-    art::ServiceHandle< util::TimeService > ts;
-    Double_t trigT = ts->TriggerClock().Time();
-    cout << " - " << trigT-10.0 << endl;
-    cout << "" << endl;
-    */
-        
