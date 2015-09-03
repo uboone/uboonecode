@@ -14,7 +14,7 @@
 #include <utility> // std::pair<>
 #include <memory> // std::unique_ptr<>
 #include <iomanip>
-
+#include <set>
 // ROOT libraries
 #include "TComplex.h"
 #include "TH1D.h"
@@ -129,7 +129,7 @@ namespace caldata {
     
     void reconfFFT(int temp_fftsize);
   private:
-    
+    std::set<unsigned int> _skip_channel_set;
     std::string  fDigitModuleLabel;  ///< module that made digits
 
     std::string  fSpillName;  ///< nominal spill is an empty string
@@ -217,6 +217,10 @@ namespace caldata {
     fFFTSize              = p.get< int  >                          ("FFTSize");
     fSaveWireWF           = p.get< int >                           ("SaveWireWF");
     fMaxAllowedChanStatus = p.get< int >                           ("MaxAllowedChannelStatus");
+
+    _skip_channel_set.clear();
+    for(auto const& ch : p.get<std::vector<unsigned int> >("SkipChannelList",std::vector<unsigned int>()))
+      _skip_channel_set.insert(ch);
 
     fDoBaselineSub_WaveformPropertiesAlg = p.get< bool >("DoBaselineSub_WaveformPropertiesAlg");
         
@@ -335,6 +339,8 @@ namespace caldata {
       // get the reference to the current raw::RawDigit
       art::Ptr<raw::RawDigit> digitVec(digitVecHandle, rdIter);
       channel = digitVec->Channel();
+
+      if(_skip_channel_set.find(channel) != _skip_channel_set.end()) continue;
 
       // The following test is meant to be temporary until the "correct" solution is implemented
       if (chanFilt->GetChannelStatus(channel) == filter::ChannelFilter::NOTPHYSICAL) continue;
