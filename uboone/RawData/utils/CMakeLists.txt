@@ -7,6 +7,7 @@ find_library( UBDut NAMES ubdata_types PATHS $ENV{UBOONEDAQ_DATATYPES_LIB} )
 #
 simple_plugin( LArRawInputSourceUBooNE
                "source"
+	       DatabaseUtil_service
 	       uboone_RawData
 	       UBOpReadoutMap_service
                ${ART_FRAMEWORK_PERSISTENCY_COMMON}
