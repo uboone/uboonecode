@@ -35,6 +35,7 @@
 #include "RawData/raw.h" // raw::Uncompress()
 #include "RawData/RawDigit.h"
 #include "RawData/OpDetWaveform.h"
+#include "RawData/TriggerData.h"
 // Optical Channel Maps
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
@@ -84,6 +85,11 @@ namespace zmqds {
     const util::UBChannelReverseMap_t& fChannelReverseMap;
 
     // FICHL Parameters
+
+    // Trigger Data
+    double fTrigTimestamp;
+    double fBeamGateTime;
+    void GetTrigger( const art::Event& evt);    
     
     // TPC Raw Digits
     int fRun;
@@ -104,6 +110,8 @@ namespace zmqds {
     int fFrame;
     int fSample;
     double fTimeStamp;
+    int fTrigFrame;
+    int fTrigSample;
     int fOpCrate;
     int fOpSlot;
     int fOpFemCH;
@@ -149,6 +157,10 @@ namespace zmqds {
       fTOpDetWaveforms->Branch( "readoutch", &fOpReadoutCH, "readoutch/I" );
       fTOpDetWaveforms->Branch( "category", &fCategory, "category/I" );
       fTOpDetWaveforms->Branch( "gaintype", &fType, "gaintype/I" );
+      fTOpDetWaveforms->Branch( "trig_timestamp", &fTrigTimestamp, "trig_timestamp/D" );      
+      //fTOpDetWaveforms->Branch( "trig_frame", &fTrigFrame, "trig_frame/I" );
+      //fTOpDetWaveforms->Branch( "trig_sample", &fTrigSample, "trig_sample/I" );
+      fTOpDetWaveforms->Branch( "beam_timestamp", &fBeamGateTime, "beam_timestamp/D" );
       fTOpDetWaveforms->Branch( "adcs", &opdetwaveforms );
 
       mf::LogInfo("")<<"Fetched channel map from DB";
@@ -167,7 +179,9 @@ namespace zmqds {
     fSubRun = (int)evt.subRun();
     fEvent = (int)evt.event();
 
-    GetRawDigits(evt);
+    GetTrigger(evt);
+
+    //GetRawDigits(evt);
 
     GetOpticalRawDigits( evt );
 
@@ -181,6 +195,37 @@ namespace zmqds {
     // }
     
   } // RawDigitWriter::analyze()
+
+  // =============================================================== 
+  // RawDigits
+
+  void RawDigitWriter::GetTrigger( const art::Event& evt) {
+   
+    ::art::ServiceHandle< util::TimeService > timeService;
+    art::Handle<std::vector<raw::Trigger> > trig_handle;
+
+    //evt.getByLabel(fTrigModuleName, trig_handle);
+    evt.getByLabel("daq", trig_handle);
+
+    if(!trig_handle.isValid()) {
+      // Trigger simulation has not run yet!
+      std::cout << "No Trigger Data!!!" << std::endl;
+      return;
+    }
+
+    if ( trig_handle->size()>0 ) {
+      art::Ptr<raw::Trigger> trigVec0( trig_handle, 0 );
+      fTrigTimestamp = trigVec0->TriggerTime();
+      fBeamGateTime = trigVec0->BeamGateTime();
+      //timeService->SetTriggerTime( trigVec0->TriggerTime(), trigVec0->BeamGateTime() );
+      //std::cout << "Retrieved Trigger: Trigger Timestamp=" << fTrigTime << " Beam Window Timestamp=" << fBeamGateTime << std::endl;
+      //timeService->debugReport();
+    }
+
+    if(trig_handle->size()>1)
+      throw cet::exception("TimeService::preProcessEvent")
+	<< "Found " << trig_handle->size() << " triggers (only 1 trigger/event supported)\n";
+  }
 
   // =============================================================== 
   // RawDigits
@@ -236,7 +281,9 @@ namespace zmqds {
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
     art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
     art::ServiceHandle<util::TimeService> ts;
+    
     std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
+    //ts->debugReport();
     
     for ( unsigned int cat=0; cat<(unsigned int)opdet::NumUBOpticalChannelCategories; cat++ ) {
       //std::stringstream ss;
