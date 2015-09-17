@@ -17,6 +17,8 @@ microboone_noisefilter :
     saveNoiseTree :          0
     saveNoiseTreeWF :        0
     doTransientNoiseFilter : 0
+    MinRMS:                  0.05
+    MaxRMS:                  20
 }
 
 END_PROLOG
