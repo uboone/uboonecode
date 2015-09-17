@@ -76,7 +76,8 @@ namespace calibration {
     //Variables Taken from FHICL File
     std::string       fRawDigitModuleLabel;   //label for rawdigit module
     int fDoChirp, fDoZigZag, fDoSignalFilter, fDoNoisyFilter,fDoTransientNoiseFilter, fSaveFilterWF, fSaveNoiseTree, fSaveNoiseTreeWF, fRunWaveFilterAlg, fRunRawAdaptiveBaselineAlg, fRemoveFilterFlags, fDoFinalNoisyFilter;
-
+    float fMinRMS, fMaxRMS;
+    
     TTree *fNoise;
     int fEvent, fRun,fSubrun,fChan, fPlaneNum;
     float fMax, fMin, fMean, fRms;
@@ -121,6 +122,8 @@ namespace calibration {
     fDoFinalNoisyFilter        = pset.get<int>("doFinalNoisyFilter",       1);
     fRemoveFilterFlags         = pset.get<int>("doRemoveFilterFlags",      1);
     fSaveFilterWF              = pset.get<int>("saveFilterWF",             1);
+    fMinRMS                   = pset.get<float>("MinRMS",   0);
+    fMaxRMS                   = pset.get<float>("MaxRMS",   0);
     fSaveNoiseTree 	           = pset.get<int>("saveNoiseTree",            0);
     fSaveNoiseTreeWF 	       = pset.get<int>("saveNoiseTreeWF",          0);
     fDoTransientNoiseFilter    = pset.get<int>("doTransientNoiseFilter",   0);
@@ -317,7 +320,7 @@ namespace calibration {
                     if( fSaveNoiseTree == 1)
                         fNoise->Fill();
 				
-                    if( fSaveFilterWF == 1 ){
+                    if( fSaveFilterWF == 1 && fRms >= fMinRMS && fRms < fMaxRMS){
                         filteredRawDigit->emplace_back( raw::RawDigit( waveNoiseHistsCh[k] , n_samp, waveform, raw::kNone) );
                         filteredRawDigit->back().SetPedestal(fMean+pedVal,fRms);
                     }
