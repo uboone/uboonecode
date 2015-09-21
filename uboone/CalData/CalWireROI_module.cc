@@ -338,6 +338,9 @@ namespace caldata {
 
       // The following test is meant to be temporary until the "correct" solution is implemented
       if (chanFilt->GetChannelStatus(channel) == filter::ChannelFilter::NOTPHYSICAL) continue;
+        
+      // Testing an idea about rejecting channels
+      if (digitVec->GetPedestal() < 0.) continue;
 
       unsigned int dataSize = digitVec->Samples();
       // vector holding uncompressed adc values
@@ -359,17 +362,20 @@ namespace caldata {
       // skip bad channels
       if(!(chanFilt->GetChannelStatus(channel) > fMaxAllowedChanStatus)) {
         
-        // uncompress the data
-        raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
-        // loop over all adc values and subtract the pedestal
-	// When we have a pedestal database, can provide the digit timestamp as the third argument of GetPedestalMean
-        float pdstl = pedestalRetrievalAlg.PedMean(channel);
-	//subtract time-offset added in SimWireMicroBooNE_module
-	// Xin, remove the time offset
-	//int time_offset = 0.;//sss->FieldResponseTOffset(channel);
-        unsigned int roiStart = 0;
-
-	double raw_noise = sss->GetRawNoise(channel);
+          // uncompress the data
+          raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
+          // loop over all adc values and subtract the pedestal
+          // When we have a pedestal database, can provide the digit timestamp as the third argument of GetPedestalMean
+          float pdstl = pedestalRetrievalAlg.PedMean(channel);
+          //subtract time-offset added in SimWireMicroBooNE_module
+          // Xin, remove the time offset
+          //int time_offset = 0.;//sss->FieldResponseTOffset(channel);
+          unsigned int roiStart = 0;
+          
+          double rms_noise = digitVec->GetSigma();
+          double raw_noise = sss->GetRawNoise(channel);
+          
+          raw_noise = std::max(raw_noise,rms_noise);
 
         // search for ROIs
         for(bin = 1; bin < dataSize; ++bin) {

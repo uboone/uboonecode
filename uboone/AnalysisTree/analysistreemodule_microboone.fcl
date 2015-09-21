@@ -10,12 +10,18 @@ microboone_analysistree:
  GenieGenModuleLabel:      "generator"
  G4ModuleLabel:            "largeant"
  TrackModuleLabel:         [ "track3d" ]
- VertexModuleLabel:        "vertex3d"
+ VertexModuleLabel:        [ "vertex3d" ]
+ ClusterModuleLabel:       "linecluster"
  OpFlashModuleLabel:       "opflash"
  MCShowerModuleLabel:      "mcreco" 
  CalorimetryModuleLabel:   [ "calo" ]
  ParticleIDModuleLabel:    [ "pid" ]
+ FlashT0FinderLabel:       ["t0"]
+ MCT0FinderLabel:          ["mct0"]
  ShowerModuleLabel:        ["showerrecofuzzy"]
+ CosmicClusterTaggerAssocLabel: "ccclustertag"
+ CosmicTaggerAssocLabel: ["trackkalmanhit"]
+ FlashMatchAssocLabel:   ["flashTrackMatchkHit"]
  POTModuleLabel:           "generator"
  UseBuffers:               false
  IgnoreMissingShowers:     false
@@ -27,6 +33,7 @@ microboone_analysistree:
  SaveHitInfo:              true
  SaveTrackInfo:            true
  SaveVertexInfo:           true
+ SaveClusterInfo:          true
  SaveFlashInfo:            true
  SaveShowerInfo:           true
  SaveCaloCosmics:          false
