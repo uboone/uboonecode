@@ -348,26 +348,28 @@ namespace caldata {
       // uncompress the data
       raw::Uncompress(digitVec->ADCs(), rawadc, digitVec->Compression());
       adcPedSub.resize(rawadc.size());
-      // loop over all adc values and subtract the pedestal
+
       float pdstl = pedestalRetrievalAlg.PedMean(channel);
-      for(bin = 0; bin < adcPedSub.size(); ++bin) adcPedSub[bin] = (float)rawadc[bin] - pdstl;
       
       float noiseRMS = 0;
       if(fNoiseSource == 1) {
         noiseRMS = digitVec->GetSigma();
-      } else if(fNoiseSource == 2) {
+     } else if(fNoiseSource == 2) {
         noiseRMS = sss->GetRawNoise(channel);
       } else if(fNoiseSource == 3) {
-          noiseRMS = std::max((float)digitVec->GetSigma(), (float)sss->GetRawNoise(channel));
+        noiseRMS = std::max((float)digitVec->GetSigma(), (float)sss->GetRawNoise(channel));
       }
       
+      // loop over all adc values and subtract the pedestal
+      for(bin = 0; bin < adcPedSub.size(); ++bin) adcPedSub[bin] = (float)rawadc[bin] - pdstl;
+
       // calculate average RMS using all bins in the sum
       noiseRMS /= sqrt_nBins;
       // Convert running average into a sum to minimize calculation
       // Set the noise floor
       float threshold = nBins * (3 * noiseRMS + fThreshold[thePlane]);
       
-      double sqrt10Times4 = sqrt(10.)*4;
+//      double sqrt10Times4 = sqrt(10.)*4;
       
       // On the first entry, when bin = fNumBinsHalf, sum the ADC's between bin 0 and 2 * fNumBinsHalf.
       // After bin is incremented by 1, subtract the ADC value in bin 0:
@@ -379,15 +381,13 @@ namespace caldata {
       // sum of pedestal subtracted ADC values in the range (bin-fNumBinsHalf) to (bin+fNumBinsHalf)
       float adcSum = 0;
       
-      if(prt) std::cout<<"noiseRMS "<<noiseRMS<<" nBins "<<nBins<<" threshold "<<threshold<<" pdstl "<<pdstl<<"\n";
+      if(prt) std::cout<<"noiseRMS "<<noiseRMS<<" nBins "<<nBins<<" digitVec->GetPedestal() "<<digitVec->GetPedestal()<<" pedestalRetrievalAlg.PedMean(channel) "<<pedestalRetrievalAlg.PedMean(channel)<<"\n";
      
       // The starting bin of a ROI. It is set to 0 after leaving a ROI
       unsigned int roiStart = 0;
       
       // Find the starting ADC sum
       for(bin = 0; bin < addBin; ++bin) adcSum += std::abs(adcPedSub[bin]);
-      // Check for a ROI at the very beginning
-      if(adcSum > threshold) roiStart = 1;
      
       for(bin = fNumBinsHalf + 1; bin < dataSize - fNumBinsHalf - 1; ++ bin) {
         // subtract the ADC value that is now outside the range
@@ -477,8 +477,7 @@ namespace caldata {
             if (bin < dataSize){
               holder[hBin] = adcPedSub[bin];
             } else {
-//              holder[hBin] = rawadc[bin-dataSize]-pdstl;
-              holder[hBin] = adcPedSub[bin-dataSize];
+              holder[hBin] = rawadc[bin-dataSize]-pdstl;
             }
             if (bin>=dataSize-1) flag = 0;
             ++hBin;
@@ -497,6 +496,8 @@ namespace caldata {
           tempPost = tempPost/20.;
           
           double deconNoise = sss->GetDeconNoise(channel) / sqrt10Times4;
+          
+          if(prt) std::cout<<"DeconNoise "<<deconNoise<<" "<<tempPre<<" "<<tempPost<<"\n";
           
           if (fabs(tempPost-tempPre) < deconNoise){
             flag = 0;
@@ -518,7 +519,6 @@ namespace caldata {
             } // !tempPre > tempPost && roiStart <= 2
           } // !fabs(tempPost-tempPre) < deconNoise
         } // while(flag)
-        
         // transfer the ROI and start bins into the vector that will be
         // put into the event
         std::vector<float> sigTemp;
