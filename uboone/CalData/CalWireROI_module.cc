@@ -238,6 +238,11 @@ namespace caldata {
     fPreROIPad[2]  = zin[0];
     fPostROIPad[2] = zin[1];
     
+    for(unsigned short ipl = 0; ipl < 3; ++ipl) {
+      if(fPreROIPad[ipl] < 20 || fPostROIPad[ipl] < 20) throw art::Exception(art::errors::Configuration)
+        <<"ROIPads must be at least 20";
+    }
+    
     fSpillName.clear();
     
     size_t pos = fDigitModuleLabel.find(":");
@@ -335,7 +340,6 @@ namespace caldata {
       std::vector<float> adcPedSub(dataSize);
       
       std::vector<geo::WireID> wids = geom->ChannelToWire(channel);
-      bool prt = (wids[0].Plane == 2 && wids[0].Wire == 1049);
       unsigned int thePlane = wids[0].Plane;
       //unsigned int theWire = wids[0].Wire;
       
@@ -369,7 +373,7 @@ namespace caldata {
       // Set the noise floor
       float threshold = nBins * (3 * noiseRMS + fThreshold[thePlane]);
       
-//      double sqrt10Times4 = sqrt(10.)*4;
+      double fourOverSqrt10 = 4 / sqrt(10.);
       
       // On the first entry, when bin = fNumBinsHalf, sum the ADC's between bin 0 and 2 * fNumBinsHalf.
       // After bin is incremented by 1, subtract the ADC value in bin 0:
@@ -380,8 +384,6 @@ namespace caldata {
       
       // sum of pedestal subtracted ADC values in the range (bin-fNumBinsHalf) to (bin+fNumBinsHalf)
       float adcSum = 0;
-      
-      if(prt) std::cout<<"noiseRMS "<<noiseRMS<<" nBins "<<nBins<<" digitVec->GetPedestal() "<<digitVec->GetPedestal()<<" pedestalRetrievalAlg.PedMean(channel) "<<pedestalRetrievalAlg.PedMean(channel)<<"\n";
      
       // The starting bin of a ROI. It is set to 0 after leaving a ROI
       unsigned int roiStart = 0;
@@ -417,7 +419,6 @@ namespace caldata {
       
       // pad the ROIs
       for(unsigned int ii = 0; ii < rois.size(); ++ii) {
-        if(prt) std::cout<<"ROI "<<ii<<" range "<<rois[ii].first<<" "<<rois[ii].second<<" post pad "<<fPostROIPad[thePlane]<<"\n";
         // low ROI end
         int low = rois[ii].first - fPreROIPad[thePlane];
         if(low < 0) low = 0;
@@ -459,7 +460,6 @@ namespace caldata {
       for (unsigned int ir = 0; ir < rois.size(); ++ir) {
         unsigned int roiLen = rois[ir].second - rois[ir].first + 1;
         unsigned int roiStart = rois[ir].first;
-        if(prt) std::cout<<"ROI "<<ir<<" range "<<rois[ir].first<<" "<<rois[ir].second<<"\n";
         int flag = 1;
         float tempPre=0,tempPost=0;
         std::vector<float> holder;
@@ -495,9 +495,8 @@ namespace caldata {
           tempPre = tempPre/20.;
           tempPost = tempPost/20.;
           
-          double deconNoise = sss->GetDeconNoise(channel) / sqrt10Times4;
-          
-          if(prt) std::cout<<"DeconNoise "<<deconNoise<<" "<<tempPre<<" "<<tempPost<<"\n";
+          // Xin: Average over 10 bins and make a 4 sigma cut
+          double deconNoise = sss->GetDeconNoise(channel) * fourOverSqrt10;
           
           if (fabs(tempPost-tempPre) < deconNoise){
             flag = 0;
@@ -540,7 +539,6 @@ namespace caldata {
         }
         for(unsigned int jj = bBegin; jj < bEnd; ++jj) sigTemp.push_back(holder[jj]-base);
         // add the range into ROIVec
-        if(prt) std::cout<<"Add "<<roiStart<<" size "<<sigTemp.size()<<"\n";
         ROIVec.add_range(roiStart, std::move(sigTemp));
       } // ir
       
