@@ -8,7 +8,7 @@ microboone_calroi:
 {
  module_type:        "CalWireROI"
  DigitModuleLabel:   "daq"
- NoiseSource:        0 # 0 = none, 1 = digitVec->GetSigma(), 2 = sss->GetRawNoise(channel),
+ NoiseSource:        3 # 0 = none, 1 = digitVec->GetSigma(), 2 = sss->GetRawNoise(channel),
                        # 3 = max of digitVec->GetSigma() and sss->GetRawNoise(channel)
  Threshold: [ 4, 4, 4 ] # abs(threshold) for finding a Region Of Interest
  uPlaneROIPad: [ 150, 50 ] # number of bins to pad both ends of the ROIs
@@ -18,7 +18,7 @@ microboone_calroi:
  FFTSize:     256      # re-initialize FFT service to this size
  SaveWireWF:  0
  MaxAllowedChannelStatus: 4 # All channels up to this status level are considered
- DoBaselineSub_WaveformPropertiesAlg:   false # subtract baseline after deconvolution?
+ DoBaselineSub_WaveformPropertiesAlg:   true # subtract baseline after deconvolution?
  
  DetPedestalRetrievalAlg:  @local::microboone_pedestalretrievalalg
  ROIPropertiesAlg:      { ROIAlgParams: @local::roiAlg_DigitAboveBaseline }
