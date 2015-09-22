@@ -202,6 +202,8 @@ void MuCSMerger::produce( art::Event &evt )
   cout << " - relative trig. time : " << t_rel << endl;
   cout << "" << endl; 
   
+  Int_t ntimes=0;
+  
   for ( Int_t i=0; i<my_entries; i++ )
       {
 	my_tree->GetEntry( i );
@@ -221,7 +223,10 @@ void MuCSMerger::produce( art::Event &evt )
 		cout << " i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
 		cout << "" << endl;
 		cout << " - mucs t0 : " << tmucs << ", " << "diff : " << dt << endl;
-		getchar();
+		
+		ntimes++;
+		
+		if ( ntimes>=2 ) getchar();
 		
 	      }
 	    
