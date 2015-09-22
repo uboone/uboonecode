@@ -83,9 +83,10 @@ public:
   Double_t previous_trigtime;
   Double_t t_start; 
   
-  //Double_t TOLER = 20.0;
+  Double_t TOLER = 20.0;
   Double_t offset = -666.0;
-  
+  // Double_t TOLER2 = 1.6*0.001;
+
 };
 
 void MuCSMerger::reconfigure( fhicl::ParameterSet const &p )
@@ -172,9 +173,7 @@ void MuCSMerger::produce( art::Event &evt )
       srun0 = evt.subRun();
       
       previous_trigtime = 0.0;
-      
-      getchar();
-      
+            
     }
   
   Int_t event = evt.id().event();
@@ -203,9 +202,31 @@ void MuCSMerger::produce( art::Event &evt )
   cout << " - relative trig. time : " << t_rel << endl;
   cout << "" << endl; 
   
-  
-  
-  
+  for ( Int_t i=0; i<my_entries; i++ )
+      {
+	my_tree->GetEntry( i );
+	
+	Float_t DTunix = TMath::Abs( time_sec_high*65536.0+time_sec_low-unix_time_stamp );
+		
+	if ( DTunix<=TOLER ) 
+	  {
+	    Double_t tmucs = t0*1.0e-9;
+	    Double_t dt0 =  tmucs-t_rel;
+	    Double_t dt = dt0-offest; 
+	    
+	    if ( TMath::Abs(dt)<TOLER2 )
+	      {
+		cout << " Gotcha !!! " << endl;
+		cout << "" << endl;
+		cout << " i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
+		cout << "" << endl;
+		cout << " - mucs t0 : " << tmus << ", " << "diff : " << dt << endl;
+		getchar();
+	      }
+	    
+	  }
+		
+      }
   
   std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
   
