@@ -32,16 +32,16 @@ MuCSData::MuCSData( Float_t t0, Float_t adc1[24], Float_t adc2[24], Float_t adc3
       
     }
   
-  Int_t s1 = hits1.size();
+  Int_t s1 = hits1.size(); fhits1.clear();
   for ( Int_t i=0; i<s1; i++ ) fhits1.push_back( hits1.at(i) );
   
-  Int_t s2 = hits2.size();
+  Int_t s2 = hits2.size(); fhits2.clear();
   for ( Int_t i=0; i<s2; i++ ) fhits2.push_back( hits2.at(i) );
   
-  Int_t s3 = hits3.size();
+  Int_t s3 = hits3.size(); fhits3.clear();
   for ( Int_t i=0; i<s3; i++ ) fhits3.push_back( hits3.at(i) );
   
-  Int_t s7 = hits7.size();
+  Int_t s7 = hits7.size(); fhits7.clear();
   for ( Int_t i=0; i<s7; i++ ) fhits7.push_back( hits7.at(i) );
     
 }
@@ -49,6 +49,38 @@ MuCSData::MuCSData( Float_t t0, Float_t adc1[24], Float_t adc2[24], Float_t adc3
 Float_t MuCSData::T0() const
 {
   return ft0;
+  
+}
+
+std::vector<Float_t> MuCSData::ADC1() const
+{
+  std::vector<Float_t> fadc; fadc.clear();
+  for ( Int_t i=0; i<24; i++ ) fadc.push_back( fadc1[i] );
+  return fadc;
+  
+}
+
+std::vector<Float_t> MuCSData::ADC2() const
+{
+  std::vector<Float_t> fadc; fadc.clear();
+  for ( Int_t i=0; i<24; i++ ) fadc.push_back( fadc2[i] );
+  return fadc;
+  
+}
+
+std::vector<Float_t> MuCSData::ADC3() const
+{
+  std::vector<Float_t> fadc; fadc.clear();
+  for ( Int_t i=0; i<24; i++ ) fadc.push_back( fadc3[i] );
+  return fadc;
+  
+}
+
+std::vector<Float_t> MuCSData::ADC7() const
+{
+  std::vector<Float_t> fadc; fadc.clear();
+  for ( Int_t i=0; i<24; i++ ) fadc.push_back( fadc7[i] );
+  return fadc;
   
 }
 
