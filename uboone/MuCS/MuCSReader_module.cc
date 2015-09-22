@@ -196,24 +196,51 @@ namespace MuCSReader
     cout << time0 << endl;
     
     Int_t tot1 = mucs->at(0).Hits1().size();
-    cout <<  tot1 << endl;
+    cout <<  tot1 << endl; cout << " hits 1 : ";
     for ( Int_t j=0; j<tot1; j++ ) cout << mucs->at(0).Hits1().at(j) << ", ";
     cout << "" << endl;
     
     Int_t tot2 = mucs->at(0).Hits2().size();
-    cout <<  tot2 << endl;
+    cout <<  tot2 << endl;  cout << " hits 2 : ";
     for ( Int_t j=0; j<tot2; j++ ) cout << mucs->at(0).Hits2().at(j) << ", ";
     cout << "" << endl;
     
     Int_t tot3 = mucs->at(0).Hits3().size();
-    cout <<  tot3 << endl;
+    cout <<  tot3 << endl;  cout << " hits 3 : ";
     for ( Int_t j=0; j<tot3; j++ ) cout << mucs->at(0).Hits3().at(j) << ", ";
     cout << "" << endl;
     
     Int_t tot7 = mucs->at(0).Hits7().size();
-    cout <<  tot7 << endl;
+    cout <<  tot7 << endl;  cout << " hits 7 : ";
     for ( Int_t j=0; j<tot7; j++ ) cout << mucs->at(0).Hits7().at(j) << ", ";
     cout << "" << endl;
+    
+    cout << "*" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+    
+    cout << " ADC1 : ";
+    for ( Int_t j=0; j<24; j++ ) cout << mucs->at(0).ADC1().at(j) << ", ";
+    cout << "" << endl;
+    
+    cout << " ADC2 : ";
+    for ( Int_t j=0; j<24; j++ ) cout << mucs->at(0).ADC2().at(j) << ", ";
+    cout << "" << endl;
+    
+    cout << " ADC3 : ";
+    for ( Int_t j=0; j<24; j++ ) cout << mucs->at(0).ADC3().at(j) << ", ";
+    cout << "" << endl;
+    
+    cout << " ADC7 : ";
+    for ( Int_t j=0; j<24; j++ ) cout << mucs->at(0).ADC7().at(j) << ", ";
+    cout << "" << endl;
+    
+    getchar();
+    cout << "*" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+    
+    
     
     trigID++;
     return;

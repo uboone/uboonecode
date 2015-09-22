@@ -33,6 +33,11 @@ class MuCSData
   
   Float_t T0() const;
   
+  std::vector<Float_t> ADC1() const; 
+  std::vector<Float_t> ADC2() const; 
+  std::vector<Float_t> ADC3() const; 
+  std::vector<Float_t> ADC7() const; 
+  
   std::vector<Int_t> Hits1() const;
   std::vector<Int_t> Hits2() const;
   std::vector<Int_t> Hits3() const;
