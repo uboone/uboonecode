@@ -85,7 +85,7 @@ public:
   
   Double_t TOLER = 20.0;
   Double_t offset = -666.0;
-  // Double_t TOLER2 = 1.6*0.001;
+  Double_t TOLER2 = 1.6*0.001;
 
 };
 
@@ -212,7 +212,7 @@ void MuCSMerger::produce( art::Event &evt )
 	  {
 	    Double_t tmucs = t0*1.0e-9;
 	    Double_t dt0 =  tmucs-t_rel;
-	    Double_t dt = dt0-offest; 
+	    Double_t dt = dt0-offset; 
 	    
 	    if ( TMath::Abs(dt)<TOLER2 )
 	      {
@@ -220,8 +220,9 @@ void MuCSMerger::produce( art::Event &evt )
 		cout << "" << endl;
 		cout << " i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
 		cout << "" << endl;
-		cout << " - mucs t0 : " << tmus << ", " << "diff : " << dt << endl;
+		cout << " - mucs t0 : " << tmucs << ", " << "diff : " << dt << endl;
 		getchar();
+		
 	      }
 	    
 	  }
