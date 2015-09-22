@@ -51,7 +51,31 @@ Float_t MuCSData::T0() const
   return ft0;
   
 }
+
+std::vector<Int_t> MuCSData::Hits1() const
+{
+  return fhits1;
   
+}
+
+std::vector<Int_t> MuCSData::Hits2() const
+{
+  return fhits2;
+  
+}
+
+std::vector<Int_t> MuCSData::Hits3() const
+{
+  return fhits3;
+  
+}
+  
+std::vector<Int_t> MuCSData::Hits7() const
+{
+  return fhits7;
+  
+}
+
 }
 
 ////////////////////////////////////////////////////////////////////////
