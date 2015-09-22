@@ -32,6 +32,11 @@ class MuCSData
 	    std::vector<Int_t> hits1, std::vector<Int_t> hits2, std::vector<Int_t> hits3, std::vector<Int_t> hits7 ); 
   
   Float_t T0() const;
+  
+  std::vector<Int_t> Hits1() const;
+  std::vector<Int_t> Hits2() const;
+  std::vector<Int_t> Hits3() const;
+  std::vector<Int_t> Hits7() const;
     
  private:
   
