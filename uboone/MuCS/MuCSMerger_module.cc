@@ -42,6 +42,7 @@
 #include "RawData/TriggerData.h"
 #include "TH1F.h"
 #include "TFile.h"
+#include "TTree.h"
 
 using namespace std;
 
@@ -67,8 +68,8 @@ public:
   Int_t run0;
   Int_t srun0;
   TFile *f1;
-  // TFile *f2;
-  /*
+  TFile *f2;
+  
   Int_t seq;
   Float_t time_sec_low;
   Float_t time_sec_high;
@@ -78,7 +79,7 @@ public:
   
   TTree *my_tree;
   Int_t my_entries;
-  */
+  
   Double_t previous_trigtime;
   Double_t t_start; 
   
@@ -131,7 +132,41 @@ void MuCSMerger::produce( art::Event &evt )
       // offset = hDT->GetXaxis()->GetBinUpEdge( hDT->GetMaximumBin() );
       cout << " - DT : " << Form( "%.6f", offset ) << endl;
       cout << "" << endl;
-      cout << "" << endl;
+            
+      f2 = new TFile( Form( "/uboone/data/users/kalousis/MuCS/muons/mega_micro_ana_%d_0.333_0.root", group ), "read" );  
+    
+      if ( f2->IsZombie() ) 
+	{
+	  cout << " - mucs file not existing ! " << endl;
+	  return;
+	  
+	}
+      
+      else
+	{
+	  my_tree = (TTree*)f2->Get( "preselected" );
+	  
+	  my_tree->SetBranchStatus( "*", 0 ); 
+	  my_tree->SetBranchStatus( "seq", 1 );
+	  my_tree->SetBranchStatus( "time_sec_low", 1 );
+	  my_tree->SetBranchStatus( "time_sec_high", 1 );
+	  my_tree->SetBranchStatus( "time_16ns_low", 1 );
+	  my_tree->SetBranchStatus( "time_16ns_high", 1 );
+	  my_tree->SetBranchStatus( "t0", 1 );
+	  
+	  my_tree->SetBranchAddress( "seq", &seq );
+	  my_tree->SetBranchAddress( "time_sec_low", &time_sec_low );
+	  my_tree->SetBranchAddress( "time_sec_high", &time_sec_high );
+	  my_tree->SetBranchAddress( "time_16ns_low", &time_16ns_low );
+	  my_tree->SetBranchAddress( "time_16ns_high", &time_16ns_high );
+	  my_tree->SetBranchAddress( "t0", &t0 );
+	  
+	  my_entries = my_tree->GetEntries();
+	  cout << " - events in mucs : " << my_entries << endl;
+	  cout << "" << endl;
+	  cout << "" << endl;
+	  
+	}
       
       run0 = evt.run();
       srun0 = evt.subRun();
