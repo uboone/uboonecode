@@ -12,7 +12,7 @@ process_name: MuCSMerger
 
 services:
 {
-  TFileService:               { fileName: "mucs_merger_hist.root" }
+  TFileService:               { fileName: " /uboone/data/users/kalousis/MuCS/merged/mucs_merger_hist_myrun_mygroup.root" }
   Timing:                     {}
   # SimpleMemoryCheck:          { ignoreTotal: 1 }
   RandomNumberGenerator:      {} 
@@ -46,7 +46,7 @@ outputs:
  {
    module_type: RootOutput
    # fileName: "%ifb_%tc_merged.root"
-   fileName: "%ifb_merged.root"
+   fileName: "/uboone/data/users/kalousis/MuCS/merged/%ifb_myrun_mygroup_merged.root"
    dataTier: "mucs_merged"
    compressionLevel: 1
  }
@@ -55,5 +55,5 @@ outputs:
 #### !!! ---> #include "triggeralgo_service.fcl"
 # services.DatabaseUtil.ShouldConnect: false
 
-physics.producers.merger.group : 138
-physics.producers.merger.run : 2362
+physics.producers.merger.group : mygroup
+physics.producers.merger.run : myrun
