@@ -223,10 +223,10 @@ void MuCSMerger::produce( art::Event &evt )
 		cout << " i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
 		cout << "" << endl;
 		cout << " - mucs t0 : " << tmucs << ", " << "diff : " << dt << endl;
+		cout << "" << endl;
 		
 		ntimes++;
-		
-		if ( ntimes>=2 ) getchar();
+		if ( ntimes>=2 ) { cout << " - MULTIPLE PAIRS !!! " << endl; getchar(); }
 		
 	      }
 	    
