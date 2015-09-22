@@ -235,9 +235,11 @@ void MuCSMerger::produce( art::Event &evt )
   cout << "" << endl; 
   
   std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
-  Float_t time0 = 0;
+  Float_t time0 = -1.0;
   Float_t adc1[24], adc2[24], adc3[24], adc7[24];
+  for ( Int_t j=0; j<24; j++ ) { adc1[j]=0; adc2[j]=0; adc3[j]=0; adc7[j]=0; }
   std::vector<Int_t> hits1, hits2, hits3, hits7;
+  hits1.clear(); hits2.clear(); hits3.clear(); hits7.clear();
   
   Int_t ntimes=0;
   
@@ -272,8 +274,8 @@ void MuCSMerger::produce( art::Event &evt )
 		    
 		    for ( Int_t j=0; j<24; j++ ) 
 		      { 
-			adc1[j]=fadc1[j]; adc2[i]=fadc2[j]; // cout << fadc1[j] << ", " << fadc2[j] << endl;
-			adc3[j]=fadc3[j]; adc7[i]=fadc7[j]; // cout << fadc3[j] << ", " << fadc7[j] << endl;
+			adc1[j]=fadc1[j]; adc2[j]=fadc2[j]; // cout << fadc1[j] << ", " << fadc2[j] << endl;
+			adc3[j]=fadc3[j]; adc7[j]=fadc7[j]; // cout << fadc3[j] << ", " << fadc7[j] << endl;
 			
 		      }
 		    
