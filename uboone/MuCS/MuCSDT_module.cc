@@ -45,6 +45,8 @@
 
 #include "RecoAlg/TrackMomentumCalculator.h"
 
+#include "RawData/TriggerData.h"
+
 
 #include "art/Framework/Core/EDAnalyzer.h"
 
@@ -64,12 +66,14 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
-#include "EventDisplay/HeaderDrawer.h"
+// #include "EventDisplay/HeaderDrawer.h"
 
 
 #include "TMath.h"
 
 #include "TH1.h"
+
+#include "TAxis.h"
 
 #include "TH2.h"
 
@@ -118,6 +122,10 @@ namespace MuCSDT
     
   private:
     
+    std::string fSwizzlerProducerLabel; 
+    
+    Int_t group = 0;
+    
     Int_t trigID = 0;
     TH1F *hDT;
     Int_t run0;
@@ -133,6 +141,12 @@ namespace MuCSDT
     
     TTree *my_tree;
     Int_t my_entries;
+    
+    Double_t previous_trigtime;
+    Double_t t_start; 
+    
+    Double_t TOLER = 20.0;
+    Double_t offset = -666.0;
         
   }; 
   
@@ -149,9 +163,10 @@ namespace MuCSDT
   void MuCSDT::beginJob()
   {
     art::ServiceHandle<art::TFileService> tfs;
-    hDT = tfs->make<TH1F>( "hDT", "", 100, -100, 100 );
+    // hDT = tfs->make<TH1F>( "hDT", "", 10800, 0, 10800 );
+    hDT = tfs->make<TH1F>( "hDT", "", 1000*10800, 0, 10800 );
     
-    f1 = new TFile( Form( "/uboone/data/users/kalousis/MuCS/muons/mega_micro_ana_134_0.333_0.root" ), "read" );  
+    f1 = new TFile( Form( "/uboone/data/users/kalousis/MuCS/muons/mega_micro_ana_%d_0.333_0.root", group ), "read" );  
     
     if ( f1->IsZombie() ) 
       {
@@ -193,6 +208,10 @@ namespace MuCSDT
   
   void MuCSDT::reconfigure( fhicl::ParameterSet const& p )
   {
+    fSwizzlerProducerLabel = p.get< std::string >( "SwizzlerProducerLabel" );
+    
+    group = p.get< int >( "group" );
+    
     return;
     
   }
@@ -205,8 +224,14 @@ namespace MuCSDT
 	cout << " starting ... " << endl;
 	cout << "" << endl;
 	
+	cout << " - group : " << group << endl;
+	cout << "" << endl;
+	cout << "" << endl;
+	
 	run0 = evt.run();
 	srun0 = evt.subRun();
+
+	previous_trigtime = 0.0;
 	
       }
     
@@ -222,6 +247,19 @@ namespace MuCSDT
     // TTimeStamp ts(unix_time_stamp, (int)llo);
     cout << " - unix timestamp : " << unix_time_stamp << endl;
     cout << "" << endl; 
+    
+    art::Handle< std::vector<raw::Trigger> > trigHandle;
+    evt.getByLabel( fSwizzlerProducerLabel, trigHandle );
+    std::vector< art::Ptr<raw::Trigger> > trigs;
+    art::fill_ptr_vector( trigs, trigHandle );
+    Double_t trigtime = ( trigs.at(0)->TriggerTime() )*1.0e-6;
+    cout << " - trig. time : " << trigtime << ", diff : " << trigtime-previous_trigtime <<  ", " << trigs.size() << endl;
+    cout << "" << endl; 
+        
+    if ( trigID==0 ) t_start = trigtime;
+    Double_t t_rel = trigtime-t_start;
+    cout << " - relative trig. time : " << t_rel << endl;
+    cout << "" << endl; 
         
     for ( Int_t i=0; i<my_entries; i++ )
       {
@@ -229,20 +267,23 @@ namespace MuCSDT
 	
 	Float_t DTunix = TMath::Abs( time_sec_high*65536.0+time_sec_low-unix_time_stamp );
 		
-	if ( DTunix<=10.0 ) 
+	if ( DTunix<=TOLER ) 
 	  {
 	    // cout << " Gotcha !!! " << endl;
 	    // cout << "" << endl;
-	    cout << " - unix timestamp : " << unix_time_stamp << ", i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
-	    cout << "" << endl;
-	    getchar();
+	    // cout << " i : " << i << ", mucs unix timestamp : " << Form( "%.1f", time_sec_high*65536.0+time_sec_low ) << ", diff : " << DTunix << endl; 
+	    // cout << "" << endl;
+	    // getchar();
 	    	    
+	    Double_t tmucs = t0*1.0e-9;
+	    hDT->Fill( tmucs-t_rel );
+	    
 	  }
-	
-	
+		
       }
     
-    // getchar();
+    previous_trigtime = trigtime;
+    
     trigID++;
     return;
     
@@ -252,6 +293,10 @@ namespace MuCSDT
   {
     cout << "" << endl; 
     cout << " - events processed : " << trigID << endl;
+    cout << "" << endl;
+    offset = hDT->GetXaxis()->GetBinCenter( hDT->GetMaximumBin() );
+    // offset = hDT->GetXaxis()->GetBinUpEdge( hDT->GetMaximumBin() );
+    cout << " - DT : " << Form( "%.6f", offset ) << endl;
     cout << "" << endl;
     cout << " ... ending ! " << endl;
     cout << "" << endl;
