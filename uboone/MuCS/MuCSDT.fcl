@@ -18,7 +18,7 @@ services:
   # option on the command line; e.g.,
   #  lar -c MuCSDT.fcl -T myhistograms.root -s myinput.root
 
-  TFileService: { fileName: "/uboone/data/users/kalousis/MuCSDT.root" }
+  TFileService: { fileName: "/uboone/data/users/kalousis/MuCS/offsets/MuCSDT_myrun_mygroup.root" }
 
   # This constrols the display in the output of how long each job step
   # takes for each event. The only parameter you can put in here is
@@ -124,6 +124,10 @@ physics:
       BezierRecoLabel: "trackkalmanhit" 
             
       OpFlashLabel: "opflash"
+      
+      SwizzlerProducerLabel: "daq"
+      
+      group:          mygroup 
       
       }
   }
