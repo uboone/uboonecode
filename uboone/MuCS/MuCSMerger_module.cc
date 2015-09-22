@@ -39,10 +39,12 @@
 #include <memory>
 #include <iostream>
 #include "MuCSData.h"
+#include "vector"
 #include "RawData/TriggerData.h"
 #include "TH1F.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TMath.h"
 
 using namespace std;
 
@@ -77,6 +79,16 @@ public:
   Float_t time_16ns_high;
   Double_t t0;
   
+  Double_t fadc1[24];
+  Double_t fadc2[24];
+  Double_t fadc3[24];
+  Double_t fadc7[24];
+
+  std::vector<Int_t> *fhits1 = new std::vector<Int_t>;
+  std::vector<Int_t> *fhits2 = new std::vector<Int_t>;
+  std::vector<Int_t> *fhits3 = new std::vector<Int_t>;
+  std::vector<Int_t> *fhits7 = new std::vector<Int_t>;
+
   TTree *my_tree;
   Int_t my_entries;
   
@@ -85,7 +97,7 @@ public:
   
   Double_t TOLER = 20.0;
   Double_t offset = -666.0;
-  Double_t TOLER2 = 1.6*0.001;
+  Double_t TOLER2 = 2.5*0.001;
 
 };
 
@@ -155,12 +167,32 @@ void MuCSMerger::produce( art::Event &evt )
 	  my_tree->SetBranchStatus( "time_16ns_high", 1 );
 	  my_tree->SetBranchStatus( "t0", 1 );
 	  
+	  my_tree->SetBranchStatus( "ADC1", 1 );
+	  my_tree->SetBranchStatus( "ADC2", 1 );
+	  my_tree->SetBranchStatus( "ADC3", 1 );
+	  my_tree->SetBranchStatus( "ADC7", 1 );
+	  
+	  my_tree->SetBranchStatus( "hits1", 1 );
+	  my_tree->SetBranchStatus( "hits2", 1 );
+	  my_tree->SetBranchStatus( "hits3", 1 );
+	  my_tree->SetBranchStatus( "hits7", 1 );
+	  
 	  my_tree->SetBranchAddress( "seq", &seq );
 	  my_tree->SetBranchAddress( "time_sec_low", &time_sec_low );
 	  my_tree->SetBranchAddress( "time_sec_high", &time_sec_high );
 	  my_tree->SetBranchAddress( "time_16ns_low", &time_16ns_low );
 	  my_tree->SetBranchAddress( "time_16ns_high", &time_16ns_high );
 	  my_tree->SetBranchAddress( "t0", &t0 );
+	  
+	  my_tree->SetBranchAddress( "ADC1", &fadc1 );
+	  my_tree->SetBranchAddress( "ADC2", &fadc2 );
+	  my_tree->SetBranchAddress( "ADC3", &fadc3 );
+	  my_tree->SetBranchAddress( "ADC7", &fadc7 );
+	  
+	  my_tree->SetBranchAddress( "hits1", &fhits1 );
+	  my_tree->SetBranchAddress( "hits2", &fhits2 );
+	  my_tree->SetBranchAddress( "hits3", &fhits3 );
+	  my_tree->SetBranchAddress( "hits7", &fhits7 );
 	  
 	  my_entries = my_tree->GetEntries();
 	  cout << " - events in mucs : " << my_entries << endl;
@@ -202,7 +234,14 @@ void MuCSMerger::produce( art::Event &evt )
   cout << " - relative trig. time : " << t_rel << endl;
   cout << "" << endl; 
   
+  std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
+  Float_t time0 = 0;
+  Float_t adc1[24], adc2[24], adc3[24], adc7[24];
+  std::vector<Int_t> hits1, hits2, hits3, hits7;
+  
   Int_t ntimes=0;
+  
+  Int_t dtmin=10000;
   
   for ( Int_t i=0; i<my_entries; i++ )
       {
@@ -225,8 +264,43 @@ void MuCSMerger::produce( art::Event &evt )
 		cout << " - mucs t0 : " << tmucs << ", " << "diff : " << dt << endl;
 		cout << "" << endl;
 		
-		ntimes++;
-		if ( ntimes>=2 ) { cout << " - MULTIPLE PAIRS !!! " << endl; getchar(); }
+		if ( TMath::Abs( dt )<TMath::Abs( dtmin ) )
+		  {
+		    // ..
+		    
+		    time0 = tmucs;
+		    
+		    for ( Int_t j=0; j<24; j++ ) 
+		      { 
+			adc1[j]=fadc1[j]; adc2[i]=fadc2[j]; // cout << fadc1[j] << ", " << fadc2[j] << endl;
+			adc3[j]=fadc3[j]; adc7[i]=fadc7[j]; // cout << fadc3[j] << ", " << fadc7[j] << endl;
+			
+		      }
+		    
+		    Int_t tot1 = fhits1->size(); // cout << tot1 << endl;
+		    Int_t tot2 = fhits2->size(); // cout << tot2 << endl;
+		    Int_t tot3 = fhits3->size(); // cout << tot3 << endl;
+		    Int_t tot7 = fhits7->size(); // cout << tot7 << endl;
+		    		    
+		    hits1.clear();
+		    for ( Int_t j=0; j<tot1; j++ ) hits1.push_back( fhits1->at(j) );
+		    
+		    hits2.clear();
+		    for ( Int_t j=0; j<tot2; j++ ) hits2.push_back( fhits2->at(j) );
+		    
+		    hits3.clear();
+		    for ( Int_t j=0; j<tot3; j++ ) hits3.push_back( fhits3->at(j) );
+		    
+		    hits7.clear();
+		    for ( Int_t j=0; j<tot7; j++ ) hits7.push_back( fhits7->at(j) );
+		    		
+		    ntimes++;
+		    if ( ntimes>=2 ) { cout << " - MULTIPLE PAIRS, PROPERLY TREATED !!! " << endl; } // getchar(); }
+		    
+		    dtmin = dt;
+		    
+		    // ..
+		  }
 		
 	      }
 	    
@@ -234,31 +308,8 @@ void MuCSMerger::produce( art::Event &evt )
 		
       }
   
-  std::unique_ptr< std::vector<MuCS::MuCSData> > mucsdatacol(new std::vector<MuCS::MuCSData>);
-  
-  Float_t t0 = 0;
-  
-  Float_t adc1[24], adc2[24], adc3[24], adc7[24];
-  
-  std::vector<Int_t> hits1, hits2, hits3, hits7;
-  
-  t0 = -1.0;  
-  for ( Int_t i=0; i<24; i++ ) 
-    { 
-      adc1[i]=-1.0; adc2[i]=-1.0;
-      adc3[i]=-1.0; adc7[i]=-1.0;
-      
-    }
-  hits1.push_back(-1.0);
-  hits2.push_back(-1.0);hits2.push_back(-1.0);
-  hits3.push_back(-1.0);hits3.push_back(-1.0);hits3.push_back(-1.0);
-  hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);hits7.push_back(-1.0);
-    
-  MuCS::MuCSData mucsevt( t0, adc1, adc2, adc3, adc7, hits1, hits2, hits3, hits7 ); 
-    
-  
+  MuCS::MuCSData mucsevt( time0, adc1, adc2, adc3, adc7, hits1, hits2, hits3, hits7 ); 
   mucsdatacol->push_back( mucsevt );
-
   evt.put( std::move( mucsdatacol ) );
   
   previous_trigtime = trigtime;
