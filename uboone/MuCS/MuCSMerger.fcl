@@ -12,7 +12,7 @@ process_name: MuCSMerger
 
 services:
 {
-  TFileService:               { fileName: " /uboone/data/users/kalousis/MuCS/merged/mucs_merger_hist_myrun_mygroup.root" }
+  TFileService:               { fileName: "/uboone/data/users/kalousis/MuCS/merged/mucs_merger_hist_myrun_mygroup.root" }
   Timing:                     {}
   # SimpleMemoryCheck:          { ignoreTotal: 1 }
   RandomNumberGenerator:      {} 
