@@ -192,8 +192,8 @@ namespace MuCSReader
     art::Handle< std::vector<MuCS::MuCSData> > mucs = mucslist[0]; 
     cout << mucs->size() << endl;
     
-    // Float_t time0 = mucs->at(0).T0();
-    // cout << time0 << endl;
+    Float_t time0 = mucs->at(0).T0();
+    cout << time0 << endl;
         
     trigID++;
     return;

@@ -46,7 +46,7 @@ MuCSData::MuCSData( Float_t t0, Float_t adc1[24], Float_t adc2[24], Float_t adc3
     
 }
   
-Float_t MuCSData::T0()
+Float_t MuCSData::T0() const
 {
   return ft0;
   

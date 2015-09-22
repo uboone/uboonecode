@@ -45,7 +45,8 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName: "%ifb_%tc_merged.root"
+   # fileName: "%ifb_%tc_merged.root"
+   fileName: "%ifb_merged.root"
    dataTier: "mucs_merged"
    compressionLevel: 1
  }
