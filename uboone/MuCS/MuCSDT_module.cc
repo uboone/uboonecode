@@ -1,4 +1,13 @@
 
+////////////////////////////////////////////////////////////////////////
+//
+//    trivia : Finding the time offset between the TPC 
+//             and the Muon Counter System (MuCS), September 2015
+//    author : Leonidas N. Kalousis
+//    e-mail : kalousis@vt.edu
+//
+////////////////////////////////////////////////////////////////////////
+
 #ifndef MuCSDT_Module
 
 #define MuCSDT_Module
@@ -125,7 +134,7 @@ namespace MuCSDT
     std::string fSwizzlerProducerLabel; 
     
     Int_t group = 0;
-    
+        
     Int_t trigID = 0;
     TH1F *hDT;
     Int_t run0;
@@ -308,3 +317,9 @@ namespace MuCSDT
 } 
 
 #endif 
+
+////////////////////////////////////////////////////////////////////////
+//
+//    The end !
+//
+////////////////////////////////////////////////////////////////////////

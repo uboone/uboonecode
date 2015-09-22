@@ -4,9 +4,9 @@ BEGIN_PROLOG
 standard_mucsmerger:
 {
   module_type: "MuCSMerger"
-  
-  group: 10
-  
+  group: 0
+  run: 0
+  SwizzlerProducerLabel: "daq"
 }
 
 END_PROLOG

@@ -23,7 +23,7 @@ services:
 source:
 {
   module_type: RootInput
-  maxEvents: 10     
+  maxEvents: 200000     
 }
 
 physics:
@@ -53,3 +53,6 @@ outputs:
 
 #### !!! ---> #include "triggeralgo_service.fcl"
 # services.DatabaseUtil.ShouldConnect: false
+
+physics.producers.merger.group : 138
+physics.producers.merger.run : 2362
