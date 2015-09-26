@@ -66,6 +66,7 @@ namespace calibration {
     void RawAdaptiveBaselineAlg(TH1F *filtHist);
     void FinalNoisyFilterAlg(TH1F* fHist, int planeNum);
     void RemoveFilterFlags(TH1F *filtHist);
+    void WaveAlg(TH1F *filtHist, float & waveVal);
     
   private:
 
@@ -75,14 +76,14 @@ namespace calibration {
     //******************************
     //Variables Taken from FHICL File
     std::string       fRawDigitModuleLabel;   //label for rawdigit module
-    int fDoChirp, fDoZigZag, fDoSignalFilter, fDoNoisyFilter,fDoTransientNoiseFilter, fSaveFilterWF, fSaveNoiseTree, fSaveNoiseTreeWF, fRunWaveFilterAlg, fRunRawAdaptiveBaselineAlg, fRemoveFilterFlags, fDoFinalNoisyFilter;
+    int fDoChirp, fDoZigZag, fDoSignalFilter, fDoNoisyFilter,fDoTransientNoiseFilter, fSaveFilterWF, fSaveNoiseTree, fSaveNoiseTreeWF, fRunWaveFilterAlg, fRunRawAdaptiveBaselineAlg, fRemoveFilterFlags, fDoFinalNoisyFilter, fRunWaviness;
 
     TTree *fNoise;
     int fEvent, fRun,fSubrun,fChan, fPlaneNum;
-    float fMax, fMin, fMean, fRms;
+    float fMax, fMin, fMean, fRms, fFinalMean, fFinalRms;
     int fMaxtime, fMintime;
     bool fisChirp;
-    float fZigZagVal, fChirp;
+    float fZigZagVal, fChirp, fWave;
     std::vector<short> fWf;
       
     int fMaxTicks; ///< maximum number of ticks expected (should get from RawDigit in future)
@@ -124,6 +125,7 @@ namespace calibration {
     fSaveNoiseTree 	           = pset.get<int>("saveNoiseTree",            0);
     fSaveNoiseTreeWF 	       = pset.get<int>("saveNoiseTreeWF",          0);
     fDoTransientNoiseFilter    = pset.get<int>("doTransientNoiseFilter",   0);
+    fRunWaviness	       = pset.get<int>("doWavinessMeasurement",   0);
   }
 
   //-------------------------------------------------------------------
@@ -133,7 +135,8 @@ namespace calibration {
 
     //noise filter variables
     fHistMod = new TH1F("fHistMod","",fMaxTicks,-0.5,fMaxTicks-0.5);
-    currentHist = new TH1F("","",fMaxTicks,-0.5,fMaxTicks-0.5);
+    currentHist = new TH1F("currentHist","",fMaxTicks,-0.5,fMaxTicks-0.5);
+    currentFFTHist = new TH1F("currentFFTHist","",fMaxTicks,-0.5,fMaxTicks-0.5);
     waveNoiseHists = new TH1F * [48];
     for(unsigned i = 0; i < 48; i++)
     	waveNoiseHists[i] = new TH1F(Form("waveNoiseHist_number%d",i),";Tick;ADC Value",fMaxTicks,-0.5,fMaxTicks-0.5);
@@ -148,7 +151,10 @@ namespace calibration {
     fNoise->Branch("min", &fMin, "min/F");
     fNoise->Branch("mean", &fMean, "mean/F");
     fNoise->Branch("rms", &fRms, "rms/F");
+    fNoise->Branch("finalMean", &fFinalMean, "finalMean/F");
+    fNoise->Branch("finalRms", &fFinalRms, "finalRms/F");
     fNoise->Branch("chirp", &fChirp, "chirp/F");
+    fNoise->Branch("wave", &fWave, "wave/F");
     fNoise->Branch("wf", "vector<short>", &fWf);
   }
 
@@ -195,7 +201,10 @@ namespace calibration {
     int waveNoiseGroupNum  = 48;
     Int_t waveNoiseCounter = -1;
     int waveNoiseHistsCh[waveNoiseGroupNum];
+    float waveNoiseHistsOrigMean[waveNoiseGroupNum];
+    float waveNoiseHistsOrigRms[waveNoiseGroupNum];
     float waveNoiseHistsChirp[waveNoiseGroupNum];
+    float waveNoiseHistseWave[waveNoiseGroupNum];
 
     //loop over channels in raw digit container, get mapping to wire plane and number
     const unsigned int n_channels = rawDigitVector.size();
@@ -243,15 +252,24 @@ namespace calibration {
             for( unsigned int s = 0 ; s < n_samp ; s++ )
                 fHistMod->SetBinContent(s+1, rawDigitVector.at(ich).ADCs().at(s) );
 
+	    //get initial noise measurements
+	    double initMean, initRms = 0.0;
+	    CalcMeanRMSWithFlags( fHistMod, initMean, initRms);
+ 	    waveNoiseHistsOrigMean[waveNoiseCounter] = initMean;
+	    waveNoiseHistsOrigRms[waveNoiseCounter] = initRms;
+
             //filter out chirping
-            float chirpVal = 0;
-            if(fDoChirp == 1) ChirpFilterAlg( fHistMod, chirpVal );
-            waveNoiseHistsChirp[waveNoiseCounter] = chirpVal;
+            if(fDoChirp == 1) ChirpFilterAlg( fHistMod,  waveNoiseHistsChirp[waveNoiseCounter] );
 
             //filter zig zag (note flag applied in method)
-			simpleZigzagFilterAlg(fHistMod);
-			//ZigzagFilterAlg();
+	    simpleZigzagFilterAlg(fHistMod);
+   	    //ZigzagFilterAlg();
 	
+   	    //measure waviness - do BEFORE signal protection
+	    waveNoiseHistseWave[waveNoiseCounter] = 0;
+	    if( fRunWaviness == 1 )
+		WaveAlg(fHistMod, waveNoiseHistseWave[waveNoiseCounter]);
+
             //protect signals
             if(fDoSignalFilter == 1) SignalFilterAlg(fHistMod);
 
@@ -260,14 +278,13 @@ namespace calibration {
 
             //filter transient noise
             if( fDoTransientNoiseFilter == 1 ) TransientNoiseFilterAlg(fHistMod, (int) pnum );
-		
+
             //load partially filtered waveform into "wave group" placeholder
             for( int s = 0 ; s < fHistMod->GetNbinsX() ; s++ )
                 waveNoiseHists[waveNoiseCounter]->SetBinContent(s+1, fHistMod->GetBinContent(s+1) );
 
             //do correlated noise removal
-      		if(waveNoiseCounter == waveNoiseGroupNum-1)
-      		{
+      	    if(waveNoiseCounter == waveNoiseGroupNum-1){
                 if( fRunWaveFilterAlg == 1)
                     WaveFilterAlg(waveNoiseHists);
                 for(Int_t k = 0; k < waveNoiseGroupNum; k++)
@@ -303,9 +320,12 @@ namespace calibration {
                     //do basic noise measurement, save in tree
                     fChan = waveNoiseHistsCh[k];
                     fChirp = waveNoiseHistsChirp[k];
+		    fWave = waveNoiseHistseWave[k];
                     calcMinMax( waveform, fMean , fRms, fMax, fMin, fMaxtime, fMintime, 0, (int) n_samp);
-                    fRms = rmsVal;
-                    fMean = meanVal;
+                    fRms = waveNoiseHistsOrigRms[k];
+                    fMean = waveNoiseHistsOrigMean[k];
+		    fFinalRms = rmsVal;
+                    fFinalMean = meanVal;
 
                     fWf.clear();
                     if( fSaveNoiseTreeWF == 1 ){
@@ -466,22 +486,38 @@ void NoiseFilter::ChirpFilterAlg(TH1F* fHist, float & isChirpFrac)
       if(runningAmpRMS < chirpMinRMS)
       {
         numLowRMS++;
-        if(lowRMSFlag == false)
- 	{
-          lowRMSFlag = true;
-          firstLowRMSBin = i-windowSize+1;
-          lastLowRMSBin = i-windowSize+1;
-	}
-	else
-	{
-          lastLowRMSBin = i-windowSize+1;
-	}
       }
 
       if(i >= 3*windowSize-1)
       {
         if((RMSsecond < chirpMinRMS) && ((RMSfirst > chirpMinRMS) || (RMSthird > chirpMinRMS)))
-          numNormalNeighbors++;
+    	{
+         	numNormalNeighbors++;
+    	}
+
+        if(lowRMSFlag == false)
+        {
+          if((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS))
+          {
+            lowRMSFlag = true;
+            firstLowRMSBin = i-2*windowSize+1;
+            lastLowRMSBin = i-windowSize+1;
+          }
+
+          if((i == 3*windowSize-1) && (RMSfirst < chirpMinRMS) && (RMSsecond < chirpMinRMS))
+          {
+            lowRMSFlag = true;
+            firstLowRMSBin = i-3*windowSize+1;
+            lastLowRMSBin = i-2*windowSize+1;
+          }
+        }
+        else
+        {
+          if((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS))
+          {
+            lastLowRMSBin = i-windowSize+1;
+          }
+        }
       }
 
       counter = 0;
@@ -589,7 +625,8 @@ void NoiseFilter::ZigzagFilterAlg(TH1F* fHist)
     waveformMean /= ((Double_t) counter);
   }
 
-  TH1F *currentHist = new TH1F("","",numBins,-0.5,numBins-0.5);
+  //TH1F *currentHist = new TH1F("","",numBins,-0.5,numBins-0.5);
+  currentHist->Reset();
   for(Int_t i = 0; i < numBins; i++)
   {
     ADCval = fHist->GetBinContent(i+1);
@@ -650,7 +687,7 @@ void NoiseFilter::ZigzagFilterAlg(TH1F* fHist)
 
   delete hm;
   delete hp;
-  delete currentHist;
+  //delete currentHist;
   delete newHist;
   delete invCurrentFFTObject;
   delete[] reFilt;
@@ -980,6 +1017,50 @@ void NoiseFilter::RemoveFilterFlags(TH1F *filtHist)
         filtHist->SetBinContent(i+1,0.0);
     }
   }
+
+  return;
+}
+
+void NoiseFilter::WaveAlg(TH1F *fHist, float & waveVal)
+{
+  const Int_t startSidebandBin = 300;
+  const Int_t endSidebandBin = 500;
+  const Int_t startPeakBin = 2;
+  const Int_t endPeakBin = 248;
+
+  Double_t sidebandAvg;
+  Double_t peakAvg;
+
+  //TH1F *currentHist = new TH1F("","",maxTicks,-0.5,maxTicks-0.5);
+  Int_t numBins = fHist->GetNbinsX();
+  currentHist->Reset();
+  for(Int_t i = 0; i < numBins ; i++)
+  {
+    currentHist->SetBinContent(i+1, fHist->GetBinContent(i+1) );
+  }
+
+  //TH1F *currentFFTHist = new TH1F("","",maxTicks,-0.5,maxTicks-0.5);
+  currentFFTHist->Reset();
+  currentFFTHist = (TH1F*)currentHist->FFT(currentFFTHist,"MAG");
+
+  Double_t integral = currentFFTHist->Integral(startPeakBin,startPeakBin+50);
+  Double_t maxIntegral = integral;
+  for(int i = startPeakBin+1; i <= endPeakBin; i++)
+  {
+    integral -= currentFFTHist->GetBinContent(i-1);
+    integral += currentFFTHist->GetBinContent(i+50);
+
+    if(integral > maxIntegral)
+      maxIntegral = integral;
+  }
+  peakAvg = maxIntegral/50.0;
+  sidebandAvg = TMath::Max(0.0001,currentFFTHist->Integral(startSidebandBin,endSidebandBin)/((Double_t) endSidebandBin-startSidebandBin+1));
+
+  //delete currentHist;
+  //delete currentFFTHist;
+  waveVal = 0.0;
+  if(peakAvg/sidebandAvg > 0.0)
+    waveVal = peakAvg/sidebandAvg;
 
   return;
 }
