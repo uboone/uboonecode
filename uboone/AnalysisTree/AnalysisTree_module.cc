@@ -3604,7 +3604,8 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
           fData->genie_ND[iPart]=part.NumberDaughters();
           fData->genie_mother[iPart]=part.Mother();
         } // for particle
-        const simb::MCNeutrino& nu(mctruth->GetNeutrino());
+	// unused variable ?
+        //const simb::MCNeutrino& nu(mctruth->GetNeutrino());
       } //if neutrino set
     }// end (fSaveGenieInfo)  
 
