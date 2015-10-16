@@ -141,13 +141,16 @@ namespace lris {
     uint32_t triggerBitPMTBeam;
     uint32_t triggerBitPMTCosmic;
     
-    int PMTframe; // internal checking variable for PMT
-    int FEM5triggerFrame ;
-    int FEM5triggerSample;
-    int FEM6triggerFrame ;
-    int FEM6triggerSample;
-    double FEM5triggerTime;
-    double FEM6triggerTime;
+    int PMTtriggerFrame; // PMT trigger frame (has to agree across PMT cards to within 1)
+    int PMTtriggerSample; //PMT trigger sample (has to agree across PMT cards to within 1)
+    int TPCtriggerFrame; //  TPC trigger frame (has to agree across TPC cards to within 1)
+    int TPCtriggerSample; // TPC trigger sample (has to agree across TPC cards to within 1)
+//    int FEM5triggerFrame ;
+//    int FEM5triggerSample;
+//    int FEM6triggerFrame ;
+//    int FEM6triggerSample;
+//    double FEM5triggerTime;
+//    double FEM6triggerTime;
 
     int RO_BNBtriggerFrame;
     int RO_NuMItriggerFrame;
@@ -167,25 +170,24 @@ namespace lris {
 //    uint32_t RO_Gate2Frame;
 //    uint32_t RO_Gate2Sample;
 
-    int TPCframe; // internal checking variable for TPC
-    int TPC1triggerFrame;
-    int TPC1triggerSample;
-    int TPC2triggerFrame;
-    int TPC2triggerSample;
-    int TPC3triggerFrame;
-    int TPC3triggerSample;
-    int TPC4triggerFrame;
-    int TPC4triggerSample;
-    int TPC5triggerFrame;
-    int TPC5triggerSample;
-    int TPC6triggerFrame;
-    int TPC6triggerSample;
-    int TPC7triggerFrame;
-    int TPC7triggerSample;
-    int TPC8triggerFrame;
-    int TPC8triggerSample;
-    int TPC9triggerFrame;
-    int TPC9triggerSample;
+//    int TPC1triggerFrame;
+//    int TPC1triggerSample;
+//    int TPC2triggerFrame;
+//    int TPC2triggerSample;
+//    int TPC3triggerFrame;
+//    int TPC3triggerSample;
+//    int TPC4triggerFrame;
+//    int TPC4triggerSample;
+//    int TPC5triggerFrame;
+//    int TPC5triggerSample;
+//    int TPC6triggerFrame;
+//    int TPC6triggerSample;
+//    int TPC7triggerFrame;
+//    int TPC7triggerSample;
+//    int TPC8triggerFrame;
+//    int TPC8triggerSample;
+//    int TPC9triggerFrame;
+//    int TPC9triggerSample;
     
     uint32_t ADCwords_crate0;
     uint32_t ADCwords_crate1;
@@ -208,7 +210,7 @@ namespace lris {
     uint32_t NumWords_crate9;
 
     int event;
-    TTree *tMyTree;
+    TTree *ValidationTree;
     
   };  // LArRawInputDriverUBooNE;
 
