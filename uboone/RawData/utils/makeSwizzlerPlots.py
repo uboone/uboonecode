@@ -2,7 +2,9 @@ import ROOT
 import array
 import sys
 
-#ROOT.gStyle.SetOptStat(0)
+ROOT.gStyle.SetOptStat("ourme")
+ROOT.gStyle.SetHistLineColor(ROOT.kBlack)
+ROOT.gStyle.SetHistFillColor(ROOT.kRed)
 
 if len(sys.argv) < 2:
   ### Andy's temporary run number inputs
@@ -236,8 +238,9 @@ for runNumber in runNumbers:
   hSampleDiffbetweenROAndNuMITrig = ROOT.TH1D("sample diff from RO to trigger NuMI","sample diff from RO to trigger NuMI",40,-20,20)
   hSampleDiffbetweenROAndEXTTrig = ROOT.TH1D("sample diff from RO to trigger EXT","sample diff from RO to trigger EXT",40,-20,20)
 
-  hSampleDiffbetweenRWMAndBNBTrig = ROOT.TH1D("sample diff from trigger BNB to RWM","sample diff from trigger BNB to RWM",1600,-96000,96000)
+  hSampleDiffbetweenRWMAndBNBTrig = ROOT.TH1D("sample diff from trigger BNB to RWM","sample diff from trigger BNB to RWM",200,200,400)
   hFrameDiffbetweenRWMAndBNBTrig = ROOT.TH1D("frame diff from trigger BNB to RWM","frame diff from trigger BNB to RWM",40,-20,20)
+  hTimeDiffbetweenRWMAndBNBTrig = ROOT.TH1D("time diff from trigger BNB to RWM / #mu s","time diff from trigger BNB to RWM / #mu s",200,3,7)
 
   hTimeDiffTriggerToWaveForm = ROOT.TH1D("waveform time - trigger time","waveform time - trigger time",64,-3200,4800)
   
@@ -273,6 +276,7 @@ for runNumber in runNumbers:
       if event.RO_RWMtriggerFrame > 0:
         hFrameDiffbetweenRWMAndBNBTrig.Fill(event.RO_RWMtriggerFrame - event.triggerFrame) ## RWM signal
         hSampleDiffbetweenRWMAndBNBTrig.Fill(event.RO_RWMtriggerSample - event.triggerSample) ## RWM signal
+        hTimeDiffbetweenRWMAndBNBTrig.Fill(event.RO_RWMtriggerTime - event.triggerTime) ## RWM signal
     if event.triggerBitNuMI:
       hFrameDiffNuMI.Fill(FEM5triggerFrame - triggerFrame)
       hSampleDiffNuMI.Fill(FEM5triggerSample - triggerSample )
@@ -391,6 +395,12 @@ for runNumber in runNumbers:
   hSampleDiffbetweenRWMAndBNBTrig.Draw()
   if save:
     canv.SaveAs("plots/BNBTrigToRWMSampleDiff"+str(runNumber)+".eps")
+  else:
+    raw_input()
+  hTimeDiffbetweenRWMAndBNBTrig.Draw()
+  if save:
+    canv.SaveAs("plots/BNBTrigToRWMTimeDiff"+str(runNumber)+".eps")
+    canv.SaveAs("plots/BNBTrigToRWMTimeDiff"+str(runNumber)+".png")
   else:
     raw_input()
 
