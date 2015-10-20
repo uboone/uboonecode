@@ -2,6 +2,8 @@
 
 // art libraries
 #include "art/Utilities/Exception.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
+#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 
 // ROOT libraries
 #include "TMatrixD.h"
@@ -16,10 +18,8 @@ namespace evwgh {
                                         std::vector<double> const& centralValue,
                                         std::vector< std::vector<double> > const& inputCovarianceMatrix,
                                         int n_multisims,
-                                        CLHEP::HepRandomEngine& randomEngine )
+                                        CLHEP::RandGaussQ& GaussRandom)
   {
-    
-    CLHEP::RandGaussQ GaussRandom(randomEngine); 
 
     std::vector<std::vector<double> > setOfSmearedCentralValues;
 

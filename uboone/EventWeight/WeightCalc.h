@@ -3,7 +3,9 @@
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 
+#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "CLHEP/Random/RandomEngine.h"
+#include "CLHEP/Random/RandGaussQ.h"
 
 #include <string>
 #include <map>
@@ -33,8 +35,7 @@ namespace evwgh {
     static std::vector<std::vector<double> > MultiGaussianSmearing(
 			std::vector<double> const& centralValues,
 			std::vector< std::vector<double>> const& inputCovarianceMatrix,
-			int n_multisims,
-                        CLHEP::HepRandomEngine& rand_engine);
+			int n_multisims, CLHEP::RandGaussQ& GaussRandom);
   private:
     std::string fName;
   };
