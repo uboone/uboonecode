@@ -1,0 +1,15 @@
+BEGIN_PROLOG
+
+# This module will generate a fake BNB gate (a sim::BeamGateInfo product)
+# run this before microboone_optical_adc_sim (UBOpticalADCSim)
+# you also need to tell microboone_optical_adc_sim (UBOpticalADCSim), microboone_optical_fem_sim (OpticalFEM), and triggersim (UBTriggerSim) about it
+# e.g. set microboone_optical_fem_sim.BeamGateModule: "fakebnb"
+
+uboone_fakebnb: {
+    module_type: FakeBNBGate
+    GateG4time_ns: 0.0
+    GateWidth: 1600.0
+}
+
+END_PROLOG
+
