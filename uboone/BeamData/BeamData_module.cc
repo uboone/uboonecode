@@ -165,13 +165,23 @@ void BeamData::beginSubRun(art::SubRun & sr)
   std::cout << md << std::endl;
   std::cout << "BeamData: end metadata" << std::endl;
 
+  // Set timezone to Fermilab local time (seconds west of utc).
+
+  const char* tz = getenv("TZ");
+  setenv("TZ", "CST+6CDT", 1);
+  tzset();
+
+  // Interpret metadata.
+
   size_t n1 = md.find("Start Time:");
   n1 += 11;
   size_t n2 = md.find("\n", n1);
   std::cout << "Start time = " << md.substr(n1, n2-n1) << std::endl;
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
+  tm.tm_isdst = -1;
   strptime(md.substr(n1, n2-n1).c_str(), "%Y-%m-%dT%H:%M:%S+00:00", &tm);
+  std::cout << "tm_isdst = " << tm.tm_isdst << std::endl;
   time_t tstart = mktime(&tm);
   std::cout << "Start time seconds = " << tstart << std::endl;
 
@@ -180,7 +190,9 @@ void BeamData::beginSubRun(art::SubRun & sr)
   n2 = md.find("\n", n1);
   std::cout << "End time = " << md.substr(n1, n2-n1) << std::endl;
   memset(&tm, 0, sizeof(tm));
+  tm.tm_isdst = -1;
   strptime(md.substr(n1, n2-n1).c_str(), "%Y-%m-%dT%H:%M:%S+00:00", &tm);
+  std::cout << "tm_isdst = " << tm.tm_isdst << std::endl;
   time_t tend = mktime(&tm);
   std::cout << "End time seconds = " << tend << std::endl;
 
@@ -194,6 +206,13 @@ void BeamData::beginSubRun(art::SubRun & sr)
   n2 = md.find("\n", n1);
   std::cout << "Usec end time = " << md.substr(n1, n2-n1) << std::endl;
 
+  // Restore time zone.
+
+  if(tz)
+    setenv("TZ", tz, 1);
+  else
+    unsetenv("TZ");
+  tzset();
 }
 
 void BeamData::endSubRun(art::SubRun & sr)
