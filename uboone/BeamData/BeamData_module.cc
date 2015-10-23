@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "art/Framework/Core/EDProducer.h"
+#include "art/Framework/Core/FileBlock.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
@@ -17,6 +18,8 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
+
+#include "IFDH_service.h"
 
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
@@ -33,6 +36,7 @@
 #include <algorithm>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <ctime>
 
 #include <memory>
 
@@ -57,7 +61,9 @@ public:
   void produce(art::Event & e) override;
   void endSubRun(art::SubRun & sr) override;
   void endJob() override;
- 
+  void respondToOpenInputFile(art::FileBlock const& fb) override;
+  void respondToCloseInputFile(art::FileBlock const& fb) override;
+
   bool nextBeamEvent(std::string beamline, ub_BeamHeader &bh, std::vector<ub_BeamData> &bd);
   bool rewindBeamFile(std::string beam, const ub_BeamHeader& bh, const std::vector<ub_BeamData> &bd); //goes back one event in the file
   int compareTime(ub_BeamHeader& bh, art::Event& e, float dt, float offsetT);
@@ -96,6 +102,7 @@ private:
   int fSubRun;
   long long fTimestamp;
   float fFOM;
+  std::string fInputFileName;
 
 };
 
@@ -149,50 +156,44 @@ void BeamData::beginSubRun(art::SubRun & sr)
   fSubRun=sr.subRun();
   mf::LogInfo(__FUNCTION__)<<"Open beam files for run "<<sr.run()
 			   <<" subrun "<<sr.subRun();
-  std::stringstream ss;
-  for (int i=0;i<120;i++) ss<<"=";
-  ss<<std::endl;
-  ss<<std::setw(10)<<"Beam"
-    <<std::setw(40)<<"File"
-    <<std::setw(30)<<"Time offset (ms)"
-    <<std::setw(30)<<"Time tolerance (ms)"
-    <<std::setw(10)<<"Found"
-    <<std::endl;
-  for (int i=0;i<120;i++) ss<<"-";
-  ss<<std::endl;  
-  for (unsigned int ibeam=0;ibeam<fBeams.size();ibeam++) {
-    std::stringstream fname;
-    fname<<"beam_"<<fBeams[ibeam]<<"_"
-	 <<std::setfill('0') << std::setw(7) << fRun<<"_"
-	 <<std::setfill('0') << std::setw(5) << fSubRun<<".dat";
-    ss<<std::setw(10)<<fBeams[ibeam]
-      <<std::setw(40)<<fname.str()
-      <<std::setw(30)<<fBeamConf[fBeams[ibeam]].fOffsetT
-      <<std::setw(30)<<fBeamConf[fBeams[ibeam]].fDt;
-    ifstream *fin=new ifstream(fBeamConf[fBeams[ibeam]].fFilePath+
-			       fname.str(), 
-			       std::ios::binary);
-    if ( !fin->is_open() ) {
-      fBeamConf.erase(fBeams[ibeam]);
-      delete fin;
-      ss<<std::setw(10)<<"No";
-    } else {      
-      fBeamConf[fBeams[ibeam]].fFileName=fname.str();
-      fBeamConf[fBeams[ibeam]].fTotalSpillCount=0;
-      fBeamConf[fBeams[ibeam]].fGoodSpillCount=0;
-      fBeamConf[fBeams[ibeam]].fNonMergedEventCount=0;
-      fBeamConf[fBeams[ibeam]].fMergedEventCount=0;
-      fBeamConf[fBeams[ibeam]].fBeamStream=fin;
-      ss<<std::setw(10)<<"Yes";
-    }
-    ss<<std::endl;
-  }
-  for (int i=0;i<120;i++) ss<<"=";
-  ss<<std::endl;
-  mf::LogInfo(__FUNCTION__) <<ss.str();
 
-  for (auto& it : fBeamConf) 
-    if (it.second.fWriteBeamData) createBranches(it.first);
+  // Get sam metadata for input file.
+
+  art::ServiceHandle<ifdh_ns::IFDH> ifdh;
+  std::string md = ifdh->getMetadata(fInputFileName);
+  std::cout << "BeamData: metadata" << std::endl;
+  std::cout << md << std::endl;
+  std::cout << "BeamData: end metadata" << std::endl;
+
+  size_t n1 = md.find("Start Time:");
+  n1 += 11;
+  size_t n2 = md.find("\n", n1);
+  std::cout << "Start time = " << md.substr(n1, n2-n1) << std::endl;
+  struct tm tm;
+  memset(&tm, 0, sizeof(tm));
+  strptime(md.substr(n1, n2-n1).c_str(), "%Y-%m-%dT%H:%M:%S+00:00", &tm);
+  time_t tstart = mktime(&tm);
+  std::cout << "Start time seconds = " << tstart << std::endl;
+
+  n1 = md.find("End Time:");
+  n1 += 9;
+  n2 = md.find("\n", n1);
+  std::cout << "End time = " << md.substr(n1, n2-n1) << std::endl;
+  memset(&tm, 0, sizeof(tm));
+  strptime(md.substr(n1, n2-n1).c_str(), "%Y-%m-%dT%H:%M:%S+00:00", &tm);
+  time_t tend = mktime(&tm);
+  std::cout << "End time seconds = " << tend << std::endl;
+
+  n1 = md.find("online.start_time_usec:");
+  n1 += 23;
+  n2 = md.find("\n", n1);
+  std::cout << "Usec start time = " << md.substr(n1, n2-n1) << std::endl;
+
+  n1 = md.find("online.end_time_usec:");
+  n1 += 21;
+  n2 = md.find("\n", n1);
+  std::cout << "Usec end time = " << md.substr(n1, n2-n1) << std::endl;
+
 }
 
 void BeamData::endSubRun(art::SubRun & sr)
@@ -284,6 +285,18 @@ void BeamData::endJob()
   ss<<std::endl;
   mf::LogInfo(__FUNCTION__)<<ss.str();
   fBeamConf.clear();
+}
+
+void BeamData::respondToOpenInputFile(art::FileBlock const& fb)
+{
+  std::cout << "BeamData: " << fb.fileName() << " opened." << std::endl;
+  fInputFileName = fb.fileName();
+}
+
+void BeamData::respondToCloseInputFile(art::FileBlock const& fb)
+{
+  std::cout << "BeamData: " << fb.fileName() << " closed." << std::endl;
+  fInputFileName.clear();
 }
 
 void BeamData::produce(art::Event & e)
