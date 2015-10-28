@@ -809,6 +809,12 @@ sub gen_pmt {
   aunit="deg"
   lunit="cm"/>
 
+ <tube name="PMT_TPBPlate"
+  rmax="(6.0*2.54)"
+  z="(0.02)"
+  deltaphi="360"
+  aunit="deg"
+  lunit="cm"/>
  <tube name="PMT_AcrylicPlate"
   rmax="(6.0*2.54)"
   z="(0.2)"
@@ -855,7 +861,11 @@ EOF
 <structure>
  <volume name="volOpDetSensitive">
   <materialref ref="LAr"/>
-  <solidref ref="PMT_AcrylicPlate"/>
+  <solidref ref="PMT_TPBPlate"/>
+ </volume>
+ <volume name="vol_PMT_TPBPlate">
+  <materialref ref="Acrylic"/>
+  <solidref ref="PMT_TPBPlate"/>
  </volume>
  <volume name="vol_PMT_AcrylicPlate">
   <materialref ref="Acrylic"/>
@@ -893,8 +903,12 @@ EOF
    <position name="posOpDetSensitive" unit="cm" x="0" y="0" z="(5.5 * 2.54) - 0.1"/>
   </physvol>
   <physvol>
+   <volumeref ref="vol_PMT_TPBPlate"/>
+   <position name="pos_PMT_TPBPlate" unit="cm" x="0" y="0" z="(5.5 * 2.54) - 0.1"/>
+  </physvol>
+  <physvol>
    <volumeref ref="vol_PMT_AcrylicPlate"/>
-   <position name="pos_PMT_AcrylicPlate" unit="cm" x="0" y="0" z="(5.5 * 2.54) - 0.3"/>
+   <position name="pos_PMT_AcrylicPlate" unit="cm" x="0" y="0" z="(5.5 * 2.54) - 0.22"/>
   </physvol>
   <physvol>
    <volumeref ref="vol_PMT_Stalk"/>
