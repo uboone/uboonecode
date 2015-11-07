@@ -9,4 +9,12 @@ standard_mucsmerger:
   SwizzlerProducerLabel: "daq"
 }
 
+standard_mucsreco:
+{
+  module_type: "MuCSReco"
+  InputDB: "input.sqlite"
+  TopBoxy: 0.0
+  
+}
+
 END_PROLOG
