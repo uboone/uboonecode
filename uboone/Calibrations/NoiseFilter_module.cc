@@ -56,7 +56,7 @@ namespace calibration {
                      int const&                endBin);
 
     void CalcMeanRMSWithFlags(TH1F* fHist, double &theMean, double &theRMS);
-    void ChirpFilterAlg(TH1F* fHist,float & isChirpFrac);
+    void ChirpFilterAlg(TH1F* fHist,float & theChirpFrac);
     void simpleZigzagFilterAlg(TH1F* fHist);
     void ZigzagFilterAlg(TH1F* fHist);
     void SignalFilterAlg(TH1F* fHist);
@@ -118,7 +118,7 @@ namespace calibration {
     fDoNoisyFilter             = pset.get<int>("doNoisyFilter",            1);
     fRunWaveFilterAlg 	       = pset.get<int>("doWaveFilter",             1);
     fRunRawAdaptiveBaselineAlg = pset.get<int>("doAdaptiveBaseline",       1);
-    fDoFinalNoisyFilter        = pset.get<int>("doFinalNoisyFilter",       1);
+    fDoFinalNoisyFilter        = pset.get<int>("doFinalNoisyFilter",       0);
     fRemoveFilterFlags         = pset.get<int>("doRemoveFilterFlags",      1);
     fSaveFilterWF              = pset.get<int>("saveFilterWF",             1);
     fSaveNoiseTree 	           = pset.get<int>("saveNoiseTree",            0);
@@ -235,7 +235,7 @@ namespace calibration {
             fPlaneNum = (int) pnum;
             fHistMod->Reset();
             waveNoiseCounter++;
-      		waveNoiseHists[waveNoiseCounter]->Reset();
+      	    waveNoiseHists[waveNoiseCounter]->Reset();
             waveNoiseHistsCh[waveNoiseCounter] = rawDigitVector.at(ich).Channel();
             waveNoiseHistsChirp[waveNoiseCounter] = 0;
 
@@ -249,45 +249,44 @@ namespace calibration {
             waveNoiseHistsChirp[waveNoiseCounter] = chirpVal;
 
             //filter zig zag (note flag applied in method)
-			simpleZigzagFilterAlg(fHistMod);
-			//ZigzagFilterAlg();
+	    simpleZigzagFilterAlg(fHistMod);
+	    //ZigzagFilterAlg();
 	
             //protect signals
             if(fDoSignalFilter == 1) SignalFilterAlg(fHistMod);
+
+            //do adaptive baseline to fix chirping channels
+            if(fRunRawAdaptiveBaselineAlg == 1)
+                RawAdaptiveBaselineAlg(fHistMod);
 
             //filter very noisy channels
             if(fDoNoisyFilter == 1) NoisyFilterAlg(fHistMod, (int) pnum);
 
             //filter transient noise
-            if( fDoTransientNoiseFilter == 1 ) TransientNoiseFilterAlg(fHistMod, (int) pnum );
+            if(fDoTransientNoiseFilter == 1) TransientNoiseFilterAlg(fHistMod, (int) pnum );
 		
             //load partially filtered waveform into "wave group" placeholder
             for( int s = 0 ; s < fHistMod->GetNbinsX() ; s++ )
                 waveNoiseHists[waveNoiseCounter]->SetBinContent(s+1, fHistMod->GetBinContent(s+1) );
 
             //do correlated noise removal
-      		if(waveNoiseCounter == waveNoiseGroupNum-1)
-      		{
-                if( fRunWaveFilterAlg == 1)
+      	    if(waveNoiseCounter == waveNoiseGroupNum-1) {
+                if(fRunWaveFilterAlg == 1)
                     WaveFilterAlg(waveNoiseHists);
-                for(Int_t k = 0; k < waveNoiseGroupNum; k++)
-        		{
-                    if( fRunRawAdaptiveBaselineAlg == 1)
-                        RawAdaptiveBaselineAlg(waveNoiseHists[k]);
-
+                for(Int_t k = 0; k < waveNoiseGroupNum; k++) {
                     //get mean for waveform
                     double meanVal, rmsVal;
                     CalcMeanRMSWithFlags(waveNoiseHists[k], meanVal, rmsVal);
-                    for( unsigned int s = 0 ; s < n_samp ; s++ ){
+                    for( unsigned int s = 0 ; s < n_samp ; s++ ) {
                         if( waveNoiseHists[k]->GetBinContent( s+1 ) != 10000.0 )
                             waveNoiseHists[k]->SetBinContent(s+1, waveNoiseHists[k]->GetBinContent( s+1 ) - meanVal );
                     }
 
-                    if( fDoFinalNoisyFilter == 1 )
+                    if(fDoFinalNoisyFilter == 1)
                         FinalNoisyFilterAlg( waveNoiseHists[k] , (int) pnum);
 
                     //remove flags
-                    if( fRemoveFilterFlags == 1)
+                    if(fRemoveFilterFlags == 1)
                         RemoveFilterFlags(waveNoiseHists[k]);
 
                     //output waveform to file
@@ -296,7 +295,7 @@ namespace calibration {
                     // Recover the database version of the pedestal
                     double pedVal = fPedestalRetrievalAlg.PedMean(waveNoiseHistsCh[k]);
 
-                    for( unsigned int s = 0 ; s < n_samp ; s++ ){
+                    for( unsigned int s = 0 ; s < n_samp ; s++) {
                         waveform.push_back( waveNoiseHists[k]->GetBinContent( s+1 ) + pedVal - meanVal );
                     }
 
@@ -425,10 +424,11 @@ void NoiseFilter::CalcMeanRMSWithFlags(TH1F* fHist, double &theMean, double &the
   return;
 }
 
-void NoiseFilter::ChirpFilterAlg(TH1F* fHist, float & isChirpFrac)
+void NoiseFilter::ChirpFilterAlg(TH1F* fHist, float & theChirpFrac)
 {
   const Int_t windowSize = 20;
-  const Double_t chirpMinRMS = 0.9;
+  const Double_t chirpMinRMS = 0.90;
+  const Double_t chirpMinRMS2 = 0.66;
   const Double_t maxNormalNeighborFrac = 0.20;
   bool recoverChirpingWaveforms = true;
   const Int_t maxTicks = fMaxTicks;
@@ -447,87 +447,107 @@ void NoiseFilter::ChirpFilterAlg(TH1F* fHist, float & isChirpFrac)
   Int_t numNormalNeighbors = 0;
   Int_t numBins = fHist->GetNbinsX();
   for(Int_t i = 0; i < numBins; i++)
-  {
-    ADCval = fHist->GetBinContent(i+1);
-    runningAmpMean += ADCval;
-    runningAmpRMS += TMath::Power(ADCval,2.0);
-
-    counter++;
-    if(counter == windowSize)
     {
-      runningAmpMean /= (Double_t)windowSize;
-      runningAmpRMS /= (Double_t)windowSize;
-      runningAmpRMS = TMath::Sqrt(runningAmpRMS-TMath::Power(runningAmpMean,2.0));
+      ADCval = fHist->GetBinContent(i+1);
+      runningAmpMean += ADCval;
+      runningAmpRMS += TMath::Power(ADCval,2.0);
 
-      RMSfirst = RMSsecond;
-      RMSsecond = RMSthird;
-      RMSthird = runningAmpRMS;
-
-      if(runningAmpRMS < chirpMinRMS)
-      {
-        numLowRMS++;
-        if(lowRMSFlag == false)
- 	{
-          lowRMSFlag = true;
-          firstLowRMSBin = i-windowSize+1;
-          lastLowRMSBin = i-windowSize+1;
-	}
-	else
+      counter++;
+      if(counter == windowSize)
 	{
-          lastLowRMSBin = i-windowSize+1;
+	  runningAmpMean /= (Double_t)windowSize;
+	  runningAmpRMS /= (Double_t)windowSize;
+	  runningAmpRMS = TMath::Sqrt(runningAmpRMS-TMath::Power(runningAmpMean,2.0));
+
+	  RMSfirst = RMSsecond;
+	  RMSsecond = RMSthird;
+	  RMSthird = runningAmpRMS;
+
+	  if(runningAmpRMS < chirpMinRMS)
+	    {
+	      numLowRMS++;
+	    }
+
+	  if(i >= 3*windowSize-1)
+	    {
+	      if((RMSsecond < chirpMinRMS) && ((RMSfirst > chirpMinRMS) || (RMSthird > chirpMinRMS)))
+		{
+		  numNormalNeighbors++;
+		}
+
+	      if(lowRMSFlag == false)
+		{
+		  if(((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS2)) || ((RMSsecond < chirpMinRMS2\
+										   ) && (RMSthird < chirpMinRMS)))
+		    {
+		      lowRMSFlag = true;
+		      firstLowRMSBin = i-2*windowSize+1;
+		      lastLowRMSBin = i-windowSize+1;
+		    }
+
+		  if((i == 3*windowSize-1) && (((RMSfirst < chirpMinRMS) && (RMSsecond < chirpMinRMS2)) || \
+					       ((RMSfirst < chirpMinRMS2) && (RMSsecond < chirpMinRMS))))
+		    {
+		      lowRMSFlag = true;
+		      firstLowRMSBin = i-3*windowSize+1;
+		      lastLowRMSBin = i-2*windowSize+1;
+		    }
+		}
+	      else
+		{
+		  if(((RMSsecond < chirpMinRMS) && (RMSthird < chirpMinRMS2)) || ((RMSsecond < chirpMinRMS2\
+										   ) && (RMSthird < chirpMinRMS)))
+		    {
+		      lastLowRMSBin = i-windowSize+1;
+		    }
+		}
+	    }
+
+	  counter = 0;
+	  runningAmpMean = 0.0;
+	  runningAmpRMS = 0.0;
 	}
-      }
-
-      if(i >= 3*windowSize-1)
-      {
-        if((RMSsecond < chirpMinRMS) && ((RMSfirst > chirpMinRMS) || (RMSthird > chirpMinRMS)))
-          numNormalNeighbors++;
-      }
-
-      counter = 0;
-      runningAmpMean = 0.0;
-      runningAmpRMS = 0.0;
     }
-  }
 
   Double_t chirpFrac = ((Double_t) numLowRMS)/(((Double_t) maxTicks)/((Double_t) windowSize));
   Double_t normalNeighborFrac = ((Double_t) numNormalNeighbors)/((Double_t) numLowRMS);
 
-  if(((normalNeighborFrac < maxNormalNeighborFrac) || ((numLowRMS < 2.0/maxNormalNeighborFrac) && (lastLowRMSBin-firstLowRMSBin == numLowRMS*windowSize))) && (numLowRMS > 4))
-  {
-    firstLowRMSBin = TMath::Max(1,firstLowRMSBin-windowSize);
-    lastLowRMSBin = TMath::Min(numBins,lastLowRMSBin+2*windowSize);
-    isChirpFrac = chirpFrac;
+  if(((normalNeighborFrac < maxNormalNeighborFrac) || ((numLowRMS < 2.0/maxNormalNeighborFrac) && (\
+												   lastLowRMSBin-firstLowRMSBin == numLowRMS*windowSize))) && (numLowRMS > 4))
+    {
+      firstLowRMSBin = TMath::Max(1,firstLowRMSBin-windowSize);
+      lastLowRMSBin = TMath::Min(numBins,lastLowRMSBin+2*windowSize);
+      theChirpFrac = chirpFrac;
 
-    if((numBins-lastLowRMSBin) < windowSize)
-    {
-      lastLowRMSBin = numBins;
-    }
+      if((numBins-lastLowRMSBin) < windowSize)
+	{
+	  lastLowRMSBin = numBins;
+	}
 
-    if(chirpFrac > 0.99)
-    {
-      firstLowRMSBin = 1;
-      lastLowRMSBin = numBins;
-    }
+      if(chirpFrac > 0.99)
+	{
+	  firstLowRMSBin = 1;
+	  lastLowRMSBin = numBins;
+	}
 
-    if(recoverChirpingWaveforms == true)
-    {
-      for(Int_t i = 0; i < numBins; i++)
-      {
-        if((i+1 >= firstLowRMSBin) && (i+1 <= lastLowRMSBin))
-        {
-          fHist->SetBinContent(i+1,10000.0);
-        }
-      }
+      if(recoverChirpingWaveforms == true)
+	{
+	  for(Int_t i = 0; i < numBins; i++)
+	    {
+	      if((i+1 >= firstLowRMSBin) && (i+1 <= lastLowRMSBin))
+		{
+		  fHist->SetBinContent(i+1,10000.0);
+		}
+	    }
+	}
+      else
+	{
+	  for(Int_t i = 0; i < numBins; i++)
+	    {
+	      fHist->SetBinContent(i+1,10000.0);
+	    }
+	}
     }
-    else
-    {
-      for(Int_t i = 0; i < numBins; i++)
-      {
-        fHist->SetBinContent(i+1,10000.0);
-      }
-    }
-  }
 
   return;
 }
@@ -538,6 +558,8 @@ void NoiseFilter::simpleZigzagFilterAlg(TH1F* fHist){
   //get mean for waveform
   double meanVal, rmsVal;
   CalcMeanRMSWithFlags(fHist, meanVal, rmsVal);
+
+  if(rmsVal < 0.5) return;
 
   // In case we want to turn zig zag off...
   if(fDoZigZag == 1)
@@ -550,8 +572,10 @@ void NoiseFilter::simpleZigzagFilterAlg(TH1F* fHist){
           nextADCval = fHist->GetBinContent(i+2);
           if( ADCval < 4096 && nextADCval < 4096 )
               fHist->SetBinContent(i+1, (ADCval + nextADCval)/2. - meanVal);
+          else if(ADCval < 4096)
+              fHist->SetBinContent(i+1, ADCval - meanVal);
       }
-      fHist->SetBinContent(numBins, fHist->GetBinContent(numBins) - meanVal );
+      fHist->SetBinContent(numBins, fHist->GetBinContent(numBins) - meanVal);
   }
   // Otherwise, we still need to baseline subtract here
   else
@@ -707,7 +731,7 @@ void NoiseFilter::NoisyFilterAlg(TH1F* fHist, int planeNum)
 {
   double meanVal, rmsVal;
   CalcMeanRMSWithFlags(fHist, meanVal, rmsVal);
-  const Double_t maxRMSCut[3] = {10.0,10.0,5.0}; //hardcoded...
+  const Double_t maxRMSCut[3] = {10.0,10.0,7.0}; //hardcoded...
   //const Double_t maxRMSCut[3] = {6.0,6.0,4.0}; //hardcoded...
   if( planeNum < 0 || planeNum >= 3 )
 	return;
@@ -774,16 +798,6 @@ void NoiseFilter::WaveFilterAlg(TH1F **filtHists)
   Double_t correction;
   Int_t corrValSize;
   int waveNoiseGroupNum = 48;
-
-  //get mean value for each hist
-  //double meanValuePerCh[waveNoiseGroupNum];
-  //for(Int_t j = 0; j < waveNoiseGroupNum; j++)
-  //{
-  //	double meanVal, rmsVal;
-  //	CalcMeanRMSWithFlags(filtHists[j], meanVal, rmsVal);
-  //	meanValuePerCh[j] = meanVal;
-  //}
-
   for(Int_t i = 0; i < numBins; i++)
   {
     corrVals.clear();
@@ -818,8 +832,6 @@ void NoiseFilter::WaveFilterAlg(TH1F **filtHists)
       ADCval = filtHists[j]->GetBinContent(i+1);
       if(ADCval != 10000.0)
       {
-	//std::cout << corrValSize << "\t" << ADCval << "\t" << correction << "\t" << TMath::Nint(ADCval-correction+ meanValuePerCh[j]) << std::endl;
-        //filtHists[j]->SetBinContent(i+1,TMath::Nint(ADCval-correction + meanValuePerCh[j]));
 	filtHists[j]->SetBinContent(i+1,TMath::Nint(ADCval-correction ));
       }
     }//end loop over wave noise group
@@ -846,11 +858,11 @@ void NoiseFilter::RawAdaptiveBaselineAlg(TH1F *filtHist)
       numFlaggedBins++;
     }
   }
-  if(numFlaggedBins == numBins) return; // Eventually replace this with flag check
+  if(numFlaggedBins == numBins) return;
+  if(numFlaggedBins == 0) return;
 
   Double_t baselineVal = 0.0;
   Int_t windowBins = 0;
-  //Int_t index;
   Double_t ADCval;
   for(Int_t j = 0; j <= windowSize/2; j++)
   {
@@ -910,10 +922,6 @@ void NoiseFilter::RawAdaptiveBaselineAlg(TH1F *filtHist)
       isFilledVec[j] = true;
   }
 
-  //get mean for waveform
-  double meanVal, rmsVal;
-  CalcMeanRMSWithFlags(filtHist, meanVal, rmsVal);
-
   Int_t downIndex;
   Int_t upIndex;
   Bool_t downFlag;
@@ -925,7 +933,6 @@ void NoiseFilter::RawAdaptiveBaselineAlg(TH1F *filtHist)
 
     ADCval = filtHist->GetBinContent(j+1);
     if(ADCval != 10000.0)
-    //if(ADCval < 10000.0)
     {
       if(isFilledVec[j] == false)
       {
@@ -957,8 +964,6 @@ void NoiseFilter::RawAdaptiveBaselineAlg(TH1F *filtHist)
           baselineVec[j] = 0.0;
       }
 
-      //std::cout << ADCval << "\t" << baselineVec[j] << "\t" << meanVal << std::endl;
-      //filtHist->SetBinContent(j+1,ADCval-baselineVec[j]+meanVal);
       filtHist->SetBinContent(j+1,ADCval-baselineVec[j]);
     }
   }
