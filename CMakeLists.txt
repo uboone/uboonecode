@@ -57,7 +57,6 @@ find_ups_product( artextensions v1_00_01 )
 find_ups_product( cetbuildtools v3_10_00 )
 find_ups_product( postgresql v9_1_5 )
 find_ups_product( boost v1_53_0 )
-find_ups_product( libwda v2_22_0 )
 
 cet_find_library( PQ NAMES pq PATHS ENV POSTGRESQL_LIBRARIES NO_DEFAULT_PATH )
 
