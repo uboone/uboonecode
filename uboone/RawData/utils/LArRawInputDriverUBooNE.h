@@ -24,6 +24,7 @@
 
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "Utilities/DatabaseUtil.h" // lardata
+#include <wda.h>
 
 #include <fstream>
 #include <vector>

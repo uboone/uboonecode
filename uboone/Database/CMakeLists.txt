@@ -1,3 +1,7 @@
+cet_find_library( LIBWDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH )
+
+include_directories( $ENV{LIBWDA_FQ_DIR}/include )
+
 art_make( BASENAME_ONLY
 	  SERVICE_LIBRARIES CalibrationDBI_Providers
 	                    CalibrationDBI_IOVData
@@ -14,6 +18,7 @@ art_make( BASENAME_ONLY
 			    ${ART_UTILITIES}
 			    ${FHICLCPP}
 			    ${ROOT_BASIC_LIB_LIST}
+			    ${LIBWDA}
 )
 
 install_headers()
