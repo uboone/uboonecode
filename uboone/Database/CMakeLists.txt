@@ -19,6 +19,7 @@ art_make( BASENAME_ONLY
 			    ${FHICLCPP}
 			    ${ROOT_BASIC_LIB_LIST}
 			    ${LIBWDA}
+			    ${PQ}
 )
 
 install_headers()
