@@ -14,6 +14,7 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include <libpq-fe.h> //Only needed for direct db connections
+#include <wda.h>   //Database web proxy API
 
 ///General LArSoft Utilities
 namespace util{
