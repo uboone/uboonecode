@@ -541,6 +541,7 @@ namespace lris {
     //Channel map has changed each time the detector has been re-cabled.
     //Provide data-taking time as first argument. (integer epoch seconds) 
     //Optionally recover outdated mappings with 'swizzling time' second arg. (also integer epoch seconds)
+    //Now renaming db util as UBDatabaseUtil and bringing to uboonecode.
     if (fDataTakingTime == -1)
       fChannelMap = art::ServiceHandle<util::UBDatabaseUtil>()->GetUBChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
     else

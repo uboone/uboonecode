@@ -39,7 +39,6 @@
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 // TPC Channel Map
-//#include "Utilities/DatabaseUtil.h" // lardata
 #include "uboone/Database/UBDatabaseUtil.h"
 
 // ROOT

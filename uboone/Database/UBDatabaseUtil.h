@@ -13,7 +13,7 @@
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
-#include <libpq-fe.h>
+#include <libpq-fe.h> //Only needed for direct db connections
 
 ///General LArSoft Utilities
 namespace util{
