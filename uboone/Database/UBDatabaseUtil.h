@@ -41,13 +41,10 @@ namespace util{
     }
     
   };
-
   
   typedef int UBLArSoftCh_t;
-
   typedef std::map< UBDaqID, UBLArSoftCh_t > UBChannelMap_t;
   typedef std::map< UBLArSoftCh_t, UBDaqID > UBChannelReverseMap_t;
-
 
   class UBDatabaseUtil {
   public:

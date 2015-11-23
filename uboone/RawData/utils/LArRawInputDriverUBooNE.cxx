@@ -542,9 +542,9 @@ namespace lris {
     //Provide data-taking time as first argument. (integer epoch seconds) 
     //Optionally recover outdated mappings with 'swizzling time' second arg. (also integer epoch seconds)
     if (fDataTakingTime == -1)
-      fChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
+      fChannelMap = art::ServiceHandle<util::UBDatabaseUtil>()->GetUBChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
     else
-      fChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBChannelMap(fDataTakingTime, fSwizzlingTime); 
+      fChannelMap = art::ServiceHandle<util::UBDatabaseUtil>()->GetUBChannelMap(fDataTakingTime, fSwizzlingTime); 
 
     
     // ### Swizzling to get the number of channels...trying the method used in write_read.cpp

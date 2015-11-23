@@ -39,7 +39,8 @@
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 // TPC Channel Map
-#include "Utilities/DatabaseUtil.h" // lardata
+//#include "Utilities/DatabaseUtil.h" // lardata
+#include "uboone/Database/UBDatabaseUtil.h"
 
 // ROOT
 #include "TTree.h"
@@ -126,7 +127,7 @@ namespace zmqds {
 
   //-------------------------------------------------
   RawDigitWriter::RawDigitWriter(fhicl::ParameterSet const& pset) 
-    : EDAnalyzer(pset), fChannelReverseMap( art::ServiceHandle<util::DatabaseUtil>()->GetUBChannelReverseMap() )
+    : EDAnalyzer(pset), fChannelReverseMap( art::ServiceHandle<util::UBDatabaseUtil>()->GetUBChannelReverseMap() )
     {
 
       art::ServiceHandle<art::TFileService> tfs;

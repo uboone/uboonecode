@@ -17,7 +17,7 @@ simple_plugin( LArRawInputSourceUBooNE
 
 simple_plugin( RawDigitWriter "module"
 	       UBOpReadoutMap_service
-	       DatabaseUtil_service
+	       UBDatabaseUtil_service
 	       RawData
                ${ART_FRAMEWORK_CORE}
 	       ${ART_FRAMEWORK_IO_SOURCES}
@@ -35,7 +35,7 @@ simple_plugin( RawDigitWriter "module"
 art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc
 	  BASENAME_ONLY
 	  LIBRARY_NAME uboone_RawData
-	  LIB_LIBRARIES DatabaseUtil_service
+	  LIB_LIBRARIES UBDatabaseUtil_service
                         Geometry
 	  	        Geometry_service
 		        Utilities
@@ -67,7 +67,7 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc
                         ${Boost_SYSTEM_LIBRARY}
                         ${ROOT_BASIC_LIB_LIST}
 
-	  MODULE_LIBRARIES DatabaseUtil_service
+	  MODULE_LIBRARIES UBDatabaseUtil_service
                         Geometry
 	  	        Geometry_service
 		        Utilities

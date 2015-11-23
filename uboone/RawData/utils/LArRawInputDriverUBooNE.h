@@ -23,9 +23,7 @@
 #include "datatypes/ub_EventRecord.h"
 
 #include "uboone/Geometry/UBOpChannelTypes.h"
-#include "Utilities/DatabaseUtil.h" // lardata
-#include <wda.h>
-
+#include "uboone/Database/UBDatabaseUtil.h"
 #include <fstream>
 #include <vector>
 #include <map>
