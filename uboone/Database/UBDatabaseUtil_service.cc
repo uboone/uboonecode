@@ -299,6 +299,17 @@ namespace util {
       // Also this avoids inglorious segfault. 
       return;
     }
+
+    //Place the query http://dbdata0vm.fnal.gov:8188/QE/uboone/query?F=get_map_double_sec&a=-1
+    const char *url = "http://dbdata0vm.fnal.gov:8188/QE/uboone/query?F=get_map_double_sec&a=-1";
+    const char *uagent = "";
+    int *error = 0;
+    Dataset mapping = getData(url, uagent, error);
+    Tuple row = getFirstTuple(mapping);
+    int eightthousandtwohundredfiftysix = getNfields(row);
+    mf::LogError("WHAT THE HECK")<< eightthousandtwohundredfiftysix;
+
+
     if ( conn==NULL )
       Connect( 0 );
 

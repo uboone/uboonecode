@@ -52,6 +52,8 @@ namespace util{
     UBDatabaseUtil(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
     ~UBDatabaseUtil();
 
+    Dataset ds;
+    
     void   reconfigure(fhicl::ParameterSet const& pset);
       
     int GetLifetimeFromDB(int run,double &lftime_real);
