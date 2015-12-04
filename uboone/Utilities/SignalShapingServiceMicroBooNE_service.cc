@@ -245,6 +245,8 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
 
   }
 
+  fUseCalibratedResponses = pset.get<bool>("UseCalibratedResponses");  //jj
+
   mf::LogInfo("SignalShapingServiceMicroBooNE") << " using the field response provided from a .root file " ;
 
   // constructor decides if initialized value is a path or an environment variable
@@ -275,7 +277,8 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
       std::string fname0 = Form("%s_vw%02i_%s.root", fileNameBase.c_str(), (int)_vw, version[ktype].c_str());
       std::string fname;
       sp.find_file(fname0, fname);
-      //std::cout << "name " << fname0 << std::endl;
+      
+      std::cout << "1" << " " <<  "name " << fname0 << std::endl; //jj
       ////std::cout << "path " << fname << std::endl;
       //std::cout << plane.size() << std::endl;
       //std::cout << fNResponses[ktype].size() << std::endl;
@@ -287,15 +290,21 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
       // load up the response functions
       for(auto& resp : plane) {
         TString histName = Form("%s_vw%02i_wr%02i", histNameBase.c_str(), (int)_vw, (int)_wr);
-        //std::cout << histName << std::endl;
+
+        std::cout << "2" << " " << histName << std::endl;  //jj
+
         resp = (TH1F*)fin->Get(histName);
-        //std::cout << resp->GetNbinsX() << std::endl;
+
+        std::cout << "3" << " " << resp->GetNbinsX() << std::endl; //jj
 
         auto Xaxis = resp->GetXaxis();
         fNFieldBins[ktype] = Xaxis->GetNbins();
 
         // internal time is in nsec
         fFieldBinWidth[ktype] = resp->GetBinWidth(1)*1000.;
+
+	std::cout << "4" << " " << "Check FieldBinWidth" << " " << ktype << " " << fFieldBinWidth[ktype] << std::endl;  //jj
+
         //fFieldResponseTOffset[ktype].at(_vw) = (resp->GetBinCenter(1) + fCalibResponseTOffset[_vw])*1000.;
 //
 //        double delta = resp->GetXaxis()->GetBinCenter(2) - resp->GetXaxis()->GetBinCenter(1);
@@ -349,6 +358,15 @@ void util::SignalShapingServiceMicroBooNE::SetTimeScaleFactor()
 void util::SignalShapingServiceMicroBooNE::SetFieldResponseTOffsets(const TH1F* resp, const size_t ktype)
 {
   double tOffset = 0.0;
+
+  if(fUseCalibratedResponses){    //jj
+    tOffset = 0.0;
+    fFieldResponseTOffset[ktype].at(_vw) = (-tOffset+ fCalibResponseTOffset[_vw])*1000.;
+ 
+    std::cout << "5" << " " << "Check Offset" <<  fFieldResponseTOffset[ktype].at(_vw) << std:: endl; //jj
+  
+    return;
+  }
 
   if(_wr==0 && _vw==fViewForNormalization) {
     // for the collection plane, find the peak
@@ -451,10 +469,18 @@ void util::SignalShapingServiceMicroBooNE::init()
 
     std::string kset[2] = { "Convolution ", "Deconvolution "};
 
+    int maxBins = 1000; //jj
 
     for(size_t ktype=0;ktype<2;++ktype) {
-      if (fNFieldBins[ktype]*4>fftsize)
-        fFFT->ReinitializeFFT( fNFieldBins[ktype]*4, options, fitbins);
+
+      int fieldBins = fNFieldBins[ktype];  //jj
+      if(fUseCalibratedResponses) fieldBins = maxBins;
+
+      if (fieldBins*4>fftsize){
+        fFFT->ReinitializeFFT( fieldBins*4, options, fitbins);
+	fftsize = fFFT->FFTSize();  //jj
+      }
+
       //std::cout << std::endl << kset[ktype] << "functions:" << std::endl;
 
       // call this first, so that the binning will be known to SetElectResponse
@@ -464,7 +490,7 @@ void util::SignalShapingServiceMicroBooNE::init()
       //std::cout << "Input field responses" << std::endl;
 
       for(_vw=0;_vw<fNViews; ++_vw) {
-        SetElectResponse(ktype,fShapeTimeConst.at(_vw),fASICGainInMVPerFC.at(_vw));
+        if(!fUseCalibratedResponses) SetElectResponse(ktype,fShapeTimeConst.at(_vw),fASICGainInMVPerFC.at(_vw));  //jj
 
         //Electronic response
         //std::cout << "Electonic response " << fElectResponse[ktype].size() << " bins" << std::endl;
@@ -488,8 +514,22 @@ void util::SignalShapingServiceMicroBooNE::init()
             std::cout << std::endl;
           }
 
-          (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(fFieldResponseVec[ktype][_vw][_wr]);
+	  DoubleVec tempVec;   //jj
+	  
+	  if(!fUseCalibratedResponses) {
+	    tempVec = fFieldResponseVec[ktype][_vw][_wr];
+	  } else {
+	    double fudgeFactor = 20.;
+	    tempVec.assign(maxBins,0);
+	    for(_bn=0; _bn<tempVec.size(); ++_bn){
+	      tempVec[_bn] = fudgeFactor*fFieldResponseVec[ktype][_vw][_wr][_bn];
+	    }
+	  }
+	  
+          (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(tempVec);
+	  if(!fUseCalibratedResponses){
           (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(fElectResponse[ktype]);
+	  }
           (fSignalShapingVec[ktype][_vw][_wr]).save_response();
           (fSignalShapingVec[ktype][_vw][_wr]).set_normflag(false);
         }
@@ -506,7 +546,7 @@ void util::SignalShapingServiceMicroBooNE::init()
         fFFT->ReinitializeFFT( fftsize, options, fitbins);
       }
 
-      SetResponseSampling(ktype);
+      if(!fUseCalibratedResponses) SetResponseSampling(ktype);  //jj
 
       // Calculate filter functions.
       SetFilters();
@@ -623,8 +663,9 @@ void util::SignalShapingServiceMicroBooNE::SetFieldResponse(size_t ktype)
       size_t nBins = fFieldResponseHistVec[ktype][_vw][_wr]->GetNbinsX();
       (fFieldResponseVec[ktype][_vw][_wr]).resize(nBins);
       for(_bn=1; _bn<=nBins; ++_bn) {
-        fFieldResponseVec[ktype][_vw][_wr][_bn-1] =
-        fFieldRespAmpVec[_vw]*fFieldResponseHistVec[ktype][_vw][_wr]->GetBinContent(_bn)*weight;
+        fFieldResponseVec[ktype][_vw][_wr][_bn-1] = fFieldResponseHistVec[ktype][_vw][_wr]->GetBinContent(_bn);
+	
+	if(!fUseCalibratedResponses) fFieldResponseVec[ktype][_vw][_wr][_bn-1] *=  fFieldRespAmpVec[_vw]*weight;  //jj
       }
     }
   }

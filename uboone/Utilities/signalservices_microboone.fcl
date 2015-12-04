@@ -4,7 +4,7 @@ microboone_signalshapingservice:
 {
   ADCPerPCAtLowestASICGain: 9390 #ADC/pC
   # ASICGains:           [4.7, 7.8, 14, 25] #Default: 7.8
-  ASICGainInMVPerFC:  [7.8, 7.8, 7.8] #mV/fC for U, Y & Y planes
+  ASICGainInMVPerFC:  [14.0, 14.0, 14.0] #mV/fC for U, Y & Y planes
 
   ShapeTimeConst:  [ 2.0, 2.0, 2.0] #Peaking time (microseconds) for U, V & Y planes
   
@@ -21,6 +21,18 @@ microboone_signalshapingservice:
   ViewForNormalization:   2         # lets say this is the local plane number, may need to rethink
 
   FieldRespAmpVec:  [1.0, 1.0, 1.0]
+
+
+#-------------------------------------------------------------
+# Switching between Calibrated and Old field response
+
+UseCalibratedResponses: true
+FieldResponseFNameBase: "uboone_response_70kV"
+FieldResponseHNameBase: "FullResponse"
+
+#UseCalibratedResponses: false
+#FieldResponseFNameBase: "uboone_response"
+#FieldResponseHNameBase: "FieldResponse"
 
 #---------------------------------------------------------------
 # Settings for old-style responses (no dynamic induced charge)
@@ -53,9 +65,6 @@ microboone_signalshapingservice:
   DefaultDriftVelocity: [-1,-1,-1] # in cm/usec per drift region ... if negative value, use LArSoft derived drift velocity
 
   Drift3DCorrVec: [ 1.0, 1.0, 1.0 ]
-  
-  FieldResponseFNameBase: "uboone_response"
-  FieldResponseHNameBase: "FieldResponse"
 
   DeconvPol:       [ -1, 1, 1 ] #Switch for RawDigit-RecobWire normalization. Entry 0,1,2 are U,V,Y respectively
                              #-1 means normalizes to min ADC count, +1 to max
@@ -91,14 +100,14 @@ microboone_signalshapingservice:
 
   UseFunctionFieldShape: false
   UseHistogramFieldShape: true
-  FieldResponseFname:     "uboone_response_v1.3.root"
-  FieldResponseHistoName: "FieldResponse"
-  IndUFieldShape: "[0]*(1.0+[3]*tanh(x-[4]))*([4]-x)*exp(-0.5*((x-[4])/[2])^2.0)"
-  IndUFieldParams:  [.00843,.1534,1.77,0.,0.5]    #last parameter needs to be half of FFT vector, correct for in code
-  IndVFieldShape: "[0]*(1.0+[3]*tanh(x-[4]))*([4]-x)*exp(-0.5*((x-[4])/[2])^2.0)"
-  IndVFieldParams:  [.00843,.1534,1.77,0.,0.5]    #last parameter needs to be half of FFT vector, correct for in code
-  ColFieldShape: "x^[2]/(1.0+(x/[0])^[1])"
-  ColFieldParams: [ 8.0,16.0,.75 ]
+  #FieldResponseFname:     "uboone_response_v1.3.root"
+  #FieldResponseHistoName: "FieldResponse"
+  #IndUFieldShape: "[0]*(1.0+[3]*tanh(x-[4]))*([4]-x)*exp(-0.5*((x-[4])/[2])^2.0)"
+  #IndUFieldParams:  [.00843,.1534,1.77,0.,0.5]    #last parameter needs to be half of FFT vector, correct for in code
+  #IndVFieldShape: "[0]*(1.0+[3]*tanh(x-[4]))*([4]-x)*exp(-0.5*((x-[4])/[2])^2.0)"
+  #IndVFieldParams:  [.00843,.1534,1.77,0.,0.5]    #last parameter needs to be half of FFT vector, correct for in code
+  #ColFieldShape: "x^[2]/(1.0+(x/[0])^[1])"
+  #ColFieldParams: [ 8.0,16.0,.75 ]
 
 }
 

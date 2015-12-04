@@ -237,7 +237,7 @@ namespace util {
     std::vector<double> fFilterICWireMaxFreq;
     std::vector<double> fFilterICWireMaxVal;
 
-    
+    bool fUseCalibratedResponses;         //Flag to use Calibrated Responses for 70kV 
 
     bool fGetFilterFromHisto;   		///< Flag that allows to use a filter function from a histogram instead of the functional dependency
 
