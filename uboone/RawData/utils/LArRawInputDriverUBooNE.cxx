@@ -547,6 +547,13 @@ namespace lris {
       fChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBChannelMap(fDataTakingTime, fSwizzlingTime); 
 
     
+    if (fDataTakingTime == -1)
+      fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
+    else
+      fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(fDataTakingTime, fSwizzlingTime); 
+    
+    
+    
     // ### Swizzling to get the number of channels...trying the method used in write_read.cpp
     // ### provided by Wes --- About the data:
     // ### The format of the data is in levels: crate, card, channel.
@@ -801,6 +808,8 @@ namespace lris {
 	      throw std::runtime_error( warn );
 	    }
 	  }
+	  
+	 	  
 	  //\todo fix this once there is a proper channel table
 	  // else{
 	  //   //continue;
@@ -862,6 +871,38 @@ namespace lris {
     using namespace gov::fnal::uboone::datatypes;
     
     auto const seb_pmt_map = event_record.getPMTSEBMap();
+    
+    
+    
+//      //int crate_number = tpc_crate.crateHeader()->crate_number;
+// 	  util::UBDaqID daqId( crate_number, card.getModule(), tpc_channel_number);
+// 
+// 	  int opch=0;
+// 	  auto it_opchsearch = fOpChannelMap.find(daqId);
+// 	  if ( it_opchsearch!=fOpChannelMap.end() ){
+// 	    opch=(*it_opchsearch).second;
+// 	    //              fOpChannelMap[daqId];
+// 	    //              wire=fWireMap[daqId];
+// 	    //              pl=fPlaneMap[daqId];
+// 	  }
+// 	  else {
+// 	    if ( ( crate_number==1 && card.getModule()==8 && (tpc_channel_number>=32 && tpc_channel_number<64) ) ||
+// 		 ( crate_number==9 && card.getModule()==5 && (tpc_channel_number>=32 && tpc_channel_number<64) ) ) {
+// 	      // As of 6/22/2016: We expect these FEM channels to have no database entry.
+// 	      continue; // do not write to data product
+// 	    }
+// 	    else {
+// 	      // unexpected channels are missing. throw.
+// 	      char warn[256];
+// 	      sprintf( warn, "Warning DAQ ID not found ( %d, %d, %d )!", crate_number, card.getModule(), tpc_channel_number );
+// 	      throw std::runtime_error( warn );
+// 	    }
+// 	  }
+    
+    
+    
+    
+    
     
     N_PMT_waveforms = 0;
     for(auto const& it:  seb_pmt_map) {

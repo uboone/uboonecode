@@ -102,6 +102,7 @@ namespace lris {
     uint32_t                       fNumberEventsInFile;
     bool                           fHuffmanDecode;
     util::UBChannelMap_t           fChannelMap;   
+    util::UBOpChannelMap_t         fOpChannelMap; 
     int                            fDataTakingTime; //fhicl parameter. Optional to override raw data's internal time stamp.
     int                            fSwizzlingTime; //fhicl parameter.  Defaults as time of Hoot database query execution.
     bool                           fSwizzleTPC; //fhicl parameter.  Tells us whether to swizzle the TPC data
