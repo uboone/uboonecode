@@ -20,6 +20,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 
 #include "uboone/Geometry/UBOpChannelTypes.h" // uboonecode
+#include "Utilities/DatabaseUtil.h" // lardata
 
 namespace geo {
 
@@ -55,6 +56,7 @@ namespace geo {
   private:
     void CheckValidity();
     void LoadOpticalReadoutMapData( fhicl::ParameterSet const& p);
+    void LoadOpticalReadoutMapDataFromDB( fhicl::ParameterSet const& p,int  swizzling_timestamp);
     void LoadInitialOpticalReadoutMapData( fhicl::ParameterSet const& pset );
     unsigned int fNReadoutChannels;
     std::set< unsigned int > fReadoutChannelSet;

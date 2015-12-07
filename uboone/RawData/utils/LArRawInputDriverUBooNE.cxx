@@ -547,10 +547,10 @@ namespace lris {
       fChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBChannelMap(fDataTakingTime, fSwizzlingTime); 
 
     
-    if (fDataTakingTime == -1)
-      fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
-    else
-      fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(fDataTakingTime, fSwizzlingTime); 
+//     if (fDataTakingTime == -1)
+//       fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(event_record.LocalHostTime().seb_time_sec, fSwizzlingTime); 
+//     else
+//       fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(fDataTakingTime, fSwizzlingTime); 
     
     
     
@@ -868,23 +868,17 @@ namespace lris {
     ::art::ServiceHandle< util::TimeService > timeService;
     ::art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
     
-    // pmt channel map is assumed to be time dependent. therefore we need eventn time to set correct map.
-    ubdaq::ub_GlobalHeader global_header = event_record.getGlobalHeader();
-    uint32_t seconds=global_header.getSeconds();
-    uint32_t nano_seconds=global_header.getNanoSeconds()+global_header.getMicroSeconds()*1000;
-    //time_t mytime = ((time_t)seconds<<32) | nano_seconds;
-    time_t mytime = (time_t)seconds;
-    std::cout << "[LArRawInputDriverUBooNE::fillPMTData] " << mytime << " " << seconds << " " << nano_seconds << std::endl;
-    if ( mytime==0 ) {
-      std::cout << "[LArRawInputDriverUBooNE::fillPMTData] event epoch time 0 (!?). using run to set channel map" << std::endl;
-      ub_pmt_channel_map->SetOpMapRun( global_header.getRunNumber() );
-    }
-    else
-      ub_pmt_channel_map->SetOpMapTime( mytime );
-    
     using namespace gov::fnal::uboone::datatypes;
     
     auto const seb_pmt_map = event_record.getPMTSEBMap();
+    
+    
+    if (fDataTakingTime == -1)
+	  ub_pmt_channel_map->SetOpMapTime(event_record.LocalHostTime().seb_time_sec);
+     else
+       ub_pmt_channel_map->SetOpMapTime(fDataTakingTime);
+
+    
     
     
     

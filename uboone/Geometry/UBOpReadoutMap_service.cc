@@ -308,8 +308,71 @@ namespace geo {
     //std::cout << "size of csf2readout: " << fCSF2Readout.size() << std::endl;
   }
 
+  void UBOpReadoutMap::LoadOpticalReadoutMapDataFromDB( fhicl::ParameterSet const& pset , int  swizzling_timestamp ) {
+  
+      // ----------------------------------------------------------------------
+    // read in channel types
+    fNReadoutChannels = 0;
+
+    util::UBOpChannelMap_t fOpChannelMap;
+     // std::map< util::UBDaqID, util::UBLArSoftOpCh_t > fOpChannelMap; 
+   
+      fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(requested_time, swizzling_timestamp); 
+   
+    
+    
+    for ( unsigned int icat=0; icat<(unsigned int)opdet::NumUBOpticalChannelCategories; icat++ ) {
+      std::vector< unsigned int > cat_channels;
+      try {
+	cat_channels = pset.get< std::vector<unsigned int> >( opdet::UBOpChannelEnumName( (opdet::UBOpticalChannelCategory_t)icat ) );
+      }
+      catch (...) {
+	continue;
+      }
+
+      fNReadoutChannels += cat_channels.size();
+
+      // save category channels
+      fCategoryChannels[ (opdet::UBOpticalChannelCategory_t)icat ] = std::set< unsigned int >( cat_channels.begin(), cat_channels.end() );
+      // save gain channel 
+      opdet::UBOpticalChannelType_t chtype = opdet::GetUBTypeFromCategory( (opdet::UBOpticalChannelCategory_t)icat );
+      if ( fTypeChannels.find( chtype )==fTypeChannels.end() )
+	fTypeChannels[ chtype ] = std::set< unsigned int >( cat_channels.begin(), cat_channels.end() ); // new set
+      else {
+	for ( auto v : cat_channels )
+	  fTypeChannels[ chtype ].insert( v ); // append to set
+      }
+
+      for ( auto v : cat_channels ) {
+	fChannelCategory[ v ] = (opdet::UBOpticalChannelCategory_t)icat;
+	fChannelType[ v ] = chtype;
+	if (chtype==opdet::LogicChannel)
+	  fLogicChannels.insert( v );
+	fReadoutChannelSet.insert( v );
+      }
+    }//end loop over categories
+
+    //std::cout << "Number of defined readout channels: " << fNReadoutChannels << std::endl;
+
+    // ----------------------------------------------------------------------
+    // Read in Crate, Slot, FEMCh
+    //char readoutname[100];
+    for ( auto v : fOpChannelMap ) {
+      //sprintf(readoutname,"ReadoutChannel%d",v);
+      //std::vector< unsigned int > fichl_csf = pset.get< std::vector<unsigned int> >( readoutname );
+      //if ( fichl_csf.size()!=3 ) {
+//	throw std::runtime_error( "Need to have 3 entries for Crate, Slot, FEMCh map." );
+ //     }
+      //std::cout << "reading in " << readoutname << " : " << fichl_csf.at(0) << ", " << fichl_csf.at(1) << ", " << fichl_csf.at(2) << std::endl;
+      fReadout2CSF.insert( std::make_pair( v.second, CrateSlotFEMCh( v.first.crate, v.first.card, v.first.channel ) ) ) ;
+      fCSF2Readout.insert( std::make_pair( CrateSlotFEMCh( v.first.crate, v.first.card, v.first.channel ), v.second ) );
+    }
+    
+  
   
 
+  } 
+    
 
   DEFINE_ART_SERVICE(UBOpReadoutMap)  
 } // namespace
