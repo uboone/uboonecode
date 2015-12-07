@@ -50,6 +50,7 @@ namespace geo {
     unsigned int GetChannelNumberFromCrateSlotFEMCh( unsigned int crate, unsigned int slot, unsigned int femch ) const;
     void GetCrateSlotFEMChFromReadoutChannel( unsigned int readoutch, unsigned int& crate, unsigned int& slot, unsigned int& femch ) const;
     void SetOpMapTime( time_t t ) { requested_time = t; user_set_run=false; CheckValidity(); };
+    void SetOpMapTime( time_t t, time_t tswiz ) { requested_time = t; swizzle_time=tswiz; user_set_run=false; CheckValidity(); };
     void SetOpMapRun( int run ) { requested_run = run; user_set_run=true; CheckValidity(); };
     const std::set<unsigned int>& GetReadoutChannelSet() const
     { return fReadoutChannelSet; }
@@ -72,6 +73,7 @@ namespace geo {
     time_t loadedmap_timerange_start;
     time_t loadedmap_timerange_end;
     time_t requested_time;
+    time_t swizzle_time;
     int loadedmap_runrange_start;
     int loadedmap_runrange_end;
     int requested_run;

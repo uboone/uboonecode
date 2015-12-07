@@ -552,7 +552,7 @@ namespace lris {
 //     else
 //       fOpChannelMap = art::ServiceHandle<util::DatabaseUtil>()->GetUBOpChannelMap(fDataTakingTime, fSwizzlingTime); 
     
-    
+     
     
     // ### Swizzling to get the number of channels...trying the method used in write_read.cpp
     // ### provided by Wes --- About the data:
@@ -787,6 +787,7 @@ namespace lris {
 	  //int crate_number = tpc_crate.crateHeader()->crate_number;
 	  util::UBDaqID daqId( crate_number, card.getModule(), tpc_channel_number);
 
+		  
 	  int ch=0;
 	  auto it_chsearch = fChannelMap.find(daqId);
 	  if ( it_chsearch!=fChannelMap.end() ){
@@ -872,14 +873,14 @@ namespace lris {
     
     auto const seb_pmt_map = event_record.getPMTSEBMap();
     
-    
-    if (fDataTakingTime == -1)
-	  ub_pmt_channel_map->SetOpMapTime(event_record.LocalHostTime().seb_time_sec);
-     else
-       ub_pmt_channel_map->SetOpMapTime(fDataTakingTime);
 
     
-    
+    if (fDataTakingTime == -1)
+	  ub_pmt_channel_map->SetOpMapTime(event_record.LocalHostTime().seb_time_sec,fSwizzlingTime);
+     else
+       ub_pmt_channel_map->SetOpMapTime(fDataTakingTime,fSwizzlingTime);
+
+
     
     
 //      //int crate_number = tpc_crate.crateHeader()->crate_number;

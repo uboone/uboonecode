@@ -195,7 +195,7 @@ namespace geo {
       }
       fhicl::ParameterSet p = fPSet.get<fhicl::ParameterSet>( "OpMapLists" );
       fhicl::ParameterSet mapset = p.get< fhicl::ParameterSet >( index );
-      LoadOpticalReadoutMapData( mapset );
+      LoadOpticalReadoutMapDataFromDB( mapset,swizzle_time );
     }
     else {
       if ( fVerbose )
