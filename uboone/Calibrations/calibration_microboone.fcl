@@ -19,4 +19,10 @@ microboone_noisefilter :
     doTransientNoiseFilter : 0
 }
 
+microboone_pedestalcalculator:
+{
+    module_type:         PedestalCalculator
+    MakeRawDigits:       false
+    RawDigitModuleLabel: "daq"
+}
 END_PROLOG
