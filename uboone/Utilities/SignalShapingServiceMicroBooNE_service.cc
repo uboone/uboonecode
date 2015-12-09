@@ -268,7 +268,7 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
     fFieldResponseHistVec[ktype].resize(fNViews);
 
     // calculate the time scale factor for this event
-    SetTimeScaleFactor();
+    if(!fUseCalibratedResponses) SetTimeScaleFactor();
 
     _vw = 0;
     //std::cout << "Time offsets for kernel set " << ktype << std::endl;
@@ -301,7 +301,8 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
         fNFieldBins[ktype] = Xaxis->GetNbins();
 
         // internal time is in nsec
-        fFieldBinWidth[ktype] = resp->GetBinWidth(1)*1000.;
+	if(!fUseCalibratedResponses) fFieldBinWidth[ktype] = resp->GetBinWidth(1)*1000.;
+        if(fUseCalibratedResponses) fFieldBinWidth[ktype] = 30.02; //resp->GetBinWidth(1)*1000.*0.5;  //jj
 
 	std::cout << "4" << " " << "Check FieldBinWidth" << " " << ktype << " " << fFieldBinWidth[ktype] << std::endl;  //jj
 
@@ -314,7 +315,7 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
 
         // get the offsets for each plane... use wire 0 and either peak or zero-crossing
 
-        SetFieldResponseTOffsets(resp, ktype);
+	SetFieldResponseTOffsets(resp, ktype);
         
         _wr++;
       }
@@ -361,7 +362,7 @@ void util::SignalShapingServiceMicroBooNE::SetFieldResponseTOffsets(const TH1F* 
 
   if(fUseCalibratedResponses){    //jj
     tOffset = 0.0;
-    fFieldResponseTOffset[ktype].at(_vw) = (-tOffset+ fCalibResponseTOffset[_vw])*1000.;
+    fFieldResponseTOffset[ktype].at(_vw) = (-tOffset+ fCalibResponseTOffset[_vw])*1000.*0.5;
  
     std::cout << "5" << " " << "Check Offset" <<  fFieldResponseTOffset[ktype].at(_vw) << std:: endl; //jj
   
@@ -469,19 +470,19 @@ void util::SignalShapingServiceMicroBooNE::init()
 
     std::string kset[2] = { "Convolution ", "Deconvolution "};
 
-    int maxBins = 1000; //jj
+    //int maxBins = 1000; //jj
 
     for(size_t ktype=0;ktype<2;++ktype) {
 
       int fieldBins = fNFieldBins[ktype];  //jj
-      if(fUseCalibratedResponses) fieldBins = maxBins;
+      //if(fUseCalibratedResponses) fieldBins = maxBins;
 
       if (fieldBins*4>fftsize){
         fFFT->ReinitializeFFT( fieldBins*4, options, fitbins);
-	fftsize = fFFT->FFTSize();  //jj
+	//fftsize = fFFT->FFTSize();  //jj
       }
 
-      //std::cout << std::endl << kset[ktype] << "functions:" << std::endl;
+      std::cout << std::endl << kset[ktype] << "functions:" << std::endl;
 
       // call this first, so that the binning will be known to SetElectResponse
       SetFieldResponse(ktype);
@@ -490,14 +491,16 @@ void util::SignalShapingServiceMicroBooNE::init()
       //std::cout << "Input field responses" << std::endl;
 
       for(_vw=0;_vw<fNViews; ++_vw) {
-        if(!fUseCalibratedResponses) SetElectResponse(ktype,fShapeTimeConst.at(_vw),fASICGainInMVPerFC.at(_vw));  //jj
+        //if(!fUseCalibratedResponses) SetElectResponse(ktype,fShapeTimeConst.at(_vw),fASICGainInMVPerFC.at(_vw));  //jj
+
+	SetElectResponse(ktype,fShapeTimeConst.at(_vw),fASICGainInMVPerFC.at(_vw));  //jj
 
         //Electronic response
         //std::cout << "Electonic response " << fElectResponse[ktype].size() << " bins" << std::endl;
 
         if(fPrintResponses) {
           for(size_t i = 0; i<100; ++i) {
-            std::cout << fElectResponse[ktype][i] << " " ;
+            std::cout << "Electronic Response" << " " << fElectResponse[ktype][i] << " " ;
             if((i+1)%10==0) std::cout << std::endl;
           }
           std::cout << std::endl;
@@ -516,20 +519,22 @@ void util::SignalShapingServiceMicroBooNE::init()
 
 	  DoubleVec tempVec;   //jj
 	  
-	  if(!fUseCalibratedResponses) {
+	  //if(!fUseCalibratedResponses) {
 	    tempVec = fFieldResponseVec[ktype][_vw][_wr];
-	  } else {
-	    double fudgeFactor = 20.;
-	    tempVec.assign(maxBins,0);
-	    for(_bn=0; _bn<tempVec.size(); ++_bn){
-	      tempVec[_bn] = fudgeFactor*fFieldResponseVec[ktype][_vw][_wr][_bn];
-	    }
-	  }
+	    //} else {
+	    // double fudgeFactor = 1.; //jj
+	    //tempVec.assign(maxBins,0);
+	    //for(_bn=0; _bn<tempVec.size(); ++_bn){
+	    //  tempVec[_bn] = fudgeFactor*fFieldResponseVec[ktype][_vw][_wr][_bn];
+	    //}
+	    //}
+	   
 	  
           (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(tempVec);
-	  if(!fUseCalibratedResponses){
-          (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(fElectResponse[ktype]);
-	  }
+	  //if(!fUseCalibratedResponses){
+	  //  (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(fElectResponse[ktype]);  //jj
+	  //}
+	  (fSignalShapingVec[ktype][_vw][_wr]).AddResponseFunction(fElectResponse[ktype]); //jj
           (fSignalShapingVec[ktype][_vw][_wr]).save_response();
           (fSignalShapingVec[ktype][_vw][_wr]).set_normflag(false);
         }
@@ -546,7 +551,8 @@ void util::SignalShapingServiceMicroBooNE::init()
         fFFT->ReinitializeFFT( fftsize, options, fitbins);
       }
 
-      if(!fUseCalibratedResponses) SetResponseSampling(ktype);  //jj
+      //if(!fUseCalibratedResponses) SetResponseSampling(ktype);  //jj
+      SetResponseSampling(ktype); //jj
 
       // Calculate filter functions.
       SetFilters();
@@ -590,6 +596,9 @@ void util::SignalShapingServiceMicroBooNE::SetDecon(int fftsize)
     }
 
     SetResponseSampling(ktype);
+
+    //if(!fUseCalibratedResponses) SetResponseSampling(ktype);
+
     //std::cout << "Xin2 " << std::endl;
     // Calculate filter functions.
     SetFilters();
@@ -664,7 +673,7 @@ void util::SignalShapingServiceMicroBooNE::SetFieldResponse(size_t ktype)
       (fFieldResponseVec[ktype][_vw][_wr]).resize(nBins);
       for(_bn=1; _bn<=nBins; ++_bn) {
         fFieldResponseVec[ktype][_vw][_wr][_bn-1] = fFieldResponseHistVec[ktype][_vw][_wr]->GetBinContent(_bn);
-	
+	//fFieldResponseVec[ktype][_vw][_wr][_bn-1] *=  fFieldRespAmpVec[_vw]*weight; //jj
 	if(!fUseCalibratedResponses) fFieldResponseVec[ktype][_vw][_wr][_bn-1] *=  fFieldRespAmpVec[_vw]*weight;  //jj
       }
     }
@@ -718,10 +727,21 @@ void util::SignalShapingServiceMicroBooNE::SetElectResponse(size_t ktype,double 
   // height. The shaping time will not affect the peak height, but make the 
   // peak broader
 
+  // if(fUseCalibratedResponses){      //jj
+  //   bool first = true;
+  //   for(auto& element :  fElectResponse[ktype]){
+  //     if(first) { element = 1.0/(fFieldBinWidth[ktype]*1.e-3); }
+  //     else { element = 0.0; }
+  //     first = false;      
+  //   }
+  //   return;
+  // }
+
   double max = 0;
 
   for(size_t i=0; i<nticks;++i) {
     time[i] = (1.*i) * fFieldBinWidth[ktype]*1.e-3;
+    if(fUseCalibratedResponses) time[i] = (1.*i) * fFieldBinWidth[ktype]*1.e-3*2; //jj
   }
   int i = 0;
   for(auto& element :fElectResponse[ktype]) {
@@ -765,12 +785,15 @@ void util::SignalShapingServiceMicroBooNE::SetElectResponse(size_t ktype,double 
 
   for(auto& element : fElectResponse[ktype]){
     element /= max;
-    element *= fADCPerPCAtLowestASICGain * 1.60217657e-7;
+    if(!fUseCalibratedResponses) element *= fADCPerPCAtLowestASICGain * 1.60217657e-7;
     element *= gain / 4.7;
 
     if(element > last_max) last_max = element;
-    last_integral += element * fFieldBinWidth[ktype] / detprop->SamplingRate();
+    if(fUseCalibratedResponses) last_integral += element;  // / detprop->SamplingRate(); (500ns) ? //jj
+    if(!fUseCalibratedResponses) last_integral += element * fFieldBinWidth[ktype] / detprop->SamplingRate();
   }
+
+  std::cout << "Print SamplingRate" << " " << detprop->SamplingRate() << std::endl; //jj
   return;
 }
 
@@ -861,13 +884,15 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling(size_t ktype)
 
     double timeFactor = fTimeScaleFactor*f3DCorrectionVec[_wr];
     double timeFactorInv = 1./timeFactor;
+
     for(_wr=0; _wr<fNResponses[ktype][_vw]; ++_wr) {
       const std::vector<double>* pResp = &((fSignalShapingVec[ktype][_vw][_wr]).Response_save());
 
       size_t nticks_input = pResp->size();
       std::vector<double> InputTime(nticks_input, 0. );
       for (size_t itime = 0; itime < nticks_input; itime++ ) {
-        InputTime[itime] = (1.*itime) * deltaInputTime*timeFactor;
+	if(fUseCalibratedResponses) InputTime[itime] = (1.*itime) * deltaInputTime;
+        if(!fUseCalibratedResponses) InputTime[itime] = (1.*itime) * deltaInputTime*timeFactor;
       }
 
       std::vector<double> SamplingResp(nticks, 0. );
@@ -896,7 +921,7 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling(size_t ktype)
             //            if(jtime<2&&itime<2) std::cout << itime << " " << jtime << " " << low << " " << up << std::endl;
             double interpolationFactor = ((*pResp)[high]-(*pResp)[low])/deltaInputTime;
             SamplingResp[itime] = ((*pResp)[low] + ( SamplingTime[itime] - InputTime[low] ) * interpolationFactor);
-            SamplingResp[itime] *= timeFactorInv;
+            if(!fUseCalibratedResponses) SamplingResp[itime] *= timeFactorInv;
             /// VELOCITY-OUT ... comment out kDVel usage here
             //SamplingResp[itime] *= kDVel;
             SamplingCount++;

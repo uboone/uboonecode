@@ -292,7 +292,7 @@ template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(s
     func.erase(func.end()-time_offset,func.end());
     func.insert(func.begin(),temp.begin(),temp.end());
   }
-  
+  //std::cout << "Print time offset in header" << " " << time_offset << std::endl;
 }
 
 // Do convolution.
@@ -338,6 +338,7 @@ template <class T> inline void util::SignalShapingServiceMicroBooNE::Deconvolute
 
     
   }
+  //std::cout << "Print Decon time offset in header" << " " << time_offset << std::endl;
 }
 
 //----------------------------------------------------------------------

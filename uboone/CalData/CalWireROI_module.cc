@@ -557,8 +557,8 @@ namespace caldata {
 	    // if (channel==3218){
 	    //   for(unsigned int bin = 0; bin <holder.size(); ++bin) {
 	    // 	std::cout << bin << " " <<  holder[bin] << std::endl;
-	    //   }
-	    // }
+	    //  }
+	    //}
 	    //1. Check Baseline match?
 	    // If not, include next ROI(if none, go to the end of signal)
 	    // If yes, proceed

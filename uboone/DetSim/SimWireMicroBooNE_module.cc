@@ -223,6 +223,7 @@ namespace detsim {
     fSampleRate    = detprop->SamplingRate();
     fNTimeSamples  = detprop->NumberTimeSamples();
 
+ 
     // make the histos if not already made
     // get access to the TFile service
     art::ServiceHandle<art::TFileService> tfs;
@@ -588,7 +589,7 @@ namespace detsim {
           if(abs(wire)>2) continue;
           size_t index = wire + 2;
 
-          bool printWF = false;
+          bool printWF = false;   //jj
           if(printWF)std::cout << "printout of waveform, index = " << index << std::endl;
           for(int i=tick0-tickCut; i<tick0+tickCut;++i) {
             double val = tempWork[i];
