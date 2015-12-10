@@ -5,7 +5,7 @@ BEGIN_PROLOG
 
 microboone_opreadoutmap:
 {
- Verbose: true
+ Verbose: false
  OpMapLists: { 
         twoFEMOpMap: @local::microboone_twofem_opmap
         threeFEMOpMap: @local::microboone_threefem_opmap
