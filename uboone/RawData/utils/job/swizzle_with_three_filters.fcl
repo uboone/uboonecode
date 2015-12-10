@@ -116,7 +116,7 @@ physics:
   }
  }
 
- common: [ triggerEnforcement, opflash, beamdata ] 
+ common: [ triggerEnforcement, opflash ] 
  filter1: [ opflashfilter ]
  filter2: [ randomfilter ]
  stream1:   [ rawfilter ]
