@@ -391,7 +391,7 @@ namespace caldata {
             // } else {
             //   if(SigVal > fThreshold[thePlane]) roiStart = bin;
             // }
-	    unsigned int sbin[7];
+	    unsigned int sbin[12];
 	    if (bin>=3) {
 	      sbin[0] = bin -3;
 	      sbin[1] = bin -2;
@@ -413,8 +413,13 @@ namespace caldata {
 	    sbin[4] = bin + 1; if (sbin[4]>dataSize-1) sbin[4] =dataSize-1;
 	    sbin[5] = bin + 2; if (sbin[5]>dataSize-1) sbin[5] =dataSize-1;
 	    sbin[6] = bin + 3; if (sbin[6]>dataSize-1) sbin[6] =dataSize-1;
+	    sbin[7] = bin + 4; if (sbin[7]>dataSize-1) sbin[7] =dataSize-1;
+            sbin[8] = bin + 5; if (sbin[8]>dataSize-1) sbin[8] =dataSize-1;
+            sbin[9] = bin + 6; if (sbin[9]>dataSize-1) sbin[9] =dataSize-1;
+            sbin[10] = bin + 7; if (sbin[10]>dataSize-1) sbin[10] =dataSize-1;
+            sbin[11] = bin + 8; if (sbin[11]>dataSize-1) sbin[11] =dataSize-1;
 	    float sum = 0;
-	    for (int qx = 0; qx!=7;qx++){
+	    for (int qx = 0; qx!=12;qx++){
 	      sum += rawadc[sbin[qx]]-pdstl;
 	    }
 	    sum = fabs(sum);

@@ -26,24 +26,23 @@ microboone_signalshapingservice:
 #-------------------------------------------------------------
 # Switching between Calibrated and Old field response
 
-#UseCalibratedResponses: true
-#FieldResponseFNameBase: "uboone_response_70kV"
-#FieldResponseHNameBase: "FieldResponse"
-#FieldResponseFVersion:  [ "v0.2", "v0.2" ]			
-#FieldResponseHNameBase: "FullResponse"
+UseCalibratedResponses: true
+FieldResponseFNameBase: "uboone_response_70kV"
+CalibResponseTOffset: [-21.61, -21.61, -21.61]   # in us time offset to align all three planes
+			
 
-UseCalibratedResponses: false
-FieldResponseFNameBase: "uboone_response"
-FieldResponseHNameBase: "FieldResponse"
-FieldResponseFVersion:  [ "v0.1", "v0.1" ]
+#UseCalibratedResponses: false
+#FieldResponseFNameBase: "uboone_response"
+
 
 #---------------------------------------------------------------
 # Settings for old-style responses (no dynamic induced charge)
 
   NResponses:           [ [1, 1, 1], [1, 1, 1] ]  # number of responses per view, including primary. 1 is current number
   NActiveResponses:     [ [1, 1, 1], [1, 1, 1] ]  # number of active responses per view, including primary. 1 is current number
-  CalibResponseTOffset: [0.0, 0.0, 0.0] # in us time offset to align all three planes
-  #FieldResponseFVersion:  [ "v0.1", "v0.1" ]
+  FieldResponseFVersion:  [ "v0.1", "v0.1" ]
+  FieldResponseHNameBase: "FieldResponse"
+  
   
   DefaultEField:       0.5
   DefaultTemperature: 87.0
@@ -97,7 +96,7 @@ FieldResponseFVersion:  [ "v0.1", "v0.1" ]
   FilterFunctionFname:  "uboone_filters_v0.1.root"
   FilterHistoName:	"noisefilter_%d"       
 
-  PrintResponses: true 
+  PrintResponses: false 
 
 # The following stuff isn't straighted out yet  
 

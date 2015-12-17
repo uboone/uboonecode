@@ -387,7 +387,7 @@ namespace caldata {
           for(bin = 0; bin < holder.size(); ++bin) {
             holder[bin] /= DeconNorm;
           }
-          
+ 
           holder.resize(dataSize,1e-5);
                   
           //This restores the DC component to signal removed by the deconvolution.
@@ -902,6 +902,7 @@ template <class T> void caldata::CalWireMicroBooNE::DeconvoluteInducedCharge(siz
 
   // do time-domain inverse-FFT for results vectors and store final result of 2D deconvolution
   int time_offset = sss->FieldResponseTOffset(firstChannel,1);
+
   for(size_t k = 0; k < (size_t)numWires; k++) {
     fft->DoInvFFT(signalFreqVecs[k],signal[k]);
 
