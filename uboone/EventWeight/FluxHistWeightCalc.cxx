@@ -86,7 +86,8 @@ namespace evwgh {
   {
     //calculate weight(s) here 
     art::ServiceHandle<art::RandomNumberGenerator> rng;
-    CLHEP::HepRandomEngine &engine = rng->getEngine(GetName());
+    //CLHEP::HepRandomEngine &engine = rng->getEngine(GetName());
+    rng->getEngine(GetName());
 
     art::Handle< std::vector<simb::MCFlux> > mcfluxListHandle;
     std::vector<art::Ptr<simb::MCFlux> > fluxlist;

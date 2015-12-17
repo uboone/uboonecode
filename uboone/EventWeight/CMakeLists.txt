@@ -23,6 +23,7 @@ art_make_library(LIBRARY_NAME WeightCalculators
 		      ${FHICLCPP}
 		      ${CLHEP}
                       ${ROOT_BASIC_LIB_LIST}
+		      ${Boost_SYSTEM_LIBRARY}
 	        ) 
 
 art_make(LIBRARY_NAME   EventWeight
