@@ -110,7 +110,7 @@ namespace lariov {
       //fFolder->GetNamedChannelData(*it, "area_err",   area_err);   
       fFolder->GetNamedChannelData(*it, "avwaveform",       av_waveform);
       //fFolder->GetNamedChannelData(*it, "avwaveform_err",   av_waveform_err);    
-
+      
       PmtCalibrationContainer pg(*it);
       pg.SetAmplitude( (float)amplitude );
       //pg.SetAmplitudeErr( (float)amplitude_err );

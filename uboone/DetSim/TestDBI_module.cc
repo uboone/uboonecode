@@ -73,7 +73,7 @@ void TestDBI::analyze(art::Event const & evt)
   art::Handle< std::vector<raw::RawDigit> > digitVecHandle;
   
   const lariov::UboonePmtCalibrationProvider& pmtCal = art::ServiceHandle<lariov::UboonePmtCalibrationService>()->GetProvider();
-  std::cout<<"PMT "<<pmtCal.Amplitude(1)<<std::endl;
+  std::cout<<"PMT "<<pmtCal.Amplitude(1)<<" "<<pmtCal.AvWaveForm(1).size()<<std::endl;
   const std::vector<double>& pmtvec = pmtCal.AvWaveForm(1);
   for (auto iter = pmtvec.begin(); iter != pmtvec.end(); ++iter) {
     std::cout<<"  "<<*iter<<std::endl;
