@@ -29,15 +29,9 @@ namespace lariov {
    *   not implemented yet
    * - *DefaultAmplitude* (real, default: ): SPE amplitude returned 
    *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultAmplitudeErr* (real, default: ): SPE amplitude uncertainty returned
-   *   when /UseDB/ and /UseFile/ parameters are false
    * - *DefaultWidth* (real, default: ): SPE width returned
    *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultWidthErr* (real, default: 0.3): SPE width uncertainty returned
-   *   when /UseDB/ and /UseFile/ parameters are false
    * - *DefaultArea* (real, default: 0.0): SPE area returned
-   *   when /UseDB/ and /UseFile/ parameters are false
-   * - *DefaultAreaErr* (real, default: 0.0): SPE area uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
    */
   class UboonePmtCalibrationProvider : public DatabaseRetrievalAlg {
@@ -59,18 +53,22 @@ namespace lariov {
       /// Retrieve calibration information
       const PmtCalibrationContainer& ChannelInfo(DBChannelID_t ch) const;      
       float Amplitude(DBChannelID_t ch) const;
-      float AmplitudeErr(DBChannelID_t ch) const;
+      //float AmplitudeErr(DBChannelID_t ch) const;
       float Width(DBChannelID_t ch) const;
-      float WidthErr(DBChannelID_t ch) const;
+      //float WidthErr(DBChannelID_t ch) const;
       float Area(DBChannelID_t ch) const;
-      float AreaErr(DBChannelID_t ch) const;
-      const std::vector<float>& AvWaveForm(DBChannelID_t ch) const;
-      const std::vector<float>& AvWaveFormErr(DBChannelID_t ch) const;
+      //float AreaErr(DBChannelID_t ch) const;
+      const std::vector<double>& AvWaveForm(DBChannelID_t ch) const;
+      //const std::vector<double>& AvWaveFormErr(DBChannelID_t ch) const;
            
       //hardcoded information about database folder - useful for debugging cross checks
-      const unsigned int NCOLUMNS = 9;    
-      const std::vector<std::string> FIELD_NAMES = {"channel", "amplitude", "amplitude_err", "area", "area_err" "width", "width_err", "avwaveform", "avwaveform_err"};
-      const std::vector<std::string> FIELD_TYPES = {"unsigned int", "float", "float", "float", "float", "float", "float", "float[]", "float[]"};
+      const unsigned int NCOLUMNS = 5;
+      const std::vector<std::string> FIELD_NAMES = {"channel", "amplitude", "area", "width", "avwaveform"};
+      const std::vector<std::string> FIELD_TYPES = {"unsigned int", "real", "real", "real", "real[]"};
+      
+      //const unsigned int NCOLUMNS = 9;    
+      //const std::vector<std::string> FIELD_NAMES = {"channel", "amplitude", "amplitude_err", "area", "area_err" "width", "width_err", "avwaveform", "avwaveform_err"};
+      //const std::vector<std::string> FIELD_TYPES = {"unsigned int", "float", "float", "float", "float", "float", "float", "float[]", "float[]"};
       
     private:
     

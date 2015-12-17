@@ -1,6 +1,17 @@
 art_make( BASENAME_ONLY
+          LIBRARY_NAME      UbooneDBI_Providers
+          LIB_LIBRARIES     CalibrationDBI_Providers
+	  		    CalibrationDBI_IOVData
+			    Geometry
+			    Geometry_service
+			    ${FHICLCPP}
+			    ${CETLIB}
+			    ${Boost_SYSTEM_LIBRARY}
+			    ${ROOT_BASIC_LIB_LIST}
+			    ${ART_UTILITIES}
 	  SERVICE_LIBRARIES CalibrationDBI_Providers
 	                    CalibrationDBI_IOVData
+			    UbooneDBI_Providers
 			    RawData
 			    Geometry
 			    Geometry_service

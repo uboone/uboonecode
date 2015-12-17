@@ -30,7 +30,6 @@ microboone_detpedestalservice:
 }
 
 
-
 microboone_channelstatus_provider:
 {
   DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg
@@ -46,5 +45,25 @@ microboone_channelstatus_service:
   ChannelStatusProvider: @local::microboone_channelstatus_provider
   FindNoisyChannels: false
 }
+
+
+microboone_pmtcalibration_provider:
+{
+  DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg
   
+  UseDB: false
+  UseFile: false
+  
+  DefaultAmplitude: 100.0
+  DefaultWidth: 20.0
+  DefaultArea: 1000.0
+}
+microboone_pmtcalibration_provider.DatabaseRetrievalAlg.DBFolderName: "test_pmts"
+
+microboone_pmtcalibration_service:
+{
+  PmtCalibrationProvider: @local::microboone_pmtcalibration_provider
+}
+  
+
 END_PROLOG

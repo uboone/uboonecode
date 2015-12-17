@@ -6,6 +6,8 @@
 #include "CalibrationDBI/IOVData/IOVDataConstants.h"
 
 // art/LArSoft libraries
+#include "art/Framework/Services/Registry/ServiceHandle.h" 
+#include "Geometry/Geometry.h"
 #include "cetlib/exception.h"
 
 namespace lariov {
@@ -36,20 +38,38 @@ namespace lariov {
 
     if (fDataSource == DataSource::Default) {
       float default_amplitude     = p.get<float>("DefaultAmplitude");
-      float default_amplitude_err = p.get<float>("DefaultAmplitudeErr");
+      //float default_amplitude_err = p.get<float>("DefaultAmplitudeErr");
       float default_width         = p.get<float>("DefaultWidth");
-      float default_width_err     = p.get<float>("DefaultWidthErr");
+      //float default_width_err     = p.get<float>("DefaultWidthErr");
       float default_area          = p.get<float>("DefaultArea");
-      float default_area_err      = p.get<float>("DefaultAreaErr");
+      //float default_area_err      = p.get<float>("DefaultAreaErr");
 
       PmtCalibrationContainer DefaultPmt(0);
 
       DefaultPmt.SetAmplitude(default_amplitude);
-      DefaultPmt.SetAmplitudeErr(default_amplitude_err);
+      //DefaultPmt.SetAmplitudeErr(default_amplitude_err);
       DefaultPmt.SetWidth(default_width);
-      DefaultPmt.SetWidthErr(default_width_err);
+      //DefaultPmt.SetWidthErr(default_width_err);
       DefaultPmt.SetArea(default_area);
-      DefaultPmt.SetAreaErr(default_area_err); 
+      //DefaultPmt.SetAreaErr(default_area_err); 
+      
+      art::ServiceHandle<geo::Geometry> geo;
+      std::cout<<"Number of OpDets: "<<geo->NOpDets()<<std::endl;
+      std::cout<<"Number of OpChannels: "<<geo->NOpChannels()<<std::endl;
+      std::cout<<"Max OpChannel: "<<geo->MaxOpChannel()<<std::endl;
+      for (unsigned int i=0; i<= geo->MaxOpChannel(); ++i) {
+        if (geo->IsValidOpChannel(i)) {
+	  std::cout<<"  OpChannel "<<i<<" is valid;"<<std::endl;
+	}
+      }
+      
+      for (unsigned int i=0; i<36; ++i) {
+        std::cout<<"    OpDet"<<i<<":";
+	for (unsigned int j=0; j<4; ++j) {
+	  std::cout<<" "<<geo->OpChannel(i,j);
+	}
+	std::cout<<std::endl;
+      }
       
       /*need loop over pmts in geomtry to add row to fData*/
            
@@ -75,27 +95,31 @@ namespace lariov {
     std::vector<DBChannelID_t> channels;
     fFolder->GetChannelList(channels);
     for (auto it = channels.begin(); it != channels.end(); ++it) {
-
-      double amplitude, amplitude_err, width, width_err, area, area_err;
-      std::vector<float> av_waveform, av_waveform_err;
-      fFolder->GetNamedChannelData(*it, "amplitude",     height);
-      fFolder->GetNamedChannelData(*it, "amplitude_err", height_err);
+      
+      double amplitude, width, area;
+      std::vector<double> av_waveform;
+      
+      //double amplitude, amplitude_err, width, width_err, area, area_err;
+      //std::vector<double> av_waveform, av_waveform_err;
+      
+      fFolder->GetNamedChannelData(*it, "amplitude",     amplitude);
+      //fFolder->GetNamedChannelData(*it, "amplitude_err", amplitude_err);
       fFolder->GetNamedChannelData(*it, "width",      width);
-      fFolder->GetNamedChannelData(*it, "width_err",  width_err);
+      //fFolder->GetNamedChannelData(*it, "width_err",  width_err);
       fFolder->GetNamedChannelData(*it, "area",       area);
-      fFolder->GetNamedChannelData(*it, "area_err",   area_err);   
+      //fFolder->GetNamedChannelData(*it, "area_err",   area_err);   
       fFolder->GetNamedChannelData(*it, "avwaveform",       av_waveform);
-      fFolder->GetNamedChannelData(*it, "avwaveform_err",   av_waveform_err);    
+      //fFolder->GetNamedChannelData(*it, "avwaveform_err",   av_waveform_err);    
 
       PmtCalibrationContainer pg(*it);
       pg.SetAmplitude( (float)amplitude );
-      pg.SetAmplitudeErr( (float)amplitude_err );
+      //pg.SetAmplitudeErr( (float)amplitude_err );
       pg.SetWidth( (float)width );
-      pg.SetWidthErr( (float)width_err );
+      //pg.SetWidthErr( (float)width_err );
       pg.SetArea( (float)area );
-      pg.SetAreaErr( (float)area_err );
+      //pg.SetAreaErr( (float)area_err );
       pg.SetAvWaveform( av_waveform );
-      pg.SetAvWaveformErr( av_waveform_err );
+      //pg.SetAvWaveformErr( av_waveform_err );
 
       fData.AddOrReplaceRow(pg);
     }
@@ -104,7 +128,7 @@ namespace lariov {
 
   }
   
-  const PmtGain& UboonePmtCalibrationProvider::ChannelInfo(DBChannelID_t ch) const { 
+  const PmtCalibrationContainer& UboonePmtCalibrationProvider::ChannelInfo(DBChannelID_t ch) const { 
     return fData.GetRow(ch);
   }
       
@@ -112,33 +136,33 @@ namespace lariov {
     return this->ChannelInfo(ch).Amplitude();
   }
   
-  float UboonePmtCalibrationProvider::AmplitudeErr(DBChannelID_t ch) const {
+  /*float UboonePmtCalibrationProvider::AmplitudeErr(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).AmplitudeErr();
-  }
+  }*/
   
   float UboonePmtCalibrationProvider::Width(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).Width();
   }
   
-  float UboonePmtCalibrationProvider::WidthErr(DBChannelID_t ch) const {
+  /*float UboonePmtCalibrationProvider::WidthErr(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).WidthErr();
-  }
+  }*/
 
   float UboonePmtCalibrationProvider::Area(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).Area();
   }
   
-  float UboonePmtCalibrationProvider::AreaErr(DBChannelID_t ch) const {
+  /*float UboonePmtCalibrationProvider::AreaErr(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).AreaErr();
-  }
+  }*/
   
-  const std::vector<float>& UboonePmtCalibrationProvider::AvWaveForm(DBChannelID_t ch) const {
+  const std::vector<double>& UboonePmtCalibrationProvider::AvWaveForm(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).AvWaveForm();
   }
   
-  const std::vector<float>& UboonePmtCalibrationProvider::AvWaveFormErr(DBChannelID_t ch) const {
+  /*const std::vector<double>& UboonePmtCalibrationProvider::AvWaveFormErr(DBChannelID_t ch) const {
     return this->ChannelInfo(ch).AvWaveFormErr();
-  }
+  }*/
 
 }//end namespace lariov
 	

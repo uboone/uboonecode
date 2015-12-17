@@ -28,6 +28,8 @@
 
 #include "CalibrationDBI/Interface/IDetPedestalService.h"
 #include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "uboone/Database/UboonePmtCalibrationService.h"
+#include "uboone/Database/UboonePmtCalibrationProvider.h"
 
 
 // ROOT
@@ -69,6 +71,14 @@ void TestDBI::analyze(art::Event const & evt)
 
   art::ServiceHandle<geo::Geometry> geo;
   art::Handle< std::vector<raw::RawDigit> > digitVecHandle;
+  
+  const lariov::UboonePmtCalibrationProvider& pmtCal = art::ServiceHandle<lariov::UboonePmtCalibrationService>()->GetProvider();
+  std::cout<<"PMT "<<pmtCal.Amplitude(1)<<std::endl;
+  const std::vector<double>& pmtvec = pmtCal.AvWaveForm(1);
+  for (auto iter = pmtvec.begin(); iter != pmtvec.end(); ++iter) {
+    std::cout<<"  "<<*iter<<std::endl;
+  }
+  
   evt.getByLabel("daq", digitVecHandle);
   for (auto iter = digitVecHandle->begin(); iter != digitVecHandle->end(); ++iter) {
     raw::RawDigit digit = *iter;
