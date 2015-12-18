@@ -54,24 +54,12 @@ namespace lariov {
       //DefaultPmt.SetAreaErr(default_area_err); 
       
       art::ServiceHandle<geo::Geometry> geo;
-      std::cout<<"Number of OpDets: "<<geo->NOpDets()<<std::endl;
-      std::cout<<"Number of OpChannels: "<<geo->NOpChannels()<<std::endl;
-      std::cout<<"Max OpChannel: "<<geo->MaxOpChannel()<<std::endl;
       for (unsigned int i=0; i<= geo->MaxOpChannel(); ++i) {
         if (geo->IsValidOpChannel(i)) {
-	  std::cout<<"  OpChannel "<<i<<" is valid;"<<std::endl;
+	  DefaultPmt.SetChannel(i);
+	  fData.AddOrReplaceRow(DefaultPmt);
 	}
       }
-      
-      for (unsigned int i=0; i<36; ++i) {
-        std::cout<<"    OpDet"<<i<<":";
-	for (unsigned int j=0; j<4; ++j) {
-	  std::cout<<" "<<geo->OpChannel(i,j);
-	}
-	std::cout<<std::endl;
-      }
-      
-      /*need loop over pmts in geomtry to add row to fData*/
            
     }
     else if (fDataSource == DataSource::File) {
