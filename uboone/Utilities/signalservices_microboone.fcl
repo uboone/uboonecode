@@ -30,10 +30,9 @@ UseCalibratedResponses: true
 FieldResponseFNameBase: "uboone_response_70kV"
 CalibResponseTOffset: [-21.61, -21.61, -21.61]   # in us time offset to align all three planes
 			
-
 #UseCalibratedResponses: false
 #FieldResponseFNameBase: "uboone_response"
-
+#CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
 
 #---------------------------------------------------------------
 # Settings for old-style responses (no dynamic induced charge)
