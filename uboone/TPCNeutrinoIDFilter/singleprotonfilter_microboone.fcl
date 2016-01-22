@@ -1,0 +1,16 @@
+BEGIN_PROLOG
+
+microboone_singleprotonfilter:
+{ 
+ module_type:              "SingleProtonFilter"
+ TrackModuleLabel:         "trackkalmanhitc3d"
+ CosmicTaggerAssocLabel:   "trackkalmanhittagc3d"
+ ClusterAssocLabel:        "trackkalmanhitc3d"
+ HitAssocLabel:            "trackkalmanhitc3d"
+ MaxCosmicScore:           0.4
+ MaxLength:                30.
+ MinCharge:                75.
+ MinStartDist:             10.
+}
+
+END_PROLOG

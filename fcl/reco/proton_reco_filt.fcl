@@ -1,0 +1,39 @@
+## proton reco analyzer
+#include "singleprotonfilter_microboone.fcl"
+
+process_name: ProtonRecoFilter
+
+services:
+{
+  scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
+  # Load the service that manages root files for histograms.
+  #TFileService: { fileName: "proton_filter.root" }
+  Timing:       {}
+  SimpleMemoryCheck:     { ignoreTotal: 1 } # default is one
+  #message:      @local::microboone_message_services_prod_debug
+  #FileCatalogMetadata:  @local::art_file_catalog_mc
+  #user:         @local::microboone_services_ana
+}
+
+physics:
+{
+  reco:            [ singleprotonfilter ]
+  stream1:         [ out1 ]
+  trigger_paths:   [ reco ]
+  end_paths:       [ stream1 ]
+}
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName:    "filtered_proton_reco.root"
+   dataTier:    "reconstructed-2d"
+   SelectEvents: { SelectEvents: [ reco ] }
+   compressionLevel: 1
+ }
+}
+
+physics.filters.singleprotonfilter:   @local::microboone_singleprotonfilter
+

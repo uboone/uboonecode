@@ -1,0 +1,12 @@
+BEGIN_PROLOG
+
+microboone_protonanalyzer:
+{ 
+ module_type:              "ProtonAnalyzer"
+ TrackModuleLabel:         "trackkalmanhitc3d"
+ CosmicTaggerAssocLabel:   "trackkalmanhittagc3d"
+ ClusterAssocLabel:        "trackkalmanhitc3d"
+ HitAssocLabel:            "trackkalmanhitc3d"
+}
+
+END_PROLOG
