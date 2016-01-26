@@ -206,8 +206,8 @@ void MuCSReco::produce( art::Event &evt ){
   Int_t xmatches=0,zmatches=0;
   //only fill fields if there are hits
   if (mucs->at(0).Hits1().size()>0 && mucs->at(0).Hits2().size()>0 && mucs->at(0).Hits3().size()>0 && mucs->at(0).Hits7().size()>0){
-    execFill(mucs->at(0).Hits1(),mucs->at(0).Hits3(),"hitmap13x",xfields);
-    execFill(mucs->at(0).Hits2(),mucs->at(0).Hits7(),"hitmap27z",zfields);
+    execFill(mucs->at(0).Hits3(),mucs->at(0).Hits1(),"hitmap13x",xfields); //assumes that PMT 3 is above PMT 1 spatially
+    execFill(mucs->at(0).Hits7(),mucs->at(0).Hits2(),"hitmap27z",zfields);//assumes that PMT 7 is above PMT 2 spatially
     xq=xfields.q;
     xq_rms=xfields.q_rms;
     x=xfields.p;
