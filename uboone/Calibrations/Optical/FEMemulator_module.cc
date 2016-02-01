@@ -33,6 +33,7 @@
 #include "SimpleTypesAndConstants/RawTypes.h"
 #include "SimpleTypesAndConstants/geo_types.h"
 #include "Utilities/TimeService.h"
+#include "uboone/TriggerSim/UBTriggerTypes.h"
 
 //Optical Channel Maps
 #include "uboone/Geometry/UBOpChannelTypes.h"
@@ -42,13 +43,17 @@
 #include "RawData/raw.h"
 #include "RawData/RawDigit.h"
 #include "RawData/OpDetWaveform.h"
+#include "RawData/TriggerData.h"
+#include "uboone/TriggerSim/UBTriggerTypes.h"
 
 // Pulse finding
 #include "uboone/OpticalDetectorAna/OpticalSubEvents/cfdiscriminator_algo/cfdiscriminator.hh"
 
 // Trigger Emulator Code
-#include "FEMBasicTriggerAlgo.h"
-
+#include "SWTriggerBase/SWTriggerTypes.h"
+#include "SWTriggerBase/MultiAlgo.h"
+#include "SWTriggerBase/ConfigHolder.h"
+#include "SWTriggerBase/Result.h"
 
 class FEMemulator;
 
@@ -70,41 +75,27 @@ public:
 
 private:
 
-  // basic trigger
-  //void basicTrigger( int BeamWinSize, int NChannels, const std::vector< std::vector<int> >& chwfms, std::vector<int>& vmaxdiff, std::vector<int>& vmulti );
+  trigger::MultiAlgo m_algos; ///< Container of algos
 
   // Declare member data here.
-
-  // Configuration Parameters
+  std::string fDAQHeaderModule;
   std::string fOpDataModule;
-  int fFEMslot;
-  int fNChannels;
-  int fBeamWinSize;
-  int fFrontBuffer;
-  int fMinReadoutTicks;
-  int fDiscr0precount;
-
-  int fDiscr0threshold;
-  int fDiscr0width;
-  int fDiscr0delay;
-  int fDiscr0deadtime;
-
-  int fDiscr3threshold;
-  int fDiscr3width;
-  int fDiscr3delay;
-  int fDiscr3deadtime;
-
-  // Output tree and variables
-  fememu::BasicTriggerConfig fFEMconfig;
+  size_t fNChannels;
+  size_t fFEMslot;
+  size_t fMinReadoutTicks;
 
   // Beam Window Tree
   TTree* fTwindow;
   int run;
   int subrun;
   int event;
-  int winid;
-  int maxdiff;
-  int multiplicity;
+  int applied;
+  unsigned int trigger_bits;
+  int bnb;
+  int numi;
+  std::vector< unsigned short > multiplicity;
+  std::vector< unsigned short > PHMAX;
+  std::vector< trigger::Result > m_results;
   
   // records configuration
   TTree* fTconfig;
@@ -122,66 +113,72 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   art::ServiceHandle<art::TFileService> out_file;
 
   // Load Parameters
-  fOpDataModule    = p.get<std::string>( "OpDataModule",  "pmtreadout" );
-  fFEMslot         = p.get<int>( "FEMslot",       5 );
-  fNChannels       = p.get<int>( "NChannels",    32 );
-  fBeamWinSize     = p.get<int>( "BeamWinSize", 103 );
-  fMinReadoutTicks = p.get<int>( "MinReadoutTicks", 500 );
-  fFrontBuffer     = p.get<int>( "FrontPorchBuffer", 0 );
-  fDiscr0precount  = p.get<int>( "Discr0precount", 2 );
-  
-  fDiscr0threshold = p.get<int>( "Discr0threshold", 5 );
-  fDiscr0width     = p.get<int>( "Discr0width", 5 );
-  fDiscr0delay     = p.get<int>( "Discr0delay", 5 );
-  fDiscr0deadtime  = p.get<int>( "Discr0deadtime", 5 );
+  fDAQHeaderModule = p.get<std::string>("DAQHeaderModule");
+  fOpDataModule    = p.get<std::string>("OpDataModule");
+  fNChannels       = p.get<int>("NumberOfChannels");
+  fFEMslot         = p.get<int>("FEMslot");
+  fMinReadoutTicks = p.get<int>("MinReadoutTicks");
+  std::vector<std::string> triggertypes = p.get<std::vector<std::string>>("swtrg_algorithms");
+  std::vector<std::string> triggernames = p.get<std::vector<std::string>>("swtrg_algonames");
+  std::vector<unsigned int> triggerbits = p.get<std::vector<unsigned int>>("swtrg_bits");
+  //size_t beam_window_size = p.get<size_t>( "swtrg_beam_window_size" );
 
-  fDiscr3threshold = p.get<int>( "Discr3threshold", 10 );
-  fDiscr3width     = p.get<int>( "Discr3width", 4 );
-  fDiscr3delay     = p.get<int>( "Discr3delay", 4 );
-  fDiscr3deadtime  = p.get<int>( "Discr3deadtime", 4 );
+  fTconfig = out_file->make<TTree>( "femconfig", "FEM emulator config. parameters" );
+  std::string instance_name;
+  std::string type;
+  unsigned int triggerbit;
+  trigger::ConfigHolder aconfig;
+  std::vector< trigger::ConfigHolder > configs;
+  char zinstance_name[50];
+  char ztype_name[50];
+  fTconfig->Branch( "algoname", zinstance_name, "algoname[50]/C" );
+  fTconfig->Branch( "algotype", ztype_name, "algotype[50]/C" );
+  fTconfig->Branch( "trigbit", &triggerbit, "trigbit/i" );
+  //fTconfig->Branch( "config", &aconfig );
 
-  // Setup config instance
-  //fFEMconfig.fBeamWinSize = fBeamWinSize;
-  fFEMconfig.fMinReadoutTicks = fMinReadoutTicks;
-  fFEMconfig.fFrontBuffer = fFrontBuffer;
-  fFEMconfig.fDiscr0delay = fDiscr0delay;
-  fFEMconfig.fDiscr0width = fDiscr0width;
-  fFEMconfig.fDiscr0threshold = fDiscr0threshold;
-  fFEMconfig.fDiscr0deadtime = fDiscr0deadtime;
-  fFEMconfig.fDiscr0precount = fDiscr0precount;
-  fFEMconfig.fDiscr3delay = fDiscr3delay;
-  fFEMconfig.fDiscr3width = fDiscr3width;
-  fFEMconfig.fDiscr3threshold = fDiscr3threshold;
-  fFEMconfig.fDiscr3deadtime = fDiscr3deadtime;
-  
+  for (int itrig=0; itrig<(int)triggernames.size(); itrig++) {
+    std::string name = triggernames.at(itrig);
+    type = triggertypes.at(itrig);
+    instance_name = name+"_"+type;
+    triggerbit = triggerbits.at(itrig);
+    
+    fhicl::ParameterSet cfg_ps = p.get<fhicl::ParameterSet>( instance_name );
+    m_algos.declareAlgo( triggerbit, type, instance_name );
+    auto& cfg = m_algos.GetConfig( instance_name );
+
+    sprintf(zinstance_name, instance_name.c_str() );
+    sprintf(ztype_name, type.c_str() );
+    
+    for ( auto const& key : cfg.ListKeys<bool>() )        cfg.Set( key, cfg_ps.get<bool>(key), true );
+    for ( auto const& key : cfg.ListKeys<std::string>() ) cfg.Set( key, cfg_ps.get<std::string>(key), true );
+    for ( auto const& key : cfg.ListKeys<int>() )         cfg.Set( key, cfg_ps.get<int>(key), true );
+    for ( auto const& key : cfg.ListKeys<double>() )      cfg.Set( key, cfg_ps.get<double>(key), true );
+    for ( auto const& key : cfg.ListKeys<std::vector<bool> >() )        cfg.Set( key, cfg_ps.get<std::vector<bool> >(key), true );
+    for ( auto const& key : cfg.ListKeys<std::vector<std::string> >() ) cfg.Set( key, cfg_ps.get<std::vector<std::string> >(key), true );
+    for ( auto const& key : cfg.ListKeys<std::vector<int> >() )         cfg.Set( key, cfg_ps.get<std::vector<int> >(key), true );
+    for ( auto const& key : cfg.ListKeys<std::vector<double> >() )      cfg.Set( key, cfg_ps.get<std::vector<double> >(key), true );
+
+    m_algos.GetAlgo( instance_name ).Configure();
+
+    aconfig = cfg; // copy
+    
+    fTconfig->Fill();
+  }// loop over algos
   
   // Setup Output Trees
-
-  // save configuration
-  fTconfig = out_file->make<TTree>( "config", "FEM emulator config. parameters" );
-  fTconfig->Branch( "femslot", &fFEMslot, "femslot/I" );
-  fTconfig->Branch( "beamwinsize", &fBeamWinSize, "beamwinsize/I" );
-  fTconfig->Branch( "frontbuffer", &fFrontBuffer, "frontbuffer/fTconfig" );
-  fTconfig->Branch( "discr0precount", &fDiscr0precount, "discr0precount/I" );
-  fTconfig->Branch( "discr0threshold", &fDiscr0threshold, "discr0threshold/I" );
-  fTconfig->Branch( "discr0width", &fDiscr0width, "discr0width/I" );
-  fTconfig->Branch( "discr0delay", &fDiscr0delay, "discr0delay/I" );
-  fTconfig->Branch( "discr0deadtime", &fDiscr0deadtime, "discr0deadtime/I" );
-  fTconfig->Branch( "discr3threshold", &fDiscr3threshold, "discr3threshold/I" );
-  fTconfig->Branch( "discr3width", &fDiscr3width, "discr3width/I" );
-  fTconfig->Branch( "discr3delay", &fDiscr3delay, "discr3delay/I" );
-  fTconfig->Branch( "discr3deadtime", &fDiscr3deadtime, "discr3deadtime/I" );
-  fTconfig->Fill();
 
   // output
   fTwindow = out_file->make<TTree>( "windowtree", "Trigger Variables per window" );
   fTwindow->Branch( "run", &run, "run/I" );
   fTwindow->Branch( "subrun", &subrun, "subrun/I" );
   fTwindow->Branch( "event", &event, "event/I" );
-  fTwindow->Branch( "winid", &winid, "winid/I" );
-  fTwindow->Branch( "maxdiff", &maxdiff, "maxdiff/I" );
-  fTwindow->Branch( "multiplicity", &multiplicity, "multiplicity/I" );
-
+  fTwindow->Branch( "multiplicity", &multiplicity );
+  fTwindow->Branch( "PHMAX", &PHMAX );
+  //fTwindow->Branch( "results", &m_results );
+  fTwindow->Branch( "applied", &applied, "applied/I");
+  fTwindow->Branch( "trigger_bits", &trigger_bits, "trigger_bits/i");
+  fTwindow->Branch( "bnb", &bnb, "bnb/I");
+  fTwindow->Branch( "numi", &numi, "numi/I");
 }
 
 void FEMemulator::analyze(art::Event const & evt)
@@ -190,156 +187,215 @@ void FEMemulator::analyze(art::Event const & evt)
   run    = (int)evt.run();
   subrun = (int)evt.subRun();
   event    = (int)evt.event();
+  applied = -1;
+  trigger_bits=0;
+  bnb=-1;
+  numi=-1;
 
+  m_results.clear();
+  PHMAX.clear();
+  multiplicity.clear();
   // initialize data handles and services
   art::ServiceHandle<geo::UBOpReadoutMap> ub_PMT_channel_map;
   art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
-  //art::Handle< std::vector< raw::OpDetWaveform > > LogicHandle;
-  ub_PMT_channel_map->SetOpMapRun( evt.run() );
+  art::Handle< std::vector< raw::Trigger > > trigHandle;
 
+  // Get OpMap
+  ub_PMT_channel_map->SetOpMapRun( evt.run() );
+  
+  // Get Trigger Bit
+  evt.getByLabel( fDAQHeaderModule, trigHandle );
+  const std::vector< raw::Trigger >& trigvec = (*trigHandle);
+  const raw::Trigger& trig = trigvec.at(0);
+  const double trigger_time = trig.TriggerTime();
+
+  trigger_bits = trig.TriggerBits();
+  if(trig.Triggered(trigger::kTriggerBNB)) bnb = 1;
+  if(trig.Triggered(trigger::kTriggerNuMI)) numi = 1;
+
+  // Get Waveforms
   evt.getByLabel( fOpDataModule, "OpdetBeamHighGain", wfHandle);
-  //evt.getByLabel( fOpDataModule, "UnspecifiedLogic" , LogicHandle);
   std::vector<raw::OpDetWaveform> const& opwfms(*wfHandle);
-  //std::vector<raw::OpDetWaveform> const& logwfms(*LogicHandle);
   
   // first accumulate waveforms
-  std::vector< std::vector<int> > wfms;
+  trigger::WaveformArray_t wfms;
   wfms.resize( fNChannels );
 
+  //
+  // Figure out target beam window
+  //
+  uint64_t min_trig_dt = 1e12;
+  uint64_t target_time = 1e12;
   for(auto &wfm : opwfms)  {
 
     unsigned int readout_ch = wfm.ChannelNumber();
     unsigned int c,s,f;
     ub_PMT_channel_map->GetCrateSlotFEMChFromReadoutChannel(readout_ch, c, s, f);
-    int slot = (int)s;
-    int ch = (int)f%100;
+    size_t slot = s;
+    size_t ch = f%100;
+
+    if ( slot!=fFEMslot )
+      continue;
+    if ( ch>=fNChannels )
+      continue;
+    if ( wfm.size()<fMinReadoutTicks )
+      continue;
+
+    int trig_dt = (int)(trigger_time - wfm.TimeStamp());
+    uint64_t unsigned_trig_dt = (trig_dt < 0 ? trig_dt*(-1) : trig_dt);
+
+    if(min_trig_dt > unsigned_trig_dt) {
+      min_trig_dt = unsigned_trig_dt;
+      target_time = wfm.TimeStamp() * 1.e3;
+    } 
+  }
+  if(target_time==1e12) {
+    std::cerr<<"\033[93m[ERROR]\033[00m Did not find target time... SKIPPING EVENT" <<std::endl;
+    return;
+  }
+
+  // Collect waveforms @ target timing
+  for(auto &wfm : opwfms)  {
+
+    unsigned int readout_ch = wfm.ChannelNumber();
+    unsigned int c,s,f;
+    ub_PMT_channel_map->GetCrateSlotFEMChFromReadoutChannel(readout_ch, c, s, f);
+    size_t slot = s;
+    size_t ch = f%100;
 
     if ( slot!=fFEMslot )
       continue;
     if ( ch%100>=fNChannels )
       continue;
-    if ( (int)wfm.size()<fMinReadoutTicks )
+    if ( wfm.size()<fMinReadoutTicks )
+      continue;
+    if ( (uint64_t)(wfm.TimeStamp()*1.e3) != target_time ) 
       continue;
 
-    wfms[ch].resize( wfm.size(), 0 );
-    for (int i=0; i<(int)wfm.size(); i++)
+    if(!wfms[ch].empty()) {
+      std::cerr<<"\033[93m[ERROR]\033[00m Found > 1 waveform with same time for channel "<<ch<<" ... SKIPPING EVENT" << std::endl;
+      return;
+    }
+    wfms[ch].resize( fMinReadoutTicks, 0 );
+    for (size_t i=0; i<fMinReadoutTicks; i++)
       wfms[ch][i] = (int)wfm[i];
   }
-  
-  // below is for the basic trigger
-  std::vector<int> vmaxdiff;
-  std::vector<int> vmulti;
-  fememu::basicTrigger( fBeamWinSize, fNChannels, fFEMconfig, wfms, vmaxdiff, vmulti );
-  for (int i=0; i<(int)vmaxdiff.size(); i++) {
-    winid = i;
-    maxdiff = vmaxdiff.at(i);
-    multiplicity = vmulti.at(i);
-    fTwindow->Fill();
+
+  // Make sure nothing missing
+  bool missing=false;
+  for(size_t ch=0;ch<wfms.size(); ++ch) {
+    auto const& wfm = wfms[ch];
+    if(wfm.empty()) {
+      std::cerr<<"\033[93m[ERROR]\033[00m Missing an waveform for channel " << ch << " ... SKIPPING EVENT" << std::endl;
+      missing=true;
+    }
   }
-
-  // NN trigger
-
-  // ZO trigger
+  if(missing) return;
+  
+  // Apply Triggers
+  applied=1;
+  m_results = m_algos.Process( trig.TriggerBits(), wfms );
+  std::cout << "[FEMemulator Module: event=" << event << "]" << std::endl;
+  for ( std::vector< trigger::Result >::iterator it=m_results.begin(); it!=m_results.end(); it++ ) {
+    std::cout << "  [" << (*it).pass << "] "
+	      << (*it).algo_instance_name 
+	      << " algo=" << (*it).pass_algo << " ps=" << (*it).pass_prescale << " PHMAX=" << (*it).amplitude << " weight=" << (*it).prescale_weight << std::endl;
+  }
+  fTwindow->Fill();
 
 }
 
-// Maybe these various triggers should go elsewhere
-// void FEMemulator::basicTrigger( int BeamWinSize, int NChannels, const std::vector< std::vector<int> >& chwfms, std::vector<int>& vmaxdiff, std::vector<int>& vmulti ) {
+// void FEMemulator::fillBeamWindowWaveforms(
+// 					  const unsigned int hw_trigger_sample,
+// 					  std::vector<std::vector<unsigned short> >& result) const
+// {
+//   if(result.empty()) return;
+//   //std::cout<<"Searching for trigger frame " << hw_trigger_frame << " sample " << hw_trigger_sample << std::endl;
+//   unsigned int target_time =0;
+//   unsigned int min_dt = 1e12; //FIXME this should be set to max integer value from compiler
+//   static const unsigned int frame_size = 102400;
+//   const unsigned int trigger_time = hw_trigger_frame * frame_size + hw_trigger_sample;
+//   //std::cout << "Trigger in tick @ " << trigger_time << std::endl; 
+//   // First search the target timing
+//   for(auto const& ch_data : getChannels()){
 
-//   //std::cout << __PRETTY_FUNCTION__ << std::endl;
+//     for(auto const& window : ch_data.getWindows()) {
 
-//   // first calculate accumulators for each waveform
-//   std::vector<int> chdiff[NChannels];
-//   std::vector<int> chhit[NChannels];
-//   for (int ch=0; ch<NChannels; ch++) {
-
-//     const std::vector<int>& wfm = chwfms[ch];
-
-//     chdiff[ch].resize( wfm.size(), 0 );
-//     chhit[ch].resize( wfm.size(), 0 );
-
-//     // memory for diff vectors
-//     std::vector<int> diff0( (int)wfm.size(), 0 );
-//     std::vector<int> diff3( (int)wfm.size(), 0 );
-//     for (int tick=fDiscr0delay; tick<(int)wfm.size(); tick++)
-//       diff0.at(tick) = wfm.at(tick)-wfm.at(tick-fDiscr0delay);
-//     for (int tick=fDiscr3delay; tick<(int)wfm.size(); tick++)
-//       diff3.at(tick) = wfm.at(tick)-wfm.at(tick-fDiscr3delay);
-
-
-//     // determine triggers and fill accumulators
-//     std::vector<int> ttrig0;
-//     std::vector<int> ttrig3;
-    
-//     for (int tick=0; tick<(int)wfm.size(); tick++) {
-//       // discr0 must fire first: acts as pre-trigger. won't fire again until all discs are no longer active
-//       if ( diff0.at(tick)>=fDiscr0threshold ) {
-// 	if ( (ttrig0.size()==0 || ttrig0.at( ttrig0.size()-1 )+fDiscr0precount<tick )
-// 	     && ( ttrig3.size()==0 || ttrig3.at( ttrig3.size()-1 )+fDiscr3deadtime < tick ) ) {
-// 	  // form discr0 trigger
-// 	  ttrig0.push_back( tick );
-// 	}
-//       } // end of if discr0 fires
-
-//       // discr3 fire
-//       if ( diff3.at(tick)>=fDiscr3threshold ) {
-// 	// must be within discr0 prewindow and outside of past discr3 deadtime
-// 	if ( ( ttrig0.size()>0 && tick-ttrig0.at( ttrig0.size()-1 ) < fDiscr0deadtime )
-// 	     && ( ttrig3.size()==0 || ttrig3.at( ttrig3.size()-1 ) + fDiscr3deadtime < tick ) ) {
-// 	  ttrig3.push_back( tick );
-// 	  // find maxdiff
-// 	  int tmaxdiff = diff3.at(tick);
-// 	  for (int t=tick; t<std::min( tick+fDiscr3width, (int)diff3.size() ); t++) {
-// 	    if ( tmaxdiff<diff3.at(t) )
-// 	      tmaxdiff = diff3.at(t);
-// 	  }
-// 	  // fill the accumulators
-// 	  int tend = std::min( tick+fDiscr3deadtime, (int)diff3.size() );
-// 	  for (int t=tick; t<tend; t++) {
-// 	    chdiff[ch].at( t ) = tmaxdiff;
-// 	    chhit[ch].at( t ) = 1;
-// 	  }
-// 	}
+//       if(window.header().getDiscriminantor()!=ub_PMT_DiscriminatorTypes_v6::BEAM && 
+// 	 window.header().getDiscriminantor()!=ub_PMT_DiscriminatorTypes_v6::BEAM_GATE) 
+// 	continue; //ignore non-BEAM signals
+      
+//       uint64_t window_time = rollOver(this->getFrame(), window.header().getFrame()) * frame_size;
+//       window_time += window.header().getSample();
+//       //std::cout << "Beamgate @ " << window_time << " size " << window.data().size() <<std::endl;
+//       uint64_t window_trigger_dt = 
+// 	( window_time < trigger_time ? trigger_time - window_time : window_time - trigger_time );
+      
+//       if( min_dt > window_trigger_dt ) {
+// 	min_dt      = window_trigger_dt;
+// 	target_time = window_time;
 //       }
-//     }//end of wfm loop for trigger and accumulators
-//   }//end of channel loop
-
-//   // break up waveform into windows and calculate trigger vars for each window
-//   int wfmsize = (int)chwfms.at(0).size();
-//   if ( wfmsize < fMinReadoutTicks ) {
-//     std::cout << "Beam readout window size is too small! (" << wfmsize << " < " << fMinReadoutTicks << ")" << std::endl;
+//     }
+//   }
+//   //std::cout << "target_time: " << target_time << std::endl;
+//   // Reaching here, my_frame && my_sample is non-zero, 
+//   // then you found a candidate beam gate start (i.e. size == expected size & closest to trigger)
+//   if(!target_time) {
+//     //std::cout << "Could not locate beam gate window!!!" << std::endl;
 //     return;
 //   }
-
-//   int nwindows = (wfmsize-1-fFrontBuffer)/fBeamWinSize;
-//   vmaxdiff.clear();
-//   vmulti.clear();
-
-//   for (int iwin=0; iwin<nwindows; iwin++) {
-//     int winstart = fFrontBuffer + iwin*fBeamWinSize;
-//     int winend   = fFrontBuffer + (iwin+1)*fBeamWinSize;
-//     winid = iwin;
-//     int winmaxmulti = 0;
-//     int winmaxdiff = 0;
-//     for (int tick=winstart; tick<winend; tick++) {
-//       int maxdiff_ = 0;
-//       int nhit_ = 0;
-//       for (int ch=0; ch<NChannels; ch++) {
-// 	maxdiff_ += chdiff[ch].at(tick);
-// 	nhit_    += chhit[ch].at(tick);
-//       }
-//       if ( winmaxdiff < maxdiff_ )
-// 	winmaxdiff = maxdiff_;
-//       if ( winmaxmulti < nhit_ )
-// 	winmaxmulti = nhit_;
-//     }
-
-//     // store for the window
-//     vmaxdiff.push_back( winmaxdiff );
-//     vmulti.push_back( winmaxmulti );
-    
-//   }
   
+//   for(auto const& chan : getChannels()) {
+
+//     if(chan.getChannelNumber() >= (int)(result.size())) continue;  //ignore non-PMT channels
+
+//     for(auto const& window : chan.getWindows()) {
+
+//       uint64_t window_time = rollOver(this->getFrame(), window.header().getFrame()) * frame_size;
+//       window_time += window.header().getSample();
+
+//       // Exactly same timing
+//       if(window_time == target_time) {
+
+// 	auto& wf = result[chan.getChannelNumber()];
+// 	if(wf.size() > window.data().size()) {
+// 	  std::cerr << "\033[93m"
+// 		    << "For channel " << chan.getChannelNumber() 
+// 		    << " window data size " << window.data().size()
+// 		    << " smaller than requested waveform size " << wf.size()
+// 		    << "\033[00m"
+// 		    << std::endl;
+// 	  throw datatypes_exception("fuck you");
+// 	}
+// 	for(size_t adc_index=0; adc_index<wf.size(); ++adc_index)
+// 	  wf[adc_index] = (0xfff & (*(window.data().begin()+adc_index)));
+// 	break;
+//       }
+       
+//       // Concatinated waveform
+//       if( target_time > window_time && 
+// 	  target_time < (window_time + window.data().size()) ) {
+
+//         //std::cout << "window_time: " <<	window_time << ", window_size: " << window.data().size() << std::endl;
+
+// 	auto& wf = result[chan.getChannelNumber()];
+// 	if(wf.size() + (target_time - window_time) > window.data().size()) {
+// 	  std::cerr << "\033[93m"
+// 		    << "For channel " << chan.getChannelNumber() 
+// 		    << " window data size " << window.data().size()
+// 		    << " smaller than requested waveform size " << wf.size()
+// 		    << "\033[00m"
+// 		    << std::endl;
+// 	  throw datatypes_exception("fuck you");
+// 	}
+// 	for(size_t adc_index=0; adc_index<wf.size(); ++adc_index)
+// 	  wf[adc_index] = (0xfff & (*(window.data().begin()+adc_index+(target_time - window_time))));
+// 	break;
+//       }
+//     }
+//   }
+
 // }
+
 
 DEFINE_ART_MODULE(FEMemulator)
