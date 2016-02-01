@@ -26,6 +26,7 @@ art_make( LIBRARY_NAME SPEcalibrationCode
 	       BASENAME_ONLY  
           MODULE_LIBRARIES 	  		   
 	  	   SPEcalibrationCode
+		   uboone_RawData
 		   Geometry
 		   uboone_Geometry
 		   Geometry_service

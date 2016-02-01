@@ -28,6 +28,7 @@
 // ROOT
 #include "TTree.h"
 #include "TH1D.h"
+#include "TStopwatch.h"
 
 // LArSoft 
 #include "SimpleTypesAndConstants/RawTypes.h"
@@ -45,6 +46,7 @@
 #include "RawData/OpDetWaveform.h"
 #include "RawData/TriggerData.h"
 #include "uboone/TriggerSim/UBTriggerTypes.h"
+#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
 // Pulse finding
 #include "uboone/OpticalDetectorAna/OpticalSubEvents/cfdiscriminator_algo/cfdiscriminator.hh"
@@ -75,6 +77,8 @@ public:
 
 private:
 
+  void clearVariables();
+
   trigger::MultiAlgo m_algos; ///< Container of algos
 
   // Declare member data here.
@@ -91,10 +95,32 @@ private:
   int event;
   int applied;
   unsigned int trigger_bits;
+  float offline_runtime;
+  float offline_iotime;
   int bnb;
   int numi;
-  std::vector< unsigned short > multiplicity;
-  std::vector< unsigned short > PHMAX;
+  int ext;
+  TStopwatch _stopwatch;
+
+  // offline outputs
+  std::vector< unsigned short > offline_multiplicity;
+  std::vector< unsigned short > offline_PHMAX;
+  std::vector< unsigned short > offline_trigtick;
+  std::vector< float > offline_weights;
+  std::vector< std::string > offline_algonames;
+  std::vector< int > offline_trigpass;
+  std::vector< int > offline_algopass;
+  std::vector< int > offline_prescalepass;
+
+  // offline outputs
+  std::vector< unsigned short > online_multiplicity;
+  std::vector< unsigned short > online_PHMAX;
+  std::vector< unsigned short > online_trigtick;
+  std::vector< float > online_weights;
+  std::vector< std::string > online_algonames;
+  std::vector< int > online_trigpass;
+  std::vector< double > online_dttrig;
+
   std::vector< trigger::Result > m_results;
   
   // records configuration
@@ -168,17 +194,38 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   // Setup Output Trees
 
   // output
-  fTwindow = out_file->make<TTree>( "windowtree", "Trigger Variables per window" );
+  fTwindow = out_file->make<TTree>( "swtrigdata", "SW Trigger Variables" );
   fTwindow->Branch( "run", &run, "run/I" );
   fTwindow->Branch( "subrun", &subrun, "subrun/I" );
   fTwindow->Branch( "event", &event, "event/I" );
-  fTwindow->Branch( "multiplicity", &multiplicity );
-  fTwindow->Branch( "PHMAX", &PHMAX );
-  //fTwindow->Branch( "results", &m_results );
+  fTwindow->Branch( "hw_trigger_bits", &trigger_bits, "hw_trigger_bits/i");
+  // offline
   fTwindow->Branch( "applied", &applied, "applied/I");
-  fTwindow->Branch( "trigger_bits", &trigger_bits, "trigger_bits/i");
+  fTwindow->Branch( "multiplicity", &offline_multiplicity );
+  fTwindow->Branch( "PHMAX", &offline_PHMAX );
+  fTwindow->Branch( "swtrigtick", &offline_trigtick );
+  fTwindow->Branch( "weights", &offline_weights );
+  fTwindow->Branch( "algonames", &offline_algonames );
+  fTwindow->Branch( "swtrigpass", &offline_trigpass );
+  fTwindow->Branch( "algopass", &offline_algopass );
+  fTwindow->Branch( "prescalepass", &offline_prescalepass );
+  fTwindow->Branch( "runtime", &offline_runtime, "runtime/F" );
+  fTwindow->Branch( "iotime", &offline_iotime, "iotime/F" );
+
+  // online
+  fTwindow->Branch( "online_multiplicity", &online_multiplicity );
+  fTwindow->Branch( "online_PHMAX", &online_PHMAX );
+  fTwindow->Branch( "online_swtrigtick", &online_trigtick );
+  fTwindow->Branch( "online_weight", &online_weights );
+  fTwindow->Branch( "online_dttrig", &online_dttrig );
+  fTwindow->Branch( "online_algonames", &online_algonames );
+  fTwindow->Branch( "online_swtrigpass", &online_trigpass );
+
+  // convenience
   fTwindow->Branch( "bnb", &bnb, "bnb/I");
   fTwindow->Branch( "numi", &numi, "numi/I");
+  fTwindow->Branch( "ext", &ext, "ext/I");
+
 }
 
 void FEMemulator::analyze(art::Event const & evt)
@@ -192,9 +239,8 @@ void FEMemulator::analyze(art::Event const & evt)
   bnb=-1;
   numi=-1;
 
-  m_results.clear();
-  PHMAX.clear();
-  multiplicity.clear();
+  clearVariables();
+
   // initialize data handles and services
   art::ServiceHandle<geo::UBOpReadoutMap> ub_PMT_channel_map;
   art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
@@ -212,8 +258,11 @@ void FEMemulator::analyze(art::Event const & evt)
   trigger_bits = trig.TriggerBits();
   if(trig.Triggered(trigger::kTriggerBNB)) bnb = 1;
   if(trig.Triggered(trigger::kTriggerNuMI)) numi = 1;
+  if(trig.Triggered(trigger::kTriggerEXT)) ext = 1;
 
   // Get Waveforms
+  offline_iotime = -1;
+  _stopwatch.Start();
   evt.getByLabel( fOpDataModule, "OpdetBeamHighGain", wfHandle);
   std::vector<raw::OpDetWaveform> const& opwfms(*wfHandle);
   
@@ -290,112 +339,83 @@ void FEMemulator::analyze(art::Event const & evt)
       missing=true;
     }
   }
+
+  _stopwatch.Stop();
+  offline_iotime = _stopwatch.RealTime();
+
+  // Extract online sw trigger results
+  art::Handle< raw::ubdaqSoftwareTriggerData > swtrigHandle;
+  evt.getByLabel( fDAQHeaderModule, swtrigHandle );
+
+  if ( swtrigHandle.isValid() ) {
+    std::cout << "[FEMemulator Module: Getting online result for event=" << event << " hwtrigbit=" << trig.TriggerBits()  << "]" << std::endl;
+    const raw::ubdaqSoftwareTriggerData& swtrig = (*swtrigHandle);
+    for (int i=0; i<swtrig.getNumberOfAlgorithms(); i++) {
+      bool pass = swtrig.getPass( i );
+      uint32_t phmax = swtrig.getPhmax(i);
+      uint32_t multi = swtrig.getMultiplicity(i);
+      uint32_t tick = swtrig.getTriggerTick(i);
+      double dt = swtrig.getTimeSinceTrigger(i);
+      std::string name = swtrig.getTriggerAlgorithm(i);
+      float weight = swtrig.getPrescale(i);
+
+      std::cout << "  [" << pass << "] " << name << " PHMAX=" << phmax << " weight=" << weight << std::endl;
+      online_PHMAX.push_back( phmax );
+      online_multiplicity.push_back( multi );
+      online_weights.push_back( weight );
+      online_algonames.push_back( name );
+      online_trigtick.push_back( tick );
+      online_dttrig.push_back( dt );
+      if ( pass ) online_trigpass.push_back( 1 ); else online_trigpass.push_back( 0 );
+    }
+  }
+
   if(missing) return;
   
   // Apply Triggers
   applied=1;
+  _stopwatch.Start();
   m_results = m_algos.Process( trig.TriggerBits(), wfms );
-  std::cout << "[FEMemulator Module: event=" << event << "]" << std::endl;
+  _stopwatch.Stop();
+  offline_runtime = _stopwatch.RealTime();
+  std::cout << "[FEMemulator Module: Running offline algo on event=" << event << " hwtrigbit=" << trig.TriggerBits()  << "]" << std::endl;
   for ( std::vector< trigger::Result >::iterator it=m_results.begin(); it!=m_results.end(); it++ ) {
     std::cout << "  [" << (*it).pass << "] "
 	      << (*it).algo_instance_name 
 	      << " algo=" << (*it).pass_algo << " ps=" << (*it).pass_prescale << " PHMAX=" << (*it).amplitude << " weight=" << (*it).prescale_weight << std::endl;
+    offline_PHMAX.push_back( (*it).amplitude );
+    offline_multiplicity.push_back( (*it).multiplicity );
+    offline_weights.push_back( (*it).prescale_weight );
+    offline_algonames.push_back( (*it).algo_instance_name );
+    if ( (*it).pass ) offline_trigpass.push_back( 1 ); else offline_trigpass.push_back( 0 );
+    if ( (*it).pass_algo ) offline_algopass.push_back( 1 ); else offline_algopass.push_back( 0 );
+    if ( (*it).pass_prescale ) offline_prescalepass.push_back( 1 ); else offline_prescalepass.push_back( 0 );
   }
+  
   fTwindow->Fill();
 
 }
 
-// void FEMemulator::fillBeamWindowWaveforms(
-// 					  const unsigned int hw_trigger_sample,
-// 					  std::vector<std::vector<unsigned short> >& result) const
-// {
-//   if(result.empty()) return;
-//   //std::cout<<"Searching for trigger frame " << hw_trigger_frame << " sample " << hw_trigger_sample << std::endl;
-//   unsigned int target_time =0;
-//   unsigned int min_dt = 1e12; //FIXME this should be set to max integer value from compiler
-//   static const unsigned int frame_size = 102400;
-//   const unsigned int trigger_time = hw_trigger_frame * frame_size + hw_trigger_sample;
-//   //std::cout << "Trigger in tick @ " << trigger_time << std::endl; 
-//   // First search the target timing
-//   for(auto const& ch_data : getChannels()){
+void FEMemulator::clearVariables() {
+  m_results.clear();
+  bnb = numi = ext = 0;
+  offline_PHMAX.clear();
+  offline_multiplicity.clear();
+  online_trigtick.clear();
+  offline_weights.clear();
+  offline_algonames.clear();
+  offline_trigpass.clear();
+  offline_algopass.clear();
+  offline_prescalepass.clear();
 
-//     for(auto const& window : ch_data.getWindows()) {
-
-//       if(window.header().getDiscriminantor()!=ub_PMT_DiscriminatorTypes_v6::BEAM && 
-// 	 window.header().getDiscriminantor()!=ub_PMT_DiscriminatorTypes_v6::BEAM_GATE) 
-// 	continue; //ignore non-BEAM signals
-      
-//       uint64_t window_time = rollOver(this->getFrame(), window.header().getFrame()) * frame_size;
-//       window_time += window.header().getSample();
-//       //std::cout << "Beamgate @ " << window_time << " size " << window.data().size() <<std::endl;
-//       uint64_t window_trigger_dt = 
-// 	( window_time < trigger_time ? trigger_time - window_time : window_time - trigger_time );
-      
-//       if( min_dt > window_trigger_dt ) {
-// 	min_dt      = window_trigger_dt;
-// 	target_time = window_time;
-//       }
-//     }
-//   }
-//   //std::cout << "target_time: " << target_time << std::endl;
-//   // Reaching here, my_frame && my_sample is non-zero, 
-//   // then you found a candidate beam gate start (i.e. size == expected size & closest to trigger)
-//   if(!target_time) {
-//     //std::cout << "Could not locate beam gate window!!!" << std::endl;
-//     return;
-//   }
-  
-//   for(auto const& chan : getChannels()) {
-
-//     if(chan.getChannelNumber() >= (int)(result.size())) continue;  //ignore non-PMT channels
-
-//     for(auto const& window : chan.getWindows()) {
-
-//       uint64_t window_time = rollOver(this->getFrame(), window.header().getFrame()) * frame_size;
-//       window_time += window.header().getSample();
-
-//       // Exactly same timing
-//       if(window_time == target_time) {
-
-// 	auto& wf = result[chan.getChannelNumber()];
-// 	if(wf.size() > window.data().size()) {
-// 	  std::cerr << "\033[93m"
-// 		    << "For channel " << chan.getChannelNumber() 
-// 		    << " window data size " << window.data().size()
-// 		    << " smaller than requested waveform size " << wf.size()
-// 		    << "\033[00m"
-// 		    << std::endl;
-// 	  throw datatypes_exception("fuck you");
-// 	}
-// 	for(size_t adc_index=0; adc_index<wf.size(); ++adc_index)
-// 	  wf[adc_index] = (0xfff & (*(window.data().begin()+adc_index)));
-// 	break;
-//       }
-       
-//       // Concatinated waveform
-//       if( target_time > window_time && 
-// 	  target_time < (window_time + window.data().size()) ) {
-
-//         //std::cout << "window_time: " <<	window_time << ", window_size: " << window.data().size() << std::endl;
-
-// 	auto& wf = result[chan.getChannelNumber()];
-// 	if(wf.size() + (target_time - window_time) > window.data().size()) {
-// 	  std::cerr << "\033[93m"
-// 		    << "For channel " << chan.getChannelNumber() 
-// 		    << " window data size " << window.data().size()
-// 		    << " smaller than requested waveform size " << wf.size()
-// 		    << "\033[00m"
-// 		    << std::endl;
-// 	  throw datatypes_exception("fuck you");
-// 	}
-// 	for(size_t adc_index=0; adc_index<wf.size(); ++adc_index)
-// 	  wf[adc_index] = (0xfff & (*(window.data().begin()+adc_index+(target_time - window_time))));
-// 	break;
-//       }
-//     }
-//   }
-
-// }
+  online_PHMAX.clear();
+  online_multiplicity.clear();
+  online_weights.clear();
+  online_algonames.clear();
+  online_trigpass.clear();
+  online_trigtick.clear();
+  online_dttrig.clear();
+}
 
 
 DEFINE_ART_MODULE(FEMemulator)
