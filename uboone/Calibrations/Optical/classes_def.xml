@@ -1,0 +1,5 @@
+<lcgdict>
+ <class name="trigger::Result"/>
+ <class name="std::vector<trigger::Result>"/>
+ <class name="art::Wrapper<std::vector<trigger::Result> >"/>
+</lcgdict>
