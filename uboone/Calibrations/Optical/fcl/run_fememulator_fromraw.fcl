@@ -140,7 +140,7 @@ microboone_fememulator:
     OpDataModule: "pmtreadout"
     NumberOfChannels: 32
     FEMslot: 4
-    MinReadoutTicks: 500
+    MinReadoutTicks: 1100
     @table::software_trg
 }
 
