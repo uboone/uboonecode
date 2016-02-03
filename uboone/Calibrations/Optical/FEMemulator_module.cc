@@ -44,6 +44,7 @@
 #include "RawData/raw.h"
 #include "RawData/RawDigit.h"
 #include "RawData/OpDetWaveform.h"
+#include "RecoBase/OpFlash.h"
 #include "RawData/TriggerData.h"
 #include "RawData/DAQHeader.h"
 #include "uboone/TriggerSim/UBTriggerTypes.h"
@@ -86,6 +87,7 @@ private:
   // Declare member data here.
   std::string fDAQHeaderModule;
   std::string fOpDataModule;
+  std::string fOpFlashModule;
   size_t fNChannels;
   size_t fFEMslot;
   size_t fMinReadoutTicks;
@@ -117,6 +119,14 @@ private:
   std::vector< int > offline_prescalepass;
   std::vector< unsigned short > offline_PHMAX_vect;
 
+  // flash outputs
+  std::vector< double > flash_z;
+  std::vector< double > flash_y;
+  std::vector< double > flash_dz;
+  std::vector< double > flash_dy;
+  std::vector< double > flash_t;
+  std::vector< double > flash_q;
+
   // offline outputs
   std::vector< unsigned short > online_multiplicity;
   std::vector< unsigned short > online_PHMAX;
@@ -146,6 +156,7 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   // Load Parameters
   fDAQHeaderModule = p.get<std::string>("DAQHeaderModule");
   fOpDataModule    = p.get<std::string>("OpDataModule");
+  fOpFlashModule   = p.get<std::string>("OpFlashModule");
   fNChannels       = p.get<int>("NumberOfChannels");
   fFEMslot         = p.get<int>("FEMslot");
   fMinReadoutTicks = p.get<int>("MinReadoutTicks");
@@ -219,7 +230,13 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   fTwindow->Branch( "prescalepass", &offline_prescalepass );
   fTwindow->Branch( "runtime", &offline_runtime, "runtime/F" );
   fTwindow->Branch( "iotime", &offline_iotime, "iotime/F" );
-
+  // flash info
+  fTwindow->Branch( "flash_z", &flash_z);
+  fTwindow->Branch( "flash_y", &flash_y);
+  fTwindow->Branch( "flash_dz", &flash_dz);
+  fTwindow->Branch( "flash_dy", &flash_dy);
+  fTwindow->Branch( "flash_t", &flash_t);
+  fTwindow->Branch( "flash_q", &flash_q);
   // online
   fTwindow->Branch( "online_multiplicity", &online_multiplicity );
   fTwindow->Branch( "online_PHMAX", &online_PHMAX );
@@ -252,6 +269,7 @@ void FEMemulator::analyze(art::Event const & evt)
   // initialize data handles and services
   art::ServiceHandle<geo::UBOpReadoutMap> ub_PMT_channel_map;
   art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
+  art::Handle< std::vector< recob::OpFlash > > opflashHandle;
   art::Handle< std::vector< raw::Trigger > > trigHandle;
   art::Handle< raw::DAQHeader > dhHandle;
 
@@ -281,6 +299,28 @@ void FEMemulator::analyze(art::Event const & evt)
   _stopwatch.Start();
   evt.getByLabel( fOpDataModule, "OpdetBeamHighGain", wfHandle);
   std::vector<raw::OpDetWaveform> const& opwfms(*wfHandle);
+
+  // Get Op Flashes
+  evt.getByLabel( fOpFlashModule, "", opflashHandle);
+  std::vector<recob::OpFlash> const& opflash(*opflashHandle);
+
+  // loop through flashes and save flash info
+  flash_t.clear();
+  flash_q.clear();
+  flash_z.clear();
+  flash_y.clear();
+  flash_dz.clear();
+  flash_dy.clear();
+  for (auto &flash : opflash){
+
+    flash_t.push_back ( flash.Time() );
+    flash_q.push_back ( flash.TotalPE() );
+    flash_z.push_back ( flash.ZCenter() );
+    flash_y.push_back ( flash.YCenter() );
+    flash_dz.push_back ( flash.ZWidth() );
+    flash_dy.push_back ( flash.YWidth() );
+
+  }// for all flashes
   
   // first accumulate waveforms
   trigger::WaveformArray_t wfms;
