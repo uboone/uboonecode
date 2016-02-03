@@ -45,6 +45,7 @@
 #include "RawData/RawDigit.h"
 #include "RawData/OpDetWaveform.h"
 #include "RawData/TriggerData.h"
+#include "RawData/DAQHeader.h"
 #include "uboone/TriggerSim/UBTriggerTypes.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
@@ -56,6 +57,7 @@
 #include "SWTriggerBase/MultiAlgo.h"
 #include "SWTriggerBase/ConfigHolder.h"
 #include "SWTriggerBase/Result.h"
+#include "FEMBeamTrigger/FEMBeamTriggerAlgo.h"
 
 class FEMemulator;
 
@@ -93,6 +95,8 @@ private:
   int run;
   int subrun;
   int event;
+  double event_timestamp_sec;
+  double event_timestamp_usec;
   int applied;
   unsigned int trigger_bits;
   float offline_runtime;
@@ -111,6 +115,7 @@ private:
   std::vector< int > offline_trigpass;
   std::vector< int > offline_algopass;
   std::vector< int > offline_prescalepass;
+  std::vector< unsigned short > offline_PHMAX_vect;
 
   // offline outputs
   std::vector< unsigned short > online_multiplicity;
@@ -198,11 +203,14 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   fTwindow->Branch( "run", &run, "run/I" );
   fTwindow->Branch( "subrun", &subrun, "subrun/I" );
   fTwindow->Branch( "event", &event, "event/I" );
+  fTwindow->Branch("event_timestamp_sec", &event_timestamp_sec, "event_timestamp_sec/D" );
+  fTwindow->Branch("event_timestamp_usec", &event_timestamp_usec, "event_timestamp_usec/D" );
   fTwindow->Branch( "hw_trigger_bits", &trigger_bits, "hw_trigger_bits/i");
   // offline
   fTwindow->Branch( "applied", &applied, "applied/I");
   fTwindow->Branch( "multiplicity", &offline_multiplicity );
   fTwindow->Branch( "PHMAX", &offline_PHMAX );
+  fTwindow->Branch( "PHMAX_vect", &offline_PHMAX_vect );
   fTwindow->Branch( "swtrigtick", &offline_trigtick );
   fTwindow->Branch( "weights", &offline_weights );
   fTwindow->Branch( "algonames", &offline_algonames );
@@ -245,6 +253,7 @@ void FEMemulator::analyze(art::Event const & evt)
   art::ServiceHandle<geo::UBOpReadoutMap> ub_PMT_channel_map;
   art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
   art::Handle< std::vector< raw::Trigger > > trigHandle;
+  art::Handle< raw::DAQHeader > dhHandle;
 
   // Get OpMap
   ub_PMT_channel_map->SetOpMapRun( evt.run() );
@@ -259,6 +268,13 @@ void FEMemulator::analyze(art::Event const & evt)
   if(trig.Triggered(trigger::kTriggerBNB)) bnb = 1;
   if(trig.Triggered(trigger::kTriggerNuMI)) numi = 1;
   if(trig.Triggered(trigger::kTriggerEXT)) ext = 1;
+
+  // Get Timestamp
+  evt.getByLabel( fDAQHeaderModule, dhHandle );
+  const raw::DAQHeader& dh = (*dhHandle);
+  time_t daq_timestamp = dh.GetTimeStamp();
+  event_timestamp_sec = (double)(daq_timestamp>>32);
+  event_timestamp_usec  = 0.001*(double)( daq_timestamp & 0xFFFFFFFF );
 
   // Get Waveforms
   offline_iotime = -1;
@@ -383,6 +399,13 @@ void FEMemulator::analyze(art::Event const & evt)
     std::cout << "  [" << (*it).pass << "] "
 	      << (*it).algo_instance_name 
 	      << " algo=" << (*it).pass_algo << " ps=" << (*it).pass_prescale << " PHMAX=" << (*it).amplitude << " weight=" << (*it).prescale_weight << std::endl;
+    if ( (*it).algo_instance_name.find("FEM")!=std::string::npos ) {
+      trigger::AlgoBase* pAlgo = &(m_algos.GetAlgo( (*it).algo_instance_name ));
+      trigger::fememu::FEMBeamTriggerAlgo* pFEMalgo = dynamic_cast<trigger::fememu::FEMBeamTriggerAlgo*>(pAlgo);
+      if ( pFEMalgo!=NULL )
+	offline_PHMAX_vect = pFEMalgo->PHMAX();
+      
+    }
     offline_PHMAX.push_back( (*it).amplitude );
     offline_multiplicity.push_back( (*it).multiplicity );
     offline_weights.push_back( (*it).prescale_weight );
@@ -391,7 +414,7 @@ void FEMemulator::analyze(art::Event const & evt)
     if ( (*it).pass_algo ) offline_algopass.push_back( 1 ); else offline_algopass.push_back( 0 );
     if ( (*it).pass_prescale ) offline_prescalepass.push_back( 1 ); else offline_prescalepass.push_back( 0 );
   }
-  
+  // save phmax vector
   fTwindow->Fill();
 
 }
@@ -407,6 +430,7 @@ void FEMemulator::clearVariables() {
   offline_trigpass.clear();
   offline_algopass.clear();
   offline_prescalepass.clear();
+  offline_PHMAX_vect.clear();
 
   online_PHMAX.clear();
   online_multiplicity.clear();
@@ -415,6 +439,7 @@ void FEMemulator::clearVariables() {
   online_trigpass.clear();
   online_trigtick.clear();
   online_dttrig.clear();
+
 }
 
 
