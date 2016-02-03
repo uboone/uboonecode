@@ -412,6 +412,7 @@ void FEMemulator::analyze(art::Event const & evt)
     offline_multiplicity.push_back( (*it).multiplicity );
     offline_weights.push_back( (*it).prescale_weight );
     offline_algonames.push_back( (*it).algo_instance_name );
+    offline_trigtick.push_back( (*it).time );
     if ( (*it).pass ) offline_trigpass.push_back( 1 ); else offline_trigpass.push_back( 0 );
     if ( (*it).pass_algo ) offline_algopass.push_back( 1 ); else offline_algopass.push_back( 0 );
     if ( (*it).pass_prescale ) offline_prescalepass.push_back( 1 ); else offline_prescalepass.push_back( 0 );
@@ -426,7 +427,7 @@ void FEMemulator::clearVariables() {
   bnb = numi = ext = 0;
   offline_PHMAX.clear();
   offline_multiplicity.clear();
-  online_trigtick.clear();
+  offline_trigtick.clear();
   offline_weights.clear();
   offline_algonames.clear();
   offline_trigpass.clear();
