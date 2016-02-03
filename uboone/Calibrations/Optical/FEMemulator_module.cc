@@ -149,7 +149,7 @@ FEMemulator::FEMemulator(fhicl::ParameterSet const & p)
   fNChannels       = p.get<int>("NumberOfChannels");
   fFEMslot         = p.get<int>("FEMslot");
   fMinReadoutTicks = p.get<int>("MinReadoutTicks");
-  std::vector<std::string> triggertypes = p.get<std::vector<std::string>>("swtrg_algorithms");
+  std::vector<std::string> triggertypes = p.get<std::vector<std::string>>("swtrg_algotype");
   std::vector<std::string> triggernames = p.get<std::vector<std::string>>("swtrg_algonames");
   std::vector<unsigned int> triggerbits = p.get<std::vector<unsigned int>>("swtrg_bits");
   //size_t beam_window_size = p.get<size_t>( "swtrg_beam_window_size" );
@@ -374,8 +374,8 @@ void FEMemulator::analyze(art::Event const & evt)
       double dt = swtrig.getTimeSinceTrigger(i);
       std::string name = swtrig.getTriggerAlgorithm(i);
       float weight = swtrig.getPrescale(i);
-
-      std::cout << "  [" << pass << "] " << name << " PHMAX=" << phmax << " weight=" << weight << std::endl;
+      
+      std::cout << "  [" << pass << "] " << name << " tick=" << tick << " PHMAX=" << phmax << " weight=" << weight << std::endl;
       online_PHMAX.push_back( phmax );
       online_multiplicity.push_back( multi );
       online_weights.push_back( weight );
@@ -398,7 +398,9 @@ void FEMemulator::analyze(art::Event const & evt)
   for ( std::vector< trigger::Result >::iterator it=m_results.begin(); it!=m_results.end(); it++ ) {
     std::cout << "  [" << (*it).pass << "] "
 	      << (*it).algo_instance_name 
-	      << " algo=" << (*it).pass_algo << " ps=" << (*it).pass_prescale << " PHMAX=" << (*it).amplitude << " weight=" << (*it).prescale_weight << std::endl;
+	      << " algo=" << (*it).pass_algo << " ps=" << (*it).pass_prescale 
+	      << " tick=" << (*it).time
+	      << " PHMAX=" << (*it).amplitude << " weight=" << (*it).prescale_weight << std::endl;
     if ( (*it).algo_instance_name.find("FEM")!=std::string::npos ) {
       trigger::AlgoBase* pAlgo = &(m_algos.GetAlgo( (*it).algo_instance_name ));
       trigger::fememu::FEMBeamTriggerAlgo* pFEMalgo = dynamic_cast<trigger::fememu::FEMBeamTriggerAlgo*>(pAlgo);
