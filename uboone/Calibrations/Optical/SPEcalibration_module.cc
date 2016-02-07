@@ -25,6 +25,7 @@
 // C++ libraries
 #include <iostream>
 #include <vector>
+#include <set>
 #include <string>
 #include <cstdio>
 #include <cmath>
@@ -99,9 +100,11 @@ private:
 
   std::vector<unsigned short> flasher_adcs;
   std::vector<unsigned short> adcs;
-  std::vector<int>* event_nchfires;
-  std::vector<double>* event_lastcosmicwin;
-  std::vector<double>* event_lastsatcosmicwin;
+  std::vector<int>*   event_nchfires;
+  std::vector<float>* event_lastcosmicwin;
+  std::vector<float>* event_lastsatcosmicwin;
+  std::vector<float>*  event_mucs_pmtarea;
+  float event_mucs_totarea;
   int nsamples = 0;
   double event_maxamp;
 
@@ -127,6 +130,9 @@ private:
   std::string DAQHeaderModule;
   bool fHandleOwnTFile;
   bool fAutoSlot;
+  float fMuCS_tmin;
+  float fMuCS_tmax;
+  
 
   bool fOutputActive;
   TFile* fOutfile;
@@ -143,6 +149,9 @@ private:
 
   // Pulse Finding Mode
   void analyzePulseFindingMode( const art::Event& evt );
+
+  // MuCS prompt pe calcualtion
+  float calculate_mucs_pe( const art::Event& evt, std::vector<float>& mucs_pmtarea, float trig_timestamp );
 
   // overriding these
   // virtual void beginRun(Run const&){}
@@ -184,13 +193,16 @@ SPEcalibration::SPEcalibration(fhicl::ParameterSet const& p)
   cfd_deadtime     = p.get<unsigned short>( "CFDDeadtime", 20 );           // deadtime for pulse-finding algorithm in ticks
   cfd_width        = p.get<unsigned short>( "CFDWidth", 20 );              // width for pulse-finding algorithm in ticks
   AVESPE_RMSLIMIT  = p.get<double>( "AveSPEBaselineRMScut", 2.0 );         // cut to use when selecting pulses to make average SPE waveforms
-  fHandleOwnTFile  = p.get<bool>( "HandleOwnTFile", false );                // module manages its own rootfiles instead of using TFileService
+  fHandleOwnTFile  = p.get<bool>( "HandleOwnTFile", false );               // module manages its own rootfiles instead of using TFileService
   fAutoSlot        = p.get<bool>( "AutoFindWaveformSlot", true );          // if true, automatically determins slot to get waveform (to handle 2 or 3 FEM)
+  fMuCS_tmin       = p.get<float>( "MuCSMinTime", -1.1 );                   // time cut to select MuCS discriminator windows
+  fMuCS_tmax       = p.get<float>( "MuCSMaxTime", -0.9 );                   // time cut to select MuCS discriminator windows
 
   // Data for each Beam Window
   event_nchfires = new std::vector<int>;
-  event_lastcosmicwin = new std::vector<double>;
-  event_lastsatcosmicwin = new std::vector<double>;
+  event_lastcosmicwin = new std::vector<float>;
+  event_lastsatcosmicwin = new std::vector<float>;
+  event_mucs_pmtarea = new std::vector<float>;
 
   if ( !fHandleOwnTFile ) {
     // User TFileService
@@ -260,18 +272,20 @@ void SPEcalibration::CloseoutTFile( TFile* file ) {
   if (!fOutputActive)
     return;
 
-  std::cout << "[SPEcalibration] Closeout TFile" << std::endl;
-  fOutDir->cd();
-  fOutDir->ls();
-  fTouttree->Write();
-  fTpulsetree->Write();
-  fTevent->Write();
-  for (int i=0; i<32; i++) {
-    hSPE_ave[i]->Write();
-    hSPE_norm[i]->Write();
+  if ( fHandleOwnTFile ) {
+    std::cout << "[SPEcalibration] Closeout TFile" << std::endl;
+    fOutDir->cd();
+    fOutDir->ls();
+    fTouttree->Write();
+    fTpulsetree->Write();
+    fTevent->Write();
+    for (int i=0; i<32; i++) {
+      hSPE_ave[i]->Write();
+      hSPE_norm[i]->Write();
+    }
+    file->Close();
+    fOutputActive = false;
   }
-  file->Close();
-  fOutputActive = false;
 }
 
 void SPEcalibration::endJob() {
@@ -324,8 +338,10 @@ void SPEcalibration::SetupBranches() {
   fTevent->Branch("wfm_unixtime", &wfm_unixtime, "wfm_unixtime/D" );
   fTevent->Branch("chmaxamp", &event_maxamp, "chmaxamp/D");
   fTevent->Branch("nchfires", "vector<int>", &event_nchfires );
-  fTevent->Branch("dt_lastcosmicwin_usec",    "vector<double>", &event_lastcosmicwin );
-  fTevent->Branch("dt_lastsatcosmicwin_usec", "vector<double>", &event_lastsatcosmicwin );
+  fTevent->Branch("dt_lastcosmicwin_usec",    "vector<float>", &event_lastcosmicwin );
+  fTevent->Branch("dt_lastsatcosmicwin_usec", "vector<float>", &event_lastsatcosmicwin );
+  fTevent->Branch("mucs_pmtarea", "vector<float>", &event_mucs_pmtarea );
+  fTevent->Branch("mucs_totarea", &event_mucs_totarea, "mucs_totarea/F" );
 
   // Tree for PMT slam events (planned)
   // fTslam = out_file->make<TTree>("slamtree", "Data about fully staurated PMT events" );
@@ -505,6 +521,9 @@ void SPEcalibration::anayzeLEDPulserMode(const art::Event& evt)
 
 void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
 {
+  // Here, the SPE is found using pulses detected with a simple constant fraction discriminator
+  // We also calculate a number of quantites for PMT monitoring
+
   // initialize data handles and services
   art::ServiceHandle<geo::UBOpReadoutMap> ub_PMT_channel_map;
   art::ServiceHandle<util::TimeService> ts;
@@ -528,6 +547,8 @@ void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
   event_lastcosmicwin->resize( 32, 1.0 );
   event_lastsatcosmicwin->clear();
   event_lastsatcosmicwin->resize( 32, 1.0 );
+  event_mucs_pmtarea->resize( 32, 0.0 );
+  event_mucs_totarea = 0.0;
   nsamples = 0;
 
   // get trigger time
@@ -544,18 +565,6 @@ void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
   const raw::Trigger& trig = trigvec.at(0);
 
   // From uboone/RawData/util/LArRawInputDriverUBooNE.cxx
-  // uint32_t trig_bits = trig_data.getPMTTrigData();
-  // if( trig_data.Trig_PC()       ) trig_bits += ( 0x1 << ::trigger::kTriggerPC    );
-  // if( trig_data.Trig_EXT()      ) trig_bits += ( 0x1 << ::trigger::kTriggerEXT   );
-  // if( trig_data.Trig_Active()   ) trig_bits += ( 0x1 << ::trigger::kActive       );
-  // if( trig_data.Trig_Gate1()    ) trig_bits += ( 0x1 << ::trigger::kTriggerNuMI  );
-  // if( trig_data.Trig_Gate2()    ) trig_bits += ( 0x1 << ::trigger::kTriggerBNB   );
-  // if( trig_data.Trig_Veto()     ) trig_bits += ( 0x1 << ::trigger::kVeto         );
-  // if( trig_data.Trig_Calib()    ) trig_bits += ( 0x1 << ::trigger::kTriggerCalib );
-  // if( trig_data.Trig_GateFake() ) trig_bits += ( 0x1 << ::trigger::kFakeGate     );
-  // if( trig_data.Trig_BeamFake() ) trig_bits += ( 0x1 << ::trigger::kFakeBeam     );
-  // if( trig_data.Trig_Spare1()   ) trig_bits += ( 0x1 << ::trigger::kSpare        );
-
   triggerbit = trig.TriggerBits();
   for (int i=0; i<10; i++)
     trigs[i] = 0;
@@ -570,6 +579,9 @@ void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
   trigs[8] = triggerbit & ( 0x1 << ::trigger::kFakeBeam );
   trigs[9] = triggerbit & ( 0x1 << ::trigger::kSpare );
 
+  if ( trigs[9]!=0 )
+    event_mucs_totarea = calculate_mucs_pe( evt, (*event_mucs_pmtarea), trig_timestamp );
+
   // auto-slot
   unsigned int autoslot = 0;
   if ( fAutoSlot ) {
@@ -580,6 +592,7 @@ void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
     autoslot = s;
   }
   
+  // Loop through Optical waveforms
   // get channel maxamp and other event related info
   for(auto &wfm : opwfms)  {
     readout_ch = wfm.ChannelNumber();
@@ -715,5 +728,65 @@ void SPEcalibration::analyzePulseFindingMode(const art::Event& evt)
   fTevent->Fill();
 }
 
+float SPEcalibration::calculate_mucs_pe( const art::Event& evt, std::vector<float>& mucs_pmtarea, float trig_timestamp ) {
+
+  std::cout << "[SPE Calibration] Calculate MuCS area" << std::endl;
+
+  mucs_pmtarea.resize(32,0.0);
+  art::Handle< std::vector< raw::OpDetWaveform > > hgHandle;
+  art::Handle< std::vector< raw::OpDetWaveform > > lgHandle;
+  evt.getByLabel( OpDataModule, "OpdetCosmicHighGain", hgHandle);
+  evt.getByLabel( OpDataModule, "OpdetBeamLowGain",  lgHandle);
+  
+  std::set<int> use_these_lowgain_channels;
+  std::vector<raw::OpDetWaveform> const& hgwfms(*hgHandle);
+  for (auto &wfm : hgwfms)  {
+    int readout_ch = (int)wfm.ChannelNumber();
+    if ( readout_ch%100>=32 )
+      continue;
+    float dt_usec = wfm.TimeStamp()-trig_timestamp;
+    std::cout << " ch=" << readout_ch << " dt=" << dt_usec << std::endl;
+    if ( dt_usec>=fMuCS_tmin  && dt_usec<=fMuCS_tmax ) {
+      // Candidate MuCS window
+      int femch = readout_ch%100;
+      auto maxelem = std::max_element( wfm.begin(), wfm.end() );
+      if ( (int)(*maxelem)>4090 ) {
+	use_these_lowgain_channels.insert( femch );
+      }
+      else {
+	float area = 0;
+	for ( auto &adc : wfm ) {
+	  area += (adc-2047);
+	}
+	mucs_pmtarea.at(femch) = area;
+      }
+    }
+  }
+
+  // if we saturated any high gain MuCS cosmics disc. windows, we fill it here
+  if ( use_these_lowgain_channels.size()>0 ) {
+    std::vector<raw::OpDetWaveform> const& lgwfms(*lgHandle);
+    for (auto &wfm : lgwfms)  {
+      int readout_ch = (int)wfm.ChannelNumber();
+      int femch = readout_ch%100;
+      if ( femch>=32 )
+	continue;
+      if ( use_these_lowgain_channels.find( femch )==use_these_lowgain_channels.end() ) continue;
+      float dt_usec = wfm.TimeStamp()-trig_timestamp;
+      if ( dt_usec>=fMuCS_tmin  && dt_usec<=fMuCS_tmax ) {
+	float area = 0;
+        for ( auto &adc : wfm ) {
+          area += (adc-2047);
+        }
+	mucs_pmtarea.at(femch) = area*10.0;
+      }
+    }
+  }
+  
+  float tot = 0.0;
+  for ( auto &pmtarea : mucs_pmtarea ) 
+    tot += pmtarea;
+  return tot;
+}
 
 DEFINE_ART_MODULE(SPEcalibration)

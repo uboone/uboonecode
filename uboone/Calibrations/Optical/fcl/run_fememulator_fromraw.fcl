@@ -19,8 +19,9 @@ microboone_SPEcalibration:
     module_type: SPEcalibration
     OpDataModule: "pmtreadout"
     LogicChannel: 39
-    LogicSlot: 4
+    LogicSlot: 5
     LogicThreshold: 200
+    WaveformSlot: 4
     WindowMinSize: 500
     LeadingBaselineStart: 0
     LeadingBaselineEnd: 180
@@ -30,6 +31,9 @@ microboone_SPEcalibration:
     PulseEnd: 210
     SaveAverageSPE: true
     AveSPEBaselineRMScut: 1.0
+    HandleOwnTFile: false
+    MuCSMinTime: -1.1
+    MuCSMaxTime: -0.9
 
     UsePulseFinder: true
     CFDThreshold: 5
@@ -140,7 +144,7 @@ microboone_fememulator:
     OpDataModule: "pmtreadout"
     NumberOfChannels: 32
     FEMslot: 4
-    MinReadoutTicks: 1100
+    MinReadoutTicks: 500
     @table::software_trg
 }
 
@@ -244,13 +248,13 @@ physics:
 
  common: [ triggerEnforcement, opflash  ] 
  trigger_paths: [ common ]
-  #stream1: []
- stream1: [ rawnotpc ]
+ stream1: []
+ #stream1: [ rawnotpc ]
  analyzeIt: [femsoft, specalib]
 
  #end_paths is a keyword and contains the paths that do not modify the art::Event,
  #ie analyzers and output streams.  these all run simultaneously
- end_paths:     [ stream1, analyzeIt ]
+ end_paths:     [ analyzeIt ]
 
 }
 
