@@ -8,7 +8,7 @@
 #include "cluster_microboone.fcl"
 #include "trackfindermodules_microboone.fcl"
 #include "opticaldetectormodules_microboone.fcl"
-#include "triggeralgo_service.fcl"
+### # include "triggeralgo_service.fcl"
 #include "cosmicremovalmodules.fcl"
 #include "calorimetry_microboone.fcl"
 #include "particleid_microboone.fcl"
@@ -78,6 +78,10 @@ microboone_reco_data_producers:
   fuzzycluster:                @local::microboone_fuzzycluster
   fuzzyclustermerger:          @local::microboone_fuzzyclustermerger
   linecluster:                 @local::microboone_linecluster
+  cluster3d:                   @local::microboone_cluster3d
+  
+  ### cosmic tagger for cluster3d
+  cluster3dpcatag:             @local::microboone_cosmicpcaxistagger
 
   ### pandora cosmic pass
   pandoraCosmic:               @local::microboone_pandora
@@ -110,6 +114,7 @@ microboone_reco_data_producers:
   ### track fit producers
   trackkalmanhit:              @local::microboone_track3Dkalmanhit        # Track fit for fuzzy cluster
   trackkalmanhitcc:            @local::microboone_track3Dkalmanhit        # Track fit for Cluster Crawler (Track Maker)
+  trackkalmanhitc3d:           @local::microboone_track3Dkalmanhit        # Track fit for Cluster 3D
   
   ### track stitching
   stitchkalmanhit:             @local::microboone_trackstitcher
@@ -124,18 +129,21 @@ microboone_reco_data_producers:
   stitchkalmanhitcalo:         @local::microboone_calomc
   trackkalmanhitcalocc:        @local::microboone_calomc                  # Calorimeter for Cluster Crawler
   stitchkalmanhitcalocc:       @local::microboone_calomc
+  trackkalmanhitcaloc3d:       @local::microboone_calomc                  # Calorimeter for Cluster 3D
 
   ### PID producers
   trackkalmanhitpid:           @local::microboone_chi2pid
   stitchkalmanhitpid:          @local::microboone_chi2pid
   trackkalmanhitpidcc:         @local::microboone_chi2pid
   stitchkalmanhitpidcc:        @local::microboone_chi2pid
+  trackkalmanhitpidc3d:        @local::microboone_chi2pid
 
   ### track-tagging producers
   trackkalmanhittag:           @local::microboone_cosmictracktagger
   stitchkalmanhittag:          @local::microboone_cosmictracktagger
   trackkalmanhittagcc:         @local::microboone_cosmictracktagger
   stitchkalmanhittagcc:        @local::microboone_cosmictracktagger
+  trackkalmanhittagc3d:        @local::microboone_cosmictracktagger
 
 }
 
@@ -176,6 +184,15 @@ microboone_reco_data_fuzzytracks: [      trackkalmanhit,
 
 microboone_reco_data_fuzzypath: [        @sequence::microboone_reco_data_fuzzycluster,
                                          @sequence::microboone_reco_data_fuzzytracks ]
+
+microboone_reco_data_cluster3d:    [     cluster3d,
+                                         cluster3dpcatag ]
+
+microboone_reco_data_c3dtracks:    [     trackkalmanhitc3d,
+                                         trackkalmanhitcaloc3d,
+                                         trackkalmanhitpidc3d,
+                                         trackkalmanhittagc3d,
+                                         trackkalmanhitflashmatchc3d ]
 
 microboone_reco_data_clustercrawler: [   linecluster ]
 
@@ -222,7 +239,7 @@ microboone_reco_data: [                  rns,
 microboone_reco_data_stage1: [           rns,
                                          @sequence::microboone_reco_data_optical,
                                          @sequence::microboone_reco_data_signalprocessing,
-                                         @sequence::microboone_reco_data_fuzzypath ]
+                                         @sequence::microboone_reco_data_cluster3d ]
 
 microboone_reco_data_stage2: [           rns,
                                          @sequence::microboone_reco_data_pandora,
@@ -387,5 +404,28 @@ microboone_reco_data_producers.pandoraNuKHitFlashMatch.BeamFlashTrackMatchAlgPar
 
 microboone_reco_data_producers.showerrecofuzzy.InputProducer:                    "fuzzyclustermerger"
 microboone_reco_data_producers.showerrecopandora.InputProducer:                  "pandoraNu"
+
+# Cluster3D related
+physics.producers.trackkalmanhitc3d.HitModuleLabel:               "gaushit"
+physics.producers.trackkalmanhitc3d.ClusterModuleLabel:           "cluster3d"
+physics.producers.trackkalmanhitc3d.PFParticleModuleLabel:        "cluster3d"
+physics.producers.trackkalmanhitc3d.UseClusterHits:               true
+physics.producers.trackkalmanhitc3d.UsePFParticleHits:            false
+
+physics.producers.trackkalmanhitcaloc3d.TrackModuleLabel:         "trackkalmanhitc3d"
+physics.producers.trackkalmanhitcaloc3d.SpacePointModuleLabel:    "trackkalmanhitc3d"
+
+physics.producers.trackkalmanhitpidc3d.CalorimetryModuleLabel:    "trackkalmanhitcaloc3d"
+physics.producers.trackkalmanhitpidc3d.TrackModuleLabel:          "trackkalmanhitc3d"
+
+physics.producers.trackkalmanhittagc3d.ClusterModuleLabel:        "cluster3d"
+physics.producers.trackkalmanhittagc3d.TrackModuleLabel:          "trackkalmanhitc3d"
+
+physics.producers.trackkalmanhitflashmatchc3d.TrackModuleLabel:      "trackkalmanhitc3d"
+physics.producers.trackkalmanhitflashmatchc3d.FlashModuleLabel:      "opflash"
+physics.producers.trackkalmanhitflashmatchc3d.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
+
+physics.producers.cluster3dpcatag.PFParticleModuleLabel:         "cluster3d"
+physics.producers.cluster3dpcatag.PCAxisModuleLabel:             "cluster3d"
 
 END_PROLOG
