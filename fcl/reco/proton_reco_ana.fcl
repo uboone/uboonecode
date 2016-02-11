@@ -1,0 +1,25 @@
+## proton reco analyzer
+#include "protonanalyzer_microboone.fcl"
+
+process_name: ProtonRecoAnalyzer
+
+services:
+{
+  scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
+  # Load the service that manages root files for histograms.
+  TFileService: { fileName: "proton_ana.root" }
+  Timing:       {}
+  SimpleMemoryCheck:     { ignoreTotal: 1 } # default is one
+  #message:      @local::microboone_message_services_prod_debug
+  #FileCatalogMetadata:  @local::art_file_catalog_mc
+  #user:         @local::microboone_services_ana
+}
+
+physics:
+{
+  ana:        [ protonanalyzer ]
+  end_paths:  [ana]
+}
+
+physics.analyzers.protonanalyzer:   @local::microboone_protonanalyzer
+
