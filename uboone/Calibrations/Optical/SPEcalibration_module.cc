@@ -142,6 +142,7 @@ private:
   TTree* fTevent;
   TH1D** hSPE_ave;
   TH1D** hSPE_norm;
+  TH1D* hmucs_twin;
   int hspe_nfills[32];
 
   // LED Pulser Mode
@@ -195,8 +196,8 @@ SPEcalibration::SPEcalibration(fhicl::ParameterSet const& p)
   AVESPE_RMSLIMIT  = p.get<double>( "AveSPEBaselineRMScut", 2.0 );         // cut to use when selecting pulses to make average SPE waveforms
   fHandleOwnTFile  = p.get<bool>( "HandleOwnTFile", false );               // module manages its own rootfiles instead of using TFileService
   fAutoSlot        = p.get<bool>( "AutoFindWaveformSlot", true );          // if true, automatically determins slot to get waveform (to handle 2 or 3 FEM)
-  fMuCS_tmin       = p.get<float>( "MuCSMinTime", -1.1 );                   // time cut to select MuCS discriminator windows
-  fMuCS_tmax       = p.get<float>( "MuCSMaxTime", -0.9 );                   // time cut to select MuCS discriminator windows
+  fMuCS_tmin       = p.get<float>( "MuCSMinTime", -1.200 );                   // time cut to select MuCS discriminator windows
+  fMuCS_tmax       = p.get<float>( "MuCSMaxTime", -0.800 );                   // time cut to select MuCS discriminator windows
 
   // Data for each Beam Window
   event_nchfires = new std::vector<int>;
@@ -224,6 +225,7 @@ SPEcalibration::SPEcalibration(fhicl::ParameterSet const& p)
     // Ave SPE waveform
     hSPE_ave = new TH1D*[32];
     hSPE_norm = new TH1D*[32];
+    hmucs_twin = out_file->make<TH1D>("mucs_twin","Time with respect to trigger of cosmics windows for MuCS events;microseconds",200, -10.0, 10.0 );
     for (int i=0; i<32; i++) {
       hspe_nfills[i] = 0;
       char hname[32];
@@ -265,6 +267,7 @@ void SPEcalibration::SetupTFile( TFile* file ) {
     for (int j=0;j<cfd_width;j++)
       hSPE_norm[i]->SetBinContent( j+1, 1.0 );
   }
+  hmucs_twin = new TH1D("mucs_twin","Time with respect to trigger of cosmics windows for MuCS events;microseconds",200, -10.0, 10.0 );
   fOutputActive = true;
 }
 
@@ -283,6 +286,7 @@ void SPEcalibration::CloseoutTFile( TFile* file ) {
       hSPE_ave[i]->Write();
       hSPE_norm[i]->Write();
     }
+    hmucs_twin->Write();
     file->Close();
     fOutputActive = false;
   }
@@ -745,11 +749,13 @@ float SPEcalibration::calculate_mucs_pe( const art::Event& evt, std::vector<floa
     if ( readout_ch%100>=32 )
       continue;
     float dt_usec = wfm.TimeStamp()-trig_timestamp;
-    std::cout << " ch=" << readout_ch << " dt=" << dt_usec << std::endl;
+    hmucs_twin->Fill( (double)dt_usec );
+    std::cout << " ch=" << readout_ch << " dt=" << dt_usec;
     if ( dt_usec>=fMuCS_tmin  && dt_usec<=fMuCS_tmax ) {
       // Candidate MuCS window
       int femch = readout_ch%100;
       auto maxelem = std::max_element( wfm.begin(), wfm.end() );
+      std::cout << " accepted";
       if ( (int)(*maxelem)>4090 ) {
 	use_these_lowgain_channels.insert( femch );
       }
@@ -761,6 +767,7 @@ float SPEcalibration::calculate_mucs_pe( const art::Event& evt, std::vector<floa
 	mucs_pmtarea.at(femch) = area;
       }
     }
+    std::cout <<  std::endl;
   }
 
   // if we saturated any high gain MuCS cosmics disc. windows, we fill it here
