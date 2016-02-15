@@ -1,0 +1,19 @@
+This is a temporary copy of SelectionTool repository. The original can be found here:
+
+https://github.com/larlight/larlite/tree/trunk/UserDev/SelectionTool
+
+... except currently only imports: OpT0Finder
+Taken from the tag ups_v04_36_00.
+
+*) No modification to the code under this temporary copy (directory uboonecode/uboone/LLSelectionTool) 
+is allowed except an import from the original github repository shown above based on a tagged release.
+Addition/modification to the original repository can be done at any time however one should note some 
+packages require passing of a unit test.
+
+*) This repository is meant to disappear once we release various packages via ups. Any code written that 
+uses this directory must expect a transition and users must accompany it smoothly. It is code user's 
+responsibility to do so (i.e. code carefully, do not hack in #include and lib dependency)
+
+Any question? Contact Kazu @ kazuhiro@nevis.columbia.edu
+
+Kazu
