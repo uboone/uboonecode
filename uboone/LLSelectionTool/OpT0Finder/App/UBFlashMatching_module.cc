@@ -18,9 +18,20 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "Utilities/AssociationUtil.h"
 #include "art/Persistency/Common/Assns.h"
+#include "art/Framework/Services/Optional/TFileService.h" 
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 
 
 #include <memory>
+//
+// ROOT fmwk includes
+//
+#include "TH1.h"
+#include "TH2.h"
+#include "TTree.h"
+#include "TLorentzVector.h"
+#include "TVector3.h"
+
 
 //
 // Basic stdlib includes
@@ -67,7 +78,7 @@ public:
   // Required functions.
   void produce(art::Event & e) override;
   void reconfigure(fhicl::ParameterSet const & p) override;
-
+  void beginJob();
 
 private:
 
@@ -77,12 +88,19 @@ private:
   ::flashana::LightPath _light_path_alg;
   std::string _track_producer_name; ///< Input recob::Track producer name
   std::string _flash_producer_name; ///< Input recob::OpFlash producer name
+  
+  ///Histogram Initializations
+  TH1D* fTrackIDCodeHist;
+  TH1D* fTrackPhiHist;
+  int fTrackID;
+  int fTrackPhi;
+
 
 };
 
 
 UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
-  : _mgr()
+  : _mgr() 
 // :
 // Initialize member data here.
 {
@@ -104,8 +122,8 @@ UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
   //
   _mgr.Configure(p);
   produces< std::vector<anab::FlashMatch> >();
-  produces< art::Assns <anab::FlashMatch, recob::Track> >();
-  produces< art::Assns <anab::FlashMatch, recob::OpFlash> >();
+//  produces< art::Assns <anab::FlashMatch, recob::Track> >();
+//  produces< art::Assns <anab::FlashMatch, recob::OpFlash> >();
   // Call appropriate produces<>() functions here.
 }
 
@@ -115,7 +133,19 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
   _flash_producer_name = p.get<std::string>("FlashProducer");
   return;
 }
+void UBFlashMatching::beginJob()
+{
+    // Access ART's TFileService, which will handle creating and writing
+    // histograms and n-tuples for us. 
+    art::ServiceHandle<art::TFileService> tfs;
+    
+    // Define the histograms. Putting semi-colons around the title
+    // causes it to be displayed as the x-axis label if the histogram
+    // is drawn.
+    fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
+    fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
+}
 
 void UBFlashMatching::produce(art::Event & e)
 {
@@ -126,9 +156,9 @@ void UBFlashMatching::produce(art::Event & e)
   //pointer to put onto event
   //
 
-  art::Ptr<std::vector<anab::FlashMatch> > flashmatch ( new std::vector<anab::FlashMatch>);
-  std::unique_ptr<art::Assns<anab::FlashMatch, recob::Track> > flashTrackAssociations( new art::Assns<anab::FlashMatch, recob::Track>);
-  std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash> > flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
+  std::unique_ptr<std::vector<anab::FlashMatch> > flashmatch ( new std::vector<anab::FlashMatch>);
+ // std::unique_ptr<art::Assns<anab::FlashMatch, recob::Track> > flashTrackAssociations( new art::Assns<anab::FlashMatch, recob::Track>);
+ // std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash> > flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
 
   //
   // Steps to be done:
@@ -162,12 +192,12 @@ void UBFlashMatching::produce(art::Event & e)
   //
 
   //  0-a) FlashArray_t
-  std::vector<recob::OpFlash> opflashPtrVec;
+ // std::vector<recob::OpFlash> opflashPtrVec;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
     auto const& opf = (*flashHandle)[opflash_index];
-    opflashPtrVec.push_back(opf);
+  //  opflashPtrVec.push_back(opf);
     ::flashana::Flash_t flash;
     flash.pe_v.resize(num_pmts);
     for(size_t pmt_index=0; pmt_index<num_pmts; ++pmt_index)
@@ -188,14 +218,18 @@ void UBFlashMatching::produce(art::Event & e)
   }
 
   //  0-b) QClusterArray_t
-  std::vector<recob::Track>  trackPtrVec;
+  //std::vector<recob::Track>  trackPtrVec;
   for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
     // Retrieve individual recob::Track and construct flashana::Flash_t
     auto const& track = (*trackHandle)[track_index];
-    trackPtrVec.push_back(track);
-
+   // trackPtrVec.push_back(track);
+    fTrackID = track.ID(); 
+    fTrackIDCodeHist->Fill(fTrackID);
+    fTrackPhi = track.Phi();
+    fTrackPhiHist->Fill(fTrackPhi);
+    
     // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
     ::geoalgo::Trajectory trj;
     // Set # points same as input track object, and initialize each point as 3D point
@@ -231,7 +265,7 @@ void UBFlashMatching::produce(art::Event & e)
   //  2) Store data products (anab::FlashMatch and associations)
   //
   
-  bool inbeam= true;
+  bool inbeam= true;	//should get this info from the fcl parameters. 
   for(auto const& match : match_result_v) {
     
     std::cout << "Match result ... "
@@ -242,8 +276,8 @@ void UBFlashMatching::produce(art::Event & e)
 	      << std::endl;
     flashmatch->push_back(::anab::FlashMatch((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam));
    }
-   util::CreateAssn(this, e, flashmatch, trackPtrVec, flashTrackAssociations); 
-   util::CreateAssn(this, e, flashmatch, opflashPtrVec, *flashOpFlashAssociations); 
+   //util::CreateAssn(this, e, flashmatch, trackPtrVec, flashTrackAssociations); 
+   //util::CreateAssn(this, e, flashmatch, opflashPtrVec, *flashOpFlashAssociations); 
    e.put(std::move(flashmatch));   
    //e.put(std::move(flashTrackAssociations));   
    //e.put(std::move(flashOpFlashAssociations));   
