@@ -16,6 +16,7 @@ art_make( BASENAME_ONLY
 		   TimeService_service
 		   MCBase
 		   RecoBase
+		   AnalysisBase
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -47,6 +48,7 @@ art_make( BASENAME_ONLY
 		   TimeService_service
 		   MCBase
 		   RecoBase
+		   AnalysisBase
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
