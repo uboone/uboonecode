@@ -167,10 +167,10 @@ void UBFlashMatching::produce(art::Event & e)
   //
 
   //art::Ptr<anab::FlashMatch>  flashmatch ( new anab::FlashMatch);
-  std::unique_ptr<std::vector<anab::FlashMatch> > flashmatchint ( new std::vector<anab::FlashMatch>);
-  std::unique_ptr<std::vector<anab::FlashMatch> > flashmatch ( new std::vector<anab::FlashMatch>);
-  std::unique_ptr<art::Assns<anab::FlashMatch, recob::Track> > flashTrackAssociations( new art::Assns<anab::FlashMatch, recob::Track>);
-  std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash> > flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
+  std::unique_ptr<std::vector<anab::FlashMatch>> flashmatchint ( new std::vector<anab::FlashMatch>);
+  std::unique_ptr<std::vector<anab::FlashMatch>> flashmatch ( new std::vector<anab::FlashMatch>);
+    std::unique_ptr<art::Assns<recob::Track, anab::FlashMatch>> flashTrackAssociations( new art::Assns<recob::Track, anab::FlashMatch>);
+  std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash>> flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
 
   //
   // Steps to be done:
@@ -284,8 +284,8 @@ void UBFlashMatching::produce(art::Event & e)
   
   bool inbeam= true;	//should get this info from the fcl parameters. 
  // const art::Ptr<recob::Track>  trackPtr;
-  int match_index;
-  size_t trackIdx = trackHandle->size();
+  size_t match_index;
+
   for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
      art::Ptr<recob::Track> track(trackHandle,track_index); 
       
@@ -293,7 +293,7 @@ void UBFlashMatching::produce(art::Event & e)
       match = match_result_v.at(match_index); 
       anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
       flashmatchint->push_back(Flash);
-      util::CreateAssn(*this, e, *flashmatchint, track,*flashTrackAssociations,fSpillName,trackIdx); 
+      util::CreateAssn(*this, e, *flashmatchint, track,*flashTrackAssociations,fSpillName);
       if(match_index<match_result_v.size()) ++match_index;
    }
    
