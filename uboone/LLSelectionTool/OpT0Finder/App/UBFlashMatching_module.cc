@@ -92,15 +92,18 @@ private:
   ///Histogram Initializations
   TH1D* fTrackIDCodeHist;
   TH1D* fTrackPhiHist;
+  //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
   int fTrackPhi;
-
+  std::string fSpillName;
 
 };
 
 
 UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
-  : _mgr() 
+  : EDProducer()
+  , _mgr() 
+   
 // :
 // Initialize member data here.
 {
@@ -121,9 +124,9 @@ UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
   // Now configure FlashMatchManager (which configures algorithms as well)
   //
   _mgr.Configure(p);
-  produces< std::vector<anab::FlashMatch> >();
-//  produces< art::Assns <anab::FlashMatch, recob::Track> >();
-//  produces< art::Assns <anab::FlashMatch, recob::OpFlash> >();
+  produces< std::vector<anab::FlashMatch> >(fSpillName);
+  produces< art::Assns <anab::FlashMatch, recob::Track> >(fSpillName);
+  produces< art::Assns <anab::FlashMatch, recob::OpFlash> >(fSpillName);
   // Call appropriate produces<>() functions here.
 }
 
@@ -131,6 +134,13 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
 {
   _track_producer_name = p.get<std::string>("TrackProducer");
   _flash_producer_name = p.get<std::string>("FlashProducer");
+   fSpillName.clear();
+   size_t pos = _track_producer_name.find(":");
+   if( pos!=std::string::npos ) {
+      fSpillName = _track_producer_name.substr( pos+1 );
+      _track_producer_name = _track_producer_name.substr( 0, pos );
+    }
+
   return;
 }
 void UBFlashMatching::beginJob()
@@ -156,9 +166,11 @@ void UBFlashMatching::produce(art::Event & e)
   //pointer to put onto event
   //
 
+  //art::Ptr<anab::FlashMatch>  flashmatch ( new anab::FlashMatch);
+  std::unique_ptr<std::vector<anab::FlashMatch> > flashmatchint ( new std::vector<anab::FlashMatch>);
   std::unique_ptr<std::vector<anab::FlashMatch> > flashmatch ( new std::vector<anab::FlashMatch>);
- // std::unique_ptr<art::Assns<anab::FlashMatch, recob::Track> > flashTrackAssociations( new art::Assns<anab::FlashMatch, recob::Track>);
- // std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash> > flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
+  std::unique_ptr<art::Assns<anab::FlashMatch, recob::Track> > flashTrackAssociations( new art::Assns<anab::FlashMatch, recob::Track>);
+  std::unique_ptr<art::Assns<anab::FlashMatch, recob::OpFlash> > flashOpFlashAssociations( new art::Assns<anab::FlashMatch, recob::OpFlash>);
 
   //
   // Steps to be done:
@@ -172,12 +184,15 @@ void UBFlashMatching::produce(art::Event & e)
   // Step -1): Get necessary data products from fmwk
   //
   art::Handle< std::vector<recob::Track> > trackHandle;
-  e.getByLabel(_track_producer_name,trackHandle);
+  e.getByLabel(_track_producer_name,fSpillName, trackHandle);
   if(!trackHandle.isValid()) {
     std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::Track from " 
 	      << _track_producer_name << std::endl;
     throw std::exception();
   }
+  std::vector< art::Ptr<recob::Track> > tracks;
+  art::fill_ptr_vector(tracks, trackHandle);
+
 
   art::Handle< std::vector<recob::OpFlash> > flashHandle;
   e.getByLabel(_flash_producer_name,flashHandle);
@@ -186,13 +201,15 @@ void UBFlashMatching::produce(art::Event & e)
 	      << _flash_producer_name << std::endl;
     throw std::exception();
   }
+  std::vector< art::Ptr<recob::OpFlash> > flashes;
+  art::fill_ptr_vector(flashes, flashHandle);
 
   //
   //  0) Provide input to FlashMatchManager: FlashArray_t and QClusterArray_t
   //
 
   //  0-a) FlashArray_t
- // std::vector<recob::OpFlash> opflashPtrVec;
+  //art::Ptr<recob::OpFlash> opflashPtrVec;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -216,15 +233,15 @@ void UBFlashMatching::produce(art::Event & e)
     // Register to a manager
     _mgr.Emplace(std::move(flash));
   }
+//  size_t opflashsize = opf.size();
 
   //  0-b) QClusterArray_t
-  //std::vector<recob::Track>  trackPtrVec;
   for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
     // Retrieve individual recob::Track and construct flashana::Flash_t
     auto const& track = (*trackHandle)[track_index];
-   // trackPtrVec.push_back(track);
+    // trackPtrVec.push_back(track);
     fTrackID = track.ID(); 
     fTrackIDCodeHist->Fill(fTrackID);
     fTrackPhi = track.Phi();
@@ -254,7 +271,7 @@ void UBFlashMatching::produce(art::Event & e)
     
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
-  } 
+  }
 
   //
   //  1) Run FlashMatchManager & retrieve matches  
@@ -266,19 +283,39 @@ void UBFlashMatching::produce(art::Event & e)
   //
   
   bool inbeam= true;	//should get this info from the fcl parameters. 
-  for(auto const& match : match_result_v) {
-    
-    std::cout << "Match result ... "
-	      << "Flash ID: " << match.flash_id
-	      << " with "
-	      << "TPC ID: " << match.tpc_id
-	      << " ... Score: " << match.score
-	      << std::endl;
-    flashmatch->push_back(::anab::FlashMatch((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam));
+ // const art::Ptr<recob::Track>  trackPtr;
+  int match_index;
+  size_t trackIdx = trackHandle->size();
+  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+     art::Ptr<recob::Track> track(trackHandle,track_index); 
+      
+      ::flashana::FlashMatch_t match; 
+      match = match_result_v.at(match_index); 
+      anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+      flashmatchint->push_back(Flash);
+      util::CreateAssn(*this, e, *flashmatchint, track,*flashTrackAssociations,fSpillName,trackIdx); 
+      if(match_index<match_result_v.size()) ++match_index;
    }
-   //util::CreateAssn(this, e, flashmatch, trackPtrVec, flashTrackAssociations); 
-   //util::CreateAssn(this, e, flashmatch, opflashPtrVec, *flashOpFlashAssociations); 
-   e.put(std::move(flashmatch));   
+   
+     for(auto const& match : match_result_v) {
+	std::cout << "Match result ... "
+	          << "Flash ID: " << match.flash_id
+		  << " with "
+		  << "TPC ID: " << match.tpc_id
+		  << " ... Score: " << match.score
+      		  << std::endl;
+      anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+      flashmatch->push_back(Flash);
+  }
+  //auto const& track = (*trackHandle)[track_index];
+//  trackPtr = track; 
+ //  }
+ /* for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
+
+    art::Ptr<recob::OpFlash> flash(flashHandle, opflash_index); 
+     util::CreateAssn(*this, e, *flashmatch, flash, *flashOpFlashAssociations, opflashsize); 
+   }*/
+   e.put(std::move(flashmatch),fSpillName);   
    //e.put(std::move(flashTrackAssociations));   
    //e.put(std::move(flashOpFlashAssociations));   
 }
