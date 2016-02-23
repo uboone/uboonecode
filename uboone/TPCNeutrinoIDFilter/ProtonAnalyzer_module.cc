@@ -33,7 +33,12 @@
 #include "Utilities/LArProperties.h"
 #include "Utilities/AssociationUtil.h"
 #include "Utilities/DetectorProperties.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 #include "SimpleTypesAndConstants/geo_types.h"
+#include "Simulation/SimChannel.h"
+#include "Simulation/sim.h"
+#include "CalibrationDBI/Interface/IChannelStatusService.h"
+#include "CalibrationDBI/Interface/IChannelStatusProvider.h"
 
 // LArSoft data definitions
 #include "RecoBase/Track.h"
@@ -75,6 +80,7 @@ private:
   float       faverageintcharge;
   float       ftotalintcharge;
   float       fclosestfriend;
+  float       ftrackphi;
 };
 
 
@@ -92,7 +98,22 @@ void ProtonAnalyzer::analyze(const art::Event& e)
   // Recover the handles to the track collection we want to analyze.
   art::Handle< std::vector<recob::Track> > trackVecHandle;
   e.getByLabel(fTrackModuleLabel, trackVecHandle);
-  
+ 
+  // Find dead wires to avoid
+  const lariov::IChannelStatusProvider& ChannelStatusProvider 
+     = art::ServiceHandle<lariov::IChannelStatusService>()->GetProvider();
+
+  std::vector<unsigned int> deadwires;
+  art::ServiceHandle<geo::Geometry> geo;
+  const size_t N_CHANNELS = geo->Nchannels();
+  for(unsigned int chan = 0; chan < N_CHANNELS; chan++) {
+    if(ChannelStatusProvider.IsBad(chan) || !ChannelStatusProvider.IsPresent(chan))
+    {
+      deadwires.push_back(chan);
+      std::cout << "deadwire: " << chan << std::endl;
+    }
+    std::cout << "total dead (or missing) wires found " << deadwires.size() << std::endl;
+  }
 
   // Require valid handle, otherwise nothing to do
   if (trackVecHandle.isValid())
@@ -122,6 +143,8 @@ void ProtonAnalyzer::analyze(const art::Event& e)
         }
         // Get track length
         ftracklen = track->Length();
+        // Get track phi
+        ftrackphi = track->Phi();
         // Check average charge
         if (!hitVec.empty())
         {
@@ -188,6 +211,7 @@ void ProtonAnalyzer::beginJob()
   fProtonTracks = tfs->make<TTree>("ProtonTracks","ProtonTracks");
   fProtonTracks->Branch("event", &fevent, "event/I");
   fProtonTracks->Branch("tracklen", &ftracklen, "tracklen/F");
+  fProtonTracks->Branch("trackphi", & ftrackphi, "trackphi/F");
   fProtonTracks->Branch("averageintcharge", &faverageintcharge, "averageintcharge/F");
   fProtonTracks->Branch("totalintcharge", &ftotalintcharge, "totalintcharge/F");
   fProtonTracks->Branch("closestfriend", &fclosestfriend, "closestfriend/F");
