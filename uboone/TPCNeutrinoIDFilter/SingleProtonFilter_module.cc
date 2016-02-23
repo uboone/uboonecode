@@ -113,6 +113,11 @@ bool SingleProtonFilter::filter(art::Event & e)
         // Get assocciated clusters
         std::vector<art::Ptr<recob::Hit> > hitVec = hitAssns.at(track.key());
         pass = testTrack(track, cosmicVec, hitVec, e);
+        if(pass)
+        {
+          std::cout << "track vertex z: " << track->Vertex().Z() << std::endl;
+          std::cout << "track vertex y: " << track->Vertex().Y() << std::endl;
+        }
         trackIdx++;
       }
     }

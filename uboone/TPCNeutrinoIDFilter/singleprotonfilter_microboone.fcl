@@ -8,8 +8,8 @@ microboone_singleprotonfilter:
  ClusterAssocLabel:        "trackkalmanhitc3d"
  HitAssocLabel:            "trackkalmanhitc3d"
  MaxCosmicScore:           0.4
- MaxLength:                30.
- MinCharge:                75.
+ MaxLength:                10.
+ MinCharge:                400.
  MinStartDist:             10.
 }
 
