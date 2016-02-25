@@ -17,8 +17,6 @@ art_make( BASENAME_ONLY
 		   MCBase
 		   RecoBase
 		   AnalysisBase
-     DetectorProperties
-     DetectorProperties_service
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -51,8 +49,6 @@ art_make( BASENAME_ONLY
 		   MCBase
 		   RecoBase
 		   AnalysisBase
-     DetectorProperties
-     DetectorProperties_service
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}

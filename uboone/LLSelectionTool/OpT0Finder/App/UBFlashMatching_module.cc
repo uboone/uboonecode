@@ -59,7 +59,7 @@
 //
 // Drift velocity includes
 //
-#include "DetectorInfo/DetectorProperties.h"
+#include "Utilities/LArProperties.h"
 
 
 class UBFlashMatching;
@@ -93,7 +93,11 @@ private:
   ::flashana::LightPath _light_path_alg;
   std::string _track_producer_name; ///< Input recob::Track producer name
   std::string _flash_producer_name; ///< Input recob::OpFlash producer name
-  
+ 
+  //DetectorProperties
+  //const util::LArProperties& detp;
+
+ 
   ///Histogram Initializations
   TH1D* fTrackIDCodeHist;
   TH1D* fTrackPhiHist;
@@ -114,7 +118,8 @@ private:
 
 UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
   : EDProducer()
-  , _mgr() 
+  , _mgr()
+  //, detp(art::ServiceHandle<util::LArProperties>()) 
    
 // :
 // Initialize member data here.
@@ -223,7 +228,7 @@ void UBFlashMatching::produce(art::Event & e)
   //
 
   //  0-a) FlashArray_t
-  //art::Ptr<recob::OpFlash> opflashPtrVec;
+  std::vector<flashana::Flash_t> opflashVec;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -246,6 +251,7 @@ void UBFlashMatching::produce(art::Event & e)
     
     // Register to a manager
     _mgr.Emplace(std::move(flash));
+    opflashVec.push_back(flash);
   }
 //  size_t opflashsize = opf.size();
 
@@ -302,8 +308,8 @@ void UBFlashMatching::produce(art::Event & e)
  // size_t match_flash_index = 0;
 
   
-  //auto const* detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  auto const* detp = art::ServiceHandle<util::DetectorProperties>();
+  //auto const* detp = art::ServiceHandle<util::LArProperties>();
+  art::ServiceHandle<util::LArProperties> detp;
 
   const double driftVelocity = detp->DriftVelocity( detp->Efield(), detp->Temperature() );
 
@@ -329,9 +335,10 @@ void UBFlashMatching::produce(art::Event & e)
     else
     {
       fTrackMomentum_Matched->Fill(track->EndMomentum());
+      std::cout<<"track->EndMomentum: "<<track->EndMomentum();
       double driftpos = track->LocationAtPoint(0).X();
       double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
-      double flashtime = flash.at(match.flash_id)->time();
+      double flashtime = opflashVec.at(match.flash_id).time;
       if (abs(drifttime - flashtime) < 120.0)
         fTrackMomentum_WellMatched->Fill(track->EndMomentum());
     }
