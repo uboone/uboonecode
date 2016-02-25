@@ -21,7 +21,6 @@
 #include "art/Framework/Services/Optional/TFileService.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 
-
 #include <memory>
 //
 // ROOT fmwk includes
@@ -56,6 +55,12 @@
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/PhotonLibHypothesis.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/LightPath.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Base/FlashMatchManager.h"
+
+//
+// Drift velocity includes
+//
+#include "DetectorInfo/DetectorProperties.h"
+
 
 class UBFlashMatching;
 
@@ -92,6 +97,13 @@ private:
   ///Histogram Initializations
   TH1D* fTrackIDCodeHist;
   TH1D* fTrackPhiHist;
+
+  TH1F *fTrackMomentum;
+  TH1F *fTrackMomentum_Matched;
+  TH1F *fTrackMomentum_WellMatched;
+  TH1F *fMatchingEfficiency;
+  TH1F *fMatchingPurity;
+
   //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
   int fTrackPhi;
@@ -155,6 +167,11 @@ void UBFlashMatching::beginJob()
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
+    fTrackMomentum             = tfs->make<TH1F>("trackE"            , "Track Energy"               , 20, 0, 2000);
+    fTrackMomentum_Matched     = tfs->make<TH1F>("trackE_matched"    , "Track Energy (Matched)"     , 20, 0, 2000);
+    fTrackMomentum_WellMatched = tfs->make<TH1F>("trackE_wellmatched", "Track Energy (Well Matched)", 20, 0, 2000);
+    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 2000);
+    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 2000);
 }
 
 void UBFlashMatching::produce(art::Event & e)
@@ -284,27 +301,45 @@ void UBFlashMatching::produce(art::Event & e)
  // size_t match_track_index = 0;
  // size_t match_flash_index = 0;
 
-  std::vector<::flashana::FlashMatch_t> match_v; 
-  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+  
+  //auto const* detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  auto const* detp = art::ServiceHandle<util::DetectorProperties>();
 
-      art::Ptr<recob::Track> track(trackHandle,track_index); 
-      
-      ::flashana::FlashMatch_t match; 
-      std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
-      std::cout<<"Size of flashmatch vector: "<<match_result_v.size()<<std::endl;
-      std::cout<<"Size of track vector: "     <<trackHandle->size()<<std::endl;
-      for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) {
-     	 match = match_result_v.at(match_index);
-	 std::cout<<"MatchID: "<<match.tpc_id<< " trackID: "<<track->ID()<<std::endl;
-         if((int)match.tpc_id==track->ID()) break; 
-      }
-      std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
-      if (match.tpc_id==::flashana::kINVALID_ID) std::cout<<"INVALID TPC_ID"<<std::endl;  
-      anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
-      
-      flashmatchtrack->push_back(Flash);
-      util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
-   }
+  const double driftVelocity = detp->DriftVelocity( detp->Efield(), detp->Temperature() );
+
+  std::vector<::flashana::FlashMatch_t> match_v; 
+  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) 
+  {
+    art::Ptr<recob::Track> track(trackHandle,track_index); 
+
+    fTrackMomentum->Fill(track->EndMomentum());
+    
+    ::flashana::FlashMatch_t match; 
+    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+    std::cout<<"Size of flashmatch vector: "<<match_result_v.size()<<std::endl;
+    std::cout<<"Size of track vector: "     <<trackHandle->size()<<std::endl;
+    for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) 
+    {
+      match = match_result_v.at(match_index);
+	     std::cout<<"MatchID: "<<match.tpc_id<< " trackID: "<<track->ID()<<std::endl;
+      if((int)match.tpc_id==track->ID()) break; 
+    }
+    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+    if (match.tpc_id==::flashana::kINVALID_ID) std::cout<<"INVALID TPC_ID"<<std::endl;  
+    else
+    {
+      fTrackMomentum_Matched->Fill(track->EndMomentum());
+      double driftpos = track->LocationAtPoint(0).X();
+      double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
+      double flashtime = flash.at(match.flash_id)->time();
+      if (abs(drifttime - flashtime) < 120.0)
+        fTrackMomentum_WellMatched->Fill(track->EndMomentum());
+    }
+    anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+    
+    flashmatchtrack->push_back(Flash);
+    util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
+  }
   
 
 /* 
