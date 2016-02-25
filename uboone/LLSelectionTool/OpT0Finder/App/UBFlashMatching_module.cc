@@ -43,6 +43,7 @@
 //
 #include "RecoBase/OpFlash.h"
 #include "RecoBase/Track.h"
+#include "RecoBase/Hit.h"
 #include "AnalysisBase/FlashMatch.h"
 
 //
@@ -102,9 +103,9 @@ private:
   TH1D* fTrackIDCodeHist;
   TH1D* fTrackPhiHist;
 
-  TH1F *fTrackMomentum;
-  TH1F *fTrackMomentum_Matched;
-  TH1F *fTrackMomentum_WellMatched;
+  TH1F *fTrackCharge;
+  TH1F *fTrackCharge_Matched;
+  TH1F *fTrackCharge_WellMatched;
   TH1F *fMatchingEfficiency;
   TH1F *fMatchingPurity;
 
@@ -172,11 +173,11 @@ void UBFlashMatching::beginJob()
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
-    fTrackMomentum             = tfs->make<TH1F>("trackE"            , "Track Energy"               , 20, 0, 2000);
-    fTrackMomentum_Matched     = tfs->make<TH1F>("trackE_matched"    , "Track Energy (Matched)"     , 20, 0, 2000);
-    fTrackMomentum_WellMatched = tfs->make<TH1F>("trackE_wellmatched", "Track Energy (Well Matched)", 20, 0, 2000);
-    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 2000);
-    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 2000);
+    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 20, 0, 400000);
+    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 20, 0, 400000);
+    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 20, 0, 400000);
+    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 400000);
+    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 400000);
 }
 
 void UBFlashMatching::produce(art::Event & e)
@@ -210,6 +211,13 @@ void UBFlashMatching::produce(art::Event & e)
   e.getByLabel(_track_producer_name,fSpillName, trackHandle);
   if(!trackHandle.isValid()) {
     std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::Track from " 
+	      << _track_producer_name << std::endl;
+    throw std::exception();
+  }
+
+  art::FindManyP<recob::Hit> trackHitAssns(trackHandle, e, _track_producer_name);
+  if(!trackHitAssns.isValid()) {
+    std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::Hit from " 
 	      << _track_producer_name << std::endl;
     throw std::exception();
   }
@@ -318,10 +326,19 @@ void UBFlashMatching::produce(art::Event & e)
   {
     art::Ptr<recob::Track> track(trackHandle,track_index); 
 
-    fTrackMomentum->Fill(track->EndMomentum());
+    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
+
+    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+    float charge=0;
+    for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
+    {
+
+    	charge += trackHitVec.at(hit_index)->Integral();
+    }
+    std::cout<<"Hit Charge: "<<charge<<std::endl;
+    fTrackCharge->Fill(charge);
     
     ::flashana::FlashMatch_t match; 
-    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
     std::cout<<"Size of flashmatch vector: "<<match_result_v.size()<<std::endl;
     std::cout<<"Size of track vector: "     <<trackHandle->size()<<std::endl;
     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) 
@@ -334,13 +351,13 @@ void UBFlashMatching::produce(art::Event & e)
     if (match.tpc_id==::flashana::kINVALID_ID) std::cout<<"INVALID TPC_ID"<<std::endl;  
     else
     {
-      fTrackMomentum_Matched->Fill(track->EndMomentum());
-      std::cout<<"track->EndMomentum: "<<track->EndMomentum();
+      fTrackCharge_Matched->Fill(charge);
+      std::cout<<"track-charge matched: "<<charge<<std::endl;
       double driftpos = track->LocationAtPoint(0).X();
       double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
       double flashtime = opflashVec.at(match.flash_id).time;
       if (abs(drifttime - flashtime) < 120.0)
-        fTrackMomentum_WellMatched->Fill(track->EndMomentum());
+        fTrackCharge_WellMatched->Fill(charge);
     }
     anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
     

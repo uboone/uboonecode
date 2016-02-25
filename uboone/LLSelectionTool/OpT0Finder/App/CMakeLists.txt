@@ -14,6 +14,7 @@ art_make( BASENAME_ONLY
 	   	   Simulation
 		   Utilities
 		   TimeService_service
+		   LArProperties_service
 		   MCBase
 		   RecoBase
 		   AnalysisBase
@@ -46,6 +47,7 @@ art_make( BASENAME_ONLY
 	   	   Simulation
 		   Utilities
 		   TimeService_service
+		   LArProperties_service
 		   MCBase
 		   RecoBase
 		   AnalysisBase
