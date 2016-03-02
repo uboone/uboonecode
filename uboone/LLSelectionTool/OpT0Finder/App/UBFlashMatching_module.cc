@@ -211,6 +211,7 @@ void UBFlashMatching::beginJob()
 
 void UBFlashMatching::produce(art::Event & e)
 {
+  _mgr.Reset();
   // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
   const size_t num_pmts = 32;
 
@@ -265,6 +266,7 @@ void UBFlashMatching::produce(art::Event & e)
 
   //  0-a) FlashArray_t
   std::vector<flashana::Flash_t> opflashVec;
+  int count = 1;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -273,8 +275,9 @@ void UBFlashMatching::produce(art::Event & e)
     ::flashana::Flash_t flash;
     flash.pe_v.resize(num_pmts);
     for(size_t pmt_index=0; pmt_index<num_pmts; ++pmt_index)
-      
+    {
       flash.pe_v[pmt_index] = opf.PE(pmt_index);
+    }
     
     flash.idx   = opflash_index;
     flash.time  = opf.Time();
@@ -284,10 +287,13 @@ void UBFlashMatching::produce(art::Event & e)
     flash.y_err = opf.YWidth();
     flash.z     = opf.ZCenter();
     flash.z_err = opf.ZWidth();
+
+    ::flashana::Flash_t flash_clone = flash;
+    opflashVec.push_back(flash_clone);
     
     // Register to a manager
     _mgr.Emplace(std::move(flash));
-    opflashVec.push_back(flash);
+    count++;
   }
 //  size_t opflashsize = opf.size();
 
@@ -372,13 +378,13 @@ void UBFlashMatching::produce(art::Event & e)
     fTrackPosYZ->Fill(startpos.Z(), startpos.Y());
     
     ::flashana::FlashMatch_t match; 
-    std::cout<<"Size of flashmatch vector: "<<match_result_v.size()<<std::endl;
-    std::cout<<"Size of track vector: "     <<trackHandle->size()<<std::endl;
     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) 
     {
       match = match_result_v.at(match_index);
-	     std::cout<<"MatchID: "<<match.tpc_id<< " trackID: "<<track->ID()<<std::endl;
-      if((int)match.tpc_id==track->ID()) break; 
+      if((int)match.tpc_id==track->ID()) 
+      {
+        break; 
+      }
     }
 
     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
@@ -398,7 +404,6 @@ void UBFlashMatching::produce(art::Event & e)
       fTrackPosYZ_Matched->Fill(startpos.Z(), startpos.Y());
       fTrackLight_Matched->Fill(light);
 
-      std::cout<<"track-charge matched: "<<charge<<std::endl;
       double driftpos = track->LocationAtPoint(0).X();
       double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
       double flashtime = opflashVec.at(match.flash_id).time;
