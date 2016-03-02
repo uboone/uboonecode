@@ -10,6 +10,7 @@ art_make( BASENAME_ONLY
 			RecoBase
 			RecoObjects  
 			RecoAlg
+			EventWeight
 			SignalShapingServiceMicroBooNE_service
                         ${SIMULATIONBASE}
                         ${LARRECO_LIB}

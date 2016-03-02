@@ -306,6 +306,7 @@
 #include "SimpleTypesAndConstants/geo_types.h"
 #include "RecoObjects/BezierTrack.h"
 #include "RecoAlg/TrackMomentumCalculator.h"
+#include "uboone/EventWeight/MCEventWeight.h"
 #include "AnalysisBase/CosmicTag.h"
 #include "AnalysisBase/FlashMatch.h"
 #include "AnalysisBase/T0.h"
@@ -338,6 +339,8 @@ constexpr int kMaxFlashes    = 1000;   //maximum number of flashes
 constexpr int kMaxShowerHits = 10000;  //maximum number of hits on a shower
 constexpr int kMaxTruth      = 10;     //maximum number of neutrino truth interactions
 constexpr int kMaxClusters   = 1000;   //maximum number of clusters;
+constexpr int kMaxSysts = 1000;   //maximum number of clusters;
+constexpr int kMaxWeights = 1000;   //maximum number of clusters;
 
 /// total_extent\<T\>::value has the total number of elements of an array
 template <typename T>
@@ -644,6 +647,11 @@ namespace microboone {
     Double_t     potbnb;             //pot per event (BNB E:TOR860)
     Double_t     potnumitgt;         //pot per event (NuMI E:TORTGT)
     Double_t     potnumi101;         //pot per event (NuMI E:TOR101)
+
+    // event weights!
+    Int_t nweights;                   // number of universes simulated
+    unsigned int nsysts;                     // number of systematics varied
+    Double_t eventWeight_MA[kMaxWeights];   // event weights
 
     // hit information (non-resizeable, 45x kMaxHits = 900k bytes worth)
     Int_t    no_hits;                  //number of hits
@@ -1913,6 +1921,10 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   potbnb = 0;
   potnumitgt = 0;
   potnumi101 = 0;
+  
+  nweights = 0;
+  nsysts = 0;
+  std::fill(std::begin(eventWeight_MA), std::end(eventWeight_MA), 0);
 
   no_hits = 0;
   no_hits_stored = 0;  
@@ -2348,6 +2360,9 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
   CreateBranch("potbnb",&potbnb,"potbnb/D");
   CreateBranch("potnumitgt",&potnumitgt,"potnumitgt/D");
   CreateBranch("potnumi101",&potnumi101,"potnumi101/D");
+  
+  CreateBranch("nweights",&nweights,"nweights/I");
+  CreateBranch("eventWeight_MA",eventWeight_MA,"eventWeight_MA[nweights]/D");
 
   if (hasHitInfo()){    
     CreateBranch("no_hits",&no_hits,"no_hits/I");
@@ -3026,7 +3041,18 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       fData->potnumi101 = datamap["E:TOR101"][0];
     }
   }
-
+  
+  // Set weights just for MA at the moment
+  art::Handle< std::vector< evwgh::MCEventWeight > > evtWeights;
+  if (evt.getByLabel("eventweight",evtWeights)){
+    std::vector<double> MA_weights = (*evtWeights->at(0).fWeight.find("genie_qema_Genie")).second;
+    int weight_i(0);
+    fData->nweights = MA_weights.size();
+    for (auto const mcWeight : MA_weights){
+      fData->eventWeight_MA[weight_i] = mcWeight;
+      ++weight_i;
+    }
+  }
 
 //  std::cout<<detprop->NumberTimeSamples()<<" "<<detprop->ReadOutWindowSize()<<std::endl;
 //  std::cout<<geom->DetHalfHeight()*2<<" "<<geom->DetHalfWidth()*2<<" "<<geom->DetLength()<<std::endl;
