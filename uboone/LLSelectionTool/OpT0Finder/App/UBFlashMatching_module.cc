@@ -420,22 +420,22 @@ void UBFlashMatching::produce(art::Event & e)
     util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
   }
 
-  fEffPosYZ = (TH2F*) fTrackPosYZ_Matched->Clone();
+  fTrackPosYZ_Matched->Copy(*fEffPosYZ);
   fEffPosYZ->Divide(fTrackPosYZ);
 
-  fPurPosYZ = (TH2F*) fTrackPosYZ_WellMatched->Clone();
+  fTrackPosYZ_WellMatched->Copy(*fPurPosYZ);
   fPurPosYZ->Divide(fTrackPosYZ_Matched);
 
-  fEffLight = (TH1F*) fTrackLight_Matched->Clone();
+  fTrackLight_Matched->Copy(*fEffLight);
   fEffLight->Divide(fTrackLight);
 
-  fPurLight = (TH1F*) fTrackLight_WellMatched->Clone();
+  fTrackLight_WellMatched->Copy(*fPurLight);
   fPurLight->Divide(fTrackLight_Matched);
 
-  fEffCharge = (TH1F*) fTrackCharge_Matched->Clone();
+  fTrackCharge_Matched->Copy(*fEffCharge);
   fEffCharge->Divide(fTrackCharge);
 
-  fPurCharge = (TH1F*) fTrackCharge_WellMatched->Clone();
+  fTrackCharge_Matched->Copy(*fPurCharge);
   fPurCharge->Divide(fTrackCharge_Matched);
 
 /* 
