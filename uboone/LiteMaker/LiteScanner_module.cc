@@ -61,6 +61,7 @@
 #include "OpticalDetectorData/OpticalTypes.h"
 #include "MCBase/MCShower.h"
 #include "MCBase/MCTrack.h"
+#include "PiZeroROI/PiZeroROI.hh"
 #include "SummaryData/POTSummary.h"
 #include "Utilities/LArProperties.h"
 #include "Utilities/GeometryUtilities.h"
@@ -224,6 +225,7 @@ void LiteScanner::analyze(art::Event const & e)
   // Loop over data type to store association ptr map
   //
   SaveAssociationSource<simb::MCTruth>(e);
+  SaveAssociationSource<ana::PiZeroROI>(e);
   SaveAssociationSource<recob::Hit>(e);
   SaveAssociationSource<recob::Cluster>(e);
   SaveAssociationSource<recob::EndPoint2D>(e);
@@ -257,6 +259,8 @@ void LiteScanner::analyze(art::Event const & e)
 	ScanData<simb::GTruth>(e,j); break;
       case ::larlite::data::kMCTruth:
 	ScanData<simb::MCTruth>(e,j); break;
+      case ::larlite::data::kPiZeroROI:
+	ScanData<ana::PiZeroROI>(e,j); break;
       case ::larlite::data::kMCFlux:
 	ScanData<simb::MCFlux>(e,j); break;
       case ::larlite::data::kMCParticle:
@@ -365,6 +369,7 @@ void LiteScanner::analyze(art::Event const & e)
       case ::larlite::data::kMuCSData:
       case ::larlite::data::kMuCSReco:
       case ::larlite::data::kMCTruth:
+      case ::larlite::data::kPiZeroROI:
       case ::larlite::data::kOpHit: 
       case ::larlite::data::kSimChannel:
       case ::larlite::data::kSimPhotons:
@@ -504,6 +509,7 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
   case ::larlite::data::kEvent:        break;
   case ::larlite::data::kGTruth:       break;
   case ::larlite::data::kMCTruth:      break;
+  case ::larlite::data::kPiZeroROI:    break;
   case ::larlite::data::kMCParticle:
     fAlg.ScanAssociation<T, simb::MCTruth     > (evt,dh,lite_ass);
     break;

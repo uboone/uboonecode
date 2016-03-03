@@ -28,6 +28,7 @@ namespace larlite {
 	name_bool.second = false;
     }
     fPtrIndex_mctruth.clear();
+    fPtrIndex_PiZeroROI.clear();
     fPtrIndex_gtruth.clear();
     fPtrIndex_mcflux.clear();
     fPtrIndex_mcpart.clear();

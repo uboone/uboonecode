@@ -1,7 +1,7 @@
 # define ROOTLIB
 set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl)
 
-set( LARLITE_LIB -L$ENV{LARLITE_LIBDIR} -lLArLite_Base -lLArLite_DataFormat -lLArLite_LArUtil)
+set( LARLITE_LIB -L$ENV{LARLITE_LIBDIR} -lLArLite_Base -lLArLite_DataFormat -lLArLite_LArUtil )
 
 set( UBOONECODE_LIB -L$ENV{UBOONECODE_LIB} )
 
@@ -29,6 +29,8 @@ art_make( BASENAME_ONLY
 		   RecoObjects
 		   LArProperties_service
 		   DetectorProperties_service
+		   ub_PiZeroROI
+		   ${PIZEROROI_LIB}
 		   ${UBOONECODE_LIB}
 		   ${SIMULATIONBASE}
 		   ${LARRECO_LIB}

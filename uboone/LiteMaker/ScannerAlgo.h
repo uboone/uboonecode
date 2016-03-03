@@ -53,6 +53,7 @@
 #include "Utilities/LArProperties.h"
 #include "Utilities/GeometryUtilities.h"
 #include "Utilities/DetectorProperties.h"
+#include "PiZeroROI/PiZeroROI.hh"
 
 // std 
 #include <vector>
@@ -171,6 +172,7 @@ namespace larlite {
 
     // art::Ptr local storage. Value = index of data product & index of label
     std::vector< std::vector< std::map< art::Ptr<::simb::MCTruth>,     std::pair<size_t,size_t> > > > fPtrIndex_mctruth;
+    std::vector< std::vector< std::map< art::Ptr<::ana::PiZeroROI>,    std::pair<size_t,size_t> > > > fPtrIndex_PiZeroROI;
     std::vector< std::vector< std::map< art::Ptr<::simb::GTruth>,      std::pair<size_t,size_t> > > > fPtrIndex_gtruth;
     std::vector< std::vector< std::map< art::Ptr<::simb::MCFlux>,      std::pair<size_t,size_t> > > > fPtrIndex_mcflux;
     std::vector< std::vector< std::map< art::Ptr<::simb::MCParticle>,  std::pair<size_t,size_t> > > > fPtrIndex_mcpart;

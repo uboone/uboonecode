@@ -37,6 +37,7 @@
 #include "DataFormat/flashmatch.h"
 #include "DataFormat/mucsdata.h"
 #include "DataFormat/mucsreco.h"
+#include "DataFormat/PiZeroROI.h"
 #include <TStopwatch.h>
 /*
   This file defines certain specilization of templated functions.
@@ -1148,6 +1149,30 @@ namespace larlite {
     }
   }
 
+  /////   Test for PiZeroROI
+  template <>
+    void ScannerAlgo::ScanData(art::Handle<std::vector< ::ana::PiZeroROI> > const &dh,
+			       ::larlite::event_base* lite_dh)
+    { 
+      fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
+      //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
+      auto lite_data = (::larlite::event_PiZeroROI*)lite_dh;
+      for(size_t i=0; i<dh->size(); ++i) {
+	
+	art::Ptr<::ana::PiZeroROI> roi_ptr(dh,i);
+	
+	larlite::PiZeroROI lite_roi( roi_ptr->GetWireROI(),
+				     roi_ptr->GetTimeROI());
+	
+	lite_roi.SetVertex(roi_ptr->GetVertex());
+
+	lite_data->push_back(lite_roi);
+      }
+    }
+  
+
+
+  /////   End test for PiZeroROI
 
   template <class T>
   void ScanData(art::Handle<std::vector<T> > const &dh,
@@ -1189,6 +1214,14 @@ namespace larlite {
   //
   // Getter for associated data product pointer 
   //
+  //////////TEST for PiZero ROI
+  template <> std::map<art::Ptr< ::ana::PiZeroROI>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
+  { if(fPtrIndex_PiZeroROI.size()<=key1) fPtrIndex_PiZeroROI.resize(key1+1);
+    if(fPtrIndex_PiZeroROI[key1].size()<=key2) fPtrIndex_PiZeroROI[key1].resize(key2+1);
+    return fPtrIndex_PiZeroROI[key1][key2]; 
+  }
+  //////////End TEST for PiZero ROI
+
   template <> std::map<art::Ptr< ::simb::MCTruth>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
   { if(fPtrIndex_mctruth.size()<=key1) fPtrIndex_mctruth.resize(key1+1);
     if(fPtrIndex_mctruth[key1].size()<=key2) fPtrIndex_mctruth[key1].resize(key2+1);
@@ -1363,6 +1396,10 @@ namespace larlite {
   { return ::larlite::data::kGTruth; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::simb::MCTruth> () const
   { return ::larlite::data::kMCTruth; }
+  //// Test for PizeroROI
+  template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::ana::PiZeroROI> () const
+  { return ::larlite::data::kPiZeroROI; }
+  /// end Test for PiZeroROI
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::simb::MCParticle> () const
   { return ::larlite::data::kMCParticle; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::simb::MCFlux> () const
@@ -1593,6 +1630,13 @@ namespace larlite {
 										  art::Handle<std::vector<::simb::MCTruth> > &dh,
 										  ::larlite::event_ass* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
+
+  ///// Test PiZeroROI
+  template <> void ScannerAlgo::ScanAssociation <::ana::PiZeroROI,::ana::PiZeroROI>(art::Event const& e,
+										    art::Handle<std::vector<::ana::PiZeroROI> > &dh,
+										    ::larlite::event_ass* lite_dh)
+    { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
+  ///// End Test PiZeroROI
   
   template <> void ScannerAlgo::ScanAssociation <::simb::MCParticle,::simb::MCParticle>(art::Event const& e,
 											art::Handle<std::vector<::simb::MCParticle> > &dh,
