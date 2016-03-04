@@ -1,0 +1,18 @@
+#include "litemaker_base.fcl"
+
+BEGIN_PROLOG
+
+litemc_pizeroroi: @local::litemaker_base
+
+litemc_pizeroroi.out_filename: "larlite_pizeroroi.root"
+
+litemc_pizeroroi.DataLookUpMap:
+{
+  PiZeroROI:       ["pizerofilter"]
+}
+
+litemc_pizeroroi.AssociationLookUpMap:
+{}
+
+END_PROLOG
+

@@ -41,6 +41,7 @@ litemaker_base:
     calo:       []
     partid:     []
     pfpart:     []
+    pzeroroi:   []
   }
 
   AssociationLookUpMap: {}
