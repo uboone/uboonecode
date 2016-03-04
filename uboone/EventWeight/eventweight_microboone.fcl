@@ -37,6 +37,14 @@ microboone_eventweight:
           mode: multisim
 	  number_of_multisims: 15
  	}
+ genie_qemacc: {
+          type: Genie
+          random_seed: 1
+          parameter_list:        ["QEMA"]
+          parameter_sigma:       [1     ]
+          mode: pm1sigma # doesn't matter what you put in parameter_sigma and number_of_multisims
+          number_of_multisims: 15
+        }
  genie_all: {
  	  type: Genie
           random_seed: 1

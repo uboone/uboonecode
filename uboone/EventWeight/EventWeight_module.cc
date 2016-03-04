@@ -87,7 +87,10 @@ EventWeight::EventWeight(fhicl::ParameterSet const & p)
     winfo->fWeightCalcType=func_type;
     winfo->fWeightCalc=wcalc;
     winfo->fNmultisims=ps_func.get<int>("number_of_multisims");
-      
+    std::string mode = ps_func.get<std::string>("mode");
+    if (mode.find("pm1sigma") != std::string::npos) { 
+      winfo->fNmultisims=2; // only +-1 sigma if pm1sigma is specified
+    }      
     std::pair<std::string, Weight_t*> pwc(*ifunc,winfo);
     fWeightCalcMap.insert(pwc);
   }

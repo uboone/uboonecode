@@ -82,11 +82,18 @@ namespace evwgh {
     fGaussRandom = new CLHEP::RandGaussQ(rng->getEngine(GetName()));
 
     std::vector<std::vector<float> > reweightingSigmas(erwgh.size());
+
+    if (mode.find("pm1sigma") != std::string::npos ) { 
+      number_of_multisims = 2; // only +-1 sigma if pm1sigma is specified
+    }
     for (unsigned int i = 0; i < reweightingSigmas.size(); ++i) {
       reweightingSigmas[i].resize(number_of_multisims);
       for (int j = 0; j < number_of_multisims; j ++) {
 	if (mode.find("multisim") != std::string::npos )
+          std::cout<<"MARCO: multisim found. number_of_multisims = "<<number_of_multisims<<std::endl;
 	  reweightingSigmas[i][j] = parsigmas[i]*fGaussRandom->shoot(&rng->getEngine(GetName()),0.,1.);
+        if (mode.find("pm1sigma") != std::string::npos )
+          reweightingSigmas[i][j] = (j == 0 ? 1.: -1.); // j==0 => 1; j==1 => -1 if pm1sigma is specified
 	else
 	  reweightingSigmas[i][j] = parsigmas[i];
       }
