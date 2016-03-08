@@ -173,11 +173,11 @@ void UBFlashMatching::beginJob()
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
-    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 20, 0, 400000);
-    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 20, 0, 400000);
-    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 20, 0, 400000);
-    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 400000);
-    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 400000);
+    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 20, 0, 40000);
+    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 20, 0, 40000);
+    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 20, 0, 40000);
+    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 40000);
+    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 40000);
 }
 
 void UBFlashMatching::produce(art::Event & e)
@@ -324,11 +324,14 @@ void UBFlashMatching::produce(art::Event & e)
   std::vector<::flashana::FlashMatch_t> match_v; 
   for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) 
   {
+    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+    
     art::Ptr<recob::Track> track(trackHandle,track_index); 
 
     std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
+    
+    std::cout<<"trackHitVec Size: "<<trackHitVec.size()<<std::endl; 
 
-    std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
     float charge=0;
     for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
     {
