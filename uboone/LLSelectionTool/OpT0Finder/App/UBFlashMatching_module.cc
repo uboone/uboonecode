@@ -106,8 +106,22 @@ private:
   TH1F *fTrackCharge;
   TH1F *fTrackCharge_Matched;
   TH1F *fTrackCharge_WellMatched;
-  TH1F *fMatchingEfficiency;
-  TH1F *fMatchingPurity;
+  TH1F *fEffCharge;
+  TH1F *fPurCharge;
+
+  TH2F *fTrackPosYZ;
+  TH2F *fTrackPosYZ_Matched;
+  TH2F *fTrackPosYZ_WellMatched;
+  TH2F *fEffPosYZ;
+  TH2F *fPurPosYZ;
+
+  TH1F *fTrackLight;
+  TH1F *fTrackLight_Matched;
+  TH1F *fTrackLight_WellMatched;
+  TH1F *fEffLight;
+  TH1F *fPurLight;
+
+  TH1F *fMatchScore;
 
   //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
@@ -173,15 +187,31 @@ void UBFlashMatching::beginJob()
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
-    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 20, 0, 40000);
-    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 20, 0, 40000);
-    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 20, 0, 40000);
-    fMatchingEfficiency        = tfs->make<TH1F>("matchingEff"       , "Flash Matching Efficiency"  , 20, 0, 40000);
-    fMatchingPurity            = tfs->make<TH1F>("matchingPur"       , "Flash Matching Purity"      , 20, 0, 40000);
+    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 40, 0, 40000);
+    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 40, 0, 40000);
+    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 40, 0, 40000);
+    fEffCharge               = tfs->make<TH1F>("effCharge"              , "Flash Matching Efficiency"  , 40, 0, 40000);
+    fPurCharge               = tfs->make<TH1F>("purCharge"              , "Flash Matching Purity"      , 40, 0, 40000);
+
+    fTrackPosYZ                = tfs->make<TH2F>("trackPos"               , "Track Pos"                  , 30, 0, 1200, 30, -300, 300);
+    fTrackPosYZ_Matched        = tfs->make<TH2F>("trackPos_matched"       , "Track Pos (Matched)"        , 30, 0, 1200, 30, -300, 300);
+    fTrackPosYZ_WellMatched    = tfs->make<TH2F>("trackPos_wellmatched"   , "Track Pos (Well Matched)"   , 30, 0, 1200, 30, -300, 300);
+    fEffPosYZ                  = tfs->make<TH2F>("effPos"                 , "Flash Matching Efficiency"  , 30, 0, 1200, 30, -300, 300);
+    fPurPosYZ                  = tfs->make<TH2F>("purPos"                 , "Flash Matching Purity"      , 30, 0, 1200, 30, -300, 300);
+
+    fTrackLight              = tfs->make<TH1F>("trackLight"            , "Track Light"                 , 50, 0, 1000);
+    fTrackLight_Matched      = tfs->make<TH1F>("trackLight_matched"    , "Track Light (Matched)"       , 50, 0, 1000);
+    fTrackLight_WellMatched  = tfs->make<TH1F>("trackLight_wellmatched", "Track Light (Well Matched)"  , 50, 0, 1000);
+    fEffLight                = tfs->make<TH1F>("effLight"              , "Flash Matching Efficiency"   , 50, 0, 1000);
+    fPurLight                = tfs->make<TH1F>("purLight"              , "Flash Matching Purity"       , 50, 0, 1000);
+
+    fMatchScore = tfs->make<TH1F>("matchScore", "Match Score", 100, 0, 100);
+
 }
 
 void UBFlashMatching::produce(art::Event & e)
 {
+  _mgr.Reset();
   // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
   const size_t num_pmts = 32;
 
@@ -222,7 +252,6 @@ void UBFlashMatching::produce(art::Event & e)
     throw std::exception();
   }
 
-
   art::Handle< std::vector<recob::OpFlash> > flashHandle;
   e.getByLabel(_flash_producer_name,flashHandle);
   if(!flashHandle.isValid()) {
@@ -237,6 +266,7 @@ void UBFlashMatching::produce(art::Event & e)
 
   //  0-a) FlashArray_t
   std::vector<flashana::Flash_t> opflashVec;
+  int count = 1;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -245,8 +275,9 @@ void UBFlashMatching::produce(art::Event & e)
     ::flashana::Flash_t flash;
     flash.pe_v.resize(num_pmts);
     for(size_t pmt_index=0; pmt_index<num_pmts; ++pmt_index)
-      
+    {
       flash.pe_v[pmt_index] = opf.PE(pmt_index);
+    }
     
     flash.idx   = opflash_index;
     flash.time  = opf.Time();
@@ -256,10 +287,13 @@ void UBFlashMatching::produce(art::Event & e)
     flash.y_err = opf.YWidth();
     flash.z     = opf.ZCenter();
     flash.z_err = opf.ZWidth();
+
+    ::flashana::Flash_t flash_clone = flash;
+    opflashVec.push_back(flash_clone);
     
     // Register to a manager
     _mgr.Emplace(std::move(flash));
-    opflashVec.push_back(flash);
+    count++;
   }
 //  size_t opflashsize = opf.size();
 
@@ -328,46 +362,82 @@ void UBFlashMatching::produce(art::Event & e)
     
     art::Ptr<recob::Track> track(trackHandle,track_index); 
 
-    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
-    
-    std::cout<<"trackHitVec Size: "<<trackHitVec.size()<<std::endl; 
-
     float charge=0;
+    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
     for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
     {
-
     	charge += trackHitVec.at(hit_index)->Integral();
     }
     std::cout<<"Hit Charge: "<<charge<<std::endl;
     fTrackCharge->Fill(charge);
     
+    TVector3 startpos = track->LocationAtPoint(0);
+    TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
+    startpos += endpos;
+    startpos *= 0.5;
+    std::cout << "Average position: " << startpos.Y() << ", " << startpos.Z() << std::endl;
+    fTrackPosYZ->Fill(startpos.Z(), startpos.Y());
+    
     ::flashana::FlashMatch_t match; 
-    std::cout<<"Size of flashmatch vector: "<<match_result_v.size()<<std::endl;
-    std::cout<<"Size of track vector: "     <<trackHandle->size()<<std::endl;
     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) 
     {
       match = match_result_v.at(match_index);
-	     std::cout<<"MatchID: "<<match.tpc_id<< " trackID: "<<track->ID()<<std::endl;
-      if((int)match.tpc_id==track->ID()) break; 
+      if((int)match.tpc_id==track->ID()) 
+      {
+        break; 
+      }
     }
+
     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
-    if (match.tpc_id==::flashana::kINVALID_ID) std::cout<<"INVALID TPC_ID"<<std::endl;  
+    if (match.tpc_id==::flashana::kINVALID_ID) 
+    {
+      std::cout<<"INVALID TPC_ID"<<std::endl;
+      fTrackLight->Fill(-100);
+    }
     else
     {
+      double light = opflashVec.at(match.flash_id).TotalPE();
+      fTrackLight->Fill(light);
+ 
+      fMatchScore->Fill(match.score);
+
       fTrackCharge_Matched->Fill(charge);
-      std::cout<<"track-charge matched: "<<charge<<std::endl;
+      fTrackPosYZ_Matched->Fill(startpos.Z(), startpos.Y());
+      fTrackLight_Matched->Fill(light);
+
       double driftpos = track->LocationAtPoint(0).X();
       double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
       double flashtime = opflashVec.at(match.flash_id).time;
       if (abs(drifttime - flashtime) < 120.0)
+      {
         fTrackCharge_WellMatched->Fill(charge);
+        fTrackPosYZ_WellMatched->Fill(startpos.Z(), startpos.Y());
+        fTrackLight_WellMatched->Fill(light);
+      }
     }
     anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
     
     flashmatchtrack->push_back(Flash);
     util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
   }
-  
+
+  fTrackPosYZ_Matched->Copy(*fEffPosYZ);
+  fEffPosYZ->Divide(fTrackPosYZ);
+
+  fTrackPosYZ_WellMatched->Copy(*fPurPosYZ);
+  fPurPosYZ->Divide(fTrackPosYZ_Matched);
+
+  fTrackLight_Matched->Copy(*fEffLight);
+  fEffLight->Divide(fTrackLight);
+
+  fTrackLight_WellMatched->Copy(*fPurLight);
+  fPurLight->Divide(fTrackLight_Matched);
+
+  fTrackCharge_Matched->Copy(*fEffCharge);
+  fEffCharge->Divide(fTrackCharge);
+
+  fTrackCharge_Matched->Copy(*fPurCharge);
+  fPurCharge->Divide(fTrackCharge_Matched);
 
 /* 
   for(size_t flash_index=0; flash_index < flashHandle->size(); ++flash_index) {
