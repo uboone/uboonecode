@@ -103,25 +103,18 @@ private:
   TH1D* fTrackIDCodeHist;
   TH1D* fTrackPhiHist;
 
-  TH1F *fTrackCharge;
-  TH1F *fTrackCharge_Matched;
-  TH1F *fTrackCharge_WellMatched;
-  TH1F *fEffCharge;
-  TH1F *fPurCharge;
+  Double_t fTrackCharge;
+  Double_t fTrackLight;
+  Double_t fTrackPosY;
+  Double_t fTrackPosZ;
+  Double_t fTrackTrueTime;
+  Double_t fTrackRecoTime;
+  Double_t fFlashTime;
+  Int_t    fTrackMatched;
+  Double_t fMatchScore;
 
-  TH2F *fTrackPosYZ;
-  TH2F *fTrackPosYZ_Matched;
-  TH2F *fTrackPosYZ_WellMatched;
-  TH2F *fEffPosYZ;
-  TH2F *fPurPosYZ;
+  TTree *fMatchTree;
 
-  TH1F *fTrackLight;
-  TH1F *fTrackLight_Matched;
-  TH1F *fTrackLight_WellMatched;
-  TH1F *fEffLight;
-  TH1F *fPurLight;
-
-  TH1F *fMatchScore;
 
   //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
@@ -187,25 +180,19 @@ void UBFlashMatching::beginJob()
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
-    fTrackCharge             = tfs->make<TH1F>("trackCharge"            , "Track Charge"               , 40, 0, 40000);
-    fTrackCharge_Matched     = tfs->make<TH1F>("trackCharge_matched"    , "Track Charge (Matched)"     , 40, 0, 40000);
-    fTrackCharge_WellMatched = tfs->make<TH1F>("trackCharge_wellmatched", "Track Charge (Well Matched)", 40, 0, 40000);
-    fEffCharge               = tfs->make<TH1F>("effCharge"              , "Flash Matching Efficiency"  , 40, 0, 40000);
-    fPurCharge               = tfs->make<TH1F>("purCharge"              , "Flash Matching Purity"      , 40, 0, 40000);
+    fMatchTree = tfs->make<TTree>("match_tree", "match_tree");
+    fMatchTree->SetDirectory(0);
+    fMatchTree->Branch("");
 
-    fTrackPosYZ                = tfs->make<TH2F>("trackPos"               , "Track Pos"                  , 30, 0, 1200, 30, -300, 300);
-    fTrackPosYZ_Matched        = tfs->make<TH2F>("trackPos_matched"       , "Track Pos (Matched)"        , 30, 0, 1200, 30, -300, 300);
-    fTrackPosYZ_WellMatched    = tfs->make<TH2F>("trackPos_wellmatched"   , "Track Pos (Well Matched)"   , 30, 0, 1200, 30, -300, 300);
-    fEffPosYZ                  = tfs->make<TH2F>("effPos"                 , "Flash Matching Efficiency"  , 30, 0, 1200, 30, -300, 300);
-    fPurPosYZ                  = tfs->make<TH2F>("purPos"                 , "Flash Matching Purity"      , 30, 0, 1200, 30, -300, 300);
-
-    fTrackLight              = tfs->make<TH1F>("trackLight"            , "Track Light"                 , 50, 0, 1000);
-    fTrackLight_Matched      = tfs->make<TH1F>("trackLight_matched"    , "Track Light (Matched)"       , 50, 0, 1000);
-    fTrackLight_WellMatched  = tfs->make<TH1F>("trackLight_wellmatched", "Track Light (Well Matched)"  , 50, 0, 1000);
-    fEffLight                = tfs->make<TH1F>("effLight"              , "Flash Matching Efficiency"   , 50, 0, 1000);
-    fPurLight                = tfs->make<TH1F>("purLight"              , "Flash Matching Purity"       , 50, 0, 1000);
-
-    fMatchScore = tfs->make<TH1F>("matchScore", "Match Score", 100, 0, 100);
+    fMatchTree->Branch("TrackCharge"  , &fTrackCharge  , "TrackCharge/D"  );
+    fMatchTree->Branch("TrackLight"   , &fTrackLight   , "TrackLight/D"   );
+    fMatchTree->Branch("TrackPosY"    , &fTrackPosY    ,  "TrackPosY/D"   );
+    fMatchTree->Branch("TrackPosZ"    , &fTrackPosZ    , "TrackPosZ/D"    );
+    fMatchTree->Branch("TrackTrueTime", &fTrackTrueTime, "TrackTrueTime/D");
+    fMatchTree->Branch("TrackRecoTime", &fTrackRecoTime, "TrackRecoTime/D");
+    fMatchTree->Branch("FlashTime"    , &fFlashTime    , "FlashTime/D"    );
+    fMatchTree->Branch("TrackMatched" , &fTrackMatched , "TrackMatched/I" );
+    fMatchTree->Branch("MatchScore"   , &fMatchScore   , "MatchScore/D"   );
 
 }
 
@@ -368,14 +355,12 @@ void UBFlashMatching::produce(art::Event & e)
     	charge += trackHitVec.at(hit_index)->Integral();
     }
     std::cout<<"Hit Charge: "<<charge<<std::endl;
-    fTrackCharge->Fill(charge);
     
     TVector3 startpos = track->LocationAtPoint(0);
     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
     startpos += endpos;
     startpos *= 0.5;
     std::cout << "Average position: " << startpos.Y() << ", " << startpos.Z() << std::endl;
-    fTrackPosYZ->Fill(startpos.Z(), startpos.Y());
     
     ::flashana::FlashMatch_t match; 
     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index) 
@@ -391,28 +376,39 @@ void UBFlashMatching::produce(art::Event & e)
     if (match.tpc_id==::flashana::kINVALID_ID) 
     {
       std::cout<<"INVALID TPC_ID"<<std::endl;
-      fTrackLight->Fill(-100);
+      fTrackCharge = -100;
+      fTrackLight = -100;
+      fTrackPosY = -100;
+      fTrackPosZ = -100;
+      fTrackTrueTime = -100;
+      fTrackRecoTime = -100;
+      fFlashTime = -100;
+      fTrackMatched = 0;
+      fMatchScore = -100;
+
+      fMatchTree->Fill();
     }
     else
     {
-      double light = opflashVec.at(match.flash_id).TotalPE();
-      fTrackLight->Fill(light);
- 
-      fMatchScore->Fill(match.score);
+      fTrackMatched = 1;
+      fMatchScore = match.score;
 
-      fTrackCharge_Matched->Fill(charge);
-      fTrackPosYZ_Matched->Fill(startpos.Z(), startpos.Y());
-      fTrackLight_Matched->Fill(light);
+      double light = opflashVec.at(match.flash_id).TotalPE();
+      fTrackLight = light;
+      fTrackCharge = charge;
+      fTrackPosY = startpos.Y();
+      fTrackPosZ = startpos.Z();
 
       double driftpos = track->LocationAtPoint(0).X();
       double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
+      fTrackRecoTime = drifttime;
+
+      fTrackTrueTime = -100;
+
       double flashtime = opflashVec.at(match.flash_id).time;
-      if (abs(drifttime - flashtime) < 120.0)
-      {
-        fTrackCharge_WellMatched->Fill(charge);
-        fTrackPosYZ_WellMatched->Fill(startpos.Z(), startpos.Y());
-        fTrackLight_WellMatched->Fill(light);
-      }
+      fFlashTime = flashtime;
+
+      fMatchTree->Fill();
     }
     anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
     
@@ -420,23 +416,6 @@ void UBFlashMatching::produce(art::Event & e)
     util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
   }
 
-  fTrackPosYZ_Matched->Copy(*fEffPosYZ);
-  fEffPosYZ->Divide(fTrackPosYZ);
-
-  fTrackPosYZ_WellMatched->Copy(*fPurPosYZ);
-  fPurPosYZ->Divide(fTrackPosYZ_Matched);
-
-  fTrackLight_Matched->Copy(*fEffLight);
-  fEffLight->Divide(fTrackLight);
-
-  fTrackLight_WellMatched->Copy(*fPurLight);
-  fPurLight->Divide(fTrackLight_Matched);
-
-  fTrackCharge_Matched->Copy(*fEffCharge);
-  fEffCharge->Divide(fTrackCharge);
-
-  fTrackCharge_Matched->Copy(*fPurCharge);
-  fPurCharge->Divide(fTrackCharge_Matched);
 
 /* 
   for(size_t flash_index=0; flash_index < flashHandle->size(); ++flash_index) {
