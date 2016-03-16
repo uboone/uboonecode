@@ -278,39 +278,40 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "Geometry/Geometry.h"
+#include "larcore/Geometry/Geometry.h"
 #include "SimulationBase/MCTruth.h"
-#include "MCBase/MCShower.h"
-#include "MCBase/MCTrack.h"
-#include "MCBase/MCStep.h"
+#include "lardata/MCBase/MCShower.h"
+#include "lardata/MCBase/MCTrack.h"
+#include "lardata/MCBase/MCStep.h"
 #include "SimulationBase/MCFlux.h"
-#include "Simulation/SimChannel.h"
-#include "Simulation/AuxDetSimChannel.h"
-#include "AnalysisBase/Calorimetry.h"
-#include "AnalysisBase/ParticleID.h"
-#include "RawData/RawDigit.h"
-#include "RawData/raw.h"
-#include "RawData/BeamInfo.h"
-#include "RawData/TriggerData.h"
-#include "Utilities/LArProperties.h"
-#include "Utilities/AssociationUtil.h"
-#include "Utilities/DetectorProperties.h"
-#include "SummaryData/POTSummary.h"
-#include "MCCheater/BackTracker.h"
-#include "RecoBase/Track.h"
-#include "RecoBase/Shower.h"
-#include "RecoBase/Cluster.h"
-#include "RecoBase/Hit.h"
-#include "RecoBase/EndPoint2D.h"
-#include "RecoBase/Vertex.h"
-#include "RecoBase/OpFlash.h"
-#include "SimpleTypesAndConstants/geo_types.h"
-#include "RecoObjects/BezierTrack.h"
-#include "RecoAlg/TrackMomentumCalculator.h"
-#include "AnalysisBase/CosmicTag.h"
-#include "AnalysisBase/FlashMatch.h"
-#include "AnalysisBase/T0.h"
+#include "larsim/Simulation/SimChannel.h"
+#include "larsim/Simulation/AuxDetSimChannel.h"
+#include "lardata/AnalysisBase/Calorimetry.h"
+#include "lardata/AnalysisBase/ParticleID.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RawData/raw.h"
+#include "lardata/RawData/BeamInfo.h"
+#include "lardata/RawData/TriggerData.h"
+#include "lardata/Utilities/AssociationUtil.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larcore/SummaryData/POTSummary.h"
+#include "larsim/MCCheater/BackTracker.h"
+#include "lardata/RecoBase/Track.h"
+#include "lardata/RecoBase/Shower.h"
+#include "lardata/RecoBase/Cluster.h"
+#include "lardata/RecoBase/Hit.h"
+#include "lardata/RecoBase/EndPoint2D.h"
+#include "lardata/RecoBase/Vertex.h"
+#include "lardata/RecoBase/OpFlash.h"
+#include "lardata/RecoBase/PFParticle.h"
+#include "larcore/SimpleTypesAndConstants/geo_types.h"
+#include "lardata/RecoObjects/BezierTrack.h"
+#include "larreco/RecoAlg/TrackMomentumCalculator.h"
+#include "lardata/AnalysisBase/CosmicTag.h"
+#include "lardata/AnalysisBase/FlashMatch.h"
+#include "lardata/AnalysisBase/T0.h"
 
+#include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
 #include <cstddef> // std::ptrdiff_t
 #include <cstring> // std::memcpy()
@@ -456,7 +457,10 @@ namespace microboone {
       TrackData_t<Float_t> trkendz;       // ending z position.
       TrackData_t<Float_t> trkendd;       // ending distance to boundary.
       TrackData_t<Float_t> trkflashT0;   // t0 per track from matching tracks to flashes (in ns)
-      TrackData_t<Float_t> trktrueT0;    // t0 per track from truth information (in ns)    
+      TrackData_t<Float_t> trktrueT0;    // t0 per track from truth information (in ns)
+      TrackData_t<Float_t> trkpurity;    // track purity based on hit information
+      TrackData_t<Float_t> trkcompleteness; //track completeness based on hit information
+      TrackData_t<int> trkg4id;        //true g4 track id for the reconstructed track
       TrackData_t<Float_t> trktheta;      // theta.
       TrackData_t<Float_t> trkphi;        // phi.
       TrackData_t<Float_t> trkstartdcosx;
@@ -610,6 +614,7 @@ namespace microboone {
 	tdMCtrk  = 0x400,
 	tdCluster = 0x800,
 	tdRawDigit = 0x1000,
+        tdPandoraNuVertex = 0x2000,
 	tdDefault = 0
 	}; // DataBits_t
     
@@ -674,6 +679,13 @@ namespace microboone {
     Float_t rawD_charge[kMaxHits];  
     Float_t rawD_fwhh[kMaxHits];  
     Double_t rawD_rms[kMaxHits]; 
+
+    //Pandora Nu Vertex information
+    Short_t nnuvtx;
+    Float_t nuvtxx[kMaxVertices];
+    Float_t nuvtxy[kMaxVertices];
+    Float_t nuvtxz[kMaxVertices];
+    Short_t nuvtxpdg[kMaxVertices];
 
     //Cluster Information
     Short_t nclusters;				      //number of clusters in a given event
@@ -1042,6 +1054,9 @@ namespace microboone {
     
     /// Returns whether we have Cluster data
     bool hasClusterInfo() const { return bits & tdCluster; }
+
+    /// Returns whether we have Pandora Nu Vertex data
+    bool hasPandoraNuVertexInfo() const { return bits & tdPandoraNuVertex; }
     
     /// Returns whether we have Geant data
     bool hasGeantInfo() const { return bits & tdGeant; }
@@ -1290,6 +1305,7 @@ namespace microboone {
     std::string fCryGenModuleLabel;
     std::string fG4ModuleLabel;
     std::string fClusterModuleLabel;
+    std::string fPandoraNuVertexModuleLabel;
     std::string fOpFlashModuleLabel;
     std::string fMCShowerModuleLabel;
     std::string fMCTrackModuleLabel;
@@ -1313,7 +1329,8 @@ namespace microboone {
     bool fSaveRawDigitInfo; ///whether to extract and save Raw Digit information
     bool fSaveTrackInfo; ///whether to extract and save Track information
     bool fSaveVertexInfo; ///whether to extract and save Vertex information
-    bool fSaveClusterInfo;  ///whether to extract and save Shower information
+    bool fSaveClusterInfo;  ///whether to extract and save Cluster information
+    bool fSavePandoraNuVertexInfo; ///whether to extract and save nu vertex information from Pandora
     bool fSaveFlashInfo;  ///whether to extract and save Flash information
     bool fSaveShowerInfo;  ///whether to extract and save Shower information
 
@@ -1353,6 +1370,7 @@ namespace microboone {
 	fData->SetBits(AnalysisTreeDataStruct::tdFlash,  !fSaveFlashInfo);
 	fData->SetBits(AnalysisTreeDataStruct::tdShower, !fSaveShowerInfo);
 	fData->SetBits(AnalysisTreeDataStruct::tdCluster,!fSaveClusterInfo);
+        fData->SetBits(AnalysisTreeDataStruct::tdPandoraNuVertex,!fSavePandoraNuVertexInfo);
 	fData->SetBits(AnalysisTreeDataStruct::tdTrack,  !fSaveTrackInfo);
 	fData->SetBits(AnalysisTreeDataStruct::tdVertex, !fSaveVertexInfo);
 	fData->SetBits(AnalysisTreeDataStruct::tdAuxDet, !fSaveAuxDetInfo);
@@ -1566,6 +1584,9 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::Clear() {
   FillWith(trkendd      , -99999.);
   FillWith(trkflashT0   , -99999.);  
   FillWith(trktrueT0    , -99999.);  
+  FillWith(trkg4id      , -99999 );
+  FillWith(trkpurity    , -99999.);
+  FillWith(trkcompleteness, -99999.);
   FillWith(trktheta     , -99999.);
   FillWith(trkphi       , -99999.);
   FillWith(trkstartdcosx, -99999.);
@@ -1726,6 +1747,15 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::SetAddresses(
 
   BranchName = "trktrueT0_" + TrackLabel;
   CreateBranch(BranchName, trktrueT0, BranchName + NTracksIndexStr + "/F");
+
+  BranchName = "trkg4id_" + TrackLabel;
+  CreateBranch(BranchName, trkg4id, BranchName + NTracksIndexStr + "/I");
+  
+  BranchName = "trkpurity_" + TrackLabel;
+  CreateBranch(BranchName, trkpurity, BranchName + NTracksIndexStr + "/F");
+  
+  BranchName = "trkcompleteness_" + TrackLabel;
+  CreateBranch(BranchName, trkcompleteness, BranchName + NTracksIndexStr + "/F");
   
   BranchName = "trktheta_" + TrackLabel;
   CreateBranch(BranchName, trktheta, BranchName + NTracksIndexStr + "/F");
@@ -2065,6 +2095,12 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   std::fill(cluncosmictags_tagger, cluncosmictags_tagger + sizeof(cluncosmictags_tagger)/sizeof(cluncosmictags_tagger[0]), -9999);
   std::fill(clucosmicscore_tagger, clucosmicscore_tagger + sizeof(clucosmicscore_tagger)/sizeof(clucosmicscore_tagger[0]), -99999.);
   std::fill(clucosmictype_tagger , clucosmictype_tagger  + sizeof(clucosmictype_tagger )/sizeof(clucosmictype_tagger [0]), -9999);
+
+  nnuvtx = 0;
+  std::fill(nuvtxx, nuvtxx + sizeof(nuvtxx)/sizeof(nuvtxx[0]), -99999.);
+  std::fill(nuvtxy, nuvtxy + sizeof(nuvtxy)/sizeof(nuvtxy[0]), -99999.);
+  std::fill(nuvtxz, nuvtxz + sizeof(nuvtxz)/sizeof(nuvtxz[0]), -99999.);
+  std::fill(nuvtxpdg, nuvtxpdg + sizeof(nuvtxpdg)/sizeof(nuvtxpdg[0]), -99999);
 
   mcevts_truth = -99999;
   mcevts_truthcry = -99999;
@@ -2586,6 +2622,14 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
     }  
   }
 
+  if (hasPandoraNuVertexInfo()){
+    CreateBranch("nnuvtx", &nnuvtx, "nnuvtx/S");
+    CreateBranch("nuvtxx", nuvtxx, "nuvtxx[nnuvtx]/F");
+    CreateBranch("nuvtxy", nuvtxy, "nuvtxy[nnuvtx]/F");
+    CreateBranch("nuvtxz", nuvtxz, "nuvtxz[nnuvtx]/F");
+    CreateBranch("nuvtxpdg", nuvtxpdg, "nuvtxpdg[nnuvtx]/S");
+  }
+
   if (hasClusterInfo()){
     CreateBranch("nclusters",&nclusters,"nclusters/S");
     CreateBranch("clusterId", clusterId, "clusterId[nclusters]/S");
@@ -2951,6 +2995,7 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fCryGenModuleLabel        (pset.get< std::string >("CryGenModuleLabel")       ), 
   fG4ModuleLabel            (pset.get< std::string >("G4ModuleLabel")           ),
   fClusterModuleLabel       (pset.get< std::string >("ClusterModuleLabel")     ),
+  fPandoraNuVertexModuleLabel (pset.get< std::string >("PandoraNuVertexModuleLabel")     ),
   fOpFlashModuleLabel       (pset.get< std::string >("OpFlashModuleLabel")      ),
   fMCShowerModuleLabel      (pset.get< std::string >("MCShowerModuleLabel")     ),  
   fMCTrackModuleLabel      (pset.get< std::string >("MCTrackModuleLabel")     ),  
@@ -2975,10 +3020,11 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fSaveTrackInfo	    (pset.get< bool >("SaveTrackInfo", false)), 
   fSaveVertexInfo	    (pset.get< bool >("SaveVertexInfo", false)),
   fSaveClusterInfo	    (pset.get< bool >("SaveClusterInfo", false)),
+  fSavePandoraNuVertexInfo        (pset.get< bool >("SavePandoraNuVertexInfo", false)),
   fSaveFlashInfo            (pset.get< bool >("SaveFlashInfo", false)),
-  fSaveShowerInfo            (pset.get< bool >("SaveShowerInfo", false)),
-  fCosmicTaggerAssocLabel  (pset.get<std::vector< std::string > >("CosmicTaggerAssocLabel") ),
-  fFlashMatchAssocLabel (pset.get<std::vector< std::string > >("FlashMatchAssocLabel") ),
+  fSaveShowerInfo           (pset.get< bool >("SaveShowerInfo", false)),
+  fCosmicTaggerAssocLabel   (pset.get<std::vector< std::string > >("CosmicTaggerAssocLabel") ),
+  fFlashMatchAssocLabel     (pset.get<std::vector< std::string > >("FlashMatchAssocLabel") ),
   bIgnoreMissingShowers     (pset.get< bool >("IgnoreMissingShowers", false)),
   isCosmics(false),
   fSaveCaloCosmics          (pset.get< bool >("SaveCaloCosmics",false)),
@@ -3074,10 +3120,8 @@ void microboone::AnalysisTree::endSubRun(const art::SubRun& sr)
 void microboone::AnalysisTree::analyze(const art::Event& evt)
 {
   //services
-  art::ServiceHandle<geo::Geometry> geom;
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   art::ServiceHandle<cheat::BackTracker> bt;
-  art::ServiceHandle<util::DetectorProperties> detprop;
-  art::ServiceHandle<util::LArProperties> LArProp;
 
   // collect the sizes which might me needed to resize the tree data structure:
   bool isMC = !evt.isRealData();
@@ -3095,7 +3139,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
     if (evt.getByLabel(fClusterModuleLabel,clusterListHandle))
       art::fill_ptr_vector(clusterlist, clusterListHandle);
   }        
-    
+
   // * flashes
   art::Handle< std::vector<recob::OpFlash> > flashListHandle;
   std::vector<art::Ptr<recob::OpFlash> > flashlist;
@@ -3472,6 +3516,58 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       }
     }
   }// end (fSaveHitInfo)
+
+
+   if(fSavePandoraNuVertexInfo) {
+     lar_pandora::PFParticleVector particleVector;
+     lar_pandora::LArPandoraHelper::CollectPFParticles(evt, fPandoraNuVertexModuleLabel, particleVector);
+     lar_pandora::VertexVector vertexVector;
+     lar_pandora::PFParticlesToVertices particlesToVertices;
+     lar_pandora::LArPandoraHelper::CollectVertices(evt, fPandoraNuVertexModuleLabel, vertexVector, particlesToVertices);
+ 
+     short nprim = 0;
+     for (unsigned int n = 0; n < particleVector.size(); ++n) {
+         const art::Ptr<recob::PFParticle> particle = particleVector.at(n);
+         if(particle->IsPrimary()) nprim++;
+     }
+ 
+     if (nprim > kMaxVertices){
+       // got this error? consider increasing kMaxClusters
+       // (or ask for a redesign using vectors)
+       mf::LogError("AnalysisTree:limits") << "event has " << nprim
+                                           << " nu neutrino vertices, only kMaxVertices=" << kMaxVertices << " stored in tree";
+     }
+ 
+     fData->nnuvtx = nprim;
+ 
+     short iv = 0;
+     for (unsigned int n = 0; n < particleVector.size(); ++n) {
+         const art::Ptr<recob::PFParticle> particle = particleVector.at(n);
+         if(particle->IsPrimary()) {
+             lar_pandora::PFParticlesToVertices::const_iterator vIter = particlesToVertices.find(particle);
+             if (particlesToVertices.end() != vIter)
+             {
+                 const lar_pandora::VertexVector &vertexVector = vIter->second;
+                 if (!vertexVector.empty())
+                 {
+                     if (vertexVector.size() == 1) {
+                        const art::Ptr<recob::Vertex> vertex = *(vertexVector.begin());
+                        double xyz[3] = {0.0, 0.0, 0.0} ;
+                        vertex->XYZ(xyz);
+                        fData->nuvtxx[iv] = xyz[0];
+                        fData->nuvtxy[iv] = xyz[1];
+                        fData->nuvtxz[iv] = xyz[2];
+                        fData->nuvtxpdg[iv] = particle->PdgCode();
+                        iv++;
+                     }
+                 }
+             }
+ 
+         }
+     }
+ 
+   }
+
   
   if (fSaveClusterInfo){
     fData->nclusters = (int) NClusters;
@@ -3574,7 +3670,8 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
     
       //call the track momentum algorithm that gives you momentum based on track range
       trkf::TrackMomentumCalculator trkm;
-       
+      trkm.SetMinLength(10); //change the minimal track length requirement to 10 cm
+
       for(size_t iTrk=0; iTrk < NTracks; ++iTrk){//loop over tracks
       
         //save t0 from reconstructed flash track matching for every track
@@ -4383,7 +4480,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       } // if (fSaveGeantInfo) 
     }//if (mcevts_truth)
   }//if (isMC){
-  fData->taulife = LArProp->ElectronLifetime();
+  fData->taulife = detprop->ElectronLifetime();
   fTree->Fill();
   
   if (mf::isDebugEnabled()) {
@@ -4546,7 +4643,7 @@ void microboone::AnalysisTree::HitsPurity(std::vector< art::Ptr<recob::Hit> > co
 double microboone::AnalysisTree::bdist(const TVector3& pos)
 {
   // Get geometry.
-  art::ServiceHandle<geo::Geometry> geom;
+  auto const* geom = lar::providerFrom<geo::Geometry>();
 
   double d1 = pos.X();                             // Distance to right side (wires).
   double d2 = 2.*geom->DetHalfWidth() - pos.X();   // Distance to left side (cathode).
@@ -4578,12 +4675,11 @@ double microboone::AnalysisTree::length(const recob::Track& track)
 
 double microboone::AnalysisTree::driftedLength(const sim::MCTrack& mctrack, TLorentzVector& tpcstart, TLorentzVector& tpcend, TLorentzVector& tpcmom){
   // Get geometry.
-  art::ServiceHandle<geo::Geometry> geom;
-  art::ServiceHandle<util::DetectorProperties> detprop;
-  art::ServiceHandle<util::LArProperties> larprop;
-  
+  auto const* geom = lar::providerFrom<geo::Geometry>();
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+
   //compute the drift x range
-  double vDrift = larprop->DriftVelocity()*1e-3; //cm/ns
+  double vDrift = detprop->DriftVelocity()*1e-3; //cm/ns
   double xrange[2] = {detprop->ConvertTicksToX(0,0,0,0),detprop->ConvertTicksToX(detprop->NumberTimeSamples(),0,0,0)};
   
   // Get active volume boundary.
@@ -4625,12 +4721,11 @@ double microboone::AnalysisTree::driftedLength(const sim::MCTrack& mctrack, TLor
 double microboone::AnalysisTree::driftedLength(const simb::MCParticle& p, TLorentzVector& start, TLorentzVector& end, unsigned int &starti, unsigned int &endi)
 {
   // Get geometry.
-  art::ServiceHandle<geo::Geometry> geom;
-  art::ServiceHandle<util::DetectorProperties> detprop;
-  art::ServiceHandle<util::LArProperties> larprop;
+  auto const* geom = lar::providerFrom<geo::Geometry>();
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   
   //compute the drift x range
-  double vDrift = larprop->DriftVelocity()*1e-3; //cm/ns
+  double vDrift = detprop->DriftVelocity()*1e-3; //cm/ns
   double xrange[2] = {detprop->ConvertTicksToX(0,0,0,0),detprop->ConvertTicksToX(detprop->NumberTimeSamples(),0,0,0)};
   
   // Get active volume boundary.
@@ -4673,7 +4768,6 @@ double microboone::AnalysisTree::length(const simb::MCParticle& p, TLorentzVecto
 {
   // Get geometry.
   art::ServiceHandle<geo::Geometry> geom;
-  art::ServiceHandle<util::LArProperties> larprop;
   
   // Get active volume boundary.
   double bnd[6] = {0.,2.*geom->DetHalfWidth(),-geom->DetHalfHeight(),geom->DetHalfHeight(),0.,geom->DetLength()};
@@ -4707,3 +4801,5 @@ namespace microboone{
   DEFINE_ART_MODULE(AnalysisTree)
 
 }
+
+namespace lar_pandora{class LArPandoraHelper;}

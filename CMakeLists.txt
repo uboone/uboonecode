@@ -34,8 +34,6 @@ set(CMAKE_MODULE_PATH $ENV{ART_DIR}/Modules
 include(CetCMakeEnv)
 cet_cmake_env()
 
-set_install_root()
-
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
@@ -50,6 +48,7 @@ find_ups_product( lardata v1_00_00 )
 find_ups_product( larevt v1_00_00 )
 find_ups_product( larsim v1_00_00 )
 find_ups_product( larreco v1_00_00 )
+find_ups_product( larpandora v1_00_00 )
 find_ups_product( larana v1_00_00 )
 find_ups_product( nutools v1_00_00 )
 find_ups_product( art v1_09_00 )

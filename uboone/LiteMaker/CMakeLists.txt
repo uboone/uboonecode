@@ -15,21 +15,12 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	  BASENAME_ONLY
 	  LIBRARY_NAME     uboonecode_uboone_LiteMaker
 	  LIB_LIBRARIES
-	  	   Geometry
+	  	   larcore_Geometry
 		   uboone_Geometry
 		   uboonecode_uboone_MuCS
-		   Geometry_service
-	   	   Simulation
+		   larcore_Geometry_Geometry_service
+	   	   larsim_Simulation
 		   SimulationBase
-		   Utilities
-		   TimeService_service
-		   RawData
-		   MCBase
-		   SummaryData
-		   RecoBase
-		   RecoObjects
-		   LArProperties_service
-		   DetectorProperties_service
 		   ${UBOONECODE_LIB}
 		   ${SIMULATIONBASE}
 		   ${LARRECO_LIB}
@@ -54,21 +45,21 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 
           MODULE_LIBRARIES 	  		   
 		   uboonecode_uboone_LiteMaker	   
+	      	   TFileMetadataMicroBooNE_service
+	      	   FileCatalogMetadataMicroBooNE_service
+		   LLMetaMaker_service
 		   uboonecode_uboone_MuCS
-		   Geometry
+		   larcore_Geometry
 		   uboone_Geometry
-		   Geometry_service
-		   TimeService_service
-		   Simulation
+		   larcore_Geometry_Geometry_service
+		   larsim_Simulation
 		   SimulationBase
-		   Utilities
-		   MCBase
-		   SummaryData
-		   RawData
-		   RecoBase
-		   RecoObjects
-		   LArProperties_service
-		   DetectorProperties_service
+		   lardata_Utilities
+		   lardata_MCBase
+		   larcore_SummaryData
+		   lardata_RawData
+		   lardata_RecoBase
+		   lardata_RecoObjects
 		   ${UBOONECODE_LIB}
 		   ${SIMULATIONBASE}
 		   ${LARRECO_LIB}
@@ -93,6 +84,9 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		)
 
 simple_plugin(LLMetaMaker "service"
+	      TFileMetadataMicroBooNE_service
+	      FileCatalogMetadataMicroBooNE_service
+	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
 	      ${ART_UTILITIES}
 	      ${MF_MESSAGELOGGER}
 	      ${MF_UTILITIES}

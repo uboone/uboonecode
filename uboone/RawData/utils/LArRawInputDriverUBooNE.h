@@ -24,7 +24,7 @@
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
 #include "uboone/Geometry/UBOpChannelTypes.h"
-#include "Utilities/DatabaseUtil.h" // lardata
+#include "lardata/Utilities/DatabaseUtil.h" // lardata
 
 #include <fstream>
 #include <vector>
@@ -111,6 +111,8 @@ namespace lris {
     uint32_t                       fEventCounter; 
     uint32_t                       fNumberEventsInFile;
     bool                           fHuffmanDecode;
+    bool                           fUseGPS;    // fhicl parameter force use GPS time.
+    bool                           fUseNTP;    // fhicl parameter force use NTP time.
     util::UBChannelMap_t           fChannelMap;
     int                            fMaxEvents; //fhicl parameter.  Maximum number of events.
     int                            fSkipEvents; // fhicl parameter.  Number of events to skip.
