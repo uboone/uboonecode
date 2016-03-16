@@ -6,11 +6,11 @@ link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} )
 art_make( BASENAME_ONLY
 	  LIBRARY_NAME     uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
 	  LIB_LIBRARIES
-		   PhotonPropagation
-		   PhotonVisibilityService_service
+		   larsim_PhotonPropagation
+		   larsim_PhotonPropagation_PhotonVisibilityService_service
 		   uboonecode_uboone_BasicTool_GeoAlgo
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
-		   Simulation
+		   larsim_Simulation
                    ${ART_FRAMEWORK_CORE}
                    ${ART_FRAMEWORK_PRINCIPAL}
                    ${ART_FRAMEWORK_BASIC}

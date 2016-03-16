@@ -3,7 +3,7 @@
 
 #include "PhotonLibHypothesis.h"
 //#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
-#include "PhotonPropagation/PhotonVisibilityService.h"
+#include "larsim/PhotonPropagation/PhotonVisibilityService.h"
 
 namespace flashana {
 

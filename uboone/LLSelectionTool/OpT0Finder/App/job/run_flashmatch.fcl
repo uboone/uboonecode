@@ -16,10 +16,10 @@ services:
                            @table::microboone_services_reco
 }
 
-services.DetectorProperties.NumberTimeSamples: 6400
-services.DetectorProperties.ReadOutWindowSize: 6400
-services.TimeService.InheritClockConfig:       false
-services.TimeService.TriggerOffsetTPC:         -0.400e3
+#services.DetectorInfo.DetectorProperties.NumberTimeSamples: 6400
+#services.DetectorInfo.DetectorProperties.ReadOutWindowSize: 6400
+#services.DetectorInfo.TimeService.InheritClockConfig:       false
+#services.DetectorInfo.TimeService.TriggerOffsetTPC:         -0.400e3
 
 source:
 {
@@ -66,7 +66,8 @@ outputs:
 
 ### Here we include the file giving us run/data dependent overrides
 services.DatabaseUtil.ShouldConnect: false
-services.IDetPedestalService.DetPedestalRetrievalAlg.UseDB: false
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB: false
+services.DetectorClocksService.InheritClockConfig: false
 
 ### Here we try to suppress known and pointless messages
 

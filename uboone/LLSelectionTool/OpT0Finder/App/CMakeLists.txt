@@ -9,15 +9,13 @@ art_make( BASENAME_ONLY
 		   uboonecode_uboone_BasicTool_GeoAlgo
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   Geometry
-		   Geometry_service
-	   	   Simulation
-		   Utilities
-		   TimeService_service
-		   LArProperties_service
-		   MCBase
-		   RecoBase
-		   AnalysisBase
+  		   larcore_Geometry
+	   	   larsim_Simulation
+		   lardata_Utilities
+		   lardata_MCBase
+		   lardata_RecoBase
+		   lardata_AnalysisBase
+		   larpandora_LArPandoraInterface
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -42,15 +40,13 @@ art_make( BASENAME_ONLY
 		   uboonecode_uboone_BasicTool_GeoAlgo
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   Geometry
-		   Geometry_service
-	   	   Simulation
-		   Utilities
-		   TimeService_service
-		   LArProperties_service
-		   MCBase
-		   RecoBase
-		   AnalysisBase
+	  	   larcore_Geometry
+	   	   larsim_Simulation
+		   lardata_Utilities
+		   lardata_MCBase
+		   lardata_RecoBase
+		   lardata_AnalysisBase
+		   larpandora_LArPandoraInterface
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}

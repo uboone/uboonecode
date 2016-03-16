@@ -16,7 +16,7 @@
 #include "art/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "Utilities/AssociationUtil.h"
+#include "lardata/Utilities/AssociationUtil.h"
 #include "art/Persistency/Common/Assns.h"
 #include "art/Framework/Services/Optional/TFileService.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
@@ -41,11 +41,11 @@
 //
 // LArSoft fmwk includes
 //
-#include "RecoBase/OpFlash.h"
-#include "RecoBase/Track.h"
-#include "RecoBase/PFParticle.h"
-#include "RecoBase/Hit.h"
-#include "AnalysisBase/FlashMatch.h"
+#include "lardata/RecoBase/OpFlash.h"
+#include "lardata/RecoBase/Track.h"
+#include "lardata/RecoBase/PFParticle.h"
+#include "lardata/RecoBase/Hit.h"
+#include "lardata/AnalysisBase/FlashMatch.h"
 //
 // OpT0Finder fmwk includes
 //
@@ -60,8 +60,11 @@
 //
 // Drift velocity includes
 //
-#include "Utilities/LArProperties.h"
-
+//#include "lardata/Utilities/LArPropertiesService.h"
+#include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/DetectorInfo/DetectorProperties.h"
+#include "larcore//CoreUtils/ServiceUtil.h"
 
 class UBFlashMatching;
 
@@ -264,6 +267,63 @@ void UBFlashMatching::produce(art::Event & e)
     throw std::exception();
   }
 
+  lar_pandora::PFParticleVector pfparticlelist;
+  lar_pandora::PFParticlesToClusters pfParticleToClusterMap;
+  lar_pandora::LArPandoraHelper::CollectPFParticles(e, fPFPModuleLabel, pfparticlelist, pfParticleToClusterMap);
+  
+  lar_pandora::TrackVector allPfParticleTracks;
+  lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
+  lar_pandora::LArPandoraHelper::CollectTracks(e, fPFPModuleLabel, allPfParticleTracks, pfParticleToTrackMap);
+  
+  std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;  
+
+  size_t NPFParticles = pfparticlelist.size();
+  std::cout<<"#PFParticles: "<<NPFParticles<<std::endl;
+  std::vector< int> selfID;
+  std::vector <int> isPrimary;
+  std::vector <int> numDaughters;
+  std::vector <int> parentID;
+  std::vector <int> pdgCode;
+  std::vector <int> isNeutrino;
+  std::vector <int> isTrack;
+  std::vector <int> trackID;
+
+for (size_t i = 0; i < NPFParticles; ++i){
+     // std::cout<<"First for loop"<<std::endl;
+      selfID.push_back(pfparticlelist[i]->Self());
+     // std::cout<<"SelfID Set"<<std::endl;
+      isPrimary.push_back((Short_t)pfparticlelist[i]->IsPrimary());
+     // std::cout<<"Primary Set"<<std::endl;
+      numDaughters.push_back(pfparticlelist[i]->NumDaughters());
+     // std::cout<<"Daughters Set"<<std::endl;
+      parentID.push_back(pfparticlelist[i]->Parent());
+      //std::cout<<"Parent Set"<<std::endl;
+      pdgCode.push_back(pfparticlelist[i]->PdgCode());
+     // std::cout<<"PDG Set"<<std::endl;
+         
+      
+    //  std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<<" isPrimary[i]: "<<isPrimary[i]<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
+
+      // Set the daughter IDs.
+      std::vector<size_t> daughterIDs = pfparticlelist[i]->Daughters();
+  if (lar_pandora::LArPandoraHelper::IsTrack(pfparticlelist[i])){
+     isTrack.push_back(1);
+
+   auto trackMapIter = pfParticleToTrackMap.find(pfparticlelist[i]);
+    if (trackMapIter != pfParticleToTrackMap.end()) {
+       lar_pandora::TrackVector pfParticleTracks = trackMapIter->second;
+            
+       if (pfParticleTracks.size() == 1)
+         trackID.push_back(pfParticleTracks.at(0)->ID());
+       else
+          std::cerr << "Warning: there was more than one track found for PFParticle with ID " << pfparticlelist[i]->Self() << std::endl;
+     }
+     else
+       std::cerr << "Warning: there was no track found for track-like PFParticle with ID " << pfparticlelist[i]->Self() << std::endl;
+   }
+   else
+       isTrack.push_back(0);
+}
  //----------------------------End PFParticle Extraction---------------------------------------// 
 
   //
@@ -311,18 +371,6 @@ void UBFlashMatching::produce(art::Event & e)
  std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
 
 
- art::FindOneP<recob::PFParticle> trackParticleAssns(trackHandle, e, fPFPModuleLabel);
- std::vector<art::Ptr<recob::Track> > trackVec;
- std::map< art::Ptr<recob::PFParticle>, std::vector< art::Ptr<recob::Track> > > particlesToTracks;
-    for (unsigned int i = 0; i < trackHandle->size(); ++i)
-    {
-        const art::Ptr<recob::Track> track(trackHandle, i);
-        trackVec.push_back(track);
-        const art::Ptr<recob::PFParticle>  particle = trackParticleAssns.at(i);
-        particlesToTracks[particle].push_back(track);
-    }
-    std::cout<<"TRACKS: "<<trackParticleAssns.size()<<" TrackVec: "<<trackVec.size()<<" MapSize: "<<particlesToTracks.size()<<std::endl;
-
  for(size_t pfp_index=0; pfp_index < pfpVecHandle->size(); ++pfp_index) {
 
     // Retrieve pfparticle and construct flashana::Flash_t
@@ -335,7 +383,7 @@ void UBFlashMatching::produce(art::Event & e)
 
     std::vector<art::Ptr<recob::Track> > trackVec = trackPFPAssns.at(pfp.key());
  
-    std::cout<<"PfParticleInfo:IsPrimary:  "<<fprimary<<" NDaughtersWay1: "<<fndaughters<<" NDaughtersWay2: "<<daughters.size()<<" AssociatedTracks: "<<trackVec.size()<<std::endl;
+  std::cout<<"PfParticleInfo:IsPrimary:  "<<fprimary<<" NDaughtersWay1: "<<fndaughters<<" NDaughtersWay2: "<<daughters.size()<<" AssociatedTracks: "<<trackVec.size()<<std::endl;
      
     for( auto const& track: trackVec)
     { 
@@ -366,7 +414,7 @@ void UBFlashMatching::produce(art::Event & e)
       }
       Tottrj.push_back(trj);
      }
-     std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
+//  std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
     ::geoalgo::Trajectory trj;
     trj.resize(Tottrj.size(), ::geoalgo::Point_t(3,0.));
     std::cout<<"Finished setting trj size"<<std::endl;
@@ -437,13 +485,15 @@ void UBFlashMatching::produce(art::Event & e)
  // size_t match_track_index = 0;
  // size_t match_flash_index = 0;
 
-  
-  //auto const* detp = art::ServiceHandle<util::LArProperties>();
-  art::ServiceHandle<util::LArProperties> detp;
+  detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  //auto const* detprop = lar::providerFrom< detinfo::DetectorProperties >();
+
+ // auto const* detp = art::ServiceHandle<util::LArProperties>();
+//  art::ServiceHandle<util::LArProperties> detp;
   
 
   
-  const double driftVelocity = detp->DriftVelocity( detp->Efield(), detp->Temperature() );
+  const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
 
   std::vector<::flashana::FlashMatch_t> match_v; 
   for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) 
