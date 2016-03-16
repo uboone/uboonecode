@@ -43,9 +43,9 @@
 //
 #include "RecoBase/OpFlash.h"
 #include "RecoBase/Track.h"
+#include "RecoBase/PFParticle.h"
 #include "RecoBase/Hit.h"
 #include "AnalysisBase/FlashMatch.h"
-
 //
 // OpT0Finder fmwk includes
 //
@@ -94,6 +94,7 @@ private:
   ::flashana::LightPath _light_path_alg;
   std::string _track_producer_name; ///< Input recob::Track producer name
   std::string _flash_producer_name; ///< Input recob::OpFlash producer name
+  std::string fPFPModuleLabel;      ///< Input recob::PFParticle producer name
  
   //DetectorProperties
   //const util::LArProperties& detp;
@@ -159,6 +160,7 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
 {
   _track_producer_name = p.get<std::string>("TrackProducer");
   _flash_producer_name = p.get<std::string>("FlashProducer");
+  fPFPModuleLabel      = p.get<std::string>("PFPModulelabel","pandoraCosmic");
    fSpillName.clear();
    size_t pos = _track_producer_name.find(":");
    if( pos!=std::string::npos ) {
@@ -246,6 +248,23 @@ void UBFlashMatching::produce(art::Event & e)
 	      << _flash_producer_name << std::endl;
     throw std::exception();
   }
+ //-----------------------------PFParticle Extraction-----------------------------------------// 
+   art::Handle< std::vector<recob::PFParticle> > pfpVecHandle;
+   e.getByLabel(fPFPModuleLabel,  pfpVecHandle);
+   if(!pfpVecHandle.isValid()) {
+    std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::PFParticle from " 
+	      << fPFPModuleLabel << std::endl;
+    throw std::exception();
+  }
+
+  art::FindManyP<recob::Track> trackPFPAssns(pfpVecHandle, e , _track_producer_name); 
+  if(!trackPFPAssns.isValid()) {
+    std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::Track from " 
+	      << fPFPModuleLabel << std::endl;
+    throw std::exception();
+  }
+
+ //----------------------------End PFParticle Extraction---------------------------------------// 
 
   //
   //  0) Provide input to FlashMatchManager: FlashArray_t and QClusterArray_t
@@ -282,10 +301,90 @@ void UBFlashMatching::produce(art::Event & e)
     _mgr.Emplace(std::move(flash));
     count++;
   }
-//  size_t opflashsize = opf.size();
+  //  size_t opflashsize = opf.size();
 
   //  0-b) QClusterArray_t
-  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+    
+ art::PtrVector<recob::PFParticle> recoPFPList;
+ std::vector<::geoalgo::Trajectory> Tottrj;
+ int track_trj=0; 
+ std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
+
+
+ art::FindOneP<recob::PFParticle> trackParticleAssns(trackHandle, e, fPFPModuleLabel);
+ std::vector<art::Ptr<recob::Track> > trackVec;
+ std::map< art::Ptr<recob::PFParticle>, std::vector< art::Ptr<recob::Track> > > particlesToTracks;
+    for (unsigned int i = 0; i < trackHandle->size(); ++i)
+    {
+        const art::Ptr<recob::Track> track(trackHandle, i);
+        trackVec.push_back(track);
+        const art::Ptr<recob::PFParticle>  particle = trackParticleAssns.at(i);
+        particlesToTracks[particle].push_back(track);
+    }
+    std::cout<<"TRACKS: "<<trackParticleAssns.size()<<" TrackVec: "<<trackVec.size()<<" MapSize: "<<particlesToTracks.size()<<std::endl;
+
+ for(size_t pfp_index=0; pfp_index < pfpVecHandle->size(); ++pfp_index) {
+
+    // Retrieve pfparticle and construct flashana::Flash_t
+    art::Ptr<recob::PFParticle> pfp(pfpVecHandle, pfp_index);
+    recoPFPList.push_back(pfp);
+    auto const fprimary    = pfp->IsPrimary();
+    auto const fndaughters = pfp->NumDaughters();
+    auto const daughters   = pfp->Daughters();
+
+
+    std::vector<art::Ptr<recob::Track> > trackVec = trackPFPAssns.at(pfp.key());
+ 
+    std::cout<<"PfParticleInfo:IsPrimary:  "<<fprimary<<" NDaughtersWay1: "<<fndaughters<<" NDaughtersWay2: "<<daughters.size()<<" AssociatedTracks: "<<trackVec.size()<<std::endl;
+     
+    for( auto const& track: trackVec)
+    { 
+      
+      fTrackID = track->ID(); 
+      fTrackIDCodeHist->Fill(fTrackID);
+      fTrackPhi = track->Phi();
+      fTrackPhiHist->Fill(fTrackPhi);
+    
+      // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+      ::geoalgo::Trajectory trj;
+      // Set # points same as input track object, and initialize each point as 3D point
+      trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
+      std::cout<<"NumTrajectoryPoints: "<<track->NumberTrajectoryPoints()<<std::endl;
+      // Now loop over points and set actual xyz values
+      for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
+       std::cout<<"TrajectorySize: "<<trj.size()<<std::endl; 
+        // Get reference to be modified
+        auto&       copy_pt = trj[point_index];
+        // Get const reference to get values
+        auto const& orig_pt = track->LocationAtPoint(point_index);
+	track_trj=track_trj + (int)point_index;
+	std::cout<<"track_trj size: "<<track_trj<<std::endl;
+        copy_pt[0] = orig_pt[0];
+        copy_pt[1] = orig_pt[1];
+        copy_pt[2] = orig_pt[2];
+	std::cout<<"Trjpnts: "<< copy_pt[0]<<", "<<copy_pt[1]<<", "<<copy_pt[2]<<std::endl;
+      }
+      Tottrj.push_back(trj);
+     }
+     std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
+    ::geoalgo::Trajectory trj;
+    trj.resize(Tottrj.size(), ::geoalgo::Point_t(3,0.));
+    std::cout<<"Finished setting trj size"<<std::endl;
+    if( Tottrj.size() == 0) continue;
+    for (int index=0; index <(int) Tottrj.size(); ++index) {
+    std::cout<<"In Tottrj loop"<<std::endl;
+        trj = Tottrj[index];
+	std::cout<<"Trjpnts: "<< trj[0]<<", "<<trj[1]<<", "<<trj[2]<<std::endl;
+    } 
+    auto qcluster = _light_path_alg.FlashHypothesis(trj);
+    qcluster.idx = pfp_index;
+    ++pfp_index; 
+
+    // Register to a manager
+    _mgr.Emplace(std::move(qcluster));
+  }
+ /*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
+ for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
     // Retrieve individual recob::Track and construct flashana::Flash_t
@@ -321,6 +420,8 @@ void UBFlashMatching::produce(art::Event & e)
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
   }
+-------------------------------------------------------------------------------------------------------------------------*/
+  
 
   //
   //  1) Run FlashMatchManager & retrieve matches  
@@ -339,7 +440,9 @@ void UBFlashMatching::produce(art::Event & e)
   
   //auto const* detp = art::ServiceHandle<util::LArProperties>();
   art::ServiceHandle<util::LArProperties> detp;
+  
 
+  
   const double driftVelocity = detp->DriftVelocity( detp->Efield(), detp->Temperature() );
 
   std::vector<::flashana::FlashMatch_t> match_v; 
