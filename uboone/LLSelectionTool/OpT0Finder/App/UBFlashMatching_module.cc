@@ -45,6 +45,7 @@
 #include "lardata/RecoBase/Track.h"
 #include "lardata/RecoBase/PFParticle.h"
 #include "lardata/RecoBase/Hit.h"
+#include "lardata/RecoBase/Vertex.h"
 #include "lardata/AnalysisBase/FlashMatch.h"
 //
 // OpT0Finder fmwk includes
@@ -267,6 +268,11 @@ void UBFlashMatching::produce(art::Event & e)
     throw std::exception();
   }
 
+  // Get a PFParticle-to-vertex map.
+  lar_pandora::VertexVector allPfParticleVertices;
+  lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
+  lar_pandora::LArPandoraHelper::CollectVertices(e, fPFPModuleLabel, allPfParticleVertices, pfParticleToVertexMap);
+
   lar_pandora::PFParticleVector pfparticlelist;
   lar_pandora::PFParticlesToClusters pfParticleToClusterMap;
   lar_pandora::LArPandoraHelper::CollectPFParticles(e, fPFPModuleLabel, pfparticlelist, pfParticleToClusterMap);
@@ -275,6 +281,7 @@ void UBFlashMatching::produce(art::Event & e)
   lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
   lar_pandora::LArPandoraHelper::CollectTracks(e, fPFPModuleLabel, allPfParticleTracks, pfParticleToTrackMap);
   
+//  lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(pfparticlelist, pfParticleToClusterMap,  &clustersToHits, PFParticlesToHits &particlesToHits, HitsToPFParticles &hitsToParticles, 1);
   std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;  
 
   size_t NPFParticles = pfparticlelist.size();
@@ -283,10 +290,12 @@ void UBFlashMatching::produce(art::Event & e)
   std::vector <int> isPrimary;
   std::vector <int> numDaughters;
   std::vector <int> parentID;
+  std::vector <int> daughterIDs;
   std::vector <int> pdgCode;
   std::vector <int> isNeutrino;
   std::vector <int> isTrack;
   std::vector <int> trackID;
+  std::vector <int> vertexID;
 
 for (size_t i = 0; i < NPFParticles; ++i){
      // std::cout<<"First for loop"<<std::endl;
@@ -302,13 +311,34 @@ for (size_t i = 0; i < NPFParticles; ++i){
      // std::cout<<"PDG Set"<<std::endl;
          
       
-    //  std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<<" isPrimary[i]: "<<isPrimary[i]<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
+      std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<<" isPrimary[i]: "<<isPrimary[i]<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
 
       // Set the daughter IDs.
       std::vector<size_t> daughterIDs = pfparticlelist[i]->Daughters();
+      std::cout<<"right after daughter loop: NumDaughters: "<<daughterIDs.size()<<std::endl; 
+      
+     /* for (size_t j = 0; j < daughterIDs.size(); ++j)
+        daughterIDs.push_back(daughterIDs[j]);*/
+
+      auto vertexMapIter = pfParticleToVertexMap.find(pfparticlelist[i]);
+	std::cout<<"above vertexMapIter if statement:"<<std::endl;
+      if (vertexMapIter != pfParticleToVertexMap.end()) {
+          lar_pandora::VertexVector pfParticleVertices = vertexMapIter->second;
+          
+          if (pfParticleVertices.size() == 1)
+            vertexID.push_back(pfParticleVertices.at(0)->ID());
+ 	    
+          else
+            std::cerr << "Warning: there was more than one vertex found for PFParticle with ID " << pfparticlelist[i]->Self() << std::endl;
+      }
+      else
+        std::cerr << "Warning: there was no vertex found for PFParticle with ID " << pfparticlelist[i]->Self() << std::endl;
+
+ 
   if (lar_pandora::LArPandoraHelper::IsTrack(pfparticlelist[i])){
      isTrack.push_back(1);
 
+	std::cout<<"above trackMapIter if statement:"<<std::endl;
    auto trackMapIter = pfParticleToTrackMap.find(pfparticlelist[i]);
     if (trackMapIter != pfParticleToTrackMap.end()) {
        lar_pandora::TrackVector pfParticleTracks = trackMapIter->second;
@@ -364,27 +394,18 @@ for (size_t i = 0; i < NPFParticles; ++i){
   //  size_t opflashsize = opf.size();
 
   //  0-b) QClusterArray_t
-    
+   std::cout<<"finished opflash stuff"<<std::endl;
+ 
  art::PtrVector<recob::PFParticle> recoPFPList;
  std::vector<::geoalgo::Trajectory> Tottrj;
  int track_trj=0; 
  std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
 
 
- for(size_t pfp_index=0; pfp_index < pfpVecHandle->size(); ++pfp_index) {
-
-    // Retrieve pfparticle and construct flashana::Flash_t
-    art::Ptr<recob::PFParticle> pfp(pfpVecHandle, pfp_index);
-    recoPFPList.push_back(pfp);
-    auto const fprimary    = pfp->IsPrimary();
-    auto const fndaughters = pfp->NumDaughters();
-    auto const daughters   = pfp->Daughters();
-
-
-    std::vector<art::Ptr<recob::Track> > trackVec = trackPFPAssns.at(pfp.key());
- 
-  std::cout<<"PfParticleInfo:IsPrimary:  "<<fprimary<<" NDaughtersWay1: "<<fndaughters<<" NDaughtersWay2: "<<daughters.size()<<" AssociatedTracks: "<<trackVec.size()<<std::endl;
-     
+int pfp_index =0;
+for (size_t i = 0; i < NPFParticles; ++i){
+   if (pfparticlelist[i]->IsPrimary()==1) {
+    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
     for( auto const& track: trackVec)
     { 
       
@@ -400,37 +421,28 @@ for (size_t i = 0; i < NPFParticles; ++i){
       std::cout<<"NumTrajectoryPoints: "<<track->NumberTrajectoryPoints()<<std::endl;
       // Now loop over points and set actual xyz values
       for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
-       std::cout<<"TrajectorySize: "<<trj.size()<<std::endl; 
+      std::cout<<"TrajectorySize: "<<trj.size()<<std::endl; 
         // Get reference to be modified
         auto&       copy_pt = trj[point_index];
         // Get const reference to get values
         auto const& orig_pt = track->LocationAtPoint(point_index);
 	track_trj=track_trj + (int)point_index;
-	std::cout<<"track_trj size: "<<track_trj<<std::endl;
+//	std::cout<<"track_trj size: "<<track_trj<<std::endl;
         copy_pt[0] = orig_pt[0];
         copy_pt[1] = orig_pt[1];
         copy_pt[2] = orig_pt[2];
 	std::cout<<"Trjpnts: "<< copy_pt[0]<<", "<<copy_pt[1]<<", "<<copy_pt[2]<<std::endl;
       }
-      Tottrj.push_back(trj);
-     }
-//  std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
-    ::geoalgo::Trajectory trj;
-    trj.resize(Tottrj.size(), ::geoalgo::Point_t(3,0.));
-    std::cout<<"Finished setting trj size"<<std::endl;
-    if( Tottrj.size() == 0) continue;
-    for (int index=0; index <(int) Tottrj.size(); ++index) {
-    std::cout<<"In Tottrj loop"<<std::endl;
-        trj = Tottrj[index];
-	std::cout<<"Trjpnts: "<< trj[0]<<", "<<trj[1]<<", "<<trj[2]<<std::endl;
-    } 
-    auto qcluster = _light_path_alg.FlashHypothesis(trj);
-    qcluster.idx = pfp_index;
-    ++pfp_index; 
+      auto qcluster = _light_path_alg.FlashHypothesis(trj);
+      qcluster.idx = pfp_index;
+      ++pfp_index; 
 
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
-  }
+     }
+//  std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
+}
+}
  /*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
@@ -491,25 +503,29 @@ for (size_t i = 0; i < NPFParticles; ++i){
  // auto const* detp = art::ServiceHandle<util::LArProperties>();
 //  art::ServiceHandle<util::LArProperties> detp;
   
-
   
   const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-
   std::vector<::flashana::FlashMatch_t> match_v; 
-  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) 
-  {
+  for (size_t i = 0; i < NPFParticles; ++i){
+   if (pfparticlelist[i]->IsPrimary()==1) {
+    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
+    for( auto const& track: trackVec)
+    { 
     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
     
-    art::Ptr<recob::Track> track(trackHandle,track_index); 
+    //art::Ptr<recob::Track> track(trackHandle,track_index); 
 
     float charge=0;
-    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
+/*
+std::cout<<"clearing charge"<<std::endl;    
+    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(&track.key());
+std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;    
     for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
     {
     	charge += trackHitVec.at(hit_index)->Integral();
     }
     std::cout<<"Hit Charge: "<<charge<<std::endl;
-    
+   */ 
     TVector3 startpos = track->LocationAtPoint(0);
     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
     startpos += endpos;
@@ -546,7 +562,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
     {
       fTrackMatched = 1;
       fMatchScore = match.score;
-
+     std::cout<<"--------------------------------------------TESTING ELSE STATEMENT---------------------------"<<std::endl;
       double light = opflashVec.at(match.flash_id).TotalPE();
       fTrackLight = light;
       fTrackCharge = charge;
@@ -563,12 +579,16 @@ for (size_t i = 0; i < NPFParticles; ++i){
       fFlashTime = flashtime;
 
       fMatchTree->Fill();
+      std::cout<<"-------------------------------FINISHED FILLING TTREE---------------------------"<<std::endl;
+      
     }
     anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
     
     flashmatchtrack->push_back(Flash);
     util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
   }
+}
+}
 
 
 /* 
@@ -602,8 +622,18 @@ for (size_t i = 0; i < NPFParticles; ++i){
       		  << std::endl;
 //      anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
  //     flashmatch->push_back(Flash);
-  }*/
+  }
 
+  selfID.clear();
+  isPrimary.clear();
+  numDaughters.clear();
+  parentID.clear();
+  daughterIDs.clear();
+  pdgCode.clear();
+  isNeutrino.clear();
+  isTrack.clear();
+  trackID.clear();
+  vertexID.clear();*/
    e.put(std::move(flashmatchtrack),fSpillName);   
    e.put(std::move(flashTrackAssociations),fSpillName);   
   // e.put(std::move(flashOpFlashAssociations),fSpillName);   
