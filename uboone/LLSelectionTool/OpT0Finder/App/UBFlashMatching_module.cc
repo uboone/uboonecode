@@ -187,8 +187,6 @@ void UBFlashMatching::beginJob()
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
     fMatchTree = tfs->make<TTree>("match_tree", "match_tree");
-    fMatchTree->SetDirectory(0);
-    fMatchTree->Branch("");
 
     fMatchTree->Branch("TrackCharge"  , &fTrackCharge  , "TrackCharge/D"  );
     fMatchTree->Branch("TrackLight"   , &fTrackLight   , "TrackLight/D"   );
@@ -400,15 +398,29 @@ for (size_t i = 0; i < NPFParticles; ++i){
  std::vector<::geoalgo::Trajectory> Tottrj;
  int track_trj=0; 
  std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
-
-
 int pfp_index =0;
 for (size_t i = 0; i < NPFParticles; ++i){
+if (trackID.size()==0) 
+{ 
+  std::cout<<"No tracks or Verticies made---- not matching: "<<std::endl; 
+
+  fTrackID = -999; 
+  fTrackIDCodeHist->Fill(fTrackID);
+  fTrackPhi = -999;
+  fTrackPhiHist->Fill(fTrackPhi);
+
+ break;
+}
+    std::cout<<"BEFORE PRIMARY!!!!!!!!!!!!"<<std::endl;
    if (pfparticlelist[i]->IsPrimary()==1) {
+    std::cout<<"PRIMARY!!!!!!!!!!!!"<<std::endl;
+    if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
+    std::cout<<"setting trackVec"<<std::endl;
     for( auto const& track: trackVec)
     { 
       
+      std::cout<<"inside trackVec for loop"<<std::endl;
       fTrackID = track->ID(); 
       fTrackIDCodeHist->Fill(fTrackID);
       fTrackPhi = track->Phi();
@@ -417,6 +429,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
       // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
       ::geoalgo::Trajectory trj;
       // Set # points same as input track object, and initialize each point as 3D point
+      std::cout<<"Before Trajectory:"<<std::endl;
       trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
       std::cout<<"NumTrajectoryPoints: "<<track->NumberTrajectoryPoints()<<std::endl;
       // Now loop over points and set actual xyz values
@@ -433,16 +446,23 @@ for (size_t i = 0; i < NPFParticles; ++i){
         copy_pt[2] = orig_pt[2];
 	std::cout<<"Trjpnts: "<< copy_pt[0]<<", "<<copy_pt[1]<<", "<<copy_pt[2]<<std::endl;
       }
+      std::cout<<"FINISHED TRJ POINTS: "<<std::endl;
       auto qcluster = _light_path_alg.FlashHypothesis(trj);
+      std::cout<<"Setting qcluster: "<<std::endl;
       qcluster.idx = pfp_index;
       ++pfp_index; 
 
+      std::cout<<"Placing it onto event: "<<std::endl;
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
+      std::cout<<"After the manager: "<<std::endl;
      }
+     std::cout<<"Outside of trackVec loop: "<<std::endl;
 //  std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
 }
+     std::cout<<"Outside of primary if statement: "<<std::endl;
 }
+     std::cout<<"Outside of NFParticles if statement: "<<std::endl;
  /*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
@@ -504,11 +524,22 @@ for (size_t i = 0; i < NPFParticles; ++i){
 //  art::ServiceHandle<util::LArProperties> detp;
   
   
+int NumPrimaries=0;
+for(unsigned int i = 0; i <isPrimary.size(); i++)
+    if(isPrimary[i]==1) ++NumPrimaries;
+std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
   const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
   std::vector<::flashana::FlashMatch_t> match_v; 
   for (size_t i = 0; i < NPFParticles; ++i){
+if (trackID.size()==0) 
+{ 
+  std::cout<<"No tracks or Verticies made---- not matching: "<<std::endl; 
+ break;
+}
    if (pfparticlelist[i]->IsPrimary()==1) {
+    if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
+    std::cout<<"Size of trackVec: "<<trackVec.size()<<std::endl;
     for( auto const& track: trackVec)
     { 
     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
@@ -516,16 +547,18 @@ for (size_t i = 0; i < NPFParticles; ++i){
     //art::Ptr<recob::Track> track(trackHandle,track_index); 
 
     float charge=0;
-/*
+
 std::cout<<"clearing charge"<<std::endl;    
-    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(&track.key());
+/*
+std::cout<<"track pointer size: "<< trackHitAssns.at(track.key()).size()<<std::endl;
+    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
 std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;    
     for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
     {
     	charge += trackHitVec.at(hit_index)->Integral();
     }
     std::cout<<"Hit Charge: "<<charge<<std::endl;
-   */ 
+ */   
     TVector3 startpos = track->LocationAtPoint(0);
     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
     startpos += endpos;
