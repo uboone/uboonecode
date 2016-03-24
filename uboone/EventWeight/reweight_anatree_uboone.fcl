@@ -86,7 +86,7 @@ physics:
  end_paths:     [ stream1, ana ] 
 }
 
-physics.producers.eventweight.weight_functions: [ genie_qemacc ]
+#physics.producers.eventweight.weight_functions: [ genie_qemacc ]
 
 
 
