@@ -394,33 +394,18 @@ for (size_t i = 0; i < NPFParticles; ++i){
   //  0-b) QClusterArray_t
    std::cout<<"finished opflash stuff"<<std::endl;
  
- art::PtrVector<recob::PFParticle> recoPFPList;
- std::vector<::geoalgo::Trajectory> Tottrj;
- int track_trj=0; 
- std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
+std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
+/*-------------------------------FLASHMATCH VIA primary PFParticle in Event------------------------- 
 int pfp_index =0;
-for (size_t i = 0; i < NPFParticles; ++i){
-if (trackID.size()==0) 
-{ 
-  std::cout<<"No tracks or Verticies made---- not matching: "<<std::endl; 
-
-  fTrackID = -999; 
-  fTrackIDCodeHist->Fill(fTrackID);
-  fTrackPhi = -999;
-  fTrackPhiHist->Fill(fTrackPhi);
-
- break;
-}
-    std::cout<<"BEFORE PRIMARY!!!!!!!!!!!!"<<std::endl;
-   if (pfparticlelist[i]->IsPrimary()==1) {
-    std::cout<<"PRIMARY!!!!!!!!!!!!"<<std::endl;
+for (size_t i = 0; i < NPFParticles; ++i)
+{
+  if (pfparticlelist[i]->IsPrimary()==1) 
+  {
     if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
-    std::cout<<"setting trackVec"<<std::endl;
     for( auto const& track: trackVec)
     { 
       
-      std::cout<<"inside trackVec for loop"<<std::endl;
       fTrackID = track->ID(); 
       fTrackIDCodeHist->Fill(fTrackID);
       fTrackPhi = track->Phi();
@@ -429,41 +414,79 @@ if (trackID.size()==0)
       // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
       ::geoalgo::Trajectory trj;
       // Set # points same as input track object, and initialize each point as 3D point
-      std::cout<<"Before Trajectory:"<<std::endl;
       trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
-      std::cout<<"NumTrajectoryPoints: "<<track->NumberTrajectoryPoints()<<std::endl;
       // Now loop over points and set actual xyz values
-      for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
-      std::cout<<"TrajectorySize: "<<trj.size()<<std::endl; 
+      for(size_t point_index = 0; point_index < trj.size(); ++point_index) 
+      {
         // Get reference to be modified
         auto&       copy_pt = trj[point_index];
         // Get const reference to get values
         auto const& orig_pt = track->LocationAtPoint(point_index);
-	track_trj=track_trj + (int)point_index;
-//	std::cout<<"track_trj size: "<<track_trj<<std::endl;
+        
         copy_pt[0] = orig_pt[0];
         copy_pt[1] = orig_pt[1];
         copy_pt[2] = orig_pt[2];
 	std::cout<<"Trjpnts: "<< copy_pt[0]<<", "<<copy_pt[1]<<", "<<copy_pt[2]<<std::endl;
       }
-      std::cout<<"FINISHED TRJ POINTS: "<<std::endl;
+      
       auto qcluster = _light_path_alg.FlashHypothesis(trj);
-      std::cout<<"Setting qcluster: "<<std::endl;
       qcluster.idx = pfp_index;
       ++pfp_index; 
 
-      std::cout<<"Placing it onto event: "<<std::endl;
-    // Register to a manager
-    _mgr.Emplace(std::move(qcluster));
-      std::cout<<"After the manager: "<<std::endl;
+      // Register to a manager
+      _mgr.Emplace(std::move(qcluster));
      }
-     std::cout<<"Outside of trackVec loop: "<<std::endl;
-//  std::cout<<"Total track trajectories vs Vector of Track trajectories: "<<track_trj<<":"<<(int)Tottrj.size()<<std::endl;
+  }
 }
-     std::cout<<"Outside of primary if statement: "<<std::endl;
+*/
+
+/*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/ 
+int pfp_index =0;
+::flashana::QCluster_t summed_cluster;
+for (size_t i = 0; i < NPFParticles; ++i)
+{
+  if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+  auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
+  for( auto const& track: trackVec)
+  { 
+      
+    fTrackID = track->ID(); 
+    fTrackIDCodeHist->Fill(fTrackID);
+    fTrackPhi = track->Phi();
+    fTrackPhiHist->Fill(fTrackPhi);
+    
+    // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+    ::geoalgo::Trajectory trj;
+    // Set # points same as input track object, and initialize each point as 3D point
+    trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
+
+    // Now loop over points and set actual xyz values
+    for(size_t point_index = 0; point_index < trj.size(); ++point_index) 
+    {
+      
+      // Get reference to be modified
+      auto&       copy_pt = trj[point_index];
+      // Get const reference to get values
+      auto const& orig_pt = track->LocationAtPoint(point_index);
+
+      copy_pt[0] = orig_pt[0];
+      copy_pt[1] = orig_pt[1];
+      copy_pt[2] = orig_pt[2];
+    }
+    
+    auto qcluster = _light_path_alg.FlashHypothesis(trj);
+    summed_cluster += qcluster;
+  }
+    summed_cluster.idx = pfp_index;
+    
+    // Register to a manager
+    _mgr.Emplace(std::move(summed_cluster));
 }
-     std::cout<<"Outside of NFParticles if statement: "<<std::endl;
- /*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
+ 
+
+
+
+/*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
  for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
@@ -528,14 +551,11 @@ int NumPrimaries=0;
 for(unsigned int i = 0; i <isPrimary.size(); i++)
     if(isPrimary[i]==1) ++NumPrimaries;
 std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
-  const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-  std::vector<::flashana::FlashMatch_t> match_v; 
-  for (size_t i = 0; i < NPFParticles; ++i){
-if (trackID.size()==0) 
-{ 
-  std::cout<<"No tracks or Verticies made---- not matching: "<<std::endl; 
- break;
-}
+
+const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
+std::vector<::flashana::FlashMatch_t> match_v; 
+
+for (size_t i = 0; i < NPFParticles; ++i){
    if (pfparticlelist[i]->IsPrimary()==1) {
     if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
@@ -544,7 +564,6 @@ if (trackID.size()==0)
     { 
     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
     
-    //art::Ptr<recob::Track> track(trackHandle,track_index); 
 
     float charge=0;
 
