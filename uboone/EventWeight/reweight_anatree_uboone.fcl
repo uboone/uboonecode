@@ -1,20 +1,5 @@
 #include "services_microboone.fcl"
-#include "hitfindermodules_microboone.fcl"
-#include "cluster_microboone.fcl"
-#include "particleid_microboone.fcl"
 #include "analysistreemodule_microboone.fcl"
-#include "filters.fcl"
-#include "signalservices_microboone.fcl"
-#include "caldata_microboone.fcl"
-#include "trackfindermodules_microboone.fcl"
-#include "calorimetry_microboone.fcl"
-#include "showerfindermodules.fcl"
-#include "opticaldetectormodules.fcl"
-#include "vertexfindermodules.fcl"
-#include "pandoramodules.fcl"
-#include "triggeralgo_service.fcl"
-#include "photpropservices_microboone.fcl"
-#include "photoncountert0matching.fcl"
 #include "seedservice_microboone.fcl"
 #include "eventweight_microboone.fcl"
  
@@ -23,6 +8,7 @@ process_name: EventWeightAnaTree
 
 services:
 {
+  scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   #Load the service that manages root files for histograms.
   TFileService: { fileName: "standard_reco_hist.root" }
   Timing:       {}
@@ -38,7 +24,7 @@ services:
 source:
 {
   module_type: RootInput
-  maxEvents:  10            # Number of events to create
+  maxEvents:  2            # Number of events to create
 }
 
 outputs:
@@ -46,7 +32,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "standard_reco_weighted.root"    #default file name, can override from command line with -o or --output
+   fileName:    "standard_reco.root"    #default file name, can override from command line with -o or --output
    dataTier:    "detector-simulated"
    fastCloning: false
  } 
@@ -55,13 +41,6 @@ outputs:
 physics:
 {
  producers:{
-  # Calorimetry producers
-   trackkalmanhitcalo: @local::microboone_calomc
-   trackkalspscalo:    @local::microboone_calomc
-   beziercalo:         @local::microboone_beziercalorimetry
-   trackkalmanhitpid:  @local::microboone_chi2pid
-   beziertrackerpid:   @local::microboone_chi2pid
-   t0match:            @local::standard_photoncountert0matching
   # EventWeight
    eventweight:    @local::microboone_eventweight
    rns:            { module_type: "RandomNumberSaver" }
@@ -87,57 +66,29 @@ physics:
 }
 
 #physics.producers.eventweight.weight_functions: [ genie_qemacc ]
+#services.TimeService.InheritClockConfig: false
+#services.user.TimeService.InheritClockConfig: false
 
 
-
-
-
-
-
-# define the list of LArSoft modules to run through the simulate path
-
-physics.producers.calo:          @local::microboone_calomc
 
 physics.analyzers.analysistree:  @local::microboone_analysistree
+physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
+physics.analyzers.analysistree.TrackModuleLabel:                ["trackkalmanhit","stitchkalmanhit","trackkalmanhitcc","stitchkalmanhitcc","pandoraCosmicKHit","pandoraNuKHit","cctrack","trackkalmanhitc3d","stitchkalmanhitc3d"]
+physics.analyzers.analysistree.VertexModuleLabel:               ["cccluster", "pandoraNu", "pandoraCosmic"]
+physics.analyzers.analysistree.CalorimetryModuleLabel:          ["trackkalmanhitcalo","stitchkalmanhitcalo","trackkalmanhitcalocc","stitchkalmanhitcalocc","pandoraCosmicKHitcalo","pandoraNuKHitcalo","cctrackcaloDUMMY","trackkalmanhitcaloc3d","stitchkalmanhitcaloc3d"]
+physics.analyzers.analysistree.ParticleIDModuleLabel:           ["trackkalmanhitpid","stitchkalmanhitpid","trackkalmanhitpidcc","stitchkalmanhitpidcc","pandoraCosmicKHitpid","pandoraNuKHitpid","cctrackpidDUMMY","trackkalmanhitpidc3d","stitchkalmanhitpidc3d"]
+physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["trackkalmanhittag","stitchkalmanhittag","trackkalmanhittagcc","stitchkalmanhittagcc","pandoraCosmicKHitPFPart","pandoraNuKHittag","cctracktagDUMMY","trackkalmanhittagc3d","stitchkalmanhittagc3d"]
+physics.analyzers.analysistree.FlashMatchAssocLabel:            ["trackkalmanhitflashmatch","stitchkalmanhitflashmatch","trackkalmanhitflashmatchcc","stitchkalmanhitflashmatchcc","pandoraCosmicKHitFlashMatch","pandoraNuKHitFlashMatch","cctrackflashmatchDUMMY","trackkalmanhitflashmatchc3d","stitchkalmanhitflashmatchc3d"]
+physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0","t0","t0","t0","t0","t0"]
+physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0"]
+physics.analyzers.analysistree.CosmicScoreThresholds:           [0.0]
+physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
+physics.analyzers.analysistree.POTModuleLabel:                  "generator"
+physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
+physics.analyzers.analysistree.ShowerModuleLabel:               ["showerrecofuzzy","showerrecopandora"]
+physics.analyzers.analysistree.IgnoreMissingShowers:            true
+physics.analyzers.analysistree.SaveCryInfo:                     false
 
-#physics.producers.t0match.MatchCriteria: 1
-
-physics.producers.trackkalmanhitcalo.TrackModuleLabel:          "trackkalmanhit"
-#physics.producers.trackkalspscalo.TrackModuleLabel:             "trackkalsps"
-physics.producers.beziercalo.BTrackModuleLabel:                 "beziertracker"
-
-physics.producers.trackkalmanhitpid.TrackModuleLabel:           "trackkalmanhit"
-physics.producers.beziertrackerpid.TrackModuleLabel:           "beziertracker"
-
-physics.producers.trackkalmanhitpid.CalorimetryModuleLabel:           "trackkalmanhitcalo"
-physics.producers.beziertrackerpid.CalorimetryModuleLabel:           "beziercalo"
-
-#physics.analyzers.analysistree.VertexModuleLabel:       ["trackkalmanhit"]
-#physics.analyzers.analysistree.VertexModuleLabel:       []
-
-physics.analyzers.analysistree.TrackModuleLabel:        ["trackkalmanhit"]
-physics.analyzers.analysistree.CalorimetryModuleLabel:  ["trackkalmanhitcalo"]
-
-physics.analyzers.analysistree.FlashT0FinderLabel: ["t0"]
-physics.analyzers.analysistree.MCT0FinderLabel: ["mct0"]
-
-
-physics.analyzers.analysistree.GenieGenModuleLabel:     "generator"
-physics.analyzers.analysistree.POTModuleLabel:          "generator"
-physics.analyzers.analysistree.ParticleIDModuleLabel:   ["trackkalmanhitpid"]
-
-physics.analyzers.analysistree.CosmicTaggerAssocLabel: ["cosmictaggerKHit"]
-physics.analyzers.analysistree.FlashMatchAssocLabel:     ["flashTrackMatchkHit"]
-
-physics.analyzers.analysistree.CosmicClusterTaggerAssocLabel: "ccclustertag"
-
-physics.analyzers.analysistree.CryGenModuleLabel: "generator"
-physics.analyzers.analysistree.HitsModuleLabel: "linecluster"
-physics.analyzers.analysistree.ClusterModuleLabel: "linecluster"
-physics.analyzers.analysistree.ShowerModuleLabel: ["showerrecofuzzy", "showerrecopandora"]
-physics.analyzers.analysistree.MCShowerModuleLabel: "mcreco"
-physics.analyzers.analysistree.IgnoreMissingShowers: true
-physics.analyzers.analysistree.SaveHitInfo: true
 
 
 #physics.analyzers.analysistree.SaveCryInfo: false

@@ -59,7 +59,7 @@ namespace evwgh {
                     kAGKYpT,           // Pion transverse momentum for Npi states in AGKY
                     kFormZone,         // Hadron Formation Zone
                     kFermiGasModelKf,  // CCQE Pauli Suppression via changes in Fermi level kF
-                    kFermiGasModelSf,  // Choice of model (sigma = 0 => FermiGas; sigma = 1 => SF (SuperFluid??))
+                    kFermiGasModelSf,  // Choice of model (sigma = 0 => FermiGas; sigma = 1 => SF (spectral function))
                     kIntraNukeNmfp,    // Nucleon mean free path (total rescattering probability)
                     kIntraNukeNcex,    // Nucleon charge exchange probability
                     kIntraNukeNel,     // Nucleon elastic reaction probability
