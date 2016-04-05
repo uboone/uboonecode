@@ -67,6 +67,13 @@
 #include "lardata/DetectorInfo/DetectorProperties.h"
 #include "larcore//CoreUtils/ServiceUtil.h"
 
+//
+// Truth matching includes
+//
+#include "larsim/MCCheater/BackTracker.h"
+#include "SimulationBase/MCParticle.h"
+#include "SimulationBase/MCTrajectory.h"
+
 class UBFlashMatching;
 
 //using namespace anab;
@@ -202,6 +209,7 @@ void UBFlashMatching::beginJob()
 
 void UBFlashMatching::produce(art::Event & e)
 {
+  std::cout << "NEW EVENT" << std::endl;
   _mgr.Reset();
   // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
   const size_t num_pmts = 32;
@@ -249,6 +257,10 @@ void UBFlashMatching::produce(art::Event & e)
     std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::OpFlash from " 
 	      << _flash_producer_name << std::endl;
     throw std::exception();
+  }
+  else
+  {
+    std::cout << "flashHandle has size " << flashHandle->size() << std::endl;
   }
  //-----------------------------PFParticle Extraction-----------------------------------------// 
    art::Handle< std::vector<recob::PFParticle> > pfpVecHandle;
@@ -361,6 +373,9 @@ for (size_t i = 0; i < NPFParticles; ++i){
   //  0-a) FlashArray_t
   std::vector<flashana::Flash_t> opflashVec;
   int count = 1;
+
+  art::ServiceHandle<cheat::BackTracker> bt;
+
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -482,12 +497,10 @@ for (size_t i = 0; i < NPFParticles; ++i)
     // Register to a manager
     _mgr.Emplace(std::move(summed_cluster));
 }
- 
 
 
-
-/*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
- for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+//-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
+/* for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
     // Retrieve individual recob::Track and construct flashana::Flash_t
@@ -523,7 +536,8 @@ for (size_t i = 0; i < NPFParticles; ++i)
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
   }
--------------------------------------------------------------------------------------------------------------------------*/
+*/
+//-------------------------------------------------------------------------------------------------------------------------
   
 
   //
@@ -626,6 +640,20 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       fTrackRecoTime = drifttime;
 
       fTrackTrueTime = -100;
+      fTrackTrueTime = -100;
+      std::cout << "BACKTRACKER AWAY" << std::endl;
+      std::cout << "Track ID = " << track->ID() << ", track length = " << track->Length() << std::endl;
+      const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID()+1);
+      std::cout << "BACKTRACKER YOU DID GOOD" << std::endl;
+      if (true_particle != NULL)
+      {
+        double truetime = true_particle->T();
+        std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
+        fTrackTrueTime = truetime;
+      }
+      else
+        std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
+
 
       double flashtime = opflashVec.at(match.flash_id).time;
       fFlashTime = flashtime;
