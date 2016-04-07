@@ -16,7 +16,8 @@
 #include "photpropservices_microboone.fcl"
 #include "photoncountert0matching.fcl"
 
- 
+#include "mchitmodules.fcl"
+##include "mcreco.fcl"
 
 process_name: AnaTree
 

@@ -127,6 +127,16 @@ private:
 
   TTree *fMatchTree;
 
+  Int_t fNPandoraTrees;
+  Int_t fNTracks;
+  Int_t fNFlashes;
+  Int_t fNFilteredFlashes;
+
+  TTree *fEventTree;
+
+  Double_t fFlashLight;
+
+  TTree *fFlashTree;
 
   //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
@@ -194,16 +204,25 @@ void UBFlashMatching::beginJob()
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
     fMatchTree = tfs->make<TTree>("match_tree", "match_tree");
+    fEventTree = tfs->make<TTree>("event_tree", "event_tree");
+    fFlashTree = tfs->make<TTree>("flash_tree", "flash_tree");
 
     fMatchTree->Branch("TrackCharge"  , &fTrackCharge  , "TrackCharge/D"  );
     fMatchTree->Branch("TrackLight"   , &fTrackLight   , "TrackLight/D"   );
-    fMatchTree->Branch("TrackPosY"    , &fTrackPosY    ,  "TrackPosY/D"   );
+    fMatchTree->Branch("TrackPosY"    , &fTrackPosY    , "TrackPosY/D"    );
     fMatchTree->Branch("TrackPosZ"    , &fTrackPosZ    , "TrackPosZ/D"    );
     fMatchTree->Branch("TrackTrueTime", &fTrackTrueTime, "TrackTrueTime/D");
     fMatchTree->Branch("TrackRecoTime", &fTrackRecoTime, "TrackRecoTime/D");
     fMatchTree->Branch("FlashTime"    , &fFlashTime    , "FlashTime/D"    );
     fMatchTree->Branch("TrackMatched" , &fTrackMatched , "TrackMatched/I" );
     fMatchTree->Branch("MatchScore"   , &fMatchScore   , "MatchScore/D"   );
+
+    fEventTree->Branch("NPandoraTrees", &fNPandoraTrees, "NPandoraTrees/I");
+    fEventTree->Branch("NTracks"      , &fNTracks      , "NTracks/I"      );
+    fEventTree->Branch("NFlashes"     , &fNFlashes     , "NFlashes/I"     );
+    fEventTree->Branch("NFilteredFlashes", &fNFilteredFlashes, "NFilteredFlashes/I");
+
+    fFlashTree->Branch("FlashLight"   , &fFlashLight   , "FlashLight/D"   );
 
 }
 
@@ -376,6 +395,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
 
   art::ServiceHandle<cheat::BackTracker> bt;
 
+  int nfiltered = 0;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -399,7 +419,11 @@ for (size_t i = 0; i < NPFParticles; ++i){
 
     ::flashana::Flash_t flash_clone = flash;
     opflashVec.push_back(flash_clone);
-    
+  
+    fFlashLight = opf.TotalPE();
+    fFlashTree->Fill();
+    if (fFlashLight > 5) nfiltered++;
+
     // Register to a manager
     _mgr.Emplace(std::move(flash));
     count++;
@@ -567,7 +591,15 @@ for(unsigned int i = 0; i <isPrimary.size(); i++)
 std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
 
 const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-std::vector<::flashana::FlashMatch_t> match_v; 
+std::vector<::flashana::FlashMatch_t> match_v;
+
+fNPandoraTrees = NPFParticles;
+fNTracks = allPfParticleTracks.size();
+std::cout << "Counting flashes" << std::endl;
+fNFlashes = flashHandle->size();
+fNFilteredFlashes = nfiltered;
+std::cout << "Filling event tree" << std::endl;
+fEventTree->Fill();
 
 for (size_t i = 0; i < NPFParticles; ++i){
    if (pfparticlelist[i]->IsPrimary()==1) {
