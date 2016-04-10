@@ -34,6 +34,9 @@ services:
   FileCatalogMetadata:     @local::art_file_catalog_mc
   PhotonVisibilityService: @local::microboone_photonvisibilityservice
                            @table::microboone_services_reco
+  OpDigiProperties:        @local::microboone_opdigiproperties
+                           @table::microboone_services_reco
+
  #BackTracker:             @local::microboone_backtracker
 }
 
