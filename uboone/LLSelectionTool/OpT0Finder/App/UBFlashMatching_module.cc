@@ -750,8 +750,11 @@ int max_matches = 0;
 int max_match_index = -1;
 for (int i = 0; i < n_flashes; i++)
 {
-  if (n_matches[i] > max_matches) max_matches = n_matches[i];
-  max_match_index = i;
+  if (n_matches[i] > max_matches) 
+  {
+    max_matches = n_matches[i];
+    max_match_index = i;
+  }
 }
 fMultiMatch = max_matches;
 fMMFlash_Light      = 0;
