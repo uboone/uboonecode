@@ -547,7 +547,7 @@ for (size_t i = 0; i < NPFParticles; ++i)
     summed_cluster += qcluster;
   }
     summed_cluster.idx = pfp_index;
-    
+    ++pfp_index;
     // Register to a manager
     _mgr.Emplace(std::move(summed_cluster));
 }
