@@ -512,9 +512,12 @@ for (size_t i = 0; i < NPFParticles; ++i)
 /*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/ 
 int pfp_index =0;
 ::flashana::QCluster_t summed_cluster;
+int NPrimaryParticles = isPrimary.size();
+
 for (size_t i = 0; i < NPFParticles; ++i)
 {
   if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+ // if(
   auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
   for( auto const& track: trackVec)
   { 
@@ -724,7 +727,7 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
         std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
         const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
         std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
-        fTrackTrueTime = truetime - (1000*trigOffset);
+        fTrackTrueTime = truetime /*- (1000*trigOffset)*/;
       }
       else
         std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
