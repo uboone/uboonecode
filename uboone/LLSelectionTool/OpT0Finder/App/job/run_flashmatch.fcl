@@ -1,6 +1,25 @@
 #include "services_microboone.fcl"
 #include "flashmatch.fcl"
 
+#include "hitfindermodules_microboone.fcl"
+#include "cluster_microboone.fcl"
+#include "particleid_microboone.fcl"
+#include "analysistreemodule_microboone.fcl"
+#include "filters.fcl"
+#include "signalservices_microboone.fcl"
+#include "caldata_microboone.fcl"
+#include "trackfindermodules_microboone.fcl"
+#include "calorimetry_microboone.fcl"
+#include "showerfindermodules.fcl"
+#include "opticaldetectormodules.fcl"
+#include "vertexfindermodules.fcl"
+#include "pandoramodules.fcl"
+#include "triggeralgo_service.fcl"
+#include "photpropservices_microboone.fcl"
+#include "photoncountert0matching.fcl"
+
+#include "simulationservices_microboone.fcl"
+
 process_name: UBFlashMatch
 
 services:
@@ -10,16 +29,21 @@ services:
   Timing:                  {}
   SimpleMemoryCheck:       { ignoreTotal: 1 } # default is one
   RandomNumberGenerator:   {} #ART native random number generator
+                           @table::microboone_full_services
   message:                 @local::microboone_message_services_prod_debug
   FileCatalogMetadata:     @local::art_file_catalog_mc
   PhotonVisibilityService: @local::microboone_photonvisibilityservice
                            @table::microboone_services_reco
+  OpDigiProperties:        @local::microboone_opdigiproperties
+                           @table::microboone_services_reco
+
+ #BackTracker:             @local::microboone_backtracker
 }
 
-#services.DetectorInfo.DetectorProperties.NumberTimeSamples: 6400
-#services.DetectorInfo.DetectorProperties.ReadOutWindowSize: 6400
-#services.DetectorInfo.TimeService.InheritClockConfig:       false
-#services.DetectorInfo.TimeService.TriggerOffsetTPC:         -0.400e3
+services.DetectorPropertiesService.NumberTimeSamples: 6400
+services.DetectorPropertiesService.ReadOutWindowSize: 6400
+services.DetectorClocksService.InheritClockConfig:    false
+services.DetectorClocksService.TriggerOffsetTPC:      -0.400e3
 
 source:
 {
@@ -93,5 +117,4 @@ services.DetectorClocksService.InheritClockConfig: false
 #     }
 #  }
 #}
-
 

@@ -67,6 +67,13 @@
 #include "lardata/DetectorInfo/DetectorProperties.h"
 #include "larcore//CoreUtils/ServiceUtil.h"
 
+//
+// Truth matching includes
+//
+#include "larsim/MCCheater/BackTracker.h"
+#include "SimulationBase/MCParticle.h"
+#include "SimulationBase/MCTrajectory.h"
+
 class UBFlashMatching;
 
 //using namespace anab;
@@ -115,11 +122,34 @@ private:
   Double_t fTrackTrueTime;
   Double_t fTrackRecoTime;
   Double_t fFlashTime;
+  Double_t fFlashTimeWidth;
+  Double_t fFlashAbsTime;
+  Double_t fFlashOnBeamTime;
   Int_t    fTrackMatched;
   Double_t fMatchScore;
 
   TTree *fMatchTree;
 
+  Int_t fNPandoraTrees;
+  Int_t fNTracks;
+  Int_t fNFlashes;
+  Int_t fNFilteredFlashes;
+  Int_t fMultiMatch;
+  Double_t fMMFlash_Light;
+  Double_t fMMFlash_Time;
+  Double_t fMMFlash_TimeWidth;
+  Double_t fMMFlash_AbsTime;
+  Double_t fMMFlash_OnBeamTime;
+  //Double_t fMM_DeltaT;
+  //Double_t fMM_DeltaR;
+
+  TTree *fEventTree;
+
+  Double_t fFlashLight;
+  Double_t fFlashyTime;
+  Int_t    fFlashNMatches;
+
+  TTree *fFlashTree;
 
   //TH2D* fTrackIDvsFlashMatchScoreHist;
   int fTrackID;
@@ -187,21 +217,42 @@ void UBFlashMatching::beginJob()
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
 
     fMatchTree = tfs->make<TTree>("match_tree", "match_tree");
+    fEventTree = tfs->make<TTree>("event_tree", "event_tree");
+    fFlashTree = tfs->make<TTree>("flash_tree", "flash_tree");
 
-    fMatchTree->Branch("TrackCharge"  , &fTrackCharge  , "TrackCharge/D"  );
-    fMatchTree->Branch("TrackLight"   , &fTrackLight   , "TrackLight/D"   );
-    fMatchTree->Branch("TrackPosY"    , &fTrackPosY    ,  "TrackPosY/D"   );
-    fMatchTree->Branch("TrackPosZ"    , &fTrackPosZ    , "TrackPosZ/D"    );
-    fMatchTree->Branch("TrackTrueTime", &fTrackTrueTime, "TrackTrueTime/D");
-    fMatchTree->Branch("TrackRecoTime", &fTrackRecoTime, "TrackRecoTime/D");
-    fMatchTree->Branch("FlashTime"    , &fFlashTime    , "FlashTime/D"    );
-    fMatchTree->Branch("TrackMatched" , &fTrackMatched , "TrackMatched/I" );
-    fMatchTree->Branch("MatchScore"   , &fMatchScore   , "MatchScore/D"   );
+    fMatchTree->Branch("TrackCharge"    , &fTrackCharge     , "TrackCharge/D"     );
+    fMatchTree->Branch("TrackLight"     , &fTrackLight      , "TrackLight/D"      );
+    fMatchTree->Branch("TrackPosY"      , &fTrackPosY       , "TrackPosY/D"       );
+    fMatchTree->Branch("TrackPosZ"      , &fTrackPosZ       , "TrackPosZ/D"       );
+    fMatchTree->Branch("TrackTrueTime"  , &fTrackTrueTime   , "TrackTrueTime/D"   );
+    fMatchTree->Branch("TrackRecoTime"  , &fTrackRecoTime   , "TrackRecoTime/D"   );
+    fMatchTree->Branch("FlashTime"      , &fFlashTime       , "FlashTime/D"       );
+    fMatchTree->Branch("FlashTimeWidth" , &fFlashTimeWidth  , "FlashTimeWidth/D"  );
+    fMatchTree->Branch("FlashAbsTime"   , &fFlashAbsTime    , "FlashAbsTime/D"    );
+    fMatchTree->Branch("FlashOnBeamTime", &fFlashOnBeamTime , "FlashOnBeamTime/D" );
+
+    fMatchTree->Branch("TrackMatched"  , &fTrackMatched  , "TrackMatched/I"   );
+    fMatchTree->Branch("MatchScore"    , &fMatchScore    , "MatchScore/D"     );
+
+    fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
+    fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
+    fEventTree->Branch("NFlashes"            , &fNFlashes           , "NFlashes/I"          );
+    fEventTree->Branch("NFilteredFlashes"    , &fNFilteredFlashes   , "NFilteredFlashes/I"  );
+    fEventTree->Branch("MultiMatch"          , &fMultiMatch         , "MultiMatch/I"        );
+    fEventTree->Branch("MMFlash_Light"       , &fMMFlash_Light      , "MMFlash_Light/D"     );
+    fEventTree->Branch("MMFlash_Time"        , &fMMFlash_Time       , "MMFlash_Time/D"      );
+    fEventTree->Branch("MMFlash_TimeWidth"   , &fMMFlash_TimeWidth  , "MMFlash_TimeWidth/D" );
+    fEventTree->Branch("MMFlash_AbsTime"     , &fMMFlash_AbsTime    , "MMFlash_AbsTime/D"   );
+    fEventTree->Branch("MMFlash_OnBeamTime"  , &fMMFlash_OnBeamTime , "MMFlash_OnBeamTime/D");
+
+    fFlashTree->Branch("FlashLight"   , &fFlashLight    , "FlashLight/D"   );
+    fFlashTree->Branch("FlashTime"    , &fFlashyTime    , "FlashTime/D"    );
 
 }
 
 void UBFlashMatching::produce(art::Event & e)
 {
+  std::cout << "NEW EVENT" << std::endl;
   _mgr.Reset();
   // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
   const size_t num_pmts = 32;
@@ -249,6 +300,10 @@ void UBFlashMatching::produce(art::Event & e)
     std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::OpFlash from " 
 	      << _flash_producer_name << std::endl;
     throw std::exception();
+  }
+  else
+  {
+    std::cout << "flashHandle has size " << flashHandle->size() << std::endl;
   }
  //-----------------------------PFParticle Extraction-----------------------------------------// 
    art::Handle< std::vector<recob::PFParticle> > pfpVecHandle;
@@ -361,6 +416,10 @@ for (size_t i = 0; i < NPFParticles; ++i){
   //  0-a) FlashArray_t
   std::vector<flashana::Flash_t> opflashVec;
   int count = 1;
+
+  art::ServiceHandle<cheat::BackTracker> bt;
+
+  int nfiltered = 0;
   for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
 
     // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -384,7 +443,16 @@ for (size_t i = 0; i < NPFParticles; ++i){
 
     ::flashana::Flash_t flash_clone = flash;
     opflashVec.push_back(flash_clone);
-    
+  
+    fFlashLight = opf.TotalPE();
+    fFlashyTime = opf.Time();
+    fFlashTimeWidth  = opf.TimeWidth();
+    fFlashAbsTime    = opf.AbsTime();
+    fFlashOnBeamTime = opf.OnBeamTime();
+
+    fFlashTree->Fill();
+    if (fFlashLight > 5) nfiltered++;
+
     // Register to a manager
     _mgr.Emplace(std::move(flash));
     count++;
@@ -482,12 +550,10 @@ for (size_t i = 0; i < NPFParticles; ++i)
     // Register to a manager
     _mgr.Emplace(std::move(summed_cluster));
 }
- 
 
 
-
-/*-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
- for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+//-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
+/* for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
 
 
     // Retrieve individual recob::Track and construct flashana::Flash_t
@@ -523,7 +589,8 @@ for (size_t i = 0; i < NPFParticles; ++i)
     // Register to a manager
     _mgr.Emplace(std::move(qcluster));
   }
--------------------------------------------------------------------------------------------------------------------------*/
+*/
+//-------------------------------------------------------------------------------------------------------------------------
   
 
   //
@@ -553,7 +620,18 @@ for(unsigned int i = 0; i <isPrimary.size(); i++)
 std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
 
 const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-std::vector<::flashana::FlashMatch_t> match_v; 
+std::vector<::flashana::FlashMatch_t> match_v;
+
+fNPandoraTrees = NPFParticles;
+fNTracks = allPfParticleTracks.size();
+std::cout << "Counting flashes" << std::endl;
+fNFlashes = flashHandle->size();
+fNFilteredFlashes = nfiltered;
+std::cout << "Filling event tree" << std::endl;
+
+const int n_flashes = opflashVec.size(); 
+int n_matches[n_flashes];
+for (int i = 0; i < n_flashes; i++) n_matches[i] = 0;
 
 for (size_t i = 0; i < NPFParticles; ++i){
    if (pfparticlelist[i]->IsPrimary()==1) {
@@ -626,9 +704,24 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       fTrackRecoTime = drifttime;
 
       fTrackTrueTime = -100;
+      fTrackTrueTime = -100;
+      std::cout << "BACKTRACKER AWAY" << std::endl;
+      std::cout << "Track ID = " << track->ID() << ", track length = " << track->Length() << std::endl;
+      const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID()+1);
+      std::cout << "BACKTRACKER YOU DID GOOD" << std::endl;
+      if (true_particle != NULL)
+      {
+        double truetime = true_particle->T();
+        std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
+        fTrackTrueTime = truetime;
+      }
+      else
+        std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
+
 
       double flashtime = opflashVec.at(match.flash_id).time;
       fFlashTime = flashtime;
+      n_matches[match.flash_id]++;
 
       fMatchTree->Fill();
       std::cout<<"-------------------------------FINISHED FILLING TTREE---------------------------"<<std::endl;
@@ -641,6 +734,32 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
   }
 }
 }
+
+int max_matches = 0;
+int max_match_index = -1;
+for (int i = 0; i < n_flashes; i++)
+{
+  if (n_matches[i] > max_matches) max_matches = n_matches[i];
+  max_match_index = i;
+}
+fMultiMatch = max_matches;
+fMMFlash_Light      = 0;
+fMMFlash_Time       = 0;
+fMMFlash_TimeWidth  = 0;
+fMMFlash_AbsTime    = 0;
+fMMFlash_OnBeamTime = 0;
+if (max_match_index != -1)
+{
+  auto const& opf = (*flashHandle)[max_match_index];
+
+  fMMFlash_Light      = opf.TotalPE();
+  fMMFlash_Time       = opf.Time();
+  fMMFlash_TimeWidth  = opf.TimeWidth();
+  fMMFlash_AbsTime    = opf.AbsTime();
+  fMMFlash_OnBeamTime = opf.OnBeamTime();
+}
+fEventTree->Fill();
+
 
 
 /* 

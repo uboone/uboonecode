@@ -16,6 +16,9 @@ art_make( BASENAME_ONLY
 		   lardata_RecoBase
 		   lardata_AnalysisBase
 		   larpandora_LArPandoraInterface
+     larsim_MCCheater_BackTracker_service
+     SignalShapingServiceMicroBooNE_service
+                        ${SIMULATIONBASE}
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -47,6 +50,9 @@ art_make( BASENAME_ONLY
 		   lardata_RecoBase
 		   lardata_AnalysisBase
 		   larpandora_LArPandoraInterface
+     larsim_MCCheater_BackTracker_service
+     SignalShapingServiceMicroBooNE_service
+                        ${SIMULATIONBASE}
 		   ${UBOONECODE_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
