@@ -35,7 +35,7 @@ larsoft         v05_08_00
 ubutil          v01_38_01
 uboone_data     v01_05_00
 uboonedaq_datatypes v6_19_00a_e9
-nutools		v1_23_01
+nutools		v1_24_01
 
 cetbuildtools	v4_19_03	-	only_for_build
 end_product_list

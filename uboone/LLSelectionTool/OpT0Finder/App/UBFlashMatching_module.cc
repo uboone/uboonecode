@@ -65,9 +65,10 @@
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfo/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardata/DetectorInfo/DetectorClocks.h"
 #include "larcore//CoreUtils/ServiceUtil.h"
 
-//
 // Truth matching includes
 //
 #include "larsim/MCCheater/BackTracker.h"
@@ -608,6 +609,7 @@ for (size_t i = 0; i < NPFParticles; ++i)
  // size_t match_flash_index = 0;
 
   detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  detinfo::DetectorClocks const* detclock = lar::providerFrom<detinfo::DetectorClocksService>();
   //auto const* detprop = lar::providerFrom< detinfo::DetectorProperties >();
 
  // auto const* detp = art::ServiceHandle<util::LArProperties>();
@@ -620,6 +622,12 @@ for(unsigned int i = 0; i <isPrimary.size(); i++)
 std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
 
 const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
+//const detinfo::ElecClock triggerclock   = detclock->TriggerClock();
+const double triggertime   = detclock->TriggerTime();
+const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
+//std::cout<<"Trigger Clock: "	<<triggerclock<<std::endl;
+std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
+std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
 std::vector<::flashana::FlashMatch_t> match_v;
 
 fNPandoraTrees = NPFParticles;
@@ -704,7 +712,6 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       fTrackRecoTime = drifttime;
 
       fTrackTrueTime = -100;
-      fTrackTrueTime = -100;
       std::cout << "BACKTRACKER AWAY" << std::endl;
       std::cout << "Track ID = " << track->ID() << ", track length = " << track->Length() << std::endl;
       const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID()+1);
@@ -713,7 +720,7 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       {
         double truetime = true_particle->T();
         std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
-        fTrackTrueTime = truetime;
+        fTrackTrueTime = truetime - (1000*triggertime);
       }
       else
         std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;

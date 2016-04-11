@@ -43,7 +43,7 @@ services:
 services.DetectorPropertiesService.NumberTimeSamples: 6400
 services.DetectorPropertiesService.ReadOutWindowSize: 6400
 services.DetectorClocksService.InheritClockConfig:    false
-services.DetectorClocksService.TriggerOffsetTPC:      -0.400e3
+#services.DetectorClocksService.TriggerOffsetTPC:      -0.400e3
 
 source:
 {
