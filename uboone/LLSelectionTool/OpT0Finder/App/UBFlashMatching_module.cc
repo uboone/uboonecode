@@ -622,10 +622,12 @@ for(unsigned int i = 0; i <isPrimary.size(); i++)
 std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
 
 const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-//const detinfo::ElecClock triggerclock   = detclock->TriggerClock();
 const double triggertime   = detclock->TriggerTime();
 const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
-//std::cout<<"Trigger Clock: "	<<triggerclock<<std::endl;
+
+const double beamgate = detclock->BeamGateTime();
+
+std::cout<<"BeamGateTime:  "	<<beamgate<<std::endl;
 std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
 std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
 std::vector<::flashana::FlashMatch_t> match_v;
@@ -720,7 +722,9 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       {
         double truetime = true_particle->T();
         std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
-        fTrackTrueTime = truetime - (1000*triggertime);
+        const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
+        std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
+        fTrackTrueTime = truetime - (1000*trigOffset);
       }
       else
         std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
