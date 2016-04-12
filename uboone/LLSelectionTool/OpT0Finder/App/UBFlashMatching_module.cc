@@ -355,7 +355,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
      // std::cout<<"First for loop"<<std::endl;
       selfID.push_back(pfparticlelist[i]->Self());
      // std::cout<<"SelfID Set"<<std::endl;
-      isPrimary.push_back((Short_t)pfparticlelist[i]->IsPrimary());
+     if (pfparticlelist[i]->IsPrimary()==1) isPrimary.push_back(pfparticlelist[i]->Self());
      // std::cout<<"Primary Set"<<std::endl;
       numDaughters.push_back(pfparticlelist[i]->NumDaughters());
      // std::cout<<"Daughters Set"<<std::endl;
@@ -365,7 +365,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
      // std::cout<<"PDG Set"<<std::endl;
          
       
-      std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<<" isPrimary[i]: "<<isPrimary[i]<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
+      std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<< " isPrimary[i]: "<<pfparticlelist[i]->IsPrimary()<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
 
       // Set the daughter IDs.
       std::vector<size_t> daughterIDs = pfparticlelist[i]->Daughters();
@@ -510,51 +510,97 @@ for (size_t i = 0; i < NPFParticles; ++i)
 */
 
 /*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/ 
-int pfp_index =0;
+std::vector <size_t> daughterIDVec;
+//int pfp_index =0;
 ::flashana::QCluster_t summed_cluster;
-int NPrimaryParticles = isPrimary.size();
-
-for (size_t i = 0; i < NPFParticles; ++i)
+size_t NPrimaryParticles = isPrimary.size();
+std::cout<<"Number Primaries: " <<NPrimaryParticles<<std::endl;
+size_t daughter_index;
+size_t primary_index;
+//size_t NumDaughters=0;
+for (size_t i = 0; i < NPrimaryParticles; ++i)
 {
-  if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
- // if(
-  auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
-  for( auto const& track: trackVec)
+  std::cout<<"isPrimary.at(i): "<<isPrimary.at(i)<<std::endl;
+  std::sort(isPrimary.begin(), isPrimary.end());
+  primary_index = isPrimary.at(i);
+  if(pfParticleToTrackMap.count(pfparticlelist[primary_index])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+  auto trackVecprimary = pfParticleToTrackMap.find(pfparticlelist[primary_index])->second;
+  //First get qcluster and validation information for primary particle 
+  for( auto const& track: trackVecprimary)
   { 
-      
+    
     fTrackID = track->ID(); 
     fTrackIDCodeHist->Fill(fTrackID);
     fTrackPhi = track->Phi();
     fTrackPhiHist->Fill(fTrackPhi);
     
     // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
-    ::geoalgo::Trajectory trj;
+    ::geoalgo::Trajectory trjprimary;
     // Set # points same as input track object, and initialize each point as 3D point
-    trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
+    trjprimary.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
 
     // Now loop over points and set actual xyz values
-    for(size_t point_index = 0; point_index < trj.size(); ++point_index) 
+    for(size_t point_index = 0; point_index < trjprimary.size(); ++point_index) 
     {
       
       // Get reference to be modified
-      auto&       copy_pt = trj[point_index];
+      auto&       copy_pt_pri = trjprimary[point_index];
       // Get const reference to get values
-      auto const& orig_pt = track->LocationAtPoint(point_index);
+      auto const& orig_pt_pri = track->LocationAtPoint(point_index);
 
-      copy_pt[0] = orig_pt[0];
-      copy_pt[1] = orig_pt[1];
-      copy_pt[2] = orig_pt[2];
-    }
+      copy_pt_pri[0] = orig_pt_pri[0];
+      copy_pt_pri[1] = orig_pt_pri[1];
+      copy_pt_pri[2] = orig_pt_pri[2];
+    }  
     
-    auto qcluster = _light_path_alg.FlashHypothesis(trj);
-    summed_cluster += qcluster;
-  }
-    summed_cluster.idx = pfp_index;
-    ++pfp_index;
-    // Register to a manager
-    _mgr.Emplace(std::move(summed_cluster));
-}
+    auto qcluster_pri = _light_path_alg.FlashHypothesis(trjprimary);
+    summed_cluster += qcluster_pri;
+  }//end for loop over tracks associated with primary particle
+ 
+  //Then loop over daughters asssociated with primary particle to extract daughter tracks and create qclusters. 
+  daughterIDVec = pfparticlelist[primary_index]->Daughters();
+  std::sort( daughterIDVec.begin(), daughterIDVec.end());
+  std::cout<<"Number Daughters associated to primary "<<i<<": "<<daughterIDVec.size()<<std::endl;
+  for(size_t j = 0; j < daughterIDVec.size(); ++j)
+  { 
+    daughter_index = daughterIDVec.at(j);
+    std::cout<<"daughterIDVec.at(j): "<<daughter_index<<std::endl;
+    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
+    for( auto const& track: trackVec)
+    { 
+      std::cout<<"Inside TrackVec loop"<<std::endl; 
+      fTrackID = track->ID(); 
+      fTrackIDCodeHist->Fill(fTrackID);
+      fTrackPhi = track->Phi();
+      fTrackPhiHist->Fill(fTrackPhi);
+    
+      // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+      ::geoalgo::Trajectory trj;
+      // Set # points same as input track object, and initialize each point as 3D point
+      trj.resize(track->NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
 
+      // Now loop over points and set actual xyz values
+      for(size_t point_index = 0; point_index < trj.size(); ++point_index) 
+      {
+      
+        // Get reference to be modified
+        auto&       copy_pt = trj[point_index];
+        // Get const reference to get values
+        auto const& orig_pt = track->LocationAtPoint(point_index);
+
+        copy_pt[0] = orig_pt[0];
+        copy_pt[1] = orig_pt[1];
+        copy_pt[2] = orig_pt[2];
+      }  
+    
+      auto qcluster = _light_path_alg.FlashHypothesis(trj);
+      summed_cluster += qcluster;
+    }
+  }//end for daughters
+  summed_cluster.idx = i;
+  // Register to a manager
+  _mgr.Emplace(std::move(summed_cluster));
+}
 
 //-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
 /* for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
