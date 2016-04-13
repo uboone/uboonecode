@@ -253,7 +253,7 @@ void UBFlashMatching::beginJob()
 
 void UBFlashMatching::produce(art::Event & e)
 {
-  std::cout << "NEW EVENT" << std::endl;
+  //std::cout << "NEW EVENT" << std::endl;
   _mgr.Reset();
   // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
   const size_t num_pmts = 32;
@@ -336,10 +336,10 @@ void UBFlashMatching::produce(art::Event & e)
   lar_pandora::LArPandoraHelper::CollectTracks(e, fPFPModuleLabel, allPfParticleTracks, pfParticleToTrackMap);
   
 //  lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(pfparticlelist, pfParticleToClusterMap,  &clustersToHits, PFParticlesToHits &particlesToHits, HitsToPFParticles &hitsToParticles, 1);
-  std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;  
+  //std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;  
 
   size_t NPFParticles = pfparticlelist.size();
-  std::cout<<"#PFParticles: "<<NPFParticles<<std::endl;
+  //std::cout<<"#PFParticles: "<<NPFParticles<<std::endl;
   std::vector< int> selfID;
   std::vector <int> isPrimary;
   std::vector <int> numDaughters;
@@ -365,17 +365,17 @@ for (size_t i = 0; i < NPFParticles; ++i){
      // std::cout<<"PDG Set"<<std::endl;
          
       
-      std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<< " isPrimary[i]: "<<pfparticlelist[i]->IsPrimary()<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
+      //std::cout<<"particleListinfo: "<<" SelfID[i] "<<selfID.at(i)<< " isPrimary[i]: "<<pfparticlelist[i]->IsPrimary()<<" numDaughters[i]: "<<numDaughters[i]<<" parentID[i]: "<<parentID[i]<<" pdgCode: "<<pdgCode[i]<<std::endl;
 
       // Set the daughter IDs.
       std::vector<size_t> daughterIDs = pfparticlelist[i]->Daughters();
-      std::cout<<"right after daughter loop: NumDaughters: "<<daughterIDs.size()<<std::endl; 
+      //std::cout<<"right after daughter loop: NumDaughters: "<<daughterIDs.size()<<std::endl; 
       
      /* for (size_t j = 0; j < daughterIDs.size(); ++j)
         daughterIDs.push_back(daughterIDs[j]);*/
 
       auto vertexMapIter = pfParticleToVertexMap.find(pfparticlelist[i]);
-	std::cout<<"above vertexMapIter if statement:"<<std::endl;
+	//std::cout<<"above vertexMapIter if statement:"<<std::endl;
       if (vertexMapIter != pfParticleToVertexMap.end()) {
           lar_pandora::VertexVector pfParticleVertices = vertexMapIter->second;
           
@@ -392,7 +392,7 @@ for (size_t i = 0; i < NPFParticles; ++i){
   if (lar_pandora::LArPandoraHelper::IsTrack(pfparticlelist[i])){
      isTrack.push_back(1);
 
-	std::cout<<"above trackMapIter if statement:"<<std::endl;
+	//std::cout<<"above trackMapIter if statement:"<<std::endl;
    auto trackMapIter = pfParticleToTrackMap.find(pfparticlelist[i]);
     if (trackMapIter != pfParticleToTrackMap.end()) {
        lar_pandora::TrackVector pfParticleTracks = trackMapIter->second;
@@ -461,9 +461,9 @@ for (size_t i = 0; i < NPFParticles; ++i){
   //  size_t opflashsize = opf.size();
 
   //  0-b) QClusterArray_t
-   std::cout<<"finished opflash stuff"<<std::endl;
+   //std::cout<<"finished opflash stuff"<<std::endl;
  
-std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
+//std::cout<<"#PFParticles: "<<pfpVecHandle->size()<<std::endl;
 /*-------------------------------FLASHMATCH VIA primary PFParticle in Event------------------------- 
 int pfp_index =0;
 for (size_t i = 0; i < NPFParticles; ++i)
@@ -510,20 +510,54 @@ for (size_t i = 0; i < NPFParticles; ++i)
 */
 
 /*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/ 
+//int myID = 30928;
 std::vector <size_t> daughterIDVec;
 //int pfp_index =0;
 ::flashana::QCluster_t summed_cluster;
 size_t NPrimaryParticles = isPrimary.size();
-std::cout<<"Number Primaries: " <<NPrimaryParticles<<std::endl;
+//std::cout<<"Number Primaries: " <<NPrimaryParticles<<std::endl;
 size_t daughter_index;
 size_t primary_index;
 //size_t NumDaughters=0;
+
+//Declare vector of tpc matching candidates---------
+std::vector<recob::PFParticle> tpc_match_candidates;
+std::vector<int> tpc_match_candidate_ids;
+//--------------------------------------------------
+
 for (size_t i = 0; i < NPrimaryParticles; ++i)
 {
-  std::cout<<"isPrimary.at(i): "<<isPrimary.at(i)<<std::endl;
+  //Get PFParticle corresponding to this iteration------
+  int candidate_id = isPrimary[i];
+  recob::PFParticle pfp = pfpVecHandle->at(candidate_id);
+  double n_hits = 0;
+  //----------------------------------------------------
+
+  //std::cout<<"isPrimary.at(i): "<<isPrimary.at(i)<<std::endl;
   std::sort(isPrimary.begin(), isPrimary.end());
   primary_index = isPrimary.at(i);
   if(pfParticleToTrackMap.count(pfparticlelist[primary_index])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+  else 
+  {
+    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[candidate_id])->second;
+    for( auto const& track: trackVec)
+    {
+      double nwires = (track->Length())/3.0;
+      n_hits += nwires;
+    }
+
+  }
+
+  //PFParticle passes conditions to create summed QCluster; add to vector of candidates----
+  /*
+  if (n_hits > 2.0)
+  {
+    tpc_match_candidates.push_back(pfp);
+    tpc_match_candidate_ids.push_back(candidate_id);
+  }
+  */
+  //---------------------------------------------------------------------------------------
+
   auto trackVecprimary = pfParticleToTrackMap.find(pfparticlelist[primary_index])->second;
   //First get qcluster and validation information for primary particle 
   for( auto const& track: trackVecprimary)
@@ -560,15 +594,28 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
   //Then loop over daughters asssociated with primary particle to extract daughter tracks and create qclusters. 
   daughterIDVec = pfparticlelist[primary_index]->Daughters();
   std::sort( daughterIDVec.begin(), daughterIDVec.end());
-  std::cout<<"Number Daughters associated to primary "<<i<<": "<<daughterIDVec.size()<<std::endl;
-  for(size_t j = 0; j < daughterIDVec.size(); ++j)
+  //std::cout<<"Number Daughters associated to primary "<<i<<": "<<daughterIDVec.size()<<std::endl;
+  for(size_t j = 0; j < daughterIDVec.size(); j++)
   { 
     daughter_index = daughterIDVec.at(j);
+  /*
     std::cout<<"daughterIDVec.at(j): "<<daughter_index<<std::endl;
-    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
+    std::cout << "pfparticlelist.size(): " << pfparticlelist.size() << std::endl;
+    std::cout << "Daughter PFParticle ID: " << pfparticlelist[daughter_index] << std::endl;
+    std::cout << "Daughter PFParticle Self ID: " << pfparticlelist[daughter_index]->Self() << std::endl;
+    std::cout << "Attempting stage one" << std::endl;
+*/
+    pfParticleToTrackMap.find(pfparticlelist[daughter_index]);
+  //  std::cout << "Attempting stage two" << std::endl;
+    //auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
+    lar_pandora::TrackVector trackVec;
+    auto trackMapIter = pfParticleToTrackMap.find(pfparticlelist[daughter_index]);
+    if (trackMapIter != pfParticleToTrackMap.end()) trackVec = trackMapIter->second;
+
+    //std::cout << "trackVec.size() = " << trackVec.size() << std::endl;
     for( auto const& track: trackVec)
     { 
-      std::cout<<"Inside TrackVec loop"<<std::endl; 
+      //std::cout<<"Inside TrackVec loop"<<std::endl; 
       fTrackID = track->ID(); 
       fTrackIDCodeHist->Fill(fTrackID);
       fTrackPhi = track->Phi();
@@ -597,9 +644,16 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
       summed_cluster += qcluster;
     }
   }//end for daughters
-  summed_cluster.idx = i;
+  summed_cluster.idx = pfp.Self();//myID;//i;
+  //myID++;
   // Register to a manager
   _mgr.Emplace(std::move(summed_cluster));
+
+  // Also saving the pfparticle that started the summed_cluster to tpc_match_candidates for bookkeeping
+  std::cout << "MARCO - pfp->Self() = " << pfp.Self() << std::endl;
+  tpc_match_candidates.push_back(pfp);
+  tpc_match_candidate_ids.push_back(candidate_id);
+
 }
 
 //-------------------------------commenting out old Track Match Way for PFParticle Implementation------------------------- 
@@ -652,13 +706,15 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
   //  2) Store data products (anab::FlashMatch and associations)
   //
   
-  bool inbeam= true;	//should get this info from the fcl parameters. 
+  //bool inbeam= true;	//should get this info from the fcl parameters. 
  // const art::Ptr<recob::Track>  trackPtr;
  // size_t match_track_index = 0;
  // size_t match_flash_index = 0;
 
-  detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  detinfo::DetectorClocks const* detclock = lar::providerFrom<detinfo::DetectorClocksService>();
+  //detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  
+  //detinfo::DetectorClocks const* detclock = lar::providerFrom<detinfo::DetectorClocksService>();
+  //
   //auto const* detprop = lar::providerFrom< detinfo::DetectorProperties >();
 
  // auto const* detp = art::ServiceHandle<util::LArProperties>();
@@ -668,33 +724,134 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
 int NumPrimaries=0;
 for(unsigned int i = 0; i <isPrimary.size(); i++)
     if(isPrimary[i]==1) ++NumPrimaries;
-std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
+//std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
 
-const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-const double triggertime   = detclock->TriggerTime();
-const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
+//const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
 
-const double beamgate = detclock->BeamGateTime();
+//const double triggertime   = detclock->TriggerTime();
+//const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
 
-std::cout<<"BeamGateTime:  "	<<beamgate<<std::endl;
-std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
-std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
+//const double beamgate = detclock->BeamGateTime();
+
+//std::cout<<"BeamGateTime:  "	<<beamgate<<std::endl;
+//std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
+//std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
+
 std::vector<::flashana::FlashMatch_t> match_v;
 
 fNPandoraTrees = NPFParticles;
 fNTracks = allPfParticleTracks.size();
-std::cout << "Counting flashes" << std::endl;
+//std::cout << "Counting flashes" << std::endl;
 fNFlashes = flashHandle->size();
 fNFilteredFlashes = nfiltered;
-std::cout << "Filling event tree" << std::endl;
+//std::cout << "Filling event tree" << std::endl;
 
 const int n_flashes = opflashVec.size(); 
 int n_matches[n_flashes];
 for (int i = 0; i < n_flashes; i++) n_matches[i] = 0;
 
-for (size_t i = 0; i < NPFParticles; ++i){
-   if (pfparticlelist[i]->IsPrimary()==1) {
+std::cout << "---------------------------> Looping over match candidates" << std::endl;
+
+
+for(size_t match_index=0; match_index < match_result_v.size(); match_index++)
+{
+  int tpc_matched_index = -1;
+  std::cout << "MARCO - (match_result_v.at(" << match_index << ")).tpc_id = " << (match_result_v.at(match_index)).tpc_id << std::endl;
+  ::flashana::FlashMatch_t match;
+  match = match_result_v.at(match_index);
+  std::cout << "MARCO - match.tpc_id, at " << match_index << " = " << match.tpc_id << std::endl;
+  for (unsigned int i = 0; i < tpc_match_candidates.size(); i++)
+  {
+    std::cout << "MARCO - tpc_match_candidate_ids.at(" << i << ") = " << tpc_match_candidate_ids.at(i) << std::endl;
+    if((int)match.tpc_id == tpc_match_candidate_ids.at(i)) 
+     {
+       std::cout << "Found match: match.tpc_id == " << match.tpc_id << ", tpc_match_candidates index = " << tpc_match_candidate_ids.at(i) << std::endl;
+       tpc_matched_index = i;//tpc_match_candidate_ids.at(i);
+       break;
+     }
+  }
+  std::cout << "MARCO - Found (match <-> TPC object) correspondence." << std::endl;
+  std::cout << "MARCO - My match has match.tpc_id = " << match.tpc_id << std::endl;
+
+    if (match.tpc_id==::flashana::kINVALID_ID) 
+    {
+      std::cout<<"INVALID TPC_ID"<<std::endl;
+      fTrackCharge = -100;
+      fTrackLight = -100;
+      fTrackPosY = -100;
+      fTrackPosZ = -100;
+      fTrackTrueTime = -100;
+      fTrackRecoTime = -100;
+      fFlashTime = -100;
+      fTrackMatched = 0;
+      fMatchScore = -100;
+
+      fMatchTree->Fill();
+    }
+    else
+    {
+      n_matches[match.flash_id]++;
+
+      fTrackMatched = 1;
+      fMatchScore = match.score;
+      //double light = opflashVec.at(match.flash_id).TotalPE();
+     
+      //Default fills for now
+      fTrackCharge = -200;
+      fTrackLight  = -200;
+      fTrackPosY   = -200;
+      fTrackPosZ   = -200;
+      //fTrackLight = light;
+      //fTrackCharge = charge;
+      //fTrackPosY = startpos.Y();
+      //fTrackPosZ = startpos.Z();
+      fTrackRecoTime = -200;
+
+      fTrackTrueTime = -200;
+   
+      // Retriving the track vector associated with primary particle that generated the matched TPC object
+      lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfparticlelist[tpc_match_candidate_ids[tpc_matched_index]])->second;
+      std::cout << "\nStarting truth-finding loop; iterating over " << trackVec.size() << " tracks" << std::endl;
+      //std::cout << "Backtracker believes there are " << bt->GetSetOfTrackIDs().size() << " tracks" << std::endl;
+      int truth_count = 0;
+      bool found_truth = false;
+      for (auto const& track: trackVec)
+      {
+        std::cout << "ITERATION " << truth_count << " BEGINNING" << std::endl;
+        std::cout << "MARCO - track->ID() = " << track->ID() << std::endl;
+        const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID());
+        if (true_particle != NULL)
+        {
+          fTrackTrueTime = true_particle->T();
+          found_truth = true;
+          break;
+        }
+        else std::cout << "COULDN'T FIND TRUE PARTICLE" << std::endl;
+
+        truth_count++;
+      }
+      if (!found_truth) std::cout << "FULL LOOP COMPLETED, NO TRUTH FOUND\n" << std::endl;
+      else std::cout << "FULL LOOP COMPLETED, FOUND THE TRUTH     - fTrackTrueTime = " << fTrackTrueTime << std::endl;
+
+      double flashtime = opflashVec.at(match.flash_id).time;
+      fFlashTime = flashtime*1000.;
+      //n_matches[match.flash_id]++;
+
+      fMatchTree->Fill();
+    }
+}
+
+//--------------------------DANGER: PHYSICSTS AT WORK---------------------------------//
+
+/*
+std::cout << "DANGER: PHYSICSTS AT WORK" << std::endl;
+
+for (size_t i = 0; i < NPFParticles; ++i)
+{
+  if (pfparticlelist[i]->IsPrimary()==1) 
+  {
     if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+
     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
     std::cout<<"Size of trackVec: "<<trackVec.size()<<std::endl;
     for( auto const& track: trackVec)
@@ -705,16 +862,16 @@ for (size_t i = 0; i < NPFParticles; ++i){
     float charge=0;
 
 std::cout<<"clearing charge"<<std::endl;    
-/*
-std::cout<<"track pointer size: "<< trackHitAssns.at(track.key()).size()<<std::endl;
-    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
-std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;    
-    for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
-    {
-    	charge += trackHitVec.at(hit_index)->Integral();
-    }
-    std::cout<<"Hit Charge: "<<charge<<std::endl;
- */   
+//
+//std::cout<<"track pointer size: "<< trackHitAssns.at(track.key()).size()<<std::endl;
+//    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
+//std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;    
+//    for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
+//    {
+//    	charge += trackHitVec.at(hit_index)->Integral();
+//    }
+//    std::cout<<"Hit Charge: "<<charge<<std::endl;
+//
     TVector3 startpos = track->LocationAtPoint(0);
     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
     startpos += endpos;
@@ -758,9 +915,9 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       fTrackPosY = startpos.Y();
       fTrackPosZ = startpos.Z();
 
-      double driftpos = track->LocationAtPoint(0).X();
-      double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
-      fTrackRecoTime = drifttime;
+      //m double driftpos = track->LocationAtPoint(0).X();
+      //m double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
+      //m fTrackRecoTime = drifttime;
 
       fTrackTrueTime = -100;
       std::cout << "BACKTRACKER AWAY" << std::endl;
@@ -769,31 +926,34 @@ std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
       std::cout << "BACKTRACKER YOU DID GOOD" << std::endl;
       if (true_particle != NULL)
       {
-        double truetime = true_particle->T();
-        std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
-        const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
-        std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
-        fTrackTrueTime = truetime /*- (1000*trigOffset)*/;
+        //m double truetime = true_particle->T();
+        //m std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
+        //m const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
+        //m std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
+        //m fTrackTrueTime = truetime;
       }
       else
         std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
 
 
-      double flashtime = opflashVec.at(match.flash_id).time;
-      fFlashTime = flashtime;
-      n_matches[match.flash_id]++;
+      //m double flashtime = opflashVec.at(match.flash_id).time;
+      //m fFlashTime = flashtime;
+      //m n_matches[match.flash_id]++;
 
       fMatchTree->Fill();
       std::cout<<"-------------------------------FINISHED FILLING TTREE---------------------------"<<std::endl;
       
     }
-    anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+    //m anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
     
-    flashmatchtrack->push_back(Flash);
-    util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
+    //m flashmatchtrack->push_back(Flash);
+    //m util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
   }
 }
 }
+ std::cout << "ROADWORKS END" << std::endl;
+*/
+//----------------------------------------ROADWORKS END-------------------------------------------------
 
 int max_matches = 0;
 int max_match_index = -1;
