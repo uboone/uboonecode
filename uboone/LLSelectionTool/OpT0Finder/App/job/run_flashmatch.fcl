@@ -93,7 +93,7 @@ services.DatabaseUtil.ShouldConnect: false
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB: false
 services.DetectorClocksService.InheritClockConfig: false
 
-physics.producers.flashmatch.FlashMatchManager.AllowReuseFlash: false
+physics.producers.flashmatch.FlashMatchManager.AllowReuseFlash: true
 physics.producers.flashmatch.FlashMatchManager.Verbosity:       0
 
 ### Here we try to suppress known and pointless messages

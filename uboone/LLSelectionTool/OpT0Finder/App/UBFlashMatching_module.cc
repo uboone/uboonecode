@@ -516,47 +516,38 @@ std::vector <size_t> daughterIDVec;
 ::flashana::QCluster_t summed_cluster;
 size_t NPrimaryParticles = isPrimary.size();
 //std::cout<<"Number Primaries: " <<NPrimaryParticles<<std::endl;
-size_t daughter_index;
-size_t primary_index;
+size_t daughter_index = -1;
+size_t primary_index = -1;
 //size_t NumDaughters=0;
 
 //Declare vector of tpc matching candidates---------
 std::vector<recob::PFParticle> tpc_match_candidates;
 std::vector<int> tpc_match_candidate_ids;
+std::vector<double> tpc_match_candidate_truetimes;
 //--------------------------------------------------
 
+std::sort(isPrimary.begin(), isPrimary.end());
 for (size_t i = 0; i < NPrimaryParticles; ++i)
 {
   //Get PFParticle corresponding to this iteration------
   int candidate_id = isPrimary[i];
   recob::PFParticle pfp = pfpVecHandle->at(candidate_id);
-  double n_hits = 0;
   //----------------------------------------------------
 
   //std::cout<<"isPrimary.at(i): "<<isPrimary.at(i)<<std::endl;
-  std::sort(isPrimary.begin(), isPrimary.end());
+  //std::sort(isPrimary.begin(), isPrimary.end());
   primary_index = isPrimary.at(i);
-  if(pfParticleToTrackMap.count(pfparticlelist[primary_index])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
-  else 
-  {
-    auto trackVec = pfParticleToTrackMap.find(pfparticlelist[candidate_id])->second;
-    for( auto const& track: trackVec)
-    {
-      double nwires = (track->Length())/3.0;
-      n_hits += nwires;
+  double truetime = -300;
+
+  // isPrimary contains ID, not indeces. Need to fix this.
+  for (unsigned int pfparticleIndex = 0; pfparticleIndex < selfID.size(); pfparticleIndex++) {
+    if (selfID[pfparticleIndex] == isPrimary[i]) {
+      // We have found the index of the primary particle. Save it.
+      primary_index = pfparticleIndex;
     }
-
   }
 
-  //PFParticle passes conditions to create summed QCluster; add to vector of candidates----
-  /*
-  if (n_hits > 2.0)
-  {
-    tpc_match_candidates.push_back(pfp);
-    tpc_match_candidate_ids.push_back(candidate_id);
-  }
-  */
-  //---------------------------------------------------------------------------------------
+  if(pfParticleToTrackMap.count(pfparticlelist[primary_index])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
 
   auto trackVecprimary = pfParticleToTrackMap.find(pfparticlelist[primary_index])->second;
   //First get qcluster and validation information for primary particle 
@@ -597,7 +588,17 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
   //std::cout<<"Number Daughters associated to primary "<<i<<": "<<daughterIDVec.size()<<std::endl;
   for(size_t j = 0; j < daughterIDVec.size(); j++)
   { 
-    daughter_index = daughterIDVec.at(j);
+    for (unsigned int pfparticleIndex = 0; pfparticleIndex < selfID.size(); pfparticleIndex++) 
+    {
+      int daughterID = daughterIDVec[j];
+      if (selfID[pfparticleIndex] == daughterID) 
+      {
+        // We have found the index of the daughter particle. Save it.
+        daughter_index = pfparticleIndex;
+      }
+    }
+
+    //daughter_index = daughterIDVec.at(j);
   /*
     std::cout<<"daughterIDVec.at(j): "<<daughter_index<<std::endl;
     std::cout << "pfparticlelist.size(): " << pfparticlelist.size() << std::endl;
@@ -606,6 +607,7 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
     std::cout << "Attempting stage one" << std::endl;
 */
     pfParticleToTrackMap.find(pfparticlelist[daughter_index]);
+
   //  std::cout << "Attempting stage two" << std::endl;
     //auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
     lar_pandora::TrackVector trackVec;
@@ -653,6 +655,7 @@ for (size_t i = 0; i < NPrimaryParticles; ++i)
   std::cout << "MARCO - pfp->Self() = " << pfp.Self() << std::endl;
   tpc_match_candidates.push_back(pfp);
   tpc_match_candidate_ids.push_back(candidate_id);
+  tpc_match_candidate_truetimes.push_back(truetime);
 
 }
 
@@ -772,6 +775,7 @@ for(size_t match_index=0; match_index < match_result_v.size(); match_index++)
   }
   std::cout << "MARCO - Found (match <-> TPC object) correspondence." << std::endl;
   std::cout << "MARCO - My match has match.tpc_id = " << match.tpc_id << std::endl;
+  std::cout << "PIP - My match has true time = " << tpc_match_candidate_truetimes[tpc_matched_index];
 
     if (match.tpc_id==::flashana::kINVALID_ID) 
     {
@@ -810,16 +814,93 @@ for(size_t match_index=0; match_index < match_result_v.size(); match_index++)
       fTrackTrueTime = -200;
    
       // Retriving the track vector associated with primary particle that generated the matched TPC object
-      lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfparticlelist[tpc_match_candidate_ids[tpc_matched_index]])->second;
+      //lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfparticlelist[tpc_match_candidate_ids[tpc_matched_index]])->second;
+
+      int match_index = -1;
+      for (unsigned int i = 0; i < pfparticlelist.size(); i++)
+      {
+        size_t cand_id = tpc_match_candidate_ids[tpc_matched_index];
+
+        if (pfparticlelist[i]->Self() == cand_id) 
+        {
+          match_index = i;
+          break;
+        }
+      }
+      lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfparticlelist[match_index])->second;
+
       std::cout << "\nStarting truth-finding loop; iterating over " << trackVec.size() << " tracks" << std::endl;
-      //std::cout << "Backtracker believes there are " << bt->GetSetOfTrackIDs().size() << " tracks" << std::endl;
+      std::cout << "Backtracker believes there are " << bt->GetSetOfTrackIDs().size() << " tracks" << std::endl;
       int truth_count = 0;
       bool found_truth = false;
       for (auto const& track: trackVec)
       {
         std::cout << "ITERATION " << truth_count << " BEGINNING" << std::endl;
         std::cout << "MARCO - track->ID() = " << track->ID() << std::endl;
-        const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID());
+        
+        art::FindManyP<recob::Hit> fmh(trackHandle, e, _track_producer_name);
+        int iTrk = -1;
+        std::cout << "Looping over tracks to find track index" << std::endl;
+        for (unsigned int i = 0; i < trackHandle->size(); i++)
+        {
+          std::cout << "Track handle index " << i << " has track ID " << (trackHandle->at(i)).ID() << " compared to track->ID() = " << track->ID() << std::endl;
+          if (track->ID() == (trackHandle->at(i)).ID()) 
+          {
+            std::cout << "Found track index = " << i << ", for track with ID " << track->ID() << std::endl;
+            iTrk = i;
+            break;
+          }
+        }
+        if (iTrk == -1) 
+        {
+          std::cout << "Failed to find track index" << std::endl;
+          continue;
+        }
+        std::vector< art::Ptr<recob::Hit> > allHits = fmh.at(iTrk);
+
+        std::map<int,int> g4IDstoMaxContributorCount;
+        for (unsigned int recohit_i = 0; recohit_i < allHits.size(); recohit_i++)
+        {
+          const art::Ptr<recob::Hit> recohit = allHits[recohit_i];
+          std::cout << "Hit integral = " << recohit->Integral() << std::endl;
+          std::cout << "Obtaining track IDs from hit" << std::endl;
+          std::vector<sim::TrackIDE> trackIDEs = bt->HitToTrackID(recohit);
+          std::cout << "Track IDs obtained" << std::endl;
+          int max_contributing_id = -1;
+          double max_energy_frac = -99999999;
+          std::cout << "Looping over " << trackIDEs.size() << " track IDEs" << std::endl;
+          for (unsigned int trackide_i = 0; trackide_i < trackIDEs.size(); trackide_i++)
+          {
+            std::cout << "IDE #" << trackide_i << ": energy frac = " << trackIDEs[trackide_i].energyFrac << ", ID = " << trackIDEs[trackide_i].trackID << std::endl;
+            if (trackIDEs[trackide_i].energyFrac > max_energy_frac)
+            {
+              max_energy_frac = trackIDEs[trackide_i].energyFrac;
+              max_contributing_id = trackIDEs[trackide_i].trackID;
+            }
+          }
+          std::cout << "About to fill map for max contributing id = " << max_contributing_id << std::endl;
+          if (max_contributing_id != -1) g4IDstoMaxContributorCount[max_contributing_id]++;
+        }
+
+        int MaxContributingCount = -9999;
+        int MaxContributingID    = -9999;
+
+        std::cout << "Looping over map" << std::endl;
+        for (std::map<int,int>::iterator mapIt = g4IDstoMaxContributorCount.begin(); mapIt != g4IDstoMaxContributorCount.end(); mapIt++)
+        {
+          std::cout << "(*mapIt).second = " << (*mapIt).second << std::endl;
+          std::cout << "(*mapIt).first = " << (*mapIt).first << std::endl;
+          if ((*mapIt).second > MaxContributingCount)
+          {
+            MaxContributingCount = (*mapIt).second;
+            MaxContributingID    = (*mapIt).first;
+          }
+        }
+        std::cout << "MaxContributingCount = " << MaxContributingCount << std::endl;
+        std::cout << "MaxContributingID = " << MaxContributingID << std::endl;
+
+        const simb::MCParticle *true_particle = bt->TrackIDToParticle(MaxContributingID);
+        std::cout << "Called true particle from backtracker" << std::endl;
         if (true_particle != NULL)
         {
           fTrackTrueTime = true_particle->T();
