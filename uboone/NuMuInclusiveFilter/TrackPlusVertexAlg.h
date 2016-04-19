@@ -1,11 +1,11 @@
 /**
- *  @file   TrackPairPlusVertexAlg.h
+ *  @file   TrackPlusVertexAlg.h
  * 
  *  @brief  This is an algorithm for finding neutrino candidates using tracks and vertices
  * 
  */
-#ifndef TrackPairPlusVertexAlg_h
-#define TrackPairPlusVertexAlg_h
+#ifndef TrackPlusVertexAlg_h
+#define TrackPlusVertexAlg_h
 
 #include "uboone/TPCNeutrinoIDFilter/NeutrinoIDAlgBase.h"
 
@@ -22,9 +22,9 @@ namespace neutrinoid
 {
 
 /**
- *  @brief  TrackPairPlusVertexAlg class
+ *  @brief  TrackPlusVertexAlg class
  */
-class TrackPairPlusVertexAlg : virtual public NeutrinoIDAlgBase
+class TrackPlusVertexAlg : virtual public NeutrinoIDAlgBase
 {
 public:
     /**
@@ -32,12 +32,12 @@ public:
      * 
      *  @param  pset
      */
-    TrackPairPlusVertexAlg(fhicl::ParameterSet const &pset);
+    TrackPlusVertexAlg(fhicl::ParameterSet const &pset);
 
     /**
      *  @brief  Destructor
      */
-    virtual ~TrackPairPlusVertexAlg();
+    virtual ~TrackPlusVertexAlg();
     
     /**
      *  @brief a handler for the case where the algorithm control parameters are to be reset
@@ -68,6 +68,7 @@ private:
     std::string                fTrackModuleLabel;        ///< Producer of input tracks
     std::string                fVertexModuleLabel;       ///< Producer of input vertices
     std::string                fCosmicModuleLabel;       ///< Producer of cosmic track tags
+    std::string                fOpFlashModuleLabel;      ///< Producer of flashes
     double                     fCosmicScoreCut;          ///< Cut value for possible cosmic tag scores
     double                     fNeutrinoVtxTrackDistCut; ///< Cut to select neutrino candidate
     bool                       fDoHists;                 ///< Fill histograms

@@ -1,5 +1,5 @@
 /**
- *  @file   TrackPairPlusVertexAlg.cxx
+ *  @file   TrackPlusVertexAlg.cxx
  * 
  *  @brief  Implementation of the Track/Vertex Neutrino ID alg
  *          This module outputs associations between vertices
@@ -20,7 +20,7 @@
 
 
 // The main include
-#include "uboone/TPCNeutrinoIDFilter/TrackPairPlusVertexAlg.h"
+#include "uboone/NuMuInclusiveFilter/TrackPlusVertexAlg.h"
 
 // Framework Includes
 #include "art/Framework/Core/FindManyP.h"
@@ -36,7 +36,10 @@
 #include "lardata/RecoBase/Hit.h"
 #include "lardata/RecoBase/Track.h"
 #include "lardata/RecoBase/Vertex.h"
+#include "lardata/RecoBase/OpFlash.h"
 #include "lardata/AnalysisBase/CosmicTag.h"
+#include "lardata/AnalysisBase/FlashMatch.h"
+#include "lardata/AnalysisBase/T0.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +48,7 @@
 
 namespace neutrinoid {
 
-TrackPairPlusVertexAlg::TrackPairPlusVertexAlg(fhicl::ParameterSet const &pset) : fMyProducerModule(0)
+TrackPlusVertexAlg::TrackPlusVertexAlg(fhicl::ParameterSet const &pset) : fMyProducerModule(0)
 {
     this->reconfigure(pset);
     
@@ -55,24 +58,26 @@ TrackPairPlusVertexAlg::TrackPairPlusVertexAlg(fhicl::ParameterSet const &pset) 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-TrackPairPlusVertexAlg::~TrackPairPlusVertexAlg()
+TrackPlusVertexAlg::~TrackPlusVertexAlg()
 {
 }
     
-void TrackPairPlusVertexAlg::reconfigure(fhicl::ParameterSet const &pset)
+void TrackPlusVertexAlg::reconfigure(fhicl::ParameterSet const &pset)
 {
     // Assume we could be called externally with the top level module's complete parameter set
-    const fhicl::ParameterSet& myPset = pset.get<fhicl::ParameterSet>("TPCTracksPlusVertexAlg");
+    const fhicl::ParameterSet& myPset = pset.get<fhicl::ParameterSet>("TPCTrackPlusVertexAlg");
     
     fTrackModuleLabel        = myPset.get<std::string> ("TrackModuleLabel",  "trackkalmanhit");
-    fVertexModuleLabel       = myPset.get<std::string> ("VertexModuleLabel", "pandoraNu");
+    fVertexModuleLabel       = myPset.get<std::string> ("VertexModuleLabel", "pandoraNu");    
     fCosmicModuleLabel       = myPset.get<std::string> ("CosmicModuleLabel", "trackKalmanHitTag");
+    fOpFlashModuleLabel      = myPset.get<std::string> ("OpFlashModuleLabel","opflash");
     fCosmicScoreCut          = myPset.get<double>      ("CosmicScoreCut",    0.4);
     fNeutrinoVtxTrackDistCut = myPset.get<double>      ("NuVtxTrackDistCut", 4.5);
     fDoHists                 = myPset.get<bool>        ("FillHistograms",    true);
+    
 }
     
-void TrackPairPlusVertexAlg::beginJob(art::ServiceHandle<art::TFileService>& tfs)
+void TrackPlusVertexAlg::beginJob(art::ServiceHandle<art::TFileService>& tfs)
 {
     if (fDoHists)
     {
@@ -86,32 +91,41 @@ void TrackPairPlusVertexAlg::beginJob(art::ServiceHandle<art::TFileService>& tfs
     return;
 }
     
-void TrackPairPlusVertexAlg::produces(art::EDProducer* owner)
+void TrackPlusVertexAlg::produces(art::EDProducer* owner)
 {
     fMyProducerModule = owner;
     fMyProducerModule->produces< art::Assns<recob::Vertex, recob::Track> >();
+    
+
 }
 
     
-bool TrackPairPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
+bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
 {
     // Agreed convention is to ALWAYS output to the event store so get a pointer to our collection
     std::unique_ptr<std::vector<recob::Track> > neutrinoTracks(new std::vector<recob::Track>);
     std::unique_ptr<art::Assns<recob::Vertex, recob::Track> > vertexTrackAssociations(new art::Assns<recob::Vertex, recob::Track>);
     
     // Recover the hanles to the vertex and track collections we want to analyze.
-    art::Handle< std::vector<recob::Vertex> > vertexVecHandle;
-    art::Handle< std::vector<recob::Track> >  trackVecHandle;
+    art::Handle< std::vector<recob::Vertex> >  vertexVecHandle;
+    art::Handle< std::vector<recob::Track> >   trackVecHandle;
+    art::Handle< std::vector<recob::OpFlash> > flashListHandle;
+    //    art::Handle< std::vector<anab::T0> >       t0Handle;
+
+    event.getByLabel(fVertexModuleLabel,    vertexVecHandle);
+    event.getByLabel(fTrackModuleLabel,     trackVecHandle);
+
     
-    event.getByLabel(fVertexModuleLabel, vertexVecHandle);
-    event.getByLabel(fTrackModuleLabel,  trackVecHandle);
-    
+    std::vector<art::Ptr<recob::OpFlash> > flashlist;    
+    if (event.getByLabel(fOpFlashModuleLabel,flashListHandle))
+      art::fill_ptr_vector(flashlist, flashListHandle);
+
     // Require valid handles, otherwise nothing to do
     if (vertexVecHandle.isValid() && vertexVecHandle->size() > 0 && trackVecHandle.isValid() && trackVecHandle->size() > 0)
     {
         // Recover associations relating cosmic tags and track
         art::FindManyP<anab::CosmicTag> cosmicAssns(trackVecHandle, event, fCosmicModuleLabel);
-        
+
         // We need to keep track of the best combination
         // Can we assign art ptrs? I don't think so...
         std::vector<art::Ptr<recob::Vertex>> bestVertexVec;
