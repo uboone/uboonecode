@@ -5,14 +5,14 @@
 #include "trackfindermodules_microboone.fcl"
 #include "vertexfindermodules.fcl"
 #include "pandoramodules.fcl"
-#include "tpcneutrinoidfiltermodule_microboone.fcl"
+#include "numuccincfiltermodule_microboone.fcl"
 
-process_name: TPCNeutrinoIDFilter
+process_name: NuMuCCIncFilter
 
 services:
 {
   #Load the service that manages root files for histograms.
-  TFileService: { fileName: "tpcneutrinoid.root" }
+  TFileService: { fileName: "numuccincfilter.root" }
   Timing:       {}
   SimpleMemoryCheck:     { ignoreTotal: 1 }     #default is one
   RandomNumberGenerator: {}                     #ART native random number generator
@@ -41,11 +41,11 @@ physics:
 {
  producers:     { }
 
- filters:       { tpcneutrinoidfilter : @local::microboone_tpcneutrinoidfilter} 
+ filters:       { numuccincfilter : @local::microboone_numuccincfilter} 
 
  analyzers:     { }
 
- reco:          [ tpcneutrinoidfilter ]
+ reco:          [ numuccincfilter ]
  
  stream1:       [ out1 ]
 
@@ -56,11 +56,7 @@ physics:
 
 # define the list of LArSoft modules to run through the simulate path
 
-#physics.analyzers.tpcneutrinoidfilter.TrackModuleLabel:        "trackkalmanhit"
-#physics.analyzers.tpcneutrinoidfilter.CosmicTaggerAssocLabel:  "trackkalmanhittag"
-#physics.analyzers.tpcneutrinoidfilter.VertexModuleLabel:       "pandoraNu"
-
-physics.filters.tpcneutrinoidfilter.module_type:             "TPCNeutrinoIDFilter"
-physics.filters.tpcneutrinoidfilter.TrackModuleLabel:        "trackkalmanhit"
-physics.filters.tpcneutrinoidfilter.CosmicTaggerAssocLabel:  "ccclustertag"
-physics.filters.tpcneutrinoidfilter.VertexModuleLabel:       "pandoraNu"
+physics.filters.numuccincfilter.module_type:             "TPCNeutrinoIDFilter"
+physics.filters.numuccincfilter.TrackModuleLabel:        "trackkalmanhit"
+physics.filters.numuccincfilter.CosmicTaggerAssocLabel:  "ccclustertag"
+physics.filters.numuccincfilter.VertexModuleLabel:       "pandoraNu"

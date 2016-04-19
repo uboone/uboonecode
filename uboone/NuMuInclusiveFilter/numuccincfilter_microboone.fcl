@@ -1,6 +1,6 @@
 BEGIN_PROLOG
 
-microboone_tpcTracksPlusVtxAlg:
+microboone_tpcTrackPlusVtxAlg:
 {
     TrackModuleLabel:           "trackkalmanhit"
     CosmicModuleLabel:          "pandoraNu"
@@ -11,8 +11,8 @@ microboone_tpcTracksPlusVtxAlg:
 microboone_tpcNeutrinoID:
 {
     module_type:                "TPCNeutrinoID"
-    NeutrinoIDAlgName:          "TrackPairPlusVertexAlg"
-    TPCTracksPlusVertexAlg:     @local::microboone_tpcTracksPlusVtxAlg
+    NeutrinoIDAlgName:          "TrackPlusVertexAlg"
+    TPCTrackPlusVertexAlg:      @local::microboone_tpcTrackPlusVtxAlg
     TPCCluster2DNuAlg:          @local::microboone_tpcCluster2DNuAlg
 }
 
@@ -23,14 +23,6 @@ microboone_tpcneutrinoidfilter:
     VtxTrackAssnModuleLabelVec:   ["vtxPlusTrkPanKal"]
     Cluster2DCosmicProducerLabel: "fuzzyclustertag"
     Cluster2DCosmicClusterAssns:  "cluster2D"
-}
-
-microboone_tpcneutrinoidana:
-{
-    module_type:                  "TPCNeutrinoIDAna"
-    VertexModuleLabelVec:         ["pandoraNu"]
-    VtxTrackAssnModuleLabelVec:   ["vtxPlusTrkPanKal"]
-    FullyQualifiedInputFile:      "/pnfs/uboone/data/uboone/some/path/to/recon/file/recon.root"
 }
 
 END_PROLOG

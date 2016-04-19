@@ -1,8 +1,8 @@
 BEGIN_PROLOG
 
-microboone_tpcneutrinoidfilter:
+microboone_numuccincfilter:
 { 
- module_type:              "TPCNeutrinoIDFilter"
+ module_type:              "NuMuCCIncFilter"
  TrackModuleLabel:         "trackkalmanhit"
  VertexModuleLabel:        "pandoraNu"
  CosmicTaggerAssocLabel:   "trackkalmanhit"

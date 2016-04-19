@@ -104,7 +104,7 @@ NuMuCCInc::~NuMuCCInc()
 ///
 void NuMuCCInc::reconfigure(fhicl::ParameterSet const & pset)
 {
-    fNeutrinoIDAlg = pset.get<std::string>("NeutrinoIDAlgName", "TrackPairPlusVertexAlg");
+    fNeutrinoIDAlg = pset.get<std::string>("NeutrinoIDAlgName", "TrackPlusVertexAlg");
 }
 
 //----------------------------------------------------------------------------
