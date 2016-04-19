@@ -33,8 +33,8 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "Geometry/Geometry.h"
-#include "Utilities/DetectorProperties.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "TH1.h"
 #include "TH2.h"
@@ -69,7 +69,7 @@ public:
 
 private:
     
-    void smoothCorrectionVec(std::vector<float>&) const;
+    void smoothCorrectionVec(std::vector<float>&, unsigned int&) const;
     
     template<class T> T getMedian(std::vector<T>&, T) const;
 
@@ -86,6 +86,7 @@ private:
     std::vector<size_t>  fNumWiresToGroup;       ///< If smoothing, the number of wires to look at
     bool                 fFillHistograms;        ///< if true then will fill diagnostic hists
     bool                 fRunFFTCorrected;       ///< Should we run FFT's on corrected wires?
+    std::vector<float>   fNumRmsToSmoothVec;     ///< # "sigma" to smooth correlated correction vec
     
     // Pointers to the histograms we'll create for monitoring what is happening
     TProfile*            fFFTHist[3];
@@ -111,7 +112,7 @@ private:
     
     // Useful services, keep copies for now (we can update during begin run periods)
     art::ServiceHandle<geo::Geometry>            fGeometry;             ///< pointer to Geometry service
-    art::ServiceHandle<util::DetectorProperties> fDetectorProperties;   ///< Detector properties service
+    detinfo::DetectorProperties const* fDetectorProperties = lar::providerFrom<detinfo::DetectorPropertiesService>();   ///< Detector properties service
 };
     
 } // end caldata namespace

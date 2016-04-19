@@ -2,7 +2,7 @@ BEGIN_PROLOG
 
 microboone_analysistree:
 { 
- module_type:              "AnalysisTree"
+ module_type:              "uboone/AnalysisTree/AnalysisTree"
  DigitModuleLabel:         "daq"
  HitsModuleLabel:          "gaushit"
  LArGeantModuleLabel:      "largeant"
@@ -11,6 +11,7 @@ microboone_analysistree:
  G4ModuleLabel:            "largeant"
  TrackModuleLabel:         [ "track3d" ]
  VertexModuleLabel:        [ "vertex3d" ]
+ PandoraNuVertexModuleLabel: "pandoraNu"
  ClusterModuleLabel:       "linecluster"
  OpFlashModuleLabel:       "opflash"
  MCShowerModuleLabel:      "mcreco" 
@@ -22,6 +23,7 @@ microboone_analysistree:
  ShowerModuleLabel:        ["showerrecofuzzy"]
  CosmicClusterTaggerAssocLabel: "ccclustertag"
  CosmicTaggerAssocLabel: ["trackkalmanhit"]
+ ContainmentTaggerAssocLabel: ["isotag"]
  FlashMatchAssocLabel:   ["flashTrackMatchkHit"]
  POTModuleLabel:           "generator"
  UseBuffers:               false
@@ -33,13 +35,14 @@ microboone_analysistree:
  SaveMCShowerInfo:         true 
  SaveMCTrackInfo:          true 
  SaveHitInfo:              true
- SaveRawDigitInfo:         false  //set this to false by default since not everyone want rawdigits.
+ SaveRawDigitInfo:         false  #set this to false by default since not everyone want rawdigits.
  SaveTrackInfo:            true
  SaveVertexInfo:           true
+ SavePandoraNuVertexInfo: true
  SaveClusterInfo:          true
  SaveFlashInfo:            true
  SaveShowerInfo:           true
- SaveCaloCosmics:          false
+ SaveCaloCosmics:          true
  G4minE:                   0.01
 }
 

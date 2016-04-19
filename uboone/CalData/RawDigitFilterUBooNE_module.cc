@@ -45,18 +45,20 @@
 #include "art/Persistency/Common/Ptr.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "Geometry/Geometry.h"
-#include "Utilities/DetectorProperties.h"
-#include "Utilities/TimeService.h"
-#include "Utilities/SimpleTimeService.h"
-#include "CalibrationDBI/Interface/IDetPedestalService.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 
 #include "NoiseFilterAlgs/RawDigitNoiseFilterDefs.h"
 #include "NoiseFilterAlgs/RawDigitBinAverageAlg.h"
 #include "NoiseFilterAlgs/RawDigitCharacterizationAlg.h"
 #include "NoiseFilterAlgs/RawDigitCorrelatedCorrectionAlg.h"
 #include "NoiseFilterAlgs/RawDigitFilterAlg.h"
+
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RawData/raw.h"
+
 
 class RawDigitFilterUBooNE : public art::EDProducer
 {
@@ -78,33 +80,16 @@ private:
 
     // Fcl parameters.
     std::string          fDigitModuleLabel;      ///< The full collection of hits
-    float                fTruncMeanFraction;     ///< Fraction for truncated mean
-    std::vector<float>   fRmsRejectionCutHi;     ///< Maximum rms for input channels, reject if larger
-    std::vector<float>   fRmsRejectionCutLow;    ///< Minimum rms to consider channel "alive"
-    std::vector<float>   fRmsSelectionCut;       ///< Don't use/apply correction to wires below this
-    std::vector<short>   fMinMaxSelectionCut;    ///< Plane by plane cuts for spread cut
-    unsigned int         fTheChosenWire;         ///< For example hist
-    double               fMaxPedestalDiff;       ///< Max pedestal diff to db to warn
+    bool                 fProcessNoise;          ///< Process the noise
     bool                 fApplyBinAverage;       ///< Do bin averaging to get rid of high frequency noise
-    std::vector<size_t>  fBinsToAverage;         ///< # bins to average by view
     bool                 fApplyTopHatFilter;     ///< Apply the top hat filter
-    size_t               fStructuringElement;    ///< Structuring element to use with Top Hat filter
     bool                 fSmoothCorrelatedNoise; ///< Should we smooth the noise?
-    bool                 fApplyCorSmoothing;     ///< Attempt to smooth the correlated noise correction?
-    bool                 fApplyFFTCorrection;    ///< Use an FFT to get the correlated noise correction
-    bool                 fFillFFTHistograms;     ///< Fill associated FFT histograms
-    std::vector<size_t>  fFFTHistsWireGroup;     ///< Wire Group to pick on
-    std::vector<size_t>  fFFTNumHists;           ///< Number of hists total per view
-    std::vector<double>  fFFTHistsStartTick;     ///< Starting tick for histograms
-    std::vector<double>  fFFTMinPowerThreshold;  ///< Threshold for trimming FFT power spectrum
     std::vector<size_t>  fNumWiresToGroup;       ///< If smoothing, the number of wires to look at
-    bool                 fFillHistograms;        ///< if true then will fill diagnostic hists
-    bool                 fRunFFTInput;           ///< Should we run FFT's on input wires?
-    bool                 fRunFFTCorrected;       ///< Should we run FFT's on corrected wires?
     bool                 fTruncateTicks;         ///< If true then drop channels off ends of wires
     unsigned int         fWindowSize;            ///< # ticks to keep in window
     unsigned int         fNumTicksToDropFront;   ///< # ticks to drop from front of waveform
-    bool                 fProcessNoise;          ///< Process the noise
+    std::vector<float>   fRmsRejectionCutHi;     ///< Maximum rms for input channels, reject if larger
+    std::vector<float>   fRmsRejectionCutLow;    ///< Minimum rms to consider channel "alive"
 
     // Statistics.
     int fNumEvent;        ///< Number of events seen.
@@ -114,11 +99,12 @@ private:
     caldata::RawDigitCharacterizationAlg         fCharacterizationAlg;
     caldata::RawDigitCorrelatedCorrectionAlg     fCorCorrectAlg;
     caldata::RawDigitFilterAlg                   fFilterAlg;
+    caldata::RawDigitFFTAlg                      fFFTAlg;
     
     // Useful services, keep copies for now (we can update during begin run periods)
-    art::ServiceHandle<geo::Geometry>            fGeometry;             ///< pointer to Geometry service
-    art::ServiceHandle<util::DetectorProperties> fDetectorProperties;   ///< Detector properties service
-    const lariov::IDetPedestalProvider&          fPedestalRetrievalAlg; ///< Keep track of an instance to the pedestal retrieval alg
+    geo::GeometryCore const*           fGeometry;             ///< pointer to Geometry service
+    detinfo::DetectorProperties const* fDetectorProperties;   ///< Detector properties service
+    const lariov::DetPedestalProvider& fPedestalRetrievalAlg; ///< Keep track of an instance to the pedestal retrieval alg
 };
 
 DEFINE_ART_MODULE(RawDigitFilterUBooNE)
@@ -133,12 +119,16 @@ DEFINE_ART_MODULE(RawDigitFilterUBooNE)
 RawDigitFilterUBooNE::RawDigitFilterUBooNE(fhicl::ParameterSet const & pset) :
                       fNumEvent(0),
                       fBinAverageAlg(pset),
-                      fCharacterizationAlg(pset),
-                      fCorCorrectAlg(pset),
-                      fFilterAlg(pset),
-                      fPedestalRetrievalAlg(art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider())
-
+                      fCharacterizationAlg(pset.get<fhicl::ParameterSet>("CharacterizationAlg")),
+                      fCorCorrectAlg(pset.get<fhicl::ParameterSet>("CorrelatedCorrectionAlg")),
+                      fFilterAlg(pset.get<fhicl::ParameterSet>("FilterAlg")),
+                      fFFTAlg(pset.get<fhicl::ParameterSet>("FFTAlg")),
+                      fPedestalRetrievalAlg(*lar::providerFrom<lariov::DetPedestalService>())
 {
+    
+    fGeometry = lar::providerFrom<geo::Geometry>();
+    fDetectorProperties = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    
     reconfigure(pset);
     produces<std::vector<raw::RawDigit> >();
 
@@ -161,33 +151,16 @@ RawDigitFilterUBooNE::~RawDigitFilterUBooNE()
 void RawDigitFilterUBooNE::reconfigure(fhicl::ParameterSet const & pset)
 {
     fDigitModuleLabel      = pset.get<std::string>        ("DigitModuleLabel",                                        "daq");
-    fTruncMeanFraction     = pset.get<float>              ("TruncMeanFraction",                                        0.15);
-    fRmsRejectionCutHi     = pset.get<std::vector<float>> ("RMSRejectionCutHi",     std::vector<float>() = {25.0,25.0,25.0});
-    fRmsRejectionCutLow    = pset.get<std::vector<float>> ("RMSRejectionCutLow",    std::vector<float>() = {0.70,0.70,0.70});
-    fRmsSelectionCut       = pset.get<std::vector<float>> ("RMSSelectionCut",       std::vector<float>() = {1.40,1.40,1.00});
-    fMinMaxSelectionCut    = pset.get<std::vector<short>> ("MinMaxSelectionCut",        std::vector<short>() = {13, 13, 11});
-    fTheChosenWire         = pset.get<unsigned int>       ("TheChosenWire",                                            1200);
-    fMaxPedestalDiff       = pset.get<double>             ("MaxPedestalDiff",                                           10.);
+    fProcessNoise          = pset.get<bool>               ("ProcessNoise",                                             true);
     fApplyBinAverage       = pset.get<bool>               ("ApplyBinAverage",                                          true);
-    fBinsToAverage         = pset.get<std::vector<size_t>>("NumBinsToAverage",              std::vector<size_t>() = {2,2,2});
     fApplyTopHatFilter     = pset.get<bool>               ("ApplyTopHatFilter",                                        true);
-    fStructuringElement    = pset.get<size_t>             ("StructuringElement",                                         30);
     fSmoothCorrelatedNoise = pset.get<bool>               ("SmoothCorrelatedNoise",                                    true);
-    fApplyCorSmoothing     = pset.get<bool>               ("ApplyCorSmoothing",                                        true);
-    fApplyFFTCorrection    = pset.get<bool>               ("ApplyFFTCorrection",                                       true);
-    fFillFFTHistograms     = pset.get<bool>               ("FillFFTHistograms",                                        true);
-    fFFTHistsWireGroup     = pset.get<std::vector<size_t>>("FFTHistsWireGroup",         std::vector<size_t>() = {1, 33, 34});
-    fFFTNumHists           = pset.get<std::vector<size_t>>("FFTNumWaveHistograms",       std::vector<size_t>() = {10,48,48});
-    fFFTHistsStartTick     = pset.get<std::vector<double>>("FFTWaveHistsStartTick", std::vector<double>() = {96.,96.,7670.});
-    fFFTMinPowerThreshold  = pset.get<std::vector<double>>("FFTPowerThreshold",     std::vector<double>() = {100.,75.,500.});
     fNumWiresToGroup       = pset.get<std::vector<size_t>>("NumWiresToGroup",          std::vector<size_t>() = {48, 48, 96});
-    fFillHistograms        = pset.get<bool>               ("FillHistograms",                                          false);
-    fRunFFTInput           = pset.get<bool>               ("RunFFTInputWires",                                        false);
-    fRunFFTCorrected       = pset.get<bool>               ("RunFFTCorrectedWires",                                    false);
     fTruncateTicks         = pset.get<bool>               ("TruncateTicks",                                           false);
     fWindowSize            = pset.get<size_t>             ("WindowSize",                                               6400);
-    fNumTicksToDropFront   = pset.get<size_t>             ("NumTicksToDropFront",                                      2250);
-    fProcessNoise          = pset.get<bool>               ("ProcessNoise",                                             true);
+    fNumTicksToDropFront   = pset.get<size_t>             ("NumTicksToDropFront",                                      2400);
+    fRmsRejectionCutHi     = pset.get<std::vector<float>> ("RMSRejectionCutHi",     std::vector<float>() = {25.0,25.0,25.0});
+    fRmsRejectionCutLow    = pset.get<std::vector<float>> ("RMSRejectionCutLow",    std::vector<float>() = {0.70,0.70,0.70});
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +174,7 @@ void RawDigitFilterUBooNE::beginJob()
     fCharacterizationAlg.initializeHists(tfs);
     fCorCorrectAlg.initializeHists(tfs);
     fFilterAlg.initializeHists(tfs);
+    fFFTAlg.initializeHists(tfs);
     
     return;
 }
@@ -342,15 +316,13 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                 raw::Uncompress(rawDigit->ADCs(), rawadc, rawDigit->Compression());
             }
             
-            // This allows the module to be used simply to truncate waveforms with no noise processing
-            if (!fProcessNoise)
-            {
-                saveRawDigits(filteredRawDigit, channel, rawadc, truncMeanWireVec[wireIdx], truncRmsWireVec[wireIdx]);
-                continue;
-            }
+            // Recover the database version of the pedestal
+            float pedestal = fPedestalRetrievalAlg.PedMean(channel);
+            
+            fFFTAlg.filterFFT(rawadc, view, wire, pedestal);
             
             // Apply the high frequency filter
-            if (fApplyBinAverage) fBinAverageAlg.doTwoBinAverage(rawadc);
+//            if (fApplyBinAverage) fBinAverageAlg.doTwoBinAverage(rawadc);
             
             // Get the kitchen sink
             fCharacterizationAlg.getWaveformParams(rawadc,
@@ -367,6 +339,13 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                                                    minMaxWireVec[wireIdx],
                                                    neighborRatioWireVec[wireIdx],
                                                    pedCorWireVec[wireIdx]);
+            
+            // This allows the module to be used simply to truncate waveforms with no noise processing
+            if (!fProcessNoise)
+            {
+                saveRawDigits(filteredRawDigit, channel, rawadc, truncMeanWireVec[wireIdx], truncRmsWireVec[wireIdx]);
+                continue;
+            }
             
             // If we are not performing noise corrections then we are done with this wire
             // Store it and move on

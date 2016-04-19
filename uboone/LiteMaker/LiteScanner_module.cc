@@ -30,52 +30,59 @@
 #include "uboone/Geometry/UBOpReadoutMap.h"
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
-#include "Utilities/TimeService.h"
-#include "Geometry/Geometry.h"
-#include "RawData/RawDigit.h"
-#include "RawData/OpDetWaveform.h"
-#include "Simulation/SimPhotons.h"
-#include "RawData/TriggerData.h"
-#include "RecoBase/Wire.h"
-#include "RecoBase/Hit.h"
-#include "RecoBase/OpHit.h"
-#include "RecoBase/OpFlash.h"
-#include "RecoBase/Track.h"
-#include "RecoBase/Cluster.h"
-#include "RecoBase/SpacePoint.h"
-#include "RecoBase/Shower.h"
-#include "RecoBase/Vertex.h"
-#include "RecoBase/EndPoint2D.h"
-#include "RecoBase/PFParticle.h"
-#include "RecoBase/PCAxis.h"
-#include "AnalysisBase/ParticleID.h"
-#include "AnalysisBase/Calorimetry.h"
-#include "AnalysisBase/CosmicTag.h"
-#include "AnalysisBase/FlashMatch.h"
-#include "Simulation/SimChannel.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardata/RawData/RawDigit.h"
+#include "lardata/RawData/OpDetWaveform.h"
+#include "larsim/Simulation/SimPhotons.h"
+#include "lardata/RawData/TriggerData.h"
+#include "lardata/RecoBase/Wire.h"
+#include "lardata/RecoBase/Hit.h"
+#include "lardata/RecoBase/OpHit.h"
+#include "lardata/RecoBase/OpFlash.h"
+#include "lardata/RecoBase/Track.h"
+#include "lardata/RecoBase/Cluster.h"
+#include "lardata/RecoBase/SpacePoint.h"
+#include "lardata/RecoBase/Shower.h"
+#include "lardata/RecoBase/Vertex.h"
+#include "lardata/RecoBase/EndPoint2D.h"
+#include "lardata/RecoBase/PFParticle.h"
+#include "lardata/RecoBase/PCAxis.h"
+#include "lardata/AnalysisBase/ParticleID.h"
+#include "lardata/AnalysisBase/Calorimetry.h"
+#include "lardata/AnalysisBase/CosmicTag.h"
+#include "lardata/AnalysisBase/FlashMatch.h"
+#include "larsim/Simulation/SimChannel.h"
+#include "larsim/Simulation/AuxDetSimChannel.h"
 #include "SimulationBase/MCFlux.h"
 #include "SimulationBase/GTruth.h"
 #include "SimulationBase/MCTruth.h"
 #include "SimulationBase/MCParticle.h"
-#include "OpticalDetectorData/FIFOChannel.h"
-#include "OpticalDetectorData/OpticalTypes.h"
-#include "MCBase/MCShower.h"
-#include "MCBase/MCTrack.h"
-#include "PiZeroROI/PiZeroROI.hh"
-#include "SummaryData/POTSummary.h"
-#include "Utilities/LArProperties.h"
-#include "Utilities/GeometryUtilities.h"
-#include "Utilities/DetectorProperties.h"
+#include "PiZeroROI/PiZeroROI/PiZeroROI.hh"
+#include "lardata/OpticalDetectorData/FIFOChannel.h"
+#include "lardata/OpticalDetectorData/OpticalTypes.h"
+#include "lardata/MCBase/MCShower.h"
+#include "lardata/MCBase/MCTrack.h"
+#include "larcore/SummaryData/POTSummary.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
+#include "lardata/Utilities/GeometryUtilities.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "DataFormat/simphotons.h"
 
 #include "ScannerAlgo.h"
+#include "LLMetaMaker.h"
 //#include "ScannerAlgo.template.h"
 
 // std 
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
+
+// ROOT
+#include <TTimeStamp.h>
+#include <TString.h>
 
 class LiteScanner;
 
@@ -121,6 +128,10 @@ private:
   bool fStoreAss;
   /// POTSummary producer label
   std::vector<std::string> fPOTSummaryLabel_v;
+  /// Boolean to enable unique file name
+  std::string fOutFileName;
+  /// Stream name
+  std::string fStreamName;
 };
 
 
@@ -129,9 +140,23 @@ LiteScanner::LiteScanner(fhicl::ParameterSet const & p)
   , fAlg()
  // More initializers here.
 {
+  fStreamName = p.get<std::string>("stream");
+
   //  fDataReadFlag.resize((size_t)(::larlite::data::kDATA_TYPE_MAX),std::map<std::string,
   fStoreAss = p.get<bool>("store_association");
-  _mgr.set_out_filename(p.get<std::string>("out_filename","annonymous.root"));
+
+  fOutFileName = p.get<std::string>("out_filename","annonymous.root");
+  if(p.get<bool>("unique_filename")) {
+    TString tmp_fname(p.get<std::string>("out_filename","annonymous.root"));
+    tmp_fname.ReplaceAll(".root","");
+    TTimeStamp ts;
+    fOutFileName = Form("%s_%08d_%06d_%06d.root",tmp_fname.Data(),ts.GetDate(),ts.GetTime(), (int)(ts.GetNanoSec()/1.e3));
+  }
+  _mgr.set_out_filename(fOutFileName);
+
+  art::ServiceHandle<util::LLMetaMaker> metamaker;
+  metamaker->addJson(fOutFileName,fStreamName);
+
   auto const data_pset = p.get<fhicl::ParameterSet>("DataLookUpMap");
   auto const ass_pset = p.get<fhicl::ParameterSet>("AssociationLookUpMap");
   for(size_t i = 0; i<(size_t)(::larlite::data::kDATA_TYPE_MAX); ++i) {
@@ -214,8 +239,8 @@ void LiteScanner::analyze(art::Event const & e)
   _mgr.set_id(e.id().run(),
 	      e.id().subRun(),
 	      e.id().event());
-  art::ServiceHandle<util::TimeService> ts;
-  ts->preProcessEvent(e);
+  //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
+  //ts->preProcessEvent(e);
   /*
   std::cout<<" Run: " << _mgr.run_id() << " ... "
 	   <<" SubRun: " << _mgr.subrun_id() << " ... "
@@ -245,11 +270,11 @@ void LiteScanner::analyze(art::Event const & e)
   //
   // Loop over data type to store data & locally art::Ptr
   //
-  auto const& labels_v = fAlg.ModuleLabels();
+  auto const& data_labels_v = fAlg.ModuleLabels();
 
-  for(size_t i=0; i<labels_v.size(); ++i) {
+  for(size_t i=0; i<data_labels_v.size(); ++i) {
 
-    auto const& labels = labels_v[i];
+    auto const& labels = data_labels_v[i];
     ::larlite::data::DataType_t lite_type = (::larlite::data::DataType_t)i;
 
     for(size_t j=0; j<labels.size(); ++j) {
@@ -270,6 +295,8 @@ void LiteScanner::analyze(art::Event const & e)
 	ScanSimPhotons(e,j); break;
       case ::larlite::data::kSimChannel:
 	ScanData<sim::SimChannel>(e,j); break;
+      case ::larlite::data::kAuxDetSimChannel:
+	ScanData<sim::AuxDetSimChannel>(e,j); break;
       case ::larlite::data::kMCShower:
 	ScanData<sim::MCShower>(e,j); break;
       case ::larlite::data::kMCTrack: 
@@ -330,12 +357,13 @@ void LiteScanner::analyze(art::Event const & e)
     }
   }
 
+  auto const& ass_labels_v = fAlg.AssLabels();
   //
   // Loop over data type to store association
   //
-  for(size_t i=0; fStoreAss && i<labels_v.size(); ++i) {
+  for(size_t i=0; fStoreAss && i<ass_labels_v.size(); ++i) {
 
-    auto const& labels = labels_v[i];
+    auto const& labels = ass_labels_v[i];
     ::larlite::data::DataType_t lite_type = (::larlite::data::DataType_t)i;
 
     for(size_t j=0; j<labels.size(); ++j) {
@@ -372,6 +400,7 @@ void LiteScanner::analyze(art::Event const & e)
       case ::larlite::data::kPiZeroROI:
       case ::larlite::data::kOpHit: 
       case ::larlite::data::kSimChannel:
+      case ::larlite::data::kAuxDetSimChannel:
       case ::larlite::data::kSimPhotons:
       case ::larlite::data::kMCShower:
       case ::larlite::data::kMCTrack:
@@ -404,7 +433,7 @@ template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t
     fAlg.ScanData(dh,lite_data);
   }else{
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
-    art::ServiceHandle<util::TimeService> ts;
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
     std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
 
     evt.getByLabel(lite_id.second, dh);
@@ -497,7 +526,7 @@ template<class T> void LiteScanner::SaveAssociationSource(const art::Event& evt)
 //-------------------------------------------------------------------------------------------------
 template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const size_t name_index)
 { 
-  auto lite_id = fAlg.ProductID<T>(name_index);
+  auto lite_id = fAlg.AssProductID<T>(name_index);
   //auto lite_data = _mgr.get_data(lite_id.first,lite_id.second);
   auto lite_ass = (::larlite::event_ass*)(_mgr.get_data(::larlite::data::kAssociation,lite_id.second));
   art::Handle<std::vector<T> > dh;
