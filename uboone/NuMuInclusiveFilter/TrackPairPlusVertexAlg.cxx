@@ -10,6 +10,15 @@
  *  Neutrino ID task force
  */
 
+/////
+///   To do list...
+// 1) Include flashes
+// 2) "at least 1" track-vertex association instead of "at least 2"
+// 3) Import christoph's cuts
+// 4) ...
+
+
+
 // The main include
 #include "uboone/TPCNeutrinoIDFilter/TrackPairPlusVertexAlg.h"
 
