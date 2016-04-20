@@ -12,12 +12,18 @@
 
 /////
 ///   To do list...
-// 1) Include flashes
-// 2) "at least 1" track-vertex association instead of "at least 2"
-// 3) Import christoph's cuts
-// 4) ...
 
+// 1) "at least 1" track-vertex association instead of "at least 2"
+// 2) Import christoph's cuts
+// 3) ...
 
+///// Casting of Christoph's cuts
+/*
+  
+  
+  
+  
+*/
 
 // The main include
 #include "uboone/NuMuInclusiveFilter/TrackPlusVertexAlg.h"
