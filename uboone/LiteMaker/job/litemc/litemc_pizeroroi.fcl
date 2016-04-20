@@ -12,7 +12,10 @@ litemc_pizeroroi.DataLookUpMap:
 }
 
 litemc_pizeroroi.AssociationLookUpMap:
-{}
+{
+    PiZeroROI:    ["pizerofilter"]
+    pfpart:       ["pandoraNu"]
+}
 
 END_PROLOG
 
