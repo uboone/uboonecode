@@ -59,14 +59,11 @@
 #include "uboone/LLSelectionTool/OpT0Finder/Base/FlashMatchManager.h"
 
 //
-// Drift velocity includes
+// Service includes
 //
-//#include "lardata/Utilities/LArPropertiesService.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfo/DetectorProperties.h"
-#include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "lardata/DetectorInfo/DetectorClocks.h"
 #include "larcore//CoreUtils/ServiceUtil.h"
 
 // Truth matching includes
@@ -102,39 +99,35 @@ private:
     
     /// FlashMatcManager instance
     ::flashana::FlashMatchManager _mgr;
+    
     /// LightPath algorithm to convert recob::Track into flashana::QCluster_t
     ::flashana::LightPath _light_path_alg;
     std::string _track_producer_name; ///< Input recob::Track producer name
     std::string _flash_producer_name; ///< Input recob::OpFlash producer name
     std::string fPFPModuleLabel;      ///< Input recob::PFParticle producer name
-  
-  
-  // Marco's addition
-  typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;
-  typedef std::map< art::Ptr<simb::MCParticle>,  RecoParticleToNMatchedHits > ParticleMatchingMap;
-  
-  void GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoParticlesToHits, const lar_pandora::MCParticlesToHits &trueParticlesToHits, const lar_pandora::HitsToMCParticles &hitsToTrueParticles, ParticleMatchingMap &particleMatchingMap) const;
-  std::string  m_hitfinderLabel;         ///<
-  std::string  m_clusterLabel;           ///<
-  std::string  m_particleLabel;          ///<
-  std::string  m_geantModuleLabel;       ///<
+    std::string  m_hitfinderLabel;    ///<
+    std::string  m_clusterLabel;      ///<
+    std::string  m_particleLabel;     ///<
+    std::string  m_geantModuleLabel;  ///<
 
+    /// Maps used for PFParticle truth matching
+    typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;
+    typedef std::map< art::Ptr<simb::MCParticle>,  RecoParticleToNMatchedHits > ParticleMatchingMap;
+   
+    /// Function for PFParticle truth matching
+    void GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoParticlesToHits, const lar_pandora::MCParticlesToHits &trueParticlesToHits, const lar_pandora::HitsToMCParticles &hitsToTrueParticles, ParticleMatchingMap &particleMatchingMap) const;
     
-    //DetectorProperties
-    //const util::LArProperties& detp;
-    
-    
-    ///Histogram Initializations
+    /// Histogram Initializations
     TH1D* fTrackIDCodeHist;
     TH1D* fTrackPhiHist;
     
+    /// Match tree variables (filled per TPC object match candidate)
     Double_t fTrackCharge;
     Double_t fMatchedFlashLight;
     Double_t fMatchedFlashPosZ;
     Double_t fTrackPosY;
     Double_t fTrackPosZ;
     Double_t fTrackTrueTime;
-    Double_t fTrackRecoTime;
     Double_t fFlashTime;
     Double_t fFlashTimeWidth;
     Double_t fFlashAbsTime;
@@ -146,7 +139,8 @@ private:
     Double_t fTruthyFlashPosZ;
     
     TTree *fMatchTree;
-    
+
+    /// Event tree variables (filled per event)
     Int_t fNPandoraTrees;
     Int_t fNTracks;
     Int_t fNFlashes;
@@ -157,10 +151,10 @@ private:
     Double_t fMMFlash_TimeWidth;
     Double_t fMMFlash_AbsTime;
     Double_t fMMFlash_OnBeamTime;
-    //Double_t fMM_DeltaT;
-    //Double_t fMM_DeltaR;
     
     TTree *fEventTree;
+    
+    /// Flash tree variables (filled per flash)
     
     Double_t fFlashLight;
     Double_t fFlashyTime;
@@ -168,20 +162,15 @@ private:
     
     TTree *fFlashTree;
     
-    //TH2D* fTrackIDvsFlashMatchScoreHist;
     int fTrackID;
     int fTrackPhi;
     std::string fSpillName;
-    
 };
 
 
 UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
 : EDProducer()
 , _mgr()
-//, detp(art::ServiceHandle<util::LArProperties>())
-
-// :
 // Initialize member data here.
 {
     
@@ -219,7 +208,7 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
         _track_producer_name = _track_producer_name.substr( 0, pos );
     }
   
-  // Marco's addition
+  // Manually set module labels 
   m_particleLabel    = p.get<std::string>("PFParticleModule","pandoraCosmic");
   m_clusterLabel     = p.get<std::string>("ClusterModule","pandoraCosmic");
   m_hitfinderLabel   = p.get<std::string>("HitFinderModule","gaushit");
@@ -238,7 +227,8 @@ void UBFlashMatching::beginJob()
     // is drawn.
     fTrackIDCodeHist        = tfs->make<TH1D>("trackIDcodes",";Track ID Code;", 10, -10, 10);
     fTrackPhiHist           = tfs->make<TH1D>("trackPhi",";Track Phi;"        , 10, -5, 5);
-    
+   
+    //Make lots of trees
     fMatchTree = tfs->make<TTree>("match_tree", "match_tree");
     fEventTree = tfs->make<TTree>("event_tree", "event_tree");
     fFlashTree = tfs->make<TTree>("flash_tree", "flash_tree");
@@ -249,16 +239,15 @@ void UBFlashMatching::beginJob()
     fMatchTree->Branch("TrackPosY"        , &fTrackPosY        , "TrackPosY/D"        );
     fMatchTree->Branch("TrackPosZ"        , &fTrackPosZ        , "TrackPosZ/D"        );
     fMatchTree->Branch("TrackTrueTime"    , &fTrackTrueTime    , "TrackTrueTime/D"    );
-    fMatchTree->Branch("TrackRecoTime"    , &fTrackRecoTime    , "TrackRecoTime/D"    );
     fMatchTree->Branch("FlashTime"        , &fFlashTime        , "FlashTime/D"        );
     fMatchTree->Branch("FlashTimeWidth"   , &fFlashTimeWidth   , "FlashTimeWidth/D"   );
     fMatchTree->Branch("FlashAbsTime"     , &fFlashAbsTime     , "FlashAbsTime/D"     );
     fMatchTree->Branch("FlashOnBeamTime"  , &fFlashOnBeamTime  , "FlashOnBeamTime/D"  );
     fMatchTree->Branch("TrackMatched"     , &fTrackMatched     , "TrackMatched/I"     );
     fMatchTree->Branch("MatchScore"       , &fMatchScore       , "MatchScore/D"       );
-    fMatchTree->Branch("TruthyFlashTime" , &fTruthyFlashTime   , "TruthyFlashTime/D"  );
-    fMatchTree->Branch("TruthyFlashLight", &fTruthyFlashLight  , "TruthyFlashLight/D" );
-    fMatchTree->Branch("TruthyFlashPosZ" , &fTruthyFlashPosZ   , "TruthyFlashPosZ/D"  );
+    fMatchTree->Branch("TruthyFlashTime"  , &fTruthyFlashTime  , "TruthyFlashTime/D"  );
+    fMatchTree->Branch("TruthyFlashLight" , &fTruthyFlashLight , "TruthyFlashLight/D" );
+    fMatchTree->Branch("TruthyFlashPosZ"  , &fTruthyFlashPosZ  , "TruthyFlashPosZ/D"  );
     
     fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
     fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
@@ -278,7 +267,6 @@ void UBFlashMatching::beginJob()
 
 void UBFlashMatching::produce(art::Event & e)
 {
-    //std::cout << "NEW EVENT" << std::endl;
     _mgr.Reset();
     // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
     const size_t num_pmts = 32;
@@ -287,10 +275,8 @@ void UBFlashMatching::produce(art::Event & e)
     //pointer to put onto event
     //
     
-    //art::Ptr<anab::FlashMatch>  flashmatch ( new anab::FlashMatch);
     std::unique_ptr<std::vector<anab::FlashMatch>> flashmatchtrack ( new std::vector<anab::FlashMatch>);
     std::unique_ptr<std::vector<anab::FlashMatch>> flashmatchopflash ( new std::vector<anab::FlashMatch>);
-    //std::unique_ptr<std::vector<anab::FlashMatch>> flashmatch ( new std::vector<anab::FlashMatch>);
     std::unique_ptr<art::Assns<recob::Track, anab::FlashMatch>> flashTrackAssociations( new art::Assns<recob::Track, anab::FlashMatch>);
     std::unique_ptr<art::Assns<recob::OpFlash, anab::FlashMatch>> flashOpFlashAssociations( new art::Assns<recob::OpFlash, anab::FlashMatch >);
     
@@ -320,8 +306,6 @@ void UBFlashMatching::produce(art::Event & e)
         throw std::exception();
     }
     
-    std::cout << "**>> trackHitAssns size: " << trackHitAssns.size() << std::endl;
-    
     art::Handle< std::vector<recob::OpFlash> > flashHandle;
     e.getByLabel(_flash_producer_name,flashHandle);
     if(!flashHandle.isValid()) {
@@ -329,10 +313,7 @@ void UBFlashMatching::produce(art::Event & e)
         << _flash_producer_name << std::endl;
         throw std::exception();
     }
-    else
-    {
-        std::cout << "flashHandle has size " << flashHandle->size() << std::endl;
-    }
+    
     //-----------------------------PFParticle Extraction-----------------------------------------//
     art::Handle< std::vector<recob::PFParticle> > pfpVecHandle;
     e.getByLabel(fPFPModuleLabel,  pfpVecHandle);
@@ -349,105 +330,96 @@ void UBFlashMatching::produce(art::Event & e)
         throw std::exception();
     }
   
-  
-  
-  // Marco's addition *******
-  
-  // Create map to store PFParticle ID and true time
-  std::map<int,double> pfParticleIDtoTrueTime;
-  std::map<int,int> pfParticleIDtoNMatchedHits;
-  
-  std::cout << "++++++++++++++++++ PANDORA MATCH ++++++++++++++++++++" << std::endl;
-  
-  // Collect Hits
-  lar_pandora::HitVector hitVector;
-  lar_pandora::LArPandoraHelper::CollectHits(e, m_hitfinderLabel, hitVector);
-  
-  std::cout << "+++++ hitVector.size() = " << hitVector.size() << std::endl;
-  
-  // Collect PFParticles and match Reco Particles to Hits
-  lar_pandora::PFParticlesToHits recoParticlesToHits;
-  lar_pandora::HitsToPFParticles recoHitsToParticles;
-  lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, m_particleLabel, m_clusterLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
-  
-  std::cout << "+++++ recoHitsToParticles.size() = " << recoHitsToParticles.size() << std::endl;
-  std::cout << "+++++ recoParticlesToHits.size() = " << recoParticlesToHits.size() << std::endl;
-  
-  // Collect MCParticles and match True Particles to Hits
-  lar_pandora::MCParticlesToHits trueParticlesToHits;
-  lar_pandora::HitsToMCParticles hitsToTrueParticles;
-  lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, m_geantModuleLabel, hitVector, trueParticlesToHits, hitsToTrueParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
-  
-  std::cout << "+++++ trueParticlesToHits.size() = " << trueParticlesToHits.size() << std::endl;
-  std::cout << "+++++ hitsToTrueParticles.size() = " << hitsToTrueParticles.size() << std::endl;
-  
-  
-  // Match Reco Particles to True Particles
-  ParticleMatchingMap particleMatchingMap;
-  this->GetRecoToTrueMatches(recoParticlesToHits, trueParticlesToHits, hitsToTrueParticles, particleMatchingMap);
-  
-  std::cout << "+++++ particleMatchingMap.size() = " << particleMatchingMap.size() << std::endl;
-  
-  for (const ParticleMatchingMap::value_type &trueToRecoEntry : particleMatchingMap)
-  {
-    std::cout << "MCPDG " << trueToRecoEntry.first->PdgCode()
-    << ", #MCHits  " << trueParticlesToHits.at(trueToRecoEntry.first).size()
-    << ", TrueTime " << trueToRecoEntry.first->T() << std::endl;
+    // Create map to store PFParticle ID and true time
+    bool pandora_talkative = false;
+    std::map<int,double> pfParticleIDtoTrueTime;
+    std::map<int,int> pfParticleIDtoNMatchedHits;
     
-    double trueParticleTime = trueToRecoEntry.first->T();
+    if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ++++++++++++++++++++" << std::endl;
     
-    for (const RecoParticleToNMatchedHits::value_type &recoToNMatchedHitsEntry : trueToRecoEntry.second)
+    // Collect Hits
+    lar_pandora::HitVector hitVector;
+    lar_pandora::LArPandoraHelper::CollectHits(e, m_hitfinderLabel, hitVector);
+    
+    if (pandora_talkative) std::cout << "+++++ hitVector.size() = " << hitVector.size() << std::endl;
+    
+    // Collect PFParticles and match Reco Particles to Hits
+    lar_pandora::PFParticlesToHits recoParticlesToHits;
+    lar_pandora::HitsToPFParticles recoHitsToParticles;
+    lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, m_particleLabel, m_clusterLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
+    
+    if (pandora_talkative) std::cout << "+++++ recoHitsToParticles.size() = " << recoHitsToParticles.size() << std::endl;
+    if (pandora_talkative) std::cout << "+++++ recoParticlesToHits.size() = " << recoParticlesToHits.size() << std::endl;
+    
+    // Collect MCParticles and match True Particles to Hits
+    lar_pandora::MCParticlesToHits trueParticlesToHits;
+    lar_pandora::HitsToMCParticles hitsToTrueParticles;
+    lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, m_geantModuleLabel, hitVector, trueParticlesToHits, hitsToTrueParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
+    
+    if (pandora_talkative) std::cout << "+++++ trueParticlesToHits.size() = " << trueParticlesToHits.size() << std::endl;
+    if (pandora_talkative) std::cout << "+++++ hitsToTrueParticles.size() = " << hitsToTrueParticles.size() << std::endl;
+    
+    // Match Reco Particles to True Particles
+    ParticleMatchingMap particleMatchingMap;
+    this->GetRecoToTrueMatches(recoParticlesToHits, trueParticlesToHits, hitsToTrueParticles, particleMatchingMap);
+    
+    if (pandora_talkative) std::cout << "+++++ particleMatchingMap.size() = " << particleMatchingMap.size() << std::endl;
+    
+    for (const ParticleMatchingMap::value_type &trueToRecoEntry : particleMatchingMap)
     {
-      // Looping now over reco particles that have hits in common with the True Particle above
-      int NMatchedHits      = recoToNMatchedHitsEntry.second;           // Hits in common between reco and true particles
-      int recoPFParticleID  = recoToNMatchedHitsEntry.first->Self();    // ID of the reco particle
-      int recoPFParticlePDG = recoToNMatchedHitsEntry.first->PdgCode(); // PDG of the reco particle
+      if (pandora_talkative) std::cout << "MCPDG " << trueToRecoEntry.first->PdgCode()
+      << ", #MCHits  " << trueParticlesToHits.at(trueToRecoEntry.first).size()
+      << ", TrueTime " << trueToRecoEntry.first->T() << std::endl;
       
-      std::cout << "--RecoPDG " << recoPFParticlePDG
-      << ", #PfoHits " << recoParticlesToHits.at(recoToNMatchedHitsEntry.first).size()
-      << ", #MatchedHits " << NMatchedHits
-      << ", ID " << recoPFParticleID
-      << std::endl;
+      double trueParticleTime = trueToRecoEntry.first->T();
       
-      // If I never saw this particle before, save the number of matched hits and the true time
-      if (pfParticleIDtoNMatchedHits.find(recoPFParticleID) != pfParticleIDtoNMatchedHits.end()) {
-        pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
-        pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
-      }
-      
-      // If the number of matched hits is bigger than before (for the same paricle), update the
-      // number of hits and save the true time of the particle.
-      if (NMatchedHits > pfParticleIDtoNMatchedHits.find(recoPFParticleID)->second) {
-        pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
-        pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
+      for (const RecoParticleToNMatchedHits::value_type &recoToNMatchedHitsEntry : trueToRecoEntry.second)
+      {
+        // Looping now over reco particles that have hits in common with the True Particle above
+        int NMatchedHits      = recoToNMatchedHitsEntry.second;           // Hits in common between reco and true particles
+        int recoPFParticleID  = recoToNMatchedHitsEntry.first->Self();    // ID of the reco particle
+        int recoPFParticlePDG = recoToNMatchedHitsEntry.first->PdgCode(); // PDG of the reco particle
+        
+        if (pandora_talkative) std::cout << "--RecoPDG " << recoPFParticlePDG
+        << ", #PfoHits " << recoParticlesToHits.at(recoToNMatchedHitsEntry.first).size()
+        << ", #MatchedHits " << NMatchedHits
+        << ", ID " << recoPFParticleID
+        << std::endl;
+        
+        // If I never saw this particle before, save the number of matched hits and the true time
+        if (pfParticleIDtoNMatchedHits.find(recoPFParticleID) != pfParticleIDtoNMatchedHits.end()) {
+          pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
+          pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
+        }
+        
+        // If the number of matched hits is bigger than before (for the same paricle), update the
+        // number of hits and save the true time of the particle.
+        if (NMatchedHits > pfParticleIDtoNMatchedHits.find(recoPFParticleID)->second) {
+          pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
+          pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
+        }
       }
     }
-  }
-  for (std::map<int,double>::iterator it=pfParticleIDtoTrueTime.begin(); it!=pfParticleIDtoTrueTime.end(); ++it)
-    std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  TrueTime: " << it->second << std::endl;
-  std::cout << "++++++++++++++++++ PANDORA MATCH ENDS ++++++++++++++++++++" << std::endl;
-  
-  // ************************
-
-  
-  
-  
+    for (std::map<int,double>::iterator it=pfParticleIDtoTrueTime.begin(); it!=pfParticleIDtoTrueTime.end(); ++it)
+      if (pandora_talkative) std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  TrueTime: " << it->second << std::endl;
+    if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ENDS ++++++++++++++++++++" << std::endl;
     
-    // Get a PFParticle-to-vertex map.
+    // ************************
+    
+    // Get a PFParticle-to-vertex map for matching (currently unused)
     lar_pandora::VertexVector allPfParticleVertices;
     lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
     lar_pandora::LArPandoraHelper::CollectVertices(e, fPFPModuleLabel, allPfParticleVertices, pfParticleToVertexMap);
     
+    // Get a PFParticle-to-cluster map for matching (currently unused)
     lar_pandora::PFParticleVector pfparticlelist;
     lar_pandora::PFParticlesToClusters pfParticleToClusterMap;
     lar_pandora::LArPandoraHelper::CollectPFParticles(e, fPFPModuleLabel, pfparticlelist, pfParticleToClusterMap);
     
+    // Get a PFParticle-to-track map for matching
     lar_pandora::TrackVector allPfParticleTracks;
     lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
     lar_pandora::LArPandoraHelper::CollectTracks(e, _track_producer_name, allPfParticleTracks, pfParticleToTrackMap);
-    
-    //  lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(pfparticlelist, pfParticleToClusterMap,  &clustersToHits, PFParticlesToHits &particlesToHits, HitsToPFParticles &hitsToParticles, 1);
-    //std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;
     
     size_t NPFParticles = pfparticlelist.size();
     
@@ -474,7 +446,6 @@ void UBFlashMatching::produce(art::Event & e)
         
         // Retrieve individual recob::OpFlash and construct flashana::Flash_t
         auto const& opf = (*flashHandle)[opflash_index];
-        //  opflashPtrVec.push_back(opf);
         ::flashana::Flash_t flash;
         flash.pe_v.resize(num_pmts);
         for(size_t pmt_index=0; pmt_index<num_pmts; ++pmt_index)
@@ -501,7 +472,7 @@ void UBFlashMatching::produce(art::Event & e)
         fFlashOnBeamTime = opf.OnBeamTime();
         
         fFlashTree->Fill();
-        if (fFlashLight > 5) nfiltered++;
+        if (fFlashLight > 10) nfiltered++;
         
         // Register to a manager
         _mgr.Emplace(std::move(flash));
@@ -509,15 +480,16 @@ void UBFlashMatching::produce(art::Event & e)
     }
     
     /*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/
-    //Declare vector of tpc matching candidates---------
+    
+    //Declare vector of tpc matching candidatesi, used to keep track of summed clusters for diagnostic tree
     std::vector<recob::PFParticle> tpc_match_candidates;
-    std::vector<int> tpc_match_candidate_ids;
-    std::vector<double> tpc_match_candidate_truetimes;
-    //--------------------------------------------------
+    std::vector<int>               tpc_match_candidate_ids;
+    std::vector<double>            tpc_match_candidate_truetimes;
+    //-----------------------------------------------------------------------------------------------------
 
     for(const auto& pfParticle : pfparticlelist)
     {
-        double truetime = -300;
+        double truetime = -3E7;
 
         // Keep only primaries
         if (!pfParticle->IsPrimary()) continue;
@@ -530,8 +502,9 @@ void UBFlashMatching::produce(art::Event & e)
         
         const lar_pandora::TrackVector& trackVecprimary = pfParticleToTrackMap.find(pfParticle)->second;
         
-        std::cout << "==> PFParticle ID: " << pfParticle->Self() << " has " << trackVecprimary.size() << " tracks" << std::endl;
-        
+        std::cout << "SUMMED QCLUSTER CONSTRUCTION [SQC]" << std::endl;
+        std::cout << "[SQC] ==> PFParticle ID: " << pfParticle->Self() << " has " << trackVecprimary.size() << " tracks" << std::endl;
+        std::cout << "[SQC] ==> Looping over primaries" << std::endl;
         //First get qcluster and validation information for primary particle
         for( auto const& track: trackVecprimary)
         {
@@ -541,7 +514,7 @@ void UBFlashMatching::produce(art::Event & e)
             fTrackPhi = track->Phi();
             fTrackPhiHist->Fill(fTrackPhi);
             
-            std::cout << "** Track ID: " << track->ID() << ", # points: " << track->NumberTrajectoryPoints() << std::endl;
+            std::cout << "[SQC] ==>     ** Track ID: " << track->ID() << ", # points: " << track->NumberTrajectoryPoints() << std::endl;
             
             // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
             ::geoalgo::Trajectory trjprimary(track->NumberTrajectoryPoints(),3);
@@ -565,11 +538,11 @@ void UBFlashMatching::produce(art::Event & e)
         }//end for loop over tracks associated with primary particle
         
         //Then loop over daughters asssociated with primary particle to extract daughter tracks and create qclusters.
+        std::cout << "[SQC] ==> Looping over daughters" << std::endl;
         for(const auto& daughterIdx : pfParticle->Daughters())
         {
             art::Ptr<recob::PFParticle> daughterPart(pfpVecHandle, daughterIdx);
             
-            //  std::cout << "Attempting stage two" << std::endl;
             //auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
             lar_pandora::TrackVector trackVec;
             auto trackMapIter = pfParticleToTrackMap.find(daughterPart);
@@ -604,59 +577,17 @@ void UBFlashMatching::produce(art::Event & e)
                 summed_cluster += qcluster;
             }
         }//end for daughters
-        summed_cluster.idx = pfParticle->Self();//myID;//i;
-        //myID++;
+        summed_cluster.idx = pfParticle->Self();
+        
         // Register to a manager
         _mgr.Emplace(std::move(summed_cluster));
         
-        // Also saving the pfparticle that started the summed_cluster to tpc_match_candidates for bookkeeping
-        std::cout << "MARCO - pfp->Self() = " << pfParticle->Self() << std::endl;
+        // Also saving the pfparticle that started the summed_cluster to tpc_match_candidates for diagnostic tree bookkeeping
         tpc_match_candidates.push_back(*pfParticle);
         tpc_match_candidate_ids.push_back(pfParticle->Self());
         tpc_match_candidate_truetimes.push_back(truetime);
         
     }
-    
-    //-------------------------------commenting out old Track Match Way for PFParticle Implementation-------------------------
-    /* for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
-     
-     
-     // Retrieve individual recob::Track and construct flashana::Flash_t
-     auto const& track = (*trackHandle)[track_index];
-     // trackPtrVec.push_back(track);
-     fTrackID = track.ID();
-     fTrackIDCodeHist->Fill(fTrackID);
-     fTrackPhi = track.Phi();
-     fTrackPhiHist->Fill(fTrackPhi);
-     
-     // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
-     ::geoalgo::Trajectory trj;
-     // Set # points same as input track object, and initialize each point as 3D point
-     trj.resize(track.NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
-     
-     // Now loop over points and set actual xyz values
-     for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
-     
-     // Get reference to be modified
-     auto&       copy_pt = trj[point_index];
-     // Get const reference to get values
-     auto const& orig_pt = track.LocationAtPoint(point_index);
-     
-     copy_pt[0] = orig_pt[0];
-     copy_pt[1] = orig_pt[1];
-     copy_pt[2] = orig_pt[2];
-     }
-     
-     auto qcluster = _light_path_alg.FlashHypothesis(trj);
-     
-     qcluster.idx = track_index;
-     
-     // Register to a manager
-     _mgr.Emplace(std::move(qcluster));
-     }
-     */
-    //-------------------------------------------------------------------------------------------------------------------------
-    
     
     //
     //  1) Run FlashMatchManager & retrieve matches
@@ -667,368 +598,131 @@ void UBFlashMatching::produce(art::Event & e)
     //  2) Store data products (anab::FlashMatch and associations)
     //
     
-
-    //bool inbeam= true;	//should get this info from the fcl parameters.
-    // const art::Ptr<recob::Track>  trackPtr;
-    // size_t match_track_index = 0;
-    // size_t match_flash_index = 0;
-    
-    //detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-    
-    //detinfo::DetectorClocks const* detclock = lar::providerFrom<detinfo::DetectorClocksService>();
-    //
-    //auto const* detprop = lar::providerFrom< detinfo::DetectorProperties >();
-    
-    // auto const* detp = art::ServiceHandle<util::LArProperties>();
-    //  art::ServiceHandle<util::LArProperties> detp;
-    
-    
-//    int NumPrimaries=0;
-//    for(unsigned int i = 0; i <isPrimary.size(); i++)
-//        if(isPrimary[i]==1) ++NumPrimaries;
-    //std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
-    
-    //const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-    
-    //const double triggertime   = detclock->TriggerTime();
-    //const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
-    
-    //const double beamgate = detclock->BeamGateTime();
-    
-    //std::cout<<"BeamGateTime:  "	<<beamgate<<std::endl;
-    //std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
-    //std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
-    
     std::vector<::flashana::FlashMatch_t> match_v;
     
     fNPandoraTrees = NPFParticles;
     fNTracks = allPfParticleTracks.size();
-    //std::cout << "Counting flashes" << std::endl;
     fNFlashes = flashHandle->size();
     fNFilteredFlashes = nfiltered;
-    //std::cout << "Filling event tree" << std::endl;
     
     const int n_flashes = opflashVec.size();
     int n_matches[n_flashes];
     for (int i = 0; i < n_flashes; i++) n_matches[i] = 0;
-    
-    std::cout << "---------------------------> Looping over match candidates" << std::endl;
-    
+   
+    std::cout << "BEGINNING LOOP OVER MATCHES" << std::endl;
     
     for(size_t match_index=0; match_index < match_result_v.size(); match_index++)
     {
-        int tpc_matched_index = -1;
-        ::flashana::FlashMatch_t match;
-        match = match_result_v.at(match_index);
-        for (unsigned int i = 0; i < tpc_match_candidates.size(); i++)
-        {
-            if((int)match.tpc_id == tpc_match_candidate_ids.at(i))
-            {
-                std::cout << "Found match: match.tpc_id == " << match.tpc_id << ", tpc_match_candidates id = " << tpc_match_candidate_ids.at(i) << std::endl;
-                tpc_matched_index = i;//tpc_match_candidate_ids.at(i);
-                break;
-            }
-        }
+      std::cout << "Match #" << match_index << std::endl;
       
-      
-      // Marco's addition
-      if (pfParticleToTrackMap.find(pfparticlelist[tpc_matched_index]) == pfParticleToTrackMap.end()) {
-        std::cout << "     >>>>> No info available. " << std::endl;
+      ::flashana::FlashMatch_t match;
+      match = match_result_v.at(match_index);
+
+      bool match_found = false;
+      for (unsigned int i = 0; i < tpc_match_candidates.size(); i++)
+      {
+          if((int)match.tpc_id == tpc_match_candidate_ids.at(i))
+          {
+              std::cout << "Found match: " << std::endl;
+              std::cout << "    match.tpc_id == " << match.tpc_id << ", tpc_match_candidates id = " << tpc_match_candidate_ids.at(i) << std::endl;
+              std::cout << "    match.flash_id == " << match.flash_id << std::endl;
+              match_found = true;
+              break;
+          }
       }
-      else {
-      lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfparticlelist[tpc_matched_index])->second;
-      art::Ptr<recob::Track> track = trackVec[0];
-      
-      // Now get the reco time
-      detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
-      const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
-      double driftpos = track->LocationAtPoint(0).X();
-      double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
-      fTrackRecoTime = drifttime;
-      
-      
+    
+      if (!match_found) std::cout << "Did not find match" << std::endl;
+
       std::cout << "     >>>>> The TPC object true time is:  " << pfParticleIDtoTrueTime.find(match.tpc_id)->second << std::endl;
-      std::cout << "     >>>>> The TPC object reco time is:  " << fTrackRecoTime << std::endl;
       std::cout << "     >>>>> The Flash time is:            " << opflashVec.at(match.flash_id).time*1000. << std::endl;
-      } 
-      //**********
-      
-      
-        
-        if (match.tpc_id==::flashana::kINVALID_ID)
-        {
-            std::cout<<"INVALID TPC_ID"<<std::endl;
-            fTrackCharge = -100;
-            fMatchedFlashLight = -100;
-            fMatchedFlashPosZ = -100;
-            fTrackPosY = -100;
-            fTrackPosZ = -100;
-            fTrackTrueTime = -100;
-            fTrackRecoTime = -100;
-            fFlashTime = -100;
-            fTrackMatched = 0;
-            fMatchScore = -100;
-            fTruthyFlashTime = -300;
-            fTruthyFlashLight = 0;
-            fTruthyFlashPosZ = -100;
-            
-            fMatchTree->Fill();
-        }
-        else
-        {
-            n_matches[match.flash_id]++;
-            
-            fTrackMatched = 1;
-            fMatchScore = match.score;
-            double light = opflashVec.at(match.flash_id).TotalPE();
-            double posZ  = opflashVec.at(match.flash_id).z;
-            
-            //Default fills for now
-            fTrackCharge = -200;
-            fMatchedFlashLight  = -200;
-            fMatchedFlashPosZ   = -200;
-            fTrackPosY   = -200;
-            fTrackPosZ   = -200;
-            fMatchedFlashLight = light;
-            fMatchedFlashPosZ  = posZ;
-            //fTrackCharge = charge;
-            //fTrackPosY = startpos.Y();
-            //fTrackPosZ = startpos.Z();
-            fTrackRecoTime = -200;
-            
-            fTrackTrueTime = -200;
-            
-            if (indexToPFParticleMap.find(tpc_match_candidate_ids[tpc_matched_index]) == indexToPFParticleMap.end()) continue;
-            
-            art::Ptr<recob::PFParticle>& pfParticle = indexToPFParticleMap.find(tpc_match_candidate_ids[tpc_matched_index])->second;
-            
-            if (pfParticleToTrackMap.find(pfParticle) == pfParticleToTrackMap.end()) continue;
-            
-            lar_pandora::TrackVector trackVec = pfParticleToTrackMap.find(pfParticle)->second;
-            
-            std::cout << "\nStarting truth-finding loop; iterating over " << trackVec.size() << " tracks" << std::endl;
-            std::cout << "Backtracker believes there are " << bt->GetSetOfTrackIDs().size() << " tracks" << std::endl;
-            int truth_count = 0;
-            bool found_truth = false;
-            for (auto const& track: trackVec)
-            {
-                std::cout << "ITERATION " << truth_count << " BEGINNING" << std::endl;
-                std::cout << "MARCO - track->ID() = " << track->ID() << std::endl;
+    
+      if (match.tpc_id==::flashana::kINVALID_ID)
+      {
+          std::cout<<"INVALID TPC_ID"<<std::endl;
+          fTrackCharge       = -100;
+          fMatchedFlashLight = -100;
+          fMatchedFlashPosZ  = -1000;
+          fTrackPosY         = -1000;
+          fTrackPosZ         = -1000;
+          fTrackTrueTime     = -3E7;
+          fFlashTime         = -3E7;
+          fTrackMatched      = 0;
+          fMatchScore        = -100;
+          fTruthyFlashTime   = -3E7;
+          fTruthyFlashLight  = -100;
+          fTruthyFlashPosZ   = -1000;
+          
+          fMatchTree->Fill();
+      }
+      else
+      {
+          n_matches[match.flash_id]++;
+          
+          fTrackMatched = 1;
+          fMatchScore = match.score;
+          double light = opflashVec.at(match.flash_id).TotalPE();
+          double posZ  = opflashVec.at(match.flash_id).z;
+          
+          //Default fills for now
+          fTrackCharge        = -100;
+          fMatchedFlashLight  = -100;
+          fMatchedFlashPosZ   = -1000;
+          fTrackPosY          = -1000;
+          fTrackPosZ          = -1000;
+          fMatchedFlashLight  = light;
+          fMatchedFlashPosZ   = posZ;
+          //fTrackCharge = charge;
+          //fTrackPosY = startpos.Y();
+          //fTrackPosZ = startpos.Z();
+          
+          fTrackTrueTime = -3E7;
+         
+          fTrackTrueTime = pfParticleIDtoTrueTime.find(match.tpc_id)->second;
 
-                std::vector< art::Ptr<recob::Hit> > allHits;
-                
-                try
-                {
-                    allHits = trackHitAssns.at(track.key());
-                } catch (...)
-                {
-                    std::cout << "*** Track ID: " << track.key() << " has no associated hits!" << std::endl;
-                }
-                
-                std::map<int,int> g4IDstoMaxContributorCount;
-                for (unsigned int recohit_i = 0; recohit_i < allHits.size(); recohit_i++)
-                {
-                    const art::Ptr<recob::Hit> recohit = allHits[recohit_i];
-                    std::cout << "Hit integral = " << recohit->Integral() << std::endl;
-                    std::cout << "Obtaining track IDs from hit" << std::endl;
-                    std::vector<sim::TrackIDE> trackIDEs = bt->HitToTrackID(recohit);
-                    std::cout << "Track IDs obtained" << std::endl;
-                    int max_contributing_id = -1;
-                    double max_energy_frac = -99999999;
-                    std::cout << "Looping over " << trackIDEs.size() << " track IDEs" << std::endl;
-                    for (unsigned int trackide_i = 0; trackide_i < trackIDEs.size(); trackide_i++)
-                    {
-                        std::cout << "IDE #" << trackide_i << ": energy frac = " << trackIDEs[trackide_i].energyFrac << ", ID = " << trackIDEs[trackide_i].trackID << std::endl;
-                        if (trackIDEs[trackide_i].energyFrac > max_energy_frac)
-                        {
-                            max_energy_frac = trackIDEs[trackide_i].energyFrac;
-                            max_contributing_id = trackIDEs[trackide_i].trackID;
-                        }
-                    }
-                    std::cout << "About to fill map for max contributing id = " << max_contributing_id << std::endl;
-                    if (max_contributing_id != -1) g4IDstoMaxContributorCount[max_contributing_id]++;
-                }
-                
-                int MaxContributingCount = -9999;
-                int MaxContributingID    = -9999;
-                
-                std::cout << "Looping over map" << std::endl;
-                for (std::map<int,int>::iterator mapIt = g4IDstoMaxContributorCount.begin(); mapIt != g4IDstoMaxContributorCount.end(); mapIt++)
-                {
-                    std::cout << "(*mapIt).second = " << (*mapIt).second << std::endl;
-                    std::cout << "(*mapIt).first = " << (*mapIt).first << std::endl;
-                    if ((*mapIt).second > MaxContributingCount)
-                    {
-                        MaxContributingCount = (*mapIt).second;
-                        MaxContributingID    = (*mapIt).first;
-                    }
-                }
-                std::cout << "MaxContributingCount = " << MaxContributingCount << std::endl;
-                std::cout << "MaxContributingID = " << MaxContributingID << std::endl;
-                
-                const simb::MCParticle *true_particle = bt->TrackIDToParticle(MaxContributingID);
-                std::cout << "Called true particle from backtracker" << std::endl;
-                if (true_particle != NULL)
-                {
-                    fTrackTrueTime = true_particle->T();
-                    found_truth = true;
-                    break;
-                }
-                else std::cout << "COULDN'T FIND TRUE PARTICLE" << std::endl;
-                
-                truth_count++;
-            }
-            if (!found_truth) std::cout << "FULL LOOP COMPLETED, NO TRUTH FOUND\n" << std::endl;
-            else std::cout << "FULL LOOP COMPLETED, FOUND THE TRUTH     - fTrackTrueTime = " << fTrackTrueTime << std::endl;
-      
-           
-            fTruthyFlashTime = -200;
-            fTruthyFlashLight = -100;
-            fTruthyFlashPosZ = -100;
+          fTruthyFlashTime  = -3E7;
+          fTruthyFlashLight = -100;
+          fTruthyFlashPosZ  = -1000;
 
-            if (fTrackTrueTime != -200)
+          //Find "truthy" (approximately true) flash associated to this particle
+          if (fTrackTrueTime != -3E7)
+          {
+            int true_flash_index = -1;
+            double min_time_diff = 999999999;
+            for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) 
             {
-              int true_flash_index = -1;
-              double min_time_diff = 999999999;
-              for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) 
+              auto const& opf = (*flashHandle)[opflash_index];
+              double time = opf.Time();
+              time *= 1000;
+              if (abs(time - fTrackTrueTime) < min_time_diff) 
               {
-                auto const& opf = (*flashHandle)[opflash_index];
-                double time = opf.Time();
-                time *= 1000;
-                if (abs(time - fTrackTrueTime) < min_time_diff) 
-                {
-                  min_time_diff = abs(time - fTrackTrueTime);
-                  true_flash_index = opflash_index;
-                }
+                min_time_diff = abs(time - fTrackTrueTime);
+                true_flash_index = opflash_index;
               }
-              auto const& opf = (*flashHandle)[true_flash_index];
-              fTruthyFlashTime  = (opf.Time())*1000.;
-              fTruthyFlashLight = opf.TotalPE();
-              fTruthyFlashPosZ = opf.ZCenter();
             }
-           
-            double flashtime = opflashVec.at(match.flash_id).time;
-            fFlashTime = flashtime*1000.;
-            //n_matches[match.flash_id]++;
-            
-            fMatchTree->Fill();
-        }
+            auto const& opf = (*flashHandle)[true_flash_index];
+            fTruthyFlashTime  = (opf.Time())*1000.;
+            fTruthyFlashLight = opf.TotalPE();
+            fTruthyFlashPosZ = opf.ZCenter();
+          }
+
+          //Get flash information
+          double flashtime = opflashVec.at(match.flash_id).time;
+          fFlashTime = flashtime*1000.;
+          
+          fMatchTree->Fill();
+      }
     }
-    
-    //--------------------------DANGER: PHYSICSTS AT WORK---------------------------------//
-    
-    /*
-     std::cout << "DANGER: PHYSICSTS AT WORK" << std::endl;
-     
-     for (size_t i = 0; i < NPFParticles; ++i)
-     {
-     if (pfparticlelist[i]->IsPrimary()==1)
-     {
-     if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
-     
-     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
-     std::cout<<"Size of trackVec: "<<trackVec.size()<<std::endl;
-     for( auto const& track: trackVec)
-     {
-     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
-     
-     
-     float charge=0;
-     
-     std::cout<<"clearing charge"<<std::endl;
-     //
-     //std::cout<<"track pointer size: "<< trackHitAssns.at(track.key()).size()<<std::endl;
-     //    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
-     //std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
-     //    for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
-     //    {
-     //    	charge += trackHitVec.at(hit_index)->Integral();
-     //    }
-     //    std::cout<<"Hit Charge: "<<charge<<std::endl;
-     //
-     TVector3 startpos = track->LocationAtPoint(0);
-     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
-     startpos += endpos;
-     startpos *= 0.5;
-     std::cout << "Average position: " << startpos.Y() << ", " << startpos.Z() << std::endl;
-     
-     ::flashana::FlashMatch_t match;
-     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index)
-     {
-     match = match_result_v.at(match_index);
-     if((int)match.tpc_id==track->ID())
-     {
-     break;
-     }
-     }
-     
-     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
-     if (match.tpc_id==::flashana::kINVALID_ID)
-     {
-     std::cout<<"INVALID TPC_ID"<<std::endl;
-     fTrackCharge = -100;
-     fMatchedFlashLight = -100;
-     fTrackPosY = -100;
-     fTrackPosZ = -100;
-     fTrackTrueTime = -100;
-     fTrackRecoTime = -100;
-     fFlashTime = -100;
-     fTrackMatched = 0;
-     fMatchScore = -100;
-     
-     fMatchTree->Fill();
-     }
-     else
-     {
-     fTrackMatched = 1;
-     fMatchScore = match.score;
-     std::cout<<"--------------------------------------------TESTING ELSE STATEMENT---------------------------"<<std::endl;
-     double light = opflashVec.at(match.flash_id).TotalPE();
-     fMatchedFlashLight = light;
-     fTrackCharge = charge;
-     fTrackPosY = startpos.Y();
-     fTrackPosZ = startpos.Z();
-     
-     //m double driftpos = track->LocationAtPoint(0).X();
-     //m double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
-     //m fTrackRecoTime = drifttime;
-     
-     fTrackTrueTime = -100;
-     std::cout << "BACKTRACKER AWAY" << std::endl;
-     std::cout << "Track ID = " << track->ID() << ", track length = " << track->Length() << std::endl;
-     const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID()+1);
-     std::cout << "BACKTRACKER YOU DID GOOD" << std::endl;
-     if (true_particle != NULL)
-     {
-     //m double truetime = true_particle->T();
-     //m std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
-     //m const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
-     //m std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
-     //m fTrackTrueTime = truetime;
-     }
-     else
-     std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
-     
-     
-     //m double flashtime = opflashVec.at(match.flash_id).time;
-     //m fFlashTime = flashtime;
-     //m n_matches[match.flash_id]++;
-     
-     fMatchTree->Fill();
-     std::cout<<"-------------------------------FINISHED FILLING TTREE---------------------------"<<std::endl;
-     
-     }
-     //m anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
-     
-     //m flashmatchtrack->push_back(Flash);
-     //m util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
-     }
-     }
-     }
-     std::cout << "ROADWORKS END" << std::endl;
-     */
-    //----------------------------------------ROADWORKS END-------------------------------------------------
-    
+   
+    //Create associations
+    //------------------------------------------------------------------------------------------------------
+    //m anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+    //m flashmatchtrack->push_back(Flash);
+    //m util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
+    //------------------------------------------------------------------------------------------------------
+ 
+    //Filling event tree
+    //--------------------
+    //Look for flash with most matches in one event
     int max_matches = 0;
     int max_match_index = -1;
     for (int i = 0; i < n_flashes; i++)
@@ -1056,9 +750,7 @@ void UBFlashMatching::produce(art::Event & e)
         fMMFlash_OnBeamTime = opf.OnBeamTime();
     }
     fEventTree->Fill();
-    
-    
-    
+    //---------------------
   
     e.put(std::move(flashmatchtrack),fSpillName);   
     e.put(std::move(flashTrackAssociations),fSpillName);   
