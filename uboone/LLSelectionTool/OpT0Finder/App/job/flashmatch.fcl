@@ -5,9 +5,11 @@ flashmatch_uboone: {
 
   module_type: "UBFlashMatching"
  
-  TrackProducer: "trackkalmanhit"
-  FlashProducer: "opflashSat"
-  
+  TrackProducer:    "pandoraCosmicKHit"
+  FlashProducer:    "opflashSat"
+  PFPModulelabel:   "pandoraCosmic"  
+  PFParticleModule: "pandoraCosmic"
+
   #
   # Manager configuration
   #

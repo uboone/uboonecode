@@ -342,6 +342,7 @@ namespace flashana {
            << " Score=" << match_info.score;
         Print(msg::kINFO, __FUNCTION__, ss.str());
       }
+      std::cout << "In manager. match_info.flash_id == " << match_info.flash_id << std::endl;
 
       // Register to a list of a "used" flash and tpc info
       tpc_used.insert(tpc_index);
