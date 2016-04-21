@@ -129,11 +129,11 @@ private:
     TH1D* fTrackPhiHist;
     
     Double_t fTrackCharge;
-    Double_t fTrackLight;
+    Double_t fMatchedFlashLight;
+    Double_t fMatchedFlashPosZ;
     Double_t fTrackPosY;
     Double_t fTrackPosZ;
-    Double_t fTrackTrueTime_backtracker;
-    Double_t fTrackTrueTime_pandoramatch;
+    Double_t fTrackTrueTime;
     Double_t fTrackRecoTime;
     Double_t fFlashTime;
     Double_t fFlashTimeWidth;
@@ -141,6 +141,9 @@ private:
     Double_t fFlashOnBeamTime;
     Int_t    fTrackMatched;
     Double_t fMatchScore;
+    Double_t fTruthyFlashTime;
+    Double_t fTruthyFlashLight;
+    Double_t fTruthyFlashPosZ;
     
     TTree *fMatchTree;
     
@@ -240,20 +243,22 @@ void UBFlashMatching::beginJob()
     fEventTree = tfs->make<TTree>("event_tree", "event_tree");
     fFlashTree = tfs->make<TTree>("flash_tree", "flash_tree");
     
-    fMatchTree->Branch("TrackCharge"    , &fTrackCharge     , "TrackCharge/D"     );
-    fMatchTree->Branch("TrackLight"     , &fTrackLight      , "TrackLight/D"      );
-    fMatchTree->Branch("TrackPosY"      , &fTrackPosY       , "TrackPosY/D"       );
-    fMatchTree->Branch("TrackPosZ"      , &fTrackPosZ       , "TrackPosZ/D"       );
-    fMatchTree->Branch("TrackTrueTime_backtracker"  , &fTrackTrueTime_backtracker   , "TrackTrueTime_backtracker/D"   );
-    fMatchTree->Branch("TrackTrueTime_pandoramatch"  , &fTrackTrueTime_pandoramatch   , "TrackTrueTime_pandoramatch/D"   );
-    fMatchTree->Branch("TrackRecoTime"  , &fTrackRecoTime   , "TrackRecoTime/D"   );
-    fMatchTree->Branch("FlashTime"      , &fFlashTime       , "FlashTime/D"       );
-    fMatchTree->Branch("FlashTimeWidth" , &fFlashTimeWidth  , "FlashTimeWidth/D"  );
-    fMatchTree->Branch("FlashAbsTime"   , &fFlashAbsTime    , "FlashAbsTime/D"    );
-    fMatchTree->Branch("FlashOnBeamTime", &fFlashOnBeamTime , "FlashOnBeamTime/D" );
-    
-    fMatchTree->Branch("TrackMatched"  , &fTrackMatched  , "TrackMatched/I"   );
-    fMatchTree->Branch("MatchScore"    , &fMatchScore    , "MatchScore/D"     );
+    fMatchTree->Branch("TrackCharge"      , &fTrackCharge      , "TrackCharge/D"      );
+    fMatchTree->Branch("MatchedFlashLight", &fMatchedFlashLight, "MatchedFlashLight/D");
+    fMatchTree->Branch("MatchedFlashPosZ" , &fMatchedFlashPosZ , "MatchedFlashPosZ/D" );
+    fMatchTree->Branch("TrackPosY"        , &fTrackPosY        , "TrackPosY/D"        );
+    fMatchTree->Branch("TrackPosZ"        , &fTrackPosZ        , "TrackPosZ/D"        );
+    fMatchTree->Branch("TrackTrueTime"    , &fTrackTrueTime    , "TrackTrueTime/D"    );
+    fMatchTree->Branch("TrackRecoTime"    , &fTrackRecoTime    , "TrackRecoTime/D"    );
+    fMatchTree->Branch("FlashTime"        , &fFlashTime        , "FlashTime/D"        );
+    fMatchTree->Branch("FlashTimeWidth"   , &fFlashTimeWidth   , "FlashTimeWidth/D"   );
+    fMatchTree->Branch("FlashAbsTime"     , &fFlashAbsTime     , "FlashAbsTime/D"     );
+    fMatchTree->Branch("FlashOnBeamTime"  , &fFlashOnBeamTime  , "FlashOnBeamTime/D"  );
+    fMatchTree->Branch("TrackMatched"     , &fTrackMatched     , "TrackMatched/I"     );
+    fMatchTree->Branch("MatchScore"       , &fMatchScore       , "MatchScore/D"       );
+    fMatchTree->Branch("TruthyFlashTime" , &fTruthyFlashTime   , "TruthyFlashTime/D"  );
+    fMatchTree->Branch("TruthyFlashLight", &fTruthyFlashLight  , "TruthyFlashLight/D" );
+    fMatchTree->Branch("TruthyFlashPosZ" , &fTruthyFlashPosZ   , "TruthyFlashPosZ/D"  );
     
     fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
     fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
@@ -441,6 +446,8 @@ void UBFlashMatching::produce(art::Event & e)
     lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
     lar_pandora::LArPandoraHelper::CollectTracks(e, _track_producer_name, allPfParticleTracks, pfParticleToTrackMap);
     
+    //  lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(pfparticlelist, pfParticleToClusterMap,  &clustersToHits, PFParticlesToHits &particlesToHits, HitsToPFParticles &hitsToParticles, 1);
+    //std::cout<<"#allPFParticleTracks: "<<allPfParticleTracks.size()<<std::endl;
     
     size_t NPFParticles = pfparticlelist.size();
     
@@ -609,7 +616,46 @@ void UBFlashMatching::produce(art::Event & e)
         tpc_match_candidate_truetimes.push_back(truetime);
         
     }
-  
+    
+    //-------------------------------commenting out old Track Match Way for PFParticle Implementation-------------------------
+    /* for(size_t track_index=0; track_index < trackHandle->size(); ++track_index) {
+     
+     
+     // Retrieve individual recob::Track and construct flashana::Flash_t
+     auto const& track = (*trackHandle)[track_index];
+     // trackPtrVec.push_back(track);
+     fTrackID = track.ID();
+     fTrackIDCodeHist->Fill(fTrackID);
+     fTrackPhi = track.Phi();
+     fTrackPhiHist->Fill(fTrackPhi);
+     
+     // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+     ::geoalgo::Trajectory trj;
+     // Set # points same as input track object, and initialize each point as 3D point
+     trj.resize(track.NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
+     
+     // Now loop over points and set actual xyz values
+     for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
+     
+     // Get reference to be modified
+     auto&       copy_pt = trj[point_index];
+     // Get const reference to get values
+     auto const& orig_pt = track.LocationAtPoint(point_index);
+     
+     copy_pt[0] = orig_pt[0];
+     copy_pt[1] = orig_pt[1];
+     copy_pt[2] = orig_pt[2];
+     }
+     
+     auto qcluster = _light_path_alg.FlashHypothesis(trj);
+     
+     qcluster.idx = track_index;
+     
+     // Register to a manager
+     _mgr.Emplace(std::move(qcluster));
+     }
+     */
+    //-------------------------------------------------------------------------------------------------------------------------
     
     
     //
@@ -622,6 +668,36 @@ void UBFlashMatching::produce(art::Event & e)
     //
     
 
+    //bool inbeam= true;	//should get this info from the fcl parameters.
+    // const art::Ptr<recob::Track>  trackPtr;
+    // size_t match_track_index = 0;
+    // size_t match_flash_index = 0;
+    
+    //detinfo::DetectorProperties const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    
+    //detinfo::DetectorClocks const* detclock = lar::providerFrom<detinfo::DetectorClocksService>();
+    //
+    //auto const* detprop = lar::providerFrom< detinfo::DetectorProperties >();
+    
+    // auto const* detp = art::ServiceHandle<util::LArProperties>();
+    //  art::ServiceHandle<util::LArProperties> detp;
+    
+    
+//    int NumPrimaries=0;
+//    for(unsigned int i = 0; i <isPrimary.size(); i++)
+//        if(isPrimary[i]==1) ++NumPrimaries;
+    //std::cout<<"NumberOfPrimaries: "<<NumPrimaries<<std::endl;
+    
+    //const double driftVelocity = detprop->DriftVelocity( detprop->Efield(), detprop->Temperature() );
+    
+    //const double triggertime   = detclock->TriggerTime();
+    //const double triggeroffsettpc   = detclock->TriggerOffsetTPC();
+    
+    //const double beamgate = detclock->BeamGateTime();
+    
+    //std::cout<<"BeamGateTime:  "	<<beamgate<<std::endl;
+    //std::cout<<"Trigger Time: "	<<triggertime<<std::endl;
+    //std::cout<<"Trigger OffsetTPC: "<<triggeroffsettpc<<std::endl;
     
     std::vector<::flashana::FlashMatch_t> match_v;
     
@@ -683,15 +759,18 @@ void UBFlashMatching::produce(art::Event & e)
         {
             std::cout<<"INVALID TPC_ID"<<std::endl;
             fTrackCharge = -100;
-            fTrackLight = -100;
+            fMatchedFlashLight = -100;
+            fMatchedFlashPosZ = -100;
             fTrackPosY = -100;
             fTrackPosZ = -100;
-            fTrackTrueTime_backtracker = -100;
-            fTrackTrueTime_pandoramatch = -100;
+            fTrackTrueTime = -100;
             fTrackRecoTime = -100;
             fFlashTime = -100;
             fTrackMatched = 0;
             fMatchScore = -100;
+            fTruthyFlashTime = -300;
+            fTruthyFlashLight = 0;
+            fTruthyFlashPosZ = -100;
             
             fMatchTree->Fill();
         }
@@ -701,25 +780,24 @@ void UBFlashMatching::produce(art::Event & e)
             
             fTrackMatched = 1;
             fMatchScore = match.score;
-            //double light = opflashVec.at(match.flash_id).TotalPE();
+            double light = opflashVec.at(match.flash_id).TotalPE();
+            double posZ  = opflashVec.at(match.flash_id).z;
             
             //Default fills for now
             fTrackCharge = -200;
-            fTrackLight  = -200;
+            fMatchedFlashLight  = -200;
+            fMatchedFlashPosZ   = -200;
             fTrackPosY   = -200;
             fTrackPosZ   = -200;
-            //fTrackLight = light;
+            fMatchedFlashLight = light;
+            fMatchedFlashPosZ  = posZ;
             //fTrackCharge = charge;
             //fTrackPosY = startpos.Y();
             //fTrackPosZ = startpos.Z();
             fTrackRecoTime = -200;
             
-            fTrackTrueTime_backtracker = -200;
-            fTrackTrueTime_pandoramatch = -200;
-      
-            // Set TrueTime obtained from the Pandora Helper functions
-            fTrackTrueTime_pandoramatch = pfParticleIDtoTrueTime.find(match.tpc_id)->second;
-      
+            fTrackTrueTime = -200;
+            
             if (indexToPFParticleMap.find(tpc_match_candidate_ids[tpc_matched_index]) == indexToPFParticleMap.end()) continue;
             
             art::Ptr<recob::PFParticle>& pfParticle = indexToPFParticleMap.find(tpc_match_candidate_ids[tpc_matched_index])->second;
@@ -734,8 +812,8 @@ void UBFlashMatching::produce(art::Event & e)
             bool found_truth = false;
             for (auto const& track: trackVec)
             {
-                //std::cout << "ITERATION " << truth_count << " BEGINNING" << std::endl;
-                //std::cout << "MARCO - track->ID() = " << track->ID() << std::endl;
+                std::cout << "ITERATION " << truth_count << " BEGINNING" << std::endl;
+                std::cout << "MARCO - track->ID() = " << track->ID() << std::endl;
 
                 std::vector< art::Ptr<recob::Hit> > allHits;
                 
@@ -751,48 +829,48 @@ void UBFlashMatching::produce(art::Event & e)
                 for (unsigned int recohit_i = 0; recohit_i < allHits.size(); recohit_i++)
                 {
                     const art::Ptr<recob::Hit> recohit = allHits[recohit_i];
-                    //std::cout << "Hit integral = " << recohit->Integral() << std::endl;
-                    //std::cout << "Obtaining track IDs from hit" << std::endl;
+                    std::cout << "Hit integral = " << recohit->Integral() << std::endl;
+                    std::cout << "Obtaining track IDs from hit" << std::endl;
                     std::vector<sim::TrackIDE> trackIDEs = bt->HitToTrackID(recohit);
-                    //std::cout << "Track IDs obtained" << std::endl;
+                    std::cout << "Track IDs obtained" << std::endl;
                     int max_contributing_id = -1;
                     double max_energy_frac = -99999999;
-                    //std::cout << "Looping over " << trackIDEs.size() << " track IDEs" << std::endl;
+                    std::cout << "Looping over " << trackIDEs.size() << " track IDEs" << std::endl;
                     for (unsigned int trackide_i = 0; trackide_i < trackIDEs.size(); trackide_i++)
                     {
-                        //std::cout << "IDE #" << trackide_i << ": energy frac = " << trackIDEs[trackide_i].energyFrac << ", ID = " << trackIDEs[trackide_i].trackID << std::endl;
+                        std::cout << "IDE #" << trackide_i << ": energy frac = " << trackIDEs[trackide_i].energyFrac << ", ID = " << trackIDEs[trackide_i].trackID << std::endl;
                         if (trackIDEs[trackide_i].energyFrac > max_energy_frac)
                         {
                             max_energy_frac = trackIDEs[trackide_i].energyFrac;
                             max_contributing_id = trackIDEs[trackide_i].trackID;
                         }
                     }
-                    //std::cout << "About to fill map for max contributing id = " << max_contributing_id << std::endl;
+                    std::cout << "About to fill map for max contributing id = " << max_contributing_id << std::endl;
                     if (max_contributing_id != -1) g4IDstoMaxContributorCount[max_contributing_id]++;
                 }
                 
                 int MaxContributingCount = -9999;
                 int MaxContributingID    = -9999;
                 
-                //std::cout << "Looping over map" << std::endl;
+                std::cout << "Looping over map" << std::endl;
                 for (std::map<int,int>::iterator mapIt = g4IDstoMaxContributorCount.begin(); mapIt != g4IDstoMaxContributorCount.end(); mapIt++)
                 {
-                    //std::cout << "(*mapIt).second = " << (*mapIt).second << std::endl;
-                    //std::cout << "(*mapIt).first = " << (*mapIt).first << std::endl;
+                    std::cout << "(*mapIt).second = " << (*mapIt).second << std::endl;
+                    std::cout << "(*mapIt).first = " << (*mapIt).first << std::endl;
                     if ((*mapIt).second > MaxContributingCount)
                     {
                         MaxContributingCount = (*mapIt).second;
                         MaxContributingID    = (*mapIt).first;
                     }
                 }
-                //std::cout << "MaxContributingCount = " << MaxContributingCount << std::endl;
-                //std::cout << "MaxContributingID = " << MaxContributingID << std::endl;
+                std::cout << "MaxContributingCount = " << MaxContributingCount << std::endl;
+                std::cout << "MaxContributingID = " << MaxContributingID << std::endl;
                 
                 const simb::MCParticle *true_particle = bt->TrackIDToParticle(MaxContributingID);
-                //std::cout << "Called true particle from backtracker" << std::endl;
+                std::cout << "Called true particle from backtracker" << std::endl;
                 if (true_particle != NULL)
                 {
-                    fTrackTrueTime_backtracker = true_particle->T();
+                    fTrackTrueTime = true_particle->T();
                     found_truth = true;
                     break;
                 }
@@ -801,15 +879,155 @@ void UBFlashMatching::produce(art::Event & e)
                 truth_count++;
             }
             if (!found_truth) std::cout << "FULL LOOP COMPLETED, NO TRUTH FOUND\n" << std::endl;
-            else std::cout << "FULL LOOP COMPLETED, FOUND THE TRUTH     - fTrackTrueTime_backtracker = " << fTrackTrueTime_backtracker << std::endl;
-            
+            else std::cout << "FULL LOOP COMPLETED, FOUND THE TRUTH     - fTrackTrueTime = " << fTrackTrueTime << std::endl;
+      
+           
+            fTruthyFlashTime = -200;
+            fTruthyFlashLight = -100;
+            fTruthyFlashPosZ = -100;
+
+            if (fTrackTrueTime != -200)
+            {
+              int true_flash_index = -1;
+              double min_time_diff = 999999999;
+              for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) 
+              {
+                auto const& opf = (*flashHandle)[opflash_index];
+                double time = opf.Time();
+                time *= 1000;
+                if (abs(time - fTrackTrueTime) < min_time_diff) 
+                {
+                  min_time_diff = abs(time - fTrackTrueTime);
+                  true_flash_index = opflash_index;
+                }
+              }
+              auto const& opf = (*flashHandle)[true_flash_index];
+              fTruthyFlashTime  = (opf.Time())*1000.;
+              fTruthyFlashLight = opf.TotalPE();
+              fTruthyFlashPosZ = opf.ZCenter();
+            }
+           
             double flashtime = opflashVec.at(match.flash_id).time;
             fFlashTime = flashtime*1000.;
-          
+            //n_matches[match.flash_id]++;
+            
             fMatchTree->Fill();
         }
     }
-  
+    
+    //--------------------------DANGER: PHYSICSTS AT WORK---------------------------------//
+    
+    /*
+     std::cout << "DANGER: PHYSICSTS AT WORK" << std::endl;
+     
+     for (size_t i = 0; i < NPFParticles; ++i)
+     {
+     if (pfparticlelist[i]->IsPrimary()==1)
+     {
+     if(pfParticleToTrackMap.count(pfparticlelist[i])==0) { std::cout<<"NO TRACKS made for pfparticle#: "<<i<<std::endl; continue;}
+     
+     auto trackVec = pfParticleToTrackMap.find(pfparticlelist[i])->second;
+     std::cout<<"Size of trackVec: "<<trackVec.size()<<std::endl;
+     for( auto const& track: trackVec)
+     {
+     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+     
+     
+     float charge=0;
+     
+     std::cout<<"clearing charge"<<std::endl;
+     //
+     //std::cout<<"track pointer size: "<< trackHitAssns.at(track.key()).size()<<std::endl;
+     //    std::vector<art::Ptr<recob::Hit>> trackHitVec = trackHitAssns.at(track.key());
+     //std::cout<<"creating recobHitVec: "<<trackHitVec.size()<<std::endl;
+     //    for(size_t hit_index=0; hit_index<trackHitVec.size(); ++hit_index)
+     //    {
+     //    	charge += trackHitVec.at(hit_index)->Integral();
+     //    }
+     //    std::cout<<"Hit Charge: "<<charge<<std::endl;
+     //
+     TVector3 startpos = track->LocationAtPoint(0);
+     TVector3 endpos = track->LocationAtPoint(track->NumberTrajectoryPoints() - 1);
+     startpos += endpos;
+     startpos *= 0.5;
+     std::cout << "Average position: " << startpos.Y() << ", " << startpos.Z() << std::endl;
+     
+     ::flashana::FlashMatch_t match;
+     for(size_t match_index=0; match_index < match_result_v.size(); ++match_index)
+     {
+     match = match_result_v.at(match_index);
+     if((int)match.tpc_id==track->ID())
+     {
+     break;
+     }
+     }
+     
+     std::cout<<"-----------------------------------------------------------------------------------------"<<std::endl;
+     if (match.tpc_id==::flashana::kINVALID_ID)
+     {
+     std::cout<<"INVALID TPC_ID"<<std::endl;
+     fTrackCharge = -100;
+     fMatchedFlashLight = -100;
+     fTrackPosY = -100;
+     fTrackPosZ = -100;
+     fTrackTrueTime = -100;
+     fTrackRecoTime = -100;
+     fFlashTime = -100;
+     fTrackMatched = 0;
+     fMatchScore = -100;
+     
+     fMatchTree->Fill();
+     }
+     else
+     {
+     fTrackMatched = 1;
+     fMatchScore = match.score;
+     std::cout<<"--------------------------------------------TESTING ELSE STATEMENT---------------------------"<<std::endl;
+     double light = opflashVec.at(match.flash_id).TotalPE();
+     fMatchedFlashLight = light;
+     fTrackCharge = charge;
+     fTrackPosY = startpos.Y();
+     fTrackPosZ = startpos.Z();
+     
+     //m double driftpos = track->LocationAtPoint(0).X();
+     //m double drifttime = (driftpos/10.)/driftVelocity; //converting from mm to cm
+     //m fTrackRecoTime = drifttime;
+     
+     fTrackTrueTime = -100;
+     std::cout << "BACKTRACKER AWAY" << std::endl;
+     std::cout << "Track ID = " << track->ID() << ", track length = " << track->Length() << std::endl;
+     const simb::MCParticle *true_particle = bt->TrackIDToParticle(track->ID()+1);
+     std::cout << "BACKTRACKER YOU DID GOOD" << std::endl;
+     if (true_particle != NULL)
+     {
+     //m double truetime = true_particle->T();
+     //m std::cout << "BACKTRACKER THAT WAS A GOOD PARTICLE YOU FOUND, IT HAS TIME = " << truetime << std::endl;
+     //m const double trigOffset = detclock->G4ToElecTime(truetime) - detclock->TriggerTime();
+     //m std::cout<<"Calculated Trig Offset: "<<trigOffset<<" G4ToElecTim: "<<detclock->G4ToElecTime(truetime)<<" TriggerTime: "<<detclock->TriggerTime()<<" TrueTime: "<<truetime<<" BeamGate: "<<beamgate<<std::endl;
+     //m fTrackTrueTime = truetime;
+     }
+     else
+     std::cout << "BACKTRACKER THAT WAS NOT A GOOD PARTICLE THOUGH PLEASE TRY HARDER" << std::endl;
+     
+     
+     //m double flashtime = opflashVec.at(match.flash_id).time;
+     //m fFlashTime = flashtime;
+     //m n_matches[match.flash_id]++;
+     
+     fMatchTree->Fill();
+     std::cout<<"-------------------------------FINISHED FILLING TTREE---------------------------"<<std::endl;
+     
+     }
+     //m anab::FlashMatch Flash((double)match.score, (int)match.flash_id, (int)match.tpc_id, (bool)inbeam);
+     
+     //m flashmatchtrack->push_back(Flash);
+     //m util::CreateAssn(*this, e, *flashmatchtrack, track,*flashTrackAssociations,fSpillName);
+     }
+     }
+     }
+     std::cout << "ROADWORKS END" << std::endl;
+     */
+    //----------------------------------------ROADWORKS END-------------------------------------------------
     
     int max_matches = 0;
     int max_match_index = -1;
