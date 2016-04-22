@@ -19,9 +19,27 @@
 
 ///// Casting of Christoph's cuts
 /*
-  
-  
-  
+
+//Flash variables
+
+flash_time
+flash_pe
+flash_zcenter
+
+//Reco variables
+
+nvtx_pandoraNu
+vtxx_pandoraNu
+vtxx_pandoraNu
+vtxx_pandoraNu
+
+trkstartx_pandoraNu
+trkstarty_pandoraNu
+trkstartz_pandoraNu
+
+trkendx_pandoraNu
+trkendy_pandoraNu
+trkendz_pandoraNu
   
 */
 
