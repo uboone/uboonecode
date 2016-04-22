@@ -11,35 +11,41 @@
  */
 
 /////
-///   To do list...
-
-// 1) "at least 1" track-vertex association instead of "at least 2"
-// 2) Import christoph's cuts
-// 3) ...
-
 ///// Casting of Christoph's cuts
 /*
 
-//Flash variables
+Analysis Tree ---> Data Product
 
-flash_time
-flash_pe
-flash_zcenter
+//Flash variables
+// opflashSat
+//recob::OpFlash flash
+flash_time     --> flash->Time()
+flash_pe       --> flash->TotalPE()
+flash_zcenter  --> flash->ZCenter()
 
 //Reco variables
 
-nvtx_pandoraNu
-vtxx_pandoraNu
-vtxx_pandoraNu
-vtxx_pandoraNu
+//  pandoraNu
+//  recob::Vertex vertex
 
-trkstartx_pandoraNu
-trkstarty_pandoraNu
-trkstartz_pandoraNu
+double xyz[3] = {0.0, 0.0, 0.0} ;
+vertex->XYZ(xyz);
 
-trkendx_pandoraNu
-trkendy_pandoraNu
-trkendz_pandoraNu
+nvtx_pandoraNu  --> size of vertex vector
+vtxx_pandoraNu  --> xyz[0]
+vtxx_pandoraNu  --> xyz[1]
+vtxx_pandoraNu  --> xyz[2]
+
+// pandoraNu
+// recob::Track track
+
+trkstartx_pandoraNu  --> track.Vertex().X()
+trkstarty_pandoraNu  --> track.Vertex().Y()
+trkstartz_pandoraNu  --> track.Vertex().Z()
+ 
+trkendx_pandoraNu    --> track.End().X()
+trkendy_pandoraNu    --> track.End().Y()
+trkendz_pandoraNu    --> track.End().Z()
   
 */
 
