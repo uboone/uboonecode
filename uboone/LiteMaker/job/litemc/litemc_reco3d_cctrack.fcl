@@ -1,6 +1,5 @@
 #include "litemaker_base.fcl"
 
-BEGIN_PROLOG
 
 litemc_reco3d_cctrack: @local::litemaker_base
 
@@ -34,4 +33,4 @@ litemc_reco3d_cctrack.AssociationLookUpMap:
   pfpart:     ["cctrack"]
 }
 
-END_PROLOG
+

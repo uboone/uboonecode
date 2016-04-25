@@ -1,6 +1,5 @@
 #include "litemaker_base.fcl"
 
-BEGIN_PROLOG
 
 litemc_mcinfo: @local::litemaker_base
 
@@ -22,4 +21,4 @@ litemc_mcinfo.AssociationLookUpMap: {
   mctruth: ["generator","corsika"]
 }
 
-END_PROLOG
+
