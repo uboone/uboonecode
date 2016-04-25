@@ -1,0 +1,11 @@
+BEGIN_PROLOG
+
+microboone_numuccincfilter:
+{ 
+ module_type:              "NuMuCCIncFilter"
+ TrackModuleLabel:         "pandoraNu"
+ VertexModuleLabel:        "pandoraNu"
+ CosmicTaggerAssocLabel:   "pandoraNu"
+}
+
+END_PROLOG

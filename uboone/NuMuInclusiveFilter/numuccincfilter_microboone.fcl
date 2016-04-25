@@ -1,0 +1,28 @@
+BEGIN_PROLOG
+
+microboone_numuccfilter_tpcTrackPlusVtxAlg:
+{
+    TrackModuleLabel:           "pandoraNu"
+    CosmicModuleLabel:          "pandoraNu"
+    CosmicScoreCut:             0.4
+    NuVtxTrackDistCut:          4.5
+}
+
+microboone_numuccfilter_tpcNeutrinoID:
+{
+    module_type:                "NuMuCCInc"
+    NeutrinoIDAlgName:          "TrackPlusVertexAlg"
+    TPCTrackPlusVertexAlg:      @local::microboone_numuccfilter_tpcTrackPlusVtxAlg
+#    TPCCluster2DNuAlg:          @local::microboone_tpcCluster2DNuAlg
+}
+
+microboone_numuccfilter_tpcneutrinoidfilter:
+{ 
+    module_type:                  "NuMuCCIncFilter"
+    VertexModuleLabelVec:         ["pandoraNu"]
+    VtxTrackAssnModuleLabelVec:   ["vtxPlusTrkPanKal"]
+    Cluster2DCosmicProducerLabel: "fuzzyclustertag"
+    Cluster2DCosmicClusterAssns:  "cluster2D"
+}
+
+END_PROLOG
