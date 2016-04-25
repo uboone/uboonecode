@@ -1,4 +1,3 @@
-BEGIN_PROLOG
 
 litemaker_base:
 {
@@ -52,4 +51,4 @@ litemaker_base:
   AssociationLookUpMap: {}
 }
 
-END_PROLOG
+
