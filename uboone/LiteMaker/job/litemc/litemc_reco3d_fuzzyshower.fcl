@@ -1,6 +1,5 @@
 #include "litemaker_base.fcl"
 
-BEGIN_PROLOG
 
 litemc_reco3d_fuzzyshower: @local::litemaker_base
 
@@ -31,4 +30,4 @@ litemc_reco3d_fuzzyshower.AssociationLookUpMap:
   pfpart:     []
 }
 
-END_PROLOG
+

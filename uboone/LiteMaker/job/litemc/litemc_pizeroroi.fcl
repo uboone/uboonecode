@@ -1,6 +1,5 @@
 #include "litemaker_base.fcl"
 
-BEGIN_PROLOG
 
 litemc_pizeroroi: @local::litemaker_base
 
@@ -17,5 +16,5 @@ litemc_pizeroroi.AssociationLookUpMap:
     pfpart:       ["pandoraNu"]
 }
 
-END_PROLOG
+
 

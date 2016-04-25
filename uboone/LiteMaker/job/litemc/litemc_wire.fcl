@@ -1,6 +1,5 @@
 #include "litemaker_base.fcl"
 
-BEGIN_PROLOG
 
 litemc_wire: @local::litemaker_base
 
@@ -14,5 +13,5 @@ litemc_wire.DataLookUpMap:
 litemc_wire.AssociationLookUpMap:
 {}
 
-END_PROLOG
+
 
