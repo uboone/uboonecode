@@ -1208,6 +1208,9 @@ namespace larlite {
 	larlite::PiZeroROI lite_roi( roi_ptr->GetWireROI(),
 				     roi_ptr->GetTimeROI());
 	
+	lite_roi.SetPiZeroROI(roi_ptr->GetPiZeroWireROI(),
+			      roi_ptr->GetPiZeroTimeROI());
+	
 	lite_roi.SetVertex(roi_ptr->GetVertex());
 
 	lite_data->push_back(lite_roi);
