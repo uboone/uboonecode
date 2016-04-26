@@ -34,7 +34,7 @@
 #include "lardata/RecoBase/Vertex.h"
 
 // Includes for the interface to our algorithms and their creator
-#include "uboone/TPCNeutrinoIDFilter/NeutrinoIDAlgFactory.h"
+#include "uboone/NuMuInclusiveFilter/NeutrinoIDAlgFactory.h"
 
 class NuMuCCInc : public art::EDProducer
 {

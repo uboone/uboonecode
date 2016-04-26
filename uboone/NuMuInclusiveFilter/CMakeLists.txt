@@ -26,7 +26,6 @@ art_make(BASENAME_ONLY
 		     ${Boost_SYSTEM_LIBRARY}
 	MODULE_LIBRARIES
 		     NuMuCCIncFilter
-		     TPCNeutrinoIDFilter
 		     lardata_RecoBase
 		     lardata_AnalysisBase
 		     larcore_Geometry
