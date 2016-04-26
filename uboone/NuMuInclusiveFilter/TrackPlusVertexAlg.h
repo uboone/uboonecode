@@ -60,9 +60,9 @@ public:
      */
     virtual bool findNeutrinoCandidates(art::Event&) const;
     
-    virtual bool inFV(double, double, double);
+    virtual bool inFV(Double_t, Double_t, Double_t) const;
     
-    virtual double FlashTrackDist(double, double, double);
+    virtual double FlashTrackDist(double&, double, double) const;
 
 private:
     

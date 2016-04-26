@@ -115,8 +115,9 @@ void TrackPlusVertexAlg::produces(art::EDProducer* owner)
     
 
 }
+
 //check is the vertex/track ends position with in the Fiducial Volume
-bool inFV(double x, double y, double z) {
+bool neutrinoid::TrackPlusVertexAlg::inFV(Double_t x, Double_t y, Double_t z) const {
       art::ServiceHandle<geo::Geometry> geom;      
       //set borders of the FV
       double xmin=10.;
@@ -129,9 +130,10 @@ bool inFV(double x, double y, double z) {
       if((x < xmax) && (x > xmin) && (y < ymax) && (y > ymin) && (z < zmax) && (z > zmin)) return true;
       else return false;
 }
+
 //This function returns the distance between a flash and 
 //a track (in one dimension, here used only for z direction)
-double FlashTrackDist(double flash, double start, double end) {
+double neutrinoid::TrackPlusVertexAlg::FlashTrackDist(double& flash, double start, double end) const {
       if(end >= start) {
         if(flash < end && flash > start) return 0;
         else return TMath::Min(fabs(flash-start), fabs(flash-end));
@@ -163,15 +165,16 @@ bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
 
     //----------------------------------------------------
     std::vector<art::Ptr<recob::OpFlash> > flashlist;    
-    //NFlashes-->total number of flashes in each event
-    const size_t NFlashes=flashlist.size();
 
+    //NFlashes-->total number of flashes in each event
 
     //int kMaxFlashes=1000;
-
     if (event.getByLabel(fOpFlashModuleLabel,flashListHandle))
       art::fill_ptr_vector(flashlist, flashListHandle);
-      for (size_t i = 0; i < NFlashes && i < 1000; ++i){//loop over hits
+    
+    const int NFlashes = flashlist.size();
+    
+    for (int i = 0; i < NFlashes && i < 1000; ++i){//loop over hits
  
       //for (size_t i = 0; i < NFlashes && i < kMaxFlashes ; ++i){//loop over hits
       flash_time[i]       = flashlist[i]->Time();
@@ -208,8 +211,8 @@ bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
         double trklen_longest=0;      
         //double trktheta_longest=0;
         //int longtracktag=0;
-        int trackcandidate=0;
-        int vertexcandidate=0;
+        //int trackcandidate=0;
+	// int vertexcandidate=0;
         double flashmax=0;
         int theflash=-1;
         bool flashtag=false;
@@ -217,7 +220,7 @@ bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
         std::cout<<"Start looping over all the flashes and get the maximum and flash number"<<std::endl; 
         //----loop over all the flashes and check if there are flashes within the beam
         //window and above the PE threshold
-        for(int f=0; f<NFlashes && f < 1000; f++){         
+        for(int f=0; f < NFlashes && f < 1000; f++){         
         //for(int f=0; f<NFlashes && f < kMaxFlashes; f++){ 
           //flash time within the beam window????
           if((flash_time[f]> beammin && flash_time[f]<beammax)&&flash_pe[f]>PEthresh) {
@@ -248,9 +251,9 @@ bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
             vertex->XYZ(vertexXYZ);
             
             TVector3 vertexPos(vertexXYZ[0],vertexXYZ[1],vertexXYZ[2]);
-
+	    
             //check if the vertex is within the FV;
-            if(!inFV(vertexXYZ[0],vertexXYZ[1],vertexXYZ[2])) return false;
+            if(!inFV(vertexPos.X(),vertexPos.Y(),vertexPos.Z())) return false;
             
             // For each vertex we loop over all tracks looking for matching pairs
             // The outer loop here, then is over one less than all tracks
@@ -299,8 +302,8 @@ bool TrackPlusVertexAlg::findNeutrinoCandidates(art::Event & event) const
                 //get the length of the longest forward going track and close to vertex
                 if((track1End-track1Pos).Mag()> trklen_longest && trktheta>0.85 && track1ToVertexDist<5) {
                   trklen_longest=(track1End-track1Pos).Mag();
-                  trackcandidate=track1Idx;
-                  vertexcandidate=vertexIdx;
+                  //trackcandidate=track1Idx;
+		  //                  vertexcandidate=vertexIdx;
                   //check if the longest track if flash matched.
                   if (FlashTrackDist(flash_zcenter[theflash], track1Pos.z(), track1End.z() )< flashwidth ) {flashmatchtag=true;}
 

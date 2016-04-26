@@ -117,7 +117,7 @@ void NuMuCCIncFilter::reconfigure(fhicl::ParameterSet const& pset)
 bool NuMuCCIncFilter::filter(art::Event& event)
 {
 
-std::cout<<"filter checking"<<endl;
+  std::cout<<"filter checking"<< std::endl;
     bool pass = false;
 
     // In principle we can have several producers running over various configurations of vertices and tracks.
