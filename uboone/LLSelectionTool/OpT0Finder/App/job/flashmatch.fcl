@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 BEGIN_PROLOG
 
 flashmatch_uboone: {
@@ -9,7 +7,6 @@ flashmatch_uboone: {
   TrackProducer:    "pandoraCosmicKHit"
   FlashProducer:    "opflashSat"
   PFPModulelabel:   "pandoraCosmic"  
-  PFParticleModule: "pandoraCosmic"
 
   #
   # Manager configuration

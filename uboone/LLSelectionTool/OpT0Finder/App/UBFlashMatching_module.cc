@@ -107,7 +107,6 @@ private:
     std::string fPFPModuleLabel;      ///< Input recob::PFParticle producer name
     std::string  m_hitfinderLabel;    ///<
     std::string  m_clusterLabel;      ///<
-    std::string  m_particleLabel;     ///<
     std::string  m_geantModuleLabel;  ///<
 
     /// Maps used for PFParticle truth matching
@@ -137,7 +136,16 @@ private:
     Double_t fTruthyFlashTime;
     Double_t fTruthyFlashLight;
     Double_t fTruthyFlashPosZ;
-    
+    Double_t fVertexX;
+    Double_t fVertexY;
+    Double_t fVertexZ;
+    Double_t fLengthLongestTrack;
+    Double_t fLengthShortestTrack; 
+    Double_t fExtremerMinY;
+    Double_t fExtremerMaxY;
+    Double_t fExtremerMinZ;
+    Double_t fExtremerMaxZ;
+
     TTree *fMatchTree;
 
     /// Event tree variables (filled per event)
@@ -198,9 +206,9 @@ UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
 
 void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
 {
-    _track_producer_name = p.get<std::string>("TrackProducer", "pandoraCosmicKHit");
+    _track_producer_name = p.get<std::string>("TrackProducer", "pandoraNuKHit");//"pandoraCosmicKHit");
     _flash_producer_name = p.get<std::string>("FlashProducer");
-    fPFPModuleLabel      = p.get<std::string>("PFPModulelabel","pandoraCosmic");
+    fPFPModuleLabel      = p.get<std::string>("PFPModulelabel","pandoraNu");
     fSpillName.clear();
     size_t pos = _track_producer_name.find(":");
     if( pos!=std::string::npos ) {
@@ -209,9 +217,8 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
     }
   
   // Manually set module labels 
-  m_particleLabel    = p.get<std::string>("PFParticleModule","pandoraCosmic");
   m_clusterLabel     = p.get<std::string>("ClusterModule","pandoraCosmic");
-  m_hitfinderLabel   = p.get<std::string>("HitFinderModule","gaushit");
+  m_hitfinderLabel   = p.get<std::string>("HitFinderModule","pandoraCosmicKHitRemoval");//"gaushit");
   m_geantModuleLabel = p.get<std::string>("GeantModule","largeant");
     
     return;
@@ -248,7 +255,17 @@ void UBFlashMatching::beginJob()
     fMatchTree->Branch("TruthyFlashTime"  , &fTruthyFlashTime  , "TruthyFlashTime/D"  );
     fMatchTree->Branch("TruthyFlashLight" , &fTruthyFlashLight , "TruthyFlashLight/D" );
     fMatchTree->Branch("TruthyFlashPosZ"  , &fTruthyFlashPosZ  , "TruthyFlashPosZ/D"  );
-    
+    fMatchTree->Branch("VertexX"          , &fVertexX          , "VertexX/D"          );
+    fMatchTree->Branch("VertexY"          , &fVertexY          , "VertexY/D"          );
+    fMatchTree->Branch("VertexZ"          , &fVertexZ          , "VertexZ/D"          );
+    fMatchTree->Branch("LengthLongestTrack", &fLengthLongestTrack, "LengthLongestTrack/D");
+    fMatchTree->Branch("LengthShortestTrack", &fLengthShortestTrack, "LengthShortestTrack/D");
+    fMatchTree->Branch("ExtremerMinY", &fExtremerMinY, "ExtremerMinY/D");
+    fMatchTree->Branch("ExtremerMaxY", &fExtremerMaxY, "ExtremerMaxY/D");
+    fMatchTree->Branch("ExtremerMinZ", &fExtremerMinZ, "ExtremerMinZ/D");
+    fMatchTree->Branch("ExtremerMaxZ", &fExtremerMaxZ, "ExtremerMaxZ/D");
+
+
     fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
     fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
     fEventTree->Branch("NFlashes"            , &fNFlashes           , "NFlashes/I"          );
@@ -329,14 +346,59 @@ void UBFlashMatching::produce(art::Event & e)
         << fPFPModuleLabel << std::endl;
         throw std::exception();
     }
-  
-    // Create map to store PFParticle ID and true time
-    bool pandora_talkative = false;
+
+
+    // Get a PFParticle-to-vertex map for matching (currently unused)
+    lar_pandora::VertexVector allPfParticleVertices;
+    lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
+    lar_pandora::LArPandoraHelper::CollectVertices(e, fPFPModuleLabel, allPfParticleVertices, pfParticleToVertexMap);
+    
+    // Get a PFParticle-to-cluster map for matching (currently unused)
+    lar_pandora::PFParticleVector pfparticlelist;
+    lar_pandora::PFParticlesToClusters pfParticleToClusterMap;
+    lar_pandora::LArPandoraHelper::CollectPFParticles(e, fPFPModuleLabel, pfparticlelist, pfParticleToClusterMap);
+    
+    // Get a PFParticle-to-track map for matching
+    lar_pandora::TrackVector allPfParticleTracks;
+    lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
+    lar_pandora::LArPandoraHelper::CollectTracks(e, _track_producer_name, allPfParticleTracks, pfParticleToTrackMap);
+   
+    size_t NPFParticles = pfparticlelist.size();
+   
+
+    std::map<int,double> tpcObjectIDtoTrueTime;
     std::map<int,double> pfParticleIDtoTrueTime;
-    std::map<int,int> pfParticleIDtoNMatchedHits;
-    
+    std::map<int,int>    pfParticleIDtoNMatchedHits;
+    std::map<int,double> tpcObjectIDtoVertexX;
+    std::map<int,double> tpcObjectIDtoVertexY;
+    std::map<int,double> tpcObjectIDtoVertexZ;
+    std::map<int,double> tpcObjectIDtoLengthLongestTrack;
+    std::map<int,double> tpcObjectIDtoLengthShortestTrack;
+    std::map<int,double> tpcObjectIDtoExtremerMinY;
+    std::map<int,double> tpcObjectIDtoExtremerMaxY;
+    std::map<int,double> tpcObjectIDtoExtremerMinZ;
+    std::map<int,double> tpcObjectIDtoExtremerMaxZ;
+
+
+
+    bool pandora_talkative = true;
+
     if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ++++++++++++++++++++" << std::endl;
-    
+  
+    // Initializing map with standard values
+    for (unsigned int pfpIndex = 0; pfpIndex < pfparticlelist.size(); pfpIndex++) {
+      int pfpID = pfparticlelist[pfpIndex]->Self();
+      pfParticleIDtoTrueTime[pfpID]     = -3e7;
+      tpcObjectIDtoTrueTime[pfpID]      = -3e7;
+      pfParticleIDtoNMatchedHits[pfpID] = -1;
+    }
+
+ 
+    // Beginning of reco to true particle match using Pandora helper functions.
+    // First create a hit-PFP map. kAddDaughters option is specified, so all the daughters are included in the primary.
+    // Then create a hit-MCParticle map.
+    // Then see the hits that are in common and construct a match.
+
     // Collect Hits
     lar_pandora::HitVector hitVector;
     lar_pandora::LArPandoraHelper::CollectHits(e, m_hitfinderLabel, hitVector);
@@ -346,7 +408,7 @@ void UBFlashMatching::produce(art::Event & e)
     // Collect PFParticles and match Reco Particles to Hits
     lar_pandora::PFParticlesToHits recoParticlesToHits;
     lar_pandora::HitsToPFParticles recoHitsToParticles;
-    lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, m_particleLabel, m_clusterLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
+    lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, fPFPModuleLabel, m_clusterLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
     
     if (pandora_talkative) std::cout << "+++++ recoHitsToParticles.size() = " << recoHitsToParticles.size() << std::endl;
     if (pandora_talkative) std::cout << "+++++ recoParticlesToHits.size() = " << recoParticlesToHits.size() << std::endl;
@@ -376,21 +438,18 @@ void UBFlashMatching::produce(art::Event & e)
       for (const RecoParticleToNMatchedHits::value_type &recoToNMatchedHitsEntry : trueToRecoEntry.second)
       {
         // Looping now over reco particles that have hits in common with the True Particle above
-        int NMatchedHits      = recoToNMatchedHitsEntry.second;           // Hits in common between reco and true particles
-        int recoPFParticleID  = recoToNMatchedHitsEntry.first->Self();    // ID of the reco particle
-        int recoPFParticlePDG = recoToNMatchedHitsEntry.first->PdgCode(); // PDG of the reco particle
-        
+        int NMatchedHits      = recoToNMatchedHitsEntry.second;             // Hits in common between reco and true particles
+        int recoPFParticleID  = recoToNMatchedHitsEntry.first->Self();      // ID of the reco particle
+        int recoPFParticlePDG = recoToNMatchedHitsEntry.first->PdgCode();   // PDG of the reco particle
+        int isAprimaryPFP     = recoToNMatchedHitsEntry.first->IsPrimary(); // If it's a primary       
+ 
         if (pandora_talkative) std::cout << "--RecoPDG " << recoPFParticlePDG
         << ", #PfoHits " << recoParticlesToHits.at(recoToNMatchedHitsEntry.first).size()
         << ", #MatchedHits " << NMatchedHits
+        << ", isPrimary " << isAprimaryPFP
         << ", ID " << recoPFParticleID
         << std::endl;
         
-        // If I never saw this particle before, save the number of matched hits and the true time
-        if (pfParticleIDtoNMatchedHits.find(recoPFParticleID) != pfParticleIDtoNMatchedHits.end()) {
-          pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
-          pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
-        }
         
         // If the number of matched hits is bigger than before (for the same paricle), update the
         // number of hits and save the true time of the particle.
@@ -405,23 +464,8 @@ void UBFlashMatching::produce(art::Event & e)
     if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ENDS ++++++++++++++++++++" << std::endl;
     
     // ************************
-    
-    // Get a PFParticle-to-vertex map for matching (currently unused)
-    lar_pandora::VertexVector allPfParticleVertices;
-    lar_pandora::PFParticlesToVertices pfParticleToVertexMap;
-    lar_pandora::LArPandoraHelper::CollectVertices(e, fPFPModuleLabel, allPfParticleVertices, pfParticleToVertexMap);
-    
-    // Get a PFParticle-to-cluster map for matching (currently unused)
-    lar_pandora::PFParticleVector pfparticlelist;
-    lar_pandora::PFParticlesToClusters pfParticleToClusterMap;
-    lar_pandora::LArPandoraHelper::CollectPFParticles(e, fPFPModuleLabel, pfparticlelist, pfParticleToClusterMap);
-    
-    // Get a PFParticle-to-track map for matching
-    lar_pandora::TrackVector allPfParticleTracks;
-    lar_pandora::PFParticlesToTracks pfParticleToTrackMap;
-    lar_pandora::LArPandoraHelper::CollectTracks(e, _track_producer_name, allPfParticleTracks, pfParticleToTrackMap);
-    
-    size_t NPFParticles = pfparticlelist.size();
+  
+  
     
     // Make a map which will let us look up art::Ptr<recob::PFParticle> objects using the PFParticle ID
     // In theory this matches the index into the handle but just to be safe
@@ -487,28 +531,90 @@ void UBFlashMatching::produce(art::Event & e)
     std::vector<double>            tpc_match_candidate_truetimes;
     //-----------------------------------------------------------------------------------------------------
 
+
+
     for(const auto& pfParticle : pfparticlelist)
     {
+        std::cout << "SUMMED QCLUSTER CONSTRUCTION [SQC]" << std::endl;
+
+        double maxMatchedHits      = -1;
+        double vertexXYZ[3]        = {-3e5}; // array to store vertex positions.
+        double lenghtLongestTrack  = -1;
+        double lenghtShortestTrack = 7e20;
+        double extremerMinY        = 7e20;
+        double extremerMaxY        = -7e20;
+        double extremerMinZ        = 7e20;
+        double extremerMaxZ        = -7e20;
         double truetime = -3E7;
 
         // Keep only primaries
-        if (!pfParticle->IsPrimary()) continue;
-        
+        if (!pfParticle->IsPrimary()) 
+        {
+          std::cout << "[SQC] ==> Skipping PFParticle with ID " << pfParticle->Self() << " since is not a primary." << std::endl;
+          continue;
+        }
+        maxMatchedHits = -1;
+        // Attempt to save true time
+        if (pfParticleIDtoTrueTime.find(pfParticle->Self()) != pfParticleIDtoTrueTime.end())
+          tpcObjectIDtoTrueTime[pfParticle->Self()] = pfParticleIDtoTrueTime.find(pfParticle->Self())->second;
+
+        // Looking at the Vertex
+        if (pfParticleToVertexMap.find(pfParticle) != pfParticleToVertexMap.end()) {
+          lar_pandora::VertexVector vertexVec = pfParticleToVertexMap.find(pfParticle)->second;
+          std::cout << "Vertex found for the primary. Size of VertexVector is " << vertexVec.size() << std::endl;
+          vertexVec[0]->XYZ(vertexXYZ); 
+          std::cout << "Vertex found for the primary. x = " << vertexXYZ[0] << std::endl;
+          std::cout << "Vertex found for the primary. y = " << vertexXYZ[1] << std::endl;
+          std::cout << "Vertex found for the primary. z = " << vertexXYZ[2] << std::endl;
+          tpcObjectIDtoVertexX[pfParticle->Self()] = vertexXYZ[0];
+          tpcObjectIDtoVertexY[pfParticle->Self()] = vertexXYZ[1];
+          tpcObjectIDtoVertexZ[pfParticle->Self()] = vertexXYZ[2];
+        }
+
         ::flashana::QCluster_t summed_cluster;
         
         summed_cluster.clear();
         
-        if (pfParticleToTrackMap.find(pfParticle) == pfParticleToTrackMap.end()) continue;
-        
+        if (pfParticleToTrackMap.find(pfParticle) == pfParticleToTrackMap.end()) 
+        {
+          std::cout << "[SQC] ==> Skipping PFParticle with ID " << pfParticle->Self() << " since there are no tracks associated with it. Its Pandora PDG code is " << pfParticle->PdgCode() << std::endl;
+          //continue;
+        } 
+        else
+        {
         const lar_pandora::TrackVector& trackVecprimary = pfParticleToTrackMap.find(pfParticle)->second;
         
-        std::cout << "SUMMED QCLUSTER CONSTRUCTION [SQC]" << std::endl;
         std::cout << "[SQC] ==> PFParticle ID: " << pfParticle->Self() << " has " << trackVecprimary.size() << " tracks" << std::endl;
         std::cout << "[SQC] ==> Looping over primaries" << std::endl;
         //First get qcluster and validation information for primary particle
         for( auto const& track: trackVecprimary)
         {
-            
+
+            // Attempt to save longest track
+            if (track->Length() > lenghtLongestTrack) 
+              lenghtLongestTrack = track->Length();
+            if (track->Length() < lenghtShortestTrack) 
+              lenghtShortestTrack = track->Length();
+
+            if ((track->Vertex()).Y() > extremerMaxY)
+              extremerMaxY = (track->Vertex()).Y();       
+            if ((track->Vertex()).Y() < extremerMinY)
+              extremerMinY = (track->Vertex()).Y();
+            if ((track->End()).Y() > extremerMaxY)
+              extremerMaxY = (track->End()).Y();
+            if ((track->End()).Y() < extremerMinY)
+              extremerMinY = (track->End()).Y();
+
+            if ((track->Vertex()).Z() < extremerMaxZ)
+              extremerMaxZ = (track->Vertex()).Z();
+            if ((track->Vertex()).Z() < extremerMinZ)
+              extremerMinZ = (track->Vertex()).Z();
+            if ((track->End()).Z() > extremerMaxZ)
+              extremerMaxZ = (track->End()).Z();
+            if ((track->End()).Z() < extremerMinZ)
+              extremerMinZ = (track->End()).Z();
+
+
             fTrackID = track->ID();
             fTrackIDCodeHist->Fill(fTrackID);
             fTrackPhi = track->Phi();
@@ -536,27 +642,76 @@ void UBFlashMatching::produce(art::Event & e)
             flashana::QCluster_t qcluster_pri = _light_path_alg.FlashHypothesis(trjprimary);
             summed_cluster += qcluster_pri;
         }//end for loop over tracks associated with primary particle
-        
+        } // else ends        
+
         //Then loop over daughters asssociated with primary particle to extract daughter tracks and create qclusters.
         std::cout << "[SQC] ==> Looping over daughters" << std::endl;
         for(const auto& daughterIdx : pfParticle->Daughters())
         {
             art::Ptr<recob::PFParticle> daughterPart(pfpVecHandle, daughterIdx);
-            
+           
+            std::cout << "[SQC] ====> At daughter with ID " << daughterPart->Self() << std::endl;
+
+            // Marco's addition
+            // First of all save the true time. This value is going 
+            // to be overwritten for each daughter, but this doesn't really matter,
+            // the important is to have one value of true time for each
+            // reco particle.
+            if (pfParticleIDtoTrueTime.find(daughterPart->Self()) != pfParticleIDtoTrueTime.end()) {
+              if (pfParticleIDtoNMatchedHits.find(daughterPart->Self())->first > maxMatchedHits) {
+                maxMatchedHits = pfParticleIDtoNMatchedHits.find(daughterPart->Self())->first;
+                tpcObjectIDtoTrueTime[pfParticle->Self()] = pfParticleIDtoTrueTime.find(daughterPart->Self())->second;
+                std::cout << "pfParticleIDtoTrueTime.find(daughterPart->Self())->second = " << pfParticleIDtoTrueTime.find(daughterPart->Self())->second << std::endl;
+              } 
+            }
+
             //auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
             lar_pandora::TrackVector trackVec;
             auto trackMapIter = pfParticleToTrackMap.find(daughterPart);
             if (trackMapIter != pfParticleToTrackMap.end()) trackVec = trackMapIter->second;
-            
-            //std::cout << "trackVec.size() = " << trackVec.size() << std::endl;
+            std::cout << "TEST trackVec.size() = " << trackVec.size() << std::endl;
+ 
+            // Trial: get cluster instead of tracks
+            lar_pandora::ClusterVector clusterVec;
+            auto clusterMapIter = pfParticleToClusterMap.find(daughterPart);
+            if (clusterMapIter != pfParticleToClusterMap.end()) clusterVec = clusterMapIter->second; 
+            std::cout << "TEST clusterVec.size() = " << clusterVec.size() << std::endl;
+
             for( auto const& track: trackVec)
             {
+
+            // Attempt to save longest track
+            if (track->Length() > lenghtLongestTrack) 
+              lenghtLongestTrack = track->Length();
+            if (track->Length() < lenghtShortestTrack)
+              lenghtShortestTrack = track->Length();
+
+            if ((track->Vertex()).Y() > extremerMaxY)
+              extremerMaxY = (track->Vertex()).Y();
+            if ((track->Vertex()).Y() < extremerMinY)
+              extremerMinY = (track->Vertex()).Y();
+            if ((track->End()).Y() > extremerMaxY)
+              extremerMaxY = (track->End()).Y();
+            if ((track->End()).Y() < extremerMinY)
+              extremerMinY = (track->End()).Y();
+
+            if ((track->Vertex()).Z() < extremerMaxZ)
+              extremerMaxZ = (track->Vertex()).Z();
+            if ((track->Vertex()).Z() < extremerMinZ)
+              extremerMinZ = (track->Vertex()).Z();
+            if ((track->End()).Z() > extremerMaxZ)
+              extremerMaxZ = (track->End()).Z();
+            if ((track->End()).Z() < extremerMinZ)
+              extremerMinZ = (track->End()).Z();
+
                 //std::cout<<"Inside TrackVec loop"<<std::endl;
                 fTrackID = track->ID();
                 fTrackIDCodeHist->Fill(fTrackID);
                 fTrackPhi = track->Phi();
                 fTrackPhiHist->Fill(fTrackPhi);
-                
+            
+            //std::cout << "[SQC] ====>     ** Track ID: " << track->ID() << ", # points: " << track->NumberTrajectoryPoints() << std::endl;
+    
                 // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
                 ::geoalgo::Trajectory trj(track->NumberTrajectoryPoints(),3);
                 
@@ -578,10 +733,20 @@ void UBFlashMatching::produce(art::Event & e)
             }
         }//end for daughters
         summed_cluster.idx = pfParticle->Self();
-        
+       
         // Register to a manager
         _mgr.Emplace(std::move(summed_cluster));
-        
+
+        tpcObjectIDtoLengthLongestTrack[pfParticle->Self()] = lenghtLongestTrack;        
+        tpcObjectIDtoLengthShortestTrack[pfParticle->Self()] = lenghtShortestTrack;
+        tpcObjectIDtoExtremerMinY[pfParticle->Self()] = extremerMinY;
+        tpcObjectIDtoExtremerMaxY[pfParticle->Self()] = extremerMaxY;
+        tpcObjectIDtoExtremerMinZ[pfParticle->Self()] = extremerMinZ;
+        tpcObjectIDtoExtremerMaxZ[pfParticle->Self()] = extremerMaxZ;
+
+        std::cout << "[SQC] ==> Summed QCluster constructed. It's ID is " << pfParticle->Self() << ", and its true time is " << 
+tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
+
         // Also saving the pfparticle that started the summed_cluster to tpc_match_candidates for diagnostic tree bookkeeping
         tpc_match_candidates.push_back(*pfParticle);
         tpc_match_candidate_ids.push_back(pfParticle->Self());
@@ -633,7 +798,8 @@ void UBFlashMatching::produce(art::Event & e)
     
       if (!match_found) std::cout << "Did not find match" << std::endl;
 
-      std::cout << "     >>>>> The TPC object true time is:  " << pfParticleIDtoTrueTime.find(match.tpc_id)->second << std::endl;
+      double timeCorrection = 343.75; //ns
+      std::cout << "     >>>>> The TPC object true time is:  " << tpcObjectIDtoTrueTime.find(match.tpc_id)->second + timeCorrection<< std::endl;
       std::cout << "     >>>>> The Flash time is:            " << opflashVec.at(match.flash_id).time*1000. << std::endl;
     
       if (match.tpc_id==::flashana::kINVALID_ID)
@@ -671,13 +837,26 @@ void UBFlashMatching::produce(art::Event & e)
           fTrackPosZ          = -1000;
           fMatchedFlashLight  = light;
           fMatchedFlashPosZ   = posZ;
+          fVertexX            = -3E7;
+          fVertexY            = -3E7;
+          fVertexZ            = -3E7;
           //fTrackCharge = charge;
           //fTrackPosY = startpos.Y();
           //fTrackPosZ = startpos.Z();
           
           fTrackTrueTime = -3E7;
          
-          fTrackTrueTime = pfParticleIDtoTrueTime.find(match.tpc_id)->second;
+          fTrackTrueTime = tpcObjectIDtoTrueTime.find(match.tpc_id)->second; // Saving true time 
+          fVertexX       = tpcObjectIDtoVertexX.find(match.tpc_id)->second;  // Saving vertex X
+          fVertexY       = tpcObjectIDtoVertexY.find(match.tpc_id)->second;  // Saving vertex Y
+          fVertexZ       = tpcObjectIDtoVertexZ.find(match.tpc_id)->second;  // Saving vertex Z
+          fLengthLongestTrack = tpcObjectIDtoLengthLongestTrack.find(match.tpc_id)->second;   // Saving lenght longest track
+          fLengthShortestTrack = tpcObjectIDtoLengthShortestTrack.find(match.tpc_id)->second; // Saving lenght shortest track
+          fExtremerMinY  = tpcObjectIDtoExtremerMinY.find(match.tpc_id)->second;  // Saving extremer min Y
+          fExtremerMaxY  = tpcObjectIDtoExtremerMaxY.find(match.tpc_id)->second;  // Saving extremer max Y
+          fExtremerMinZ  = tpcObjectIDtoExtremerMinZ.find(match.tpc_id)->second;  // Saving extremer min Z
+          fExtremerMaxZ  = tpcObjectIDtoExtremerMaxZ.find(match.tpc_id)->second;  // Saving extremer max Z
+
 
           fTruthyFlashTime  = -3E7;
           fTruthyFlashLight = -100;
