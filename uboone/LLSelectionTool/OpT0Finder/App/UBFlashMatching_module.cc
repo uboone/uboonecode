@@ -141,10 +141,11 @@ private:
     Double_t fVertexZ;
     Double_t fLengthLongestTrack;
     Double_t fLengthShortestTrack; 
-    Double_t fExtremerMinY;
-    Double_t fExtremerMaxY;
-    Double_t fExtremerMinZ;
-    Double_t fExtremerMaxZ;
+    Double_t fExtremaMinY;
+    Double_t fExtremaMaxY;
+    Double_t fExtremaMinZ;
+    Double_t fExtremaMaxZ;
+    Int_t fPrimaryPDG;
 
     TTree *fMatchTree;
 
@@ -260,11 +261,12 @@ void UBFlashMatching::beginJob()
     fMatchTree->Branch("VertexZ"          , &fVertexZ          , "VertexZ/D"          );
     fMatchTree->Branch("LengthLongestTrack", &fLengthLongestTrack, "LengthLongestTrack/D");
     fMatchTree->Branch("LengthShortestTrack", &fLengthShortestTrack, "LengthShortestTrack/D");
-    fMatchTree->Branch("ExtremerMinY", &fExtremerMinY, "ExtremerMinY/D");
-    fMatchTree->Branch("ExtremerMaxY", &fExtremerMaxY, "ExtremerMaxY/D");
-    fMatchTree->Branch("ExtremerMinZ", &fExtremerMinZ, "ExtremerMinZ/D");
-    fMatchTree->Branch("ExtremerMaxZ", &fExtremerMaxZ, "ExtremerMaxZ/D");
-
+    fMatchTree->Branch("ExtremaMinY", &fExtremaMinY, "ExtremaMinY/D");
+    fMatchTree->Branch("ExtremaMaxY", &fExtremaMaxY, "ExtremaMaxY/D");
+    fMatchTree->Branch("ExtremaMinZ", &fExtremaMinZ, "ExtremaMinZ/D");
+    fMatchTree->Branch("ExtremaMaxZ", &fExtremaMaxZ, "ExtremaMaxZ/D");
+    fMatchTree->Branch("PrimaryPDG"       , &fPrimaryPDG       , "PrimaryPDG/I"       );
+ 
 
     fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
     fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
@@ -374,10 +376,10 @@ void UBFlashMatching::produce(art::Event & e)
     std::map<int,double> tpcObjectIDtoVertexZ;
     std::map<int,double> tpcObjectIDtoLengthLongestTrack;
     std::map<int,double> tpcObjectIDtoLengthShortestTrack;
-    std::map<int,double> tpcObjectIDtoExtremerMinY;
-    std::map<int,double> tpcObjectIDtoExtremerMaxY;
-    std::map<int,double> tpcObjectIDtoExtremerMinZ;
-    std::map<int,double> tpcObjectIDtoExtremerMaxZ;
+    std::map<int,double> tpcObjectIDtoExtremaMinY;
+    std::map<int,double> tpcObjectIDtoExtremaMaxY;
+    std::map<int,double> tpcObjectIDtoExtremaMinZ;
+    std::map<int,double> tpcObjectIDtoExtremaMaxZ;
 
 
 
@@ -541,10 +543,10 @@ void UBFlashMatching::produce(art::Event & e)
         double vertexXYZ[3]        = {-3e5}; // array to store vertex positions.
         double lenghtLongestTrack  = -1;
         double lenghtShortestTrack = 7e20;
-        double extremerMinY        = 7e20;
-        double extremerMaxY        = -7e20;
-        double extremerMinZ        = 7e20;
-        double extremerMaxZ        = -7e20;
+        double extremaMinY        = 7e20;
+        double extremaMaxY        = -7e20;
+        double extremaMinZ        = 7e20;
+        double extremaMaxZ        = -7e20;
         double truetime = -3E7;
 
         // Keep only primaries
@@ -596,23 +598,23 @@ void UBFlashMatching::produce(art::Event & e)
             if (track->Length() < lenghtShortestTrack) 
               lenghtShortestTrack = track->Length();
 
-            if ((track->Vertex()).Y() > extremerMaxY)
-              extremerMaxY = (track->Vertex()).Y();       
-            if ((track->Vertex()).Y() < extremerMinY)
-              extremerMinY = (track->Vertex()).Y();
-            if ((track->End()).Y() > extremerMaxY)
-              extremerMaxY = (track->End()).Y();
-            if ((track->End()).Y() < extremerMinY)
-              extremerMinY = (track->End()).Y();
+            if ((track->Vertex()).Y() > extremaMaxY)
+              extremaMaxY = (track->Vertex()).Y();       
+            if ((track->Vertex()).Y() < extremaMinY)
+              extremaMinY = (track->Vertex()).Y();
+            if ((track->End()).Y() > extremaMaxY)
+              extremaMaxY = (track->End()).Y();
+            if ((track->End()).Y() < extremaMinY)
+              extremaMinY = (track->End()).Y();
 
-            if ((track->Vertex()).Z() < extremerMaxZ)
-              extremerMaxZ = (track->Vertex()).Z();
-            if ((track->Vertex()).Z() < extremerMinZ)
-              extremerMinZ = (track->Vertex()).Z();
-            if ((track->End()).Z() > extremerMaxZ)
-              extremerMaxZ = (track->End()).Z();
-            if ((track->End()).Z() < extremerMinZ)
-              extremerMinZ = (track->End()).Z();
+            if ((track->Vertex()).Z() < extremaMaxZ)
+              extremaMaxZ = (track->Vertex()).Z();
+            if ((track->Vertex()).Z() < extremaMinZ)
+              extremaMinZ = (track->Vertex()).Z();
+            if ((track->End()).Z() > extremaMaxZ)
+              extremaMaxZ = (track->End()).Z();
+            if ((track->End()).Z() < extremaMinZ)
+              extremaMinZ = (track->End()).Z();
 
 
             fTrackID = track->ID();
@@ -686,23 +688,23 @@ void UBFlashMatching::produce(art::Event & e)
             if (track->Length() < lenghtShortestTrack)
               lenghtShortestTrack = track->Length();
 
-            if ((track->Vertex()).Y() > extremerMaxY)
-              extremerMaxY = (track->Vertex()).Y();
-            if ((track->Vertex()).Y() < extremerMinY)
-              extremerMinY = (track->Vertex()).Y();
-            if ((track->End()).Y() > extremerMaxY)
-              extremerMaxY = (track->End()).Y();
-            if ((track->End()).Y() < extremerMinY)
-              extremerMinY = (track->End()).Y();
+            if ((track->Vertex()).Y() > extremaMaxY)
+              extremaMaxY = (track->Vertex()).Y();
+            if ((track->Vertex()).Y() < extremaMinY)
+              extremaMinY = (track->Vertex()).Y();
+            if ((track->End()).Y() > extremaMaxY)
+              extremaMaxY = (track->End()).Y();
+            if ((track->End()).Y() < extremaMinY)
+              extremaMinY = (track->End()).Y();
 
-            if ((track->Vertex()).Z() < extremerMaxZ)
-              extremerMaxZ = (track->Vertex()).Z();
-            if ((track->Vertex()).Z() < extremerMinZ)
-              extremerMinZ = (track->Vertex()).Z();
-            if ((track->End()).Z() > extremerMaxZ)
-              extremerMaxZ = (track->End()).Z();
-            if ((track->End()).Z() < extremerMinZ)
-              extremerMinZ = (track->End()).Z();
+            if ((track->Vertex()).Z() < extremaMaxZ)
+              extremaMaxZ = (track->Vertex()).Z();
+            if ((track->Vertex()).Z() < extremaMinZ)
+              extremaMinZ = (track->Vertex()).Z();
+            if ((track->End()).Z() > extremaMaxZ)
+              extremaMaxZ = (track->End()).Z();
+            if ((track->End()).Z() < extremaMinZ)
+              extremaMinZ = (track->End()).Z();
 
                 //std::cout<<"Inside TrackVec loop"<<std::endl;
                 fTrackID = track->ID();
@@ -739,10 +741,10 @@ void UBFlashMatching::produce(art::Event & e)
 
         tpcObjectIDtoLengthLongestTrack[pfParticle->Self()] = lenghtLongestTrack;        
         tpcObjectIDtoLengthShortestTrack[pfParticle->Self()] = lenghtShortestTrack;
-        tpcObjectIDtoExtremerMinY[pfParticle->Self()] = extremerMinY;
-        tpcObjectIDtoExtremerMaxY[pfParticle->Self()] = extremerMaxY;
-        tpcObjectIDtoExtremerMinZ[pfParticle->Self()] = extremerMinZ;
-        tpcObjectIDtoExtremerMaxZ[pfParticle->Self()] = extremerMaxZ;
+        tpcObjectIDtoExtremaMinY[pfParticle->Self()] = extremaMinY;
+        tpcObjectIDtoExtremaMaxY[pfParticle->Self()] = extremaMaxY;
+        tpcObjectIDtoExtremaMinZ[pfParticle->Self()] = extremaMinZ;
+        tpcObjectIDtoExtremaMaxZ[pfParticle->Self()] = extremaMaxZ;
 
         std::cout << "[SQC] ==> Summed QCluster constructed. It's ID is " << pfParticle->Self() << ", and its true time is " << 
 tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
@@ -784,6 +786,7 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
       match = match_result_v.at(match_index);
 
       bool match_found = false;
+      int match_candidate_index = -1;
       for (unsigned int i = 0; i < tpc_match_candidates.size(); i++)
       {
           if((int)match.tpc_id == tpc_match_candidate_ids.at(i))
@@ -792,6 +795,7 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
               std::cout << "    match.tpc_id == " << match.tpc_id << ", tpc_match_candidates id = " << tpc_match_candidate_ids.at(i) << std::endl;
               std::cout << "    match.flash_id == " << match.flash_id << std::endl;
               match_found = true;
+              match_candidate_index = i;
               break;
           }
       }
@@ -817,6 +821,15 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fTruthyFlashTime   = -3E7;
           fTruthyFlashLight  = -100;
           fTruthyFlashPosZ   = -1000;
+          fPrimaryPDG        = -1;
+          fVertexX            = -3E7;
+          fVertexY            = -3E7;
+          fVertexZ            = -3E7;
+          fExtremaMinY        = -3E7;
+          fExtremaMinZ        = -3E7;
+          fExtremaMaxY        = -3E7;
+          fExtremaMaxZ        = -3E7;
+ 
           
           fMatchTree->Fill();
       }
@@ -840,6 +853,10 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fVertexX            = -3E7;
           fVertexY            = -3E7;
           fVertexZ            = -3E7;
+          fExtremaMinY        = -3E7;
+          fExtremaMinZ        = -3E7;
+          fExtremaMaxY        = -3E7;
+          fExtremaMaxZ        = -3E7;
           //fTrackCharge = charge;
           //fTrackPosY = startpos.Y();
           //fTrackPosZ = startpos.Z();
@@ -852,15 +869,16 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fVertexZ       = tpcObjectIDtoVertexZ.find(match.tpc_id)->second;  // Saving vertex Z
           fLengthLongestTrack = tpcObjectIDtoLengthLongestTrack.find(match.tpc_id)->second;   // Saving lenght longest track
           fLengthShortestTrack = tpcObjectIDtoLengthShortestTrack.find(match.tpc_id)->second; // Saving lenght shortest track
-          fExtremerMinY  = tpcObjectIDtoExtremerMinY.find(match.tpc_id)->second;  // Saving extremer min Y
-          fExtremerMaxY  = tpcObjectIDtoExtremerMaxY.find(match.tpc_id)->second;  // Saving extremer max Y
-          fExtremerMinZ  = tpcObjectIDtoExtremerMinZ.find(match.tpc_id)->second;  // Saving extremer min Z
-          fExtremerMaxZ  = tpcObjectIDtoExtremerMaxZ.find(match.tpc_id)->second;  // Saving extremer max Z
+          fExtremaMinY  = tpcObjectIDtoExtremaMinY.find(match.tpc_id)->second;  // Saving extrema min Y
+          fExtremaMaxY  = tpcObjectIDtoExtremaMaxY.find(match.tpc_id)->second;  // Saving extrema max Y
+          fExtremaMinZ  = tpcObjectIDtoExtremaMinZ.find(match.tpc_id)->second;  // Saving extrema min Z
+          fExtremaMaxZ  = tpcObjectIDtoExtremaMaxZ.find(match.tpc_id)->second;  // Saving extrema max Z
 
 
           fTruthyFlashTime  = -3E7;
           fTruthyFlashLight = -100;
           fTruthyFlashPosZ  = -1000;
+          fPrimaryPDG       = -1;
 
           //Find "truthy" (approximately true) flash associated to this particle
           if (fTrackTrueTime != -3E7)
@@ -887,6 +905,9 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           //Get flash information
           double flashtime = opflashVec.at(match.flash_id).time;
           fFlashTime = flashtime*1000.;
+
+          //Check whether true parent particle was neutrino
+          if (match_candidate_index != -1) fPrimaryPDG = tpc_match_candidates[match_candidate_index].PdgCode();
           
           fMatchTree->Fill();
       }
