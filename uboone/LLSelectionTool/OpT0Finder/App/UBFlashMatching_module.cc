@@ -51,6 +51,7 @@
 // OpT0Finder fmwk includes
 //
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/QLLMatch.h"
+#include "uboone/LLSelectionTool/OpT0Finder/Algorithms/QWeightPoint.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/TimeCompatMatch.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/MaxNPEWindow.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/NPtFilter.h"
@@ -191,6 +192,7 @@ UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
     _mgr.SetAlgo( new ::flashana::MaxNPEWindow()        );
     _mgr.SetAlgo( new ::flashana::TimeCompatMatch()     );
     _mgr.SetAlgo( &(::flashana::QLLMatch::GetME())      );
+    //_mgr.SetAlgo( new ::flashana::QWeightPoint()        );
     _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis() );
     // Also attach LightPath instance to be configured via Manager
     _mgr.AddCustomAlgo( &_light_path_alg                );
