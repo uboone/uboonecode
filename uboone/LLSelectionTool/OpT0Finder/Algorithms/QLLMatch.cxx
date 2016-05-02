@@ -125,17 +125,17 @@ namespace flashana {
 
         //std::cout << "minuit offset : " << Fval << std::endl;
         ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
-
+        
         auto const &hypothesis = QLLMatch::GetME().ChargeHypothesis(*Xval);
         auto const &measurement = QLLMatch::GetME().Measurement();
         Fval = QLLMatch::GetME().QLL(hypothesis, measurement);
-
         QLLMatch::GetME().Record(Fval, Xval[0]);
 
         return;
     }
 
     double QLLMatch::CallMinuit(const QCluster_t &tpc, const Flash_t &pmt) {
+
 
         if (_measurement.pe_v.empty()) {
             _measurement.pe_v.resize(NOpDets(), 0.);
@@ -179,7 +179,10 @@ namespace flashana {
         _minimizer_record_fval_v.clear();
         _minimizer_record_x_v.clear();
 
-        if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);
+        if (!_minuit_ptr) 
+        {
+          _minuit_ptr = new TMinuit(4);
+        }
 
         double reco_x = 128.;
         double reco_x_err = 0;
@@ -188,6 +191,7 @@ namespace flashana {
         double arglist[4], error[4], Fmin, Fedm, Errdef;
 	for(size_t i=0; i<4; ++i) if(error[i]) error[i] = 0;
         ierrflag = npari = nparx = istat = 0;
+
 
         _minuit_ptr->SetPrintLevel(-1);
         arglist[0] = 2.0;
@@ -211,6 +215,7 @@ namespace flashana {
         _minuit_ptr->GetParameter(0, reco_x, reco_x_err);
 
         _minuit_ptr->mnstat(Fmin, Fedm, Errdef, npari, nparx, istat);
+
 
 
         // use this for debugging, maybe uncomment the actual minimzing function (MIGRAD / simplex calls)
@@ -247,6 +252,7 @@ namespace flashana {
 
         if (_minuit_ptr) delete _minuit_ptr;
         _minuit_ptr = 0;
+
 
         return _qll;
     }
