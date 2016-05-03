@@ -357,7 +357,7 @@ void UBFlashMatching::produce(art::Event & e)
         throw std::exception();
     }
 
-    // Marco's addition: try to get MCTruth
+    // Marco's addition: try to get MCTruth (NOT used)
     art::Handle< std::vector<simb::MCTruth> > MCTruthVecHandle;
     e.getByLabel(fGenieGenModuleLabel, MCTruthVecHandle);
     if(!MCTruthVecHandle.isValid()) {
@@ -374,38 +374,6 @@ void UBFlashMatching::produce(art::Event & e)
         << m_geantModuleLabel << std::endl;
         throw std::exception();
     }
-
-/*
-    // Now construct a map between MCParticle track ID and MCTruth.Origin()
-    // MCTruth.Origin() is 1 if neutrino
-    // MCTruth.Origin() is 2 if cosmic
-    // Default is -999
-    std::map<int,int> mcParticleTrackIDToOrigin;
-    for (unsigned int mcPartIndex = 0; mcPartIndex<MCParticleVecHandle->size(); mcPartIndex++) {
-      int MCPartTrackID = MCParticleVecHandle->at(mcPartIndex).TrackId();
-      mcParticleTrackIDToOrigin[MCPartTrackID] = -999;
-      std::cout << "**************** Track ID: " << MCPartTrackID << "   Mother track ID " << MCParticleVecHandle->at(mcPartIndex).Mother() << std::endl;
-      // Now loop over the MCTruth track ID and construct the map
-      for ( int mcPartIndex  = 0; mcPartIndex < (MCTruthVecHandle->at(0)).NParticles(); mcPartIndex++) {
-        simb::MCParticle mcPart = (MCTruthVecHandle->at(0)).GetParticle(mcPartIndex);
-        if (mcPart.TrackId() == MCPartTrackID) {
-          mcParticleTrackIDToOrigin[MCPartTrackID] = (MCTruthVecHandle->at(0)).Origin();
-        }
-      }
-    } // map constructed
-
-    for (std::map<int,int>::iterator it=mcParticleTrackIDToOrigin.begin(); it!=mcParticleTrackIDToOrigin.end(); ++it) {
-     // std::cout << "**************** MCParticle Track ID: " << it->first << "   Origin: " << it->second << std::endl;
-    }
-
-
-    std::cout << "**************** The size of MCTruthVecHandle is " << MCTruthVecHandle->size() << std::endl;
-    for ( int mcPartIndex  = 0; mcPartIndex < (MCTruthVecHandle->at(0)).NParticles(); mcPartIndex++) {
-      simb::MCParticle mcPart = (MCTruthVecHandle->at(0)).GetParticle(mcPartIndex);
-      std::cout << "mcPart.TrackId(): " << mcPart.TrackId() << std::endl;
-      std::cout << "(MCTruthVecHandle->at(0)).Origin(): " << (MCTruthVecHandle->at(0)).Origin() << std::endl;
-    }
-*/
 
     // Get a PFParticle-to-vertex map for matching (currently unused)
     lar_pandora::VertexVector allPfParticleVertices;
@@ -532,15 +500,6 @@ void UBFlashMatching::produce(art::Event & e)
       for (std::map<int,double>::iterator it=pfParticleIDtoTrueTime.begin(); it!=pfParticleIDtoTrueTime.end(); ++it) {
         std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  TrueTime: " << it->second << std::endl;
       }
-/*      for (std::map<int,art::Ptr<simb::MCParticle>>::iterator it=pfParticleIDToMCParticle.begin(); it!=pfParticleIDToMCParticle.end(); ++it) {
-        for ( int mcPartIndex  = 0; mcPartIndex < (MCTruthVecHandle->at(0)).NParticles(); mcPartIndex++) {
-          simb::MCParticle mcPart = (MCTruthVecHandle->at(0)).GetParticle(mcPartIndex);
-          if (mcPart.TrackId() == (it->second)->TrackId()) {
-            pfParticleIDToOrigin[it->first] = (MCTruthVecHandle->at(0)).Origin();
-          }
-        }
-        std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  Process of related MCParticle: " << (it->second)->Process() << std::endl;
-      }*/
       for (std::map<int,simb::Origin_t>::iterator it=pfParticleIDtoOrigin.begin(); it!=pfParticleIDtoOrigin.end(); ++it) {
         std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  Origin: " << it->second << std::endl;
       }
@@ -919,7 +878,6 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fTruthyFlashTime   = -3E7;
           fTruthyFlashLight  = -100;
           fTruthyFlashPosZ   = -1000;
-          fIsNu        = -1;
           fVertexX            = -3E7;
           fVertexY            = -3E7;
           fVertexZ            = -3E7;
@@ -977,7 +935,6 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fTruthyFlashTime  = -3E7;
           fTruthyFlashLight = -100;
           fTruthyFlashPosZ  = -1000;
-          fIsNu       = -1;
 
           //Find "truthy" (approximately true) flash associated to this particle
           if (fTrackTrueTime != -3E7)
