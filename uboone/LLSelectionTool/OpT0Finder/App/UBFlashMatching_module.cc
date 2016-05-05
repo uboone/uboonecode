@@ -50,6 +50,7 @@
 //
 // OpT0Finder fmwk includes
 //
+#include "uboone/LLSelectionTool/OpT0Finder/Algorithms/QLLMatch.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/QWeightPoint.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/TimeCompatMatch.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/MaxNPEWindow.h"
@@ -114,6 +115,7 @@ private:
     std::string  m_clusterLabel;      ///<
     std::string  m_geantModuleLabel;  ///<
     std::string fMCTrackModuleLabel;  ///< Input sim::MCTrack producer name
+    std::string fGenieGenModuleLabel;
 
     /// Maps used for PFParticle truth matching
     typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;
@@ -152,6 +154,7 @@ private:
     Double_t fExtremaMinZ;
     Double_t fExtremaMaxZ;
     Int_t fPrimaryPDG;
+    Int_t fOrigin;
 
     TTree *fMatchTree;
 
@@ -196,7 +199,8 @@ UBFlashMatching::UBFlashMatching(fhicl::ParameterSet const & p)
     _mgr.SetAlgo( new ::flashana::NPtFilter()           );
     _mgr.SetAlgo( new ::flashana::MaxNPEWindow()        );
     _mgr.SetAlgo( new ::flashana::TimeCompatMatch()     );
-    _mgr.SetAlgo( new ::flashana::QWeightPoint()        );
+    _mgr.SetAlgo( &(::flashana::QLLMatch::GetME())      );
+    //_mgr.SetAlgo( new ::flashana::QWeightPoint()        );
     _mgr.SetAlgo( new ::flashana::PhotonLibHypothesis() );
     // Also attach LightPath instance to be configured via Manager
     _mgr.AddCustomAlgo( &_light_path_alg                );
@@ -226,10 +230,12 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
     }
   
   // Manually set module labels 
-  m_clusterLabel     = p.get<std::string>("ClusterModule","pandoraCosmic");
-  m_hitfinderLabel   = p.get<std::string>("HitFinderModule","pandoraCosmicKHitRemoval");//"gaushit");
-  m_geantModuleLabel = p.get<std::string>("GeantModule","largeant");
-    
+  m_clusterLabel       = p.get<std::string>("ClusterModule","pandoraCosmic");
+  m_hitfinderLabel     = p.get<std::string>("HitFinderModule","pandoraCosmicKHitRemoval");//"gaushit");
+  m_geantModuleLabel   = p.get<std::string>("GeantModule","largeant");
+  fGenieGenModuleLabel = p.get<std::string>("GenieGenModuleLabel","generator");    
+  //largeant:generator
+ 
     return;
 }
 void UBFlashMatching::beginJob()
@@ -274,7 +280,7 @@ void UBFlashMatching::beginJob()
     fMatchTree->Branch("ExtremaMinZ", &fExtremaMinZ, "ExtremaMinZ/D");
     fMatchTree->Branch("ExtremaMaxZ", &fExtremaMaxZ, "ExtremaMaxZ/D");
     fMatchTree->Branch("PrimaryPDG"       , &fPrimaryPDG       , "PrimaryPDG/I"       );
- 
+    fMatchTree->Branch("Origin"       , &fOrigin       , "fOrigin/I"       );
 
     fEventTree->Branch("NPandoraTrees"       , &fNPandoraTrees      , "NPandoraTrees/I"     );
     fEventTree->Branch("NTracks"             , &fNTracks            , "NTracks/I"           );
@@ -294,7 +300,9 @@ void UBFlashMatching::beginJob()
 
 void UBFlashMatching::produce(art::Event & e)
 {
+    std::cout << "I want to be a producer" << std::endl;
     _mgr.Reset();
+    std::cout << "With a hit show on broadway" << std::endl;
     // Define # PMTs here as const (we should retrieve from geo::Geometry for good practice)
     const size_t num_pmts = 32;
     
@@ -367,6 +375,23 @@ void UBFlashMatching::produce(art::Event & e)
         throw std::exception();
     }
 
+    // Marco's addition: try to get MCTruth (NOT used)
+    art::Handle< std::vector<simb::MCTruth> > MCTruthVecHandle;
+    e.getByLabel(fGenieGenModuleLabel, MCTruthVecHandle);
+    if(!MCTruthVecHandle.isValid()) {
+        std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve simb::MCTruth from "
+        << fGenieGenModuleLabel << std::endl;
+        throw std::exception();
+    }
+
+    // Marco's addition: try to get MCParticle
+    art::Handle<std::vector<simb::MCParticle> > MCParticleVecHandle;
+    e.getByLabel(m_geantModuleLabel, MCParticleVecHandle);
+    if(!MCParticleVecHandle.isValid()) {
+        std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve simb::MCParticle from "
+        << m_geantModuleLabel << std::endl;
+        throw std::exception();
+    }
 
     // Get a PFParticle-to-vertex map for matching (currently unused)
     lar_pandora::VertexVector allPfParticleVertices;
@@ -398,22 +423,25 @@ void UBFlashMatching::produce(art::Event & e)
     std::map<int,double> tpcObjectIDtoExtremaMaxY;
     std::map<int,double> tpcObjectIDtoExtremaMinZ;
     std::map<int,double> tpcObjectIDtoExtremaMaxZ;
-
-
+    std::map<int,art::Ptr<simb::MCParticle>> pfParticleIDToMCParticle;
+    std::map<int,simb::Origin_t> pfParticleIDtoOrigin;
+    std::map<int,simb::Origin_t> tpcObjectIDtoOrigin; 
 
     //bool pandora_talkative = true;
     bool pandora_talkative = false;
 
     if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ++++++++++++++++++++" << std::endl;
-  
+ 
+    art::ServiceHandle<cheat::BackTracker> bt; // need this only for particle origin tag (neutrino or cosmic)
+ 
     // Initializing map with standard values
     for (unsigned int pfpIndex = 0; pfpIndex < pfparticlelist.size(); pfpIndex++) {
       int pfpID = pfparticlelist[pfpIndex]->Self();
       pfParticleIDtoTrueTime[pfpID]     = -3e7;
       tpcObjectIDtoTrueTime[pfpID]      = -3e7;
       pfParticleIDtoNMatchedHits[pfpID] = -1;
+      tpcObjectIDtoOrigin[pfpID]        = simb::kUnknown;
     }
-
  
     // Beginning of reco to true particle match using Pandora helper functions.
     // First create a hit-PFP map. kAddDaughters option is specified, so all the daughters are included in the primary.
@@ -454,8 +482,9 @@ void UBFlashMatching::produce(art::Event & e)
     {
       if (pandora_talkative) std::cout << "MCPDG " << trueToRecoEntry.first->PdgCode()
       << ", #MCHits  " << trueParticlesToHits.at(trueToRecoEntry.first).size()
-      << ", TrueTime " << trueToRecoEntry.first->T() << std::endl;
-      
+      << ", TrueTime " << trueToRecoEntry.first->T()
+      << ", TrackID " << trueToRecoEntry.first->TrackId()
+      << ", Mother TrackID " << trueToRecoEntry.first->Mother() << std::endl; 
       double trueParticleTime = trueToRecoEntry.first->T();
       
       for (const RecoParticleToNMatchedHits::value_type &recoToNMatchedHitsEntry : trueToRecoEntry.second)
@@ -478,12 +507,28 @@ void UBFlashMatching::produce(art::Event & e)
         // number of hits and save the true time of the particle.
         if (NMatchedHits > pfParticleIDtoNMatchedHits.find(recoPFParticleID)->second) {
           pfParticleIDtoNMatchedHits[recoPFParticleID] = NMatchedHits;
-          pfParticleIDtoTrueTime[recoPFParticleID] = trueParticleTime;
-        }
+          pfParticleIDtoTrueTime[recoPFParticleID]     = trueParticleTime;
+          pfParticleIDToMCParticle[recoPFParticleID]   = trueToRecoEntry.first; 
+          // Now retrieve the origin of this pfParticle (1=>neutrino;  2=>cosmic)
+          const simb::MCParticle* p = trueToRecoEntry.first.get();
+          const art::Ptr<simb::MCTruth>& mcTruth = bt->ParticleToMCTruth(p);
+          pfParticleIDtoOrigin[recoPFParticleID] = mcTruth->Origin();
+        } // end Nhits
       }
     }
-    for (std::map<int,double>::iterator it=pfParticleIDtoTrueTime.begin(); it!=pfParticleIDtoTrueTime.end(); ++it)
-      if (pandora_talkative) std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  TrueTime: " << it->second << std::endl;
+
+    if (pandora_talkative) {
+      for (std::map<int,double>::iterator it=pfParticleIDtoTrueTime.begin(); it!=pfParticleIDtoTrueTime.end(); ++it) {
+        std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  TrueTime: " << it->second << std::endl;
+      }
+      for (std::map<int,simb::Origin_t>::iterator it=pfParticleIDtoOrigin.begin(); it!=pfParticleIDtoOrigin.end(); ++it) {
+        std::cout << " +=+=+=+=+= PFP ID: " << it->first << "  Origin: " << it->second << std::endl;
+      }
+    }
+
+
+
+
     if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ENDS ++++++++++++++++++++" << std::endl;
     
     // ************************
@@ -506,7 +551,7 @@ void UBFlashMatching::produce(art::Event & e)
     std::vector<flashana::Flash_t> opflashVec;
     int count = 1;
     
-    art::ServiceHandle<cheat::BackTracker> bt;
+    //art::ServiceHandle<cheat::BackTracker> bt;
     
     int nfiltered = 0;
     std::cout<<"------------------------------------------------------------------------"<<std::endl;
@@ -815,6 +860,9 @@ void UBFlashMatching::produce(art::Event & e)
         // Attempt to save true time
         if (pfParticleIDtoTrueTime.find(pfParticle->Self()) != pfParticleIDtoTrueTime.end())
           tpcObjectIDtoTrueTime[pfParticle->Self()] = pfParticleIDtoTrueTime.find(pfParticle->Self())->second;
+        // Attemp to save particle origin (neutrino or cosmic)
+        if (pfParticleIDtoOrigin.find(pfParticle->Self()) != pfParticleIDtoOrigin.end())
+          tpcObjectIDtoOrigin[pfParticle->Self()] = pfParticleIDtoOrigin.find(pfParticle->Self())->second;
 
         // Looking at the Vertex
         if (pfParticleToVertexMap.find(pfParticle) != pfParticleToVertexMap.end()) {
@@ -922,6 +970,9 @@ void UBFlashMatching::produce(art::Event & e)
                 std::cout << "pfParticleIDtoTrueTime.find(daughterPart->Self())->second = " << pfParticleIDtoTrueTime.find(daughterPart->Self())->second << std::endl;
               } 
             }
+            // Now save particle origin (neutrino or cosmic)
+            if (pfParticleIDtoOrigin.find(daughterPart->Self()) != pfParticleIDtoOrigin.end())
+              tpcObjectIDtoOrigin[pfParticle->Self()] = pfParticleIDtoOrigin.find(daughterPart->Self())->second;
 
             //auto trackVec = pfParticleToTrackMap.find(pfparticlelist[daughter_index])->second;
             lar_pandora::TrackVector trackVec;
@@ -993,7 +1044,9 @@ void UBFlashMatching::produce(art::Event & e)
         summed_cluster.idx = pfParticle->Self();
        
         // Register to a manager
+        std::cout << "Preparing to emplace" << std::endl;
         _mgr.Emplace(std::move(summed_cluster));
+        std::cout << "Emplaced" << std::endl;
 
         tpcObjectIDtoLengthLongestTrack[pfParticle->Self()] = lenghtLongestTrack;        
         tpcObjectIDtoLengthShortestTrack[pfParticle->Self()] = lenghtShortestTrack;
@@ -1044,7 +1097,7 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
       match = match_result_v.at(match_index);
 
       bool match_found = false;
-      int match_candidate_index = -1;
+      //int match_candidate_index = -1;
       for (unsigned int i = 0; i < tpc_match_candidates.size(); i++)
       {
           if((int)match.tpc_id == tpc_match_candidate_ids.at(i))
@@ -1053,7 +1106,7 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
               std::cout << "    match.tpc_id == " << match.tpc_id << ", tpc_match_candidates id = " << tpc_match_candidate_ids.at(i) << std::endl;
               std::cout << "    match.flash_id == " << match.flash_id << std::endl;
               match_found = true;
-              match_candidate_index = i;
+              //match_candidate_index = i;
               break;
           }
       }
@@ -1061,9 +1114,13 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
       if (!match_found) std::cout << "Did not find match" << std::endl;
 
       double timeCorrection = 343.75; //ns
+      std::cout << "     (TPC time contains time correction here)" << std::endl;
       std::cout << "     >>>>> The TPC object true time is:  " << tpcObjectIDtoTrueTime.find(match.tpc_id)->second + timeCorrection<< std::endl;
       std::cout << "     >>>>> The Flash time is:            " << opflashVec.at(match.flash_id).time*1000. << std::endl;
-    
+      std::cout << "     >>>>> The TPC object origin is:     " << tpcObjectIDtoOrigin.find(match.tpc_id)->second << std::endl;
+      std::cout << "     (1: neutrino;  2: cosmic)" << std::endl;
+
+
       if (match.tpc_id==::flashana::kINVALID_ID)
       {
           std::cout<<"INVALID TPC_ID"<<std::endl;
@@ -1079,7 +1136,6 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fTruthyFlashTime   = -3E7;
           fTruthyFlashLight  = -100;
           fTruthyFlashPosZ   = -1000;
-          fPrimaryPDG        = -1;
           fVertexX            = -3E7;
           fVertexY            = -3E7;
           fVertexZ            = -3E7;
@@ -1132,11 +1188,11 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fExtremaMinZ  = tpcObjectIDtoExtremaMinZ.find(match.tpc_id)->second;  // Saving extrema min Z
           fExtremaMaxZ  = tpcObjectIDtoExtremaMaxZ.find(match.tpc_id)->second;  // Saving extrema max Z
 
+          fOrigin       = tpcObjectIDtoOrigin.find(match.tpc_id)->second; // Saving Origin (neutrino or cosmic)
 
           fTruthyFlashTime  = -3E7;
           fTruthyFlashLight = -100;
           fTruthyFlashPosZ  = -1000;
-          fPrimaryPDG       = -1;
 
           //Find "truthy" (approximately true) flash associated to this particle
           if (fTrackTrueTime != -3E7)
@@ -1165,7 +1221,20 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
           fFlashTime = flashtime*1000.;
 
           //Check whether true parent particle was neutrino
-          if (match_candidate_index != -1) fPrimaryPDG = tpc_match_candidates[match_candidate_index].PdgCode();
+          /*
+          if (match_candidate_index != -1)
+          {
+            size_t index = match.tpc_id;
+            art::Ptr<recob::PFParticle> match_cand = indexToPFParticleMap.find(index)->second;
+            art::Ptr<recob::Hit> match_hits        = recoParticleToHits.find(match_cand)->second;
+            art::Ptr<
+            //pfparticletohits
+            //hitstomcparticle
+            const lar_pandora::TrackVector& trackVec = pfParticleToTrackMap.find(match_cand)->second;
+            if (trackVec.size() == 0) fIsNu = 1;
+            else if (trackVec.size() > 0) fIsNu = 0;
+          }
+          */
           
           fMatchTree->Fill();
       }

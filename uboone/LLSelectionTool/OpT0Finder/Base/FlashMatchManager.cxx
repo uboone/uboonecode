@@ -288,6 +288,7 @@ namespace flashana {
           if (compat == false)
             continue;
         }
+
 //        std::cout<<"\n\n\nIn manager. TPC size is? "<<tpc.size()<<", flash time : "<<flash.time<<std::endl ;
         auto res = _alg_flash_match->Match( tpc, flash ); // Run matching
 
