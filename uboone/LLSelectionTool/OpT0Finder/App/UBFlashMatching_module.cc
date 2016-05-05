@@ -66,10 +66,15 @@
 #include "lardata/DetectorInfo/DetectorProperties.h"
 #include "larcore//CoreUtils/ServiceUtil.h"
 
+//
 // Truth matching includes
 //
+
+#include "SimulationBase/MCTruth.h"
 #include "larsim/MCCheater/BackTracker.h"
 #include "SimulationBase/MCParticle.h"
+#include "lardata/MCBase/MCTrack.h"
+#include "lardata/MCBase/MCStep.h"
 #include "SimulationBase/MCTrajectory.h"
 
 class UBFlashMatching;
@@ -108,6 +113,7 @@ private:
     std::string  m_hitfinderLabel;    ///<
     std::string  m_clusterLabel;      ///<
     std::string  m_geantModuleLabel;  ///<
+    std::string fMCTrackModuleLabel;  ///< Input sim::MCTrack producer name
 
     /// Maps used for PFParticle truth matching
     typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;
@@ -210,6 +216,8 @@ void UBFlashMatching::reconfigure(fhicl::ParameterSet const& p)
     _track_producer_name = p.get<std::string>("TrackProducer", "pandoraNuKHit");//"pandoraCosmicKHit");
     _flash_producer_name = p.get<std::string>("FlashProducer");
     fPFPModuleLabel      = p.get<std::string>("PFPModulelabel","pandoraNu");
+    fMCTrackModuleLabel  = p.get<std::string>("MCTrackModulelabel", "mcreco");
+
     fSpillName.clear();
     size_t pos = _track_producer_name.find(":");
     if( pos!=std::string::npos ) {
@@ -310,6 +318,16 @@ void UBFlashMatching::produce(art::Event & e)
     //
     // Step -1): Get necessary data products from fmwk
     //
+    
+    
+    art::Handle< std::vector<sim::MCTrack> >mctrackHandle;
+    e.getByLabel(fMCTrackModuleLabel,fSpillName, mctrackHandle);
+    if(!mctrackHandle.isValid()) {
+      std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve sim::MCTrack from " 
+                << fMCTrackModuleLabel << std::endl;
+      throw std::exception();
+    }
+
     art::Handle< std::vector<recob::Track> > trackHandle;
     e.getByLabel(_track_producer_name,fSpillName, trackHandle);
     if(!trackHandle.isValid()) {
@@ -383,7 +401,8 @@ void UBFlashMatching::produce(art::Event & e)
 
 
 
-    bool pandora_talkative = true;
+    //bool pandora_talkative = true;
+    bool pandora_talkative = false;
 
     if (pandora_talkative) std::cout << "++++++++++++++++++ PANDORA MATCH ++++++++++++++++++++" << std::endl;
   
@@ -410,6 +429,7 @@ void UBFlashMatching::produce(art::Event & e)
     // Collect PFParticles and match Reco Particles to Hits
     lar_pandora::PFParticlesToHits recoParticlesToHits;
     lar_pandora::HitsToPFParticles recoHitsToParticles;
+    lar_pandora::MCParticleVector mcparticlelist;
     lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, fPFPModuleLabel, m_clusterLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
     
     if (pandora_talkative) std::cout << "+++++ recoHitsToParticles.size() = " << recoHitsToParticles.size() << std::endl;
@@ -419,6 +439,7 @@ void UBFlashMatching::produce(art::Event & e)
     lar_pandora::MCParticlesToHits trueParticlesToHits;
     lar_pandora::HitsToMCParticles hitsToTrueParticles;
     lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, m_geantModuleLabel, hitVector, trueParticlesToHits, hitsToTrueParticles, lar_pandora::LArPandoraHelper::kAddDaughters);
+    lar_pandora::LArPandoraHelper::CollectMCParticles(e, m_geantModuleLabel, mcparticlelist);
     
     if (pandora_talkative) std::cout << "+++++ trueParticlesToHits.size() = " << trueParticlesToHits.size() << std::endl;
     if (pandora_talkative) std::cout << "+++++ hitsToTrueParticles.size() = " << hitsToTrueParticles.size() << std::endl;
@@ -488,6 +509,8 @@ void UBFlashMatching::produce(art::Event & e)
     art::ServiceHandle<cheat::BackTracker> bt;
     
     int nfiltered = 0;
+    std::cout<<"------------------------------------------------------------------------"<<std::endl;
+    std::cout<<"FlashHandleSize: "<<flashHandle->size()<<std::endl;
     for(size_t opflash_index=0; opflash_index < flashHandle->size(); ++opflash_index) {
         
         // Retrieve individual recob::OpFlash and construct flashana::Flash_t
@@ -525,6 +548,239 @@ void UBFlashMatching::produce(art::Event & e)
         count++;
     }
     
+/*-------------------------------FLASHMATCH VIA MCtracks/MCParticle in Event----------------------------------------------*/ 
+/*std::cout<<"--------------------------------------------------------------------------------------------------------"<<std::endl; 
+ std::cout<<"MCTrackHandleSize: "<<mctrackHandle->size()<<std::endl;
+ for(size_t track_index=0; track_index < mctrackHandle->size(); ++track_index) {
+
+
+    // Retrieve individual recob::Track and construct flashana::Flash_t
+    auto const& track = (*mctrackHandle)[track_index];
+    // trackPtrVec.push_back(track);
+    fTrackID = track.TrackID(); 
+    fTrackIDCodeHist->Fill(fTrackID);
+   // fTrackPhi = track.Phi();
+   // fTrackPhiHist->Fill(fTrackPhi);
+   
+
+
+   //track.Origin();
+   int pdgcode = track.PdgCode();       
+   unsigned int trackid = track.TrackID();      
+   const std::string& process = track.Process();      
+   auto const start = track.Start();         
+   auto const end = track.End();  
+   //int numtrajpoints = (int) abs(end - start)          
+   //track.dEdx();          
+   //track.dQdx();
+   std::cout<<"PDGCode: "<<pdgcode<<" TrackID: "<< trackid<<" Process: "<<process<<" StartX: "<<start.X()<<" EndX: "<<end.X()<<std::endl;  
+   std::cout<<"                                        "   			 <<" StartY: "<<start.Y()<<" EndY: "<<end.Y()<<std::endl;  
+   std::cout<<"                                        "         		 <<" StartZ: "<<start.Z()<<" EndZ: "<<end.Z()<<std::endl;  
+   std::cout<<"--------------------------------------------------------------------------------------------------------"<<std::endl; 
+   int motherpdg = track.MotherPdgCode(); 
+   unsigned int mothertrackid = track.MotherTrackID(); 
+   const std::string& motherprocess = track.MotherProcess();
+   auto const motherstart = track.MotherStart();   
+   auto const motherend = track.MotherEnd();     
+   std::cout<<"MotherPDGCode: "<<motherpdg<<" MotherTrackID: "<< mothertrackid<<" MotherProcess: "<<motherprocess<<" MotherStartX: "<<motherstart.X()<<" MotherEndX: "<<motherend.X()<<std::endl;  
+   std::cout<<"                                        "   				 	        	 <<" MotherStartY: "<<motherstart.Y()<<" MotherEndY: "<<motherend.Y()<<std::endl;  
+   std::cout<<"                                        "         				 		 <<" MotherStartZ: "<<motherstart.Z()<<" MotherEndZ: "<<motherend.Z()<<std::endl;  
+   std::cout<<"--------------------------------------------------------------------------------------------------------"<<std::endl; 
+   
+   int ancestorpdg = track.AncestorPdgCode(); 
+   unsigned int ancestortrackid = track.AncestorTrackID(); 
+   const std::string& ancestorprocess = track.AncestorProcess(); 
+   auto const ancestorstart = track.AncestorStart();   
+   auto const ancestorend = track.AncestorEnd(); 
+   std::cout<<"AncestorPDGCode: "<<ancestorpdg<<" AncestorTrackID: "<< ancestortrackid<<" AncestorProcess: "<<ancestorprocess<<" AncestorStartX: "<<ancestorstart.X()<<" AncestorEnd: "<<ancestorend.X()<<std::endl;  
+   std::cout<<"                                       "   				 		    <<" AncestorStartY: "<<ancestorstart.Y()<<" AncestorEndY: "<<ancestorend.Y()<<std::endl;  
+   std::cout<<"                                       "         				 	    <<" AncestorStartZ: "<<ancestorstart.Z()<<" AncestorEndZ: "<<ancestorend.Z()<<std::endl;  
+   std::cout<<"--------------------------------------------------------------------------------------------------------"<<std::endl; 
+   
+ 
+    // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+    ::geoalgo::Trajectory trj;
+    // Set # points same as input track object, and initialize each point as 3D point
+    trj.resize(track.NumberTrajectoryPoints(),::geoalgo::Point_t(3,0.));
+
+    // Now loop over points and set actual xyz values
+    for(size_t point_index = 0; point_index < trj.size(); ++point_index) {
+      
+      // Get reference to be modified
+      auto&       copy_pt = trj[point_index];
+      // Get const reference to get values
+      auto const& orig_pt = track.LocationAtPoint(point_index);
+
+      copy_pt[0] = orig_pt[0];
+      copy_pt[1] = orig_pt[1];
+      copy_pt[2] = orig_pt[2];
+    }
+    
+    auto qcluster = _light_path_alg.FlashHypothesis(trj);
+
+    qcluster.idx = track_index;
+    
+    // Register to a manager
+    _mgr.Emplace(std::move(qcluster));
+  }*/
+
+
+  std::map<int,std::vector<int> >primarytrackIDTODaughtertrackID;
+  std::map<art::Ptr<simb::MCTruth>,std::vector<int> >primaryMCParticleTODaughtertrackIDVec;
+  std::vector< int > primarytrackIDs;
+  for(size_t mcparticle_index=0; mcparticle_index < mcparticlelist.size(); ++mcparticle_index) {
+    auto const trackid			= mcparticlelist[mcparticle_index]->TrackId();  
+    auto const statuscode 		= mcparticlelist[mcparticle_index]->StatusCode();                         
+    auto const pdgcode 			= mcparticlelist[mcparticle_index]->PdgCode();                               
+    auto const mother 			= mcparticlelist[mcparticle_index]->Mother();                                  
+    //auto const polarization 		= mcparticlelist[mcparticle_index]->Polarization();                      
+    auto const process 			= mcparticlelist[mcparticle_index]->Process();                                
+    auto const endprocess 		= mcparticlelist[mcparticle_index]->EndProcess();                         
+    auto const numdaughters 		= mcparticlelist[mcparticle_index]->NumberDaughters();                             
+    auto const numtrajpoints 		= mcparticlelist[mcparticle_index]->NumberTrajectoryPoints(); 
+    //auto const 			= mcparticlelist[mcparticle_index]->Position( const int i );    
+    //auto const 			= mcparticlelist[mcparticle_index]->Momentum( const int i );    
+    //auto const 			= mcparticlelist[mcparticle_index]->Vx(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->Vy(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->Vz(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->T(const int i);                     
+    auto const endposition		= mcparticlelist[mcparticle_index]->EndPosition();                        
+    auto const endx			= mcparticlelist[mcparticle_index]->EndX();                                     
+    auto const endy			= mcparticlelist[mcparticle_index]->EndY();                                     
+    auto const endz			= mcparticlelist[mcparticle_index]->EndZ();                                     
+    auto const endt			= mcparticlelist[mcparticle_index]->EndT();                                     
+    //auto const 			= mcparticlelist[mcparticle_index]->Px(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->Py(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->Pz(const int i);                    
+    //auto const 			= mcparticlelist[mcparticle_index]->E(const int i);                     
+    //auto const 			= mcparticlelist[mcparticle_index]->P(const int i);                     
+    //auto const 			= mcparticlelist[mcparticle_index]->Pt(const int i);                    
+    auto const mass  			= mcparticlelist[mcparticle_index]->Mass();                                     
+    auto const endmomentum 		= mcparticlelist[mcparticle_index]->EndMomentum();                        
+    auto const endpx 			= mcparticlelist[mcparticle_index]->EndPx();                                    
+    auto const endpy 			= mcparticlelist[mcparticle_index]->EndPy();                                    
+    auto const endpz 			= mcparticlelist[mcparticle_index]->EndPz();                                    
+    auto const ende 			= mcparticlelist[mcparticle_index]->EndE();                                     
+    auto const getgvtx 			= mcparticlelist[mcparticle_index]->GetGvtx();                                
+    auto const gvx 			= mcparticlelist[mcparticle_index]->Gvx();                                        
+    auto const gvy 			= mcparticlelist[mcparticle_index]->Gvy();                                        
+    auto const gvz 			= mcparticlelist[mcparticle_index]->Gvz();                                        
+    auto const gvt 			= mcparticlelist[mcparticle_index]->Gvt();                                        
+   //auto const firstdaughter 		= mcparticlelist[mcparticle_index]->FirstDaughter();                    
+   //auto const lastdaughter 		= mcparticlelist[mcparticle_index]->LastDaughter();                     
+   //auto const rescatter 		= mcparticlelist[mcparticle_index]->Rescatter();                            
+   //auto const trajectory 		= mcparticlelist[mcparticle_index]->Trajectory();                 
+   //auto const weight 			= mcparticlelist[mcparticle_index]->Weight(); 
+   std::vector<int> daughterID;
+   if(mother==0 && process=="primary") 
+   {
+     primarytrackIDs.push_back(trackid);
+     for(int daughteriterator=0; daughteriterator<numdaughters; daughteriterator++)
+     {
+       daughterID.push_back(mcparticlelist[mcparticle_index]->Daughter(daughteriterator));
+     }
+       
+     //primarytrackIDTODaughtertrackID.insert( std::pair<int, std::vector<int>>(trackid,daughterID)); 
+     primarytrackIDTODaughtertrackID[trackid] = daughterID; 
+     //primaryMCParticleTODaughtertrackIDVec.insert(primarytrackIDTODaughtertrackID::value_type((int)trackid, daughterID) ); 
+     //primaryMCParticleTODaughtertrackIDVec.insert(primaryMCParticleTODaughtertrackIDVec::value_type(mcparticlelist[mcparticle_index], daughterID) ); 
+         
+   }
+    std::cout<<"MCPARTICLE INFO:----------------------------------------------------"<<std::endl;
+    std::cout<<"                trackid:"<<trackid<<std::endl;
+    std::cout<<"                statuscode:"<<statuscode<<std::endl;
+    std::cout<<"                pdgcode:"<<pdgcode<<std::endl;
+    std::cout<<"                mother:"<<mother<<std::endl;
+   //std::cout<<"                polarization:"<<polarization<<std::endl;
+    std::cout<<"                process:"<<process<<std::endl;
+    std::cout<<"                endprocess:"<<endprocess<<std::endl;
+    std::cout<<"                numdaughters:"<<numdaughters<<std::endl;
+    std::cout<<"                numtrajpoints:"<<numtrajpoints<<std::endl;
+    //std::cout<<"                endposition:"<<endposition<<std::endl;
+    std::cout<<"                endx:"<<endx<<std::endl;
+    std::cout<<"                endy:"<<endy<<std::endl;
+    std::cout<<"                endz:"<<endz<<std::endl;
+    std::cout<<"                endt:"<<endt<<std::endl;
+    std::cout<<"		mass:"<<mass<<std::endl;
+    //std::cout<<"		endmomentum:"<<endmomentum<<std::endl;
+    std::cout<<"		endpx:"<<endpx<<std::endl;
+    std::cout<<"		endpy:"<<endpy<<std::endl;
+    std::cout<<"		endpz:"<<endpz<<std::endl;
+    std::cout<<"		ende:"<<ende<<std::endl;
+    //std::cout<<"                getgvtx:"<<getgvtx<<std::endl;
+    std::cout<<"                gvx:"<<gvx<<std::endl;
+    std::cout<<"                gvy:"<<gvy<<std::endl;
+    std::cout<<"                gvz:"<<gvz<<std::endl;
+    std::cout<<"                gvt:"<<gvt<<std::endl;
+    //std::cout<<"                firstdaughter:"<<firstdaughter<<std::endl;
+    //std::cout<<"                lastdaughter:"<<lastdaughter<<std::endl;
+    //std::cout<<"                rescatter:"<<rescatter<<std::endl;
+    //std::cout<<"                trajectory:"<<trajectory<<std::endl;
+    //std::cout<<"                weight:"<<weight<<std::endl;
+    //std::cout<" 		daugtherIDSize in map:"<<primarytrackIDTODaughtertrackID[trackid]->size()<<std::endl;
+
+  }
+ // std::vector<int> daughtertrackIDs;
+  ::flashana::QCluster_t summed_cluster;
+  for (std::map<int,std::vector<int> >::iterator it=primarytrackIDTODaughtertrackID.begin(); it!=primarytrackIDTODaughtertrackID.end(); ++it)
+  {
+    summed_cluster.clear();
+    auto const numtraj = mcparticlelist[it->first]->NumberTrajectoryPoints();
+    ::geoalgo::Trajectory trj;
+    // Set # points same as input track object, and initialize each point as 3D point
+    trj.resize(numtraj,::geoalgo::Point_t(3,0.));
+    for(unsigned int point_index = 0; point_index < trj.size(); ++point_index) {
+        
+      // Get reference to be modified
+      auto&         copy_pt = trj[point_index];
+      // Get const reference to get values
+      auto const& orig_pt = mcparticlelist[it->first]->Position(point_index);
+
+      copy_pt[0] = orig_pt.X();
+      copy_pt[1] = orig_pt.Y();
+      copy_pt[2] = orig_pt.Z();
+    }
+      
+    auto qcluster_pri = _light_path_alg.FlashHypothesis(trj);
+    summed_cluster+=qcluster_pri;
+    
+    for(unsigned daughter_index=0; daughter_index<it->second.size(); daughter_index++)
+    {
+      auto const numtraj = mcparticlelist[it->second.at(daughter_index)]->NumberTrajectoryPoints();
+      // Construct ::geoalgo::Trajectory (i.e. vector of points) to use for LightPath
+      ::geoalgo::Trajectory trj; // Set # points same as input track object, and initialize each point as 3D point
+      trj.resize(numtraj,::geoalgo::Point_t(3,0.));
+
+      // Now loop over points and set actual xyz values
+      for(unsigned int point_index = 0; point_index < trj.size(); ++point_index) {
+        
+        // Get reference to be modified
+        auto&         copy_pt = trj[point_index];
+        // Get const reference to get values
+        auto const& orig_pt = mcparticlelist[it->second.at(daughter_index)]->Position(point_index);
+
+        copy_pt[0] = orig_pt.X();
+        copy_pt[1] = orig_pt.Y();
+        copy_pt[2] = orig_pt.Z();
+      }
+      
+      auto qcluster_daughter = _light_path_alg.FlashHypothesis(trj);
+
+      
+      // Register to a manager
+      summed_cluster+=qcluster_daughter; 
+    }
+    summed_cluster.idx = it->first; 
+    _mgr.Emplace(std::move(summed_cluster));
+  }
+
+   
+     
+
+/*--------------------------------------------------------------------------------------------------------------------------*/ 
+
+
+
     /*-------------------------------FLASHMATCH VIA Summing all tracks associated to all PFParticles in Event-------------------------*/
     
     //Declare vector of tpc matching candidatesi, used to keep track of summed clusters for diagnostic tree
@@ -755,7 +1011,9 @@ tpcObjectIDtoTrueTime.find(pfParticle->Self())->second << std::endl;
         tpc_match_candidate_truetimes.push_back(truetime);
         
     }
-    
+
+
+  
     //
     //  1) Run FlashMatchManager & retrieve matches
     //
