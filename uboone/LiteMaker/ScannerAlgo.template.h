@@ -1213,7 +1213,13 @@ namespace larlite {
 	
 	lite_roi.SetVertex(roi_ptr->GetVertex());
 
+	lite_roi.SetCCIncVertex(roi_ptr->GetCCIncVertex());
+
 	lite_roi.SetTrackEnd(roi_ptr->GetTrackEnd());
+
+	lite_roi.SetMuonVertex(roi_ptr->GetMuonVertex());
+
+	lite_roi.SetNeutrinoVertex(roi_ptr->GetNeutrinoVertex());
 
 	lite_data->push_back(lite_roi);
       }
