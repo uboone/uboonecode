@@ -58,7 +58,7 @@ microboone_eventweight:
           type: Genie
           random_seed: 1
           parameter_list:        ["QEMA"]
-          parameter_sigma:       [1     ]
+          parameter_sigma:       [1.4545] # corresponds to Ma = 1.35 GeV
           mode: reweight
           number_of_multisims: 1
         }
