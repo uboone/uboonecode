@@ -14,7 +14,7 @@
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
 #include "art/Utilities/InputTag.h"
-#include "artextensions/SeedService/SeedService.hh"
+#include "larsim/RandomUtils/LArSeedService.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "art/Persistency/Common/Assns.h" 
 #include "fhiclcpp/ParameterSet.h"
@@ -60,7 +60,7 @@ private:
 EventWeight::EventWeight(fhicl::ParameterSet const & p) 
 // Initialize member data here.
 {
-  art::ServiceHandle<artext::SeedService> seedservice;
+  art::ServiceHandle<sim::LArSeedService> seedservice;
 
   //get list of weight functions
   std::vector<std::string> rw_func=p.get<std::vector<std::string> >("weight_functions");

@@ -4,10 +4,10 @@ include_directories ( $ENV{GENIE_INC}/GENIE )
 art_make_library(LIBRARY_NAME WeightCalculators 
                  SOURCE	      ${WGHCALCFILES}
 	         LIBRARIES
-		       Utilities
+		       lardata_Utilities
 		       NuReweightArt	
                        NuReweight
-		       Simulation
+		       larsim_Simulation
 		       ${SIMULATIONBASE}
               	      ${ART_FRAMEWORK_CORE}
 		      ${ART_FRAMEWORK_PRINCIPAL}
@@ -39,7 +39,7 @@ art_make(LIBRARY_NAME   EventWeight
 #                      ${ART_PERSISTENCY_COMMON}
 #                      ${ART_PERSISTENCY_PROVENANCE}
 #                      ${ART_UTILITIES}
-		      ${SEEDSERVICE_SERVICE}
+		      larsim_RandomUtils_LArSeedService_service
                       ${MF_MESSAGELOGGER}
                       ${MF_UTILITIES}
 #                      ${FHICLCPP}

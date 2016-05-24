@@ -17,7 +17,7 @@ services:
   user:         @local::microboone_services
   message:      @local::standard_info
   FileCatalogMetadata:  @local::art_file_catalog_mc
-#  SeedService: @local::microboone_seedservice
+#  LArSeedService: @local::microboone_seedservice
 }
 
 #source is now a root file
