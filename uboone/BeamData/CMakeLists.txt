@@ -7,15 +7,14 @@ find_library( UB_DATA_TYPES NAMES ubdata_types PATHS $ENV{UBOONEDAQ_DATATYPES_LI
 
 art_make( BASENAME_ONLY
           MODULE_LIBRARIES
-                        Utilities
-                        TimeService_service
-                        Filters
-                        RawData
-			SummaryData
+                        lardata_Utilities
+                        larevt_Filters
+                        lardata_RawData
+			larcore_SummaryData
 			BeamDAQ
 			${UB_DATA_TYPES}
 			${Boost_SERIALIZATION_LIBRARY}
-                        ${SEEDSERVICE_SERVICE} # artextensions
+                        larsim_RandomUtils_LArSeedService_service
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -38,4 +37,3 @@ art_make( BASENAME_ONLY
 # install_headers()
 install_fhicl()
 install_source()
-
