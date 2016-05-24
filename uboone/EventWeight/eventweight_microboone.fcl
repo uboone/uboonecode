@@ -4,7 +4,8 @@ microboone_eventweight:
 {
  module_type:	"EventWeight"
  #weight_functions:   [ func1, bnbcorrection, genie_qema, genie_all]
- weight_functions:    [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf, genie_IntraNukeNmfp, genie_IntraNukeNcex, genie_IntraNukeNel, genie_IntraNukeNinel, genie_IntraNukeNabs, genie_IntraNukeNpi, genie_IntraNukePImfp, genie_IntraNukePIcex, genie_IntraNukePIel, genie_IntraNukePIinel, genie_IntraNukePIabs, genie_IntraNukePIpi   ]
+ #weight_functions:    [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf, genie_IntraNukeNmfp, genie_IntraNukeNcex, genie_IntraNukeNel, genie_IntraNukeNinel, genie_IntraNukeNabs, genie_IntraNukeNpi, genie_IntraNukePImfp, genie_IntraNukePIcex, genie_IntraNukePIel, genie_IntraNukePIinel, genie_IntraNukePIabs, genie_IntraNukePIpi   ]
+  weight_functions:    [ genie_qema_ccincltechnote ]
 
  #throw exception if weight outside limits
  min_weight: 0
@@ -34,9 +35,9 @@ microboone_eventweight:
 
 #########################################
 #
-# ----------------------------------------
-# Funtion definition for GENIE reweighting
-# ----------------------------------------
+# -----------------------------------------
+# Function definition for GENIE reweighting
+# -----------------------------------------
 #
 # One function is defined for each GENIE parameter
 # *pm1sigma* is specifed: two weights will be evaluated for each parameter,
@@ -51,6 +52,17 @@ microboone_eventweight:
 # A list of available parameters is in GenieWeightCalc.cxx
 #
 #########################################
+
+# MaCCQE for ccincl technote
+ genie_qema_ccincltechnote : {
+          type: Genie
+          random_seed: 1
+          parameter_list:        ["QEMA"]
+          parameter_sigma:       [1     ]
+          mode: reweight
+          number_of_multisims: 1
+        }
+
 # MaCCQE
  genie_qema: {
  	  type: Genie

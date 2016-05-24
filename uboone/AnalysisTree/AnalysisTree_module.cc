@@ -756,13 +756,17 @@ namespace microboone {
     Double_t     potnumi101;         //pot per event (NuMI E:TOR101)
 
     // event weights!
+    // When you are done with the cc incl tech-note for NEUTRINO2016, 
+    // restore all the lines that now have "//*" and remove the others.
+    //
     //Int_t nweights;                                  // number of universes simulated
     //unsigned int nsysts;                             // number of systematics varied
     //Double_t eventWeight_MA[kMaxWeights];            // event weights
-    std::vector<std::string> evtwgt_funcname;          // the name of the functions used
-    std::vector<std::vector<double>> evtwgt_weight;    // the weights (a vector for each function used)
-    std::vector<int> evtwgt_nweight;                   // number of weights for each function
-    Int_t evtwgt_nfunc;                                // number of functions used
+    //* std::vector<std::string> evtwgt_funcname;          // the name of the functions used
+    //* std::vector<std::vector<double>> evtwgt_weight;    // the weights (a vector for each function used)
+    //* std::vector<int> evtwgt_nweight;                   // number of weights for each function
+    //* Int_t evtwgt_nfunc;                                // number of functions used
+    Double_t eventWeight_MA;                           // the weight for Ma (just for the technote)
 
     // hit information (non-resizeable, 45x kMaxHits = 900k bytes worth)
     Int_t    no_hits;                  //number of hits
@@ -2360,9 +2364,10 @@ void microboone::AnalysisTreeDataStruct::ClearLocalData() {
   potnumitgt = 0;
   potnumi101 = 0;
   
-  evtwgt_nfunc = 0;
-  FillWith(evtwgt_funcname, "noname");
-  FillWith(evtwgt_nweight, 0);
+  eventWeight_MA = -9999999;
+  //* evtwgt_nfunc = 0;
+  //* FillWith(evtwgt_funcname, "noname");
+  //* FillWith(evtwgt_nweight, 0);
   //FillWith(evtwgt_weight,-99999);
   //nweights = 0;
   //nsysts = 0;
@@ -2928,10 +2933,11 @@ void microboone::AnalysisTreeDataStruct::SetAddresses(
   //CreateBranch("nWeights",nWeights,"nWeights[nFunc]/I");
   //CreateBranch("funcName",funcName,"funcName[nFunc]/D");
   //CreateBranch("theWeight",theWeight,"theWeight[nFunc][nWeights]/D");
-  CreateBranch("evtwgt_funcname",evtwgt_funcname);
-  CreateBranch("evtwgt_weight",evtwgt_weight);
-  CreateBranch("evtwgt_nweight",evtwgt_nweight);
-  CreateBranch("evtwgt_nfunc",&evtwgt_nfunc,"evtwgt_nfunc/I");
+  //* CreateBranch("evtwgt_funcname",evtwgt_funcname);
+  //* CreateBranch("evtwgt_weight",evtwgt_weight);
+  //* CreateBranch("evtwgt_nweight",evtwgt_nweight);
+  //* CreateBranch("evtwgt_nfunc",&evtwgt_nfunc,"evtwgt_nfunc/I");
+  CreateBranch("eventWeight_MA",&eventWeight_MA,"eventWeight_MA/D");
 
   if (hasHitInfo()){    
     CreateBranch("no_hits",&no_hits,"no_hits/I");
@@ -3769,24 +3775,30 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 
   art::Handle< std::vector< evwgh::MCEventWeight > > evtWeights;
 
-  if (evt.getByLabel("eventweight",evtWeights)) {
-    const std::vector< evwgh::MCEventWeight > * evtwgt_vec = evtWeights.product();
-    evwgh::MCEventWeight evtwgt = evtwgt_vec->at(0); // just for the first neutrino interaction
-    std::map<std::string, std::vector<double>> evtwgt_map = evtwgt.fWeight;
-    int countFunc = 0;
-    // loop over the map and save the name of the function and the vector of weights for each function
-    for(std::map<std::string, std::vector<double>>::iterator it = evtwgt_map.begin(); it != evtwgt_map.end(); ++it) {
-      fData->evtwgt_funcname.push_back(it->first);      // filling the name of the function
-      fData->evtwgt_weight.push_back(it->second);       // filling the vector with the weights
-      std::vector<double> mytemp = it->second;          // getting the vector of weights
-      fData->evtwgt_nweight.push_back(mytemp.size());   // filling the number of weights
-      countFunc++;
-    }
-    fData->evtwgt_nweight.resize(countFunc);
-    fData->evtwgt_funcname.resize(countFunc);
-    fData->evtwgt_nfunc = countFunc;                    // saving the number of functions used
-  }
+  //* if (evt.getByLabel("eventweight",evtWeights)) {
+  //*  const std::vector< evwgh::MCEventWeight > * evtwgt_vec = evtWeights.product();
+  //*  evwgh::MCEventWeight evtwgt = evtwgt_vec->at(0); // just for the first neutrino interaction
+  //*  std::map<std::string, std::vector<double>> evtwgt_map = evtwgt.fWeight;
+  //*  int countFunc = 0;
+  //*  // loop over the map and save the name of the function and the vector of weights for each function
+  //*  for(std::map<std::string, std::vector<double>>::iterator it = evtwgt_map.begin(); it != evtwgt_map.end(); ++it) {
+  //*    fData->evtwgt_funcname.push_back(it->first);      // filling the name of the function
+  //*    fData->evtwgt_weight.push_back(it->second);       // filling the vector with the weights
+  //*    std::vector<double> mytemp = it->second;          // getting the vector of weights
+  //*    fData->evtwgt_nweight.push_back(mytemp.size());   // filling the number of weights
+  //*    countFunc++;
+  //*  }
+  //*  fData->evtwgt_nweight.resize(countFunc);
+  //*  fData->evtwgt_funcname.resize(countFunc);
+  //*  fData->evtwgt_nfunc = countFunc;                    // saving the number of functions used
+  //*}
  
+  // Saving just 1 weight for Ma CCQE, for cc incl NEUTRINO2016 tech-note
+  if (evt.getByLabel("eventweight",evtWeights)) {
+    std::vector<double> MA_weights = (*evtWeights->at(0).fWeight.find("genie_qema_ccincltechnote_Genie")).second;
+    fData->eventWeight_MA = MA_weights[0];
+  }
+
   /* Set weights just for MA at the moment
   if (evt.getByLabel("eventweight",evtWeights)) {
     std::vector<double> MA_weights = (*evtWeights->at(0).fWeight.find("genie_qema_Genie")).second;
