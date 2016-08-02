@@ -4918,13 +4918,13 @@
 
   <tube name="Ground"
     rmin="792.48"
-    rmax="2311.4"
+    rmax="4000"
     z="1249.68"
     deltaphi="360"
     lunit="cm"
     aunit="deg"/>
   <tube name="GroundBottom"
-    rmax="2311.4"
+    rmax="4000"
     z="1524.0"
     deltaphi="360"
     lunit="cm"
