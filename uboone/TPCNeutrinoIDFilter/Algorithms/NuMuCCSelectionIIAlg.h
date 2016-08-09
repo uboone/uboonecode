@@ -1,43 +1,31 @@
 /**
- *  @file   AltNuMuCCInclusiveAlg.h
+ *  @file   NuMuCCSelectionIIAlg.h
  * 
  *  @brief  This is an algorithm for finding neutrino candidates using tracks and vertices
  * 
+ *  @authors xiao.luo@yale.edu, tjyang@fnal.gov
  */
-#ifndef AltNuMuCCInclusiveAlg_h
-#define AltNuMuCCInclusiveAlg_h
+#ifndef NuMuCCSelectionIIAlg_h
+#define NuMuCCSelectionIIAlg_h
 
 #include "uboone/TPCNeutrinoIDFilter/Algorithms/NeutrinoIDAlgBase.h"
 
-// Framework Includes
-#include "canvas/Persistency/Common/FindManyP.h"
-
 // LArSoft includes
 #include "larcore/Geometry/GeometryCore.h"
-#include "lardata/DetectorInfo/DetectorProperties.h"
-#include "lardata/DetectorInfo/DetectorClocks.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 // Root includes
 #include "TH1D.h"
-#include "TH2D.h"
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-
-namespace recob
-{
-    class OpFlash;
-    class PFParticle;
-    class Track;
-    class Vertex;
-}
 
 namespace neutrinoid
 {
 
 /**
- *  @brief  AltNuMuCCInclusiveAlg class
+ *  @brief  NuMuCCSelectionIIAlg class
  */
-class AltNuMuCCInclusiveAlg : virtual public NeutrinoIDAlgBase
+class NuMuCCSelectionIIAlg : virtual public NeutrinoIDAlgBase
 {
 public:
     /**
@@ -45,12 +33,12 @@ public:
      * 
      *  @param  pset
      */
-    AltNuMuCCInclusiveAlg(fhicl::ParameterSet const &pset);
+    NuMuCCSelectionIIAlg(fhicl::ParameterSet const &pset);
 
     /**
      *  @brief  Destructor
      */
-    virtual ~AltNuMuCCInclusiveAlg();
+    virtual ~NuMuCCSelectionIIAlg();
     
     /**
      *  @brief a handler for the case where the algorithm control parameters are to be reset
@@ -75,45 +63,42 @@ public:
 
 private:
     
-    double projectedLength(const recob::Track* track) const;
-    bool inFV(const TVector3&) const;
-    bool endPointOK(const TVector3& pos) const;
+    bool   inFV(double x, double y, double z) const;
     
-    int traversePFParticleHierarchy(art::Handle<std::vector<recob::PFParticle>>& pfParticleHandle,
-                                    size_t                                       pfParticleIdx,
-                                    const art::FindManyP<recob::Track>&          trackAssns,
-                                    const art::FindManyP<recob::Vertex>&         vertexAssns,
-                                    std::vector<art::Ptr<recob::PFParticle>>&    pfParticleVec,
-                                    std::vector<art::Ptr<recob::Track>>&         trackVec,
-                                    std::vector<art::Ptr<recob::Vertex>>&        vertexVec) const;
-    
-    void   getBestFlashTrackDist(const std::vector<art::Ptr<recob::OpFlash>>&, double, double, size_t&, double&) const;
-    double FlashTrackDistInZ(double flash, double start, double end) const;
-    void   getTrackVertexDCA(const TVector3& vertex, const TVector3& trackStart, TVector3& trackDir, double& doca, double& arcLen) const;
+    double scaledEdx(double x, int plane, bool isdata) const;
     
     /**
      *  @ brief FHICL parameters.
      */
-    std::string                fPFParticleModuleLabel;   ///< Producer of input PFParticles
     std::string                fTrackModuleLabel;        ///< Producer of input tracks
     std::string                fVertexModuleLabel;       ///< Producer of input vertices
     std::string                fOpFlashModuleLabel;      ///< Producer of flashes
-    
+    std::string                fCalorimetryModuleLabel;  ///< Producer of calorimetry module
+
     double                     fDistToEdgeX;             ///< fiducial volume - x
     double                     fDistToEdgeY;             ///< fiducial volume - y
     double                     fDistToEdgeZ;             ///< fiducial volume - z
     
-    double                     fFlashWidth;              ///< Cut on flash width
     double                     fBeamMin;                 ///< Cut on min beam time
     double                     fBeamMax;                 ///< Cut on max beam time
     double                     fPEThresh;                ///< Cut on PE threshold
+    double                     fTrk2FlashDist;           ///< Cut on track to flash distance
+    double                     fMinTrk2VtxDist;          ///< Minimum track to vertex distance
     double                     fMinTrackLen;             ///< Minimum track length
-    double                     fMaxTrackDoca;            ///< Maximum track to vertex doca
-    double                     fMaxTrackArcLen;          ///< Maximum track arclen to trk/vtx doca
+    double                     fMaxCosineAngle;          ///< Cut on cosine angle of two longest track
+    double                     fMaxCosy1stTrk;           ///< Maximum cosy of longtest track when mult>1
+    double                     fMinTrackLen2ndTrk;       ///< Minimum track length of the second longest track when mult>1
+    double                     fMaxCosySingle;           ///< Maximum cosy of the single track
+    double                     fMinTrackLenSingle;       ///< Minimum track length of single track
+    double                     fMindEdxRatioSingle;      ///< Minimum dEdx ratio of single track
+    double                     fMaxTrkLengthySingle;     ///< Maximum track length in y projection
+    double                     fMinStartdEdx1stTrk;      ///< Minimum dEdx of track start
+    double                     fMaxEnddEdx1stTrk;        ///< Maximum dEdx of track end
     bool                       fDoHists;                 ///< Fill histograms
-    
-    std::vector<TH1D*>         fTH1DVec;                 ///< histogram container
-    std::vector<TH2D*>         fTH2DVec;                 ///< 2D histogram container
+    int                        fDebug;                   ///< Print out debug information
+    TH1D*                      fNFlashPerEvent;          ///< number of flashes per event
+    TH1D*                      fFlashPE;                 ///< flash photoelectrons
+    TH1D*                      fFlashTime;               ///< flash timing
     
     art::EDProducer*           fMyProducerModule;        ///< The producer module driving us
     
@@ -123,7 +108,6 @@ private:
      */
     geo::GeometryCore const*            fGeometry;           ///< pointer to the Geometry service
     detinfo::DetectorProperties const*  fDetector;           ///< Pointer to the detector properties
-    detinfo::DetectorClocks const*      fClocks;             ///< Pointer to the clock services
     /// @}
 };
 
