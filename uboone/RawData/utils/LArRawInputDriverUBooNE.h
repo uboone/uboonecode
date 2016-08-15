@@ -177,7 +177,20 @@ namespace lris {
     double RO_NuMItriggerTime;
     double RO_EXTtriggerTime;
     double RO_RWMtriggerTime;
-    
+   
+    int RO_BNBtriggerFrame;
+    int RO_NuMItriggerFrame;
+    int RO_EXTtriggerFrame;
+    int RO_RWMtriggerFrame;
+    int RO_BNBtriggerSample;
+    int RO_NuMItriggerSample;
+    int RO_EXTtriggerSample;
+    int RO_RWMtriggerSample;
+    double RO_BNBtriggerTime;
+    double RO_NuMItriggerTime;
+    double RO_EXTtriggerTime;
+    double RO_RWMtriggerTime;	
+
 //    uint32_t RO_Gate1Frame;
 //    uint32_t RO_Gate1Sample;
 //    uint32_t RO_Gate2Frame;
@@ -225,6 +238,11 @@ namespace lris {
     uint32_t NumWords_crate7;
     uint32_t NumWords_crate8;
     uint32_t NumWords_crate9;
+
+    int N_trig_algos;
+    std::vector<std::string> algo_instance_name;
+    bool pass_algo[20];
+    bool pass_prescale[20];
 
     int event;
     TTree *ValidationTree;

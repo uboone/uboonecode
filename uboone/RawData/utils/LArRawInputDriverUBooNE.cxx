@@ -206,6 +206,19 @@ namespace lris {
     ValidationTree->Branch("RO_EXTtriggerTime",&RO_EXTtriggerTime,"RO_EXTtriggerTime/D");
     ValidationTree->Branch("RO_RWMtriggerTime",&RO_RWMtriggerTime,"RO_RWMtriggerTime/D");
 
+	ValidationTree->Branch("RO_LEDFlashTfriggerFrame",&RO_LEDFlashTfriggerFrame,"RO_LEDFlashTfriggerFrame/I");
+    ValidationTree->Branch("RO_LEDtriggerFrame",&RO_LEDtriggerFrame,"RO_LEDtriggerFrame/I");
+    ValidationTree->Branch("RO_PaddleTriggerFrame",&RO_PaddleTriggerFrame,"RO_PaddleTriggerFrame/I");
+    ValidationTree->Branch("RO_HVtriggerFrame",&RO_HVtriggerFrame,"RO_HVtriggerFrame/I");
+    ValidationTree->Branch("RO_LEDFlashTfriggerSample",&RO_LEDFlashTfriggerSample,"RO_LEDFlashTfriggerSample/I");
+    ValidationTree->Branch("RO_LEDtriggerSample",&RO_LEDtriggerSample,"RO_LEDtriggerSample/I");
+    ValidationTree->Branch("RO_PaddleTriggerSample",&RO_PaddleTriggerSample,"RO_PaddleTriggerSample/I");
+    ValidationTree->Branch("RO_HVtriggerSample",&RO_HVtriggerSample,"RO_HVtriggerSample/I");
+    ValidationTree->Branch("RO_LEDFlashTfriggerTime",&RO_LEDFlashTfriggerTime,"RO_LEDFlashTfriggerTime/D");
+    ValidationTree->Branch("RO_LEDtriggerTime",&RO_LEDtriggerTime,"RO_LEDtriggerTime/D");
+    ValidationTree->Branch("RO_PaddleTriggerTime",&RO_PaddleTriggerTime,"RO_PaddleTriggerTime/D");
+    ValidationTree->Branch("RO_HVtriggerTime",&RO_HVtriggerTime,"RO_HVtriggerTime/D");
+
 	// These guys currently aren't used.
     //ValidationTree->Branch("N_discriminators",N_discriminators,"N_discriminators[40]/I");
     //ValidationTree->Branch("discriminatorSample",discriminatorSample,"discriminatorSample[40][100]/I");
@@ -235,8 +248,14 @@ namespace lris {
     ValidationTree->Branch("NumWords_crate8",&NumWords_crate8,"NumWords_crate8/I");
     ValidationTree->Branch("NumWords_crate9",&NumWords_crate9,"NumWords_crate9/I");
 
-    event = 0;
+	ValidationTree->Branch("N_trig_algos", &N_trig_algos, "N_trig_algos/I");
+	ValidationTree->Branch("algo_instance_name", &algo_instance_name);
+	ValidationTree->Branch("pass_algo", &pass_algo, "pass_algo[20]/O");
+	ValidationTree->Branch("pass_prescale", &pass_prescale, "pass_prescale[20]/O");
 
+	algo_instance_name.clear();
+	algo_instance_name.resize(20);
+    event = 0;
   }
 
 
@@ -964,7 +983,7 @@ namespace lris {
           std::cerr << "ERROR!" << std::endl;
           std::cerr << "PMT card header trigger frames not within one sample of each other!!" << std::endl;
           throw std::exception();
-        }
+	  }
 
 
 //        // check if we have swizzled the trigger data
@@ -992,7 +1011,7 @@ namespace lris {
 //          FEM6triggerSample = sample;
 //          FEM6triggerTime = timeService->OpticalClock().Time( sample, frame );
 //        }
-	//        int card_number = card_data.getModule();
+	//
 
         // nathaniel's version of datatypes:
         for(auto const& channel_data : card_data.getChannels() ) { // auto here is pmt_crate_data_t::card_t::card_channel-type
@@ -1003,7 +1022,8 @@ namespace lris {
 	  // }
 
           int channel_number = channel_data.getChannelNumber();
-
+		  int card_number = card_data.getModule();
+		  
           //now get the windows
           auto const& windows = channel_data.getWindows();  // auto here is std::vector<ub_PMT_WindowData_v6>
           for(const auto& window: windows ) {               // auto here is ub_PMT_WindowData_v6
@@ -1037,15 +1057,20 @@ namespace lris {
             rd.reserve(win_data_size); // Don't know if this compiles, but it is more efficient. push_back is terrible without it.
 
 	    //std::cout << " into ReadoutCH=" << data_product_ch_num << " category=" << opdet::UBOpChannelEnumName( ch_category ) << std::endl;
-	    short adc_max=0;
-	    short adc_max_sample=0;
+	    short adc_edge=-1;
+		short adc_dif = 0;
+	    short adc_edge_sample=0;
             for(ub_RawData::const_iterator it = window_data.begin(); it!= window_data.end(); it++){
               rd.push_back(*it & 0xfff);
-              if(adc_max < rd.back()){
-                adc_max_sample = rd.size();
-                adc_max = rd.back();
-              }
-
+			  if(adc_edge == -1){
+				  adc_edge_sample = rd.size();
+				  adc_edge = rd.back();
+				  dif = 0;
+			  }
+              else if(rd.back() - adc_edge > dif){
+				  adc_edge_sample = rd.size();
+				  adc_edge = rd.back();
+			  }
             }
             // fill OpDetWaveform time
             double OpDetWaveForm_time = rd.TimeStamp();
@@ -1054,38 +1079,78 @@ namespace lris {
               N_PMT_waveforms += 1;
             }
             // Saving trigger readout stream variables to output file
-            if(adc_max>2150) { // logic pulses have high ADC values
+            if(adc_edge>2150) { // logic pulses have high ADC values
 
-              if (channel_number == 39){
+              if (channel_number == 39 && card_number == 4){
 //                std::cout << "Found RWM signal!" << std::endl;
-//                std::cout << "RWM signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) << ", " <<  window_header.getSample() + adc_max_sample << std::endl;
+//                std::cout << "RWM signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) << ", " <<  window_header.getSample() + adc_edge_sample << std::endl;
                 RO_RWMtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
-                RO_RWMtriggerSample = window_header.getSample() + adc_max_sample;
+                RO_RWMtriggerSample = window_header.getSample() + adc_edge_sample;
                 RO_RWMtriggerTime = timeService->OpticalClock().Time( RO_RWMtriggerSample, RO_RWMtriggerFrame);
 //                std::cout << "window size = " << win_data_size << std::endl;
               }
-              else if (channel_number == 38){
+              else if (channel_number == 38 && card_number == 4){
 //                std::cout << "Found STROBE signal!" << std::endl;
-//                std::cout << "STROBE signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_max_sample << std::endl;
+//                std::cout << "STROBE signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_edge_sample << std::endl;
                 RO_EXTtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
-                RO_EXTtriggerSample = window_header.getSample() + adc_max_sample;
+                RO_EXTtriggerSample = window_header.getSample() + adc_edge_sample;
                 RO_EXTtriggerTime = timeService->OpticalClock().Time( RO_EXTtriggerSample, RO_EXTtriggerFrame);
 //                std::cout << "window size = " << win_data_size << std::endl;
               }
-              else if (channel_number == 37){
+              else if (channel_number == 37 && card_number == 4){
 //                std::cout << "Found NuMI signal!" << std::endl;
 //                std::cout << "NuMI signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() << std::endl;
                 RO_NuMItriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
-                RO_NuMItriggerSample = window_header.getSample() + adc_max_sample;
+                RO_NuMItriggerSample = window_header.getSample() + adc_edge_sample;
                 RO_NuMItriggerTime = timeService->OpticalClock().Time( RO_NuMItriggerSample, RO_NuMItriggerFrame);
 //                std::cout << "window size = " << win_data_size << std::endl;
               }
-              else if (channel_number == 36){
+              else if (channel_number == 36 && card_number == 4){
 //                std::cout << "Found BNB signal!" << std::endl;
-//                std::cout << "BNB signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_max_sample << std::endl;
+//                std::cout << "BNB signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_edge_sample << std::endl;
                 RO_BNBtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
-                RO_BNBtriggerSample = window_header.getSample() + adc_max_sample;
+                RO_BNBtriggerSample = window_header.getSample() + adc_edge_sample;
                 RO_BNBtriggerTime = timeService->OpticalClock().Time( RO_BNBtriggerSample, RO_BNBtriggerFrame);
+//                std::cout << "window size = " << win_data_size << std::endl;
+              }
+			  if (channel_number == 39 && card_number == 5){
+//                std::cout << "Found RWM signal!" << std::endl;
+//                std::cout << "RWM signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) << ", " <<  window_header.getSample() + adc_edge_sample << std::endl;
+                RO_LEDFlashTriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
+                RO_LEDFlashTriggerSample = window_header.getSample() + adc_edge_sample;
+                RO_LEDFlashTriggerTime = timeService->OpticalClock().Time( RO_LEDFlashTriggerSample, RO_LEDFlashTriggerFrame);
+//                std::cout << "window size = " << win_data_size << std::endl;
+              }
+              else if (channel_number == 38 && card_number == 5){
+//                std::cout << "Found STROBE signal!" << std::endl;
+//                std::cout << "STROBE signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_edge_sample << std::endl;
+                RO_HVtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
+                RO_HVtriggerSample = window_header.getSample() + adc_edge_sample;
+                RO_HVtriggerTime = timeService->OpticalClock().Time( RO_HVtriggerSample, RO_HVtriggerFrame);
+//                std::cout << "window size = " << win_data_size << std::endl;
+              }
+              else if (channel_number == 37 && card_number == 5){
+//                std::cout << "Found NuMI signal!" << std::endl;
+//                std::cout << "NuMI signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() << std::endl;
+                RO_PaddleTriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
+                RO_PaddleTriggerSample = window_header.getSample() + adc_edge_sample;
+                RO_PaddleTriggerTime = timeService->OpticalClock().Time( RO_PaddleTriggerSample, RO_PaddleTriggerFrame);
+//                std::cout << "window size = " << win_data_size << std::endl;
+              }
+              else if (channel_number == 36 && card_number == 5){
+//                std::cout << "Found BNB signal!" << std::endl;
+//                std::cout << "BNB signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_edge_sample << std::endl;
+                RO_LEDtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
+                RO_LEDtriggerSample = window_header.getSample() + adc_edge_sample;
+                RO_LEDtriggerTime = timeService->OpticalClock().Time( RO_LEDtriggerSample, RO_LEDtriggerFrame);
+//                std::cout << "window size = " << win_data_size << std::endl;
+              }
+			  else if (channel_number == -999 && card_number == -999){
+//                std::cout << "Found BNB signal!" << std::endl;
+//                std::cout << "BNB signal at frame, sample " << RollOver(card_data.getFrame(),window_header.getFrame(),3) <<  ", " << window_header.getSample() + adc_edge_sample << std::endl;
+                RO_NuMIRWMtriggerFrame = RollOver(card_data.getFrame(),window_header.getFrame(),3);
+                RO_NuMIRWMtriggerSample = window_header.getSample() + adc_edge_sample;
+                RO_NuMIRWMtriggerTime = timeService->OpticalClock().Time( RO_NuMIRWMtriggerSample, RO_NuMIRWMtriggerFrame);
 //                std::cout << "window size = " << win_data_size << std::endl;
               }
 //              else if (channel_number == 46){
@@ -1290,10 +1355,16 @@ namespace lris {
       _trigger_beam_window_time *= -1.;
     }
 
-    for (unsigned int i(0); i < swTrig_vect.size(); ++i){ // loop through swtrigger algos filling info
-      ub_FEMBeamTriggerOutput swTrig = swTrig_vect.at(i); // fetch algorithm
 
-      trigInfo.addAlgorithm(swTrig.algo_instance_name, // add algorithm to art data product
+	N_trig_algos = 0;
+    for (unsigned int i(0); i < swTrig_vect.size(); ++i){ // loop through swtrigger algos filling info
+		ub_FEMBeamTriggerOutput swTrig = swTrig_vect.at(i); // fetch algorithm
+
+		algo_instance_name[N_trig_algos] = swTrig.algo_instance_name;
+		pass_algo[N_trig_algos] = swTrig.pass_algo;
+		pass_prescale[N_trig_algos] = swTrig.pass_prescale;
+
+      	trigInfo.addAlgorithm(swTrig.algo_instance_name, // add algorithm to art data product
                             swTrig.pass_algo,
                             swTrig.pass_prescale,
                             swTrig.amplitude,
@@ -1301,6 +1372,8 @@ namespace lris {
                             swTrig.time,
                             _trigger_beam_window_time + swTrig.time * opt_clock.TickPeriod(),
                             swTrig.prescale_weight);
+
+		N_trig_algos++;
     } // end loop over swtrigger algos
   }
 
