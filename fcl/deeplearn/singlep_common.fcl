@@ -174,15 +174,4 @@ physics.analyzers.opreco.DataLookUpMap.opflash: ["opflash","opflashSat"]
 physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSat"]
 physics.analyzers.opreco.AssociationLookUpMap.opflash: ["opflash","opflashSat"]
 
-outputs:
-{
- out1:
- {
-   module_type: RootOutput
-   fileName:    "genie_gen.root" #default file name, can override from command line with -o or --output
-   dataTier:    "generated"
-   compressionLevel: 1
-   outputCommands: ["keep *_*_*_*","drop raw
- }
-}
 
