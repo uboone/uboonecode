@@ -10,6 +10,7 @@ swtrigger_bnb:
     NumberOfChannels: 32
     FEMslot:          5
     MinReadoutTicks:  1499
+    Verbosity: 0
 
     drop_event : true
     swtrg_algonames : ["BNB"]
@@ -22,7 +23,7 @@ swtrigger_bnb:
       Discr0precount : 1
       Discr0threshold : 5
       Discr3WindowSize : 124
-      Discr3WindowStart : 187
+      Discr3WindowStart : 186
       Discr3deadtime : 6
       Discr3delay : 4
       Discr3threshold : 10
@@ -32,8 +33,8 @@ swtrigger_bnb:
       TriggerThresMult : 1
       TriggerThresPHMAX : 130
       TriggerWindowSize : 120
-      TriggerWindowStart : 191
-      Verbosity : 3
+      TriggerWindowStart : 190
+      Verbosity : 0
     }
 }
 
