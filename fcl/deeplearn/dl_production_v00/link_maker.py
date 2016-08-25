@@ -14,9 +14,9 @@ UNIQUE_NAME = XMLFILE.replace('.xml','')
 UNIQUE_NAME = UNIQUE_NAME[UNIQUE_NAME.rfind('/')+1:len(UNIQUE_NAME)] + '/'
 OUTPUT_DIR  = '/uboone/data/users/kterao/dl_production_symlink_v00/%s' % UNIQUE_NAME
 print 'SymLink directory:\033[95m',UNIQUE_NAME,'\033[00m'
-if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
-    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
-    sys.exit(1)
+#if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
+#    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
+#    sys.exit(1)
 if not os.path.isdir(OUTPUT_DIR):
     os.system('mkdir %s; chmod -R 775 %s' % (OUTPUT_DIR,OUTPUT_DIR))
 
@@ -64,7 +64,7 @@ for d in jobdirs:
     lite_files = [x for x in os.listdir(jobdir) if ( ( (x.startswith('larlite') and x.endswith('.root')) or
                                                        (x.startswith('ana_hist'))
                                                        ) and
-                                                     os.path.getsize('%s/%s' % (jobdir,x)) > 1000000 )
+                                                     os.path.getsize('%s/%s' % (jobdir,x)) > 1000 )
                   ]
     for f in lite_files:
 
@@ -120,11 +120,12 @@ for flavor,fmap in lite_files_map.iteritems():
             target_link = '%s/anatree_%04d.root' % (OUTPUT_DIR,jobid)
         else:
             target_link = '%s/larlite_%s_%04d.root' % (OUTPUT_DIR,flavor,jobid)
-        
-        cmd = 'ln -s %s %s' % (target_fname,target_link)
-        #print cmd
-        #break
-        os.system(cmd)
+
+        if not os.path.isfile(target_link):
+            cmd = 'ln -s %s %s' % (target_fname,target_link)
+            #print cmd
+            #break
+            os.system(cmd)
         ctr -=1
         sys.stdout.write('\033[95mProcessing: %-10s\033[00m ... Remaining: %-3d/%-3d\r' % (flavor,ctr,len(success_jobs)))
         sys.stdout.flush()
