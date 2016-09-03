@@ -1,5 +1,5 @@
 #include "services_microboone.fcl"
-#include "genie_microboone.fcl"
+#include "singles_microboone.fcl"
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "detsimmodules_microboone.fcl"
@@ -17,7 +17,7 @@
 #include "litemc_opreco.fcl"
 #include "litemc_opdigit.fcl"
 
-process_name: BNBNuLArLite
+process_name: SinglePLArLite
 
 services:
 {
@@ -73,12 +73,12 @@ physics:
 
  producers:
  {
-   generator: @local::microboone_genie_uniform_flux_cc
+   generator: @local::microboone_singlep
    largeant: @local::microboone_largeant
    mcreco:   @local::standard_mcreco
-   optdigitizer:   @local::microboone_optical_adc_sim
-   optfem:         @local::microboone_optical_fem_sim
-   triggersim:     @local::ubtrigger_standard
+   optdigitizer:   @local::microboone_optical_adc_sim_singlep
+   optfem:         @local::microboone_optical_fem_sim_singlep
+   triggersim:     @local::ubtrigger_singlep
    pmtreadout:     @local::microboone_optical_dram_readout_sim
    daq:            @local::microboone_simwire
    
@@ -109,15 +109,14 @@ physics:
    opreco:  @local::litemc_opreco
  }
 
- filters: { swtrigger: @local::swtrigger_bnb }
+ filters: { swtrigger: @local::swtrigger_extbnb }
 
  simulate: [ rns, generator, 
              largeant, mcreco, 
-             optdigitizer, optfem, triggersim, pmtreadout, swtrigger, daq, 
-             digitfilter, saturation, 
+             optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
+             daq, digitfilter, saturation, 
              ophit, opflash, ophitSatBeam, ophitSatCosmic, opflashSatBeam, opflashSatCosmic,
-             sflashSatBeam, sflashSatCosmic, 
-             caldata]
+             sflashSatBeam, sflashSatCosmic, caldata]
 
  ana: [ mcinfo, simch, wire, opdigit, opreco ]
  
@@ -129,22 +128,33 @@ physics:
  end_paths:     [stream1,ana]  
 }
 
-physics.producers.generator: @local::microboone_genie_simple
-physics.producers.generator.GlobalTimeOffset: 3125.
-physics.producers.generator.RandomTimeOffset: 1600.
-#physics.producers.generator.TopVolume: "volCryostat"
-physics.producers.generator.TopVolume: "volTPCActive"
-#physics.producers.generator.BeamName: "booster"
-#physics.producers.generator.FluxCopyMethod: "IFDH"
-#physics.producers.generator.MaxFluxFileMB:  2000
-
-#physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"]
+physics.producers.generator.PDG:    [ 11, 11, 11, 11 ]            # eminus
+physics.producers.generator.P0:     [ 0.505, 0.505, 0.505, 0.505 ]
+physics.producers.generator.SigmaP: [ 0.495, 0.495, 0.495, 0.495 ]
+physics.producers.generator.PosDist: 0             # Flat position dist.
+physics.producers.generator.X0: [ 128.0, 128.0, 128.0, 128.0 ]
+physics.producers.generator.Y0: [ 0.0, 0.0, 0.0, 0.0 ]
+physics.producers.generator.Z0: [ 518.5, 518.5, 518.5, 518.5 ]
+physics.producers.generator.T0: [ -1000000, -500000, 800, 1000000 ]
+physics.producers.generator.SigmaX: [ 98.0, 98.0, 98.0, 98.0 ]      # x = (0, 256)
+physics.producers.generator.SigmaY: [ 86.5, 86.5, 86.5, 86.5 ]      # y = (-116.5, 116.5)
+physics.producers.generator.SigmaZ: [ 488.5, 488.5, 488.5, 488.5 ]      # z = (0, 1037)
+physics.producers.generator.SigmaT: [ 100.0, 100.0, 800, 100.0  ]      # In time
+physics.producers.generator.PDist: 0               # Flat momentum dist. (0.1-2.0 GeV)
+physics.producers.generator.AngleDist: 0           # Flat angle dist.
+physics.producers.generator.Theta0XZ: [ 0., 0., 0., 0. ]       # y-azimuth
+physics.producers.generator.Theta0YZ: [ 0., 0., 0., 0. ]       # y-latitude
+physics.producers.generator.SigmaThetaXZ: [ 180., 180., 180., 180. ] # Quasi-isotropic
+physics.producers.generator.SigmaThetaYZ: [ 90., 90., 90., 90. ]
 
 physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
                                                       1000010020,1000010030,1000020030,1000020040]
 
+physics.producers.triggersim.ExtTrigger: [-3468.75]
+physics.producers.triggersim.Mask:       [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2]
+#physics.producers.triggersim.DebugMode: true
+
 physics.producers.digitfilter.TruncateTicks: true
-#physics.producers.digitfilter.TruncateTicks: false
 #physics.producers.digitfilter.WindowSize:    9600
 #physics.producers.digitfilter.NumTicksToDropFront:  0
 
@@ -178,15 +188,4 @@ physics.analyzers.opreco.DataLookUpMap.opflash: ["opflash","opflashSatBeam","opf
 
 physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSat","ophitSatBeam","ophitSatCosmic"]
 physics.analyzers.opreco.AssociationLookUpMap.opflash: ["opflash","opflashSatBeam","opflashSatCosmic","sflashBeam","sflashCosmic"]
-
-outputs:
-{
- out1:
- {
-   module_type: RootOutput
-   fileName:    "genie_gen.root" #default file name, can override from command line with -o or --output
-   dataTier:    "generated"
-   compressionLevel: 1
- }
-}
 
