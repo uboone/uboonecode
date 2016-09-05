@@ -2,7 +2,7 @@
 
   gStyle->SetOptStat(0);
   
-  TFile input_file("~wketchum/larsoft_development/PatternMatching/ac_trakana_output_chain_2.root");
+  TFile input_file("~wketchum/larsoft_development/PatternMatching/ac_trakana_output_chain.root");
   TTree *anatree;
   input_file.GetObject("ac_trkana_tree",anatree);
 
@@ -225,8 +225,13 @@
   h_start_z_trg_fail->DrawNormalized("same");
   
   leg_startz_trg = new TLegend(0.55,0.7,0.85,0.85);
+<<<<<<< HEAD
   leg_startz_trg->AddEntry("h_start_z_trg_pass","match > 85%, #DeltaX > 240","l");
   leg_startz_trg->AddEntry("h_start_z_trg_fail","match > 85%, #DeltaX < 240","l");
+=======
+  leg_startz_trg->AddEntry("h_start_z_trg_pass","match > 85%, #DeltaX > 210","l");
+  leg_startz_trg->AddEntry("h_start_z_trg_fail","match > 85%, #DeltaX < 210","l");
+>>>>>>> b5fe65744c50c09791f040b22d4eba6b470b2334
   leg_startz_trg->Draw();
   /*
   TCanvas c_endz("c_endz");
