@@ -25,6 +25,8 @@
 
 #include "larcore/Geometry/Geometry.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "uboone/PatternFilter/PMAlgs/AnodeCathodePMAlg.h"
 
 #include "TTree.h"
@@ -140,11 +142,12 @@ void pm::AnodeCathodeTrackAna::analyze(art::Event const & e)
 
 void pm::AnodeCathodeTrackAna::reconfigure(fhicl::ParameterSet const & p)
 {
-  auto const* geo     = lar::providerFrom<geo::Geometry>();  
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();  
+  auto const* geo      = lar::providerFrom<geo::Geometry>();  
+  auto const* detprop  = lar::providerFrom<detinfo::DetectorPropertiesService>();  
+  auto const& chanStatus = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
   fHitLabel = art::InputTag( p.get<std::string>("HitLabel") );
   
-  fAlg.Configure(p.get<fhicl::ParameterSet>("AnodeCathodPMAlg"),*geo,*detprop);
+  fAlg.Configure(p.get<fhicl::ParameterSet>("AnodeCathodPMAlg"),*geo,*detprop,chanStatus);
 
   fTrackLabels = p.get< std::vector<art::InputTag> >("TrackLabels");
   fTrackMinDeltaX = p.get<float>("TrackMinDeltaX");

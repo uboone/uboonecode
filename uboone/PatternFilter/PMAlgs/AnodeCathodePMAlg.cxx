@@ -14,6 +14,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/GeometryCore.h"
 #include "lardata/DetectorInfo/DetectorProperties.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "lardataobj/RecoBase/Hit.h"
 
 #include <math.h>
@@ -24,9 +25,10 @@ pm::AnodeCathodePMAlg::AnodeCathodePMAlg()
 {
 }
 
-void pm::AnodeCathodePMAlg::Configure(fhicl::ParameterSet         const& p,
-				      geo::GeometryCore           const& geo,
-				      detinfo::DetectorProperties const& detp)
+void pm::AnodeCathodePMAlg::Configure(fhicl::ParameterSet           const& p,
+				      geo::GeometryCore             const& geo,
+				      detinfo::DetectorProperties   const& detp,
+				      lariov::ChannelStatusProvider const& chstatus)
 {
 
   //grab the wire information
@@ -86,7 +88,7 @@ void pm::AnodeCathodePMAlg::Configure(fhicl::ParameterSet         const& p,
   
   fPatterns.reserve(fNbinsWires*fNbinsWires*fNbinsPattern);
 
-  MakePatterns();
+  MakePatterns(geo,chstatus);
   
 }
 
@@ -115,7 +117,8 @@ unsigned int pm::AnodeCathodePMAlg::GetBinWire(float wire){
   return (wire - fStartWire.Wire)/fWiresPerBin;
 }
 
-void pm::AnodeCathodePMAlg::MakePatterns(){
+void pm::AnodeCathodePMAlg::MakePatterns(geo::GeometryCore             const& geo,
+					 lariov::ChannelStatusProvider const& chstatus){
 
   float wire_a,wire_c;
   float slope, intercept, time, time_start, time_end;
@@ -132,6 +135,11 @@ void pm::AnodeCathodePMAlg::MakePatterns(){
 
       fPatterns.push_back(Pattern_t());
       for(time=time_start; time<=time_end; time += 0.1*fTimeTicksPerBin){
+
+	//ignore the bad wires
+	geo::WireID nearest_wire(fPlaneID,std::round(wire_a+time*slope-intercept));
+	if(chstatus.IsBad(geo.PlaneWireToChannel(nearest_wire)))
+	  continue;
 	
 	fPatterns.back().emplace(GetBinWire(wire_a+time*slope-intercept),GetBinTime(time));
       }

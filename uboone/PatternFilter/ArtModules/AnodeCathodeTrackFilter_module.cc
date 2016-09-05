@@ -34,6 +34,8 @@
 
 #include "larcore/Geometry/Geometry.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "uboone/PatternFilter/PMAlgs/AnodeCathodePMAlg.h"
 
 namespace pm {
@@ -94,8 +96,9 @@ bool pm::AnodeCathodeTrackFilter::filter(art::Event & e)
 void pm::AnodeCathodeTrackFilter::reconfigure(fhicl::ParameterSet const & p)
 {
 
-  auto const* geo     = lar::providerFrom<geo::Geometry>();  
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();  
+  auto const* geo      = lar::providerFrom<geo::Geometry>();  
+  auto const* detprop  = lar::providerFrom<detinfo::DetectorPropertiesService>();  
+  auto const& chanStatus = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
   fHitLabel = art::InputTag( p.get<std::string>("HitLabel") );
   fFractionMatchingThreshold = p.get<float>("FractionMatchingThreshold");
 
@@ -112,7 +115,7 @@ void pm::AnodeCathodeTrackFilter::reconfigure(fhicl::ParameterSet const & p)
 	fFractionMatchingThreshold = 0.0;
     }
   
-  fAlg.Configure(p.get<fhicl::ParameterSet>("AnodeCathodPMAlg"),*geo,*detprop);
+  fAlg.Configure(p.get<fhicl::ParameterSet>("AnodeCathodPMAlg"),*geo,*detprop,chanStatus);
 
   fVerbose = p.get<bool>("Verbose",false);
 }

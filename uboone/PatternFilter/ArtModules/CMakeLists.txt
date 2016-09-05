@@ -5,6 +5,8 @@ art_make(
 			uboone_PatternFilter_PMAlgs
 			larcore_Geometry
 			lardata_DetectorInfo
+			larevt_CalibrationDBI_IOVData
+			larevt_CalibrationDBI_Providers
 			lardataobj_RecoBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_IO_ROOT}

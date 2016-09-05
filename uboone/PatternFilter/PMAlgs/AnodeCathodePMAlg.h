@@ -20,6 +20,7 @@
 namespace pm      { class AnodeCathodePMAlg; }
 namespace geo     { class GeometryCore; }
 namespace detinfo { class DetectorProperties; }
+namespace lariov  { class ChannelStatusProvider; }
 namespace fhicl   { class ParameterSet; }
 namespace recob   { class Hit; }
 
@@ -31,9 +32,10 @@ class pm::AnodeCathodePMAlg{
  public:
   AnodeCathodePMAlg();
   
-  void Configure(fhicl::ParameterSet         const&,
-		 geo::GeometryCore           const&,
-		 detinfo::DetectorProperties const&);
+  void Configure(fhicl::ParameterSet           const&,
+		 geo::GeometryCore             const&,
+		 detinfo::DetectorProperties   const&,
+		 lariov::ChannelStatusProvider const& );
   
   void RunPatternMatching(std::vector<recob::Hit> const&,float &);
   
@@ -45,7 +47,7 @@ class pm::AnodeCathodePMAlg{
   unsigned int  GetBinWire(geo::WireID wid)
   { return GetBinWire((float)(wid.Wire)); }
 
-  void    MakePatterns();
+  void    MakePatterns(geo::GeometryCore const&, lariov::ChannelStatusProvider const&);
   void    FillHitmap( std::vector<recob::Hit> const&);
   float   GetFractionMatched();
   
