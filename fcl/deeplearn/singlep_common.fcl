@@ -64,7 +64,7 @@ source:
   module_type: EmptyEvent
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
   maxEvents:   10          # Number of events to create
-  firstRun:    1           # Run number to use for this file
+  firstRun:    5000        # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
 
@@ -114,11 +114,14 @@ physics:
  simulate: [ rns, generator, 
              largeant, mcreco, 
              optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
-             daq, digitfilter, saturation, 
+             #daq, digitfilter, caldata,
+             saturation, 
              ophit, opflash, ophitSatBeam, ophitSatCosmic, opflashSatBeam, opflashSatCosmic,
-             sflashSatBeam, sflashSatCosmic, caldata]
+             sflashSatBeam, sflashSatCosmic]
 
- ana: [ mcinfo, simch, wire, opdigit, opreco ]
+ ana: [ mcinfo, 
+        #simch, wire, 
+        opdigit, opreco ]
  
  #stream1:  [ out1 ]
  stream1:  []

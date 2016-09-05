@@ -8,7 +8,7 @@ swtrigger_bnb:
     OpDataModule:     "pmtreadout"
     OpFlashModule:    "opflashSat"
     NumberOfChannels: 32
-    FEMslot:          5
+    FEMslot:          4
     MinReadoutTicks:  1499
     Verbosity: 0
 
@@ -46,7 +46,7 @@ swtrigger_extbnb:
     OpDataModule:     "pmtreadout"
     OpFlashModule:    "opflashSat"
     NumberOfChannels: 32
-    FEMslot:          5
+    FEMslot:          4
     MinReadoutTicks:  1499
 
     drop_event : true
