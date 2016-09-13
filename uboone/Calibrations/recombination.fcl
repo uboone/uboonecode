@@ -1,0 +1,8 @@
+BEGIN_PROLOG
+Recombination: {
+ module_type   : "Recombination"  
+ TrackProducer : "trackkalmanhit"
+ HitProducer   : "gaushit"
+ CaloProducer  : "trackkalmanhitcalo"
+}
+END_PROLOG
