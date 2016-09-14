@@ -33,10 +33,10 @@
 #include "larcore/CoreUtils/ServiceUtil.h" // lar::providerFrom<>()
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 // RawDigits
-//#include "RawData/TriggerData.h"
 #include "lardataobj/RawData/raw.h" // raw::Uncompress()
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RawData/OpDetWaveform.h"
+#include "lardataobj/RawData/TriggerData.h"
 // Optical Channel Maps
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
@@ -184,7 +184,7 @@ namespace zmqds {
     fSubRun = (int)evt.subRun();
     fEvent = (int)evt.event();
 
-    //GetTrigger(evt);
+    GetTrigger(evt);
 
     if ( fWriteTPCdata )
       GetRawDigits(evt);
@@ -208,7 +208,7 @@ namespace zmqds {
 
   void RawDigitWriter::GetTrigger( const art::Event& evt) {
    
-    ::art::ServiceHandle< util::TimeService > timeService;
+    //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
     art::Handle<std::vector<raw::Trigger> > trig_handle;
 
     //evt.getByLabel(fTrigModuleName, trig_handle);
