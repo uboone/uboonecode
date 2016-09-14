@@ -25,7 +25,7 @@ services:
   SimpleMemoryCheck:       { ignoreTotal: 1 } # default is one
   RandomNumberGenerator:   {} #ART native random number generator
   message:                 @local::microboone_message_services_prod_debug
-  FileCatalogMetadata:     @local::art_file_catalog_mc
+  FileCatalogMetadata:     @local::art_file_catalog_data
   PhotonVisibilityService: @local::microboone_photonvisibilityservice
                            @table::microboone_services_reco
 }
@@ -36,6 +36,7 @@ source:
 {
   module_type: RootInput
   maxEvents:  10        # Number of events to create
+  saveMemoryObjectThreshold: 0
 }
 
 # Define and configure some modules to do work on each event.
@@ -55,7 +56,14 @@ physics:
   digitfilter:         @local::microboone_noisefilter
   
   ### flash finders
-  opflash:             @local::microboone_opflash
+  ophit            : @local::microboone_ophit_beam_highgain
+  ophitLow         : @local::microboone_ophit_beam_lowgain
+  ophitCosmic      : @local::microboone_ophit_cosmic_highgain
+  ophitCosmicLow   : @local::microboone_ophit_cosmic_lowgain
+  opflash          : @local::microboone_opflash_beam_highgain
+  opflashLow       : @local::microboone_opflash_beam_lowgain
+  opflashCosmic    : @local::microboone_opflash_cosmic_highgain
+  opflashCosmicLow : @local::microboone_opflash_cosmic_lowgain
 
   ### calwire producers
   caldata:             @local::microboone_calroi
@@ -85,12 +93,19 @@ physics:
  #filters reject all following items.  see lines starting physics.producers below
  reco: [ rns,
          digitfilter,
+         ophit,
+         ophitLow,
+         ophitCosmic,
+         ophitCosmicLow,
          opflash,
+         opflashLow,
+         opflashCosmic,
+         opflashCosmicLow,
          caldata,
-	     calWireInvert,
+         calWireInvert,
          gaushit,
-	     invertedHits,
-	     cchit,
+         invertedHits,
+         cchit,
          fuzzycluster, fuzzyclustermerger, linecluster, cluster3d,
          cctrack,
          pandoraCosmic,
@@ -121,6 +136,7 @@ outputs:
    sam_ignore:  true
    dataTier:    "reconstructed-2d"
    compressionLevel: 1
+   saveMemoryObjectThreshold: 0
  }
 }
 
@@ -133,11 +149,6 @@ outputs:
 #physics.producers.digitfilter.TruncMeanFraction:                0.1
 #physics.producers.digitfilter.NumWiresToGroup:                  [48, 48, 96]
 
-physics.producers.opflash.InputModule:                          "optreadout"
-physics.producers.opflash.GenModule:                            "generator"
-physics.producers.opflash.InputLabels:                        [ "OpdetBeamHighGain",   "OpdetBeamLowGain",
-                                                                "OpdetCosmicHighGain", "OpdetCosmicLowGain"]
-								
 physics.producers.caldata.DigitModuleLabel:                     "digitfilter"
 physics.producers.caldata.MaxAllowedChannelStatus:              1
 

@@ -1,31 +1,32 @@
 art_make( BASENAME_ONLY
           LIBRARY_NAME CalData
           LIB_LIBRARIES 
-			RawData
-                        RecoBase
-	                Utilities
+			lardataobj_RawData
+                        lardataobj_RecoBase
+	                lardata_Utilities
 	                ${FHICLCPP}
 			${CETLIB}
 			${ROOT_BASIC_LIB_LIST}
-	  MODULE_LIBRARIES Geometry
-  	  		CalData
-	  		Geometry_service
-	                Utilities
-			Filters
-			RawData
-			CalibrationDBI_IOVData
-			CalibrationDBI_Providers
-			RecoBase
-			RecoBaseArt
+	  MODULE_LIBRARIES larcore_Geometry
+	                CalData
+  	  		NoiseFilterAlgs
+	  		larcore_Geometry_Geometry_service
+	                lardata_Utilities
+			larevt_Filters
+			lardataobj_RawData
+			larevt_CalibrationDBI_IOVData
+			larevt_CalibrationDBI_Providers
+			lardataobj_RecoBase
+			lardata_RecoBaseArt
 			SignalShapingServiceMicroBooNE_service
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			${ART_PERSISTENCY_COMMON}
-			${ART_PERSISTENCY_PROVENANCE}
-			${ART_UTILITIES}
+			art_Persistency_Common canvas_Persistency_Common
+			art_Persistency_Provenance canvas_Persistency_Provenance
+			art_Utilities canvas_Utilities
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
@@ -37,7 +38,8 @@ art_make( BASENAME_ONLY
 			${ROOT_BASIC_LIB_LIST}
         )
 
+add_subdirectory(NoiseFilterAlgs)
+
 install_headers()
 install_fhicl()
 install_source()
-

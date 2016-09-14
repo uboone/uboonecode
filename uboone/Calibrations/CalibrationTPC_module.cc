@@ -40,10 +40,10 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h" 
 
-#include "Utilities/LArFFT.h"
-#include "RawData/RawDigit.h"
-#include "Geometry/Geometry.h"
-#include "RecoBase/Wire.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "lardataobj/RawData/RawDigit.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardataobj/RecoBase/Wire.h"
 #include "uboone/CalData/ROIAlg.h"
 
 #include "CalibrationTPC_Algs.h"

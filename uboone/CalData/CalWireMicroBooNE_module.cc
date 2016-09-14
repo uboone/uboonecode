@@ -28,24 +28,25 @@
 #include "art/Framework/Core/EDProducer.h"
 #include "art/Framework/Principal/Event.h" 
 #include "art/Framework/Principal/Handle.h" 
-#include "art/Persistency/Common/Ptr.h" 
-#include "art/Persistency/Common/Assns.h" 
+#include "canvas/Persistency/Common/Ptr.h" 
+#include "canvas/Persistency/Common/Assns.h" 
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Framework/Services/Optional/TFileService.h"
 
 // LArSoft libraries
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "Geometry/Geometry.h"
-#include "Filters/ChannelFilter.h"
-#include "RawData/RawDigit.h"
-#include "RawData/raw.h"
-#include "RecoBase/Wire.h"
-#include "RecoBaseArt/WireCreator.h"
-#include "Utilities/LArFFT.h"
-#include "Utilities/AssociationUtil.h"
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcore/Geometry/Geometry.h"
+#include "lardataobj/RawData/RawDigit.h"
+#include "lardataobj/RawData/raw.h"
+#include "lardataobj/RecoBase/Wire.h"
+#include "lardata/RecoBaseArt/WireCreator.h"
+#include "lardata/Utilities/LArFFT.h"
+#include "lardata/Utilities/AssociationUtil.h"
 #include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
-#include "CalibrationDBI/Interface/IDetPedestalService.h"
-#include "CalibrationDBI/Interface/IDetPedestalProvider.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
+#include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 ///creation of calibrated signals on wires
 namespace caldata {
@@ -153,7 +154,7 @@ namespace caldata {
   {      
 
     //get pedestal conditions
-    const lariov::IDetPedestalProvider& pedestalRetrievalAlg = art::ServiceHandle<lariov::IDetPedestalService>()->GetPedestalProvider();
+    const lariov::DetPedestalProvider& pedestalRetrievalAlg = art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider();
 
     // get the geometry
     art::ServiceHandle<geo::Geometry> geom;
@@ -214,7 +215,7 @@ namespace caldata {
     raw::ChannelID_t channel = raw::InvalidChannelID; // channel number
     unsigned int bin(0);     // time bin loop variable
     
-    std::unique_ptr<filter::ChannelFilter> chanFilt(new filter::ChannelFilter());
+    const lariov::ChannelStatusProvider& chanFilt = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
 
     std::vector<float> holder;                // holds signal data
     std::vector<short> rawadc(transformSize);  // vector holding uncompressed adc values
@@ -233,7 +234,7 @@ namespace caldata {
         channel = digitVec->Channel();
       
         // skip bad channels
-        if(!chanFilt->BadChannel(channel)) {
+        if(chanFilt.IsPresent(channel) && !chanFilt.IsBad(channel)) {
       
           // resize and pad with zeros
       	  holder.resize(transformSize, 0.);

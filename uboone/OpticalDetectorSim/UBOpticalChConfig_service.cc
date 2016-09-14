@@ -2,9 +2,8 @@
 #define UBOPTICALCHCONFIG_CXX
 
 #include "UBOpticalChConfig.h"
-#include "Utilities/LArProperties.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "Geometry/Geometry.h" // larcore
 #include "uboone/Geometry/UBOpReadoutMap.h" // uboonecode
 
 namespace opdet {
@@ -28,7 +27,6 @@ namespace opdet {
   void UBOpticalChConfig::reconfigure(fhicl::ParameterSet const& pset)
   //-----------------------------------------------------------
   {
-    art::ServiceHandle<geo::Geometry> geom;
     art::ServiceHandle<geo::UBOpReadoutMap> chanmap;
     
     std::vector< std::vector< float    > > tmp_float_params;
@@ -39,7 +37,7 @@ namespace opdet {
     tmp_float_params.at ( kPedestalSpread ) = pset.get<std::vector< float   > >("PedestalSpread");
     tmp_float_params.at ( kQE             ) = pset.get<std::vector< float   > >("QE");
     tmp_float_params.at ( kPMTGain        ) = pset.get<std::vector< float   > >("PMTGain");
-    tmp_float_params.at ( kSplitterGain   ) = pset.get<std::vector< float   > >("PMTGain");
+    tmp_float_params.at ( kSplitterGain   ) = pset.get<std::vector< float   > >("SplitterGain");
     tmp_float_params.at ( kGainSpread     ) = pset.get<std::vector< float   > >("GainSpread");
     tmp_float_params.at ( kT0             ) = pset.get<std::vector< float   > >("T0");
     tmp_float_params.at ( kT0Spread       ) = pset.get<std::vector< float   > >("T0Spread");
@@ -71,7 +69,7 @@ namespace opdet {
     // ------------------------------------------------------------------------------------------------------
     
     // Correct QE by prescaling set in LArProperties
-    art::ServiceHandle<util::LArProperties>   LarProp;
+    auto const* LarProp = lar::providerFrom<detinfo::LArPropertiesService>();
     auto tmp_QE = tmp_float_params.at( kQE );
     for (unsigned int i = 0; i < tmp_QE.size(); i++) {
 
@@ -79,7 +77,7 @@ namespace opdet {
       if ( chanmap->GetChannelType( chnum )==opdet::LogicChannel )
 	continue; // skip QE check for logic channels
       
-      if ( LarProp->ScintPreScale() >= tmp_QE.at(i) ) {
+      if ( ((float)(LarProp->ScintPreScale())) >= (float)(tmp_QE.at(i)) ) {
         //tmp_QE[i] /= LarProp->ScintPreScale();
 	tmp_float_params.at( kQE )[i] /=  LarProp->ScintPreScale();
       }

@@ -16,7 +16,7 @@
 #include <exception>
 
 #include "fhiclcpp/ParameterSet.h"
-#include "Utilities/UniqueRangeSet.h"
+#include "lardata/Utilities/UniqueRangeSet.h"
 
 /*!
  * When you add a new ROIAlg, you should do the following:
@@ -72,11 +72,11 @@ namespace util{
 	std::unique_ptr< ROIAlg<Digit> > new_ptr(new ROIAlg_DigitAboveThreshold<Digit>(p));
 	ptr.swap(new_ptr);
       }
-      if(algName.compare("CalibrationPulseFinder")==0){
+      else if(algName.compare("CalibrationPulseFinder")==0){
 	std::unique_ptr< ROIAlg<Digit> > new_ptr(new ROIAlg_CalibrationPulseFinder<Digit>(p));
 	ptr.swap(new_ptr);
       }
-      if(algName.compare("DigitAboveBaseline")==0){
+      else if(algName.compare("DigitAboveBaseline")==0){
 	std::unique_ptr< ROIAlg<Digit> > new_ptr(new ROIAlg_DigitAboveBaseline<Digit>(p));
 	ptr.swap(new_ptr);
       }

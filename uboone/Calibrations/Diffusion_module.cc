@@ -15,42 +15,41 @@
 #include "art/Framework/Principal/SubRun.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/View.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
-#include "art/Framework/Core/FindMany.h"
+#include "canvas/Persistency/Common/FindMany.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include "Geometry/Geometry.h"
-#include "SimulationBase/MCTruth.h"
-#include "SimulationBase/MCFlux.h"
-#include "Simulation/SimChannel.h"
-#include "Simulation/AuxDetSimChannel.h"
-#include "AnalysisBase/Calorimetry.h"
-#include "AnalysisBase/ParticleID.h"
-#include "RawData/RawDigit.h"
-#include "RawData/raw.h"
-#include "RawData/BeamInfo.h"
-#include "Utilities/LArProperties.h"
-#include "Utilities/AssociationUtil.h"
-#include "Utilities/DetectorProperties.h"
-#include "SummaryData/POTSummary.h"
-#include "MCCheater/BackTracker.h"
-#include "RecoBase/Track.h"
-#include "RecoBase/Cluster.h"
-#include "RecoBase/Hit.h"
-#include "RecoBase/Wire.h"
-#include "RecoBase/EndPoint2D.h"
-#include "RecoBase/Vertex.h"
-#include "RecoBase/OpFlash.h"
-#include "SimpleTypesAndConstants/geo_types.h"
-#include "RecoObjects/BezierTrack.h"
-#include "RecoAlg/TrackMomentumCalculator.h"
-#include "AnalysisBase/CosmicTag.h"
-#include "AnalysisBase/FlashMatch.h"
+#include "larcore/Geometry/Geometry.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
+#include "larsimobj/Simulation/SimChannel.h"
+#include "larsimobj/Simulation/AuxDetSimChannel.h"
+#include "lardataobj/AnalysisBase/Calorimetry.h"
+#include "lardataobj/AnalysisBase/ParticleID.h"
+#include "lardataobj/RawData/RawDigit.h"
+#include "lardataobj/RawData/raw.h"
+#include "lardataobj/RawData/BeamInfo.h"
+#include "lardata/Utilities/AssociationUtil.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larcoreobj/SummaryData/POTSummary.h"
+#include "larsim/MCCheater/BackTracker.h"
+#include "lardataobj/RecoBase/Track.h"
+#include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/Hit.h"
+#include "lardataobj/RecoBase/Wire.h"
+#include "lardataobj/RecoBase/EndPoint2D.h"
+#include "lardataobj/RecoBase/Vertex.h"
+#include "lardataobj/RecoBase/OpFlash.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
+#include "lardata/RecoObjects/BezierTrack.h"
+#include "larreco/RecoAlg/TrackMomentumCalculator.h"
+#include "lardataobj/AnalysisBase/CosmicTag.h"
+#include "lardataobj/AnalysisBase/FlashMatch.h"
 	
 #include <cstring> // std::memcpy()
 #include <vector>
@@ -508,10 +507,8 @@ void microboone::Diffusion::analyze(const art::Event& evt)
   }  
 
   //services
-  art::ServiceHandle<geo::Geometry> geom;  
+  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
   art::ServiceHandle<cheat::BackTracker> bt;
-  art::ServiceHandle<util::DetectorProperties> detprop;
-  art::ServiceHandle<util::LArProperties> LArProp;
   
   //associations
   if (fSaveTrackInfo){
@@ -655,7 +652,7 @@ void microboone::Diffusion::analyze(const art::Event& evt)
     	   chan = fSimChannels[sc];
       }     
       if (chan){
-        const std::map<unsigned short, std::vector<sim::IDE> >& tdcidemap = chan->TDCIDEMap();
+        auto const& tdcidemap = chan->TDCIDEMap();
         int k=-1;
         double elec[tdcidemap.size()];
         int tdc[tdcidemap.size()];
@@ -1047,7 +1044,7 @@ void microboone::Diffusion::analyze(const art::Event& evt)
    }//if (mcevts_truth)
   }//if (!isdata) 
   
-  taulife = LArProp->ElectronLifetime();
+  taulife = detprop->ElectronLifetime();
   fTree->Fill();
 }
 
@@ -1106,8 +1103,7 @@ double microboone::Diffusion::length(const recob::Track& track)
 double microboone::Diffusion::length(const simb::MCParticle& part, TVector3& start, TVector3& end)
 {
   // Get geometry.
-  art::ServiceHandle<geo::Geometry> geom;
-  art::ServiceHandle<util::DetectorProperties> detprop;
+  auto const* geom = lar::providerFrom<geo::Geometry>();
   
   // Get active volume boundary.
   double xmin = 0.;
@@ -1335,5 +1331,3 @@ namespace microboone{
 } 
 
 #endif
-
-

@@ -96,6 +96,8 @@ my $NumberOfTestBoxes=30;
 my $granite_block="off";
 my $enclosureExtras="on";       #turn on or off depending on whether you'd like to generate the external things around the cryostat (ie. insulation, platform, stands, etc.) in the gdml file
 my $vetoWall_switch="off";  #turn on or off a proposed scintillator wall infront of the cryostat
+my $CRT_switch_A = "off";     #turn on/off cosmic ray tracker for Phase A (Bottom + Sides)
+my $CRT_switch_B = "off";     #turn on/off cosmic ray tracker for Phase B (Top)
 
 # The routines that create the GDML sub-files. Most of the explanatory
 # comments are in gen_defs().
@@ -117,6 +119,8 @@ if ( $granite_block eq "on" ) {  gen_granite(); } # physical volumes defined in 
 if ( $enclosureExtras eq "on" ) {  gen_enclosureExtras(); } #generation of insulation, etc. will happen if specified
 gen_cryostat();
 if ( $vetoWall_switch eq "on" ) {  gen_vetoWall();  } # physical volumes defined in gen_vetoWall()
+if ( $CRT_switch_A eq "on" ) {  gen_CRT_A();  } # physical volumes defined in gen_CRT_A()
+if ( $CRT_switch_B eq "on" ) {  gen_CRT_B();  } # physical volumes defined in gen_CRT_B()
 
 gen_enclosure();
 gen_world();
@@ -252,6 +256,7 @@ sub gen_rotations()
    <rotation name="rPlus90AboutXMinus90AboutZ" unit="deg" x="90" y="0"   z="-90"/>
    <rotation name="rPlus90AboutXPlus90AboutY"  unit="deg"  x="90" y="90" z="0"/>
    <rotation name="rPMTRotation1"  unit="deg" x="90"  y="270"   z="0"/>
+   <rotation name="r39degFix" unit="deg" x="0" y="39" z="0"/>
    <position name="posCenter" unit="mm" x="0" y="0" z="0"/>
 
 </define>
@@ -1561,7 +1566,7 @@ EOF
   <physvol>
    <volumeref ref="volSteelVessel"/>
    <position name="posSteelVessel" unit="cm" x="0" y="0" z="0"/>
-  </physvol>
+  </physvol> 
  <physvol>
     <volumeref ref="volFrame"/>
     <position name="posFrame2" unit="cm" x="-256/2-8" y="0" z="0"/>
@@ -1609,43 +1614,45 @@ EOF
   </physvol>
 EOF
 
+   
+#  $i = ( 11.1*2.54+0.005)/2
 
-  @pmt_pos = ( ' x="-141.487" y="55.249" z="108.693 - 424.75*2.54*.5"',
-               ' x="-141.342" y="55.249" z="149.287-424.75*2.54*.5"',
-               ' x="-141.380" y="27.431"  z="72.034 - 424.75*2.54*.5"',
-               ' x="-141.387" y="-0.303" z="194.676 - 424.75*2.54*.5"',
-               ' x="-141.098"  y="-28.576"  z="71.407 - 424.75*2.54*.5"',
-               ' x="-141.183"  y="-56.615"  z="108.802 - 424.75*2.54*.5"',
-               ' x="-141.2239"  y="-56.203"  z="149.112- 424.75*2.54*.5"',
-               ' x="-141.363" y="54.646" z="308.909 - 424.75*2.54*.5"',
-               ' x="-141.132"  y="54.693"  z="349.145 - 424.75*2.54*.5"',
-               ' x="-141.096" y="-0.829" z="262.947 - 424.75*2.54*.5"',
-               ' x="-141.031"  y="-0.706"  z="394.771 - 424.75*2.54*.5"',
-               ' x="-140.953"  y="-56.261"  z="308.572 - 424.75*2.54*.5"',
-               ' x="-140.594"  y="-57.022"  z="349.273 - 424.75*2.54*.5"',
-               ' x="-140.929" y="55.771" z="521.066 - 424.75*2.54*.5"',
-               ' x="-140.819"  y="55.822"  z="561.862 - 424.75*2.54*.5"',
-               ' x="-140.564" y="-0.875" z="474.028 - 424.75*2.54*.5"',
-               ' x="-140.597"  y="-0.549"  z="606.217 - 424.75*2.54*.5"',
-               ' x="-140.540"  y="-56.323"  z="521.153 - 424.75*2.54*.5"',
-               ' x="-140.566"  y="-56.205"  z="561.549 - 424.75*2.54*.5"',
-               ' x="-140.607" y="55.800" z="732.006 - 424.75*2.54*.5"',
-               ' x="-140.486"  y="55.625"  z="772.816 - 424.75*2.54*.5"',
-               ' x="-140.570" y="-0.051" z="685.136 - 424.75*2.54*.5"',
-               ' x="-140.250"  y="-0.502"  z="817.141 - 424.75*2.54*.5"',
-               ' x="-140.558"  y="-56.408"  z="732.207 - 424.75*2.54*.5"',
-               ' x="-140.550"  y="-56.284"  z="772.838 - 424.75*2.54*.5"',
-               ' x="-139.780" y="55.822" z="931.998 - 424.75*2.54*.5"',
-               ' x="-139.587"  y="55.313"  z="972.794 - 424.75*2.54*.5"',
-               ' x="-139.363" y="27.607" z="1010.644 - 424.75*2.54*.5"',
-               ' x="-140.122"  y="-0.722"  z="886.531 - 424.75*2.54*.5"',
-               ' x="-139.400"  y="-28.625"  z="1011.288 - 424.75*2.54*.5"', 
-	       ' x="-140.004" y="-56.309" z="932.872 - 424.75*2.54*.5"',
-	       ' x="-139.721" y="-56.514" z="972.797 - 424.75*2.54*.5"',
-  	       ' x="-161.341" y="-28.201 + 20/2*2.54" z="287.161 - 424.75*2.54*.5"',
-	       ' x="-160.858" y="-27.994 + 20/2*2.54" z="498.501 - 424.75*2.54*.5"',
-	       ' x="-160.882" y="-28.100 + 20/2*2.54" z="583.333 - 424.75*2.54*.5"',
-	       ' x="-160.654" y="-27.755 + 20/2*2.54" z="794.575 - 424.75*2.54*.5"' );
+  @pmt_pos = ( ' x="-(11.1*2.54+0.005)/2 -141.487" y="55.249" z="108.693 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.342" y="55.249" z="149.287-424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.380" y="27.431"  z="72.034 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.387" y="-0.303" z="194.676 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.098"  y="-28.576"  z="71.407 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.183"  y="-56.615"  z="108.802 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.2239"  y="-56.203"  z="149.112- 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.363" y="54.646" z="308.909 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.132"  y="54.693"  z="349.145 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.096" y="-0.829" z="262.947 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -141.031"  y="-0.706"  z="394.771 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.953"  y="-56.261"  z="308.572 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.594"  y="-57.022"  z="349.273 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.929" y="55.771" z="521.066 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.819"  y="55.822"  z="561.862 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.564" y="-0.875" z="474.028 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.597"  y="-0.549"  z="606.217 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.540"  y="-56.323"  z="521.153 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.566"  y="-56.205"  z="561.549 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.607" y="55.800" z="732.006 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.486"  y="55.625"  z="772.816 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.570" y="-0.051" z="685.136 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.250"  y="-0.502"  z="817.141 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.558"  y="-56.408"  z="732.207 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.550"  y="-56.284"  z="772.838 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -139.780" y="55.822" z="931.998 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -139.587"  y="55.313"  z="972.794 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -139.363" y="27.607" z="1010.644 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -140.122"  y="-0.722"  z="886.531 - 424.75*2.54*.5"',
+               ' x="-(11.1*2.54+0.005)/2 -139.400"  y="-28.625"  z="1011.288 - 424.75*2.54*.5"', 
+	           ' x="-(11.1*2.54+0.005)/2-140.004" y="-56.309" z="932.872 - 424.75*2.54*.5"',
+	           ' x="-(11.1*2.54+0.005)/2-139.721" y="-56.514" z="972.797 - 424.75*2.54*.5"',
+  	           ' x="-161.341" y="-28.201 + 20/2*2.54" z="287.161 - 424.75*2.54*.5"',
+	           ' x="-160.858" y="-27.994 + 20/2*2.54" z="498.501 - 424.75*2.54*.5"',
+	           ' x="-160.882" y="-28.100 + 20/2*2.54" z="583.333 - 424.75*2.54*.5"',
+	           ' x="-160.654" y="-27.755 + 20/2*2.54" z="794.575 - 424.75*2.54*.5"' );
 
   if ( $pmt_switch eq "on" ) {
     for ( $i=0; $i<32; ++$i ){
@@ -1701,6 +1708,34 @@ sub gen_vetoWall()
   print VW <FILE>;
   close FILE;
 }
+
+##Generate Cosmic Ray Tracker (Bern's Geometry)
+sub gen_CRT_A()
+{
+    #Set up the output file.
+    $CRT = "micro-CosmicRayTracker" . $suffix . ".gdml";
+    push (@gdmlFiles, $CRT); # Add file to list of GDML fragments
+    $CRT = ">" . $CRT; 
+    open(CRT) or die("Could not open file $CRT for writing");
+    my $subroutineFile = 'gdml_CRT_A_subroutine_file.gdml';
+    open( FILE, "< $subroutineFile" ) or die "Can't open $subroutineFile : $!";
+    print CRT <FILE>;
+    close FILE;
+}
+
+sub gen_CRT_B()
+{
+    #Set up the output file.
+    $CRT = "micro-CosmicRayTracker" . $suffix . ".gdml";
+    push (@gdmlFiles, $CRT); # Add file to list of GDML fragments
+    $CRT = ">" . $CRT; 
+    open(CRT) or die("Could not open file $CRT for writing");
+    my $subroutineFile = 'gdml_CRT_B_subroutine_file.gdml';
+    open( FILE, "< $subroutineFile" ) or die "Can't open $subroutineFile : $!";
+    print CRT <FILE>;
+    close FILE;
+}
+
 
 # Parameterize the cryostat's surroundings.
 sub gen_enclosure()
@@ -1948,6 +1983,18 @@ EOF
     print GDML <VPF>;
   }
 
+ if ( $CRT_switch_A eq "on" ) {
+    my $CRTvolumePlacementFile = 'gdml_CRT_A_volumePlacement_file.gdml';
+    open VPF, "< $CRTvolumePlacementFile" or die "Can't open $CRTvolumePlacementFile : $!";
+    print GDML <VPF>;
+  }
+
+ if ( $CRT_switch_B eq "on" ) {
+    my $CRTvolumePlacementFile = 'gdml_CRT_B_volumePlacement_file.gdml';
+    open VPF, "< $CRTvolumePlacementFile" or die "Can't open $CRTvolumePlacementFile : $!";
+    print GDML <VPF>;
+  }
+
     print GDML <<EOF;
  </volume>
 </structure>
@@ -1976,6 +2023,18 @@ sub gen_world()
     x="$WorldWidth" 
     y="$WorldHeight" 
     z="$WorldLength"/>
+  <box name="VacuumBox"
+	lunit="cm"
+	x="$WorldWidth"
+    y="53000-1800"
+    z="$WorldLength"/>
+  <tube name="LArTFVacuumSubtract"
+    rmax="310*2.54"
+    z="(29*12+6)*2.54"
+    deltaphi="360"
+    lunit="cm"
+    aunit="deg"/>
+ 
 <tube name="ConcreteWallAboveGrade0"
    rmin="292*2.54"
    rmax="(310)*2.54"
@@ -1990,7 +2049,7 @@ sub gen_world()
    lunit="cm"
    aunit="deg"/>
 <tube name="ConcreteDiscRoof0"
-	rmax="304*2.54-0.1"
+	rmax="304*2.54-31.5"
 	z="13*2.54"
 	deltaphi="360"
 	lunit="cm"
@@ -2011,11 +2070,17 @@ sub gen_world()
   	y="2*230*2.54+0.1" 
   	z="34*2.54+0.1"/> 
 
+<tube name="RoofPlusBars"
+	rmax="304*2.54-31"
+	z="68*2.54 + 0.1"
+	deltaphi="360"
+	lunit="cm"
+	aunit="deg"/>
  <box name="SteelGrating"
   	lunit="cm"
 	x="(23*12*2.54)"
   	y=".5*2.54"
-	z="(43*12+2+6.56)*2.54"/>
+	z="(43*12-2)*2.54"/>
  <box name="RemovableRoof"
 	lunit="cm"
 	x="(23*12*2.54+.1)"
@@ -2089,6 +2154,12 @@ sub gen_world()
     lunit="cm"
     aunit="deg"/>
 
+  <subtraction name="VacuumSpace">
+   <first ref="VacuumBox"/> <second ref="LArTFVacuumSubtract"/>
+   <rotation name="rotLArTFVac" unit="deg" x="90" y="0" z="0"/>
+   <position name="posLArTFVac" unit="cm" x="0.5*$TPCActiveDepth" y="-(53000-1800)/2+(29*12+6)*2.54/2" z="0.5*$TPCWirePlaneLength" />
+  </subtraction>
+
   <subtraction name="ConcreteWallAboveGrade">
     <first ref="ConcreteWallAboveGrade0"/> <second ref="ConcreteWallAboveGradeSegment"/>
 	<position name="posRemoval0" unit="cm" x="0" y="0" z="(122+24+3.5)*2.54"/>
@@ -2097,7 +2168,6 @@ sub gen_world()
   <subtraction name="ConcreteDiscRoof">
     <first ref="ConcreteDiscRoof0"/> <second ref="RemovableRoof"/>
 	<position name="posRemoval1" unit="cm" x="0" y="0" z="0"/>
-<!--	<rotation name="rotPlatformSub0" unit="deg" x="90" y="0" z="0"/>-->
   </subtraction>
 
   <subtraction name="ConcreteSteelBeam1">
@@ -2129,33 +2199,37 @@ sub gen_world()
     <first ref="IBeam35_1"/> <second ref="IBeam35Segment"/>
 	<position name="posBeamRemoval5" unit="cm" x="-(6.56-3.13)*0.5*2.54" y="0" z="0"/>
   </subtraction>
-
 </solids>
 
 <structure>
-<volume name="volIBeam22">
+ 
+  <volume name="volVacuumSpace">
+    <materialref ref="Vacuum"/>
+ 	<solidref ref="VacuumSpace"/>
+  </volume>  
+
+  <volume name="volIBeam22">
 	<materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
 	<solidref ref="IBeam22"/>
-</volume>
-<volume name="volIBeam35">
+  </volume>
+  <volume name="volIBeam35">
 	<materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
 	<solidref ref="IBeam35"/>
-</volume>
+  </volume>
 
-
-<volume name="volConcreteWallAboveGrade" >
+  <volume name="volConcreteWallAboveGrade" >
     <materialref ref="Concrete" />
     <solidref ref="ConcreteWallAboveGrade" />
   </volume>
-<volume name="volConcreteDiscRoof" >
+  <volume name="volConcreteDiscRoof" >
     <materialref ref="Concrete" />
     <solidref ref="ConcreteDiscRoof" />
   </volume>
-<volume name="volConcreteSteelBeam" >
+  <volume name="volConcreteSteelBeam" >
     <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
     <solidref ref="ConcreteSteelBeam" />
   </volume>
-<volume name="volSteelGrating" >
+  <volume name="volSteelGrating" >
     <materialref ref="STEEL_STAINLESS_Fe7Cr2Ni"/>
     <solidref ref="SteelGrating" />
   </volume>
@@ -2206,6 +2280,7 @@ sub gen_world()
        <volumeref ref="volIBeam22"/>
        <position name="posIBeam223" unit="cm" x="-((3*12+5)*2.54+(6*12+10)*2.54+4.03*0.5*2.54)" y="0" z="-(12.5*2.54*0.5)"/>
      </physvol> 
+	 
 EOF
 	
 	for($i=0;$i<4;++$i){
@@ -2224,41 +2299,50 @@ EOF
 EOF
 	}
 
-
 print GDML<<EOF;
   </volume>
+  <volume name="volRoofPlusBars">
+	<materialref ref="Air"/>
+	<solidref ref="RoofPlusBars"/>
+	<physvol>
+		<volumeref ref="volSteelGrating"/>
+		<position name="posSteelGrating" unit="cm" x="0" y="0" z="50"/>
+        <rotationref ref="rPlus90AboutX"/>
+	</physvol>
+	<physvol>
+		<volumeref ref="volConcreteDiscRoof"/>
+    	<position name="posConcreteDiscRoof" unit="cm" x="0" y="0" z="0"/>
+	</physvol>
+	<physvol>
+		<volumeref ref="volConcreteSteelBeam"/>
+    	<position name="posCBeam1" unit="cm" x="-6*27*2.54" y="0" z="0"/>
+	</physvol>
+	<physvol>
+		<volumeref ref="volConcreteSteelBeam"/>
+    	<position name="posCBeam2" unit="cm" x="6*27*2.54" y="0" z="0"/>
+	</physvol>
+	<physvol>
+		<volumeref ref="volRemovableRoof"/>
+		<position name="posRemovableRoof" unit="cm" x="0" y="0" z="0"/>
+	</physvol>
+	</volume>
 
   <volume name="volWorld" >
     <materialref ref="Air"/> 
     <solidref ref="World"/>
+   <physvol>
+	  <volumeref ref="volVacuumSpace"/>
+ 	  <position name="posVacuumSpace" unit="cm" x="0" y="(53000-1800)/2 + 624.85" z="0"/>
+ 	</physvol> 
 	<physvol>
       <volumeref ref="volConcreteWallAboveGrade"/>
       <position name="posConcreteWallAboveGrade" unit="cm" x="0.5*256.35" y="34.50000555*12*2.54 + 22.86" z="0.5*1037"/>
       <rotationref ref="rPlus90AboutX"/>
     </physvol> 
 	<physvol>
-      <volumeref ref="volRemovableRoof"/>
-      <position name="posRemovableRoof" unit="cm" x="0.5*256.35" y="34.50000555*12*2.54 +22.86 +127*2.54" z="0.5*1037"/>
-      <rotationref ref="rPlus90AboutX"/>
-    </physvol> 
-	<physvol>
-      <volumeref ref="volConcreteDiscRoof"/>
-      <position name="posConcreteDiscRoof" unit="cm" x="0.5*256.35" y="34.50000555*12*2.54 +22.86+2.54 +127.5*2.54" z="0.5*1037"/>
-      <rotationref ref="rPlus90AboutX"/>
-    </physvol> 
-	<physvol>
-      <volumeref ref="volConcreteSteelBeam"/>
-      <position name="posConcreteSteelBeam0" unit="cm" x="0.5*256.35+(23+ 4)*12*0.5*2.54" y="34.50000555*12*2.54+22.86 + 121*2.54-0.1" z="0.5*1037"/>
-	<rotation name="rot90X180Y" unit="deg" x="90" y="0" z="180"/>
-    </physvol> 
-	<physvol>
-      <volumeref ref="volConcreteSteelBeam"/>
-      <position name="posConcreteSteelBeam1" unit="cm" x="0.5*256.35-(23 + 4)*12*0.5*2.54" y="34.50000555*12*2.54+22.86+121*2.54-0.1" z="0.5*1037"/>
-      <rotationref ref="rPlus90AboutX"/>
-    </physvol> 
-	<physvol>
-      <volumeref ref="volSteelGrating"/>
-      <position name="posSteelGrating" unit="cm" x="0.5*256.35" y="34.50000555*12*2.54+ 22.86+127*2.54+13*2.54" z="0.5*1037"/>
+      <volumeref ref="volRoofPlusBars"/>
+      <position name="posRoofPlusBars" unit="cm" x="0.5*256.35" y="34.50000555*12*2.54 +22.86 +127*2.54" z="0.5*1037"/>
+	  <rotation name="r39Plus90" unit="deg" x="90" y="0" z="39" />
     </physvol> 
     <physvol>
       <volumeref ref="volConcreteEnclosure"/>

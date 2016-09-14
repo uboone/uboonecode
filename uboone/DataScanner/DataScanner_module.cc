@@ -19,8 +19,8 @@
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Principal/Handle.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
@@ -29,33 +29,33 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // LArSoft includes
-#include "Geometry/Geometry.h"
-#include "RawData/RawDigit.h"
-#include "RecoBase/Wire.h"
-#include "RecoBase/Hit.h"
-#include "RecoBase/Track.h"
-#include "RecoBase/Cluster.h"
-#include "RecoBase/SpacePoint.h"
-#include "RecoBase/Shower.h"
-#include "RecoBase/Vertex.h"
-#include "RecoBase/EndPoint2D.h"
-#include "AnalysisBase/Calorimetry.h"
-#include "Simulation/SimChannel.h"
-#include "SimulationBase/MCTruth.h"
-#include "SimulationBase/MCParticle.h"
-#include "OpticalDetectorData/FIFOChannel.h"
-#include "OpticalDetectorData/OpticalTypes.h"
-#include "MCBase/MCShower.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardataobj/RawData/RawDigit.h"
+#include "lardataobj/RecoBase/Wire.h"
+#include "lardataobj/RecoBase/Hit.h"
+#include "lardataobj/RecoBase/Track.h"
+#include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/SpacePoint.h"
+#include "lardataobj/RecoBase/Shower.h"
+#include "lardataobj/RecoBase/Vertex.h"
+#include "lardataobj/RecoBase/EndPoint2D.h"
+#include "lardataobj/AnalysisBase/Calorimetry.h"
+#include "larsimobj/Simulation/SimChannel.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCParticle.h"
+#include "lardataobj/OpticalDetectorData/FIFOChannel.h"
+#include "lardataobj/OpticalDetectorData/OpticalTypes.h"
+#include "lardataobj/MCBase/MCShower.h"
 //#include "RecoAlg/ClusterParamsAlg.h"
-#include "Utilities/LArProperties.h"
-#include "Utilities/GeometryUtilities.h"
-#include "Utilities/DetectorProperties.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
+#include "lardata/Utilities/GeometryUtilities.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 // ART includes.
 #include "art/Framework/Core/EDAnalyzer.h"
-#include "art/Framework/Core/FindManyP.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
+#include "canvas/Persistency/Common/FindManyP.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
 
 // LArLight includes
 #include <Base/Base-TypeDef.hh>
@@ -228,9 +228,8 @@ namespace datascanner {
     Double_t _readout_size;   ///< Readout window size in readout time thick
 
     // Service modules
-    art::ServiceHandle<util::DetectorProperties> _detp;
-    art::ServiceHandle<util::LArProperties> _larp;
-    art::ServiceHandle<geo::Geometry> _geo;
+    detinfo::DetectorProperties const* _detp;
+    geo::GeometryCore const* _geo;
 
   };
 
@@ -253,16 +252,18 @@ namespace datascanner {
   //#######################################################################################################
   {
 
+    _detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    _geo = lar::providerFrom<geo::Geometry>();
+    
     //fCParamsAlg.reconfigure(pset.get< fhicl::ParameterSet >("ClusterParamsAlg"));
 
     // Set detector boundaries
-    art::ServiceHandle<geo::Geometry> geo;
-    _y_max = geo->DetHalfHeight();
+    _y_max = _geo->DetHalfHeight();
     _y_min = (-1.) * _y_max;
     _z_min = 0;
-    _z_max = geo->DetLength();
+    _z_max = _geo->DetLength();
     _x_min = 0;
-    _x_max = 2.*(geo->DetHalfWidth());
+    _x_max = 2.*(_geo->DetHalfWidth());
 
     // These should be obtained from time service
     _readout_startT = -1.6e-3;
@@ -767,7 +768,7 @@ namespace datascanner {
   {
     // Some detector constants
     CONV_WIRE2CM = _geo->WirePitch(0,1,0);    //wire pitch in cm
-    CONV_TIME2CM = (_detp->SamplingRate()/1000.) * _larp->DriftVelocity(_larp->Efield(),_larp->Temperature());
+    CONV_TIME2CM = (_detp->SamplingRate()/1000.) * _detp->DriftVelocity(_detp->Efield(),_detp->Temperature());
   }
 
   //#######################################################################################################
@@ -947,7 +948,7 @@ namespace datascanner {
 
       const art::Ptr<sim::SimChannel> sch_ptr(schArray,i);
 
-      std::map<unsigned short,std::vector<sim::IDE> > sch_map(sch_ptr->TDCIDEMap());
+      const auto & sch_map(sch_ptr->TDCIDEMap());
 
       larlight::simch light_sch;
       light_sch.set_channel(sch_ptr->Channel());

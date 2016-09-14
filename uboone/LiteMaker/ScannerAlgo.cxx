@@ -34,11 +34,13 @@ namespace larlite {
     fPtrIndex_mcshower.clear();
     fPtrIndex_mctrack.clear();
     fPtrIndex_simch.clear();
+    fPtrIndex_auxsimch.clear();
     fPtrIndex_rawdigit.clear();
     fPtrIndex_wire.clear();
     fPtrIndex_hit.clear();
     fPtrIndex_ophit.clear();
     fPtrIndex_opflash.clear();
+    fPtrIndex_trigger.clear();
     fPtrIndex_cluster.clear();
     fPtrIndex_shower.clear();
     fPtrIndex_vertex.clear();

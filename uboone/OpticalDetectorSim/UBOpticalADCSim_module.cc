@@ -29,22 +29,23 @@
 #include "art/Framework/Core/EDProducer.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
 
 /// LArSoft
-#include "OpticalDetectorData/ChannelDataGroup.h" // from lardata
-#include "Geometry/Geometry.h" // larcore
-#include "Simulation/SimPhotons.h" // larsim
+#include "lardataobj/OpticalDetectorData/ChannelDataGroup.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "larcore/Geometry/Geometry.h"
+#include "larsimobj/Simulation/SimPhotons.h"
 #include "UBOpticalADC.h" // uboonecode
 #include "UBLogicPulseADC.h" // uboonecode
 #include "uboone/Geometry/UBOpReadoutMap.h" // uboone
 
 /// nutools
-#include "Simulation/BeamGateInfo.h"
+#include "larsimobj/Simulation/BeamGateInfo.h"
 
 #include <algorithm>
 
@@ -84,6 +85,12 @@ namespace opdet {
     /// G4 time to start waveform generation (default 0)
     double fG4StartTime;
 
+    /// User-defined beamgate pulse (BNB) in G4 time ns
+    std::vector<double> fUserBNBTime_v;
+
+    /// User-defined beamgate pulse (NuMI)
+    std::vector<double> fUserNuMITime_v;
+
   };
 
 } 
@@ -117,7 +124,13 @@ namespace opdet {
 
     fLogicGen.SetPedestal(2048,0.3); // move to ubchannelconfig
 
+    fUserBNBTime_v = pset.get<std::vector<double> >("UserBNBTime");
+
+    fUserNuMITime_v = pset.get<std::vector<double> >("UserNuMITime");
+
     produces< optdata::ChannelDataGroup >();
+
+    produces< std::vector<sim::BeamGateInfo > >();
   }
 
   //#################################
@@ -134,13 +147,14 @@ namespace opdet {
     // Get services
     //
     ::art::ServiceHandle<geo::Geometry> geom;
-    ::art::ServiceHandle<util::TimeService> ts;
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
 
     // allocate the container
     ::std::unique_ptr< optdata::ChannelDataGroup > wfs(new optdata::ChannelDataGroup);
+    ::std::unique_ptr< std::vector<sim::BeamGateInfo > > beam_info_ptr(new std::vector<sim::BeamGateInfo>);
 
     // get the clock definition
-    ::util::ElecClock clock = ts->OpticalClock();
+    ::detinfo::ElecClock clock = ts->OpticalClock();
     clock.SetTime(ts->G4ToElecTime(fG4StartTime));
     if(clock.Time()<0)
       throw UBOpticalException(Form("Cannot start readout @ %g (before Electronics Clock start time %g)",
@@ -190,6 +204,7 @@ namespace opdet {
       
       // transfer the time of each hit (in opdet 'ch') into a vector<double>
       std::vector<double> photon_time;
+
       for(auto const &pmt_index : pmt_indexes.at(ipmt)) {
 	
 	const art::Ptr<sim::SimPhotons> pmt_ptr(pmtHandle,pmt_index);
@@ -199,7 +214,7 @@ namespace opdet {
 	for(size_t photon_index=0; photon_index<pmt_ptr->size(); ++photon_index)
 	  photon_time.push_back(pmt_ptr->at(photon_index).Time);
       }
-      
+      //std::cout<<"INPUT: pmt="<<ipmt<<" PE ="<<photon_time.size()<<std::endl;
       // send the hits over to the waveform generator
       fOpticalGen.SetPhotons(photon_time);
       
@@ -212,7 +227,29 @@ namespace opdet {
       for (unsigned int ireadout=0; ireadout<geom->NOpHardwareChannels(ipmt); ireadout++) {
 	unsigned int channel_num = geom->OpChannel( ipmt, ireadout );
 	optdata::ChannelData adc_wfm( channel_num );
-	fOpticalGen.GenWaveform(ipmt, adc_wfm );
+	//fOpticalGen.GenWaveform(ipmt, adc_wfm );
+	fOpticalGen.GenWaveform(channel_num, adc_wfm );
+	/*
+	if(channel_num<32) {
+	  double pe=0;
+	  double ped_mean=0;
+	  double max=0;
+	  double min=1e12;
+	  for(auto const& v : adc_wfm) {
+	    ped_mean += v;
+	    if(v > max) max = (double)v;
+	    if(v < min) min = (double)v;
+	  }
+	  ped_mean /= ((double)(adc_wfm.size()));
+	  for(auto const& v : adc_wfm)
+	    if(v > ped_mean + 3) pe += (v - ped_mean);
+
+	  std::cout<<"Digit Ch: "<<channel_num
+		   <<" Pedestal: "<<ped_mean
+		   <<" ... " << min << " => "<<max
+		   <<" PE: "<< pe / 119.76 << " or PE: " << (max - ped_mean)/20. << std::endl<<std::endl;
+	}
+	*/
 	wfs->emplace_back( adc_wfm );
       }	
     } // loop over pmts
@@ -233,26 +270,40 @@ namespace opdet {
 
       fLogicGen.SetPedestal( ch_conf->GetFloat( kPedestalMean, ch ), ch_conf->GetFloat( kPedestalSpread, ch ) );
 
-      if( (chcat == opdet::BNBLogicPulse || chcat == opdet::NUMILogicPulse) && fBeamModName.size() ) {
+      if( chcat == opdet::BNBLogicPulse || chcat == opdet::NUMILogicPulse ) {
 
-	// get beam gate data product
-	for(auto const& name : fBeamModName) {
-	  art::Handle< std::vector<sim::BeamGateInfo> > beamHandle;
-	  evt.getByLabel(name, beamHandle);
-	  if(!beamHandle.isValid()) continue;
-	  
-	  for(size_t i=0; i<beamHandle->size(); ++i) {
-
-	    const art::Ptr<sim::BeamGateInfo> beam_ptr(beamHandle,i);
+	if(fBeamModName.size()) {
+	  // get beam gate data product
+	  for(auto const& name : fBeamModName) {
+	    art::Handle< std::vector<sim::BeamGateInfo> > beamHandle;
+	    evt.getByLabel(name, beamHandle);
+	    if(!beamHandle.isValid()) continue;
 	    
-	    if( (beam_ptr->BeamType() == ::sim::kBNB  && chcat == opdet::BNBLogicPulse ) ||
-		(beam_ptr->BeamType() == ::sim::kNuMI && chcat == opdet::NUMILogicPulse ) )
-
-	      fLogicGen.AddPulse(beam_ptr->Start());
-
+	    for(size_t i=0; i<beamHandle->size(); ++i) {
+	      
+	      const art::Ptr<sim::BeamGateInfo> beam_ptr(beamHandle,i);
+	      
+	      if( (beam_ptr->BeamType() == ::sim::kBNB  && chcat == opdet::BNBLogicPulse ) ||
+		  (beam_ptr->BeamType() == ::sim::kNuMI && chcat == opdet::NUMILogicPulse ) )
+		
+		fLogicGen.AddPulse(beam_ptr->Start());
+	      
+	    }
 	  }
-
 	}
+
+	// open user-defined beamgate open (BNB)
+	if(chcat == opdet::BNBLogicPulse) {
+	  for(auto const& t : fUserBNBTime_v)
+	    fLogicGen.AddPulse(t);
+	}
+
+	if(chcat == opdet::NUMILogicPulse) {
+
+	  for(auto const& t : fUserNuMITime_v)
+	    fLogicGen.AddPulse(t);
+	}
+	// open user-defined beamgate open (NuMI)
 
       }
       
@@ -269,6 +320,11 @@ namespace opdet {
     if(wfs->size())
       evt.put(std::move(wfs));
 
+    for(auto const& t : fUserBNBTime_v)    
+      beam_info_ptr->push_back(sim::BeamGateInfo( t, 1600, ::sim::kBNB) );
+    for(auto const& t : fUserNuMITime_v)
+      beam_info_ptr->push_back(sim::BeamGateInfo( t, 1600*6, ::sim::kNuMI) );
+    evt.put(std::move(beam_info_ptr));
     // Make sure to free memory
     fOpticalGen.Reset();
     fLogicGen.Reset();
@@ -276,4 +332,3 @@ namespace opdet {
   }
 } 
 /** @} */ // end of doxygen group 
-

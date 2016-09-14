@@ -1,9 +1,4 @@
 
-# find_ups_product is meant to be called from the top CMakeLists.txt file
-find_ups_product( uboonedaq_datatypes v6_14_00 )
-
-find_library( UBDut NAMES ubdata_types PATHS $ENV{UBOONEDAQ_DATATYPES_LIB} )
-
 #
 simple_plugin( LArRawInputSourceUBooNE
                "source"
@@ -15,35 +10,54 @@ simple_plugin( LArRawInputSourceUBooNE
 
 simple_plugin( RawDigitWriter "module"
 	       UBOpReadoutMap_service
-	       DatabaseUtil_service
-	       RawData
+	       lardata_Utilities_DatabaseUtil_service
+	       lardataobj_RawData
                ${ART_FRAMEWORK_CORE}
 	       ${ART_FRAMEWORK_IO_SOURCES}
                ${ART_FRAMEWORK_PRINCIPAL}
                ${ART_FRAMEWORK_SERVICES_REGISTRY}
                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-               ${ART_PERSISTENCY_COMMON}
-               ${ART_PERSISTENCY_PROVENANCE}
-               ${ART_UTILITIES}
+               art_Persistency_Common canvas_Persistency_Common
+               art_Persistency_Provenance canvas_Persistency_Provenance
+               art_Utilities canvas_Utilities
 	       ${ROOT_BASIC_LIB_LIST}	       
                BASENAME_ONLY
              )
- 
-               
-art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc
+
+# need a special link list because of the explicit link to a specific service inplementation
+simple_plugin( TriggerEnforcement "module"
+                   lardata_DetectorInfoServices_DetectorClocksServiceStandard_service # BUG note that we link to a specific service implementation
+                   lardataobj_RawData
+                   uboone_RawData
+                   ${ART_FRAMEWORK_CORE}
+                   ${ART_FRAMEWORK_PRINCIPAL}
+                   ${ART_FRAMEWORK_SERVICES_REGISTRY}
+                   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                   art_Persistency_Common canvas_Persistency_Common
+                   art_Persistency_Provenance canvas_Persistency_Provenance
+                   art_Utilities canvas_Utilities
+                   ${MF_MESSAGELOGGER}
+                   ${MF_UTILITIES}
+                   ${FHICLCPP}
+                   ${CETLIB}
+                   ${ROOT_BASIC_LIB_LIST}
+                   BASENAME_ONLY
+             )
+
+
+art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc TriggerEnforcement_module.cc
 	  BASENAME_ONLY
 	  LIBRARY_NAME uboone_RawData
-	  LIB_LIBRARIES DatabaseUtil_service
-                  Geometry
-	  	            Geometry_service
-		              Utilities
-	       	        TimeService_service
+	  LIB_LIBRARIES lardata_Utilities_DatabaseUtil_service
+                        larcore_Geometry
+	  	        larcore_Geometry_Geometry_service
+		        lardata_Utilities
 	                uboone_Geometry
 			UBOpReadoutMap_service
-                        OpticalDetectorData
-                        RawData
-                        SummaryData
+                        lardataobj_OpticalDetectorData
+                        lardataobj_RawData
+                        larcoreobj_SummaryData
 			${UBDut}
                         ${PQ}
 			${Boost_SERIALIZATION_LIBRARY}
@@ -53,9 +67,41 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                        ${ART_PERSISTENCY_COMMON}
-                        ${ART_PERSISTENCY_PROVENANCE}
-                        ${ART_UTILITIES}
+                        art_Persistency_Common canvas_Persistency_Common
+                        art_Persistency_Provenance canvas_Persistency_Provenance
+                        art_Utilities canvas_Utilities
+                        ${MF_MESSAGELOGGER}
+                        ${MF_UTILITIES}
+                        ${FHICLCPP}
+                        ${CETLIB}
+                        ${ROOT_GEOM}
+                        ${ROOT_XMLIO}
+                        ${ROOT_GDML}
+                        ${Boost_SYSTEM_LIBRARY}
+                        ${ROOT_BASIC_LIB_LIST}
+
+	  MODULE_LIBRARIES lardata_Utilities_DatabaseUtil_service
+                        larcore_Geometry
+	  	        larcore_Geometry_Geometry_service
+		        lardata_Utilities
+	                uboone_Geometry
+			UBOpReadoutMap_service
+                        lardataobj_OpticalDetectorData
+                        lardataobj_RawData
+                        larcoreobj_SummaryData
+			uboone_RawData
+			${UBDut}
+                        ${PQ}
+			${Boost_SERIALIZATION_LIBRARY}
+                        ${ART_FRAMEWORK_CORE}
+			${ART_FRAMEWORK_IO_SOURCES}
+                        ${ART_FRAMEWORK_PRINCIPAL}
+                        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+                        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+                        art_Persistency_Common canvas_Persistency_Common
+                        art_Persistency_Provenance canvas_Persistency_Provenance
+                        art_Utilities canvas_Utilities
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}

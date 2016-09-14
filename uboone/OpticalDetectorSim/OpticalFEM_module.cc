@@ -9,14 +9,14 @@
 // <http://microboone-docdb.fnal.gov:8080/cgi-bin/ShowDocument?docid=2465>
 
 // LArSoft includes
-#include "Geometry/Geometry.h"
-#include "OpticalDetectorData/OpticalTypes.h"
-#include "OpticalDetectorData/ChannelData.h"
-#include "OpticalDetectorData/ChannelDataGroup.h"
-#include "OpticalDetectorData/FIFOChannel.h"
-#include "OpticalDetectorData/PMTTrigger.h"
-#include "Simulation/BeamGateInfo.h"
-#include "Utilities/TimeService.h"
+#include "larcore/Geometry/Geometry.h"
+#include "lardataobj/OpticalDetectorData/OpticalTypes.h"
+#include "lardataobj/OpticalDetectorData/ChannelData.h"
+#include "lardataobj/OpticalDetectorData/ChannelDataGroup.h"
+#include "lardataobj/OpticalDetectorData/FIFOChannel.h"
+#include "lardataobj/OpticalDetectorData/PMTTrigger.h"
+#include "larsimobj/Simulation/BeamGateInfo.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "UBOpticalChConfig.h"
 #include "UBOpticalConstants.h"
 #include "uboone/Geometry/UBOpChannelTypes.h"
@@ -28,12 +28,12 @@
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
-#include "art/Persistency/Common/Ptr.h"
-#include "art/Persistency/Common/PtrVector.h"
+#include "canvas/Persistency/Common/Ptr.h"
+#include "canvas/Persistency/Common/PtrVector.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Utilities/Exception.h"
+#include "canvas/Utilities/Exception.h"
 
 // ROOT includes (for diagnostic histograms)
 #include <TH1S.h>
@@ -67,6 +67,7 @@ namespace opdet {
     typedef std::vector<optdata::TimeSlice_t> timeVector_t;
     typedef std::vector<unsigned int>         adcVector_t; // ART can't handle reading vectors of ADC_Count_t
     std::string          fBeamModule;           // module that created input simulated beam gate
+    std::string          fFakeBeamModule;       // module that created input "fake" beam gate (UBOpticalADCSim)
     std::string          fInputModule;          // module that created input ADC counts.
     timeVector_t         fm_delay0;             // delay for DIFF subtraction, in time slices
     std::vector<int>     fm_delay1;             // number of slices to go back relative to disc 0
@@ -132,6 +133,7 @@ namespace opdet {
     // Read parameters from the .fcl file.
     fInputModule          = p.get< std::string >         ("OpticalDigitizationModule");
     fBeamModule           = p.get< std::string >         ("BeamGateModule");
+    fFakeBeamModule       = p.get< std::string >         ("FakeBeamGateModule");
     fm_hist               = p.get< bool >                ("VerboseHistograms");
     fm_delay0             = p.get< timeVector_t >        ("PMTDelay0");
     fm_delay1             = p.get< std::vector<int> >    ("PMTDelay1");
@@ -166,8 +168,8 @@ namespace opdet {
   {
     
     // Obtain optical clock to be used for sample/frame number generation
-    art::ServiceHandle<util::TimeService> ts;
-    ::util::ElecClock clock = ts->OpticalClock();
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
+    ::detinfo::ElecClock clock = ts->OpticalClock();
     size_t numberOfGates = beamGates.size();
 
     // Determine the "begin" and "end" bin of the beam-gate
@@ -206,7 +208,7 @@ namespace opdet {
 	    << "\033[00m" << std::endl;
 	
 	optdata::TimeSlice_t gateTime = ts->OpticalG4Time2TDC(beamGateInfo.Start());
-	optdata::TimeSlice_t gateWidth = clock.Ticks(beamGateInfo.Width());
+	//optdata::TimeSlice_t gateWidth = clock.Ticks(beamGateInfo.Width());
 
 	if(gateTime < readout_start_tdc) {
 	  //std::cout << "FillBeamTimingVectors: gateTime < readout_start_tdc (" << gateTime << " < " << readout_start_tdc << ")" << std::endl;
@@ -254,15 +256,14 @@ namespace opdet {
 	  beamEndBin[gateIndex] = readout_size;
 	
 	// Compute the frame number of the first slice to be saved. 
-	gateFrame[gateIndex] = ( gateTime / clock.FrameTicks() );
+	gateFrame[gateIndex] = ( beamBeginBin[gateIndex] / clock.FrameTicks() );
 	// The time of the "beginBin[gateIndex]" slice within the gateFrame.
-	gateWindowTime[gateIndex] = ( gateTime % clock.FrameTicks() ); 
+	gateWindowTime[gateIndex] = ( beamBeginBin[gateIndex] % clock.FrameTicks() ); 
       
 	LOG_DEBUG("OpticalFEM") 
 	//std::cout << "Beam gate #" << gateIndex
 	  << " begin beam gate bin to save = " << beamBeginBin[gateIndex]
 	  << "; end beam gate bin to save = " << beamEndBin[gateIndex]
-	  << "; beam gate width = " << gateWidth
 	  << "; beam gate frame = " << gateFrame[gateIndex]
 	  << "; starts at sample = " << gateWindowTime[gateIndex]
 	  << "; slices to save = " << beam_words;
@@ -276,8 +277,8 @@ namespace opdet {
   void OpticalFEM::produce(art::Event& event)
   {
     // Obtain optical clock to be used for sample/frame number generation
-    art::ServiceHandle<util::TimeService> ts;
-    ::util::ElecClock clock = ts->OpticalClock();
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
+    ::detinfo::ElecClock clock = ts->OpticalClock();
 
     // The collection of channels we'll write in response to beam
     // gates and cosmic signals.
@@ -327,11 +328,26 @@ namespace opdet {
     // Did we actually read in any BeamGateInfo objects?
     size_t numberOfGates = 0;
     if ( beamGates.isValid() ) {
+      if( !fFakeBeamModule.empty() ) {
+	std::cout<< "\033[95m[ERROR]\033[00m Found both BeamGateModule and FakeBeamGateModule provided!" << std::endl;
+	throw std::exception();
+      }
       numberOfGates = beamGates->size();
       FillBeamTimingVectors(*beamGates,
 			    firstTDC,
-			    (firstSlice + sizeFirstChannel - 1));
+			    (firstSlice + sizeFirstChannel - 1) );
     }
+    
+    else if(!fFakeBeamModule.empty()) {
+      event.getByLabel(fFakeBeamModule, beamGates);
+      if( beamGates.isValid() ) {
+	numberOfGates = beamGates->size();
+	FillBeamTimingVectors(*beamGates,
+			      firstTDC,
+			      (firstSlice + sizeFirstChannel -1) );
+      }
+    }
+  
     //std::cout << "Number of Gates: " << numberOfGates << std::endl;
 
     // Do the same for the vectors that will accumulate the sums of
@@ -422,7 +438,8 @@ namespace opdet {
 			     beamEndBin[gateIndex] - beamBeginBin[gateIndex]);
 
 	  mf::LogDebug("OpticalFEM")
-	  //std::cout << "Writing beam gate FIFO entry: chanel=" << channel
+	  //std::cout
+	    << "Writing beam gate FIFO entry: chanel=" << channel
 	    << " at frame=" << gateFrame[gateIndex]
 	    << " slice="    << gateWindowTime[gateIndex]
 	    << " beginBin=" << beamBeginBin[gateIndex]
@@ -719,7 +736,7 @@ namespace opdet {
 	      << " begin=" << saveSlice
 	      << " end=" << saveSlice+fm_cosmicSlices[gain_index]
 	      << " max ADC=" << maxADC; 
-	    
+
 	    // Create a new FIFO channel, copying the channel
 	    // number from the input: wrong categories.
 	    
@@ -826,6 +843,7 @@ namespace opdet {
 	      << (*channelDataHandle).Frame() + slice / clock.FrameTicks()
 	      << " slice=" << slice % clock.FrameTicks()
 	      << " max ADC=" << maxADC;
+
 	    
 	  } // disc 3 fired
 	} // inside beam gate and threshold3 satisfied
@@ -957,7 +975,7 @@ namespace opdet {
 	    << " max ADC sum=" << maxADCSum1[slot][slice]
 	    << " multiplicity sum=" << multiplicitySum1[slot][slice]
 	    << std::endl;
-	  
+
 	  if (fm_hist) {
 	    // Dump some trigger sums as histograms. 
 	    // Pick some arbitrary display range for the trigger info.
@@ -1021,6 +1039,7 @@ namespace opdet {
 	    << " slice=" << sample
 	    << " max ADC sum=" << maxADCSum3[slot][slice]
 	    << " multiplicity sum=" << multiplicitySum3[slot][slice];
+
 	  if (fm_hist) {
 	    // Dump some trigger sums as histograms. 
 	    // Pick some arbitrary display range for the trigger info.

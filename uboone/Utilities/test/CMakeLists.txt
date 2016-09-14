@@ -1,16 +1,16 @@
 cet_enable_asserts()
 
 art_make( BASENAME_ONLY
-	  MODULE_LIBRARIES Utilities
+	  MODULE_LIBRARIES lardata_Utilities
                         SignalShapingServiceMicroBooNE_service
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			${ART_PERSISTENCY_COMMON}
-			${ART_PERSISTENCY_PROVENANCE}
-			${ART_UTILITIES}
+			art_Persistency_Common canvas_Persistency_Common
+			art_Persistency_Provenance canvas_Persistency_Provenance
+			art_Utilities canvas_Utilities
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}

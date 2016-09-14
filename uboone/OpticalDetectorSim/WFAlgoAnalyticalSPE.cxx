@@ -3,6 +3,8 @@
 
 #include "WFAlgoAnalyticalSPE.h"
 
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
+
 namespace opdet {
   
   //----------------------------------------------------------
@@ -21,13 +23,13 @@ namespace opdet {
 
   //--------------------------------------------------------------------
   void WFAlgoAnalyticalSPE::Process(std::vector<float> &wf,
-				    const ::util::ElecClock &start_time)
+				    const ::detinfo::ElecClock &start_time)
   //--------------------------------------------------------------------
   {
     // Predefine variables to save time later
-    ::util::ElecClock rel_spe_start = start_time;
+    ::detinfo::ElecClock rel_spe_start = start_time;
 
-    ::art::ServiceHandle<util::TimeService> ts;
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
 
     rel_spe_start.SetTime(0);
 
@@ -38,7 +40,7 @@ namespace opdet {
       //
 
       // Time in electronics clock frame (with T0)
-      //double time = ::util::TimeService::GetME().G4ToElecTime(t);
+      //double time = ::detinfo::DetectorClocksService::GetME().G4ToElecTime(t);
       double time = ts->G4ToElecTime(t);
 
       if(fEnableSpread) time += RandomServer::GetME().Gaus(fT0,fT0Sigma) * 1.e-3;
@@ -65,17 +67,18 @@ namespace opdet {
 	
 	double amp = EvaluateSPE(func_time*1.e3);
 
-	if(fEnableSpread) amp *= RandomServer::GetME().Gaus(fGain,fGainSigma * fGain);
-	else amp *= fGain;
+	double gain = fGain;
+	if(fEnableSpread) gain = RandomServer::GetME().Gaus(fGain,fGainSigma * fGain);
+
+	amp *= gain;
 
 	wf.at(i) += amp;
 	/*
 	if(!peaked && amp >0.01) peaked = true;
 	else if(peaked && amp<0.01) break;
 	*/
-	if(func_time>0.4) break;
+	if(func_time>0.624) break;
       }
-      
     }
   }
   
@@ -88,7 +91,7 @@ namespace opdet {
     //
     // Max @ x=62.8000 (and I believe we don't need sub pico-second accuracy) 
     //
-    return (2.853e-3 * pow(x,3) * exp( -x / 20.94) - 4.988e-3 * exp( -x / 110000)) / 35.208752;
+    return (2.853e-3 * pow(x,3) * exp( -x / 20.94) - 4.988e-3 * exp( -x / 110000)) / 35.208752 / 5.9865;
     
   }
 

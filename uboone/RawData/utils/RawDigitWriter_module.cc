@@ -27,20 +27,21 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 
 // LArSoft includes
-#include "SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-#include "SimpleTypesAndConstants/geo_types.h" // geo::View_t
-#include "Filters/ChannelFilter.h"
-#include "Utilities/TimeService.h" // lardata
+#include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
+#include "larcoreobj/SimpleTypesAndConstants/geo_types.h" // geo::View_t
+#include "larevt/Filters/ChannelFilter.h"
+#include "larcore/CoreUtils/ServiceUtil.h" // lar::providerFrom<>()
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
 // RawDigits
-#include "RawData/raw.h" // raw::Uncompress()
-#include "RawData/RawDigit.h"
-#include "RawData/OpDetWaveform.h"
-#include "RawData/TriggerData.h"
+//#include "RawData/TriggerData.h"
+#include "lardataobj/RawData/raw.h" // raw::Uncompress()
+#include "lardataobj/RawData/RawDigit.h"
+#include "lardataobj/RawData/OpDetWaveform.h"
 // Optical Channel Maps
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 // TPC Channel Map
-#include "Utilities/DatabaseUtil.h" // lardata
+#include "lardata/Utilities/DatabaseUtil.h"
 
 // ROOT
 #include "TTree.h"
@@ -110,8 +111,8 @@ namespace zmqds {
     int fFrame;
     int fSample;
     double fTimeStamp;
-    int fTrigFrame;
-    int fTrigSample;
+    double fTrigTimeStamp;
+    double fBeamTimeStamp;
     int fOpCrate;
     int fOpSlot;
     int fOpFemCH;
@@ -119,6 +120,9 @@ namespace zmqds {
     TTree* fTOpDetWaveforms;
     std::vector< short > opdetwaveforms;
     void GetOpticalRawDigits(const art::Event& evt);
+
+    bool fWriteTPCdata;
+    bool fWritePMTdata;
 
   }; // class RawDigitWriter
   
@@ -133,8 +137,8 @@ namespace zmqds {
     {
 
       art::ServiceHandle<art::TFileService> tfs;
-      art::TFileDirectory tfbeamdir = tfs->mkdir( "RawData" );
-      fTRawDigits = tfbeamdir.make<TTree>("RawDigits","TPC Waveform data");
+      //art::TFileDirectory tfbeamdir = tfs->mkdir( "RawData" );
+      fTRawDigits = tfs->make<TTree>("RawDigits","TPC Waveform data");
       fTRawDigits->Branch( "run", &fRun, "run/I" );
       fTRawDigits->Branch( "subrun", &fSubRun, "subrun/I" );
       fTRawDigits->Branch( "event", &fEvent, "event/I" );
@@ -144,7 +148,7 @@ namespace zmqds {
       fTRawDigits->Branch( "wireid", &fWireID, "wireid/I" );
       fTRawDigits->Branch( "adcs", &rawdigits );
 
-      fTOpDetWaveforms = tfbeamdir.make<TTree>("OpDetWaveforms","PMT Readout Waveforms");
+      fTOpDetWaveforms = tfs->make<TTree>("OpDetWaveforms","PMT Readout Waveforms");
       fTOpDetWaveforms->Branch( "run", &fRun, "run/I" );
       fTOpDetWaveforms->Branch( "subrun", &fSubRun, "subrun/I" );
       fTOpDetWaveforms->Branch( "event", &fEvent, "event/I" );
@@ -153,18 +157,19 @@ namespace zmqds {
       fTOpDetWaveforms->Branch( "opfemch", &fOpFemCH, "opfemch/I" );
       fTOpDetWaveforms->Branch( "frame", &fFrame, "frame/I" );
       fTOpDetWaveforms->Branch( "sample", &fSample, "sample/I" );
-      fTOpDetWaveforms->Branch( "timestamp", &fTimeStamp, "timestamp/D" );
       fTOpDetWaveforms->Branch( "readoutch", &fOpReadoutCH, "readoutch/I" );
       fTOpDetWaveforms->Branch( "category", &fCategory, "category/I" );
       fTOpDetWaveforms->Branch( "gaintype", &fType, "gaintype/I" );
-      fTOpDetWaveforms->Branch( "trig_timestamp", &fTrigTimestamp, "trig_timestamp/D" );      
-      //fTOpDetWaveforms->Branch( "trig_frame", &fTrigFrame, "trig_frame/I" );
-      //fTOpDetWaveforms->Branch( "trig_sample", &fTrigSample, "trig_sample/I" );
-      fTOpDetWaveforms->Branch( "beam_timestamp", &fBeamGateTime, "beam_timestamp/D" );
+      fTOpDetWaveforms->Branch( "timestamp", &fTimeStamp, "timestamp/D" );
+      fTOpDetWaveforms->Branch( "trig_timestamp", &fTrigTimeStamp, "trig_timestamp/D" );
+      fTOpDetWaveforms->Branch( "beam_timestamp", &fBeamTimeStamp, "beam_timestamp/D" );
       fTOpDetWaveforms->Branch( "adcs", &opdetwaveforms );
+      
 
       mf::LogInfo("")<<"Fetched channel map from DB";
-      
+
+      fWriteTPCdata = pset.get< bool >( "WriteTPCdata", true );
+      fWritePMTdata = pset.get< bool >( "WritePMTdata", true );
     }
 
   RawDigitWriter::~RawDigitWriter() {
@@ -179,11 +184,13 @@ namespace zmqds {
     fSubRun = (int)evt.subRun();
     fEvent = (int)evt.event();
 
-    GetTrigger(evt);
+    //GetTrigger(evt);
 
-    //GetRawDigits(evt);
+    if ( fWriteTPCdata )
+      GetRawDigits(evt);
 
-    GetOpticalRawDigits( evt );
+    if ( fWritePMTdata )
+      GetOpticalRawDigits( evt );
 
     // if ( fSendOpticalRawDigits )
     //   SendOpticalRawDigits(evt);
@@ -280,8 +287,10 @@ namespace zmqds {
 
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
     art::Handle< std::vector< raw::OpDetWaveform > > wfHandle;
-    art::ServiceHandle<util::TimeService> ts;
-    
+    auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
+    fTrigTimeStamp = ts->TriggerTime();
+    fBeamTimeStamp = ts->BeamGateTime();
+
     std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
     //ts->debugReport();
     
@@ -317,6 +326,7 @@ namespace zmqds {
 	fSample = ts->OpticalClock().Sample( fTimeStamp );
 
 	opdetwaveforms.clear();
+	opdetwaveforms.reserve( wfm.size() );
 	for ( auto &adc : wfm )
 	  opdetwaveforms.push_back( (short)adc );
 	fTOpDetWaveforms->Fill();

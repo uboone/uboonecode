@@ -1,5 +1,5 @@
 # define ROOTLIB
-set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl)
+#set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -pthread -lm -ldl)
 
 set( LARLITE_LIB -L$ENV{LARLITE_LIBDIR} -lLArLite_Base -lLArLite_DataFormat -lLArLite_LArUtil)
 
@@ -11,24 +11,23 @@ link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} ${LARLIT
 
 add_subdirectory(job)
 
-art_make( BASENAME_ONLY
+art_make( EXCLUDE LLMetaMaker_service.cc
+	  BASENAME_ONLY
 	  LIBRARY_NAME     uboonecode_uboone_LiteMaker
 	  LIB_LIBRARIES
-	  	   Geometry
-		   Geometry_service
-	   	   Simulation
-		   SimulationBase
-		   Utilities
-		   TimeService_service
-		   RawData
-		   MCBase
-		   SummaryData
-		   RecoBase
-		   RecoObjects
-		   LArProperties_service
-		   DetectorProperties_service
+	  	   larcore_Geometry
+		   uboone_Geometry
+		   uboonecode_uboone_MuCS
+		   larcore_Geometry_Geometry_service
+	   	   larsim_Simulation larsimobj_Simulation
+		   lardataobj_RecoBase
+		   nusimdata_SimulationBase
+		   lardataobj_MCBase
+		   larcoreobj_SummaryData
+		   lardataobj_RawData
+		   lardata_RecoObjects
 		   ${UBOONECODE_LIB}
-		   ${SIMULATIONBASE}
+		   nusimdata_SimulationBase
 		   ${LARRECO_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -37,9 +36,9 @@ art_make( BASENAME_ONLY
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-		   ${ART_PERSISTENCY_COMMON}
-		   ${ART_PERSISTENCY_PROVENANCE}
-		   ${ART_UTILITIES}
+		   art_Persistency_Common canvas_Persistency_Common
+		   art_Persistency_Provenance canvas_Persistency_Provenance
+		   art_Utilities canvas_Utilities
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
@@ -50,22 +49,27 @@ art_make( BASENAME_ONLY
 		   ${ROOT_BASIC_LIB_LIST}
 
           MODULE_LIBRARIES 	  		   
-		   uboonecode_uboone_LiteMaker
-		   Geometry
-		   Geometry_service
-		   TimeService_service
-		   Simulation
-		   SimulationBase
-		   Utilities
-		   MCBase
-		   SummaryData
-		   RawData
-		   RecoBase
-		   RecoObjects
-		   LArProperties_service
-		   DetectorProperties_service
+		   uboonecode_uboone_LiteMaker	   
+	      	   TFileMetadataMicroBooNE_service
+	      	   FileCatalogMetadataMicroBooNE_service
+		   LLMetaMaker_service
+		   uboonecode_uboone_MuCS
+		   larcore_Geometry
+		   uboone_Geometry
+		   larcore_Geometry_Geometry_service
+		   larsim_Simulation larsimobj_Simulation
+		   nusimdata_SimulationBase
+		   lardata_Utilities
+		   lardataobj_MCBase
+		   larcoreobj_SummaryData
+		   lardataobj_RawData
+		   lardataobj_RecoBase
+		   lardata_RecoObjects
+                   larevt_Filters
+                   larevt_CalibrationDBI_IOVData
+                   larevt_CalibrationDBI_Providers
 		   ${UBOONECODE_LIB}
-		   ${SIMULATIONBASE}
+		   nusimdata_SimulationBase
 		   ${LARRECO_LIB}
 		   ${LARDATA_LIB}
 		   ${ART_FRAMEWORK_CORE}
@@ -74,9 +78,9 @@ art_make( BASENAME_ONLY
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-		   ${ART_PERSISTENCY_COMMON}
-		   ${ART_PERSISTENCY_PROVENANCE}
-		   ${ART_UTILITIES}
+		   art_Persistency_Common canvas_Persistency_Common
+		   art_Persistency_Provenance canvas_Persistency_Provenance
+		   art_Utilities canvas_Utilities
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
@@ -86,6 +90,19 @@ art_make( BASENAME_ONLY
 		   ${ROOT_GDML}
 		   ${ROOT_BASIC_LIB_LIST}
 		)
+
+simple_plugin(LLMetaMaker "service"
+	      TFileMetadataMicroBooNE_service
+	      FileCatalogMetadataMicroBooNE_service
+	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
+	      art_Utilities canvas_Utilities
+	      ${MF_MESSAGELOGGER}
+	      ${MF_UTILITIES}
+	      ${FHICLCPP}
+	      ${CETLIB}
+	      ${ROOT_BASIC_LIB_LIST}
+              BASENAME_ONLY
+)
 
 # install_headers()
 install_fhicl()

@@ -1,23 +1,23 @@
 art_make( BASENAME_ONLY
-          MODULE_LIBRARIES Geometry
-                        Geometry_service
-                        Simulation
-                        Utilities
-                        TimeService_service
-                        Filters
-                        RawData
+          EXCLUDE SimWireMicroBooNE_module.cc
+          MODULE_LIBRARIES larcore_Geometry
+                        larcore_Geometry_Geometry_service
+                        larsim_Simulation larsimobj_Simulation
+                        lardata_Utilities
+                        larevt_Filters
+                        lardataobj_RawData
                         SignalShapingServiceMicroBooNE_service
-			CalibrationDBI_Providers
-                        ${SEEDSERVICE_SERVICE} # artextensions
+			larevt_CalibrationDBI_Providers
+                        larsim_RandomUtils_LArSeedService_service
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                        ${ART_PERSISTENCY_COMMON}
-                        ${ART_PERSISTENCY_PROVENANCE}
-                        ${ART_UTILITIES}
+                        art_Persistency_Common canvas_Persistency_Common
+                        art_Persistency_Provenance canvas_Persistency_Provenance
+                        art_Utilities canvas_Utilities
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}
@@ -29,7 +29,38 @@ art_make( BASENAME_ONLY
                         ${ROOT_BASIC_LIB_LIST}
         )
 
+simple_plugin(SimWireMicroBooNE "module"
+          BASENAME_ONLY
+              larcore_Geometry
+              larcore_Geometry_Geometry_service
+              larsim_Simulation larsimobj_Simulation
+              lardata_Utilities
+              larevt_Filters
+              lardataobj_RawData
+              lardata_DetectorInfoServices_DetectorClocksServiceStandard_service # BUG note that we link to a specific service implementation
+              SignalShapingServiceMicroBooNE_service
+              larevt_CalibrationDBI_Providers
+              larsim_RandomUtils_LArSeedService_service
+              ${ART_FRAMEWORK_CORE}
+              ${ART_FRAMEWORK_PRINCIPAL}
+              ${ART_FRAMEWORK_SERVICES_REGISTRY}
+              ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+              ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+              ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+              art_Persistency_Common canvas_Persistency_Common
+              art_Persistency_Provenance canvas_Persistency_Provenance
+              art_Utilities canvas_Utilities
+              ${MF_MESSAGELOGGER}
+              ${MF_UTILITIES}
+              ${FHICLCPP}
+              ${CETLIB}
+              ${CLHEP}
+              ${ROOT_GEOM}
+              ${ROOT_XMLIO}
+              ${ROOT_GDML}
+              ${ROOT_BASIC_LIB_LIST}
+        )
+
 # install_headers()
 install_fhicl()
 install_source()
-
