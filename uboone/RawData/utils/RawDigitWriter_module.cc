@@ -124,6 +124,17 @@ namespace zmqds {
     bool fWriteTPCdata;
     bool fWritePMTdata;
 
+    // Index tree variables
+    TTree* fTRawDigitIndex;
+    TTree* fTOpDigitIndex;
+    int idx_raw_start;
+    int idx_raw_nentries;
+    int idx_op_start;
+    int idx_op_nentries;
+    int idx_raw;
+    int idx_op;
+
+
   }; // class RawDigitWriter
   
 } // namespace zmqds
@@ -164,7 +175,21 @@ namespace zmqds {
       fTOpDetWaveforms->Branch( "trig_timestamp", &fTrigTimeStamp, "trig_timestamp/D" );
       fTOpDetWaveforms->Branch( "beam_timestamp", &fBeamTimeStamp, "beam_timestamp/D" );
       fTOpDetWaveforms->Branch( "adcs", &opdetwaveforms );
-      
+
+      fTRawDigitIndex = tfs->make<TTree>("IndexRawDigits","Event to entry indices for RawDigits");
+      fTRawDigitIndex->Branch( "idx_run", &fRun, "idx_run/I");
+      fTRawDigitIndex->Branch( "idx_subrun", &fSubRun, "idx_subrun/I");
+      fTRawDigitIndex->Branch( "idx_event", &fEvent, "idx_event/I");
+      fTRawDigitIndex->Branch( "entrystart", &idx_raw_start, "   idx_start/I");
+      fTRawDigitIndex->Branch( "nentries",   &idx_raw_nentries, "idx_nentries/I");
+      fTOpDigitIndex  = tfs->make<TTree>("IndexOpDetWfms","Event to entry indices for RawDigits");
+      fTOpDigitIndex->Branch( "idx_run", &fRun, "idx_run/I");
+      fTOpDigitIndex->Branch( "idx_subrun", &fSubRun, "idx_subrun/I");
+      fTOpDigitIndex->Branch( "idx_event", &fEvent, "idx_event/I");
+      fTOpDigitIndex->Branch( "entrystart", &idx_op_start, "   idx_start/I");
+      fTOpDigitIndex->Branch( "nentries",   &idx_op_nentries, "idx_nentries/I");
+      idx_raw = 0; // set these to zero, counter of entries filled into rawdigits tree
+      idx_op  = 0; // set these to zero, counter of entries filled into opdet tree      
 
       mf::LogInfo("")<<"Fetched channel map from DB";
 
@@ -252,6 +277,8 @@ namespace zmqds {
     
     std::cout << "Processing RawDigits..." << std::endl;
 
+    idx_raw_start = idx_raw;
+
     // data size
     unsigned int dataSize = digitVec0->Samples(); //size of raw data vectors
     rawdigits.reserve( dataSize );
@@ -272,8 +299,12 @@ namespace zmqds {
       rawdigits = digitVec->ADCs();
 
       fTRawDigits->Fill();
+      idx_raw++;
 
     }// end of wire loop
+
+    idx_raw_nentries = idx_raw-idx_raw_start;
+    fTRawDigitIndex->Fill();
 
   }
   
@@ -293,6 +324,7 @@ namespace zmqds {
 
     std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
     //ts->debugReport();
+    idx_op_start = idx_op;
     
     for ( unsigned int cat=0; cat<(unsigned int)opdet::NumUBOpticalChannelCategories; cat++ ) {
       //std::stringstream ss;
@@ -330,8 +362,11 @@ namespace zmqds {
 	for ( auto &adc : wfm )
 	  opdetwaveforms.push_back( (short)adc );
 	fTOpDetWaveforms->Fill();
+	idx_op++;
       }
     }// end of category loop
+    idx_op_nentries = idx_op-idx_op_start;
+    fTOpDigitIndex->Fill();
   }
 
   DEFINE_ART_MODULE(RawDigitWriter)
