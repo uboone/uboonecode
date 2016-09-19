@@ -13,12 +13,11 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
-#include "art/Utilities/InputTag.h"
-#include "artextensions/SeedService/SeedService.hh"
-//#include "larsim/RandomUtils/LArSeedService.h"
-#include "larsim/Simulation/sim.h"
+#include "canvas/Utilities/InputTag.h"
+#include "larsim/RandomUtils/LArSeedService.h"
+#include "lardataobj/Simulation/sim.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
-#include "art/Persistency/Common/Assns.h" 
+#include "canvas/Persistency/Common/Assns.h" 
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -31,7 +30,7 @@
 #include "WeightCalc.h"
 #include "WeightCalcFactory.h"
 
-#include "SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
 
 namespace evwgh {
 

@@ -8,9 +8,9 @@
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
-#include "SimulationBase/MCFlux.h"
-#include "SimulationBase/MCTruth.h"
-#include "SimulationBase/GTruth.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/GTruth.h"
 
 #include <vector>
 #include "TH1.h"
@@ -22,6 +22,8 @@
 #include "TTree.h"
 #include <TROOT.h>
 #include <TChain.h>
+#include "TSpline.h"
+#include "TDecompChol.h"
 
 using namespace std;
 
@@ -126,10 +128,10 @@ namespace evwgh {
     ////////////////////////////////////////////////////////////
 
     if(primaryHad == 211){
-      crossSection = PiPluscrossSection;
+      crossSection = *PiPluscrossSection;
       momentumBounds = PiPlusmomentumBounds;
       thetaBounds = PiPlusthetaBounds;
-      covarianceMatrix = PiPluscovarianceMatrix;
+      covarianceMatrix = *PiPluscovarianceMatrix;
     }
 
   }/////end ExternalData function
@@ -185,7 +187,7 @@ namespace evwgh {
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::RandGaussQ GaussRandom(rng->getEngine(GetName()));
  
-    PrimaryHadronSplinesWeightCal::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
+    PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
  
     //    fakeData = WeightCalc::MultiGaussianSmearing(crossSectionVal, covariancematrix_input, fNmultisims, GaussRandom);//***es un vector of vectors no usar
 
@@ -197,7 +199,7 @@ namespace evwgh {
     std::vector<TMatrixD> myFakeData;
     std::vector<double> thetaBinCenter;
     std::vector<double> momentumBinCenter;
-    PrimaryHadronSplinesWeightCal::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
+    PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
 
     for(unsigned int t = 0; t < thetaBounds.size(); ++t)
       thetaBinCenter.push_back(0.5*(thetaBounds[t]+thetaBounds[t+1]));
@@ -304,7 +306,7 @@ namespace evwgh {
   /////
   */
 
-   std::vector<std::vector<double> >  PrimaryHadronSplinesWeightCal::GetWeight(art::Event & e)
+  std::vector<std::vector<double> >  PrimaryHadronSplinesWeightCalc::GetWeight(art::Event & e)
   {
     //calculate weight(s) here 
     std::vector<std::vector<double> > weight;
@@ -375,11 +377,11 @@ namespace evwgh {
 	double e_proton  = sqrt(px_proton*px_proton + py_proton*py_proton + pz_proton*pz_proton + m_proton*m_proton);  
 	incidentPVec.SetPxPyPzE(px_proton,py_proton,pz_proton,e_proton);
 
-	PrimaryHadronSplinesWeightCal::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
+	PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
 
 	double crossSection_at_pt = xsec_splines(hadronVec, incidentPVec, crossSection,momentumBounds, thetaBounds);
 
-	fakeData = PrimaryHadronSplinesWeightCal::GetFakeData(GaussRandom);
+	fakeData = GetFakeData(*GaussRandom);
 
 	//loop over each multisim
 	for(Int_t i = 0; i < fNmultisims; ++i)
@@ -395,5 +397,5 @@ namespace evwgh {
     return weight;
   }
 
-  REGISTER_WEIGHTCALC(PrimaryHadronSplinesWeightCal)
+  REGISTER_WEIGHTCALC(PrimaryHadronSplinesWeightCalc)
 }

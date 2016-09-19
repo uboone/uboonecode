@@ -1,8 +1,8 @@
 #include <map>
 #include <string>
-#include "art/Persistency/Common/Wrapper.h"
+#include "canvas/Persistency/Common/Wrapper.h"
 
-#include "MCEventWeight.h"
+#include "uboone/EventWeight/MCEventWeight.h"
 
 template class art::Wrapper<evwgh::MCEventWeight>;
 template class art::Wrapper<std::vector<evwgh::MCEventWeight> >;

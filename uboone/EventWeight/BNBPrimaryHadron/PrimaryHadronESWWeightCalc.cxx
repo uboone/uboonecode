@@ -11,7 +11,7 @@
 
 #include "CLHEP/Random/RandGaussQ.h"
 #include "CLHEP/Random/RandomEngine.h"
-#include "SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
 
 #include "TLorentzVector.h"
 

@@ -9,9 +9,9 @@
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
-#include "SimulationBase/MCFlux.h"
-#include "SimulationBase/MCTruth.h"
-#include "SimulationBase/GTruth.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/GTruth.h"
 
 #include <vector>
 #include "TH1.h"
