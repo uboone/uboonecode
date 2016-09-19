@@ -1,0 +1,116 @@
+BEGIN_PROLOG
+
+microboone_eventweight:
+{
+ module_type:	"EventWeight"
+ #weight_functions:   [ func1, bnbcorrection, piplus, piminus, kzero, kplus]
+# weight_functions:   [ func1, bnbcorrection, piplus]
+#weight_functions:   [ piminus, kzero,kplus]
+#weight_functions:   [ func1, bnbcorrection, piminus]
+#weight_functions:   [ func1, bnbcorrection, kplus]
+ weight_functions:   [ func1, bnbcorrection, piplussplines]
+
+ #throw exception if weight outside limits
+ min_weight: 0
+ max_weight: 100
+
+ genie_module_label:    generator	
+
+ func1: {
+ #this parameter set will be passed to the function
+ #type XXX should correspond to XXXWeightCalc.cxx in the function name
+ 	  type: FluxHist
+	  cv_hist_file: "/uboone/app/users/zarko/eventweight_v04_03_03/srcs/uboonecode/uboone/EventWeight/data/gsimple_flux.root"
+	  rw_hist_file: "/uboone/app/users/zarko/eventweight_v04_03_03/srcs/uboonecode/uboone/EventWeight/data/redecay_flux.root"
+          random_seed: 1
+          mode: multisim
+	  number_of_multisims: 10
+ 	}
+ bnbcorrection: {
+ 	  type: FluxHist
+	  cv_hist_file: "/uboone/app/users/zarko/eventweight_v04_03_03/srcs/uboonecode/uboone/EventWeight/data/gsimple_flux.root"
+	  rw_hist_file: "/uboone/app/users/zarko/eventweight_v04_03_03/srcs/uboonecode/uboone/EventWeight/data/redecay_flux.root"
+          random_seed: 1
+          mode: reweight
+	  number_of_multisims: 1
+ 	}
+ genie_qema: {
+ 	  type: Genie
+          random_seed: 1
+	  parameter_list:        ["QEMA", "CCRes", "NCRes"] 
+          parameter_sigma:       [1     , 1      , 1      ] 
+          mode: multisim
+	  number_of_multisims: 15
+ 	}
+ genie_all: {
+ 	  type: Genie
+          random_seed: 1
+	  parameter_list:        ["QEMA", "ResGanged", "CCRes", 
+	  			  "NCRes", "NonResRvp1pi", "NonResRvbarp1pi",
+				  "NonResRvp2pi", "NonResRvbarp2pi", "NC" ] 
+          parameter_sigma:       [1     , 1    , 1  ,     
+	  			  1     , 1    , 1  ,   
+				  1     , 1    , 1  ]  
+          mode: multisim
+	  number_of_multisims: 15
+ 	}
+	
+ piplus:{
+       type: PrimaryHadronSW
+#       random_seed: 1
+       parameter_list: ["piplus"]
+       parameter_sigma: 1
+       mode: multisim
+       number_of_multisims: 10
+       PrimaryHadronGeantCode: 211 # geant code for particle production on Be
+       ExternalData:"/uboone/app/users/rcastill/larsoft_v05_01_01_Systematics/srcs/uboonecode/uboone/EventWeight/BNBPrimaryHadron/BNBExternalData_uBooNE.root"
+}
+
+ piplussplines:{
+       type: PrimaryHadronSplines
+       parameter_list: ["piplus"]
+       parameter_sigma: 1
+       mode: multisim
+       number_of_multisims: 10
+       PrimaryHadronGeantCode: 211 # geant code for particle production on Be
+       ExternalData:"/uboone/app/users/rcastill/uboone_v05_08_00/srcs/uboonecode/uboone/EventWeight/BNBExternalData_uBooNE_SplinesHARP.root"
+}
+
+
+ piminus:{
+       type: PrimaryHadronSW
+#       random_seed: 1
+       parameter_list: ["piminus"]
+       parameter_sigma: 1
+       mode: multisim
+       number_of_multisims: 10
+       PrimaryHadronGeantCode: -211 # geant code for particle production on Be
+       ExternalData:"/uboone/app/users/rcastill/larsoft_v05_01_01_Systematics/srcs/uboonecode/uboone/EventWeight/BNBPrimaryHadron/BNBExternalData_uBooNE.root"
+}
+
+ kzero:{
+       type: PrimaryHadronSW
+#       random_seed: 1
+       parameter_list: ["kzero"]
+       parameter_sigma: 1
+       mode: multisim
+       number_of_multisims: 10
+       PrimaryHadronGeantCode: 310 # geant code for particle production on Be
+       ExternalData:"/uboone/app/users/rcastill/larsoft_v05_01_01_Systematics/srcs/uboonecode/uboone/EventWeight/BNBPrimaryHadron/BNBExternalData_uBooNE.root"
+}
+
+ kplus:{
+       type: PrimaryHadronFS
+#       random_seed: 1
+       parameter_list: ["kplus"]
+       parameter_sigma: 1
+ 
+      mode: multisim
+       number_of_multisims: 10
+       PrimaryHadronGeantCode: 321 # geant code for particle production on Be
+       ExternalData:"/uboone/app/users/rcastill/larsoft_v05_01_01_Systematics/srcs/uboonecode/uboone/EventWeight/BNBPrimaryHadron/BNBExternalData_uBooNE.root"
+}
+
+}	
+
+END_PROLOG
