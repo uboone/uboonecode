@@ -1,0 +1,10 @@
+
+<lcgdict>
+ <class name="std::pair< art::Ptr<recob::Track>,    art::Ptr<recob::OpFlash> >" />
+ <class name="art::Assns<recob::Track, recob::OpFlash, void>" />
+ <class name="art::Wrapper< art::Assns<recob::Track, recob::OpFlash, void > >" />
+
+ <class name="std::pair< art::Ptr<recob::OpFlash>,    art::Ptr<recob::Track> >" />
+ <class name="art::Assns<recob::OpFlash, recob::Track, void>" />
+ <class name="art::Wrapper< art::Assns<recob::OpFlash, recob::Track, void > >" />
+</lcgdict>
