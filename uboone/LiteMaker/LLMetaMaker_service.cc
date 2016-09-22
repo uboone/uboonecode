@@ -105,7 +105,7 @@ void util::LLMetaMaker::postEndJob()
 void util::LLMetaMaker::preProcessEvent(const art::Event& evt)
 //------------------------------------------------------------
 {
-  std::cout << "This is before event process" << std::endl;
+  //std::cout << "This is before event process" << std::endl;
 }
 
 //------------------------------------------------------------

@@ -1518,7 +1518,7 @@ namespace larlite {
 
     try{
       if(!ptr_coll_v.size()) {
-	std::cout << "Empty!" << std::endl;
+	//std::cout << "Empty!" << std::endl;
 	return;
       }
       const std::vector<art::Ptr<U> > ptr_coll = ptr_coll_v.at(0);

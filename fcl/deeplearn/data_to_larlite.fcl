@@ -5,9 +5,10 @@
 #include "correct_saturation.fcl"
 #include "caldata_microboone.fcl" 
 #include "time_memory_tracker_microboone.fcl"
-#include "litemc_wire.fcl"
-#include "litemc_opreco.fcl"
-#include "litemc_opdigit.fcl"
+#include "ubflashfinder.fcl"
+#include "litedatamin_wire.fcl"
+#include "litedatamin_opreco.fcl"
+#include "litedatamin_opdigit.fcl"
 
 microboone_reco_data_services:
 {
@@ -41,6 +42,7 @@ services.DetectorPropertiesService.NumberTimeSamples:   6400
 services.DetectorPropertiesService.ReadOutWindowSize:   6400
 services.DetectorClocksService.InheritClockConfig:      false
 services.DetectorClocksService.TriggerOffsetTPC:       -0.400e3
+services.DetectorClocksService.TrigModuleName:          "daq"
 
 services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
 services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
@@ -79,16 +81,12 @@ physics:
 
  producers:
  {
-   saturation: @local::correct_saturation
-
-   ophit:            @local::microboone_ophit_beam_highgain
-   opflash:          @local::microboone_opflash_beam_highgain
-   ophitSatBeam:     @local::microboone_ophit_saturation_beam
-   ophitSatCosmic:   @local::microboone_ophit_saturation_cosmic
-   opflashSatBeam:   @local::microboone_opflash_saturation_beam
-   opflashSatCosmic: @local::microboone_opflash_saturation_cosmic
-   sflashSatBeam:    @local::microboone_simple_flash_sat_beam
-   sflashSatCosmic:  @local::microboone_simple_flash_sat_cosmic
+   saturation:        @local::correct_saturation
+   ophit:             @local::microboone_ophit_beam_highgain
+   ophitSatBeam:      @local::microboone_ophit_saturation_beam
+   ophitSatCosmic:    @local::microboone_ophit_saturation_cosmic
+   simpleFlashBeam:   @local::UBFlashBeam
+   simpleFlashCosmic: @local::UBFlashCosmic
 
    digitfilter:  @local::microboone_rawdigitfilter
    caldata:      @local::microboone_calroi
@@ -98,14 +96,14 @@ physics:
 
  analyzers:
  {
-   wire:    @local::litemc_wire
-   opdigit: @local::litemc_opdigit
-   opreco:  @local::litemc_opreco
+   wire:    @local::litedatamin_wire
+   opdigit: @local::litedatamin_opdigit
+   opreco:  @local::litedatamin_opreco
  }
 
  reco: [ rns, digitfilter, caldata, saturation, 
-         ophit, opflash, ophitSatBeam, ophitSatCosmic, opflashSatBeam, opflashSatCosmic,
-         sflashSatBeam, sflashSatCosmic]
+         ophit, ophitSatBeam, ophitSatCosmic, 
+         simpleFlashBeam, simpleFlashCosmic]
 
  ana: [ wire, opdigit, opreco ]
  
@@ -134,10 +132,10 @@ physics.analyzers.opdigit.out_filename:     "larlite_opdigit.root"
 physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
 
 physics.analyzers.opreco.DataLookUpMap.ophit: ["ophit","ophitSatBeam","ophitSatCosmic"]
-physics.analyzers.opreco.DataLookUpMap.opflash: ["opflash","opflashSatBeam","opflashSatCosmic","sflashSatBeam","sflashSatCosmic"]
+physics.analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic"]
 
-physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSat","ophitSatBeam","ophitSatCosmic"]
-physics.analyzers.opreco.AssociationLookUpMap.opflash: ["opflash","opflashSatBeam","opflashSatCosmic","sflashBeam","sflashCosmic"]
+physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSatBeam","ophitSatCosmic"]
+physics.analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic"]
 
 outputs:
 {
