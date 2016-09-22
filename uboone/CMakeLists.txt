@@ -27,6 +27,10 @@ add_subdirectory(TPCNeutrinoIDFilter)
 #add_subdirectory(DataScanner)
 add_subdirectory(LiteMaker)
 add_subdirectory(MuCS)
+add_subdirectory(UBFlashFinder)
+add_subdirectory(LLBasicTool)
+add_subdirectory(LLSelectionTool)
+add_subdirectory(T0Reco)
 
 # Respect the order specified in lar_build, which is:
 #
