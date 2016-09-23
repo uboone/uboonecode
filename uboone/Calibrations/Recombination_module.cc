@@ -88,6 +88,9 @@ private:
   bool DeadRegion(const recob::Track& track);
   bool AngleCut(const recob::Track& track);
   bool BrokenTrack(const recob::Track& track, art::Handle<std::vector<recob::Track> > track_v);
+  int FindMatchedRecotrack(sim::MCTrack mctrack, art::Handle<std::vector<recob::Track> > track_h);
+  bool FindMatchedMCStoppingMuontrack(const recob::Track& track, art::Handle<std::vector<sim::MCTrack> > mctrk_h);
+ 
   // Declare member data here.
   std::string fTrackProducer;
   std::string fHitProducer;
@@ -113,6 +116,14 @@ private:
   //TH2D* hdQdxVsRR_Sorted;
   TH1I* hTrackStat;
   TH1I* hFoundMCMuon;
+  TH2D* hTrueVsRecoStartDis;
+  TH1D* hFindNumMatchedTrack;
+  TH1D* hTrueVsRecoStartDisMin;
+
+  TH1D* hMCRecoYZStartDis;
+  TH1D* hMCRecoXYZStartDis;
+  TH1I* hStopMCMuonMatchedRecoStartYZ;
+
   TTree* _tree;
   double _mc_time;
   double _rc_time;
@@ -238,6 +249,15 @@ void Recombination::beginJob()
   // hdQdxVsRR_Sorted = tfs->make<TH2D>("hdQdxVsRR_Sorted","dQdx vs RR",100,0.,100,100,0.,2000.);
   hdQdxVsRR_Correct = tfs->make<TH2D>("hdQdxVsRR_Correct","dQdx vs RR",100,0.,100,100,0.,2000.);
   hdQdxVsNCaloHits = tfs->make<TH2D>("hdQdxVsNCaloHits","dQdx vs number of hits in Y plane",1000,0.,1000,100,0.,2000.);
+  hTrueVsRecoStartDis = tfs->make<TH2D>("hTrueVsRecoStartDis","distance between true MC track start and reco track start",200,0,200,120,0,1200);
+  hFindNumMatchedTrack = tfs->make<TH1D>("hFindNumMatchedTrack","Number of MC tracks that matched the current Reco Track",10,0,10);
+  hTrueVsRecoStartDisMin = tfs->make<TH1D>("hTrueVsRecoStartDisMin","the shortest distance between reco and MC track start point",200,0,200);
+
+  hMCRecoYZStartDis = tfs->make<TH1D>("hMCRecoYZStartDis","MC muon start vs reco start YZ disntance",1000,0,1000);
+  hMCRecoXYZStartDis = tfs->make<TH1D>("hMCRecoXYZStartDis","MC muon start vs reco start XYZ disntance",1000,0,1000);
+  hStopMCMuonMatchedRecoStartYZ = tfs->make<TH1I>("hStopMCMuonMatchedRecoStartYZ","number of start matched reco track for every mc muon",20,0,20);
+
+
   hTrackStat = tfs->make<TH1I>("hTrackStat","Track stats at each cut",20,0,20);
   hTrackStat->GetXaxis()->SetBinLabel(1,"AllTracks");
   hTrackStat->GetXaxis()->SetBinLabel(2,"FidYZ");
@@ -249,6 +269,7 @@ void Recombination::beginJob()
   hTrackStat->GetXaxis()->SetBinLabel(8,"VetoBrokenTracks");
   hTrackStat->GetXaxis()->SetBinLabel(9,"MiniNCaloHits");
   hTrackStat->GetXaxis()->SetBinLabel(10,"Correct RR");
+  hTrackStat->GetXaxis()->SetBinLabel(11,"FindMCtrack");
  
   hFoundMCMuon = tfs->make<TH1I>("hFoundMCMuon","MC muon stat",10,0,10); 
   hFoundMCMuon->GetXaxis()->SetBinLabel(1,"all mu-");
@@ -259,6 +280,7 @@ void Recombination::beginJob()
   hFoundMCMuon->GetXaxis()->SetBinLabel(6,"e- & stopped mu-");
   hFoundMCMuon->GetXaxis()->SetBinLabel(7,"e+ & all mu+");
   hFoundMCMuon->GetXaxis()->SetBinLabel(8,"e+ & stoped mu+");
+  hFoundMCMuon->GetXaxis()->SetBinLabel(9,"MatchRecoFoundStop");
   
 
   _tree = tfs->make<TTree>("StopMuontree","recombination");
@@ -411,6 +433,12 @@ void Recombination::analyze(art::Event const & e)
       if(mctrack.PdgCode()==-13 || mctrack.PdgCode()==13)
 	{
 	  //std::cout<<"mctrack start XYZ=["<<mctrack.at(0).X()<<" ,"<<mctrack.at(0).Y()<<" ,"<<mctrack.at(0).Z()<<"] end XYZ=["<<mctrack.at(mctrack.size()-1).X()<<" ,"<<mctrack.at(mctrack.size()-1).Y()<<" ,"<<mctrack.at(mctrack.size()-1).Z()<<"] start energy="<<mctrack.at(0).E()<<" end energy"<<mctrack.at(mctrack.size()-1).E()<<std::endl;
+	  if(InFid(mctrack.at(mctrack.size()-1).X(),mctrack.at(mctrack.size()-1).Y(),mctrack.at(mctrack.size()-1).Z()))
+	    {
+	      int NumMatchedRecoTrack = FindMatchedRecotrack(mctrack, track_h);
+	      hStopMCMuonMatchedRecoStartYZ->Fill(NumMatchedRecoTrack);
+	    }
+	
 	}
       if(mctrack.PdgCode()==-13)//mu+
 	{
@@ -491,8 +519,8 @@ void Recombination::analyze(art::Event const & e)
     if(FidYZ(track)==false)
       continue;
     hTrackStat->AddBinContent(2);
-    if(DeadRegion(track)==true)
-      continue;
+    //if(DeadRegion(track)==true)
+    //  continue;
     hTrackStat->AddBinContent(3);
     auto const& TrackStartX = track.Vertex().X();
     auto const& TrackStartY = track.Vertex().Y();
@@ -511,11 +539,15 @@ void Recombination::analyze(art::Event const & e)
       continue;
     
     hTrackStat->AddBinContent(4);
-    if(fabs(TrackStartX - TrackEndX)>150)
+    if(fabs(TrackStartX - TrackEndX)>200)
       continue;
     hTrackStat->AddBinContent(5);
 
-    
+    if(FindMatchedMCStoppingMuontrack(track, mctrk_h))
+      {
+	hTrackStat->AddBinContent(11);
+	hFoundMCMuon->AddBinContent(9);
+      }
 
 
     if(AngleCut(track)==true)
@@ -664,6 +696,11 @@ void Recombination::analyze(art::Event const & e)
     if(CorrectRR==true)
       {
 	hTrackStat->AddBinContent(10);
+	/*if(FindMatchedMCStoppingMuontrack(track, mctrk_h))
+	  {
+	    hTrackStat->AddBinContent(11);
+	    hFoundMCMuon->AddBinContent(9);
+	    }*/
       }
     
     _tree->Fill();
@@ -808,20 +845,76 @@ bool Recombination::BrokenTrack(const recob::Track& track, art::Handle<std::vect
     return false;
 }
 
-bool Recombination::FindMatchedMCStoppingMuontrack(const recob::Track& track, art::Handle<std::vector<sim::MCtrack> > mctrk_h)
+int Recombination::FindMatchedRecotrack(sim::MCTrack mctrack, art::Handle<std::vector<recob::Track> > track_h)
+{
+  auto MCTrackStartX = mctrack.at(0).X();
+  auto MCTrackStartY = mctrack.at(0).Y();
+  auto MCTrackStartZ = mctrack.at(0).Z();
+  /*auto MCTrackEndX = mctrack.at(mctrack.size()).X();
+  auto MCTrackEndY = mctrack.at(mctrack.size()).Y();
+  auto MCTrackEndZ = mctrack.at(mctrack.size()).Z();*/
+  int FindNumRecoTrack=0;
+  for(unsigned int itr=0;itr<track_h->size();itr++){
+    auto const& tr_reco = track_h->at(itr);
+    auto RecoStartX = tr_reco.Vertex().X();
+    auto RecoStartY = tr_reco.Vertex().Y();
+    auto RecoStartZ = tr_reco.Vertex().Z();
+    auto RecoEndX = tr_reco.End().X();
+    auto RecoEndY = tr_reco.End().Y();
+    auto RecoEndZ = tr_reco.End().Z();
+    double StartYZDis=9999;
+    double StartXYZDis=9999;
+    if(RecoStartY>=RecoEndY)
+      {
+	StartYZDis = (MCTrackStartY - RecoStartY)*(MCTrackStartY - RecoStartY) + (MCTrackStartZ - RecoStartZ)*(MCTrackStartZ - RecoStartZ);
+	StartXYZDis = (MCTrackStartX - RecoStartX)*(MCTrackStartX - RecoStartX) +(MCTrackStartY - RecoStartY)*(MCTrackStartY - RecoStartY) + (MCTrackStartZ - RecoStartZ)*(MCTrackStartZ - RecoStartZ);	
+      }
+    else{
+      StartYZDis = (MCTrackStartY - RecoEndY)*(MCTrackStartY - RecoEndY) + (MCTrackStartZ - RecoEndZ)*(MCTrackStartZ - RecoEndZ);
+      StartXYZDis = (MCTrackStartX - RecoEndX)*(MCTrackStartX - RecoEndX) +(MCTrackStartY - RecoEndY)*(MCTrackStartY - RecoEndY) + (MCTrackStartZ - RecoEndZ)*(MCTrackStartZ - RecoEndZ);	
+    }
+    hMCRecoYZStartDis->Fill(StartYZDis);
+    hMCRecoXYZStartDis->Fill(StartXYZDis);
+    if(StartYZDis<=3) 
+      FindNumRecoTrack++;
+  }
+  return FindNumRecoTrack;
+}
+bool Recombination::FindMatchedMCStoppingMuontrack(const recob::Track& track, art::Handle<std::vector<sim::MCTrack> > mctrk_h)
 {
   auto const& RecoTrackStart=track.Vertex();
   auto const& RecoTrackEnd=track.End();
-  
-  for(unsigned int imc=0;imc<mctrk_h->size();mctrk_h++)
+  bool FindMatchedTrueMCTrack = false;
+  int FindMatchedTrueNum = 0;
+  double FindMatchedTrackMinDis = 198;
+  for(unsigned int imc=0;imc<mctrk_h->size();imc++)
     {
-      auto const& mctrack=mctrk_h->at(imc);
+      auto const& mctrack = mctrk_h->at(imc);
       if(mctrack.size()<2)
 	continue;
       if(mctrack.PdgCode()!=13 && mctrack.PdgCode()!=-13)
 	continue;
-      if(InFid(mctrack.at(mctrack.size()-1).X(),mctrack.at(mctrack.size()-1).Y(),mctrack.at(mctrack.size()-1).Z())
-
+      //if(InFid(mctrack.at(mctrack.size()-1).X(),mctrack.at(mctrack.size()-1).Y(),mctrack.at(mctrack.size()-1).Z()))
+      //{
+      TVector3 MCtrackStart(mctrack.at(0).X(),mctrack.at(0).Y(), mctrack.at(0).Z());
+      TVector3 MCtrackEnd(mctrack.at(mctrack.size()-1).X(),mctrack.at(mctrack.size()-1).Y(),mctrack.at(mctrack.size()-1).Z());
+      std::cout<<"mctrack start ["<<MCtrackStart.X()<<","<<MCtrackStart.Y()<<","<<MCtrackStart.Z()<<"] mctrack end ["<<MCtrackEnd.X()<<","<<MCtrackEnd.Y()<<","<<MCtrackEnd.Z()<<"] reco track start ["<<RecoTrackStart.X()<<","<<RecoTrackStart.Y()<<","<<RecoTrackStart.Z()<<"] Reco track End ["<<RecoTrackEnd.X()<<","<<RecoTrackEnd.Y()<<","<<RecoTrackEnd.Z()<<"]"<<std::endl;
+      auto TrueVsRecoStartDis = std::min((MCtrackStart - RecoTrackStart).Mag(), (MCtrackStart - RecoTrackEnd).Mag());
+      hTrueVsRecoStartDis->Fill(TrueVsRecoStartDis,MCtrackStart.Z());
+      if(TrueVsRecoStartDis<5)
+	{
+	  if(TrueVsRecoStartDis<=FindMatchedTrackMinDis)
+	    {
+	      FindMatchedTrackMinDis = TrueVsRecoStartDis;
+	    }
+	  FindMatchedTrueMCTrack = true;
+	  FindMatchedTrueNum++;
+	      
+	}
+	  //}in Fid	
     }
+  hFindNumMatchedTrack->Fill(FindMatchedTrueNum);
+  hTrueVsRecoStartDisMin->Fill(FindMatchedTrackMinDis);
+  return FindMatchedTrueMCTrack;
 }
 DEFINE_ART_MODULE(Recombination)
