@@ -29,6 +29,7 @@
 #include "lardataobj/MCBase/MCTrack.h"
 #include "lardataobj/MCBase/MCShower.h"
 #include "lardata/Utilities/AssociationUtil.h"
+#include "larsim/MCCheater/BackTracker.h"
 
 // C++
 #include <memory>
@@ -90,7 +91,9 @@ private:
   bool BrokenTrack(const recob::Track& track, art::Handle<std::vector<recob::Track> > track_v);
   int FindMatchedRecotrack(sim::MCTrack mctrack, art::Handle<std::vector<recob::Track> > track_h);
   bool FindMatchedMCStoppingMuontrack(const recob::Track& track, art::Handle<std::vector<sim::MCTrack> > mctrk_h);
- 
+  const simb::MCParticle* GetTrueParticle(std::vector<art::Ptr<recob::Hit>> hits); //Find true g4 particle from a vector of hits
+  void GetStartEnd(const simb::MCParticle* p, double* start, double *end);
+
   // Declare member data here.
   std::string fTrackProducer;
   std::string fHitProducer;
@@ -413,7 +416,7 @@ void Recombination::analyze(art::Event const & e)
   //Services
   //art::ServiceHandle<cheat::BackTracker> bt;
   // grab hit objects associated with tracks
-  art::FindMany<recob::Hit> trk_hit_assn_v(track_h, e, fTrackProducer );
+  art::FindManyP<recob::Hit> trk_hit_assn_v(track_h, e, fTrackProducer );
 
   // grab calorimetry objects associated with tracks
   art::FindMany<anab::Calorimetry> trk_calo_assn_v(track_h, e, fCaloProducer );
@@ -510,7 +513,7 @@ void Recombination::analyze(art::Event const & e)
     
     auto const& track = track_h->at(i);
     
-    std::vector<const recob::Hit*>        hit_v  = trk_hit_assn_v.at(i);
+    std::vector<art::Ptr<recob::Hit>>     hit_v  = trk_hit_assn_v.at(i);
     std::vector<const anab::Calorimetry*> calo_v = trk_calo_assn_v.at(i);
 
     //std::cout << "This track has " << hit_v.size() << " hits associated "<< "and " << calo_v.size() << " calo objects associated" << std::endl;
@@ -606,6 +609,18 @@ void Recombination::analyze(art::Event const & e)
       }
       if(NCaloHits<80)
 	continue;
+
+      //Find true particle
+      const simb::MCParticle *particle = GetTrueParticle(hit_v);
+      if (particle){
+        double start[3], end[3];
+        std::cout<<"True pdg code is "<<particle->PdgCode()<<std::endl;
+        GetStartEnd(particle, start, end);
+        std::cout<<"Start position "<<start[0]<<" "<<start[1]<<" "<<start[2]<<std::endl;
+        std::cout<<"End position "<<end[0]<<" "<<end[1]<<" "<<end[2]<<std::endl;
+        std::cout<<"Track start "<<track.Vertex().X()<<" "<<track.Vertex().Y()<<" "<<track.Vertex().Z()<<std::endl;
+        std::cout<<"Track end "<<track.End().X()<<" "<<track.End().Y()<<" "<<track.End().Z()<<std::endl;
+      }
       MiniNCaloHits=true;
       for(unsigned int iCaloHit=0;iCaloHit<NCaloHits;iCaloHit++)
 	{
@@ -916,5 +931,53 @@ bool Recombination::FindMatchedMCStoppingMuontrack(const recob::Track& track, ar
   hFindNumMatchedTrack->Fill(FindMatchedTrueNum);
   hTrueVsRecoStartDisMin->Fill(FindMatchedTrackMinDis);
   return FindMatchedTrueMCTrack;
+}
+
+const simb::MCParticle* Recombination::GetTrueParticle(std::vector<art::Ptr<recob::Hit>> hits){
+
+  art::ServiceHandle<cheat::BackTracker> bt;
+  std::map<int,double> trkide;
+  for (auto & hit : hits){
+    std::vector<sim::TrackIDE> eveIDs = bt->HitToEveID(hit);
+    for(size_t e = 0; e < eveIDs.size(); ++e){
+      trkide[eveIDs[e].trackID] += eveIDs[e].energy;
+    }
+  }
+
+  double maxe = -1;
+  int trackid = -1;
+  for (auto & i : trkide){
+    if ((i.second)>maxe){
+      maxe = i.second;
+      trackid = i.first;
+    }
+  }
+  return bt->TrackIDToParticle(trackid); //this can be 0 if no track is found
+}
+
+void Recombination::GetStartEnd(const simb::MCParticle* p, double* start, double *end){
+ 
+  // Get geometry.
+  art::ServiceHandle<geo::Geometry> geom;
+  
+  // Get active volume boundary.
+  double bnd[6] = {0.,2.*geom->DetHalfWidth(),-geom->DetHalfHeight(),geom->DetHalfHeight(),0.,geom->DetLength()};
+  
+  bool first = true;
+  
+  for(unsigned int i = 0; i < p->NumberTrajectoryPoints(); ++i) {
+    // check if the particle is inside a TPC
+    if (p->Vx(i) >= bnd[0] && p->Vx(i) <= bnd[1] && p->Vy(i) >= bnd[2] && p->Vy(i) <= bnd[3] && p->Vz(i) >= bnd[4] && p->Vz(i) <= bnd[5]){
+      if(first){
+        start[0] = p->Vx(i);
+        start[1] = p->Vy(i);
+        start[2] = p->Vz(i);
+        first = false;
+      }
+      end[0] = p->Vx(i);
+      end[1] = p->Vy(i);
+      end[2] = p->Vz(i);
+    }
+  }
 }
 DEFINE_ART_MODULE(Recombination)
