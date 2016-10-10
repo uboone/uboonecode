@@ -82,7 +82,7 @@ namespace pmtana {
 
       area_pe *= _cosmic_ophit_correction_v[opdet];
 
-    area_pe /= _relative_qe_v[opdet];
+    area_pe *= _relative_qe_v[opdet];
 
     return area_pe;
   }
@@ -94,7 +94,7 @@ namespace pmtana {
       throw std::exception();
     }
 
-    double area_pe = area / _spe_area_gain_v[opdet] / _relative_qe_v[opdet];
+    double area_pe = area / _spe_area_gain_v[opdet] * _relative_qe_v[opdet];
 
     return area_pe;
 

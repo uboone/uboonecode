@@ -19,6 +19,7 @@
 
 #include "lardata/RecoBase/OpHit.h"
 #include "lardata/RecoBase/OpFlash.h"
+#include "lardata/Utilities/AssociationUtil.h"
 
 #include <memory>
 #include <string>
@@ -74,7 +75,7 @@ UBFlashFinder::UBFlashFinder(pmtana::Config_t const & p)
   _beam_flash = p.get<bool>("BeamFlash");
 
   produces< std::vector<recob::OpFlash>   >();
-
+  produces< art::Assns <recob::OpHit, recob::OpFlash> >();
 }
 
 void UBFlashFinder::produce(art::Event & e)
@@ -82,7 +83,7 @@ void UBFlashFinder::produce(art::Event & e)
 
   // produce OpFlash data-product to be filled within module
   std::unique_ptr< std::vector<recob::OpFlash> > opflashes(new std::vector<recob::OpFlash>);
-
+  std::unique_ptr< art::Assns <recob::OpHit, recob::OpFlash> > flash2hit_assn_v  ( new art::Assns<recob::OpHit, recob::OpFlash> );
   // load OpHits previously created
   art::Handle<std::vector<recob::OpHit> > ophit_h;
   e.getByLabel(_hit_producer,ophit_h);
@@ -116,9 +117,15 @@ void UBFlashFinder::produce(art::Event & e)
 			 (trigger_time + lflash.time) / 1600.,
 			 lflash.channel_pe);
     opflashes->emplace_back(std::move(flash));
-  }
 
+    for(auto const& hitidx : lflash.asshit_idx) {
+      const art::Ptr<recob::OpHit> hit_ptr(ophit_h, hitidx);
+      util::CreateAssn(*this, e, *opflashes, hit_ptr, *flash2hit_assn_v);
+    }
+  }
+  
   e.put(std::move(opflashes));
+  e.put(std::move(flash2hit_assn_v));
 }
 
 DEFINE_ART_MODULE(UBFlashFinder)
