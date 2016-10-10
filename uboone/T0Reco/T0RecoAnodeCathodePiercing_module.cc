@@ -292,7 +292,7 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
   
   e.put(std::move(T0_v));
   e.put(std::move(trk_t0_assn_v));
-  std::cout << "create track flash association " << std::endl;
+  //std::cout << "create track flash association " << std::endl;
   e.put(std::move(flash_t0_assn_v));
   e.put(std::move(trk_flash_assn_v));
 

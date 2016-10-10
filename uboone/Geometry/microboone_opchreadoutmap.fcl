@@ -15,8 +15,10 @@ microboone_opreadoutmap:
         threeFEMOpMap: ["2015-12-09 18:50:01 CST","3000-01-01 23:59:59 CST"]
         }
  OpMapRunRanges: {
-        twoFEMOpMap:   [1, 3984]   
-        threeFEMOpMap: [3985,999999]
+        twoFEMOpMap: [100000,9999999]
+        threeFEMOpMap: [1, 99999]
+        #twoFEMOpMap:   [1, 3984]   
+        #threeFEMOpMap: [3985,999999]
         }
 }
 

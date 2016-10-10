@@ -12,6 +12,7 @@
 #include "caldata_microboone.fcl" 
 #include "time_memory_tracker_microboone.fcl"
 #include "deeplearn_swtrigger.fcl"
+#include "ubflashfinder.fcl"
 #include "litemc_mcinfo.fcl"
 #include "litemc_simch.fcl"
 #include "litemc_wire.fcl"
@@ -59,9 +60,44 @@ services.MemoryTracker.printSummaries: []
 services.MemoryTracker.includeMallocInfo: false
 services.MemoryTracker.filename: ""
 
+services.UBOpticalChConfig.DarkRate: [ 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, # channels 0-35
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, # logic channels 36-47
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, # channels 100-135
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, # logic channels 136-147
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, # channels 200-236
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0] # 300-335
+
 source:
 {
   module_type: RootInput
+  inputCommands: ["keep *_*_*_*",
+                  "drop *_optdigitizer_*_*",
+                  "drop *_optfem_*_*",
+                  "drop *_triggersim_*_*",
+                  "drop *_pmtreadout_*_*",
+                  "drop *_caldata_*_*"]
 }
 
 physics:
@@ -69,19 +105,21 @@ physics:
 
  producers:
  {
+   daq:            @local::microboone_simwire
    digitfilter:  @local::microboone_rawdigitfilter
    caldata:      @local::microboone_calroi
 
-   saturation: @local::correct_saturation
+   optdigitizer:   @local::microboone_optical_adc_sim_singlep
+   optfem:         @local::microboone_optical_fem_sim_singlep
+   triggersim:     @local::ubtrigger_singlep
+   pmtreadout:     @local::microboone_optical_dram_readout_sim
 
-   ophit:            @local::microboone_ophit_beam_highgain
-   opflash:          @local::microboone_opflash_beam_highgain
-   ophitSatBeam:     @local::microboone_ophit_saturation_beam
-   ophitSatCosmic:   @local::microboone_ophit_saturation_cosmic
-   opflashSatBeam:   @local::microboone_opflash_saturation_beam
-   opflashSatCosmic: @local::microboone_opflash_saturation_cosmic
-   sflashSatBeam:    @local::microboone_simple_flash_sat_beam
-   sflashSatCosmic:  @local::microboone_simple_flash_sat_cosmic
+   saturation:        @local::correct_saturation
+   ophit:             @local::microboone_ophit_beam_highgain
+   ophitSatBeam:      @local::microboone_ophit_saturation_beam
+   ophitSatCosmic:    @local::microboone_ophit_saturation_cosmic
+   simpleFlashBeam:   @local::UBFlashBeam
+   simpleFlashCosmic: @local::UBFlashCosmic
 
    rns:       { module_type: "RandomNumberSaver" }
  }
@@ -97,10 +135,11 @@ physics:
 
  filters: { swtrigger: @local::swtrigger_bnb }
 
- simulate: [ rns, swtrigger, saturation,
-             ophit, opflash, ophitSatBeam, ophitSatCosmic, opflashSatBeam, opflashSatCosmic,
-             sflashSatBeam, sflashSatCosmic, 
-             digitfilter, caldata ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, swtrigger, 
+             saturation,
+             ophit, ophitSatBeam, ophitSatCosmic,
+             simpleFlashBeam, simpleFlashCosmic, 
+             daq, digitfilter, caldata ]
 
  ana: [ mcinfo, simch, wire, opdigit, opreco ]
  
@@ -121,6 +160,11 @@ physics.producers.caldata.DodQdxCalib: false
 physics.producers.saturation.CalibrationCorr : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                                                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
+physics.producers.simpleFlashBeam.AlgoConfig.PEBaseline:[0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]
+physics.producers.simpleFlashBeam.PECalib: @local::NoCalib
+physics.producers.simpleFlashCosmic.AlgoConfig.PEBaseline:[0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]
+physics.producers.simpleFlashCosmic.PECalib: @local::NoCalib
+
 physics.analyzers.mcinfo.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.simch.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.wire.SelectEvents: { SelectEvents: [ simulate ] }
@@ -140,10 +184,10 @@ physics.analyzers.opdigit.out_filename:     "larlite_opdigit.root"
 physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
 
 physics.analyzers.opreco.DataLookUpMap.ophit: ["ophit","ophitSatBeam","ophitSatCosmic"]
-physics.analyzers.opreco.DataLookUpMap.opflash: ["opflash","opflashSatBeam","opflashSatCosmic","sflashSatBeam","sflashSatCosmic"]
+physics.analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashCosmic","simpleFlashBeam"]
 
-physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSat","ophitSatBeam","ophitSatCosmic"]
-physics.analyzers.opreco.AssociationLookUpMap.opflash: ["opflash","opflashSatBeam","opflashSatCosmic","sflashBeam","sflashCosmic"]
+physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophit","ophitSatBeam","ophitSatCosmic"]
+physics.analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashCosmic","simpleFlashBeam"]
 
 outputs:
 {
