@@ -123,10 +123,6 @@ namespace lris {
     int                            fSwizzlingTime; //fhicl parameter.  Defaults as time of Hoot database query execution.
     bool                           fSwizzleTPC; //fhicl parameter.  Tells us whether to swizzle the TPC data
     bool                           fSwizzlePMT; //fhicl parameter.  Tells us whether to swizzle the PMT data
-    bool                           fSwizzlePMT_init; //stored initial fhicl parameter telling whether to swizzle PMT data
-                                                    // using this to reset fSwizzlePMT for events without PMT data but
-                                                    // with the fSwizzlePMT fhicl parameter set to true
-                                                    // (fix crash in checkTimeStampConsistency)
     bool                           fSwizzleTrigger; //fhicl parameter.  Tells us whether to swizzle the trigger data. (desired if we don't care about frame slippage)
     std::string                    fSwizzleTriggerType; //fhicl parameter.  Tells us whether to swizzle a specific trigger type only. Options are ALL, BNB, NuMI, CALIB
     bool skipEvent; // tag to skip event if trigger is not the type we want.
@@ -162,13 +158,12 @@ namespace lris {
     uint32_t triggerBitPMTBeam;
     uint32_t triggerBitPMTCosmic;
     
-    int PMTframe; // internal checking variable for PMT
-    int FEM5triggerFrame ;
-    int FEM5triggerSample;
-    int FEM6triggerFrame ;
-    int FEM6triggerSample;
-    double FEM5triggerTime;
-    double FEM6triggerTime;
+    //int FEM5triggerFrame ;
+    //int FEM5triggerSample;
+    //int FEM6triggerFrame ;
+    //int FEM6triggerSample;
+    //double FEM5triggerTime;
+    //double FEM6triggerTime;
 
     int RO_BNBtriggerFrame;
     int RO_NuMItriggerFrame;
@@ -182,31 +177,47 @@ namespace lris {
     double RO_NuMItriggerTime;
     double RO_EXTtriggerTime;
     double RO_RWMtriggerTime;
-    
+   
+    int RO_BNBtriggerFrame;
+    int RO_NuMItriggerFrame;
+    int RO_EXTtriggerFrame;
+    int RO_RWMtriggerFrame;
+    int RO_BNBtriggerSample;
+    int RO_NuMItriggerSample;
+    int RO_EXTtriggerSample;
+    int RO_RWMtriggerSample;
+    double RO_BNBtriggerTime;
+    double RO_NuMItriggerTime;
+    double RO_EXTtriggerTime;
+    double RO_RWMtriggerTime;	
+
 //    uint32_t RO_Gate1Frame;
 //    uint32_t RO_Gate1Sample;
 //    uint32_t RO_Gate2Frame;
 //    uint32_t RO_Gate2Sample;
 
-    int TPCframe; // internal checking variable for TPC
-    int TPC1triggerFrame;
-    int TPC1triggerSample;
-    int TPC2triggerFrame;
-    int TPC2triggerSample;
-    int TPC3triggerFrame;
-    int TPC3triggerSample;
-    int TPC4triggerFrame;
-    int TPC4triggerSample;
-    int TPC5triggerFrame;
-    int TPC5triggerSample;
-    int TPC6triggerFrame;
-    int TPC6triggerSample;
-    int TPC7triggerFrame;
-    int TPC7triggerSample;
-    int TPC8triggerFrame;
-    int TPC8triggerSample;
-    int TPC9triggerFrame;
-    int TPC9triggerSample;
+    int TPCtriggerFrame; // internal checking variable for TPC
+    int TPCtriggerSample;
+    int PMTtriggerFrame; // same for the pmt
+    int PMTtriggerSample;
+    //int TPC1triggerFrame;
+    //int TPC1triggerSample;
+    //int TPC2triggerFrame;
+    //int TPC2triggerSample;
+    //int TPC3triggerFrame;
+    //int TPC3triggerSample;
+    //int TPC4triggerFrame;
+    //int TPC4triggerSample;
+    //int TPC5triggerFrame;
+    //int TPC5triggerSample;
+    //int TPC6triggerFrame;
+    //int TPC6triggerSample;
+    //int TPC7triggerFrame;
+    //int TPC7triggerSample;
+    //int TPC8triggerFrame;
+    //int TPC8triggerSample;
+    //int TPC9triggerFrame;
+    //int TPC9triggerSample;
     
     uint32_t ADCwords_crate0;
     uint32_t ADCwords_crate1;
@@ -228,8 +239,13 @@ namespace lris {
     uint32_t NumWords_crate8;
     uint32_t NumWords_crate9;
 
+    int N_trig_algos;
+    std::vector<std::string> algo_instance_name;
+    bool pass_algo[20];
+    bool pass_prescale[20];
+
     int event;
-    TTree *tMyTree;
+    TTree *ValidationTree;
     
   };  // LArRawInputDriverUBooNE;
 
