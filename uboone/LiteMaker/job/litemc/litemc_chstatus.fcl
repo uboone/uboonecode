@@ -1,0 +1,18 @@
+#include "litemaker_base.fcl"
+
+litemc_chstatus: @local::litemaker_base
+
+litemc_chstatus.out_filename: "larlite_chstatus.root"
+
+litemc_chstatus.RawDigit4ChStatus: "digitfilter"
+
+litemc_chstatus.DataLookUpMap:
+{
+  chstatus:   ["chstatus"]
+}
+
+litemc_wire.AssociationLookUpMap:
+{}
+
+
+
