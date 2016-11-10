@@ -6,6 +6,7 @@ import pprint as pp
 if len(sys.argv)!=3:
     print "usage: link_maker.py [xmlfile] [folder where simlinks should be made]"
     print "special: if folder is simply kazu, links made at: '/uboone/data/users/kterao/dl_production_symlink_v00/%s' % UNIQUE_NAME"
+    sys.exit(-1)
 
 ########READ XML                                                                                                                                                                
 XMLFILE=sys.argv[1]
@@ -17,11 +18,9 @@ if not XMLFILE.endswith('.xml'):
     sys.exit(1)
 UNIQUE_NAME = XMLFILE.replace('.xml','')
 UNIQUE_NAME = UNIQUE_NAME[UNIQUE_NAME.rfind('/')+1:len(UNIQUE_NAME)] + '/'
+OUTPUT_DIR=sys.argv[2]
 if OUTPUT_DIR=="kazu":
     OUTPUT_DIR  = '/uboone/data/users/kterao/dl_production_symlink_v00/%s' % UNIQUE_NAME    
-else:
-    OUTPUT_DIR=sys.argv[2]
-
 
 print 'SymLink directory:\033[95m',UNIQUE_NAME,'\033[00m'
 #if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
@@ -69,16 +68,20 @@ lite_files_map={}
 ctr = 0
 for d in jobdirs:
 
-    jobid = int(d.split('_')[-1])
+    jobid = int(d.split('_')[-2])*10000 + int(d.split('_')[-1])
     jobdir = '%s/%s' % (INPUT_DIR,d)
-    lite_files = [x for x in os.listdir(jobdir) if ( ( (x.startswith('larlite') and x.endswith('.root')) or
+    lite_files = [x for x in os.listdir(jobdir) if ( ( (x.startswith('supera') and x.endswith('.root')) or
+                                                       (x.startswith('larlite') and x.endswith('.root')) or
                                                        (x.startswith('ana_hist'))
                                                        ) and
                                                      os.path.getsize('%s/%s' % (jobdir,x)) > 1000 )
                   ]
     for f in lite_files:
 
-        flavor = f.split('_')[1]
+        if "larlite" in f:
+            flavor = f.split('_')[1]
+        elif "supera" in f:
+            flavor = "supera"
         #if flavor == 'mc': flavor = 'mcinfo'
         if not flavor in lite_files_map: 
             lite_files_map[flavor] = {}
@@ -123,13 +126,17 @@ for flavor,fmap in lite_files_map.iteritems():
     sys.stdout.flush()
 
     ctr=len(success_jobs)
-    for jobid in success_jobs:
-
+    for iidx,jobid in enumerate(success_jobs):
         target_fname = fmap[jobid]
+        print flavor,target_fname
         if flavor == 'hist':
-            target_link = '%s/anatree_%04d.root' % (OUTPUT_DIR,jobid)
+            target_link = '%s/anatree_%04d.root' % (OUTPUT_DIR,iidx)
+        elif flavor=="supera":
+            target_link = '%s/supera_%04d.root' % ( OUTPUT_DIR,int(target_fname.split("/")[-1].split("_")[1]) )
         else:
-            target_link = '%s/larlite_%s_%04d.root' % (OUTPUT_DIR,flavor,jobid)
+            target_link = '%s/larlite_%s_%04d.root' % (OUTPUT_DIR,flavor,iidx)
+
+        
 
         if not os.path.isfile(target_link):
             cmd = 'ln -s %s %s' % (target_fname,target_link)

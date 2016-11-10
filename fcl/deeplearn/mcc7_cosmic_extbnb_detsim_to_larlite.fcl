@@ -16,6 +16,7 @@
 #include "litemc_simch.fcl"
 #include "litemc_rawdigit.fcl"
 #include "litemc_wire.fcl"
+#include "litemc_chstatus.fcl"
 #include "litemc_opreco.fcl"
 #include "litemc_opdigit.fcl"
 
@@ -106,6 +107,7 @@ physics:
    simch:    @local::litemc_simch
    #rawdigit: @local::litemc_rawdigit
    wire:     @local::litemc_wire
+   chstatus: @local::litemc_chstatus
    opdigit:  @local::litemc_opdigit
    opreco:   @local::litemc_opreco
  }
@@ -119,7 +121,7 @@ physics:
              simpleFlashBeam, simpleFlashCosmic, 
              daq, digitfilter, caldata ]
 
- ana: [ mcinfo, simch, wire, opdigit, opreco ]
+ ana: [ mcinfo, simch, wire, chstatus, opdigit, opreco ]
  
  #stream1:  [ out1 ]
  stream1:  []
@@ -150,6 +152,7 @@ physics.analyzers.mcinfo.SelectEvents: { SelectEvents: [ simulate ] }
 #physics.analyzers.rawdigit.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.simch.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.wire.SelectEvents: { SelectEvents: [ simulate ] }
+physics.analyzers.chstatus.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.opdigit.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.opreco.SelectEvents: { SelectEvents: [ simulate ] }
 
@@ -157,6 +160,7 @@ physics.analyzers.opreco.SelectEvents: { SelectEvents: [ simulate ] }
 physics.analyzers.mcinfo.stream:      "mcinfo"
 physics.analyzers.simch.stream:       "simch"
 physics.analyzers.wire.stream:        "wire"
+physics.analyzers.chstatus.stream:    "chstatus"
 physics.analyzers.opdigit.stream:     "opdigit"
 physics.analyzers.opreco.stream:      "opreco"
 
@@ -164,6 +168,7 @@ physics.analyzers.opreco.stream:      "opreco"
 physics.analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
 physics.analyzers.simch.out_filename:       "larlite_simch.root"
 physics.analyzers.wire.out_filename:        "larlite_wire.root"
+physics.analyzers.chstatus.out_filename:    "larlite_chstatus.root"
 physics.analyzers.opdigit.out_filename:     "larlite_opdigit.root"
 physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
 
