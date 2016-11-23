@@ -1,38 +1,37 @@
 #include "services_microboone.fcl"
-#include "correct_saturation_afterRun3701.fcl"
-#include "opticaldetectormodules_microboone.fcl"
-#include "photpropservices_microboone.fcl"
-#include "correct_saturation.fcl"
-#include "caldata_microboone.fcl" 
-#include "time_memory_tracker_microboone.fcl"
-#include "ubflashfinder.fcl"
-#include "litedatamin_wire.fcl"
-#include "litedatamin_chstatus.fcl"
-#include "litedatamin_opreco.fcl"
-#include "litedatamin_opdigit.fcl"
-
+#include "singles_microboone.fcl"
 
 process_name: SuperaDummy
 
 services:
 {
-  scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
+  #scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
+  #TFileService: { fileName: "mc_hist.root" }
+  #TimeTracker:             @local::microboone_time_tracker
+  #MemoryTracker:           @local::microboone_memory_tracker
+  #RandomNumberGenerator:   {} #ART native random number generator                                                                                          
+  #message:                 @local::microboone_message_services_prod_debug
+  FileCatalogMetadata:     @local::art_file_catalog_mc
+  #LLMetaMaker: {Enable: false }
+  @table::microboone_simulation_services
 }
 
-
-# source:
-# {
-#   module_type: RootInput
-#   maxEvents:   10          # Number of events to create
-#   inputCommands: ["keep *_*_*_*","drop recob::OpHits_*_*_*","drop recob::OpFlashs_*_*_*"]
-# }
+source:
+{
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   1          # Number of events to create
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
+}
 
 physics:
 {
 
  producers:
  {
+  generator: @local::microboone_singlep
  }
 
  analyzers:
@@ -46,15 +45,9 @@ physics:
  end_paths:     []  
 }
 
+services.ChannelStatusService.ChannelStatusProvider.UseDB: false
 
 outputs:
 {
- out1:
- {
-   module_type: RootOutput
-   fileName:    "dummy_out.root" #default file name, can override from command line with -o or --output
-   dataTier:    "generated"
-   compressionLevel: 1
- }
 }
 
