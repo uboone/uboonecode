@@ -1,5 +1,5 @@
 art_make( BASENAME_ONLY
-          EXCLUDE SimWireMicroBooNE_module.cc
+          EXCLUDE SimWireMicroBooNE_module.cc 
           MODULE_LIBRARIES larcore_Geometry
                         larcore_Geometry_Geometry_service
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
@@ -8,7 +8,7 @@ art_make( BASENAME_ONLY
                         lardataobj_RawData
                         SignalShapingServiceMicroBooNE_service
 			larevt_CalibrationDBI_Providers
-                        larsim_RandomUtils_LArSeedService_service
+                        nutools_RandomUtils_NuRandomService_service
                         ${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -40,7 +40,7 @@ simple_plugin(SimWireMicroBooNE "module"
               lardata_DetectorInfoServices_DetectorClocksServiceStandard_service # BUG note that we link to a specific service implementation
               SignalShapingServiceMicroBooNE_service
               larevt_CalibrationDBI_Providers
-              larsim_RandomUtils_LArSeedService_service
+              nutools_RandomUtils_NuRandomService_service
               ${ART_FRAMEWORK_CORE}
               ${ART_FRAMEWORK_PRINCIPAL}
               ${ART_FRAMEWORK_SERVICES_REGISTRY}

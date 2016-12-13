@@ -29,6 +29,7 @@ add_subdirectory(MuCS)
 add_subdirectory(T0Reco)
 add_subdirectory(LLBasicTool)
 add_subdirectory(LLSelectionTool)
+add_subdirectory(EventWeight)
 add_subdirectory(UBFlashFinder)
 
 add_subdirectory(DataOverlay)
