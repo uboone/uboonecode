@@ -13,19 +13,21 @@
 #include "photpropservices_microboone.fcl"
 
 #include "ubflashfinder.fcl"
+#include "mucstrackfinder.fcl"
 
-process_name: mcst0study 
+process_name: MuCSTrackFinder
 
 services:
 {
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
-  TFileService:            { fileName: "output.root" }
+  TFileService: { fileName: "flashtrackmatch_mucstrackfinder_run158_OneToMany.root" }
   TimeTracker:             @local::microboone_time_tracker
   MemoryTracker:           @local::microboone_memory_tracker
   RandomNumberGenerator:   {} #ART native random number generator                                                                                          
   message:                 @local::microboone_message_services_prod_debug
-  FileCatalogMetadata:     @local::art_file_catalog_mc
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  #LLMetaMaker: {Enable: true}
   @table::microboone_simulation_services
 }
 
@@ -36,6 +38,17 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 services.DetectorClocksService.TrigModuleName:               "daq"
 
 services.Geometry.ForceUseFCLOnly: true
+
+services.FileCatalogMetadata.applicationVersion: "develop"
+services.FileCatalogMetadata.fileType: "data"
+services.FileCatalogMetadata.runType: "physics"
+services.FileCatalogMetadataMicroBooNE: {
+  FCLName: "litemucs.fcl"
+  FCLVersion: "develop"
+  ProjectName: "LiteMC"
+  ProjectStage: "LiteMaker"
+  ProjectVersion: "develop"
+}
 
 services.TimeTracker.printSummary: false
 services.TimeTracker.dbOutput: {}
@@ -63,8 +76,11 @@ physics:
    saturation:        @local::correct_saturation
    ophitSatBeam:      @local::microboone_ophit_saturation_beam
    ophitSatCosmic:    @local::microboone_ophit_saturation_cosmic
+   opflashSatBeam:    @local::microboone_opflash_saturation_beam
+   opflashSatCosmic:  @local::microboone_opflash_saturation_cosmic
    simpleFlashBeam:   @local::UBFlashBeam
    simpleFlashCosmic: @local::UBFlashCosmic
+   mucsTrackFinder:   @local::MuCSTrackFinder
    rns:               { module_type: "RandomNumberSaver" }
  }
 
@@ -72,8 +88,9 @@ physics:
  {
  }
 
- reco: [ rns, saturation, ophitSatBeam, ophitSatCosmic, 
-         simpleFlashBeam, simpleFlashCosmic ]
+ reco: [ rns, saturation, ophitSatBeam, ophitSatCosmic,
+         opflashSatBeam, opflashSatCosmic, simpleFlashBeam, simpleFlashCosmic, 
+         mucsTrackFinder ]
 
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -87,7 +104,13 @@ physics:
  end_paths:     [stream1]
 }
 
+
 physics.producers.saturation.verbose:                         false
+
+
+
+
+
 
 #block to define where the output goes.  if you defined a filter in the physics
 #block and put it in the trigger_paths then you need to put a SelectEvents: {SelectEvents: [XXX]}
@@ -97,10 +120,11 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "art-root-simple-flash.root"
+   fileName:    "T0Reco.root"
    dataTier:    "reco"
    compressionLevel: 1
-   outputCommands: [
+   #outputCommands: [
+  outputCommands: [
             "keep *_*_*_*",
             "keep recob::Track_*_pandoraCosmic_*",
             "drop raw::RawDigits_*_*_*",
