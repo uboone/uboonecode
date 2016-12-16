@@ -52,10 +52,10 @@ CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
   NActiveResponses:     [ [1, 1, 1], [1, 1, 1] ]  # number of active responses per view, including primary. 1 is current number
   NYZActiveResponses:   [ [1, 2, 1], [1, 2, 1] ]  # number of active responses per view for YZ-dependent field responses
   NdatadrivenActiveResponses: [ [3, 3, 2], [3, 3, 2] ]  # number of active responses per view for data driven field responses
-  FieldResponseFVersion:  [ "v0.1", "v0.1" ]	 
+  FieldResponseFVersion:  [ "v3.1", "v3.1" ]	 
   
-  DefaultEField:       0.5
-  DefaultTemperature:  87.0
+  DefaultEField:       0.273
+  DefaultTemperature:  89.0
 
   TimeScaleParams:   [ 1.0, 0.806 ] # this does the scaling from full- to half-field
                                       # good to ~0.2% over the range of the velocity ratio for 1-0.4 in the field
@@ -64,8 +64,8 @@ CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
 
   StretchFullResponse:  false         # to maintain the original stretching scheme
                                       # false means only the field response is stretched, not the electronic response
-  YZdependentResponse:  false         # flag to use YZ-dependent field responses
-  datadrivenResponse:   false         # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)
+  YZdependentResponse:  true          # flag to use YZ-dependent field responses
+  datadrivenResponse:   true          # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)
   YZchargeScaling:      [ [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0] ] # scale charge; from transparency effects - ramification of shorted wires
   #YZwireOverlap:        [ [ [296, 671], [2400, 3071], [4800, 6143] ], [ [1168, 1903], [3568, 4303], [7136, 7263] ] ] # channel ranges for shorted wires and corresponding channel ranges for wires effected on other planes
 
