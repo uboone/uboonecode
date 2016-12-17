@@ -702,9 +702,7 @@ namespace detsim {
 	    //  for(int wire = 0; wire < (int)N_RESPONSES[0][view]; ++wire) {
 	    for(int wire = -(N_RESPONSES[0][view]-1); wire<(int)N_RESPONSES[0][view]; ++wire) {
 	      auto wireIndex = (size_t)wire+N_RESPONSES[0][view] - 1;
-	      if((int)wireIndex == (int)N_RESPONSES[0][view]) continue;
-	      //int wireChan = (int)chan + wire;
-	      int wireChan = (int) chan;
+	      int wireChan = (int)chan + wire;
 	      if(wireChan<0 || wireChan>= (int)N_CHANNELS) continue;
 	      if((size_t)geo->View(wireChan)!=view) continue;
 
@@ -882,14 +880,13 @@ namespace detsim {
       if(fSample>=0) tick0 = t0[fSample] - factor[view]*slope0[fSample]*(wireNum-wire0[view]) + 0.5;
 
       for(int wire=-(N_RESPONSES[0][view]-1); wire<(int)N_RESPONSES[0][view];++wire) {
-      //for(int wire = 0; wire<(int)N_RESPONSES[0][view]; ++wire) {
-	int wireChan = chan;
-        //int wireChan = chan + wire;
+	size_t wireIndex = (size_t)(wire + (int)N_RESPONSES[0][view] -1 );
+	int wireChan;
+	if(YZresponse){ wireChan = chan; }
+        if(!YZresponse){ wireChan = chan + wire; }
         if(wireChan<0 || wireChan>= (int)N_CHANNELS) continue;
-        if ((size_t)geo->View(wireChan)!=view) continue;
-	//int wireIndex = wire;
-        size_t wireIndex = (size_t)(wire + (int)N_RESPONSES[0][view] - 1);
-	if((int)wireIndex >= (int)N_RESPONSES[0][view]) continue;
+        if((size_t)geo->View(wireChan)!=view) continue;
+        if( YZresponse && (int)wireIndex >= (int)N_RESPONSES[0][view]) continue;
 
         auto & thisWire = thisChan[wireIndex];
         if(thisWire.empty()) continue;
