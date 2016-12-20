@@ -362,9 +362,13 @@ bool SWTrigger::filter(art::Event & evt)
       continue;
     if ( wfm.size()<fMinReadoutTicks )
       continue;
-    long int trig_dt = (long int)(trigger_time - wfm.TimeStamp());
+    //long int trig_dt = (long int)(trigger_time - wfm.TimeStamp());
+    int trig_dt = (int)(trigger_time - wfm.TimeStamp());
     uint64_t unsigned_trig_dt = (trig_dt < 0 ? trig_dt*(-1) : trig_dt);
 
+    std::cout << "Trigger time and wfm timestamp are " << trigger_time << " and " << wfm.TimeStamp() << std::endl;
+    std::cout << "Trig_dt and unsigned_trig_dt are " << trig_dt << " and " << unsigned_trig_dt << std::endl;
+    
     if(min_trig_dt > unsigned_trig_dt) {
       min_trig_dt = unsigned_trig_dt;
       target_time = wfm.TimeStamp() * 1.e3;
