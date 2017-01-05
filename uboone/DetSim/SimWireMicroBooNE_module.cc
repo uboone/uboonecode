@@ -457,8 +457,6 @@ namespace detsim {
     // scale ionization depending on plane, wire and YZ location 
     if(YZresponse){
       for(unsigned int chan = 0; chan < N_CHANNELS; chan++) {
-	const sim::SimChannel* sc = channels.at(chan);
-	if( !sc ) continue;
 	
 	auto wid = geo->ChannelToWire(chan);
 	size_t view = (size_t)geo->View(chan);
@@ -466,6 +464,9 @@ namespace detsim {
 	if (first_channel_in_view[view] == -1) {
 	  first_channel_in_view[view] = chan;
 	}
+
+	const sim::SimChannel* sc = channels.at(chan);
+	if( !sc ) continue;
 
 	auto const& timeSlices = sc->TDCIDEMap();
 
