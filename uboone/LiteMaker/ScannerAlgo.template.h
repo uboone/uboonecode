@@ -39,6 +39,7 @@
 #include "DataFormat/mucsdata.h"
 #include "DataFormat/mucsreco.h"
 #include "DataFormat/chstatus.h"
+#include "DataFormat/mceventweight.h"
 #include <TStopwatch.h>
 /*
   This file defines certain specilization of templated functions.
@@ -1181,15 +1182,32 @@ namespace larlite {
     //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
     auto lite_data = (::larlite::event_flashmatch*)lite_dh;
     for(size_t i=0; i<dh->size(); ++i) {
-      
+
       art::Ptr<::anab::FlashMatch> fmatch_ptr(dh,i);
 
       larlite::flashmatch lite_fmatch( fmatch_ptr->Chi2(),
 				       fmatch_ptr->FlashID(),
 				       fmatch_ptr->SubjectID(),
 				       fmatch_ptr->InBeam() );
-      
+
       lite_data->push_back(lite_fmatch);
+    }
+  }
+
+  template <>
+  void ScannerAlgo::ScanData(art::Handle<std::vector< ::evwgh::MCEventWeight> > const &dh,
+			     ::larlite::event_base* lite_dh)
+  {
+    fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;
+    //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
+    auto lite_data = (::larlite::event_mceventweight*)lite_dh;
+    for(size_t i=0; i<dh->size(); ++i) {
+
+      art::Ptr<::evwgh::MCEventWeight> weight_ptr(dh,i);
+
+      larlite::mceventweight lite_weight(weight_ptr->fWeight);
+
+      lite_data->push_back(lite_weight);
     }
   }
 
@@ -1402,6 +1420,12 @@ namespace larlite {
     return fPtrIndex_fmatch[key1][key2]; 
   }
 
+  template <> std::map<art::Ptr< ::evwgh::MCEventWeight>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
+  { if(fPtrIndex_eventweight.size()<=key1) fPtrIndex_eventweight.resize(key1+1);
+    if(fPtrIndex_eventweight[key1].size()<=key2) fPtrIndex_eventweight[key1].resize(key2+1);
+    return fPtrIndex_eventweight[key1][key2];
+  }
+
   template <class T>
   std::map<art::Ptr<T>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
   { throw cet::exception(__PRETTY_FUNCTION__)<<"Not implemented for a specified data product type..."; }
@@ -1482,6 +1506,9 @@ namespace larlite {
   { return ::larlite::data::kMuCSData; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::MuCS::MuCSRecoData> () const
   { return ::larlite::data::kMuCSReco; }
+  // evwgh
+  template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::evwgh::MCEventWeight> () const
+  { return ::larlite::data::kMCEventWeight; }
   //
   // LocateLiteProduct implementation
   //
@@ -1678,6 +1705,10 @@ namespace larlite {
 										  ::larlite::event_ass* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
 
+  template <> void ScannerAlgo::ScanAssociation <::evwgh::MCEventWeight,::evwgh::MCEventWeight>(art::Event const& e,
+										  art::Handle<std::vector<::evwgh::MCEventWeight> > &dh,
+										  ::larlite::event_ass* lite_dh)
+  { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
 
   //
   // LiteDataType

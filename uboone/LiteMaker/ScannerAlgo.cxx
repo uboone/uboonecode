@@ -53,6 +53,7 @@ namespace larlite {
     fPtrIndex_partid.clear();
     fPtrIndex_pfpart.clear();
     fPtrIndex_pcaxis.clear();
+    fPtrIndex_eventweight.clear();
   }
 }
 
