@@ -7,7 +7,7 @@ microboone_opreadoutmap:
 {
  Verbose: false
  OpMapLists: { 
-        twoFEMOpMap: @local::microboone_twofem_opmap
+        twoFEMOpMap: @local::microboone_threefem_opmap
         threeFEMOpMap: @local::microboone_threefem_opmap
         }
  OpMapTimeRanges: {
