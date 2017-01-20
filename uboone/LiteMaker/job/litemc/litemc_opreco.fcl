@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_opreco: @local::litemaker_base
 
 litemc_opreco.out_filename: "larlite_opreco.root"
@@ -20,4 +22,4 @@ litemc_opreco.AssociationLookUpMap:
   opflash: ["opflash","opflashSat"]
 }
 
-
+END_PROLOG

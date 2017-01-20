@@ -206,7 +206,7 @@ MultiPartVertex::MultiPartVertex(fhicl::ParameterSet const & p)
     param.multi[1]   = maxmult_v[idx];
     param.weight     = weight_v[idx];
     for(size_t i=0; i<pdg.size(); ++i)
-      param.mass[i] = db->GetParticle(param.pdg[i])->Mass() * 1.e3;
+      param.mass[i] = db->GetParticle(param.pdg[i])->Mass();
     
     // sanity check
     if(kerange[0]<0 || kerange[1]<0)

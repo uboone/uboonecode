@@ -1,0 +1,22 @@
+#include "dlmc_fclbase_driver.fcl"
+
+process_name: BNBNuLArLite
+
+physics.sim: [ @sequence::dlmc_process_filter ]
+physics.trigger_paths: [ sim ]
+
+# GENIE
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName:  "booster"
+physics.producers.generator.FluxCopyMethod:   "IFDH"
+physics.producers.generator.MaxFluxFileMB:    2000
+
+# Filter output
+physics.analyzers.mcinfo.SelectEvents:  {SelectEvents:  [ sim ]}
+physics.analyzers.opdigit.SelectEvents: {SelectEvents:  [ sim ]}
+physics.analyzers.opreco.SelectEvents:  {SelectEvents:  [ sim ]}
+physics.analyzers.wire.SelectEvents:    {SelectEvents:  [ sim ]}
+physics.analyzers.reco2d.SelectEvents:  {SelectEvents:  [ sim ]}

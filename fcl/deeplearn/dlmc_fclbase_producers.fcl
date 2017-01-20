@@ -1,0 +1,100 @@
+#include "genie_microboone.fcl"
+#include "largeantmodules_microboone.fcl"
+#include "mcreco.fcl"
+#include "detsimmodules_microboone.fcl"
+#include "triggersim_microboone.fcl"
+#include "opticaldetectorsim_microboone.fcl"
+#include "opticaldetectormodules_microboone.fcl"
+#include "correct_saturation.fcl"
+#include "caldata_microboone.fcl" 
+#include "hitfindermodules_microboone.fcl"
+#include "wirecellmodules_microboone.fcl"
+#include "swtrigger_microboone.fcl"
+#include "ubflashfinder.fcl" 
+
+BEGIN_PROLOG
+
+dlmc_producers:
+ {
+   generator: @local::microboone_genie_uniform_flux_cc
+   largeant: @local::microboone_largeant
+   mcreco:   @local::standard_mcreco
+   optdigitizer:   @local::microboone_optical_adc_sim
+   optfem:         @local::microboone_optical_fem_sim
+   triggersim:     @local::ubtrigger_dark_bnb
+   pmtreadout:     @local::microboone_optical_dram_readout_sim
+
+   ophitBeam         : @local::microboone_ophit_saturation_beam
+   ophitCosmic       : @local::microboone_ophit_saturation_cosmic
+   saturation        : @local::correct_saturation_mc
+   simpleFlashBeam   : @local::UBFlashBeamMC
+   simpleFlashCosmic : @local::UBFlashCosmicMC
+   opflashBeam       : @local::microboone_opflash_saturation_beam
+   opflashCosmic     : @local::microboone_opflash_saturation_cosmic
+
+   daq               : @local::microboone_simwire
+   wcNoiseFilter     : @local::microboone_wirecellnoisefilter
+   caldata           : @local::microboone_calroi
+   gaushit           : @local::microboone_gaushitfinder
+
+   rns:       { module_type: "RandomNumberSaver" }
+}
+
+dlmc_filters: { swtrigger: @local::microboone_swtrigger_mc_bnb }
+
+
+dlmc_process_all: [ rns, generator,
+                    largeant, mcreco,
+                    optdigitizer, optfem, triggersim, pmtreadout,
+                    saturation,
+                    ophitBeam, ophitCosmic,
+                    simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                    daq, wcNoiseFilter, caldata, gaushit, swtrigger]
+dlmc_process_filter: [ rns, generator,
+                       largeant, mcreco,
+                       optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
+                       saturation,
+                       ophitBeam, ophitCosmic,
+                       simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                       daq, wcNoiseFilter, caldata, gaushit]
+
+# generator
+dlmc_producers.generator: @local::microboone_genie_simple
+dlmc_producers.generator.GlobalTimeOffset: 3125.
+dlmc_producers.generator.RandomTimeOffset: 1600.
+dlmc_producers.generator.TopVolume: "volTPCActive"
+dlmc_producers.generator.BeamName:  "booster"
+dlmc_producers.generator.FluxCopyMethod:   "IFDH"
+dlmc_producers.generator.MaxFluxFileMB:    2000
+
+# G4 step
+dlmc_producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
+                                                      1000010020,1000010030,1000020030,1000020040]
+dlmc_producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
+dlmc_producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
+                                                      1000010020,1000010030,1000020030,1000020040]
+
+dlmc_producers.daq.GenNoise: 0
+
+#wirecell noise filtering
+dlmc_producers.wcNoiseFilter.DigitModuleLabel:    "daq"
+dlmc_producers.wcNoiseFilter.DoNoiseFiltering:    false
+dlmc_producers.wcNoiseFilter.NumTicksToDropFront: 2400
+dlmc_producers.wcNoiseFilter.WindowSize:          6400
+
+dlmc_producers.saturation.CalibrationCorr : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                                                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+dlmc_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
+dlmc_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
+dlmc_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
+dlmc_producers.caldata.DodQdxCalib:                              false
+
+dlmc_producers.gaushit.CalDataModuleLabel:                       "caldata"
+dlmc_producers.gaushit.MinSig:                                   [3.25, 3.25, 3.75]
+dlmc_producers.gaushit.MinWidth:                                 [1.0,  1.0,  1.0]
+dlmc_producers.gaushit.MaxMultiHit:                              6
+dlmc_producers.gaushit.TryNplus1Fits:                            false
+dlmc_producers.gaushit.Chi2NDF:                                  50.
+
+END_PROLOG

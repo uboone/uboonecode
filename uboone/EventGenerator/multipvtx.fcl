@@ -1,3 +1,4 @@
+BEGIN_PROLOG
 
 MultiPartVertex : {
     module_type  : "MultiPartVertex"
@@ -17,3 +18,5 @@ MultiPartVertex : {
         KERange      : [ [40,1500], [40,1500],  [40,1500], [50,700]]
     }
 }
+
+END_PROLOG

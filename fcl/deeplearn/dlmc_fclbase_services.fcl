@@ -1,0 +1,106 @@
+#include "services_microboone.fcl"
+#include "photpropservices_microboone.fcl"
+
+BEGIN_PROLOG
+
+dlmc_services:
+{
+  RandomNumberGenerator:   {} #ART native random number generator                                                                                          
+  LLMetaMaker: {Enable: true}
+  @table::microboone_simulation_services
+}
+
+services.FileCatalogMetadata.applicationVersion: "develop"
+services.FileCatalogMetadata.fileType: "mc"
+services.FileCatalogMetadata.runType: "physics"
+services.FileCatalogMetadataMicroBooNE: {
+  FCLName: "run_larlite_maker_mc.fcl"
+  FCLVersion: "develop"
+  ProjectName: "LiteMC"
+  ProjectStage: "LiteMaker"
+  ProjectVersion: "develop"
+}
+
+services.Geometry.ForceUseFCLOnly: true
+
+#services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
+#services.SignalShapingServiceMicroBooNE.NConfigs:            2
+#services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
+#services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
+#services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
+
+services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.1", "v3.1"]
+services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
+services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+
+#services.DetectorPropertiesService.NumberTimeSamples:        6400
+#services.DetectorPropertiesService.ReadOutWindowSize:        6400
+#services.DetectorClocksService.InheritClockConfig:           false
+#services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+
+services.SpaceCharge.EnableSimSpatialSCE: true
+services.SpaceCharge.EnableSimEfieldSCE: true
+
+services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 0-35
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 36-47
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 100-135
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 136-147
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 200-236
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
+
+services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 0-35
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 36-47
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 100-135
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 136-147
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 200-236
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
+
+END_PROLOG
