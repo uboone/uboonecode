@@ -10,19 +10,10 @@ print
 if not XMLFILE.endswith('.xml'):
     print '\033[93mERROR\033[00m: input does not have an .xml extension!\n'
     sys.exit(1)
-UNIQUE_NAME = XMLFILE.replace('.xml','')
-UNIQUE_NAME = UNIQUE_NAME[UNIQUE_NAME.rfind('/')+1:len(UNIQUE_NAME)] + '/'
-OUTPUT_DIR  = '/uboone/data/users/kterao/dl_production_symlink_v00/%s' % UNIQUE_NAME
-print 'SymLink directory:\033[95m',UNIQUE_NAME,'\033[00m'
-#if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
-#    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
-#    sys.exit(1)
-if not os.path.isdir(OUTPUT_DIR):
-    os.system('mkdir %s; chmod -R 775 %s' % (OUTPUT_DIR,OUTPUT_DIR))
 
 contents = ""
 with open(XMLFILE,"r") as file_:
-    contents = file_.read() #why use etree if we don't have too                                                                                                                 
+    contents = file_.read() #why use etree if we don't have too
 
 project = {}
 
@@ -48,7 +39,16 @@ for item in project:
 project["logs"] = logs
 project["outs"] = outs
 
-INPUT_DIR=project['outs']
+INPUT_DIR   = project['outs']
+UNIQUE_NAME = INPUT_DIR.split('/')[-2]
+OUTPUT_DIR  = '/uboone/data/users/kterao/dl_production_symlink_v01/%s' % UNIQUE_NAME
+print 'SymLink directory:\033[95m',UNIQUE_NAME,'\033[00m'
+if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
+    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
+    sys.exit(1)
+if not os.path.isdir(OUTPUT_DIR):
+    os.system('mkdir %s; chmod -R 775 %s' % (OUTPUT_DIR,OUTPUT_DIR))
+
 
 jobdirs = [x for x in os.listdir(INPUT_DIR) if ( len(x.split('_'))==2 and 
                                                  x.split('_')[0].isdigit() and 
@@ -75,7 +75,9 @@ for d in jobdirs:
             print flavor 
             lite_files_map[flavor] = {}
         if jobid in lite_files_map[flavor]:
-            print 'ERROR: duplicate jobid found (%d)' % jobid
+            print 'ERROR: duplicate jobid found (%d)' % jobid,'flavor',flavor
+            print f
+            print lite_files_map[flavor]
             raise Exception
         lite_files_map[flavor][jobid]='%s/%s' % (jobdir,f)
 
