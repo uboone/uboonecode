@@ -33,7 +33,7 @@ table_fragment_end
 # Add the dependent product and version
 
 product          version
-larlite         v06_09_00
+larlite         v06_20_00
 larcv		v06_09_00
 swtrigger       v02_02_03
 genie_xsec      v2_12_0
