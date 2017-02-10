@@ -1,4 +1,4 @@
-#include "reco_uboone_mcc8_driver_stage1and2.fcl"
+#include "reco_uboone_data_mcc8_driver_stage1and2_MuCSbs34.fcl"
 
 # Enable data-driven field response.
 
