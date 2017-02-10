@@ -85,7 +85,7 @@ namespace detsim {
 
     void GenNoiseInTime(std::vector<float> &noise, double noise_factor) const;
     void GenNoiseInFreq(std::vector<float> &noise, double noise_factor) const;
-    void GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan);
+    void GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan, bool IsUMisconfigured);
     void MakeADCVec(std::vector<short>& adc, std::vector<float> const& noise, 
                     std::vector<double> const& charge, float ped_mean) const;
 
@@ -154,6 +154,7 @@ namespace detsim {
     std::vector<double> _pfn_value_re;
     std::vector<double> _pfn_value_im;
     float gammaRand;
+
 
   }; // class SimWireMicroBooNE
 
@@ -853,7 +854,7 @@ namespace detsim {
         else if(fGenNoise==2)
           GenNoiseInFreq(noisetmp, noise_factor);
 	else if(fGenNoise==3)
-	  GenNoisePostFilter(noisetmp, noise_factor, view, chan);
+	  GenNoisePostFilter(noisetmp, noise_factor, view, chan, IsUMisconfigured);
       }
    
       //Add Noise to NoiseDist Histogram
@@ -948,7 +949,6 @@ namespace detsim {
       rd.SetPedestal(ped_mean);
       digcol->push_back(std::move(rd)); // we do move the raw digit copy, though
     }// end of 2nd loop over channels
-
  
     evt.put(std::move(digcol));
     return;
@@ -1071,7 +1071,7 @@ namespace detsim {
   
   //---------------------------------------------------------
 
-  void SimWireMicroBooNE::GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan)
+  void SimWireMicroBooNE::GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan, bool IsUMisconfigured)
   {
     // noise is a vector of size fNTicks, which is the number of ticks
     const size_t waveform_size = noise.size();
@@ -1082,7 +1082,8 @@ namespace detsim {
 
     Double_t ShapingTime = _pfn_shaping_time_v[view];
 
-      if(!_pfn_f1) _pfn_f1 = new TF1("_pfn_f1", "([0]*exp(-0.5*(((x*9592/2)-[1])/[2])**2)*exp(-0.5*pow(x*9592/(2*[3]),[4]))+[5])", 0.0, (double)waveform_size/2);
+    // define gain function
+    if(!_pfn_f1) _pfn_f1 = new TF1("_pfn_f1", "([0]*exp(-0.5*(((x*9592/2)-[1])/[2])**2)*exp(-0.5*pow(x*9592/(2*[3]),[4]))+[5])", 0.0, (double)waveform_size/2);
 
     if(_pfn_rho_v.empty()) _pfn_rho_v.resize(waveform_size);
     if(_pfn_value_re.empty()) _pfn_value_re.resize(waveform_size);
@@ -1091,30 +1092,74 @@ namespace detsim {
     //**Setting lambda/
     Double_t params[1] = {0.};
     Double_t fitpar[6] = {0.};
+    double baseline = 0; // calculated previously for each shaping time
 
-    if(ShapingTime==2.0) {
-      params[0] = 3.3708; //2us
-
-      // wiener-like
-      fitpar[0] = 8.49571e+02;
-      fitpar[1] = 6.60496e+02;
-      fitpar[2] = 5.68387e+02;
-      fitpar[3] = 1.02403e+00;
-      fitpar[4] = 1.57143e-01;
-      fitpar[5] = 4.79649e+01;
-
-
-    }
-    else if(ShapingTime==1.0) {
-      params[0] = 3.5125; //1us
-      fitpar[0] = 14.4;
-      fitpar[1] = 35.1;
-      fitpar[2] = 0.049;
-      fitpar[3] = 6.0e-9;
-      fitpar[4] = 2.4;
-    }else
-      throw cet::exception("SimWireMicroBooNE") << "<<" << __FUNCTION__ << ">> not supported shaping time " << ShapingTime << std::endl;
+    if(IsUMisconfigured == true) {
     
+      if ((((int)chan >= 2016 && (int)chan <= 2095) || ((int)chan >= 2192 && (int)chan <= 2303) || ((int)chan >= 2352 && (int)chan <= 2382))){ // misconfigured U-channels (from FT1)
+
+        params[0] = 3.50032; //1us
+      
+        fitpar[0] = 3.70635e+02;
+        fitpar[1] = 3.42429e+03;
+        fitpar[2] = 1.24392e+03;
+        fitpar[3] = 7.20309e+02;
+        fitpar[4] = 1.49008e+00;
+        fitpar[5] = 3.03494e+01;
+     
+
+        baseline = 0.378896;
+
+      }
+      else {
+      
+        params[0] = 3.3034; //2us
+
+        fitpar[0] = 5.30920e+02;
+        fitpar[1] = 6.50436e+02;
+        fitpar[2] = 5.63204e+02;
+        fitpar[3] = 1.15575e-03;
+        fitpar[4] = 5.81834e-02;
+        fitpar[5] = 4.29010e+01;
+ 
+        baseline = 0.988159;
+
+
+
+      }
+    }
+    else if(IsUMisconfigured == false){
+        
+      if(ShapingTime==2.0) {
+        params[0] = 3.3034; //2us
+
+        // wiener-like
+        fitpar[0] = 5.30920e+02;
+        fitpar[1] = 6.50436e+02;
+        fitpar[2] = 5.63204e+02;
+        fitpar[3] = 1.15575e-03;
+        fitpar[4] = 5.81834e-02;
+        fitpar[5] = 4.29010e+01;
+ 
+        baseline = 0.988159;
+      }
+      else if(ShapingTime==1.0) {
+        params[0] = 3.50032; //1us
+      
+        fitpar[0] = 3.70635e+02;
+        fitpar[1] = 3.42429e+03;
+        fitpar[2] = 1.24392e+03;
+        fitpar[3] = 7.20309e+02;
+        fitpar[4] = 1.49008e+00;
+        fitpar[5] = 3.03494e+01;
+     
+
+        baseline = 0.378896;
+      }
+      else throw cet::exception("SimWireMicroBooNE") << "<<" << __FUNCTION__ << "A shaping time of " << ShapingTime << " is currently unsupported!" << std::endl;
+    }
+    else throw cet::exception("SimWireMicroBooNE") << "<<" << __FUNCTION__ << " << IncludeMisconfiguredU not configred in fcl! " << std::endl;
+
     _pfn_f1->SetParameters(fitpar);
 
     Int_t n = waveform_size;
@@ -1171,7 +1216,7 @@ namespace detsim {
     
     Double_t min = fb->GetMinimum();
     Double_t max = fb->GetMaximum();	 
-    TH1F* h_rms = new TH1F("h_rms", "h_rms", Int_t(10*(max-min+1)), min, max+1);
+    TH1F* h_rms = new TH1F("h_rms", "h_rms", Int_t(100*(max-min+1)), min, max+1);
     
     
     for(size_t i=0; i < waveform_size; ++i){
@@ -1193,27 +1238,26 @@ namespace detsim {
       rms_quantilemethod = sqrt((pow(par[1]-par[0],2)+pow(par[2]-par[1],2))/2.);
     
     }
-    
+    else 
+    {
+      
+      throw cet::exception("SimWireMicroBooNE") << "h_rms sum is 0!";
+
+    }
+
     // Scaling noise RMS with wire length dependance
-    double baseline = 1.17764;
 
     double para = 0.4616;
     double parb = 0.19;
     double parc = 1.07;
 
-    // 0.77314 scale factor accounts for fact that original DDN designed based
-    // on the Y plane, updated fit takes average of wires on 2400 on each plane
-    double scalefactor = 0.83 * (rms_quantilemethod/baseline) * sqrt(para*para + pow(parb*wirelength/100 + parc, 2));
+    double scalefactor = (rms_quantilemethod/baseline) * sqrt(para*para + pow(parb*wirelength/100 + parc, 2));
+    
     for(size_t i=0; i<waveform_size; ++i) {
       noise[i] = fb->GetBinContent(i+1)*scalefactor;
     }
-    /*
-      double average=0;
-      for(auto const& v : noise) average += v;
-      average /= ((double)waveform_size);
-      std::cout<<"\033[93m Average ADC: \033[00m" << average << std::endl;
-    */
+    
     delete fb;
   }
   
-}
+} 
