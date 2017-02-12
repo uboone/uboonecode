@@ -1,0 +1,7 @@
+#include "dldata_fclbase_driver.fcl"
+
+process_name: DataRecoLArLite
+
+physics.reco: [ @sequence::dldata_process_all ]
+physics.trigger_paths: [ reco ]
+

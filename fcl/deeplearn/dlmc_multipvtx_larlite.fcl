@@ -5,6 +5,7 @@ process_name: MultiPartVertex
 services.TFileService.fileName: "multipvtx_%tc.root"
 
 physics.analyzers.mcinfo.SelectEvents:  []
+physics.analyzers.simch.SelectEvents:   []
 physics.analyzers.opdigit.SelectEvents: []
 physics.analyzers.opreco.SelectEvents:  []
 physics.analyzers.wire.SelectEvents:    []

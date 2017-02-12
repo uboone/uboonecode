@@ -10,10 +10,10 @@ dlmc_services:
   @table::microboone_simulation_services
 }
 
-services.FileCatalogMetadata.applicationVersion: "develop"
-services.FileCatalogMetadata.fileType: "mc"
-services.FileCatalogMetadata.runType: "physics"
-services.FileCatalogMetadataMicroBooNE: {
+dlmc_services.FileCatalogMetadata.applicationVersion: "develop"
+dlmc_services.FileCatalogMetadata.fileType: "mc"
+dlmc_services.FileCatalogMetadata.runType: "physics"
+dlmc_services.FileCatalogMetadataMicroBooNE: {
   FCLName: "run_larlite_maker_mc.fcl"
   FCLVersion: "develop"
   ProjectName: "LiteMC"
@@ -21,31 +21,31 @@ services.FileCatalogMetadataMicroBooNE: {
   ProjectVersion: "develop"
 }
 
-services.Geometry.ForceUseFCLOnly: true
+dlmc_services.Geometry.ForceUseFCLOnly: true
 
-#services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
-#services.SignalShapingServiceMicroBooNE.NConfigs:            2
-#services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
-#services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
-#services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
+#dlmc_services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
+#dlmc_services.SignalShapingServiceMicroBooNE.NConfigs:            2
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
 
-services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.5", "v3.5"]
-services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
-services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
-services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
-services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
-services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+dlmc_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.5", "v3.5"]
+dlmc_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+dlmc_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+dlmc_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+dlmc_services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
+dlmc_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
 
-#services.DetectorPropertiesService.NumberTimeSamples:        6400
-#services.DetectorPropertiesService.ReadOutWindowSize:        6400
-#services.DetectorClocksService.InheritClockConfig:           false
-#services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+#dlmc_services.DetectorPropertiesService.NumberTimeSamples:        6400
+#dlmc_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+#dlmc_services.DetectorClocksService.InheritClockConfig:           false
+#dlmc_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 
-services.SpaceCharge.EnableSimSpatialSCE: true
-services.SpaceCharge.EnableSimEfieldSCE: true
+dlmc_services.SpaceCharge.EnableSimSpatialSCE: true
+dlmc_services.SpaceCharge.EnableSimEfieldSCE: true
 
-services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+dlmc_services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -74,7 +74,7 @@ services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
 
-services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+dlmc_services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

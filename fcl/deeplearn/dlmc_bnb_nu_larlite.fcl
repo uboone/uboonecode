@@ -16,6 +16,7 @@ physics.producers.generator.MaxFluxFileMB:    2000
 
 # Filter output
 physics.analyzers.mcinfo.SelectEvents:  {SelectEvents:  [ sim ]}
+physics.analyzers.simch.SelectEvents:   {SelectEvents:  [ sim ]}
 physics.analyzers.opdigit.SelectEvents: {SelectEvents:  [ sim ]}
 physics.analyzers.opreco.SelectEvents:  {SelectEvents:  [ sim ]}
 physics.analyzers.wire.SelectEvents:    {SelectEvents:  [ sim ]}

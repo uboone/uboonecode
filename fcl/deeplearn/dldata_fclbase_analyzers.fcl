@@ -1,0 +1,41 @@
+#include "litedatamin_wire.fcl"
+#include "litedatamin_reco2d.fcl"
+#include "litedatamin_opreco.fcl"
+#include "litedatamin_opdigit.fcl"
+
+BEGIN_PROLOG
+
+dldata_analyzers:
+ {
+   wire:    @local::litedatamin_wire
+   opdigit: @local::litedatamin_opdigit
+   opreco:  @local::litedatamin_opreco
+   reco2d:  @local::litedatamin_reco2d
+}
+
+dldata_analyze_all: [ opdigit, opreco, wire, reco2d ]
+
+dldata_analyzers.opdigit.stream:     "opdigit"
+dldata_analyzers.opreco.stream:      "opreco"
+dldata_analyzers.wire.stream:        "wire"
+dldata_analyzers.reco2d.stream:      "reco2d"
+
+dldata_analyzers.opdigit.out_filename:     "larlite_opdigit.root"
+dldata_analyzers.opreco.out_filename:      "larlite_opreco.root"
+dldata_analyzers.wire.out_filename:        "larlite_wire.root"
+dldata_analyzers.reco2d.out_filename:      "larlite_reco2d.root"
+
+dldata_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
+
+dldata_analyzers.opreco.DataLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dldata_analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+dldata_analyzers.opreco.AssociationLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dldata_analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+
+dldata_analyzers.reco2d.DataLookUpMap.hit: ["gaushit"]
+dldata_analyzers.reco2d.DataLookUpMap.cluster: []
+dldata_analyzers.reco2d.AssociationLookUpMap.wire: ["caldata"]
+dldata_analyzers.reco2d.AssociationLookUpMap.hit: ["gaushit"]
+dldata_analyzers.reco2d.AssociationLookUpMap.cluster: []
+
+END_PROLOG

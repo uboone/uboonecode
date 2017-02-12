@@ -6,6 +6,7 @@ physics.sim: [ @sequence::dlmc_process_all ]
 physics.trigger_paths: [ sim ]
 
 physics.analyzers.mcinfo.SelectEvents:  []
+physics.analyzers.simch.SelectEvents:   []
 physics.analyzers.opdigit.SelectEvents: []
 physics.analyzers.opreco.SelectEvents:  []
 physics.analyzers.wire.SelectEvents:    []

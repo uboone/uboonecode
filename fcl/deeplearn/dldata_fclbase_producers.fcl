@@ -1,0 +1,51 @@
+#include "opticaldetectormodules_microboone.fcl"
+#include "correct_saturation.fcl"
+#include "caldata_microboone.fcl" 
+#include "hitfindermodules_microboone.fcl"
+#include "wirecellmodules_microboone.fcl"
+#include "ubflashfinder.fcl" 
+
+BEGIN_PROLOG
+
+dldata_producers:
+ {
+   ophitBeam         : @local::microboone_ophit_saturation_beam
+   ophitCosmic       : @local::microboone_ophit_saturation_cosmic
+   saturation        : @local::correct_saturation_mc
+   simpleFlashBeam   : @local::UBFlashBeamMC
+   simpleFlashCosmic : @local::UBFlashCosmicMC
+   opflashBeam       : @local::microboone_opflash_saturation_beam
+   opflashCosmic     : @local::microboone_opflash_saturation_cosmic
+
+   wcNoiseFilter     : @local::microboone_wirecellnoisefilter
+   caldata           : @local::microboone_calroi
+   gaushit           : @local::microboone_gaushitfinder
+
+   rns:       { module_type: "RandomNumberSaver" }
+}
+
+dldata_process_all: [ rns, 
+                      saturation,
+                      ophitBeam, ophitCosmic,
+                      simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                      wcNoiseFilter, caldata, gaushit]
+
+#wirecell noise filtering
+#dldata_producers.wcNoiseFilter.DigitModuleLabel:    "daq"
+#dldata_producers.wcNoiseFilter.DoNoiseFiltering:    false
+#dldata_producers.wcNoiseFilter.NumTicksToDropFront: 2400
+#dldata_producers.wcNoiseFilter.WindowSize:          6400
+
+dldata_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
+dldata_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
+dldata_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
+dldata_producers.caldata.DodQdxCalib:                              false
+
+microboone_reco_data_producers.gaushit.CalDataModuleLabel:                       "caldata"
+microboone_reco_data_producers.gaushit.MinSig:                                   [2.6, 2.6, 3.25]
+microboone_reco_data_producers.gaushit.MinWidth:                                 [1.0, 1.0, 1.0]
+microboone_reco_data_producers.gaushit.MaxMultiHit:                              4
+microboone_reco_data_producers.gaushit.TryNplus1Fits:                            false
+microboone_reco_data_producers.gaushit.Chi2NDF:                                  50.
+
+END_PROLOG
