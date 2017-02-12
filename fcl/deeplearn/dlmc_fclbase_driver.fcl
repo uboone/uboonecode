@@ -33,13 +33,20 @@ services.FileCatalogMetadataMicroBooNE: {
   ProjectVersion: "develop"
 }
 
-source:
+
+source_gen:
 {
   module_type: EmptyEvent
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
   maxEvents:   10          # Number of events to create
-  firstRun:    5000        # Run number to use for this file
+  firstRun:    1        # Run number to use for this file
   firstEvent:  1           # number of first event in the file
+}
+
+source_reprocess:
+{
+  module_type: RootInput
+  maxEvents:   100000     # Number of events to create
 }
 
 physics:
@@ -50,9 +57,7 @@ physics:
 
  analyzers: { @table::dlmc_analyzers }
 
- ana: [ @sequence::dlmc_analyze_all ]
-
- end_paths:     [ana]
+ end_paths: []
  trigger_paths: []
 }
 

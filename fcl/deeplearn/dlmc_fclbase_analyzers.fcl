@@ -21,6 +21,8 @@ dlmc_analyzers:
 
 dlmc_analyze_all: [ simch, mcinfo, opdigit, opreco, wire, reco2d ]
 
+dlmc_analyze_cosmic: [ mcinfo, opdigit, opreco, wire, reco2d ]
+
 dlmc_analyzers.mcinfo.stream:      "mcinfo"
 dlmc_analyzers.simch.stream:      "simch"
 dlmc_analyzers.opdigit.stream:     "opdigit"

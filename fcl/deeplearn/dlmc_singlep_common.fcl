@@ -2,7 +2,11 @@
 #include "dlmc_fclbase_driver.fcl"                                                                                                                                                   
 process_name: SinglePCommon
 
+source: @local::source_gen
+
+physics.ana: [ @sequence::dlmc_analyze_all ]
 physics.sim: [ @sequence::dlmc_process_all ]
+physics.end_paths:     [ ana ]
 physics.trigger_paths: [ sim ]
 
 physics.analyzers.mcinfo.SelectEvents:  []

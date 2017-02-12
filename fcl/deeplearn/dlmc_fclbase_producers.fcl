@@ -42,7 +42,6 @@ dlmc_producers:
 
 dlmc_filters: { swtrigger: @local::microboone_swtrigger_mc_bnb }
 
-
 dlmc_process_all: [ rns, generator,
                     largeant, mcreco,
                     optdigitizer, optfem, triggersim, pmtreadout,
@@ -58,6 +57,12 @@ dlmc_process_filter: [ rns, generator,
                        ophitBeam, ophitCosmic,
                        simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
                        daq, wcNoiseFilter, caldata, gaushit]
+
+dlmc_reprocess_mcc8: [ rns, 
+                       saturation,
+                       ophitBeam, ophitCosmic,
+                       simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                       daq, wcNoiseFilter, caldata, gaushit ]
 
 # generator
 dlmc_producers.generator: @local::microboone_genie_simple

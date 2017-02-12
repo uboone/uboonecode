@@ -1,0 +1,19 @@
+#include "dlmc_fclbase_driver.fcl"
+
+process_name: MCC8LArLite
+
+source: @local::source_reprocess
+
+physics.ana: [ @sequence::dlmc_analyze_cosmic ]
+physics.sim: [ @sequence::dlmc_reprocess_mcc8 ]
+physics.trigger_paths: [ sim ]
+physics.end_paths:     [ ana ]
+
+# Filter output
+physics.analyzers.mcinfo.SelectEvents:  []
+physics.analyzers.simch.SelectEvents:   []
+physics.analyzers.opdigit.SelectEvents: []
+physics.analyzers.opreco.SelectEvents:  []
+physics.analyzers.wire.SelectEvents:    []
+physics.analyzers.reco2d.SelectEvents:  []
+
