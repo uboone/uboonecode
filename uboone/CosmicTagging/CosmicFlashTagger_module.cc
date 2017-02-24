@@ -180,7 +180,7 @@ void CosmicFlashTagger::produce(art::Event & e)
   ::art::Handle<std::vector<recob::OpFlash> > beamflash_h;
   e.getByLabel(_opflash_producer_beam,beamflash_h);
   if( !beamflash_h.isValid() || beamflash_h->empty() ) {
-    std::cerr << "Don't have good flashes." << std::endl;
+    mf::LogDebug("CosmicFlashTagger") << "Don't have good flashes. Or handler is empty." << std::endl;
     e.put(std::move(cosmicTagTrackVector));
     e.put(std::move(assnOutCosmicTagTrack));
     e.put(std::move(assnOutCosmicTagPFParticle));
@@ -196,7 +196,7 @@ void CosmicFlashTagger::produce(art::Event & e)
   ::art::Handle<std::vector<recob::Track> > track_h;
   e.getByLabel(_track_producer,track_h);
   if( !track_h.isValid() || track_h->empty() )  {
-    std::cerr << "Don't have tracks, or they are not valid." << std::endl;
+    mf::LogDebug("CosmicFlashTagger") << "Don't have tracks, or they are not valid." << std::endl;
     e.put(std::move(cosmicTagTrackVector));
     e.put(std::move(assnOutCosmicTagTrack));
     e.put(std::move(assnOutCosmicTagPFParticle));
