@@ -59,6 +59,7 @@ private:
   std::string _geantModuleLabel;
   std::string _spacepointLabel;
   std::string _cosmic_tag_producer;
+  std::string _cosmic_geo_tag_producer;
   bool _recursiveMatching = false;
   bool _debug = true;
 
@@ -93,10 +94,19 @@ private:
   void GetRecoToTrueMatches(const lar_pandora::PFParticlesToHits &recoParticlesToHits, const lar_pandora::HitsToMCParticles &trueHitsToParticles,
                lar_pandora::MCParticlesToPFParticles &matchedParticles, lar_pandora::MCParticlesToHits &matchedHits, PFParticleSet &recoVeto, MCParticleSet &trueVeto) const;
 
+
+  void GetGeometricTaggedPFP(art::Event const & e, lar_pandora::PFParticleVector & pfpTaggedOut);
+  int PFPInCommon(lar_pandora::PFParticleVector taggedPFP, lar_pandora::PFParticleVector pfpGeoTagged);
+  bool InFV(double * nu_vertex_xyz);
+ 
   TTree* _tree1;
   int _run, _subrun, _event;
-  int _ccnc, _pdg;
-  int _nPFPtagged, _nuPFPwasTagged;
+  int _ccnc, _pdg, _fv;
+  double _nu_e;
+  int _nPFP;
+  int _nPFPtagged, _nuPFPwasTagged, _nuPFPTaggedTotal;
+  int _nuPFPwasGeoTagged, _nPFPGeotagged, _geo_flash_incommon;
+
 };
 
 
@@ -109,6 +119,7 @@ CosmicFlashTaggerAna::CosmicFlashTaggerAna(fhicl::ParameterSet const & p)
   _geantModuleLabel        = p.get<std::string>("GeantModule");
   _spacepointLabel         = p.get<std::string>("SpacePointProducer");
   _cosmic_tag_producer     = p.get<std::string>("CosmicTagProducer");
+  _cosmic_geo_tag_producer = p.get<std::string>("CosmicGeoTagProducer");
 
   art::ServiceHandle<art::TFileService> fs;
   _tree1 = fs->make<TTree>("tree","");
@@ -117,8 +128,15 @@ CosmicFlashTaggerAna::CosmicFlashTaggerAna(fhicl::ParameterSet const & p)
   _tree1->Branch("event",  &_event,  "event/I");
   _tree1->Branch("ccnc",   &_ccnc,   "ccnc/I");
   _tree1->Branch("pdg",    &_pdg,    "pdg/I");
+  _tree1->Branch("nu_e",   &_nu_e,   "nu_e/D");
+  _tree1->Branch("fv",     &_fv,     "fv/I");
+  _tree1->Branch("nPFP",   &_nPFP,   "nPFP/I");
   _tree1->Branch("nPFPtagged",     &_nPFPtagged,     "nPFPtagged/I");
+  _tree1->Branch("nPFPGeotagged",     &_nPFPGeotagged,     "nPFPGeotagged/I");
   _tree1->Branch("nuPFPwasTagged", &_nuPFPwasTagged, "nuPFPwasTagged/I");
+  _tree1->Branch("nuPFPwasGeoTagged", &_nuPFPwasGeoTagged, "nuPFPwasGeoTagged/I");
+  _tree1->Branch("nuPFPTaggedTotal", &_nuPFPTaggedTotal, "nuPFPTaggedTotal/I");
+  _tree1->Branch("geo_flash_incommon", &_geo_flash_incommon, "geo_flash_incommon/I");
 }
 
 void CosmicFlashTaggerAna::analyze(art::Event const & e)
@@ -155,6 +173,8 @@ void CosmicFlashTaggerAna::analyze(art::Event const & e)
 
   if (_debug)
     std::cout << "  RecoParticles: " << recoParticleVector.size() << std::endl;
+
+  _nPFP = recoParticleVector.size();
 
   // --- Collect MCParticles and match True Particles to Hits
   lar_pandora::MCParticleVector     trueParticleVector;
@@ -227,6 +247,9 @@ void CosmicFlashTaggerAna::analyze(art::Event const & e)
 
        _ccnc = mc_truth->GetNeutrino().CCNC();
        _pdg  = mc_truth->GetNeutrino().Nu().PdgCode();
+       _nu_e = mc_truth->GetNeutrino().Nu().E();
+       double pos[3] = {mc_truth->GetNeutrino().Nu().Vx(), mc_truth->GetNeutrino().Nu().Vy(), mc_truth->GetNeutrino().Nu().Vz()};
+       _fv   = (this->InFV(pos) ? 1 : 0);
      }
   }
   if (_debug) std::cout << "Neutrino related PFPs in this event: " << neutrinoOriginPFP.size() << std::endl;
@@ -277,14 +300,38 @@ void CosmicFlashTaggerAna::analyze(art::Event const & e)
 
   // Loop through the taggedPFP and see if there is a neutrino related one
   _nuPFPwasTagged = 0;
+  _nuPFPTaggedTotal = 0;
   for (unsigned int i = 0; i < taggedPFP.size(); i++) {
     for (unsigned int j = 0; j < neutrinoOriginPFP.size(); j++) {
       if(taggedPFP[i] == neutrinoOriginPFP[j]) {
         std::cout << ">>>>>>>>>>>>>>>>> A neutrino related PFP (with ID " << neutrinoOriginPFP[j]->Self() << ") was tagged as beam incompatible." << std::endl;
         _nuPFPwasTagged = 1;
+        _nuPFPTaggedTotal = 1;
       }
     }
   }
+
+
+  lar_pandora::PFParticleVector pfpGeoTagged;
+  this->GetGeometricTaggedPFP(e, pfpGeoTagged);
+  std::cout << pfpGeoTagged.size() << " PFP as been geo tagged." << std::endl;
+  _nPFPGeotagged = pfpGeoTagged.size();
+
+   // geo Loop through the taggedPFP and see if there is a neutrino related one
+  _nuPFPwasGeoTagged = 0;
+  for (unsigned int i = 0; i < pfpGeoTagged.size(); i++) {
+    for (unsigned int j = 0; j < neutrinoOriginPFP.size(); j++) {
+      if(pfpGeoTagged[i] == neutrinoOriginPFP[j]) {
+        std::cout << ">>>>>>>>>>>>>>>>> geometry A neutrino related PFP (with ID " << neutrinoOriginPFP[j]->Self() << ") was tagged as beam incompatible." << std::endl;
+        _nuPFPwasGeoTagged = 1;
+        _nuPFPTaggedTotal = 1;
+      }
+    }
+  } 
+
+  _geo_flash_incommon = this->PFPInCommon(taggedPFP, pfpGeoTagged);
+  std::cout << _geo_flash_incommon << " PFP are in common between geo and flash tagger" << std::endl;
+
 
   _tree1->Fill();
 }
@@ -381,4 +428,89 @@ void CosmicFlashTaggerAna::GetRecoToTrueMatches(const lar_pandora::PFParticlesTo
 }
 
 
+
+
+
+
+//____________________________________________________________________________________________
+void CosmicFlashTaggerAna::GetGeometricTaggedPFP(art::Event const & e, lar_pandora::PFParticleVector & pfpTaggedOut){
+
+  pfpTaggedOut.clear();
+
+  // Get the CosmicTag from the ART event
+  art::Handle<std::vector<anab::CosmicTag>> cosmicTagHandle;
+  e.getByLabel(_cosmic_geo_tag_producer, cosmicTagHandle);
+
+  if (!cosmicTagHandle.isValid() || cosmicTagHandle->empty()){
+    std::cerr << "Geometry cosmic tag is not valid or empty." << std::endl;
+    return;
+  }
+
+  // Look up the associations to PFPs
+  art::FindManyP<recob::PFParticle> cosmicPFPAssns(cosmicTagHandle, e, _cosmic_geo_tag_producer);
+
+  if (_debug) std::cout << "geometry cosmicPFPAssns.size(): " << cosmicPFPAssns.size() << std::endl;
+
+  // Loop over the cosmic tags
+  for (unsigned int ct = 0; ct < cosmicPFPAssns.size(); ct++) {
+
+    // Get the cosmic tag
+    art::Ptr<anab::CosmicTag> cosmicTag(cosmicTagHandle, ct);
+    if(_debug) std::cout << "geometry This cosmic tag (" << ct << ") has type: " << cosmicTag->CosmicType() << std::endl;
+
+    // Get the PFP associated with this CT
+    std::vector<art::Ptr<recob::PFParticle>> cosmicTagToPFP_v = cosmicPFPAssns.at(cosmicTag.key());
+    if(_debug) std::cout << "geometry Number of PFP associated with this Cosmic Tag: " << cosmicTagToPFP_v.size() << std::endl;
+
+    if (cosmicTag->CosmicScore() > 0.6) {
+      pfpTaggedOut.emplace_back(cosmicTagToPFP_v.at(0));
+    }
+  }
+
+}
+//____________________________________________________________________________________________
+int CosmicFlashTaggerAna::PFPInCommon(lar_pandora::PFParticleVector taggedPFP, lar_pandora::PFParticleVector pfpGeoTagged){
+
+  int nInCommon = 0;
+
+  for (unsigned int flash = 0; flash < taggedPFP.size(); flash++){
+
+    for (unsigned int geo = 0; geo < pfpGeoTagged.size(); geo++){
+ 
+      if(taggedPFP[flash] == pfpGeoTagged[geo]) {
+
+        nInCommon++;
+
+        std::cout << "In common found, flash is  " << flash << " and geo is " << geo << std::endl; 
+
+      }
+    }
+
+  }
+  return nInCommon;
+
+}
+
+
+//______________________________________________________________________________________________________________________________________
+bool CosmicFlashTaggerAna::InFV(double * nu_vertex_xyz){
+
+  double x = nu_vertex_xyz[0];
+  double y = nu_vertex_xyz[1];
+  double z = nu_vertex_xyz[2];
+
+  //This defines our current settings for the fiducial volume
+  double FVx = 256.35;
+  double FVy = 233;
+  double FVz = 1036.8;
+  double borderx = 10.;
+  double bordery = 20.;
+  double borderz = 10.;
+  //double cryoradius = 191.61;
+  //double cryoz = 1086.49 + 2*67.63;
+
+  if(x < (FVx - borderx) && (x > borderx) && (y < (FVy/2. - bordery)) && (y > (-FVy/2. + bordery)) && (z < (FVz - borderz)) && (z > borderz)) return true;
+  return false;
+
+}
 DEFINE_ART_MODULE(CosmicFlashTaggerAna)
