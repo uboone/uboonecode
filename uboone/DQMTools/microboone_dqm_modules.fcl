@@ -1,0 +1,14 @@
+BEGIN_PROLOG
+
+microboone_asicconfigcheck:
+{
+  module_type: "ASICConfigCheck"
+  DigitModuleLabel: digitfilter
+  HitModuleLabel: gaushit
+
+  HitMultiplicityCut: 1
+  HitRMSCut: 6
+  EventsFFTPerRun: -1
+}
+
+END_PROLOG
