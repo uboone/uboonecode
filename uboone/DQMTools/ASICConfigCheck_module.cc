@@ -71,6 +71,8 @@ private:
   int hitMultiplicityCut;
   int hitRMSCut;
 
+  float fftSignalRemovalCut;
+  
   bool verbose;
 
   std::unordered_map<raw::ChannelID_t,size_t> nhits_map;  
@@ -125,6 +127,10 @@ void dqm::ASICConfigCheck::reconfigure(fhicl::ParameterSet const & pset)
     
   hitMultiplicityCut = pset.get<int>("HitMultiplicityCut");
   hitRMSCut = pset.get<int>("HitRMSCut");
+
+  fftSignalRemovalCut = pset.get<float>("FFTSignalRemovalCut");
+  if(fftSignalRemovalCut<0)
+    fftSignalRemovalCut = 999999.;
 
   verbose = pset.get<bool>("Verbose",false);
 }
@@ -222,7 +228,7 @@ void dqm::ASICConfigCheck::analyze(art::Event const & ev)
       
       doubleVecInput.assign(digit.ADCs().begin(),digit.ADCs().end());
       for(auto & val : doubleVecInput)
-	if( std::abs(val-chTreeData.median)>(3.5*chTreeData.rms_trunc) ) val = chTreeData.median;
+	if( std::abs(val-chTreeData.median)>(fftSignalRemovalCut*chTreeData.rms_trunc) ) val = chTreeData.median;
       
       fftr2c->SetPoints(doubleVecInput.data());
       fftr2c->Transform();
