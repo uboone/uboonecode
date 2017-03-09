@@ -6,6 +6,7 @@
 #include "DataFormat/opdetwaveform.h"
 #include "DataFormat/simphotons.h"
 #include "DataFormat/trigger.h"
+#include "DataFormat/swtrigger.h"
 #include "DataFormat/potsummary.h"
 #include "DataFormat/hit.h"
 #include "DataFormat/track.h"
@@ -675,6 +676,32 @@ namespace larlite {
       lite_data->TriggerBits(trigger_ptr->TriggerBits());
       
     }
+
+  template <>
+  void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::ubdaqSoftwareTriggerData> > const &dh,
+			     ::larlite::event_base* lite_dh)
+    { 
+      
+      //fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
+      //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
+      auto lite_data = (::larlite::swtrigger*)lite_dh;
+      
+      if (dh->size() == 0)
+	return;
+
+      const art::Ptr<::raw::ubdaqSoftwareTriggerData> trigger_ptr(dh,0);
+      
+      for(size_t i=0; i<(size_t)(trigger_ptr->getNumberOfAlgorithms()); ++i) {
+	lite_data->addAlgorithm( trigger_ptr->getTriggerAlgorithm(i),
+				 trigger_ptr->getPass(i),
+				 trigger_ptr->getPassPrescale(i),
+				 trigger_ptr->getPhmax(i),
+				 trigger_ptr->getMultiplicity(i),
+				 trigger_ptr->getTriggerTick(i),
+				 trigger_ptr->getTimeSinceTrigger(i),
+				 trigger_ptr->getPrescale(i) );
+      }
+    }
   
   template <>
   void ScannerAlgo::ScanData(art::Handle<std::vector< ::recob::Wire> > const &dh,
@@ -1319,6 +1346,12 @@ namespace larlite {
     return fPtrIndex_trigger[key1][key2]; 
   }
 
+  template <> std::map<art::Ptr< ::raw::ubdaqSoftwareTriggerData>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
+  { if(fPtrIndex_swtrigger.size()<=key1) fPtrIndex_swtrigger.resize(key1+1);
+    if(fPtrIndex_swtrigger[key1].size()<=key2) fPtrIndex_swtrigger[key1].resize(key2+1);
+    return fPtrIndex_swtrigger[key1][key2]; 
+  }
+
   template <> std::map<art::Ptr< ::recob::Wire>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
   { if(fPtrIndex_wire.size()<=key1) fPtrIndex_wire.resize(key1+1);
     if(fPtrIndex_wire[key1].size()<=key2) fPtrIndex_wire[key1].resize(key2+1);
@@ -1442,6 +1475,8 @@ namespace larlite {
   { return ::larlite::data::kOpDetWaveform; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::raw::Trigger> () const
   { return ::larlite::data::kTrigger; }
+  template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::raw::ubdaqSoftwareTriggerData> () const
+  { return ::larlite::data::kSWTrigger; }
   // recob
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::recob::Wire> () const
   { return ::larlite::data::kWire; }

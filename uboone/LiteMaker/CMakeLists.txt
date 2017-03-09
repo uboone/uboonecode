@@ -15,6 +15,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	  BASENAME_ONLY
 	  LIBRARY_NAME     uboonecode_uboone_LiteMaker
 	  LIB_LIBRARIES
+		   uboone_RawData
 	  	   larcore_Geometry
 		   uboone_Geometry
 		   uboonecode_uboone_MuCS

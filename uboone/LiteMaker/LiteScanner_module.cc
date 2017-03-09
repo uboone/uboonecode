@@ -28,6 +28,7 @@
 // LArSoft includes
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
+#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
@@ -322,6 +323,8 @@ void LiteScanner::analyze(art::Event const & e)
 	ScanData<raw::OpDetWaveform>(e,j); break;
       case ::larlite::data::kTrigger:
 	ScanData<raw::Trigger>(e,j); break;
+      case ::larlite::data::kSWTrigger:
+	ScanData<raw::ubdaqSoftwareTriggerData>(e,j); break;
 
       case ::larlite::data::kHit:
 	ScanData<recob::Hit>(e,j); break;
@@ -630,6 +633,7 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
     case ::larlite::data::kOpDetWaveform: break;
     case ::larlite::data::kSimPhotons:    break;
     case ::larlite::data::kTrigger:       break;
+    case ::larlite::data::kSWTrigger:     break;
     case ::larlite::data::kWire:          break;
     case ::larlite::data::kHit:           break;
     case ::larlite::data::kMuCSData:      break;
