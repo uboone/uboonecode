@@ -29,13 +29,15 @@ dlmc_services.Geometry.ForceUseFCLOnly: true
 #dlmc_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
 #dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
 
-dlmc_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.5", "v3.5"]
+dlmc_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
 dlmc_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
 dlmc_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
 dlmc_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
 dlmc_services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
-dlmc_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+dlmc_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
 dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
+services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
 
 #dlmc_services.DetectorPropertiesService.NumberTimeSamples:        6400
 #dlmc_services.DetectorPropertiesService.ReadOutWindowSize:        6400

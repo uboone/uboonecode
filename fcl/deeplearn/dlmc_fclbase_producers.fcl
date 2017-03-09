@@ -101,7 +101,7 @@ dlmc_producers.caldata.DodQdxCalib:                              false
 #dlmc_producers.gaushit.Chi2NDF:                                  50.
 
 dlmc_producers.gaushit.CalDataModuleLabel:                       "caldata"
-dlmc_producers.gaushit.MinSig:                                   [3.25, 3.25, 3.75]
+dlmc_producers.gaushit.MinSig:                                   [3.25, 4.0, 3.75]
 dlmc_producers.gaushit.MinWidth:                                 [1.0,  1.0,  1.0]
 dlmc_producers.gaushit.MaxMultiHit:                              6
 dlmc_producers.gaushit.TryNplus1Fits:                            false
