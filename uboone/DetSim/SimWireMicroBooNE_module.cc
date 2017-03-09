@@ -511,7 +511,7 @@ namespace detsim {
 		    else{ charge = charge * 1; }
 		  }
 		}
-		else if( (IsUMisconfigured == true) && (((int)chan >= 2016 && (int)chan <= 2095) || ((int)chan >= 2192 && (int)chan <= 2303) || ((int)chan >= 2352 && (int)chan <= 2382))){ // misconfigured U-channels (from FT1)
+		else if( (IsUMisconfigured == true) && (((int)chan >= 2016 && (int)chan <= 2095) || ((int)chan >= 2192 && (int)chan <= 2303) || ((int)chan >= 2352 && (int)chan <= 2399))){ // misconfigured U-channels (from FT1)
 		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false; } }
 		    else{ charge = charge * 1; }
 		}

@@ -26,11 +26,17 @@ T0RecoAnodeCathodePiercing_mc.RecoT0TimeOffsetC: 9.97
 T0RecoAnodeCathodePiercing_mc.TimeResA: 5
 T0RecoAnodeCathodePiercing_mc.TimeResC: 2
 
-T0RecoAnodeCathodePiercing_reco : @local::T0RecoAnodeCathodePiercing
-T0RecoAnodeCathodePiercing_reco.RecoT0TimeOffsetA: 3.4
-T0RecoAnodeCathodePiercing_reco.RecoT0TimeOffsetC: -14.0
-T0RecoAnodeCathodePiercing_reco.TimeResA: 5
-T0RecoAnodeCathodePiercing_reco.TimeResC: 2
+T0RecoAnodeCathodePiercing_mc_loose : @local::T0RecoAnodeCathodePiercing_mc
+T0RecoAnodeCathodePiercing_mc_loose.Resolution: 20
+
+T0RecoAnodeCathodePiercing_data : @local::T0RecoAnodeCathodePiercing
+T0RecoAnodeCathodePiercing_data.RecoT0TimeOffsetA: 5.0
+T0RecoAnodeCathodePiercing_data.RecoT0TimeOffsetC: -16.4
+T0RecoAnodeCathodePiercing_data.TimeResA: 5
+T0RecoAnodeCathodePiercing_data.TimeResC: 2
+
+T0RecoAnodeCathodePiercing_data_loose : @local::T0RecoAnodeCathodePiercing_data
+T0RecoAnodeCathodePiercing_data_loose.Resolution: 20
 
 T0RecoAnodeCathodePiercing_mc_beamgate : @local::T0RecoAnodeCathodePiercing
 T0RecoAnodeCathodePiercing_mc_beamgate.RecoT0TimeOffsetA: -0.53
@@ -39,11 +45,17 @@ T0RecoAnodeCathodePiercing_mc_beamgate.FlashProducer: "simpleFlashBeam"
 T0RecoAnodeCathodePiercing_mc_beamgate.TimeResA: 5
 T0RecoAnodeCathodePiercing_mc_beamgate.TimeResC: 5
 
-T0RecoAnodeCathodePiercing_reco_beamgate : @local::T0RecoAnodeCathodePiercing
-T0RecoAnodeCathodePiercing_reco_beamgate.RecoT0TimeOffsetA: 3.4
-T0RecoAnodeCathodePiercing_reco_beamgate.RecoT0TimeOffsetC: -14.0
-T0RecoAnodeCathodePiercing_reco_beamgate.FlashProducer: "simpleFlashBeam"
-T0RecoAnodeCathodePiercing_reco_beamgate.TimeResA: 5
-T0RecoAnodeCathodePiercing_reco_beamgate.TimeResC: 5
+T0RecoAnodeCathodePiercing_mc_beamgate_loose : @local::T0RecoAnodeCathodePiercing_mc_beamgate
+T0RecoAnodeCathodePiercing_mc_beamgate_loose.Resolution: 20
+
+T0RecoAnodeCathodePiercing_data_beamgate : @local::T0RecoAnodeCathodePiercing
+T0RecoAnodeCathodePiercing_data_beamgate.RecoT0TimeOffsetA: 5.0
+T0RecoAnodeCathodePiercing_data_beamgate.RecoT0TimeOffsetC: -16.4
+T0RecoAnodeCathodePiercing_data_beamgate.FlashProducer: "simpleFlashBeam"
+T0RecoAnodeCathodePiercing_data_beamgate.TimeResA: 5
+T0RecoAnodeCathodePiercing_data_beamgate.TimeResC: 5
+
+T0RecoAnodeCathodePiercing_data_beamgate_loose : @local::T0RecoAnodeCathodePiercing_data_beamgate
+T0RecoAnodeCathodePiercing_data_beamgate_loose.Resolution: 20
 
 END_PROLOG

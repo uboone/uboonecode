@@ -1079,6 +1079,7 @@ namespace larlite {
       
       lite_calo.set_dedx(calo_ptr->dEdx());
       lite_calo.set_dqdx(calo_ptr->dQdx());
+      lite_calo.set_xyz(calo_ptr->XYZ());
       lite_calo.set_residual_range(calo_ptr->ResidualRange());
       lite_calo.set_deadwire_range(calo_ptr->DeadWireResRC());
       lite_calo.set_kinetic_energy(calo_ptr->KineticEnergy());

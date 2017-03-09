@@ -1529,10 +1529,13 @@ namespace microboone {
 	if (!pBranch) {
 	  pTree->Branch(name.c_str(), &data);
 	  // ROOT needs a TClass definition for T in order to create a branch,
-	  // se we are sure that at this point the TClass exists
+	  // se we are sure that at this point the TClass exists;
+	  // well, except for when it does not.
 	  LOG_DEBUG("AnalysisTreeStructure")
 	    << "Creating object branch '" << name
-	    << " with " << TClass::GetClass(typeid(T))->ClassName();
+	    << "' with "
+	    << (TClass::GetClass(typeid(T))? TClass::GetClass(typeid(T))->ClassName(): "some")
+	    << " data type";
 	}
 	else if
 	  (*(reinterpret_cast<std::vector<T>**>(pBranch->GetAddress())) != &data)
@@ -4431,11 +4434,6 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       fData->evtwgt_weight.push_back(it->second);       // filling the vector with the weights
       std::vector<double> mytemp = it->second;          // getting the vector of weights
 
-      std::cout<<" *************************************"<<std::endl;
-      std::cout<<" mytemp : "<<mytemp.size()<<std::endl;
-      for(unsigned int nweight =0; nweight < mytemp.size(); nweight++) std::cout<<" weight : "<<mytemp[nweight]<<std::endl;
-      std::cout<<" *************************************"<<std::endl;
-
       fData->evtwgt_nweight.push_back(mytemp.size());   // filling the number of weights
       countFunc++;
     }
@@ -5537,6 +5535,20 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
           unsigned int opdet = geom->OpDetFromOpChannel(opch);
           FlashData.flsPePerOpDet[i][opdet] = pePerOpChannel;
         }
+
+        // Now be dragons. simpleFlash always saves PEs per OpDet in a 32 position array
+        // while opFlash in an n position one, depending on beam or cosmic opChannels
+        // So in the case of opflashCosmic we need to look at cosmic discriminator channels
+        // I know this is terrible, but I don't see a better way to do it now, but to go back
+        // and have a better recob::OpFlash data product definition. --mdeltutt
+        if (fOpFlashModuleLabel[iFlashAlg].find("opflashCosmic") != std::string::npos) {
+          for (int opch = 200; opch < 200+kNOpDets; opch++) {
+            Double_t pePerOpChannel = (Double_t) flashlist[iFlashAlg][i]->PE(opch);
+            unsigned int opdet = geom->OpDetFromOpChannel(opch);
+            FlashData.flsPePerOpDet[i][opdet] = pePerOpChannel;
+          }
+        }
+
       }
     }
   } // if fSaveFlashInfo
