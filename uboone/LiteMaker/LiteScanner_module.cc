@@ -115,6 +115,9 @@ private:
   /// Templated data scanner function
   template<class T> void ScanData(const art::Event& evt, const size_t name_index);
 
+  /// Templated data scanner function
+  template<class T> void ScanSimpleData(const art::Event& evt, const size_t name_index);
+
   /// Special function for SimPhotons
   void ScanSimPhotons(const art::Event& evt, const size_t name_index);
 
@@ -324,7 +327,7 @@ void LiteScanner::analyze(art::Event const & e)
       case ::larlite::data::kTrigger:
 	ScanData<raw::Trigger>(e,j); break;
       case ::larlite::data::kSWTrigger:
-	ScanData<raw::ubdaqSoftwareTriggerData>(e,j); break;
+	ScanSimpleData<raw::ubdaqSoftwareTriggerData>(e,j); break;
 
       case ::larlite::data::kHit:
 	ScanData<recob::Hit>(e,j); break;
@@ -505,14 +508,11 @@ template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t
 { 
   auto lite_id = fAlg.ProductID<T>(name_index);
   auto lite_data = _mgr.get_data((::larlite::data::DataType_t)lite_id.first,lite_id.second);
+
   art::Handle<std::vector<T> > dh;
 
   // All cases except for optical
-  if(lite_id.first != ::larlite::data::kOpDetWaveform) {
-    evt.getByLabel(lite_id.second,dh);
-    if(!dh.isValid()) return;
-    fAlg.ScanData(dh,lite_data);
-  }else{
+  if(lite_id.first == ::larlite::data::kOpDetWaveform) {
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
     //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
     //std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
@@ -531,6 +531,25 @@ template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t
 
     }
   }
+  else{
+    evt.getByLabel(lite_id.second,dh);
+    if(!dh.isValid()) return;
+    fAlg.ScanData(dh,lite_data);
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+// Scan
+//-------------------------------------------------------------------------------------------------
+template<class T> void LiteScanner::ScanSimpleData(const art::Event& evt, const size_t name_index)
+{ 
+  auto lite_id = fAlg.ProductID<T>(name_index);
+  auto lite_data = _mgr.get_data((::larlite::data::DataType_t)lite_id.first,lite_id.second);
+
+  art::Handle<T> dh;
+  evt.getByLabel(lite_id.second,dh);
+  if(!dh.isValid()) return;
+  fAlg.ScanSimpleData(dh,lite_data);
 }
 
 //-------------------------------------------------------------------------------------------------

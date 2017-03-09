@@ -659,8 +659,8 @@ namespace larlite {
 
 
   template <>
-    void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::Trigger> > const &dh,
-			       ::larlite::event_base* lite_dh)
+  void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::Trigger> > const &dh,
+			     ::larlite::event_base* lite_dh)
     { 
       
       //fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
@@ -678,28 +678,23 @@ namespace larlite {
     }
 
   template <>
-  void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::ubdaqSoftwareTriggerData> > const &dh,
-			     ::larlite::event_base* lite_dh)
-    { 
+  void ScannerAlgo::ScanSimpleData(art::Handle< ::raw::ubdaqSoftwareTriggerData> const &dh,
+				   ::larlite::event_base* lite_dh)
+  { 
       
       //fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
       //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
       auto lite_data = (::larlite::swtrigger*)lite_dh;
       
-      if (dh->size() == 0)
-	return;
-
-      const art::Ptr<::raw::ubdaqSoftwareTriggerData> trigger_ptr(dh,0);
-      
-      for(size_t i=0; i<(size_t)(trigger_ptr->getNumberOfAlgorithms()); ++i) {
-	lite_data->addAlgorithm( trigger_ptr->getTriggerAlgorithm(i),
-				 trigger_ptr->getPass(i),
-				 trigger_ptr->getPassPrescale(i),
-				 trigger_ptr->getPhmax(i),
-				 trigger_ptr->getMultiplicity(i),
-				 trigger_ptr->getTriggerTick(i),
-				 trigger_ptr->getTimeSinceTrigger(i),
-				 trigger_ptr->getPrescale(i) );
+      for(size_t i=0; i<(size_t)(dh->getNumberOfAlgorithms()); ++i) {
+	lite_data->addAlgorithm( dh->getTriggerAlgorithm(i),
+				 dh->getPass(i),
+				 dh->getPassPrescale(i),
+				 dh->getPhmax(i),
+				 dh->getMultiplicity(i),
+				 dh->getTriggerTick(i),
+				 dh->getTimeSinceTrigger(i),
+				 dh->getPrescale(i) );
       }
     }
   
@@ -1225,6 +1220,11 @@ namespace larlite {
   template <class T>
   void ScanData(art::Handle<std::vector<T> > const &dh,
 		::larlite::event_base* lite_dh)
+  { throw cet::exception(__PRETTY_FUNCTION__)<<"Not implemented!"; }
+  
+  template <class T>
+  void ScanSimpleData(art::Handle<T> const &dh,
+		      ::larlite::event_base* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__)<<"Not implemented!"; }
 
 

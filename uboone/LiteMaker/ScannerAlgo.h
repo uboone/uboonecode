@@ -140,6 +140,11 @@ namespace larlite {
     template <class T>
     void ScanData(art::Handle<std::vector<T> > const &dh,
 		  ::larlite::event_base* lite_dh);
+
+    /// Core method: convert LArSoft data product (dh) to LArLite (lite_dh)
+    template <class T>
+    void ScanSimpleData(art::Handle<T> const &dh,
+			::larlite::event_base* lite_dh);
     
     /// Core method: generate LArLite association data product and store (in lite_dh)
     template <class T, class U>
