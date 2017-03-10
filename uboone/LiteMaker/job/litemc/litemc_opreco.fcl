@@ -8,18 +8,17 @@ litemc_opreco.out_filename: "larlite_opreco.root"
 
 litemc_opreco.DataLookUpMap:
 {
-
+  opdigit:    ["saturation"]
   ophit: ["ophit","ophitSat"]
-
   opflash: ["opflash","opflashSat"]
-
+  trigger:    ["triggersim"]
+  swtrigger:    ["swtrigger"]
 }
 
 litemc_opreco.AssociationLookUpMap:
 {
   ophit: ["ophit","ophitSat"]
-
   opflash: ["opflash","opflashSat"]
 }
-
+litemc_opreco.AssLabelToSave: ["opflash","opflashSat"]
 END_PROLOG

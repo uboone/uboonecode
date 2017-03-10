@@ -136,9 +136,11 @@ private:
   bool fStoreAss;
   /// POTSummary producer label
   std::vector<std::string> fPOTSummaryLabel_v;
-  /// Association producer label (for those associations not made by product producers)
+  /// Association producer label to be scanned (for those associations not made by product producers)
   std::vector<std::string> fAssProducer_v;
-  /// Boolean flat to automatically scan associations made by producers
+  /// Association producer label to be stored
+  std::set<std::string> fAssLabelToSave_s;
+  /// Boolean flag to automatically scan associations made by producers
   bool fScanAssByProducers;
   /// Boolean to enable unique file name
   std::string fOutFileName;
@@ -199,9 +201,13 @@ LiteScanner::LiteScanner(fhicl::ParameterSet const & p)
   }
   fPOTSummaryLabel_v = p.get<std::vector<std::string> >("pot_labels");
 
+  fAssLabelToSave_s.clear();
+  auto const& label_to_save_v = p.get<std::vector<std::string> >("AssLabelToSave",std::vector<std::string>());
+  for(auto const& label : label_to_save_v) 
+    fAssLabelToSave_s.insert(label);
+
   fAssProducer_v.clear();
   fAssProducer_v = p.get<std::vector<std::string> >("AssociationProducers",fAssProducer_v);
-
   fScanAssByProducers = p.get<bool>("ScanAssByProducers",true);
 }
 /*
@@ -390,6 +396,9 @@ void LiteScanner::analyze(art::Event const & e)
 
     for(size_t j=0; j<labels.size(); ++j) {
 
+      auto const& label = labels[j];
+      if(!fAssLabelToSave_s.empty() && fAssLabelToSave_s.find(label) == fAssLabelToSave_s.end())
+	continue;
       switch(lite_type) {
       case ::larlite::data::kCluster:
 	ScanAssociation<recob::Cluster>(e,j); break;

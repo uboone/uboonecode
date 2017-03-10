@@ -37,5 +37,5 @@ dldata_analyzers.reco2d.DataLookUpMap.cluster: []
 dldata_analyzers.reco2d.AssociationLookUpMap.wire: ["caldata"]
 dldata_analyzers.reco2d.AssociationLookUpMap.hit: ["gaushit"]
 dldata_analyzers.reco2d.AssociationLookUpMap.cluster: []
-
+dldata_analyzers.reco2d.AssLabelToSave: ["gaushit"]
 END_PROLOG

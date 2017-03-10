@@ -1,0 +1,27 @@
+#include "multipvtx.fcl"
+#include "dlmc_singlep_common.fcl"
+
+process_name: MultiPartVertex
+services.TFileService.fileName: "multipvtx_%tc.root"
+
+physics.analyzers.mcinfo.SelectEvents:  []
+physics.analyzers.simch.SelectEvents:   []
+physics.analyzers.opdigit.SelectEvents: []
+physics.analyzers.opreco.SelectEvents:  []
+physics.analyzers.wire.SelectEvents:    []
+physics.analyzers.reco2d.SelectEvents:  []
+
+physics.producers.generator: @local::MultiPartVertex
+physics.producers.generator.DebugMode    : 0
+physics.producers.generator.G4Time       : 3925.0
+physics.producers.generator.G4TimeJitter : 800
+physics.producers.generator.XRange       : [10]
+physics.producers.generator.YRange       : [10]
+physics.producers.generator.ZRange       : [10]
+physics.producers.generator.MultiMax     : 2
+physics.producers.generator.MultiMin     : 2
+physics.producers.generator.ParticleParameter.PDGCode      : [   [11],         [2212]]
+physics.producers.generator.ParticleParameter.MinMulti     : [      1,              1]
+physics.producers.generator.ParticleParameter.MaxMulti     : [      1,              1]
+physics.producers.generator.ParticleParameter.ProbWeight   : [      1,              1]
+physics.producers.generator.ParticleParameter.KERange      : [ [0.02,0.8], [0.03,0.6]]

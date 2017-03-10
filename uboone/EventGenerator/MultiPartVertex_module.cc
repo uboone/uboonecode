@@ -159,7 +159,7 @@ MultiPartVertex::MultiPartVertex(fhicl::ParameterSet const & p)
     if(minmult_v[idx] > _multi_min)
       _multi_min = minmult_v[idx];
   }
-  if(_multi_max <= _multi_min) this->abort("Overall MultiMax <= overall MultiMin!");
+  if(_multi_max < _multi_min) this->abort("Overall MultiMax <= overall MultiMin!");
 
   if(!xrange.empty() && xrange.size() >2) this->abort("Incompatible legnth @ X vector!" );
   if(!yrange.empty() && yrange.size() >2) this->abort("Incompatible legnth @ Y vector!" );
@@ -247,7 +247,7 @@ std::vector<size_t> MultiPartVertex::GenParticles() const {
   for(size_t idx=0; idx<_param_v.size(); ++idx)
     weight_v[idx] = _param_v[idx].weight;
   
-  int num_part = (int)(fFlatRandom->fire(_multi_min,_multi_max+1));
+  int num_part = (int)(fFlatRandom->fire(_multi_min,_multi_max+1-1.e-10));
   
   while(num_part) {
 
