@@ -2,11 +2,11 @@
 
 BEGIN_PROLOG
 
-litedata_reco2d: @local::litemaker_base
+litedatamin_reco2d: @local::litemaker_base
 
-litedata_reco2d.out_filename: "larlite_reco2d.root"
+litedatamin_reco2d.out_filename: "larlite_reco2d.root"
 
-litedata_reco2d.DataLookUpMap:
+litedatamin_reco2d.DataLookUpMap:
 {
   hit:        ["gaushit","pandoraCosmicHitRemoval"]
   cluster:    []
@@ -14,7 +14,7 @@ litedata_reco2d.DataLookUpMap:
   endpoint2d: []
 }
 
-litedata_reco2d.AssociationLookUpMap:
+litedatamin_reco2d.AssociationLookUpMap:
 {
   hit:        []
   cluster:    []
