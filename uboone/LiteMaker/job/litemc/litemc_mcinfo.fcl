@@ -19,7 +19,10 @@ litemc_mcinfo.DataLookUpMap:
 }
 
 litemc_mcinfo.AssociationLookUpMap: {
+  mcpart:  ["largeant"]
   mctruth: ["generator","corsika"]
 }
+
+litemc_mcinfo.AssLabelToSave:["generator","corsika"]
 
 END_PROLOG

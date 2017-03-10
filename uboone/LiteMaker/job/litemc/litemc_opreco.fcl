@@ -8,17 +8,17 @@ litemc_opreco.out_filename: "larlite_opreco.root"
 
 litemc_opreco.DataLookUpMap:
 {
-  opdigit:    ["saturation"]
-  ophit: ["ophit","ophitSat"]
-  opflash: ["opflash","opflashSat"]
   trigger:    ["triggersim"]
   swtrigger:    ["swtrigger"]
+  opdigit:    ["saturation"]
+  ophit: ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 }
 
 litemc_opreco.AssociationLookUpMap:
 {
-  ophit: ["ophit","ophitSat"]
-  opflash: ["opflash","opflashSat"]
+  ophit: ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 }
-litemc_opreco.AssLabelToSave: ["opflash","opflashSat"]
+litemc_opreco.AssLabelToSave: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 END_PROLOG

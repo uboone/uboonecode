@@ -8,7 +8,7 @@ litemc_reco2d.out_filename: "larlite_reco2d.root"
 
 litemc_reco2d.DataLookUpMap:
 {
-  hit:        ["gaushit","pandoraCosmicKHitRemoval"]
+  hit:        ["gaushit","pandoraCosmicHitRemoval"]
   cluster:    []
   vertex:     []
   endpoint2d: []
