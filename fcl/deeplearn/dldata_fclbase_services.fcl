@@ -29,15 +29,15 @@ dldata_services.Geometry.ForceUseFCLOnly: true
 #dldata_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
 #dldata_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
 
-services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
-services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
-services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
-services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
-services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
-services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
-services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
-services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
+dldata_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
+dldata_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+dldata_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+dldata_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+dldata_services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
+dldata_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
+dldata_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+dldata_services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
+dldata_services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
 
 dldata_services.DetectorPropertiesService.NumberTimeSamples:        6400
 dldata_services.DetectorPropertiesService.ReadOutWindowSize:        6400

@@ -6,7 +6,7 @@
 <!ENTITY release      "v06_24_00" >
 <!ENTITY file_type    "mc"        >
 <!ENTITY run_type     "physics"   >
-<!ENTITY name         "dlmc_multipvtx_test">
+<!ENTITY name         "dlmc_multipvtx">
 <!ENTITY fcl          "dlmc_multipvtx_larlite.fcl">
 <!ENTITY dl_version   "v01"       >
 <!ENTITY dl_part      "p00"       >
@@ -18,7 +18,7 @@
 <project name="&name;">
 
   <!-- Project size -->
-  <numevents>50000</numevents>
+  <numevents>20000</numevents>
 
   <!-- Operating System -->
   <os>SL6</os>
@@ -37,7 +37,7 @@
     <outdir>/pnfs/uboone/scratch/users/kterao/&name;_&dl_version;_&dl_part;_out/&release;</outdir>
     <logdir>/pnfs/uboone/scratch/users/kterao/&name;_&dl_version;_&dl_part;_log/&release;</logdir>
     <workdir>/pnfs/uboone/scratch/users/kterao/&name;_&dl_version;_&dl_part;_work/&release;</workdir>
-    <numjobs>500</numjobs>
+    <numjobs>200</numjobs>
     <memory>4000</memory>
     <datatier>larlite</datatier>
     <resource>DEDICATED,OPPORTUNISTIC</resource>
