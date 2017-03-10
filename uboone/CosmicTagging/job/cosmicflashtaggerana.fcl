@@ -10,6 +10,7 @@ HitProducer:           "gaushit"
 GeantModule:           "largeant"
 SpacePointProducer:    "pandoraCosmic"
 CosmicTagProducer:     "cosmicFlashTagger"
+CosmicGeoTagProducer:  "cosmicGeoTagger"
 }
 
 END_PROLOG
