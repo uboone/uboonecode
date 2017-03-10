@@ -1,31 +1,25 @@
 #include "litemaker_base.fcl"
+
 BEGIN_PROLOG
-litedatamin_reco2d: @local::litemaker_base
-litedatamin_reco2d.out_filename: "larlite_datamin_reco2d.root"
-litedatamin_reco2d.DataLookUpMap:
+
+litedata_reco2d: @local::litemaker_base
+
+litedata_reco2d.out_filename: "larlite_reco2d.root"
+
+litedata_reco2d.DataLookUpMap:
 {
-  hit : [ 
-    "gaushit",
-    "pandoraCosmicKHitRemoval"
-  ]
-  cluster : [ 
-    "fuzzycluster",
-    "pandoraCosmic",
-    "pandoraNu"
-  ]
+  hit:        ["gaushit","pandoraCosmicHitRemoval"]
+  cluster:    []
+  vertex:     []
+  endpoint2d: []
 }
 
-litedatamin_reco2d.AssociationLookUpMap:
+litedata_reco2d.AssociationLookUpMap:
 {
-  hit : [ 
-    "gaushit",
-    "pandoraCosmicKHitRemoval"
-  ]
-  cluster : [ 
-    "fuzzycluster",
-    "pandoraCosmic",
-    "pandoraNu"
-  ]
+  hit:        []
+  cluster:    []
+  vertex:     []
+  endpoint2d: []
 }
+
 END_PROLOG
-
