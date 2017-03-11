@@ -33,7 +33,7 @@ art_make( BASENAME_ONLY
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -68,7 +68,7 @@ art_make( BASENAME_ONLY
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
