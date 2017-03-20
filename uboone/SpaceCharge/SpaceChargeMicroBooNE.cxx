@@ -21,12 +21,24 @@
 // Framework includes
 #include "cetlib/exception.h"
 
+double spacecharge::SpaceChargeMicroBooNE::fPos[3];
+double spacecharge::SpaceChargeMicroBooNE::parA[6][7];
+double spacecharge::SpaceChargeMicroBooNE::parB[6];
+
 //-----------------------------------------------
 spacecharge::SpaceChargeMicroBooNE::SpaceChargeMicroBooNE(
   fhicl::ParameterSet const& pset
 )
 {
   Configure(pset);
+}
+
+void spacecharge::SpaceChargeMicroBooNE::ParseRepresentationType(std::string s)
+{
+  if(s=="Parametric")
+    fRepresentationType = SpaceChargeRepresentation_t::kParametric;
+  else
+    fRepresentationType = SpaceChargeRepresentation_t::kUnknown;   
 }
 
 //------------------------------------------------
@@ -38,7 +50,8 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
-    fRepresentationType = pset.get<std::string>("RepresentationType");
+    ParseRepresentationType(pset.get<std::string>("RepresentationType"));
+
     fInputFilename = pset.get<std::string>("InputFilename");
 
     std::string fname;
@@ -48,7 +61,7 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
     std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
     if(!infile->IsOpen()) throw cet::exception("SpaceChargeMicroBooNE") << "Could not find the space charge effect file '" << fname << "'!\n";
 
-    if(fRepresentationType == "Parametric")
+    if(fRepresentationType==SpaceChargeRepresentation_t::kParametric)
     {      
       for(int i = 0; i < 5; i++)
       {
@@ -170,370 +183,262 @@ bool spacecharge::SpaceChargeMicroBooNE::EnableCorrSCE() const
   return fEnableCorrSCE;
 }
 
+void spacecharge::SpaceChargeMicroBooNE::SetPosition(double xVal, double yVal, double zVal) const
+{
+  fPos[0] = TransformX(xVal); fPos[1] = TransformY(yVal); fPos[2] = TransformZ(zVal);
+}
+
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(double xVal, double yVal, double zVal) const
+void spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(double xVal, double yVal, double zVal,
+						     std::vector<double> & posOffsets) const
 {
-  std::vector<double> thePosOffsets;
+  posOffsets.resize(3,0.0);
+  if(!IsInsideBoundaries(xVal,yVal,zVal))
+    return;
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
-  {
-    thePosOffsets.resize(3,0.0);
-  }
-  else
-  {
-    if(fRepresentationType == "Parametric")
-      thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
-    else
-      thePosOffsets.resize(3,0.0);
+  SetPosition(xVal,yVal,zVal);
+  
+  if(fRepresentationType==SpaceChargeRepresentation_t::kParametric){
+    posOffsets[0] = GetXPosOffsetParametric();
+    posOffsets[1] = GetYPosOffsetParametric();
+    posOffsets[2] = GetZPosOffsetParametric();
   }
 
-  return thePosOffsets;
 }
 
 //----------------------------------------------------------------------------
-/// Provides position offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
-{
-  std::vector<double> thePosOffsetsParametric;
-
-  double xValNew = TransformX(xVal);
-  double yValNew = TransformY(yVal);
-  double zValNew = TransformZ(zVal);
-
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Z"));
-
-  return thePosOffsetsParametric;
-}
-
-//----------------------------------------------------------------------------
-/// Provides one position offset using a parametric representation, for a given
-/// axis
-double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+/// Provides X position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetXPosOffsetParametric() const
 {      
-  double parA[6][7];
-  double parB[6];
+
+  for(int j = 0; j < 7; ++j)
+    {
+      parA[0][j] = g1_x[j]->Eval(fPos[2]);
+      parA[1][j] = g2_x[j]->Eval(fPos[2]);
+      parA[2][j] = g3_x[j]->Eval(fPos[2]);
+      parA[3][j] = g4_x[j]->Eval(fPos[2]);
+      parA[4][j] = g5_x[j]->Eval(fPos[2]);
+    }
+  
+  f1_x->SetParameters(parA[0]);
+  f2_x->SetParameters(parA[1]);
+  f3_x->SetParameters(parA[2]);
+  f4_x->SetParameters(parA[3]);
+  f5_x->SetParameters(parA[4]);
+  
+  parB[0] = f1_x->Eval(fPos[1]);
+  parB[1] = f2_x->Eval(fPos[1]);
+  parB[2] = f3_x->Eval(fPos[1]);
+  parB[3] = f4_x->Eval(fPos[1]);
+  parB[4] = f5_x->Eval(fPos[1]);
+  
+  fFinal_x->SetParameters(parB);
+  return 100.0*fFinal_x->Eval(fPos[0]);
+  
+}
+
+
+//----------------------------------------------------------------------------
+/// Provides y position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetYPosOffsetParametric() const
+{      
   
   for(int j = 0; j < 6; j++)
-  {
-    for(int i = 0; i < 7; i++)
-      parA[j][i] = 0.0;
-  
-    parB[j] = 0.0;
-  }
-  
-  if(axis == "X")
-  {
-    for(int j = 0; j < 7; j++)
     {
-      parA[0][j] = g1_x[j]->Eval(zValNew);
-      parA[1][j] = g2_x[j]->Eval(zValNew);
-      parA[2][j] = g3_x[j]->Eval(zValNew);
-      parA[3][j] = g4_x[j]->Eval(zValNew);
-      parA[4][j] = g5_x[j]->Eval(zValNew);
+      parA[0][j] = g1_y[j]->Eval(fPos[2]);
+      parA[1][j] = g2_y[j]->Eval(fPos[2]);
+      parA[2][j] = g3_y[j]->Eval(fPos[2]);
+      parA[3][j] = g4_y[j]->Eval(fPos[2]);
+      parA[4][j] = g5_y[j]->Eval(fPos[2]);
+      parA[5][j] = g6_y[j]->Eval(fPos[2]);
     }
   
-    f1_x->SetParameters(parA[0]);
-    f2_x->SetParameters(parA[1]);
-    f3_x->SetParameters(parA[2]);
-    f4_x->SetParameters(parA[3]);
-    f5_x->SetParameters(parA[4]);
-  }
-  else if(axis == "Y")
-  {
-    for(int j = 0; j < 6; j++)
+  f1_y->SetParameters(parA[0]);
+  f2_y->SetParameters(parA[1]);
+  f3_y->SetParameters(parA[2]);
+  f4_y->SetParameters(parA[3]);
+  f5_y->SetParameters(parA[4]);
+  f6_y->SetParameters(parA[5]);
+
+  parB[0] = f1_y->Eval(fPos[0]);
+  parB[1] = f2_y->Eval(fPos[0]);
+  parB[2] = f3_y->Eval(fPos[0]);
+  parB[3] = f4_y->Eval(fPos[0]);
+  parB[4] = f5_y->Eval(fPos[0]);
+  parB[5] = f6_y->Eval(fPos[0]);
+  
+  fFinal_y->SetParameters(parB);
+  return 100.0*fFinal_y->Eval(fPos[1]);
+}
+
+//----------------------------------------------------------------------------
+/// Provides z position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetZPosOffsetParametric() const
+{      
+  static double parA[6][7];
+  static double parB[6];
+  
+  for(int j = 0; j < 5; j++)
     {
-      parA[0][j] = g1_y[j]->Eval(zValNew);
-      parA[1][j] = g2_y[j]->Eval(zValNew);
-      parA[2][j] = g3_y[j]->Eval(zValNew);
-      parA[3][j] = g4_y[j]->Eval(zValNew);
-      parA[4][j] = g5_y[j]->Eval(zValNew);
-      parA[5][j] = g6_y[j]->Eval(zValNew);
+      parA[0][j] = g1_z[j]->Eval(fPos[2]);
+      parA[1][j] = g2_z[j]->Eval(fPos[2]);
+      parA[2][j] = g3_z[j]->Eval(fPos[2]);
+      parA[3][j] = g4_z[j]->Eval(fPos[2]);
     }
   
-    f1_y->SetParameters(parA[0]);
-    f2_y->SetParameters(parA[1]);
-    f3_y->SetParameters(parA[2]);
-    f4_y->SetParameters(parA[3]);
-    f5_y->SetParameters(parA[4]);
-    f6_y->SetParameters(parA[5]);
-  }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
-      parA[0][j] = g1_z[j]->Eval(zValNew);
-      parA[1][j] = g2_z[j]->Eval(zValNew);
-      parA[2][j] = g3_z[j]->Eval(zValNew);
-      parA[3][j] = g4_z[j]->Eval(zValNew);
-    }
+  f1_z->SetParameters(parA[0]);
+  f2_z->SetParameters(parA[1]);
+  f3_z->SetParameters(parA[2]);
+  f4_z->SetParameters(parA[3]);
   
-    f1_z->SetParameters(parA[0]);
-    f2_z->SetParameters(parA[1]);
-    f3_z->SetParameters(parA[2]);
-    f4_z->SetParameters(parA[3]);
-  }
+  parB[0] = f1_z->Eval(fPos[1]);
+  parB[1] = f2_z->Eval(fPos[1]);
+  parB[2] = f3_z->Eval(fPos[1]);
+  parB[3] = f4_z->Eval(fPos[1]);
   
-  double aValNew;
-  double bValNew;
-  
-  if(axis == "Y")
-  {
-    aValNew = xValNew;
-    bValNew = yValNew;
-  }
-  else
-  {
-    aValNew = yValNew;
-    bValNew = xValNew;
-  }
-  
-  double offsetValNew = 0.0;
-  if(axis == "X")
-  {
-    parB[0] = f1_x->Eval(aValNew);
-    parB[1] = f2_x->Eval(aValNew);
-    parB[2] = f3_x->Eval(aValNew);
-    parB[3] = f4_x->Eval(aValNew);
-    parB[4] = f5_x->Eval(aValNew);
-  
-    fFinal_x->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_x->Eval(bValNew);
-  }
-  else if(axis == "Y")
-  {
-    parB[0] = f1_y->Eval(aValNew);
-    parB[1] = f2_y->Eval(aValNew);
-    parB[2] = f3_y->Eval(aValNew);
-    parB[3] = f4_y->Eval(aValNew);
-    parB[4] = f5_y->Eval(aValNew);
-    parB[5] = f6_y->Eval(aValNew);
-  
-    fFinal_y->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_y->Eval(bValNew);
-  }
-  else if(axis == "Z")
-  {
-    parB[0] = f1_z->Eval(aValNew);
-    parB[1] = f2_z->Eval(aValNew);
-    parB[2] = f3_z->Eval(aValNew);
-    parB[3] = f4_z->Eval(aValNew);
-  
-    fFinal_z->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_z->Eval(bValNew);
-  }
-  
-  return offsetValNew;
+  fFinal_z->SetParameters(parB);
+  return 100.0*fFinal_z->Eval(fPos[0]);
 }
 
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(double xVal, double yVal, double zVal) const
+void spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(double xVal, double yVal, double zVal,
+							std::vector<double> & efieldOffsets) const
 {
-  std::vector<double> theEfieldOffsets;
+  efieldOffsets.resize(3,0.0);
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
-  {
-    theEfieldOffsets.resize(3,0.0);
+  SetPosition(xVal,yVal,zVal);
+  
+  if(fRepresentationType==SpaceChargeRepresentation_t::kParametric){
+    efieldOffsets[0] = -1.*GetXEfieldOffsetParametric();
+    efieldOffsets[1] = -1.*GetYEfieldOffsetParametric();
+    efieldOffsets[2] = -1.*GetZEfieldOffsetParametric();
   }
-  else
-  {
-    if(fRepresentationType == "Parametric")
-      theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
-    else
-      theEfieldOffsets.resize(3,0.0);
-  }
-
-  theEfieldOffsets.at(0) = -1.0*theEfieldOffsets.at(0);
-  theEfieldOffsets.at(1) = -1.0*theEfieldOffsets.at(1);
-  theEfieldOffsets.at(2) = -1.0*theEfieldOffsets.at(2);
-
-  return theEfieldOffsets;
+  
 }
 
 //----------------------------------------------------------------------------
-/// Provides E field offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
-{
-  std::vector<double> theEfieldOffsetsParametric;
-
-  double xValNew = TransformX(xVal);
-  double yValNew = TransformY(yVal);
-  double zValNew = TransformZ(zVal);
-
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Z"));
-
-  return theEfieldOffsetsParametric;
-}
-
-//----------------------------------------------------------------------------
-/// Provides one E field offset using a parametric representation, for a given
-/// axis
-double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+/// Provides X position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetXEfieldOffsetParametric() const
 {      
-  double parA[6][7];
-  double parB[6];
+
+  for(int j = 0; j < 7; ++j)
+    {
+      parA[0][j] = g1_Ex[j]->Eval(fPos[2]);
+      parA[1][j] = g2_Ex[j]->Eval(fPos[2]);
+      parA[2][j] = g3_Ex[j]->Eval(fPos[2]);
+      parA[3][j] = g4_Ex[j]->Eval(fPos[2]);
+      parA[4][j] = g5_Ex[j]->Eval(fPos[2]);
+    }
   
+  f1_Ex->SetParameters(parA[0]);
+  f2_Ex->SetParameters(parA[1]);
+  f3_Ex->SetParameters(parA[2]);
+  f4_Ex->SetParameters(parA[3]);
+  f5_Ex->SetParameters(parA[4]);
+  
+  parB[0] = f1_Ex->Eval(fPos[1]);
+  parB[1] = f2_Ex->Eval(fPos[1]);
+  parB[2] = f3_Ex->Eval(fPos[1]);
+  parB[3] = f4_Ex->Eval(fPos[1]);
+  parB[4] = f5_Ex->Eval(fPos[1]);
+  
+  fFinal_Ex->SetParameters(parB);
+  return fFinal_Ex->Eval(fPos[0]);
+  
+}
+
+
+//----------------------------------------------------------------------------
+/// Provides y position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetYEfieldOffsetParametric() const
+{
+
   for(int j = 0; j < 6; j++)
-  {
-    for(int i = 0; i < 7; i++)
-      parA[j][i] = 0.0;
-  
-    parB[j] = 0.0;
-  }
-  
-  if(axis == "X")
-  {
-    for(int j = 0; j < 7; j++)
     {
-      parA[0][j] = g1_Ex[j]->Eval(zValNew);
-      parA[1][j] = g2_Ex[j]->Eval(zValNew);
-      parA[2][j] = g3_Ex[j]->Eval(zValNew);
-      parA[3][j] = g4_Ex[j]->Eval(zValNew);
-      parA[4][j] = g5_Ex[j]->Eval(zValNew);
+      parA[0][j] = g1_Ey[j]->Eval(fPos[2]);
+      parA[1][j] = g2_Ey[j]->Eval(fPos[2]);
+      parA[2][j] = g3_Ey[j]->Eval(fPos[2]);
+      parA[3][j] = g4_Ey[j]->Eval(fPos[2]);
+      parA[4][j] = g5_Ey[j]->Eval(fPos[2]);
+      parA[5][j] = g6_Ey[j]->Eval(fPos[2]);
     }
   
-    f1_Ex->SetParameters(parA[0]);
-    f2_Ex->SetParameters(parA[1]);
-    f3_Ex->SetParameters(parA[2]);
-    f4_Ex->SetParameters(parA[3]);
-    f5_Ex->SetParameters(parA[4]);
-  }
-  else if(axis == "Y")
-  {
-    for(int j = 0; j < 6; j++)
+  f1_Ey->SetParameters(parA[0]);
+  f2_Ey->SetParameters(parA[1]);
+  f3_Ey->SetParameters(parA[2]);
+  f4_Ey->SetParameters(parA[3]);
+  f5_Ey->SetParameters(parA[4]);
+  f6_Ey->SetParameters(parA[5]);
+
+  parB[0] = f1_Ey->Eval(fPos[0]);
+  parB[1] = f2_Ey->Eval(fPos[0]);
+  parB[2] = f3_Ey->Eval(fPos[0]);
+  parB[3] = f4_Ey->Eval(fPos[0]);
+  parB[4] = f5_Ey->Eval(fPos[0]);
+  parB[5] = f6_Ey->Eval(fPos[0]);
+  
+  fFinal_Ey->SetParameters(parB);
+  return fFinal_Ey->Eval(fPos[1]);
+}
+
+//----------------------------------------------------------------------------
+/// Provides z position offset using a parametric representation
+double spacecharge::SpaceChargeMicroBooNE::GetZEfieldOffsetParametric() const
+{
+  
+  for(int j = 0; j < 5; j++)
     {
-      parA[0][j] = g1_Ey[j]->Eval(zValNew);
-      parA[1][j] = g2_Ey[j]->Eval(zValNew);
-      parA[2][j] = g3_Ey[j]->Eval(zValNew);
-      parA[3][j] = g4_Ey[j]->Eval(zValNew);
-      parA[4][j] = g5_Ey[j]->Eval(zValNew);
-      parA[5][j] = g6_Ey[j]->Eval(zValNew);
+      parA[0][j] = g1_Ez[j]->Eval(fPos[2]);
+      parA[1][j] = g2_Ez[j]->Eval(fPos[2]);
+      parA[2][j] = g3_Ez[j]->Eval(fPos[2]);
+      parA[3][j] = g4_Ez[j]->Eval(fPos[2]);
     }
   
-    f1_Ey->SetParameters(parA[0]);
-    f2_Ey->SetParameters(parA[1]);
-    f3_Ey->SetParameters(parA[2]);
-    f4_Ey->SetParameters(parA[3]);
-    f5_Ey->SetParameters(parA[4]);
-    f6_Ey->SetParameters(parA[5]);
-  }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
-      parA[0][j] = g1_Ez[j]->Eval(zValNew);
-      parA[1][j] = g2_Ez[j]->Eval(zValNew);
-      parA[2][j] = g3_Ez[j]->Eval(zValNew);
-      parA[3][j] = g4_Ez[j]->Eval(zValNew);
-    }
+  f1_Ez->SetParameters(parA[0]);
+  f2_Ez->SetParameters(parA[1]);
+  f3_Ez->SetParameters(parA[2]);
+  f4_Ez->SetParameters(parA[3]);
   
-    f1_Ez->SetParameters(parA[0]);
-    f2_Ez->SetParameters(parA[1]);
-    f3_Ez->SetParameters(parA[2]);
-    f4_Ez->SetParameters(parA[3]);
-  }
+  parB[0] = f1_Ez->Eval(fPos[1]);
+  parB[1] = f2_Ez->Eval(fPos[1]);
+  parB[2] = f3_Ez->Eval(fPos[1]);
+  parB[3] = f4_Ez->Eval(fPos[1]);
   
-  double aValNew;
-  double bValNew;
-  
-  if(axis == "Y")
-  {
-    aValNew = xValNew;
-    bValNew = yValNew;
-  }
-  else
-  {
-    aValNew = yValNew;
-    bValNew = xValNew;
-  }
-  
-  double offsetValNew = 0.0;
-  if(axis == "X")
-  {
-    parB[0] = f1_Ex->Eval(aValNew);
-    parB[1] = f2_Ex->Eval(aValNew);
-    parB[2] = f3_Ex->Eval(aValNew);
-    parB[3] = f4_Ex->Eval(aValNew);
-    parB[4] = f5_Ex->Eval(aValNew);
-  
-    fFinal_Ex->SetParameters(parB);
-    offsetValNew = fFinal_Ex->Eval(bValNew);
-  }
-  else if(axis == "Y")
-  {
-    parB[0] = f1_Ey->Eval(aValNew);
-    parB[1] = f2_Ey->Eval(aValNew);
-    parB[2] = f3_Ey->Eval(aValNew);
-    parB[3] = f4_Ey->Eval(aValNew);
-    parB[4] = f5_Ey->Eval(aValNew);
-    parB[5] = f6_Ey->Eval(aValNew);
-  
-    fFinal_Ey->SetParameters(parB);
-    offsetValNew = fFinal_Ey->Eval(bValNew);
-  }
-  else if(axis == "Z")
-  {
-    parB[0] = f1_Ez->Eval(aValNew);
-    parB[1] = f2_Ez->Eval(aValNew);
-    parB[2] = f3_Ez->Eval(aValNew);
-    parB[3] = f4_Ez->Eval(aValNew);
-  
-    fFinal_Ez->SetParameters(parB);
-    offsetValNew = fFinal_Ez->Eval(bValNew);
-  }
-  
-  return offsetValNew;
+  fFinal_Ez->SetParameters(parB);
+  return fFinal_Ez->Eval(fPos[0]);
 }
 
 //----------------------------------------------------------------------------
 /// Transform X to SCE X coordinate:  [2.56,0.0] --> [0.0,2.50]
 double spacecharge::SpaceChargeMicroBooNE::TransformX(double xVal) const
 {
-  double xValNew;
-  xValNew = 2.50 - (2.50/2.56)*(xVal/100.0);
-  xValNew -= 1.25;
-
-  return xValNew;
+  return 2.50 - (2.50/2.56)*(xVal/100.0) - 1.25;
 }
 
 //----------------------------------------------------------------------------
 /// Transform Y to SCE Y coordinate:  [-1.165,1.165] --> [0.0,2.50]
 double spacecharge::SpaceChargeMicroBooNE::TransformY(double yVal) const
 {
-  double yValNew;
-  yValNew = (2.50/2.33)*((yVal/100.0)+1.165);
-  yValNew -= 1.25;
-
-  return yValNew;
+  return (2.50/2.33)*((yVal/100.0)+1.165) - 1.25;
 }
 
 //----------------------------------------------------------------------------
 /// Transform Z to SCE Z coordinate:  [0.0,10.37] --> [0.0,10.0]
 double spacecharge::SpaceChargeMicroBooNE::TransformZ(double zVal) const
 {
-  double zValNew;
-  zValNew = (10.0/10.37)*(zVal/100.0);
-
-  return zValNew;
+  return (10.0/10.37)*(zVal/100.0);
 }
 
 //----------------------------------------------------------------------------
 /// Check to see if point is inside boundaries of map (allow to go slightly out of range)
 bool spacecharge::SpaceChargeMicroBooNE::IsInsideBoundaries(double xVal, double yVal, double zVal) const
 {
-  bool isInside = true;
-
   if((xVal < 0.0) || (xVal > 260.0) || (yVal < -120.0) || (yVal > 120.0) || (zVal < 0.0) || (zVal > 1050.0))
-  {
-    isInside = false;
-  }
+    return false;
 
-  return isInside;
+  return true;
 }
