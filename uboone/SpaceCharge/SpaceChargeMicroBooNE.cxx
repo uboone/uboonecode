@@ -8,18 +8,47 @@
 ////////////////////////////////////////////////////////////////////////
 
 // C++ language includes
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include "math.h"
-#include "stdio.h"
+#include <memory> // std::unique_ptr<>
+#include <cassert>
 
 // LArSoft includes
 #include "uboone/SpaceCharge/SpaceChargeMicroBooNE.h"
 
 // Framework includes
 #include "cetlib/exception.h"
+
+// ROOT includes
+#include "TFile.h"
+
+
+namespace {
+  
+  /// TGraph wrapper with RAII.
+  class SortedTGraphFromFile {
+    TGraph* graph = nullptr;
+    
+      public:
+    SortedTGraphFromFile(TFile& file, char const* graphName)
+      : graph(static_cast<TGraph*>(file.Get(graphName)))
+      {
+        if (!graph) {
+          throw cet::exception("SpaceChargeMicroBooNE")
+            << "Graph '" << graphName << "' not found in '" << file.GetPath()
+            << "'\n";
+        }
+        graph->Sort();
+      }
+    
+    ~SortedTGraphFromFile() { delete graph; }
+    
+    TGraph const& operator* () const { return *graph; }
+    
+  }; // class SortedTGraphFromFile
+  
+} // local namespace
+
 
 //-----------------------------------------------
 spacecharge::SpaceChargeMicroBooNE::SpaceChargeMicroBooNE(
@@ -38,99 +67,109 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
 
   if((fEnableSimSpatialSCE == true) || (fEnableSimEfieldSCE == true))
   {
-    fRepresentationType = pset.get<std::string>("RepresentationType");
+    auto const reprTypeString = pset.get<std::string>("RepresentationType");
+    fRepresentationType = ParseRepresentationType(reprTypeString);
+    if (fRepresentationType == SpaceChargeRepresentation_t::kUnknown) {
+      throw cet::exception("SpaceChargeMicroBooNE")
+        << "Unknown space charge representation type: '" << reprTypeString
+        << "'\n";
+    }
     fInputFilename = pset.get<std::string>("InputFilename");
 
     std::string fname;
     cet::search_path sp("FW_SEARCH_PATH");
     sp.find_file(fInputFilename,fname);
 
-    std::unique_ptr<TFile> infile(new TFile(fname.c_str(), "READ"));
-    if(!infile->IsOpen()) throw cet::exception("SpaceChargeMicroBooNE") << "Could not find the space charge effect file '" << fname << "'!\n";
+    TFile infile(fname.c_str(), "READ");
+    if(!infile.IsOpen()) throw cet::exception("SpaceChargeMicroBooNE") << "Could not find the space charge effect file '" << fname << "'!\n";
 
-    if(fRepresentationType == "Parametric")
-    {      
-      for(int i = 0; i < 5; i++)
-      {
-        g1_x[i] = (TGraph*)infile->Get(Form("deltaX/g1_%d",i));
-        g2_x[i] = (TGraph*)infile->Get(Form("deltaX/g2_%d",i));
-        g3_x[i] = (TGraph*)infile->Get(Form("deltaX/g3_%d",i));   
-        g4_x[i] = (TGraph*)infile->Get(Form("deltaX/g4_%d",i));
-        g5_x[i] = (TGraph*)infile->Get(Form("deltaX/g5_%d",i));
+    switch (fRepresentationType) {
+      case SpaceChargeRepresentation_t::kParametric:
+        for(int i = 0; i < 5; i++)
+        {
+          g1_x[i] = makeInterpolator(infile, Form("deltaX/g1_%d",i));
+          g2_x[i] = makeInterpolator(infile, Form("deltaX/g2_%d",i));
+          g3_x[i] = makeInterpolator(infile, Form("deltaX/g3_%d",i));   
+          g4_x[i] = makeInterpolator(infile, Form("deltaX/g4_%d",i));
+          g5_x[i] = makeInterpolator(infile, Form("deltaX/g5_%d",i));
 
-        g1_y[i] = (TGraph*)infile->Get(Form("deltaY/g1_%d",i));
-        g2_y[i] = (TGraph*)infile->Get(Form("deltaY/g2_%d",i));
-        g3_y[i] = (TGraph*)infile->Get(Form("deltaY/g3_%d",i));   
-        g4_y[i] = (TGraph*)infile->Get(Form("deltaY/g4_%d",i));
-        g5_y[i] = (TGraph*)infile->Get(Form("deltaY/g5_%d",i));
-        g6_y[i] = (TGraph*)infile->Get(Form("deltaY/g6_%d",i));
+          g1_y[i] = makeInterpolator(infile, Form("deltaY/g1_%d",i));
+          g2_y[i] = makeInterpolator(infile, Form("deltaY/g2_%d",i));
+          g3_y[i] = makeInterpolator(infile, Form("deltaY/g3_%d",i));   
+          g4_y[i] = makeInterpolator(infile, Form("deltaY/g4_%d",i));
+          g5_y[i] = makeInterpolator(infile, Form("deltaY/g5_%d",i));
+          g6_y[i] = makeInterpolator(infile, Form("deltaY/g6_%d",i));
 
-        g1_z[i] = (TGraph*)infile->Get(Form("deltaZ/g1_%d",i));
-        g2_z[i] = (TGraph*)infile->Get(Form("deltaZ/g2_%d",i));
-        g3_z[i] = (TGraph*)infile->Get(Form("deltaZ/g3_%d",i));   
-        g4_z[i] = (TGraph*)infile->Get(Form("deltaZ/g4_%d",i));
+          g1_z[i] = makeInterpolator(infile, Form("deltaZ/g1_%d",i));
+          g2_z[i] = makeInterpolator(infile, Form("deltaZ/g2_%d",i));
+          g3_z[i] = makeInterpolator(infile, Form("deltaZ/g3_%d",i));   
+          g4_z[i] = makeInterpolator(infile, Form("deltaZ/g4_%d",i));
 
-	g1_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g1_%d",i));
-	g2_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g2_%d",i));
-	g3_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g3_%d",i));
-	g4_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g4_%d",i));
-	g5_Ex[i] = (TGraph*)infile->Get(Form("deltaExOverE/g5_%d",i));
+          g1_Ex[i] = makeInterpolator(infile, Form("deltaExOverE/g1_%d",i));
+          g2_Ex[i] = makeInterpolator(infile, Form("deltaExOverE/g2_%d",i));
+          g3_Ex[i] = makeInterpolator(infile, Form("deltaExOverE/g3_%d",i));
+          g4_Ex[i] = makeInterpolator(infile, Form("deltaExOverE/g4_%d",i));
+          g5_Ex[i] = makeInterpolator(infile, Form("deltaExOverE/g5_%d",i));
+          
+          g1_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g1_%d",i));
+          g2_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g2_%d",i));
+          g3_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g3_%d",i));
+          g4_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g4_%d",i));
+          g5_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g5_%d",i));
+          g6_Ey[i] = makeInterpolator(infile, Form("deltaEyOverE/g6_%d",i));
+          
+          g1_Ez[i] = makeInterpolator(infile, Form("deltaEzOverE/g1_%d",i));
+          g2_Ez[i] = makeInterpolator(infile, Form("deltaEzOverE/g2_%d",i));
+          g3_Ez[i] = makeInterpolator(infile, Form("deltaEzOverE/g3_%d",i));
+          g4_Ez[i] = makeInterpolator(infile, Form("deltaEzOverE/g4_%d",i));
+        }
 
-	g1_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g1_%d",i));
-	g2_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g2_%d",i));
-	g3_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g3_%d",i));
-	g4_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g4_%d",i));
-	g5_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g5_%d",i));
-	g6_Ey[i] = (TGraph*)infile->Get(Form("deltaEyOverE/g6_%d",i));
+        g1_x[5] = makeInterpolator(infile, "deltaX/g1_5");
+        g2_x[5] = makeInterpolator(infile, "deltaX/g2_5");
+        g3_x[5] = makeInterpolator(infile, "deltaX/g3_5");   
+        g4_x[5] = makeInterpolator(infile, "deltaX/g4_5");
+        g5_x[5] = makeInterpolator(infile, "deltaX/g5_5");
 
-	g1_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g1_%d",i));
-	g2_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g2_%d",i));
-	g3_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g3_%d",i));
-	g4_Ez[i] = (TGraph*)infile->Get(Form("deltaEzOverE/g4_%d",i));
-      }
+        g1_y[5] = makeInterpolator(infile, "deltaY/g1_5");
+        g2_y[5] = makeInterpolator(infile, "deltaY/g2_5");
+        g3_y[5] = makeInterpolator(infile, "deltaY/g3_5");   
+        g4_y[5] = makeInterpolator(infile, "deltaY/g4_5");
+        g5_y[5] = makeInterpolator(infile, "deltaY/g5_5");
+        g6_y[5] = makeInterpolator(infile, "deltaY/g6_5");
+        
+        g1_x[6] = makeInterpolator(infile, "deltaX/g1_6");
+        g2_x[6] = makeInterpolator(infile, "deltaX/g2_6");
+        g3_x[6] = makeInterpolator(infile, "deltaX/g3_6");
+        g4_x[6] = makeInterpolator(infile, "deltaX/g4_6");
+        g5_x[6] = makeInterpolator(infile, "deltaX/g5_6");
 
-      g1_x[5] = (TGraph*)infile->Get("deltaX/g1_5");
-      g2_x[5] = (TGraph*)infile->Get("deltaX/g2_5");
-      g3_x[5] = (TGraph*)infile->Get("deltaX/g3_5");   
-      g4_x[5] = (TGraph*)infile->Get("deltaX/g4_5");
-      g5_x[5] = (TGraph*)infile->Get("deltaX/g5_5");
+        g1_Ex[5] = makeInterpolator(infile, "deltaExOverE/g1_5");
+        g2_Ex[5] = makeInterpolator(infile, "deltaExOverE/g2_5");
+        g3_Ex[5] = makeInterpolator(infile, "deltaExOverE/g3_5");
+        g4_Ex[5] = makeInterpolator(infile, "deltaExOverE/g4_5");
+        g5_Ex[5] = makeInterpolator(infile, "deltaExOverE/g5_5");
+        
+        g1_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g1_5");
+        g2_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g2_5");
+        g3_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g3_5");
+        g4_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g4_5");
+        g5_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g5_5");
+        g6_Ey[5] = makeInterpolator(infile, "deltaEyOverE/g6_5");
+        
+        g1_Ex[6] = makeInterpolator(infile, "deltaExOverE/g1_6");
+        g2_Ex[6] = makeInterpolator(infile, "deltaExOverE/g2_6");
+        g3_Ex[6] = makeInterpolator(infile, "deltaExOverE/g3_6");
+        g4_Ex[6] = makeInterpolator(infile, "deltaExOverE/g4_6");
+        g5_Ex[6] = makeInterpolator(infile, "deltaExOverE/g5_6");
+        break; // kParametric
+      case SpaceChargeRepresentation_t::kUnknown:
+        assert(false); // logic error
+        break;
+    } // switch
 
-      g1_y[5] = (TGraph*)infile->Get("deltaY/g1_5");
-      g2_y[5] = (TGraph*)infile->Get("deltaY/g2_5");
-      g3_y[5] = (TGraph*)infile->Get("deltaY/g3_5");   
-      g4_y[5] = (TGraph*)infile->Get("deltaY/g4_5");
-      g5_y[5] = (TGraph*)infile->Get("deltaY/g5_5");
-      g6_y[5] = (TGraph*)infile->Get("deltaY/g6_5");
-      
-      g1_x[6] = (TGraph*)infile->Get("deltaX/g1_6");
-      g2_x[6] = (TGraph*)infile->Get("deltaX/g2_6");
-      g3_x[6] = (TGraph*)infile->Get("deltaX/g3_6");
-      g4_x[6] = (TGraph*)infile->Get("deltaX/g4_6");
-      g5_x[6] = (TGraph*)infile->Get("deltaX/g5_6");
-
-      g1_Ex[5] = (TGraph*)infile->Get("deltaExOverE/g1_5");
-      g2_Ex[5] = (TGraph*)infile->Get("deltaExOverE/g2_5");
-      g3_Ex[5] = (TGraph*)infile->Get("deltaExOverE/g3_5");
-      g4_Ex[5] = (TGraph*)infile->Get("deltaExOverE/g4_5");
-      g5_Ex[5] = (TGraph*)infile->Get("deltaExOverE/g5_5");
-
-      g1_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g1_5");
-      g2_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g2_5");
-      g3_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g3_5");
-      g4_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g4_5");
-      g5_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g5_5");
-      g6_Ey[5] = (TGraph*)infile->Get("deltaEyOverE/g6_5");
-
-      g1_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g1_6");
-      g2_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g2_6");
-      g3_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g3_6");
-      g4_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g4_6");
-      g5_Ex[6] = (TGraph*)infile->Get("deltaExOverE/g5_6");
-    }
-
-    infile->Close();
+    infile.Close();
   }
-
+  
   if(fEnableCorrSCE == true)
   {
     // Grab other parameters from pset  
@@ -146,6 +185,7 @@ bool spacecharge::SpaceChargeMicroBooNE::Update(uint64_t ts)
 
   return true;
 }
+
 
 //----------------------------------------------------------------------------
 /// Return boolean indicating whether or not to turn simulation of SCE on for
@@ -183,10 +223,15 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(double xVa
   }
   else
   {
-    if(fRepresentationType == "Parametric")
-      thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
-    else
-      thePosOffsets.resize(3,0.0);
+    switch (fRepresentationType) {
+      case SpaceChargeRepresentation_t::kParametric:
+        thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
+        break;
+      case SpaceChargeRepresentation_t::kUnknown:
+        assert(false); // logic error: can't be unknown
+        thePosOffsets.resize(3,0.0);
+        break;
+    } // switch
   }
 
   return thePosOffsets;
@@ -202,132 +247,139 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsetsParametric(
   double yValNew = TransformY(yVal);
   double zValNew = TransformZ(zVal);
 
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametric(xValNew,yValNew,zValNew,"Z"));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricX(xValNew,yValNew,zValNew));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricY(xValNew,yValNew,zValNew));
+  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricZ(xValNew,yValNew,zValNew));
 
   return thePosOffsetsParametric;
 }
 
 //----------------------------------------------------------------------------
+double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricX
+  (double xValNew, double yValNew, double zValNew) const
+{
+  
+  double parA[5][7];
+  for(size_t j = 0; j < 7; j++) 
+  {
+    parA[0][j] = g1_x[j].Eval(zValNew);
+    parA[1][j] = g2_x[j].Eval(zValNew);
+    parA[2][j] = g3_x[j].Eval(zValNew);
+    parA[3][j] = g4_x[j].Eval(zValNew);
+    parA[4][j] = g5_x[j].Eval(zValNew);
+  }
+
+  f1_x_poly_t f1_x;
+  f2_x_poly_t f2_x;
+  f3_x_poly_t f3_x;
+  f4_x_poly_t f4_x;
+  f5_x_poly_t f5_x;
+  
+  f1_x.SetParameters(parA[0]);
+  f2_x.SetParameters(parA[1]);
+  f3_x.SetParameters(parA[2]);
+  f4_x.SetParameters(parA[3]);
+  f5_x.SetParameters(parA[4]);
+
+  double const aValNew = yValNew;
+  double const parB[] = {
+    f1_x.Eval(aValNew),
+    f2_x.Eval(aValNew),
+    f3_x.Eval(aValNew),
+    f4_x.Eval(aValNew),
+    f5_x.Eval(aValNew)
+  };
+  
+  double const bValNew = xValNew;
+  return 100.0*fFinal_x_poly_t::Eval(bValNew, parB);
+}
+
+//----------------------------------------------------------------------------
+/// Provides one position offset using a parametric representation, for Y axis
+double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY
+  (double xValNew, double yValNew, double zValNew) const
+{
+  
+  double parA[6][6];
+  for(size_t j = 0; j < 6; j++)
+  {
+    parA[0][j] = g1_y[j].Eval(zValNew);
+    parA[1][j] = g2_y[j].Eval(zValNew);
+    parA[2][j] = g3_y[j].Eval(zValNew);
+    parA[3][j] = g4_y[j].Eval(zValNew);
+    parA[4][j] = g5_y[j].Eval(zValNew);
+    parA[5][j] = g6_y[j].Eval(zValNew);
+  }
+  
+  f1_y_poly_t f1_y;
+  f2_y_poly_t f2_y;
+  f3_y_poly_t f3_y;
+  f4_y_poly_t f4_y;
+  f5_y_poly_t f5_y;
+  f6_y_poly_t f6_y;
+  
+  f1_y.SetParameters(parA[0]);
+  f2_y.SetParameters(parA[1]);
+  f3_y.SetParameters(parA[2]);
+  f4_y.SetParameters(parA[3]);
+  f5_y.SetParameters(parA[4]);
+  f6_y.SetParameters(parA[5]);
+  
+  double const aValNew = xValNew;
+  
+  double const parB[] = {
+    f1_y.Eval(aValNew),
+    f2_y.Eval(aValNew),
+    f3_y.Eval(aValNew),
+    f4_y.Eval(aValNew),
+    f5_y.Eval(aValNew),
+    f6_y.Eval(aValNew)
+  };
+  
+  double const bValNew = yValNew;
+  return 100.0*fFinal_y_poly_t::Eval(bValNew, parB);
+} // spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY()
+
+
+//----------------------------------------------------------------------------
 /// Provides one position offset using a parametric representation, for a given
 /// axis
-double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
-{      
-  double parA[6][7];
-  double parB[6];
+double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
+  (double xValNew, double yValNew, double zValNew) const
+{
   
-  for(int j = 0; j < 6; j++)
+  double parA[4][5];
+  for(size_t j = 0; j < 5; j++)
   {
-    for(int i = 0; i < 7; i++)
-      parA[j][i] = 0.0;
-  
-    parB[j] = 0.0;
+    parA[0][j] = g1_z[j].Eval(zValNew);
+    parA[1][j] = g2_z[j].Eval(zValNew);
+    parA[2][j] = g3_z[j].Eval(zValNew);
+    parA[3][j] = g4_z[j].Eval(zValNew);
   }
+
+  f1_z_poly_t f1_z;
+  f2_z_poly_t f2_z;
+  f3_z_poly_t f3_z;
+  f4_z_poly_t f4_z;
   
-  if(axis == "X")
-  {
-    for(int j = 0; j < 7; j++)
-    {
-      parA[0][j] = g1_x[j]->Eval(zValNew);
-      parA[1][j] = g2_x[j]->Eval(zValNew);
-      parA[2][j] = g3_x[j]->Eval(zValNew);
-      parA[3][j] = g4_x[j]->Eval(zValNew);
-      parA[4][j] = g5_x[j]->Eval(zValNew);
-    }
+  f1_z.SetParameters(parA[0]);
+  f2_z.SetParameters(parA[1]);
+  f3_z.SetParameters(parA[2]);
+  f4_z.SetParameters(parA[3]);
   
-    f1_x->SetParameters(parA[0]);
-    f2_x->SetParameters(parA[1]);
-    f3_x->SetParameters(parA[2]);
-    f4_x->SetParameters(parA[3]);
-    f5_x->SetParameters(parA[4]);
-  }
-  else if(axis == "Y")
-  {
-    for(int j = 0; j < 6; j++)
-    {
-      parA[0][j] = g1_y[j]->Eval(zValNew);
-      parA[1][j] = g2_y[j]->Eval(zValNew);
-      parA[2][j] = g3_y[j]->Eval(zValNew);
-      parA[3][j] = g4_y[j]->Eval(zValNew);
-      parA[4][j] = g5_y[j]->Eval(zValNew);
-      parA[5][j] = g6_y[j]->Eval(zValNew);
-    }
+  double const aValNew = yValNew;
+  double const parB[] = {
+    f1_z.Eval(aValNew),
+    f2_z.Eval(aValNew),
+    f3_z.Eval(aValNew),
+    f4_z.Eval(aValNew)
+  };
   
-    f1_y->SetParameters(parA[0]);
-    f2_y->SetParameters(parA[1]);
-    f3_y->SetParameters(parA[2]);
-    f4_y->SetParameters(parA[3]);
-    f5_y->SetParameters(parA[4]);
-    f6_y->SetParameters(parA[5]);
-  }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
-      parA[0][j] = g1_z[j]->Eval(zValNew);
-      parA[1][j] = g2_z[j]->Eval(zValNew);
-      parA[2][j] = g3_z[j]->Eval(zValNew);
-      parA[3][j] = g4_z[j]->Eval(zValNew);
-    }
+  double const bValNew = xValNew;
+  return 100.0*fFinal_z_poly_t::Eval(bValNew, parB);
   
-    f1_z->SetParameters(parA[0]);
-    f2_z->SetParameters(parA[1]);
-    f3_z->SetParameters(parA[2]);
-    f4_z->SetParameters(parA[3]);
-  }
-  
-  double aValNew;
-  double bValNew;
-  
-  if(axis == "Y")
-  {
-    aValNew = xValNew;
-    bValNew = yValNew;
-  }
-  else
-  {
-    aValNew = yValNew;
-    bValNew = xValNew;
-  }
-  
-  double offsetValNew = 0.0;
-  if(axis == "X")
-  {
-    parB[0] = f1_x->Eval(aValNew);
-    parB[1] = f2_x->Eval(aValNew);
-    parB[2] = f3_x->Eval(aValNew);
-    parB[3] = f4_x->Eval(aValNew);
-    parB[4] = f5_x->Eval(aValNew);
-  
-    fFinal_x->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_x->Eval(bValNew);
-  }
-  else if(axis == "Y")
-  {
-    parB[0] = f1_y->Eval(aValNew);
-    parB[1] = f2_y->Eval(aValNew);
-    parB[2] = f3_y->Eval(aValNew);
-    parB[3] = f4_y->Eval(aValNew);
-    parB[4] = f5_y->Eval(aValNew);
-    parB[5] = f6_y->Eval(aValNew);
-  
-    fFinal_y->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_y->Eval(bValNew);
-  }
-  else if(axis == "Z")
-  {
-    parB[0] = f1_z->Eval(aValNew);
-    parB[1] = f2_z->Eval(aValNew);
-    parB[2] = f3_z->Eval(aValNew);
-    parB[3] = f4_z->Eval(aValNew);
-  
-    fFinal_z->SetParameters(parB);
-    offsetValNew = 100.0*fFinal_z->Eval(bValNew);
-  }
-  
-  return offsetValNew;
-}
+} // spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ()
+
 
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
@@ -342,10 +394,15 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(double 
   }
   else
   {
-    if(fRepresentationType == "Parametric")
-      theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
-    else
-      theEfieldOffsets.resize(3,0.0);
+    switch (fRepresentationType) {
+      case SpaceChargeRepresentation_t::kParametric:
+        theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
+        break;
+      case SpaceChargeRepresentation_t::kUnknown:
+        assert(false); // logic error: can't be unknown
+        theEfieldOffsets.resize(3,0.0);
+        break;
+    } // switch
   }
 
   theEfieldOffsets.at(0) = -1.0*theEfieldOffsets.at(0);
@@ -365,132 +422,139 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsetsParametr
   double yValNew = TransformY(yVal);
   double zValNew = TransformZ(zVal);
 
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"X"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Y"));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametric(xValNew,yValNew,zValNew,"Z"));
+  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricX(xValNew,yValNew,zValNew));
+  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricY(xValNew,yValNew,zValNew));
+  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricZ(xValNew,yValNew,zValNew));
 
   return theEfieldOffsetsParametric;
 }
 
 //----------------------------------------------------------------------------
-/// Provides one E field offset using a parametric representation, for a given
-/// axis
-double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
-{      
-  double parA[6][7];
-  double parB[6];
+/// Provides one E field offset using a parametric representation, for x axis
+double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX
+  (double xValNew, double yValNew, double zValNew) const
+{
   
-  for(int j = 0; j < 6; j++)
+  double parA[5][7];
+  for(size_t j = 0; j < 7; j++)
   {
-    for(int i = 0; i < 7; i++)
-      parA[j][i] = 0.0;
-  
-    parB[j] = 0.0;
+    parA[0][j] = g1_Ex[j].Eval(zValNew);
+    parA[1][j] = g2_Ex[j].Eval(zValNew);
+    parA[2][j] = g3_Ex[j].Eval(zValNew);
+    parA[3][j] = g4_Ex[j].Eval(zValNew);
+    parA[4][j] = g5_Ex[j].Eval(zValNew);
   }
+
+  f1_Ex_poly_t f1_Ex;
+  f2_Ex_poly_t f2_Ex;
+  f3_Ex_poly_t f3_Ex;
+  f4_Ex_poly_t f4_Ex;
+  f5_Ex_poly_t f5_Ex;
   
-  if(axis == "X")
+  f1_Ex.SetParameters(parA[0]);
+  f2_Ex.SetParameters(parA[1]);
+  f3_Ex.SetParameters(parA[2]);
+  f4_Ex.SetParameters(parA[3]);
+  f5_Ex.SetParameters(parA[4]);
+  
+  double const aValNew = yValNew;
+  double const parB[] = {
+    f1_Ex.Eval(aValNew),
+    f2_Ex.Eval(aValNew),
+    f3_Ex.Eval(aValNew),
+    f4_Ex.Eval(aValNew),
+    f5_Ex.Eval(aValNew)
+  };
+  
+  double const bValNew = xValNew;
+  return fFinal_Ex_poly_t::Eval(bValNew, parB);
+  
+} // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX()
+
+//----------------------------------------------------------------------------
+/// Provides one E field offset using a parametric representation, for y axis
+double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY
+  (double xValNew, double yValNew, double zValNew) const
+{
+  
+  double parA[6][6];
+  for(size_t j = 0; j < 6; j++)
   {
-    for(int j = 0; j < 7; j++)
-    {
-      parA[0][j] = g1_Ex[j]->Eval(zValNew);
-      parA[1][j] = g2_Ex[j]->Eval(zValNew);
-      parA[2][j] = g3_Ex[j]->Eval(zValNew);
-      parA[3][j] = g4_Ex[j]->Eval(zValNew);
-      parA[4][j] = g5_Ex[j]->Eval(zValNew);
-    }
-  
-    f1_Ex->SetParameters(parA[0]);
-    f2_Ex->SetParameters(parA[1]);
-    f3_Ex->SetParameters(parA[2]);
-    f4_Ex->SetParameters(parA[3]);
-    f5_Ex->SetParameters(parA[4]);
+    parA[0][j] = g1_Ey[j].Eval(zValNew);
+    parA[1][j] = g2_Ey[j].Eval(zValNew);
+    parA[2][j] = g3_Ey[j].Eval(zValNew);
+    parA[3][j] = g4_Ey[j].Eval(zValNew);
+    parA[4][j] = g5_Ey[j].Eval(zValNew);
+    parA[5][j] = g6_Ey[j].Eval(zValNew);
   }
-  else if(axis == "Y")
+
+  f1_Ey_poly_t f1_Ey;
+  f2_Ey_poly_t f2_Ey;
+  f3_Ey_poly_t f3_Ey;
+  f4_Ey_poly_t f4_Ey;
+  f5_Ey_poly_t f5_Ey;
+  f6_Ey_poly_t f6_Ey;
+  
+  f1_Ey.SetParameters(parA[0]);
+  f2_Ey.SetParameters(parA[1]);
+  f3_Ey.SetParameters(parA[2]);
+  f4_Ey.SetParameters(parA[3]);
+  f5_Ey.SetParameters(parA[4]);
+  f6_Ey.SetParameters(parA[5]);
+
+  double const aValNew = xValNew;
+  double const parB[] = {
+    f1_Ey.Eval(aValNew),
+    f2_Ey.Eval(aValNew),
+    f3_Ey.Eval(aValNew),
+    f4_Ey.Eval(aValNew),
+    f5_Ey.Eval(aValNew),
+    f6_Ey.Eval(aValNew)
+  };
+  
+  double const bValNew = yValNew;
+  return fFinal_Ey_poly_t::Eval(bValNew, parB);
+  
+} // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY()
+
+
+//----------------------------------------------------------------------------
+/// Provides one E field offset using a parametric representation, for z axis
+double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ
+  (double xValNew, double yValNew, double zValNew) const
+{
+  
+  double parA[4][5];
+  for(size_t j = 0; j < 5; j++)
   {
-    for(int j = 0; j < 6; j++)
-    {
-      parA[0][j] = g1_Ey[j]->Eval(zValNew);
-      parA[1][j] = g2_Ey[j]->Eval(zValNew);
-      parA[2][j] = g3_Ey[j]->Eval(zValNew);
-      parA[3][j] = g4_Ey[j]->Eval(zValNew);
-      parA[4][j] = g5_Ey[j]->Eval(zValNew);
-      parA[5][j] = g6_Ey[j]->Eval(zValNew);
-    }
-  
-    f1_Ey->SetParameters(parA[0]);
-    f2_Ey->SetParameters(parA[1]);
-    f3_Ey->SetParameters(parA[2]);
-    f4_Ey->SetParameters(parA[3]);
-    f5_Ey->SetParameters(parA[4]);
-    f6_Ey->SetParameters(parA[5]);
+    parA[0][j] = g1_Ez[j].Eval(zValNew);
+    parA[1][j] = g2_Ez[j].Eval(zValNew);
+    parA[2][j] = g3_Ez[j].Eval(zValNew);
+    parA[3][j] = g4_Ez[j].Eval(zValNew);
   }
-  else if(axis == "Z")
-  {
-    for(int j = 0; j < 5; j++)
-    {
-      parA[0][j] = g1_Ez[j]->Eval(zValNew);
-      parA[1][j] = g2_Ez[j]->Eval(zValNew);
-      parA[2][j] = g3_Ez[j]->Eval(zValNew);
-      parA[3][j] = g4_Ez[j]->Eval(zValNew);
-    }
+
+  f1_Ez_poly_t f1_Ez;
+  f2_Ez_poly_t f2_Ez;
+  f3_Ez_poly_t f3_Ez;
+  f4_Ez_poly_t f4_Ez;
   
-    f1_Ez->SetParameters(parA[0]);
-    f2_Ez->SetParameters(parA[1]);
-    f3_Ez->SetParameters(parA[2]);
-    f4_Ez->SetParameters(parA[3]);
-  }
+  f1_Ez.SetParameters(parA[0]);
+  f2_Ez.SetParameters(parA[1]);
+  f3_Ez.SetParameters(parA[2]);
+  f4_Ez.SetParameters(parA[3]);
+
+  double const aValNew = yValNew;
+  double const parB[] = {
+    f1_Ez.Eval(aValNew),
+    f2_Ez.Eval(aValNew),
+    f3_Ez.Eval(aValNew),
+    f4_Ez.Eval(aValNew)
+  };
   
-  double aValNew;
-  double bValNew;
-  
-  if(axis == "Y")
-  {
-    aValNew = xValNew;
-    bValNew = yValNew;
-  }
-  else
-  {
-    aValNew = yValNew;
-    bValNew = xValNew;
-  }
-  
-  double offsetValNew = 0.0;
-  if(axis == "X")
-  {
-    parB[0] = f1_Ex->Eval(aValNew);
-    parB[1] = f2_Ex->Eval(aValNew);
-    parB[2] = f3_Ex->Eval(aValNew);
-    parB[3] = f4_Ex->Eval(aValNew);
-    parB[4] = f5_Ex->Eval(aValNew);
-  
-    fFinal_Ex->SetParameters(parB);
-    offsetValNew = fFinal_Ex->Eval(bValNew);
-  }
-  else if(axis == "Y")
-  {
-    parB[0] = f1_Ey->Eval(aValNew);
-    parB[1] = f2_Ey->Eval(aValNew);
-    parB[2] = f3_Ey->Eval(aValNew);
-    parB[3] = f4_Ey->Eval(aValNew);
-    parB[4] = f5_Ey->Eval(aValNew);
-    parB[5] = f6_Ey->Eval(aValNew);
-  
-    fFinal_Ey->SetParameters(parB);
-    offsetValNew = fFinal_Ey->Eval(bValNew);
-  }
-  else if(axis == "Z")
-  {
-    parB[0] = f1_Ez->Eval(aValNew);
-    parB[1] = f2_Ez->Eval(aValNew);
-    parB[2] = f3_Ez->Eval(aValNew);
-    parB[3] = f4_Ez->Eval(aValNew);
-  
-    fFinal_Ez->SetParameters(parB);
-    offsetValNew = fFinal_Ez->Eval(bValNew);
-  }
-  
-  return offsetValNew;
-}
+  double const bValNew = xValNew;
+  return fFinal_Ez_poly_t::Eval(bValNew, parB);
+} // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ()
+
 
 //----------------------------------------------------------------------------
 /// Transform X to SCE X coordinate:  [2.56,0.0] --> [0.0,2.50]
@@ -537,3 +601,28 @@ bool spacecharge::SpaceChargeMicroBooNE::IsInsideBoundaries(double xVal, double 
 
   return isInside;
 }
+
+
+//----------------------------------------------------------------------------
+
+spacecharge::SpaceChargeMicroBooNE::SpaceChargeRepresentation_t
+spacecharge::SpaceChargeMicroBooNE::ParseRepresentationType
+  (std::string repr_str)
+{
+  
+  if (repr_str == "Parametric") return SpaceChargeRepresentation_t::kParametric;
+  else                          return SpaceChargeRepresentation_t::kUnknown;
+  
+} // spacecharge::SpaceChargeMicroBooNE::ParseRepresentationType()
+
+
+//----------------------------------------------------------------------------
+gsl::Interpolator spacecharge::SpaceChargeMicroBooNE::makeInterpolator
+  (TFile& file, char const* graphName)
+{
+  SortedTGraphFromFile graph(file, graphName);
+  return gsl::Interpolator(*graph);
+} // spacecharge::SpaceChargeMicroBooNE::makeInterpolator()
+
+
+//----------------------------------------------------------------------------

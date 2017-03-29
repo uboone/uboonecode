@@ -77,11 +77,11 @@ outputs:
 # MCC7 compatibility.
 
 physics.producers.daq.GenNoise: 1
-services.SignalShapingServiceMicroBooNE.NConfigs: 2
+services.ElectronicsCalibService.ElectronicsCalibProvider.UseDB: true
 services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
 services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v0.1", "v0.1"]
 services.SignalShapingServiceMicroBooNE.YZdependentResponse: false
 services.SignalShapingServiceMicroBooNE.datadrivenResponse: false
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
 services.SignalShapingServiceMicroBooNE.DefaultEField: 0.5
 services.SignalShapingServiceMicroBooNE.DefaultTemperature: 87

@@ -39,7 +39,7 @@ physics:
         pmtrackeff:          @local::microboone_neutrinotrackingeff
         trackkalmanhiteff:   @local::microboone_neutrinotrackingeff
         stitchkalmanhiteff:  @local::microboone_neutrinotrackingeff
-        }
+    }
 
  #define the output stream, there could be more than one if using filters 
 # stream1:  [ out1 ]
@@ -73,10 +73,11 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 
 ### Here, we overwrite ALL module labels with the ones defined above.
 #physics.analyzers.analysistree:  @local::microboone_analysistree
-physics.analyzers.analysistree.OpFlashModuleLabel:              [ "opFlashSat", "simpleFlashBeam", "simpleFlashCosmic" ]
+physics.analyzers.analysistree.OpFlashModuleLabel:              [ "simpleFlashBeam", "simpleFlashCosmic", "opflashBeam", "opflashCosmic" ]
 physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
 physics.analyzers.analysistree.TrackModuleLabel:                ["trackkalmanhit","stitchkalmanhit","pandoraCosmic","pandoraCosmicKHit","pandoraNu","pandoraNuKHit","pandoraNuPMA","pmtrack"]
 physics.analyzers.analysistree.VertexModuleLabel:               ["cccluster", "pandoraNu", "pandoraCosmic","pmtrack","linecluster"]
+physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandoraNu"]
 physics.analyzers.analysistree.CalorimetryModuleLabel:          ["trackkalmanhitcalo","stitchkalmanhitcalo","pandoraCosmiccalo","pandoraCosmicKHitcalo","pandoraNucalo","pandoraNuKHitcalo","pandoraNuPMAcalo","pmtrackcalo"]
 physics.analyzers.analysistree.ParticleIDModuleLabel:           ["trackkalmanhitpid","stitchkalmanhitpid","pandoraCosmicpid","pandoraCosmicKHitpid","pandoraNupid","pandoraNuKHitpid","pandoraNuPMApid","pmtrackpid"]
 physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["trackkalmanhittag","stitchkalmanhittag","pandoraCosmictag","pandoraCosmicKHitPFPart","pandoraNutag","pandoraNuKHittag","pandoraNuPMAtag","pmtracktag"]
@@ -91,10 +92,14 @@ physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
 physics.analyzers.analysistree.POTModuleLabel:                  "generator"
 physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
 physics.analyzers.analysistree.ShowerModuleLabel:               ["showerrecofuzzy","showerrecopandora"]
+physics.analyzers.analysistree.SWTriggerModuleLabel:            "swtrigger"
+
 physics.analyzers.analysistree.IgnoreMissingShowers:            true
 physics.analyzers.analysistree.SavePandoraNuVertexInfo:         true
 physics.analyzers.analysistree.SavePFParticleInfo:              true
 physics.analyzers.analysistree.SaveCryInfo:                     false
+physics.analyzers.analysistree.SaveSWTriggerInfo:               true
+
 physics.analyzers.pandoraNueff.TrackModuleLabel:       "pandoraNu"
 physics.analyzers.pandoraCosmiceff.TrackModuleLabel:   "pandoraCosmic"
 physics.analyzers.pandoraNuPMAeff.TrackModuleLabel:    "pandoraNuPMA"

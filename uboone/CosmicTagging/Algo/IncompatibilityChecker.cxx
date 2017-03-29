@@ -17,6 +17,7 @@ namespace flashana {
   {
     _sigmaThreshold   = pset.get< double > ( "SigmaThreshold"   );
     _nBinsRequirement = pset.get< int    > ( "NBinsRequirement" );
+    _usePEConstraint  = pset.get< bool   > ( "UsePEConstraint"  );
     _useFlashPosition = pset.get< bool   > ( "UseFlashPosition" );
   }
 
@@ -25,6 +26,7 @@ namespace flashana {
     std::cout << "--- IncompatibilityChecker configuration:" << std::endl;
     std::cout << "---   _sigmaThreshold   = " << _sigmaThreshold << std::endl;
     std::cout << "---   _nBinsRequirement = " << _nBinsRequirement << std::endl;
+    std::cout << "---   _usePEConstraint  = " << _usePEConstraint << std::endl;
     std::cout << "---   _useFlashPosition = " << _useFlashPosition << std::endl;
 
   }
@@ -80,18 +82,48 @@ namespace flashana {
       }
     }
 
-    if(!_useFlashPosition) {
-      if( (areIncompatibleByBin || areIncompatibleByTotPe) ) {
-        //std::cout << "Flashes are incompatible by bin or total pe." << std::endl;
-        return true;
-      }
-    } else {
-      if( (areIncompatibleByBin || areIncompatibleByTotPe) && areIncompatibleByFlsPos) {
-        //std::cout << "Flashes are incompatible by (bin or total pe) and flash position." << std::endl;
+
+    if ( _useFlashPosition && !_usePEConstraint ) {
+      if (areIncompatibleByFlsPos) {
         return true;
       }
     }
 
+    if ( !_useFlashPosition && _usePEConstraint ) {
+      if(areIncompatibleByBin) {
+        return true;
+      }
+      if(areIncompatibleByTotPe) {
+      }
+    }
+
+    if ( _useFlashPosition && _usePEConstraint ) {
+      if ( areIncompatibleByFlsPos && areIncompatibleByBin) {
+        return true;
+      }
+    }
+
+    if ( !_useFlashPosition && !_usePEConstraint ) {
+      std::cout << "ERROR Specify a criteria." << std::endl;
+      return false;
+    }
+
+/* 
+  
+      if(!_useFlashPosition) {
+      if( (areIncompatibleByBin || areIncompatibleByTotPe) ) {
+      }
+      if( areIncompatibleByBin ) {
+        //std::cout << "Flashes are incompatible by bin or total pe." << std::endl;
+        return true;
+      }
+    } else {
+      if( areIncompatibleByBin && areIncompatibleByFlsPos) {
+        //std::cout << "Flashes are incompatible by (bin or total pe) and flash position." << std::endl;
+        return true;
+      }
+    }
+*/
     return false;
   
   }

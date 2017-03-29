@@ -3,9 +3,6 @@ BEGIN_PROLOG
 microboone_signalshapingservice:
 {
 
-  NConfigs:  1  # if set to 1, you get the same config for all channels
-                # otherwise, you need to supply the map of channel <-> config... see GetConfig()
-
   ADCPerPCAtLowestASICGain: 9390 #ADC/pC
   # ASICGains:           [4.7, 7.8, 14, 25] #Default: 7.8
   #mV/fC for different configs and U, V & Y planes
@@ -25,7 +22,7 @@ microboone_signalshapingservice:
   ViewForNormalization:   2         # lets say this is the local plane number, may need to rethink
 
 
-  FieldRespAmpVec:  [1.0, 1.0, 1.0]
+  FieldRespAmpVec:  [ 0.555, 0.447, 1.46 ]
 
   # there is commented code in SignalShapingService to test vector of vector of vectors... works!
   #TestParams:       [[[1.0, 2.0],[3.0, 4.0]], [[5.0,6.0],[7.0, 8.0]]]
@@ -40,7 +37,7 @@ microboone_signalshapingservice:
 			
 UseCalibratedResponses: false
 FieldResponseFNameBase: "uboone_response"
-CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
+CalibResponseTOffset: [0.0, 2.0, 0.0]   # in us time offset to align all three planes
 
 
 #---------------------------------------------------------------
@@ -52,10 +49,10 @@ CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
   NActiveResponses:     [ [1, 1, 1], [1, 1, 1] ]  # number of active responses per view, including primary. 1 is current number
   NYZActiveResponses:   [ [1, 2, 1], [1, 2, 1] ]  # number of active responses per view for YZ-dependent field responses
   NdatadrivenActiveResponses: [ [3, 3, 2], [3, 3, 2] ]  # number of active responses per view for data driven field responses
-  FieldResponseFVersion:  [ "v0.1", "v0.1" ]	 
+  FieldResponseFVersion:  [ "v3.11", "v3.11" ]	 
   
-  DefaultEField:       0.5
-  DefaultTemperature:  87.0
+  DefaultEField:       0.273
+  DefaultTemperature:  89.0
 
   TimeScaleParams:   [ 1.0, 0.806 ] # this does the scaling from full- to half-field
                                       # good to ~0.2% over the range of the velocity ratio for 1-0.4 in the field
@@ -64,12 +61,12 @@ CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
 
   StretchFullResponse:  false         # to maintain the original stretching scheme
                                       # false means only the field response is stretched, not the electronic response
-  YZdependentResponse:  false         # flag to use YZ-dependent field responses
-  datadrivenResponse:   false         # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)
+  YZdependentResponse:  true          # flag to use YZ-dependent field responses
+  datadrivenResponse:   true          # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)
   YZchargeScaling:      [ [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0] ] # scale charge; from transparency effects - ramification of shorted wires
   #YZwireOverlap:        [ [ [296, 671], [2400, 3071], [4800, 6143] ], [ [1168, 1903], [3568, 4303], [7136, 7263] ] ] # channel ranges for shorted wires and corresponding channel ranges for wires effected on other planes
 
-  IncludeMisconfiguredU: true
+  IncludeMisconfiguredU: false
   MisconfiguredU:	[ [2016, 2095], [2192, 2303], [2352, 2382] ]	# channel range of misconfigured U-plane wires during run 1
 
   DeconNorm: 200.
@@ -106,7 +103,7 @@ CalibResponseTOffset: [0, 0, 0]   # in us time offset to align all three planes
   # Introduced on July 29, 2016
   FilterFuncVec:                [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
   FilterParamsVec:              [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
-  FilterWidthCorrectionFactor:  [ 0.738, 0.738, 0.738 ]
+  FilterWidthCorrectionFactor:  [ 1.0, 1.0, 1.0 ]
 
   # never omit mentioning a parameter in a formula; in collection plane, 4th parameter is unused but it must still appear in the expression
   FilterFuncVecICTime:  [ "(x<=0.0)? 0.0: (gaus(0)+[5]*(x+0.005)+[6]*pow((x+0.005),[7]))*exp(-0.5*pow((x+0.005)/[3],[4]))",

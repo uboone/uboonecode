@@ -5,7 +5,7 @@ microboone_eventweight:
  module_type:	"EventWeight"
   #weight_functions:   [ func1, bnbcorrection, piplus, piminus, kzero, kplus]
   #weight_functions:   [ piplussplines]
-  weight_functions:   [ func1, bnbcorrection, piplussplines, piminus, kzero, kplus]
+  weight_functions:   [ bnbcorrection ]
 
  #throw exception if weight outside limits
  min_weight: 0
@@ -28,12 +28,10 @@ microboone_eventweight:
  bnbcorrection: {
  
 	  type: FluxHist
-	  cv_hist_file: "/pnfs/uboone/persistent/users/rcastill/beamData/data/gsimple_flux.root"
-          #cv_hist_file: "./gsimple_flux.root"
-	  rw_hist_file: "/pnfs/uboone/persistent/users/rcastill/beamData/data/redecay_flux.root"
-          #rw_hist_file: "./redecay_flux.root"
- 
-         random_seed: 1
+	  cv_hist_file: "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root"
+	  rw_hist_file: "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root"
+
+          random_seed: 1
           mode: reweight
 	  number_of_multisims: 1
  	}

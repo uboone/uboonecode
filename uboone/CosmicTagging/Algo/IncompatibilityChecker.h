@@ -51,6 +51,7 @@ namespace flashana{
 
     double _sigmaThreshold;
     double _nBinsRequirement;
+    bool   _usePEConstraint;
     bool   _useFlashPosition;
   };
 }

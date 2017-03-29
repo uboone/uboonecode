@@ -37,6 +37,7 @@ cet_cmake_env()
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
+  ALLOW_DEPRECATIONS
   EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
@@ -60,7 +61,9 @@ find_ups_product( postgresql v9_1_5 )
 find_ups_boost( v1_53_0 )
 find_ups_product( uboonedaq_datatypes )
 find_ups_product( ifdh_art )
+find_ups_product( gsl )
 
+cet_find_library( GSL NAMES gsl PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 cet_find_library( PQ NAMES pq PATHS ENV POSTGRESQL_LIBRARIES NO_DEFAULT_PATH )
 cet_find_library( UBDut NAMES ubdata_types PATHS $ENV{UBOONEDAQ_DATATYPES_LIB} )
 

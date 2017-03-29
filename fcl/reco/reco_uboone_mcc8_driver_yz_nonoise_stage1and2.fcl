@@ -3,11 +3,11 @@
 # Enable YZ-dependent field response.
 
 services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
 
 # Choose no noise inputs.
 
-physics.producers.digitfilter.DigitModuleLabel: "daqnonoise"
+physics.producers.wcNoiseFilter.DigitModuleLabel: "daqnonoise"
 physics.producers.saturation.LGProducer: "pmtreadoutnonoise"
 physics.producers.saturation.HGProducer: "pmtreadoutnonoise"
 physics.producers.saturation.HGProducerCosmic: "pmtreadoutnonoise"

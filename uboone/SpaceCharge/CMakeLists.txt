@@ -9,6 +9,7 @@ art_make( NO_PLUGINS
 			${FHICLCPP}
                         ${ROOT_BASIC_LIB_LIST}
 			${Boost_SYSTEM_LIBRARY}
+                        ${GSL}
         )
 
 
