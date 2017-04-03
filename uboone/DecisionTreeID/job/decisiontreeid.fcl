@@ -1,0 +1,29 @@
+
+BEGIN_PROLOG
+#
+# Module configuration
+#
+DecisionTreeID: {
+
+ module_type:      "DecisionTreeID"
+ TrackModuleLabel: "pandoraNu"
+
+ ModelFile:        "/uboone/data/users/kwoodruf/treefiles/multi.bst"
+
+ # this should be the same for training and predicting!
+ FeaturesConfig:
+ {
+    NEndHits:         3
+    BeamWindowStartT: 3.55
+    BeamWindowEndT:   5.15
+
+    PIDAssocLabel:        "pandoraNupid"
+    CaloAssocLabel:       "pandoraNucalo"
+    CosmicTagAssocLabel:  "pandoraNutag"
+    ContainTagAssocLabel: "pandoraNuContTag"
+    HitAssocLabel:        "pandoraNu"
+    FlashModuleLabel:     "opflashBeam"
+ }
+
+}
+END_PROLOG
