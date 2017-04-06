@@ -39,6 +39,7 @@ art_make(LIBRARY_NAME   EventWeight
                       ${MF_UTILITIES}
                       ${IFDH}
                       ${Boost_SYSTEM_LIBRARY}
+                      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
         MODULE_LIBRARIES EventWeight
 			 WeightCalculators
                          BNBPrimaryHadronWeightCalculators
