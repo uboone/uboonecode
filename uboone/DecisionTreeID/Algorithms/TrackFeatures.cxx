@@ -281,7 +281,9 @@ namespace dtfeatures {
         
           if(g4ides.empty()) continue;    
           const simb::MCParticle* mcparticle = bt->TrackIDToParticle( g4ides.at(0).trackID );
+          if(!mcparticle) continue;
           art::Ptr<simb::MCTruth> mctruth = bt->TrackIDToMCTruth( g4ides.at(0).trackID );
+          if(mctruth.isNull()) continue;
         
           if(mcparticle->PdgCode() == 2212)
           { labelVec[0] = labelVec[0] + 1; }
@@ -295,8 +297,13 @@ namespace dtfeatures {
           { labelVec[4] = labelVec[4] + 1; }
         
         }
-        trklabelvec.emplace_back( (float)(max_element(labelVec.begin(), 
-                                                      labelVec.end()) - labelVec.begin()) );
+        // PDG index with the most hits wins
+        int maxidx = (int)(max_element(labelVec.begin(),labelVec.end()) - labelVec.begin());
+
+        // if no mc tracks were found give label -1
+        if(labelVec[maxidx] == 0) maxidx = -1;
+
+        trklabelvec.emplace_back( (float)maxidx ); 
       }
     } 
     return trklabelvec;
