@@ -17,7 +17,7 @@ art_make_library(LIBRARY_NAME BNBPrimaryHadronWeightCalculators
                       ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 #                      ${ART_UTILITIES}
       ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-#                      ${CETLIB}
+#                      cetlib cetlib_except
 #			      ${FHICLCPP}
 				      ${CLHEP}
 #                      ${ROOT_BASIC_LIB_LIST}
@@ -40,7 +40,7 @@ art_make_library(LIBRARY_NAME BNBPrimaryHadronWeightCalculators
 #                      ${MF_MESSAGELOGGER}
 #                      ${MF_UTILITIES}
 #                      ${FHICLCPP}
-#                      ${CETLIB}
+#                      cetlib cetlib_except
 #                      ${ROOT_GEOM}
 #                      ${ROOT_XMLIO}
 #                      ${ROOT_GDML}

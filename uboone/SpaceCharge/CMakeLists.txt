@@ -2,7 +2,7 @@ art_make( LIB_LIBRARIES
           #  larcore_Geometry
           #  ${MF_MESSAGELOGGER}
           #  ${MF_UTILITIES}
-            ${CETLIB}
+            cetlib cetlib_except
             ${FHICLCPP}
             ${ROOT_CORE}
             ${ROOT_RIO}

@@ -14,10 +14,10 @@ art_make_library(LIBRARY_NAME WeightCalculators
 		      ${ART_FRAMEWORK_PRINCIPAL}
 		      ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-		      art_Persistency_Common canvas_Persistency_Common canvas_Persistency_Common
-                      art_Persistency_Provenance canvas_Persistency_Provenance canvas_Persistency_Provenance
-                      art_Utilities canvas_Utilities canvas_Utilities
-                      ${CETLIB}
+		      art_Persistency_Common canvas canvas
+                      art_Persistency_Provenance canvas canvas
+                      art_Utilities canvas canvas
+                      cetlib cetlib_except
 		      ${FHICLCPP}
                       ${MF_MESSAGELOGGER}
 		      ${CLHEP}
