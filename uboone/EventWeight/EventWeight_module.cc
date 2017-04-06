@@ -127,7 +127,7 @@ void EventWeight::produce(art::Event & e)
     for (auto it=fWeightCalcMap.begin();it!=fWeightCalcMap.end();it++) {
 
       auto const & weights = it->second->GetWeight(e);
-      
+      std::cout<<"test of weights values in the module file:"<<  weights[0][0] <<std::endl; 
       if(weights.size() == 0){
 	std::vector< double > empty;
 	std::pair<std::string, std::vector <double> > p("empty",empty);

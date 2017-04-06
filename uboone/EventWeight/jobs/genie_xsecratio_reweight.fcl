@@ -1,0 +1,79 @@
+BEGIN_PROLOG
+
+microboone_eventweight:
+{
+  module_type:	"EventWeight"
+
+  #Use this to reweight one parameter at a time (to study the effect of varying one single parameter)
+  #weight_functions: [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf, genie_IntraNukeNmfp, genie_IntraNukeNcex, genie_IntraNukeNel, genie_IntraNukeNinel, genie_IntraNukeNabs, genie_IntraNukeNpi, genie_IntraNukePImfp, genie_IntraNukePIcex, genie_IntraNukePIel, genie_IntraNukePIinel, genie_IntraNukePIabs, genie_IntraNukePIpi   ]
+
+  #This was used for the Ma+-1sigma in the Neutrino2016 CC incl tech-note
+  weight_functions: [ genie_Fv3technote ]
+
+  #Use to reweight all GENIE parameters at the same time (see below for definition)
+  #weight_functions: [ genie_all ]
+
+  #throw exception if weight outside limits
+  min_weight: 0
+  max_weight: 100
+
+  genie_module_label:    generator	
+
+#########################################
+#
+# -----------------------------------------
+# Function definition for GENIE reweighting
+# -----------------------------------------
+#
+# One function is defined for each GENIE parameter
+# *pm1sigma* is specifed: two weights will be evaluated for each parameter,
+#                       one with +1 sigma the other with -1 sigma,
+#                       it doesn't matter what you write in parameter_sigma and number _of_multisims
+#                       if pm1sigma is specifed
+# Defining one function for each parameter means that the reweighting procedure is done 
+# separately for each parameter
+# We can define one function with more parameters in parameter_list and in this case the reweight will 
+# be done simultaneously for all the parameters specified
+#
+# A list of available parameters is in GenieWeightCalc.cxx
+#
+#########################################
+
+# MaCCQE for ccincl technote
+ genie_Fv3technote : {
+          type: XSecRatio   #match the calculator's name
+          random_seed: 1
+          parameter_list:        ["Fv3"]
+          parameter_sigma:       [1   ] # corresponds to
+          mode: multisim
+          number_of_multisims: 50
+        }
+
+# MaNCEL 
+ genie_Fa3technote : {
+          type: XSecRatio
+          random_seed: 1
+          parameter_list:        ["Fa3"]
+          parameter_sigma:       [1     ]
+          mode: multisim
+          number_of_multisims: 50
+        }
+
+# Here the GENIE parameters are reweighted all at once (40 parameters)
+genie_all: {
+          type:                  XSecRatio
+          random_seed:           1
+          parameter_list:        ["Fv3", "Fa3"]
+          parameter_sigma:       [1, 1]
+          mode: multisim
+          number_of_multisims:   1000
+        }
+
+
+####################################################
+
+
+
+}	
+
+END_PROLOG
