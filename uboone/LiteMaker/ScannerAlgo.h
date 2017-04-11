@@ -19,6 +19,7 @@
 // LArSoft includes
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
+#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/RawData/OpDetWaveform.h"
@@ -139,6 +140,11 @@ namespace larlite {
     template <class T>
     void ScanData(art::Handle<std::vector<T> > const &dh,
 		  ::larlite::event_base* lite_dh);
+
+    /// Core method: convert LArSoft data product (dh) to LArLite (lite_dh)
+    template <class T>
+    void ScanSimpleData(art::Handle<T> const &dh,
+			::larlite::event_base* lite_dh);
     
     /// Core method: generate LArLite association data product and store (in lite_dh)
     template <class T, class U>
@@ -186,6 +192,7 @@ namespace larlite {
     std::vector< std::vector< std::map< art::Ptr<::raw::RawDigit>,     std::pair<size_t,size_t> > > > fPtrIndex_rawdigit;
     std::vector< std::vector< std::map< art::Ptr<::raw::OpDetWaveform>,std::pair<size_t,size_t> > > > fPtrIndex_opdigit;
     std::vector< std::vector< std::map< art::Ptr<::raw::Trigger>,      std::pair<size_t,size_t> > > > fPtrIndex_trigger;
+    std::vector< std::vector< std::map< art::Ptr<::raw::ubdaqSoftwareTriggerData>, std::pair<size_t,size_t> > > > fPtrIndex_swtrigger;
     std::vector< std::vector< std::map< art::Ptr<::recob::Wire>,       std::pair<size_t,size_t> > > > fPtrIndex_wire;
     std::vector< std::vector< std::map< art::Ptr<::recob::Hit>,        std::pair<size_t,size_t> > > > fPtrIndex_hit;
     std::vector< std::vector< std::map< art::Ptr<::recob::OpHit>,      std::pair<size_t,size_t> > > > fPtrIndex_ophit;

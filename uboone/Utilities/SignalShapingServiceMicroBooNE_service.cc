@@ -591,13 +591,13 @@ void util::SignalShapingServiceMicroBooNE::init()
     //once, presumably for the first event)
     art::ServiceHandle<geo::Geometry> geo;
     if (!fInitConfigMap) {
-      const size_t N_CHANNELS = geo->Nchannels();
+      /*const size_t N_CHANNELS = geo->Nchannels();
       const lariov::ElectronicsCalibProvider& elec_provider = art::ServiceHandle<lariov::ElectronicsCalibService>()->GetProvider();
       for (unsigned int channel=0; channel!= N_CHANNELS; ++channel) {
 	if (elec_provider.ExtraInfo(channel).GetBoolData("is_misconfigured")) {
 	  fConfigMap[channel] = 1;
 	}
-      }
+      }*/
       fInitConfigMap = true;
 
       if(fConfigMap.size()) {

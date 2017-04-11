@@ -2,8 +2,6 @@
 
 #include "../WeightCalcCreator.h"
 #include "../WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
-
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
@@ -31,7 +29,6 @@ using namespace std;
 namespace evwgh {
   class PrimaryHadronFSWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     PrimaryHadronFSWeightCalc();
     void Configure(fhicl::ParameterSet const& p);
@@ -185,7 +182,9 @@ namespace evwgh {
     fNmultisims			=   pset.get<int>("number_of_multisims");
     primaryHad			=   pset.get<int>("PrimaryHadronGeantCode");//debiera ser un vector
     std::string dataInput       =   pset.get< std::string >("ExternalData");
-    ExternalDataInput = IFDH.fetch(dataInput);
+
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string ExternalDataInput = sp.find_file(dataInput);
  
     //Prepare random generator
     art::ServiceHandle<art::RandomNumberGenerator> rng;

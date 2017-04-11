@@ -20,13 +20,14 @@ art_make(
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
                         ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-                        art_Persistency_Common canvas_Persistency_Common
-                        art_Utilities canvas_Utilities
+                        art_Persistency_Common
+                        art_Utilities
+			canvas
 			ifdh
                         ${MF_MESSAGELOGGER}
                         ${BOOST_LIB}
                         ${FHICLCPP}
-                        ${CETLIB}
+                        cetlib cetlib_except
 )							   
 
 art_make(
@@ -44,6 +45,7 @@ art_make(
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
 			${BOOST_LIB}
                         ${FHICLCPP}
+                        cetlib cetlib_except
 )							   
 
 install_headers()
@@ -54,6 +56,6 @@ install_fhicl()
 #			ub_RawDigitAdderAna
 #
 #			${ART_FRAMEWORK_IO_SOURCES}
-#                        art_Persistency_Provenance canvas_Persistency_Provenance
+#                        art_Persistency_Provenance canvas
 #                        ${MF_UTILITIES}
 #                        ${ROOT_BASIC_LIB_LIST}

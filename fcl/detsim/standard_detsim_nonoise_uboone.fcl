@@ -81,6 +81,8 @@ outputs:
 physics.producers.daqnonoise.GenNoise: 0
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
+services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 

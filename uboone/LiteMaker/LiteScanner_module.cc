@@ -28,6 +28,7 @@
 // LArSoft includes
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
+#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
@@ -114,6 +115,9 @@ private:
   /// Templated data scanner function
   template<class T> void ScanData(const art::Event& evt, const size_t name_index);
 
+  /// Templated data scanner function
+  template<class T> void ScanSimpleData(const art::Event& evt, const size_t name_index);
+
   /// Special function for SimPhotons
   void ScanSimPhotons(const art::Event& evt, const size_t name_index);
 
@@ -132,9 +136,11 @@ private:
   bool fStoreAss;
   /// POTSummary producer label
   std::vector<std::string> fPOTSummaryLabel_v;
-  /// Association producer label (for those associations not made by product producers)
+  /// Association producer label to be scanned (for those associations not made by product producers)
   std::vector<std::string> fAssProducer_v;
-  /// Boolean flat to automatically scan associations made by producers
+  /// Association producer label to be stored
+  std::set<std::string> fAssLabelToSave_s;
+  /// Boolean flag to automatically scan associations made by producers
   bool fScanAssByProducers;
   /// Boolean to enable unique file name
   std::string fOutFileName;
@@ -195,9 +201,13 @@ LiteScanner::LiteScanner(fhicl::ParameterSet const & p)
   }
   fPOTSummaryLabel_v = p.get<std::vector<std::string> >("pot_labels");
 
+  fAssLabelToSave_s.clear();
+  auto const& label_to_save_v = p.get<std::vector<std::string> >("AssLabelToSave",std::vector<std::string>());
+  for(auto const& label : label_to_save_v) 
+    fAssLabelToSave_s.insert(label);
+
   fAssProducer_v.clear();
   fAssProducer_v = p.get<std::vector<std::string> >("AssociationProducers",fAssProducer_v);
-
   fScanAssByProducers = p.get<bool>("ScanAssByProducers",true);
 }
 /*
@@ -233,8 +243,12 @@ void LiteScanner::beginSubRun(const art::SubRun& sr)
     auto lite_data = (::larlite::potsummary*)(_mgr.get_subrundata(::larlite::data::kPOTSummary,label));
     
     art::Handle< sumdata::POTSummary > potHandle;
-    sr.getByLabel(label,potHandle);
-    
+    if(label.find("::")<label.size()) {
+      sr.getByLabel(label.substr(0,label.find("::")),
+		    label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		    potHandle);
+    }else{ sr.getByLabel(label, potHandle); }
+
     if(potHandle.isValid()) {
       lite_data->totpot     = potHandle->totpot;
       lite_data->totgoodpot = potHandle->totgoodpot;
@@ -322,6 +336,8 @@ void LiteScanner::analyze(art::Event const & e)
 	ScanData<raw::OpDetWaveform>(e,j); break;
       case ::larlite::data::kTrigger:
 	ScanData<raw::Trigger>(e,j); break;
+      case ::larlite::data::kSWTrigger:
+	ScanSimpleData<raw::ubdaqSoftwareTriggerData>(e,j); break;
 
       case ::larlite::data::kHit:
 	ScanData<recob::Hit>(e,j); break;
@@ -384,6 +400,9 @@ void LiteScanner::analyze(art::Event const & e)
 
     for(size_t j=0; j<labels.size(); ++j) {
 
+      auto const& label = labels[j];
+      if(!fAssLabelToSave_s.empty() && fAssLabelToSave_s.find(label) == fAssLabelToSave_s.end())
+	continue;
       switch(lite_type) {
       case ::larlite::data::kCluster:
 	ScanAssociation<recob::Cluster>(e,j); break;
@@ -446,7 +465,15 @@ void LiteScanner::FillChStatus(const art::Event& e, const std::string& name)
   // If specified check RawDigit pedestal value: if negative this channel is not used by wire (set status=>-2)
   if(!_chstatus_rawdigit_producer.empty()) {
     art::Handle<std::vector<raw::RawDigit> > digit_h;
-    e.getByLabel(_chstatus_rawdigit_producer,digit_h);
+
+    std::string label = _chstatus_rawdigit_producer;
+
+    if(label.find("::")<label.size()) {
+      e.getByLabel(label.substr(0,label.find("::")),
+		   label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		   digit_h);
+    }else{ e.getByLabel(_chstatus_rawdigit_producer,digit_h);}
+      
     for(auto const& digit : *digit_h) {
       auto const ch = digit.Channel();
       if(ch >= filled_ch.size()) throw ::larlite::DataFormatException("Found RawDigit > possible channel number!");
@@ -500,27 +527,29 @@ void LiteScanner::FillChStatus(const art::Event& e, const std::string& name)
 //-------------------------------------------------------------------------------------------------
 template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t name_index)
 { 
-  auto lite_id = fAlg.ProductID<T>(name_index);
-  auto lite_data = _mgr.get_data((::larlite::data::DataType_t)lite_id.first,lite_id.second);
-  art::Handle<std::vector<T> > dh;
 
+  auto lite_id = fAlg.ProductID<T>(name_index);
+  std::string label = lite_id.second;
+  auto lite_data = _mgr.get_data((::larlite::data::DataType_t)lite_id.first,label);
+
+  art::Handle<std::vector<T> > dh;
   // All cases except for optical
-  if(lite_id.first != ::larlite::data::kOpDetWaveform) {
-    evt.getByLabel(lite_id.second,dh);
-    if(!dh.isValid()) return;
-    fAlg.ScanData(dh,lite_data);
-  }else{
+  if(lite_id.first == ::larlite::data::kOpDetWaveform) {
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
     //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
     //std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
 
-    evt.getByLabel(lite_id.second, dh);
+    if(label.find("::")<label.size()) {
+      evt.getByLabel(label.substr(0,label.find("::")),
+		     label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		     dh);
+    }else{ evt.getByLabel(label, dh); }
 
     if(dh.isValid()) fAlg.ScanData(dh,lite_data);
 
     for ( unsigned int cat=0; cat<(unsigned int)opdet::NumUBOpticalChannelCategories; cat++ ) {
-
-      evt.getByLabel(lite_id.second, opdet::UBOpChannelEnumName( (opdet::UBOpticalChannelCategory_t)cat ), dh);
+      
+      evt.getByLabel(label, opdet::UBOpChannelEnumName( (opdet::UBOpticalChannelCategory_t)cat ), dh);
 
       if(!dh.isValid()) continue;
 
@@ -528,6 +557,34 @@ template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t
 
     }
   }
+  else{
+    if(label.find("::")<label.size()) {
+      evt.getByLabel(label.substr(0,label.find("::")),
+		     label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		     dh);
+    }else{ evt.getByLabel(label,dh); }
+    if(!dh.isValid()) return;
+    fAlg.ScanData(dh,lite_data);
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
+// Scan
+//-------------------------------------------------------------------------------------------------
+template<class T> void LiteScanner::ScanSimpleData(const art::Event& evt, const size_t name_index)
+{ 
+  auto lite_id = fAlg.ProductID<T>(name_index);
+  auto lite_data = _mgr.get_data((::larlite::data::DataType_t)lite_id.first,lite_id.second);
+  std::string label=lite_id.second;
+  art::Handle<T> dh;
+  if(label.find("::")<label.size()) {
+    evt.getByLabel(label.substr(0,label.find("::")),
+		   label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		   dh);
+  }else{ evt.getByLabel(lite_id.second,dh); }
+    
+  if(!dh.isValid()) return;
+  fAlg.ScanSimpleData(dh,lite_data);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -537,9 +594,15 @@ void LiteScanner::ScanSimPhotons(const art::Event& evt, const size_t name_index)
 { 
   auto lite_id = fAlg.ProductID<::sim::SimPhotonsCollection>(name_index);
   auto lite_data = (::larlite::event_simphotons*)(_mgr.get_data((::larlite::data::DataType_t)lite_id.first,lite_id.second));
-
+  std::string label = lite_id.second;
   art::Handle< std::vector<sim::SimPhotons> > dh;
-  evt.getByLabel(lite_id.second,dh);
+
+  if(label.find("::")<label.size()) {
+    evt.getByLabel(label.substr(0,label.find("::")),
+		   label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		   dh);
+  }else{ evt.getByLabel(lite_id.second,dh); }
+    
   if(!dh.isValid()) return;
 
   lite_data->reserve(dh->size());
@@ -580,7 +643,12 @@ template<class T> void LiteScanner::SaveAssociationSource(const art::Event& evt)
     auto const& name = ass_labels_v[lite_type][i];
 
     art::Handle<std::vector<T> > dh;
-    evt.getByLabel(name,dh);
+    if(name.find("::")<name.size()) {
+      evt.getByLabel(name.substr(0,name.find("::")),
+		     name.substr(name.find("::")+2,name.size()-name.find("::")-2),
+		     dh);
+    }else{ evt.getByLabel(name,dh); }
+    
     if(!dh.isValid() || !(dh->size())) continue;
 
     for(size_t j=0; j<dh->size(); ++j) {
@@ -606,7 +674,13 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
 { 
   auto lite_id = fAlg.AssProductID<T>(name_index);
   art::Handle<std::vector<T> > dh;
-  evt.getByLabel(lite_id.second,dh);
+  std::string label = lite_id.second;
+  if(label.find("::")<label.size()) {
+    evt.getByLabel(label.substr(0,label.find("::")),
+		   label.substr(label.find("::")+2,label.size()-label.find("::")-2),
+		   dh);
+  }else{ evt.getByLabel(lite_id.second,dh); }
+      
   if(!dh.isValid()) return;
 
   //std::cout<<"Inspecting association for type " << lite_id.first << " by " << lite_id.second << std::endl;
@@ -630,6 +704,7 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
     case ::larlite::data::kOpDetWaveform: break;
     case ::larlite::data::kSimPhotons:    break;
     case ::larlite::data::kTrigger:       break;
+    case ::larlite::data::kSWTrigger:     break;
     case ::larlite::data::kWire:          break;
     case ::larlite::data::kHit:           break;
     case ::larlite::data::kMuCSData:      break;

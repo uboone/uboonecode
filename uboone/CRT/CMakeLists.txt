@@ -15,18 +15,18 @@ art_make( BASENAME_ONLY
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
         art_Persistency_Common 
-        canvas_Persistency_Common
+        canvas
         art_Persistency_Provenance 
-        canvas_Persistency_Provenance
+        canvas
         art_Utilities 
-        canvas_Utilities
+        canvas
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
         ${MF_UTILITIES}
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
-        ${CETLIB}
+        cetlib cetlib_except
 )
 
 art_make_library( LIBRARY_NAME CRT
@@ -39,7 +39,7 @@ art_make_library( LIBRARY_NAME CRT
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
-        ${CETLIB}
+        cetlib cetlib_except
 )
 
 simple_plugin( CRTGeometryHelper service
@@ -49,16 +49,16 @@ simple_plugin( CRTGeometryHelper service
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
         art_Persistency_Common 
-        canvas_Persistency_Common
+        canvas
         art_Persistency_Provenance 
-        canvas_Persistency_Provenance
+        canvas
         art_Utilities 
-        canvas_Utilities
+        canvas
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
         ${MF_UTILITIES}
         ${ROOT_BASIC_LIB_LIST}
-        ${CETLIB}
+        cetlib cetlib_except
     BASENAME_ONLY
 )
 simple_plugin( CRTDetSim module
@@ -69,11 +69,11 @@ simple_plugin( CRTDetSim module
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
         art_Persistency_Common 
-        canvas_Persistency_Common
+        canvas
         art_Persistency_Provenance 
-        canvas_Persistency_Provenance
+        canvas
         art_Utilities 
-        canvas_Utilities
+        canvas
         lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
         nutools_RandomUtils_NuRandomService_service
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -82,7 +82,7 @@ simple_plugin( CRTDetSim module
         ${MF_UTILITIES}
         ${ROOT_BASIC_LIB_LIST}
         ${CLHEP}
-        ${CETLIB}
+        cetlib cetlib_except
     BASENAME_ONLY
 )
 

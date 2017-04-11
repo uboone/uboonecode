@@ -6,11 +6,11 @@
 namespace evwgh {
   struct Weight_t {
     
-    Weight_t() :
-      fMinWeight(1e32),
-      fMaxWeight(0),
-      fAvgWeight(0),
-      fNcalls(0)
+  Weight_t() :
+    fMinWeight(std::numeric_limits<double>::max()),
+    fMaxWeight(std::numeric_limits<double>::min()),
+    fAvgWeight(0),
+    fNcalls(0)
     {}
 
     std::vector<std::vector<double> > GetWeight(art::Event& e) {

@@ -14,12 +14,12 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc OpticalDRAMReadout_module.cc
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Utilities canvas_Utilities
+			art_Persistency_Common canvas
+			art_Utilities canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${ROOT_BASIC_LIB_LIST}
           MODULE_LIBRARIES larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 			lardataobj_OpticalDetectorData
@@ -37,12 +37,12 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc OpticalDRAMReadout_module.cc
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Utilities canvas_Utilities
+			art_Persistency_Common canvas
+			art_Utilities canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${ROOT_BASIC_LIB_LIST}
 
          )
@@ -53,11 +53,11 @@ simple_plugin(UBOpticalChConfig "service"
 	      larcore_Geometry_Geometry_service
 	      larcore_Geometry
 #	      uboonecode_uboone_OpticalDetectorSim
-	      art_Utilities canvas_Utilities
+	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
 	      ${MF_UTILITIES}
 	      ${FHICLCPP}
-	      ${CETLIB}
+	      cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}
               BASENAME_ONLY
 )
@@ -80,12 +80,12 @@ simple_plugin(OpticalDRAMReadout "module"
                   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                   ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-                  art_Persistency_Common canvas_Persistency_Common
-                  art_Utilities canvas_Utilities
+                  art_Persistency_Common canvas
+                  art_Utilities canvas
                   ${MF_MESSAGELOGGER}
                   ${MF_UTILITIES}
                   ${FHICLCPP}
-                  ${CETLIB}
+                  cetlib cetlib_except
                   ${ROOT_BASIC_LIB_LIST}
               BASENAME_ONLY
 )

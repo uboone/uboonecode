@@ -6,6 +6,7 @@
 #include "DataFormat/opdetwaveform.h"
 #include "DataFormat/simphotons.h"
 #include "DataFormat/trigger.h"
+#include "DataFormat/swtrigger.h"
 #include "DataFormat/potsummary.h"
 #include "DataFormat/hit.h"
 #include "DataFormat/track.h"
@@ -658,8 +659,8 @@ namespace larlite {
 
 
   template <>
-    void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::Trigger> > const &dh,
-			       ::larlite::event_base* lite_dh)
+  void ScannerAlgo::ScanData(art::Handle< std::vector<::raw::Trigger> > const &dh,
+			     ::larlite::event_base* lite_dh)
     { 
       
       //fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
@@ -674,6 +675,27 @@ namespace larlite {
       lite_data->BeamGateTime(trigger_ptr->BeamGateTime());
       lite_data->TriggerBits(trigger_ptr->TriggerBits());
       
+    }
+
+  template <>
+  void ScannerAlgo::ScanSimpleData(art::Handle< ::raw::ubdaqSoftwareTriggerData> const &dh,
+				   ::larlite::event_base* lite_dh)
+  { 
+      
+      //fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
+      //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
+      auto lite_data = (::larlite::swtrigger*)lite_dh;
+      
+      for(size_t i=0; i<(size_t)(dh->getNumberOfAlgorithms()); ++i) {
+	lite_data->addAlgorithm( dh->getTriggerAlgorithm(i),
+				 dh->getPass(i),
+				 dh->getPassPrescale(i),
+				 dh->getPhmax(i),
+				 dh->getMultiplicity(i),
+				 dh->getTriggerTick(i),
+				 dh->getTimeSinceTrigger(i),
+				 dh->getPrescale(i) );
+      }
     }
   
   template <>
@@ -1079,6 +1101,7 @@ namespace larlite {
       
       lite_calo.set_dedx(calo_ptr->dEdx());
       lite_calo.set_dqdx(calo_ptr->dQdx());
+      lite_calo.set_xyz(calo_ptr->XYZ());
       lite_calo.set_residual_range(calo_ptr->ResidualRange());
       lite_calo.set_deadwire_range(calo_ptr->DeadWireResRC());
       lite_calo.set_kinetic_energy(calo_ptr->KineticEnergy());
@@ -1198,6 +1221,11 @@ namespace larlite {
   void ScanData(art::Handle<std::vector<T> > const &dh,
 		::larlite::event_base* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__)<<"Not implemented!"; }
+  
+  template <class T>
+  void ScanSimpleData(art::Handle<T> const &dh,
+		      ::larlite::event_base* lite_dh)
+  { throw cet::exception(__PRETTY_FUNCTION__)<<"Not implemented!"; }
 
 
   //
@@ -1316,6 +1344,12 @@ namespace larlite {
   { if(fPtrIndex_trigger.size()<=key1) fPtrIndex_trigger.resize(key1+1);
     if(fPtrIndex_trigger[key1].size()<=key2) fPtrIndex_trigger[key1].resize(key2+1);
     return fPtrIndex_trigger[key1][key2]; 
+  }
+
+  template <> std::map<art::Ptr< ::raw::ubdaqSoftwareTriggerData>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
+  { if(fPtrIndex_swtrigger.size()<=key1) fPtrIndex_swtrigger.resize(key1+1);
+    if(fPtrIndex_swtrigger[key1].size()<=key2) fPtrIndex_swtrigger[key1].resize(key2+1);
+    return fPtrIndex_swtrigger[key1][key2]; 
   }
 
   template <> std::map<art::Ptr< ::recob::Wire>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
@@ -1441,6 +1475,8 @@ namespace larlite {
   { return ::larlite::data::kOpDetWaveform; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::raw::Trigger> () const
   { return ::larlite::data::kTrigger; }
+  template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::raw::ubdaqSoftwareTriggerData> () const
+  { return ::larlite::data::kSWTrigger; }
   // recob
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::recob::Wire> () const
   { return ::larlite::data::kWire; }
@@ -1518,7 +1554,7 @@ namespace larlite {
 
     try{
       if(!ptr_coll_v.size()) {
-	std::cout << "Empty!" << std::endl;
+	//std::cout << "Empty!" << std::endl;
 	return;
       }
       const std::vector<art::Ptr<U> > ptr_coll = ptr_coll_v.at(0);
