@@ -1,0 +1,12 @@
+BEGIN_PROLOG
+
+
+microboone_v_response_correction:{
+  module_type :       VResponseCorrector
+  HitModuleLable:     gaushit
+  WireModuleLable:    caldata
+  SquaredDiffCutoff:  1.5
+ 
+}
+
+END_PROLOG

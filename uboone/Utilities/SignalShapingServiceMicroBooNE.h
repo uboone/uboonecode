@@ -148,12 +148,12 @@ namespace util {
 
     int FieldResponseTOffset(unsigned int const channel, size_t ktype) const;
 
-    // Do convolution calcution (for simulation).
+    // Do convolution calculation (for simulation).
 
     template <class T> void Convolute(size_t channel, std::vector<T>& func) const;
     template <class T> void Convolute(size_t channel, size_t wire, std::vector<T>& func) const;
   
-    // Do deconvolution calcution (for reconstruction).
+    // Do deconvolution calculation (for reconstruction).
 
     template <class T> void Deconvolute(size_t channel, std::vector<T>& func) const;
     template <class T> void Deconvolute(size_t channel, size_t wire, std::vector<T>& func) const;
