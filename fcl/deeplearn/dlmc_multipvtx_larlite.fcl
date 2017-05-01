@@ -18,10 +18,10 @@ physics.producers.generator.G4TimeJitter : 800
 physics.producers.generator.XRange       : [10]
 physics.producers.generator.YRange       : [10]
 physics.producers.generator.ZRange       : [10]
-physics.producers.generator.MultiMax     : 6
-physics.producers.generator.MultiMin     : 1
+physics.producers.generator.MultiMax     : 3
+physics.producers.generator.MultiMin     : 2
 physics.producers.generator.ParticleParameter.PDGCode      : [   [11,13],        [22],  [211,-211],     [2212]]
-physics.producers.generator.ParticleParameter.MinMulti     : [         0,           0,           0,          0]
-physics.producers.generator.ParticleParameter.MaxMulti     : [         1,           2,           3,          3]
-physics.producers.generator.ParticleParameter.ProbWeight   : [         3,           2,           3,          3]
-physics.producers.generator.ParticleParameter.KERange      : [ [0.03,0.8], [0.03,0.4],  [0.03,0.8], [0.05,0.6]]
+physics.producers.generator.ParticleParameter.MinMulti     : [         1,           0,           0,          0]
+physics.producers.generator.ParticleParameter.MaxMulti     : [         1,           1,           1,          2]
+physics.producers.generator.ParticleParameter.ProbWeight   : [         3,           2,           2,          4]
+physics.producers.generator.ParticleParameter.KERange      : [ [0.035,0.8], [0.1,0.5],  [0.035,0.8], [0.05,0.5]]

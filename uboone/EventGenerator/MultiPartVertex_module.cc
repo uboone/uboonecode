@@ -291,9 +291,9 @@ void MultiPartVertex::GenMomentum(const PartGenParam& param, const double& mass,
   double tot_energy = fFlatRandom->fire(param.kerange[0],param.kerange[1]) + mass;
   double mom_mag = sqrt(pow(tot_energy,2) - pow(mass,2));
 
-  px = fFlatRandom->fire(0.,1.);
-  py = fFlatRandom->fire(0.,1.);
-  pz = fFlatRandom->fire(0.,1.);
+  px = fFlatRandom->fire(-1.,1.);
+  py = fFlatRandom->fire(-1.,1.);
+  pz = fFlatRandom->fire(-1.,1.);
 
   double unit_mag = sqrt(pow(px,2)+pow(py,2)+pow(pz,2));
   px /= unit_mag;
@@ -320,8 +320,11 @@ void MultiPartVertex::produce(art::Event & e)
 
   double x, y, z;
   GenPosition(x,y,z);
+  TLorentzVector pos(x,y,z,g4_time);
   
   simb::MCTruth mct;
+
+  std::vector<simb::MCParticle> part_v;
 
   auto const param_idx_v = GenParticles();
   if(_debug)
@@ -336,13 +339,32 @@ void MultiPartVertex::produce(art::Event & e)
     auto const& mass = param.mass[pdg_index];
     if(_debug) std::cout << "  " << idx << "th instance PDG " << pdg << std::endl;
     GenMomentum(param,mass,px,py,pz);
-    TLorentzVector pos(x,y,z,g4_time);
     TLorentzVector mom(px,py,pz,sqrt(pow(px,2)+pow(py,2)+pow(pz,2)+pow(mass,2)));
-    simb::MCParticle part(mct.NParticles(), pdg, "primary", mct.NParticles(), mass, 1);
+    simb::MCParticle part(mct.NParticles(), pdg, "primary", 0, mass, 1);
     part.AddTrajectoryPoint(pos,mom);
-    mct.Add(part);
+    part_v.emplace_back(std::move(part));
   }
+
   if(_debug) std::cout << "Total number particles: " << mct.NParticles() << std::endl;
+
+  simb::MCParticle nu(mct.NParticles(), 16, "primary", mct.NParticles(), 0, 0);
+  double px=0;
+  double py=0;
+  double pz=0;
+  double en=0;
+  for(auto const& part : part_v) {
+    px = part.Momentum().Px();
+    py = part.Momentum().Py();
+    pz = part.Momentum().Pz();
+    en = part.Momentum().E();
+  }
+  TLorentzVector mom(px,py,pz,en);
+  nu.AddTrajectoryPoint(pos,mom);
+  
+  mct.Add(nu);
+  for(auto& part : part_v)
+    mct.Add(part);
+
   mctArray->push_back(mct);
   
   e.put(std::move(mctArray));

@@ -1,16 +1,19 @@
 #include "services_microboone.fcl"
-#include "litedatamin_wire.fcl"
-#include "litedatamin_opdigit.fcl"
-#include "litedatamin_opreco.fcl"
-#include "litedatamin_reco2d.fcl"
-#include "litedatamin_reco3d_pandora.fcl"
-#include "litedatamin_reco3d_pandoraKHit.fcl"
-#include "litedatamin_reco3d_pandoraKalmanTrack.fcl"
-#include "litedatamin_reco3d_pandoraPMA.fcl"
-#include "litedatamin_calo_pandora.fcl"
-#include "litedatamin_calo_pandoraKHit.fcl"
-#include "litedatamin_calo_pandoraPMA.fcl"
-#include "litedatamin_reco3d_trajcluster.fcl"
+#include "litemc_mcinfo.fcl"
+#include "litemc_mcpart.fcl"
+#include "litemc_simch.fcl"
+#include "litemc_wire.fcl"
+#include "litemc_opdigit.fcl"
+#include "litemc_opreco.fcl"
+#include "litemc_reco2d.fcl"
+#include "litemc_reco3d_pandora.fcl"
+#include "litemc_reco3d_pandoraKHit.fcl"
+#include "litemc_reco3d_pandoraKalmanTrack.fcl"
+#include "litemc_reco3d_pandoraPMA.fcl"
+#include "litemc_calo_pandora.fcl"
+#include "litemc_calo_pandoraKHit.fcl"
+#include "litemc_calo_pandoraPMA.fcl"
+#include "litemc_reco3d_trajcluster.fcl"
 
 process_name: LiteMC
 
@@ -54,30 +57,20 @@ physics:
 
  analyzers:
  {
-   reco2d:    @local::litedatamin_reco2d
-   opdigit:   @local::litedatamin_opdigit
-   opreco:    @local::litedatamin_opreco
-   wire:      @local::litedatamin_wire
+   reco3dpandora:            @local::litemc_reco3d_pandora
+   reco3dpandoraKHit:        @local::litemc_reco3d_pandoraKHit
+   reco3dpandoraKalmanTrack: @local::litemc_reco3d_pandoraKalmanTrack
+   reco3dpandoraPMA:         @local::litemc_reco3d_pandoraPMA
 
-   reco3dpandora:            @local::litedatamin_reco3d_pandora
-   reco3dpandoraKHit:        @local::litedatamin_reco3d_pandoraKHit
-   reco3dpandoraKalmanTrack: @local::litedatamin_reco3d_pandoraKalmanTrack
-   reco3dpandoraPMA:         @local::litedatamin_reco3d_pandoraPMA
+   calopandora:            @local::litemc_calo_pandora
+   calopandoraKHit:        @local::litemc_calo_pandoraKHit
+   calopandoraPMA:         @local::litemc_calo_pandoraPMA
 
-   calopandora:            @local::litedatamin_calo_pandora
-   calopandoraKHit:        @local::litedatamin_calo_pandoraKHit
-   calopandoraPMA:         @local::litedatamin_calo_pandoraPMA
-
-   trajcluster:        @local::litedatamin_reco3d_trajcluster
+   trajcluster:        @local::litemc_reco3d_trajcluster
 
  }
 
- analyzeIt: [ opdigit,
-              opreco,
-              wire,
-
-              reco2d,
-              reco3dpandora,
+ analyzeIt: [ reco3dpandora,
               reco3dpandoraKHit,
               reco3dpandoraKalmanTrack,
               reco3dpandoraPMA,
@@ -92,10 +85,6 @@ physics:
  end_paths:     [ analyzeIt ]
 }
 
-physics.analyzers.reco2d.stream:      "reco2d"
-physics.analyzers.opdigit.stream:     "opdigit"
-physics.analyzers.opreco.stream:      "opreco"
-physics.analyzers.wire.stream:        "wire"
 physics.analyzers.trajcluster.stream:     "trajcluster"
 physics.analyzers.reco3dpandora.stream:     "reco3d_pandora"
 physics.analyzers.reco3dpandoraKHit.stream:     "reco3d_pandoraKHit"
@@ -105,10 +94,6 @@ physics.analyzers.calopandora.stream:     "calo_pandora"
 physics.analyzers.calopandoraKHit.stream:     "calo_pandoraKHit"
 physics.analyzers.calopandoraPMA.stream:     "calo_pandoraPMA"
 
-physics.analyzers.reco2d.out_filename:      "larlite_reco2d.root"
-physics.analyzers.opdigit.out_filename:     "larlite_opdigit.root"
-physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
-physics.analyzers.wire.out_filename:      "larlite_wire.root"
 physics.analyzers.trajcluster.out_filename:  "larlite_trajcluster.root"
 physics.analyzers.reco3dpandora.out_filename:     "larlite_reco3d_pandora.root"
 physics.analyzers.reco3dpandoraKHit.out_filename: "larlite_reco3d_pandoraKHit.root"

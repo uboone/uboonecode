@@ -11,6 +11,7 @@
 #include "wirecellmodules_microboone.fcl"
 #include "swtrigger_microboone.fcl"
 #include "ubflashfinder.fcl" 
+#include "filters.fcl" 
 
 BEGIN_PROLOG
 
@@ -40,7 +41,10 @@ dlmc_producers:
    rns:       { module_type: "RandomNumberSaver" }
 }
 
-dlmc_filters: { swtrigger: @local::microboone_swtrigger_mc_bnb }
+dlmc_filters: { 
+    swtrigger: @local::microboone_swtrigger_mc_bnb 
+    finalstatefilter: @local::microboone_finalstateselectfilter
+}
 
 dlmc_process_all: [ rns, generator,
                     largeant, mcreco,
@@ -50,13 +54,21 @@ dlmc_process_all: [ rns, generator,
                     simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
                     daq, wcNoiseFilter, caldata, gaushit, swtrigger]
 
-dlmc_process_filter: [ rns, generator,
-                       largeant, mcreco,
-                       optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
-                       saturation,
-                       ophitBeam, ophitCosmic,
-                       simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                       daq, wcNoiseFilter, caldata, gaushit]
+dlmc_process_genfilter: [ rns, generator, finalstatefilter,
+                          largeant, mcreco,
+                          optdigitizer, optfem, triggersim, pmtreadout,
+                          saturation,
+                          ophitBeam, ophitCosmic,
+                          simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                          daq, wcNoiseFilter, caldata, gaushit, swtrigger]
+
+dlmc_process_trigfilter: [ rns, generator,
+                           largeant, mcreco,
+                           optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
+                           saturation,
+                           ophitBeam, ophitCosmic,
+                           simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+                           daq, wcNoiseFilter, caldata, gaushit]
 
 dlmc_reprocess_mcc8: [ rns, 
                        saturation,

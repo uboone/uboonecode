@@ -58,8 +58,8 @@ physics:
  analyzers:
  {
    mcinfo:    @local::litemc_mcinfo
-   mcpart:    @local::litemc_mcpart
-   simch:     @local::litemc_simch
+   #mcpart:    @local::litemc_mcpart
+   #simch:     @local::litemc_simch
    reco2d:    @local::litemc_reco2d
    opdigit:   @local::litemc_opdigit
    opreco:    @local::litemc_opreco
@@ -79,8 +79,8 @@ physics:
  }
 
  analyzeIt: [ mcinfo,
-              simch,
-              mcpart,
+              #simch,
+              #mcpart,
               opdigit,
               opreco,
               wire,
@@ -102,11 +102,12 @@ physics:
 }
 
 physics.analyzers.mcinfo.stream:      "mcinfo"
-physics.analyzers.mcpart.stream:      "mcpart"
-physics.analyzers.simch.stream:       "simch"
+#physics.analyzers.mcpart.stream:      "mcpart"
+#physics.analyzers.simch.stream:       "simch"
 physics.analyzers.reco2d.stream:      "reco2d"
 physics.analyzers.opdigit.stream:     "opdigit"
 physics.analyzers.opreco.stream:      "opreco"
+physics.analyzers.wire.stream:        "wire"
 physics.analyzers.trajcluster.stream:     "trajcluster"
 physics.analyzers.reco3dpandora.stream:     "reco3d_pandora"
 physics.analyzers.reco3dpandoraKHit.stream:     "reco3d_pandoraKHit"
@@ -117,11 +118,12 @@ physics.analyzers.calopandoraKHit.stream:     "calo_pandoraKHit"
 physics.analyzers.calopandoraPMA.stream:     "calo_pandoraPMA"
 
 physics.analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
-physics.analyzers.mcpart.out_filename:      "larlite_mcpart.root"
-physics.analyzers.simch.out_filename:       "larlite_simch.root"
+#physics.analyzers.mcpart.out_filename:      "larlite_mcpart.root"
+#physics.analyzers.simch.out_filename:       "larlite_simch.root"
 physics.analyzers.reco2d.out_filename:      "larlite_reco2d.root"
 physics.analyzers.opdigit.out_filename:     "larlite_opdigit.root"
 physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
+physics.analyzers.wire.out_filename:      "larlite_wire.root"
 physics.analyzers.trajcluster.out_filename:  "larlite_trajcluster.root"
 physics.analyzers.reco3dpandora.out_filename:     "larlite_reco3d_pandora.root"
 physics.analyzers.reco3dpandoraKHit.out_filename: "larlite_reco3d_pandoraKHit.root"

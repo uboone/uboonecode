@@ -5,7 +5,7 @@ process_name: BNBNuLArLite
 source: @local::source_gen
 
 physics.ana: [ @sequence::dlmc_analyze_all ]
-physics.sim: [ @sequence::dlmc_process_filter ]
+physics.sim: [ @sequence::dlmc_process_all ]
 physics.end_paths:     [ ana ]
 physics.trigger_paths: [ sim ]
 
@@ -19,12 +19,12 @@ physics.producers.generator.FluxCopyMethod:   "IFDH"
 physics.producers.generator.MaxFluxFileMB:    2000
 
 # Filter output
-physics.analyzers.mcinfo.SelectEvents:  [ sim ]
-physics.analyzers.simch.SelectEvents:   [ sim ]
-physics.analyzers.opdigit.SelectEvents: [ sim ]
-physics.analyzers.opreco.SelectEvents:  [ sim ]
-physics.analyzers.wire.SelectEvents:    [ sim ]
-physics.analyzers.reco2d.SelectEvents:  [ sim ]
+physics.analyzers.mcinfo.SelectEvents:  []
+physics.analyzers.simch.SelectEvents:   []
+physics.analyzers.opdigit.SelectEvents: []
+physics.analyzers.opreco.SelectEvents:  []
+physics.analyzers.wire.SelectEvents:    []
+physics.analyzers.reco2d.SelectEvents:  []
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
