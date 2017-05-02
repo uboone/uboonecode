@@ -6,7 +6,7 @@
 BEGIN_PROLOG
 
 dldata_analyzers:
- {
+{
    wire:    @local::litedatamin_wire
    opdigit: @local::litedatamin_opdigit
    opreco:  @local::litedatamin_opreco
@@ -27,9 +27,9 @@ dldata_analyzers.reco2d.out_filename:      "larlite_reco2d.root"
 
 dldata_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
 
-dldata_analyzers.opreco.DataLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dldata_analyzers.opreco.DataLookUpMap.ophit:   ["ophitBeam","ophitCosmic"]
 dldata_analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
-dldata_analyzers.opreco.AssociationLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dldata_analyzers.opreco.AssociationLookUpMap.ophit:   ["ophitBeam","ophitCosmic"]
 dldata_analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 
 dldata_analyzers.reco2d.DataLookUpMap.hit: ["gaushit"]

@@ -7,8 +7,6 @@ litedatamin_opdigit.out_filename: "larlite_datamin_opdigit.root"
 litedatamin_opdigit.DataLookUpMap:
 {
   opdigit:   ["pmtreadout","saturation"]
-  trigger:   ["daq"]
-  swtrigger: ["daq"]
 }
 
 litedatamin_opdigit.AssociationLookUpMap:
