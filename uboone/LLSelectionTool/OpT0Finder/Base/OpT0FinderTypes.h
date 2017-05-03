@@ -161,7 +161,7 @@ namespace flashana {
     double y;
     double z;
     double q;
-    double plane;
+    int plane;
   };
 
   namespace msg {

@@ -40,10 +40,13 @@ namespace flashana{
     ~LightCharge(){}
 
     // Setter function
-    double SetChargeToLight(double x) {_charge_to_light = x; return _charge_to_light;}
+    void SetChargeToLight(double x) {_charge_to_light = x;}
       
     // Flash Hypothesis for Trajectory (Track)
     flashana::QCluster_t FlashHypothesis(const std::vector<flashana::Hit3D_t>) const;
+
+    // More general Flash Hypothesis for tracks and showers, needs to be given a conversion factor to photons
+    flashana::QCluster_t FlashHypothesisCharge(const std::vector<flashana::Hit3D_t>, double charge_to_light);
 
     // Getter for light yield configured paramater
     double GetChargeToLight() const { return _charge_to_light; }

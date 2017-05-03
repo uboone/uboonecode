@@ -41,6 +41,12 @@ namespace flashana {
     return result;
   }
 
+  // More general Flash Hypothesis for tracks and showers, needs to be given a conversion factor to photons
+  QCluster_t LightCharge::FlashHypothesisCharge(const std::vector<flashana::Hit3D_t> hit3d_v, double charge_to_light) {
+    SetChargeToLight(charge_to_light);
+    return LightCharge::FlashHypothesis(hit3d_v);
+  }
+
 }
 
 
