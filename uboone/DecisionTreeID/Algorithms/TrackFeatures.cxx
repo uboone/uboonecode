@@ -109,7 +109,10 @@ namespace dtfeatures {
         float cosmicscore   = -9999.;
         float coscontscore  = -9999.;
         float pidpida       = -9999.;
-        float pidchi        = -9999.;
+        float pidchipr      = -9999.;
+        float pidchika      = -9999.;
+        float pidchipi      = -9999.;
+        float pidchimu      = -9999.;
         float cfdistance    = 9999.;
        
         float tmpphi;
@@ -120,6 +123,9 @@ namespace dtfeatures {
         float dist;
         
         bool tflip          = false;
+
+        size_t bstplane = 2;
+        int bstplanehits = 0;
 
         if(!caloVec.empty())
         {
@@ -135,6 +141,11 @@ namespace dtfeatures {
             if(dqdx.empty()) continue;
 
             int pnhits = dqdx.size();
+            if(pnhits > bstplanehits)
+            {
+              bstplanehits = pnhits;
+              bstplane     = caloVec.at(iplane)->PlaneID().Plane;
+            }
             nhits += pnhits;
             for( auto& dq : dqdx) totaldqdx += dq;
             size_t endhits;
@@ -198,8 +209,17 @@ namespace dtfeatures {
         if(!containVec.empty()) coscontscore = containVec.at(0)->CosmicScore();
         if(!pidVec.empty())
         {
-          pidpida = pidVec.at(0)->PIDA();
-          pidchi  = pidVec.at(0)->Chi2Proton();
+          for(size_t iplane = 0; iplane < pidVec.size(); iplane++)
+          {
+            if(pidVec[iplane]->PlaneID().Plane == bstplane)
+            {
+              pidpida  = pidVec[iplane]->PIDA();
+              pidchipr = pidVec[iplane]->Chi2Proton();
+              pidchika = pidVec[iplane]->Chi2Kaon();
+              pidchipi = pidVec[iplane]->Chi2Pion();
+              pidchimu = pidVec[iplane]->Chi2Muon();
+            }
+          }
         }
         
         // find closest flash
@@ -237,7 +257,10 @@ namespace dtfeatures {
         trkdata.emplace_back(cosmicscore);
         trkdata.emplace_back(coscontscore);
         trkdata.emplace_back(pidpida);
-        trkdata.emplace_back(pidchi);
+        trkdata.emplace_back(pidchipr);
+        trkdata.emplace_back(pidchika);
+        trkdata.emplace_back(pidchipi);
+        trkdata.emplace_back(pidchimu);
         trkdata.emplace_back(cfdistance);
 
         evtdata.emplace_back(trkdata);

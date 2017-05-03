@@ -79,7 +79,7 @@ private:
   float _startdqdx,_enddqdx,_dqdxdiff,_dqdxratio;
   float _totaldqdx,_averagedqdx;
   float _cosmicscore,_coscontscore;
-  float _pidpida,_pidchi,_cfdistance;
+  float _pidpida,_pidchipr,_pidchika,_pidchipi,_pidchimu,_cfdistance;
   float _label;
   float _predict_p,_predict_mu,_predict_pi,_predict_em,_predict_cos;
 
@@ -130,7 +130,10 @@ DecisionTreeIDAna::DecisionTreeIDAna(fhicl::ParameterSet const & p)
   _tree1->Branch("cosmicscore",&_cosmicscore,"cosmicscore/F");
   _tree1->Branch("coscontscore",&_coscontscore,"coscontscore/F");
   _tree1->Branch("pidpida",&_pidpida,"pidpida/F");
-  _tree1->Branch("pidchi",&_pidchi,"pidchi/F");
+  _tree1->Branch("pidchipr",&_pidchipr,"pidchipr/F");
+  _tree1->Branch("pidchika",&_pidchika,"pidchika/F");
+  _tree1->Branch("pidchipi",&_pidchipi,"pidchipi/F");
+  _tree1->Branch("pidchimu",&_pidchimu,"pidchimu/F");
   _tree1->Branch("cfdistance",&_cfdistance,"cfdistance/F");
   _tree1->Branch("label",&_label,"label/F");
   _tree1->Branch("predict_p",&_predict_p,"predict_p/F");
@@ -229,8 +232,11 @@ void DecisionTreeIDAna::analyze(art::Event const & e)
       _cosmicscore  = trkdata[15];
       _coscontscore = trkdata[16];
       _pidpida      = trkdata[17];
-      _pidchi       = trkdata[18];
-      _cfdistance   = trkdata[19];
+      _pidchipr     = trkdata[18];
+      _pidchika     = trkdata[19];
+      _pidchipi     = trkdata[20];
+      _pidchimu     = trkdata[21];
+      _cfdistance   = trkdata[22];
 
       _tree1->Fill();
 
@@ -249,7 +255,7 @@ void DecisionTreeIDAna::beginJob()
     fout << "nhits,length,starty,startz,endy,endz,theta,phi,"
             "distlenratio,startdqdx,enddqdx,dqdxdiff,dqdxratio,"
             "totaldqdx,averagedqdx,cosmicscore,coscontscore,"
-            "pidpida,pidchi,cfdistance";
+            "pidpida,pidchipr,pidchika,pidchipi,pidchimu,cfdistance";
 
     if(_getlabel) fout << ",label";
     if(_getprediction)
