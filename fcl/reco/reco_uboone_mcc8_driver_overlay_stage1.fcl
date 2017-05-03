@@ -11,11 +11,14 @@ source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
 
 
 physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
+physics.producers.digitfilter.DigitModuleLabel: "mixer"
 #physics.producers.ophit.InputModule: "mixer"
 #physics.producers.ophitLow.InputModule: "mixer"
 physics.producers.saturation.LGProducer: "mixer"
 physics.producers.saturation.HGProducer: "mixer"
-physics.producers.saturation.HGProducerCosmic: "mixer"
+physics.producers.saturation.HGProducerCosmic: "pmtreadout"
+
+physics.producers.pandoraCosmicKHitFlashTag.TriggerProducer: "mixer"
 
 #physics.producers.digitfilter.ProcessNoise:                         true
 #physics.producers.digitfilter.FFTAlg.TransformViewVec:              [true,false,false]
@@ -30,3 +33,6 @@ services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
 services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
 services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
 services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
+
+services.DetectorClocksService.TrigModuleName: "mixer"
+

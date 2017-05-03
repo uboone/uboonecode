@@ -1,0 +1,5 @@
+#include "standard_detsim_uboone.fcl"
+
+process_name: DetsimNoShortedResp
+
+services.SignalShapingServiceMicroBooNE.FieldResponseFVersion:  [ "v3.12", "v3.12" ]

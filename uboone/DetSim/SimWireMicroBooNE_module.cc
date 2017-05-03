@@ -62,7 +62,8 @@
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
-
+#include "larevt/CalibrationDBI/Interface/ElectronicsCalibService.h"
+#include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
 
 ///Detector simulation of raw signals on wires
 namespace detsim {
@@ -334,6 +335,10 @@ namespace detsim {
     const lariov::DetPedestalProvider& pedestalRetrievalAlg 
        = art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider();
     
+    //electronics conditions
+    const lariov::ElectronicsCalibProvider& elec_provider 
+       = art::ServiceHandle<lariov::ElectronicsCalibService>()->GetProvider();
+    
     //get rng for pedestals
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::HepRandomEngine &engine = rng->getEngine("pedestal");   
@@ -511,8 +516,8 @@ namespace detsim {
 		    else{ charge = charge * 1; }
 		  }
 		}
-		else if( (IsUMisconfigured == true) && (((int)chan >= 2016 && (int)chan <= 2095) || ((int)chan >= 2192 && (int)chan <= 2303) || ((int)chan >= 2352 && (int)chan <= 2399))){ // misconfigured U-channels (from FT1)
-		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false; } }
+		else if( (IsUMisconfigured == true) && elec_provider.ExtraInfo(chan).GetBoolData("is_misconfigured") ){ // misconfigured U-channels (from FT1)
+		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false;} }
 		    else{ charge = charge * 1; }
 		}
 		else{ // nominal region

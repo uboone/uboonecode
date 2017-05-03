@@ -33,7 +33,7 @@ source:
 physics:
 {
 
- producers:
+ producers: 
  {
    optdigitizer:      @local::microboone_optical_adc_sim
    optfem:            @local::microboone_optical_fem_sim
@@ -77,15 +77,25 @@ outputs:
  }
 }
 
-# Enable YZ-dependent field response.
+# Enable data-driven field response.
 
+services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
 services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
 services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
+services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
 
 # Turn off noise.
 
 physics.producers.daqnonoise.GenNoise: 0
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
+
+#adjust timing of hw trigger
+physics.producers.triggersim.BNBTrigger: [-414.0625]
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 

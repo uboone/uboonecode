@@ -1,0 +1,5 @@
+#include "standard_g4_uboone.fcl"
+
+process_name: G4DT0
+
+services.LArG4Parameters.TransverseDiffusion:0.0

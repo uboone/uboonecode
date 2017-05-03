@@ -64,11 +64,13 @@ namespace lariov {
       
     }
     else if (fDataSource == DataSource::File) {
-      std::cout << "Using electronics calibrations from local file: "<<fileName<<"\n";
-      std::ifstream file(fileName);
+      cet::search_path sp("FW_SEARCH_PATH");
+      std::string abs_fp = sp.find_file(fileName);
+      std::cout << "Using electronics calibrations from local file: "<<abs_fp<<"\n";
+      std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("UbooneElectronicsCalibProvider")
-          << "File "<<fileName<<" is not found.";
+          << "File "<<abs_fp<<" is not found.";
       }
       
       std::string line;
