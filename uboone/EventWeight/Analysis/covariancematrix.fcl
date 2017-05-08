@@ -1,0 +1,9 @@
+BEGIN_PROLOG
+
+covariance_matrix: {
+  module_type: "CovarianceMatrix"
+  OutputFile: "cov.txt"
+  UseWeights: [ "*" ]
+}	
+
+END_PROLOG
