@@ -57,7 +57,7 @@ ProcessDriver: {
       EventImageCols:   [3456,3456,3456]
       EventCompRows:    [6,6,6]
       EventCompCols:    [1,1,1]
-      Origin: 0
+      Origin: 1
     }
     SuperaMCROI: {
       Verbosity: 2

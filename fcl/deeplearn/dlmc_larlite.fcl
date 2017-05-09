@@ -17,6 +17,7 @@
 #include "litemc_opreco.fcl"
 #include "litemc_opdigit.fcl"
 #include "litemc_reco2d.fcl"
+#include "microboone_dlpmtprecuts.fcl"
 
 BEGIN_PROLOG
 SuperaModule: {
@@ -25,7 +26,7 @@ SuperaModule: {
   supera_params:   "supera_segment.fcl"
   out_filename:    "larcv.root"
   unique_filename: true
-  stream:          "data"
+  stream:          "mc"
 }
 END_PROLOG
 
@@ -86,7 +87,10 @@ physics:
 
  producers: {}
 
- filters: { swtrigger: @local::microboone_swtrigger_mc_bnb }
+ filters: { 
+            swtrigger: @local::microboone_swtrigger_mc_bnb 
+            dlpmtprecuts: @local::microboone_dlpmtprecuts
+          }
 
  analyzers:
  {
@@ -96,7 +100,7 @@ physics:
    supera:  @local::SuperaModule
  }
 
- sim: [ swtrigger ]
+ sim: [ swtrigger, dlpmtprecuts ]
  ana: [ mcinfo, opreco, reco2d, supera ]
  
  stream1:  []
@@ -120,3 +124,5 @@ physics.analyzers.mcinfo.SelectEvents:  [sim]
 physics.analyzers.opreco.SelectEvents:  [sim]
 physics.analyzers.reco2d.SelectEvents:  [sim]
 physics.analyzers.supera.SelectEvents:  [sim]
+
+physics.filters.dlpmtprecuts.OpHitProducer: "ophitBeam"
