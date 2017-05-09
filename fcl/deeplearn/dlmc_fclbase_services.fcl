@@ -1,0 +1,50 @@
+#include "services_microboone.fcl"
+#include "photpropservices_microboone.fcl"
+
+BEGIN_PROLOG
+
+dlmc_services:
+{
+  RandomNumberGenerator:   {} #ART native random number generator                                                                                          
+  LLMetaMaker: {Enable: true}
+  @table::microboone_simulation_services
+}
+
+dlmc_services.FileCatalogMetadata.applicationVersion: "develop"
+dlmc_services.FileCatalogMetadata.fileType: "mc"
+dlmc_services.FileCatalogMetadata.runType: "physics"
+dlmc_services.FileCatalogMetadataMicroBooNE: {
+  FCLName: "run_larlite_maker_mc.fcl"
+  FCLVersion: "develop"
+  ProjectName: "LiteMC"
+  ProjectStage: "LiteMaker"
+  ProjectVersion: "develop"
+}
+
+dlmc_services.Geometry.ForceUseFCLOnly: true
+
+#dlmc_services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
+#dlmc_services.SignalShapingServiceMicroBooNE.NConfigs:            2
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
+#dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
+
+dlmc_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
+dlmc_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+dlmc_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+dlmc_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+dlmc_services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
+dlmc_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
+dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+dlmc_services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
+dlmc_services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
+
+#dlmc_services.DetectorPropertiesService.NumberTimeSamples:        6400
+#dlmc_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+#dlmc_services.DetectorClocksService.InheritClockConfig:           false
+#dlmc_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+
+dlmc_services.SpaceCharge.EnableSimSpatialSCE: true
+dlmc_services.SpaceCharge.EnableSimEfieldSCE: true
+
+END_PROLOG

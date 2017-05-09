@@ -1,0 +1,125 @@
+%MSG-i MF_INIT_OK:  lar 02-May-2017 21:59:14 CDT JobSetup
+Messagelogger initialization complete.
+%MSG
+%MSG-i path:  lar 02-May-2017 21:59:15 CDT JobSetup
+The following module labels are not assigned to any path:
+'out1', 'wire'
+
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Import() 02-May-2017 21:59:16 CDT  JobSetup
+Reading geometry from file: /build/kterao/mrbdev_v06_34_00/build_slf6.x86_64/uboonecode/gdml/microboonev11.gdml
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::TGeoManager()  02-May-2017 21:59:16 CDT JobSetup
+Geometry GDMLImport, Geometry imported from GDML created
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::SetTopVolume()  02-May-2017 21:59:16 CDT JobSetup
+Top volume is volWorld. Master volume is volWorld
+%MSG
+%MSG-i Root_Information:  lar TGeoNavigator::BuildCache()  02-May-2017 21:59:16 CDT JobSetup
+--- Maximum geometry depth set to 100
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  02-May-2017 21:59:16 CDT JobSetup
+Fixing runtime shapes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  02-May-2017 21:59:16 CDT JobSetup
+...Nothing to fix
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  02-May-2017 21:59:16 CDT JobSetup
+Counting nodes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Voxelize() 02-May-2017 21:59:16 CDT  JobSetup
+Voxelizing...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  02-May-2017 21:59:16 CDT JobSetup
+Building cache...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CountLevels()  02-May-2017 21:59:16 CDT JobSetup
+max level = 5, max placements = 3456
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  02-May-2017 21:59:16 CDT JobSetup
+11422 nodes/ 3084 volume UID's in Geometry imported from GDML
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  02-May-2017 21:59:16 CDT JobSetup
+----------------modeler ready----------------
+%MSG
+%MSG-i AuxDetGeometryCore:  lar 02-May-2017 21:59:16 CDT JobSetup
+New detector geometry loaded from 
+	/build/kterao/mrbdev_v06_34_00/build_slf6.x86_64/uboonecode/gdml/microboonev11.gdml
+	/build/kterao/mrbdev_v06_34_00/build_slf6.x86_64/uboonecode/gdml/microboonev11.gdml
+
+%MSG
+%MSG-i GeometryCore:  lar 02-May-2017 21:59:17 CDT JobSetup
+New detector geometry loaded from 
+	/build/kterao/mrbdev_v06_34_00/build_slf6.x86_64/uboonecode/gdml/microboonev11.gdml
+	/build/kterao/mrbdev_v06_34_00/build_slf6.x86_64/uboonecode/gdml/microboonev11_nowires.gdml
+
+%MSG
+%MSG-i GeometryCore:  lar 02-May-2017 21:59:17 CDT JobSetup
+Sorting volumes...
+%MSG
+%MSG-i ChannelMapStandardAlg:  lar 02-May-2017 21:59:17 CDT JobSetup
+Initializing Standard ChannelMap...
+%MSG
+%MSG-i setupProvider<DetectorPropertiesStandard>:  lar 02-May-2017 21:59:17 CDT  JobSetup
+Asked to ignore 1 keys: 'InheritNumberTimeSamples'
+%MSG
+%MSG-i PhotonVisibilityService:  lar 02-May-2017 21:59:17 CDT JobSetup
+PhotonVisbilityService initializing
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 02-May-2017 21:59:17 CDT JobSetup
+Getting Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 02-May-2017 21:59:17 CDT JobSetup
+Getting 2D Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 02-May-2017 21:59:17 CDT JobSetup
+ using the field response provided from a .root file 
+%MSG
+02-May-2017 21:59:17 CDT  Initiating request to open input file "/build/kterao/prodgenie_bnb_nu_uboone_overlay_0_20170306T095239_gen2_f25f9630-959f-4c5d-b394-6f0b116c0f2a_20170306T223415_overlaid_20170311T085753_reco1_20170311T093514_reco2.root"
+02-May-2017 21:59:17 CDT  Opened input file "/build/kterao/prodgenie_bnb_nu_uboone_overlay_0_20170306T095239_gen2_f25f9630-959f-4c5d-b394-6f0b116c0f2a_20170306T223415_overlaid_20170311T085753_reco1_20170311T093514_reco2.root"
+%MSG-i DetectorPropertiesServiceStandard:  OpenFile 02-May-2017 21:59:19 CDT  BeforeEvents
+Overriding configuration parameter NumberTimeSamples using historical value.
+  Configured value:        6400
+  Historical (used) value: 9600
+
+%MSG
+Begin processing the 1st record. run: 1 subRun: 1657 event: 82801 at 02-May-2017 21:59:19 CDT
+%MSG-d RANDOM:  PostSource 02-May-2017 21:59:20 CDT  run: 1 subRun: 1657 event: 82801
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 2nd record. run: 1 subRun: 1657 event: 82802 at 02-May-2017 21:59:27 CDT
+%MSG-d RANDOM:  PostSource 02-May-2017 21:59:27 CDT  run: 1 subRun: 1657 event: 82802
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+02-May-2017 21:59:31 CDT  Closed input file "/build/kterao/prodgenie_bnb_nu_uboone_overlay_0_20170306T095239_gen2_f25f9630-959f-4c5d-b394-6f0b116c0f2a_20170306T223415_overlaid_20170311T085753_reco1_20170311T093514_reco2.root"
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 2 passed = 2 failed = 0
+
+TrigReport ------ Modules in End-Path: end_path ------------
+TrigReport  Trig Bit#        Run    Success      Error Name
+TrigReport     0    0          2          2          0 opdigit
+TrigReport     0    0          2          2          0 opreco
+TrigReport     0    0          2          2          0 reco2d
+TrigReport     0    0          2          2          0 supera
+
+TimeReport ---------- Time  Summary ---[sec]----
+TimeReport CPU = 10.950335 Real = 11.599658
+
+%MSG-d RANDOM:  LArSoftSuperaSriver:supera@EndJob 02-May-2017 21:59:31 CDT  PostEndRun
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i NuRandomService:  LArSoftSuperaSriver:supera@EndJob  02-May-2017 21:59:31 CDT PostEndRun
+
+Summary of seeds computed by the NuRandomService
+Random policy: 'random'
+  master seed: 410753574
+  seed within: [ 1 ; 900000000 ]
+
+%MSG

@@ -1,0 +1,7 @@
+#include "dlmc_singlep_common.fcl"
+
+process_name: EMinus
+services.TFileService.fileName: "eminus_%tc.root"
+physics.producers.generator.PDG:    [ 11 ]            # eminus
+physics.producers.generator.P0:     [ 0.4155 ]
+physics.producers.generator.SigmaP: [ 0.385 ]

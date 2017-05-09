@@ -28,7 +28,7 @@ namespace flashana {
       throw OpT0FinderException();
     }
   }
-  
+
   void PhotonLibHypothesis::FillEstimate(const QCluster_t& trk,
 					 Flash_t &flash) const
   {
@@ -46,7 +46,6 @@ namespace flashana {
         auto const& pt = trk[ipt];
 	
         double q = pt.q;
-
 	//q *= ::phot::PhotonVisibilityService::GetME().GetVisibility( pt.x, pt.y, pt.z, ipmt) * _global_qe / _qe_v[ipmt];
         xyz[0] = pt.x;
 	xyz[1] = pt.y;

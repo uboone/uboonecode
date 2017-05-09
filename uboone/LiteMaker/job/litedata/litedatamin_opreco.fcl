@@ -10,7 +10,6 @@ litedatamin_opreco.DataLookUpMap:
 {
   trigger:    ["daq"]
   swtrigger:  ["swtrigger"]
-  opdigit:    ["saturation"]
   ophit:      ["ophitBeam","ophitCosmic"]
   opflash:    ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 }

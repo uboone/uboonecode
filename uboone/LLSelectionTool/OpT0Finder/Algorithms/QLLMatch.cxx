@@ -256,7 +256,6 @@ namespace flashana {
       }
       
       nvalid_pmt += 1;
-
       if(_mode == kLLHD) {
         /* Replaced block to be used in uboonecode
         _current_llhd -= std::log10(TMath::Poisson(O,H));

@@ -1,0 +1,1189 @@
+%MSG-i MF_INIT_OK:  lar 19-Jul-2016 17:41:44 CDT JobSetup
+Messagelogger initialization complete.
+%MSG
+%MSG-i Root_Information:  lar TClassTable::Add() 19-Jul-2016 17:41:45 CDT  JobSetup
+class pair<unsigned long,unsigned long> already in TClassTable
+%MSG
+%MSG-i Root_Information:  lar TClassTable::Add() 19-Jul-2016 17:41:45 CDT  JobSetup
+class pair<string,bool> already in TClassTable
+%MSG
+%MSG-i path:  lar 19-Jul-2016 17:41:45 CDT JobSetup
+The following module label is not assigned to any path:
+'out1'
+
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Import() 19-Jul-2016 17:41:45 CDT  JobSetup
+Reading geometry from file: /build/kterao/mrbdev_v05_08_00_01/localProducts_larsoft_v05_08_00_e9_prof/uboonecode/v05_08_00_01/gdml/microboonev10.gdml
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::TGeoManager()  19-Jul-2016 17:41:45 CDT JobSetup
+Geometry GDMLImport, Geometry imported from GDML created
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::SetTopVolume()  19-Jul-2016 17:41:47 CDT JobSetup
+Top volume is volWorld. Master volume is volWorld
+%MSG
+%MSG-i Root_Information:  lar TGeoNavigator::BuildCache()  19-Jul-2016 17:41:47 CDT JobSetup
+--- Maximum geometry depth set to 100
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+Fixing runtime shapes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+...Nothing to fix
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+Counting nodes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Voxelize() 19-Jul-2016 17:41:47 CDT  JobSetup
+Voxelizing...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+Building cache...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CountLevels()  19-Jul-2016 17:41:47 CDT JobSetup
+max level = 5, max placements = 3456
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+9086 nodes/ 748 volume UID's in Geometry imported from GDML
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  19-Jul-2016 17:41:47 CDT JobSetup
+----------------modeler ready----------------
+%MSG
+%MSG-i GeometryCore:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+New detector geometry loaded from 
+	/build/kterao/mrbdev_v05_08_00_01/localProducts_larsoft_v05_08_00_e9_prof/uboonecode/v05_08_00_01/gdml/microboonev10.gdml
+	/build/kterao/mrbdev_v05_08_00_01/localProducts_larsoft_v05_08_00_e9_prof/uboonecode/v05_08_00_01/gdml/microboonev10_nowires.gdml
+
+%MSG
+%MSG-i ChannelMapStandardAlg:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+Initializing Standard ChannelMap...
+%MSG
+%MSG-i ChannelMapStandardAlg:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+Initializing Standard ChannelMap...
+%MSG
+%MSG-i MemoryPeak:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+MemoryPeak: startup VMPEAK 647.6 MiB
+%MSG
+%MSG-w OpDigiProperties:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+    OpDigiProperties using analytical function for WF generation.
+%MSG
+%MSG-w OpDigiProperties:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+    Generating gain for each pmt.
+        High gain mean: 20 ADC/p.e.
+        Low  gain mean: 2 ADC/p.e.
+        PMT-to-PMT gain spread : 0.05 
+        Intrinsic gain spread  : 0.05 
+
+%MSG
+%MSG-i reconfigure:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+Ch. Number ... Pedestal   ... High Gain  ... Low Gain  
+0          ... 2043       ... 18.5971    ... 1.91234   
+1          ... 2048       ... 20.1782    ... 1.99111   
+2          ... 2050       ... 19.5165    ... 1.95216   
+3          ... 2048       ... 18.3181    ... 1.9659    
+4          ... 2050       ... 20.2816    ... 1.85123   
+5          ... 2043       ... 20.6548    ... 2.15632   
+6          ... 2050       ... 19.0187    ... 2.00534   
+7          ... 2050       ... 20.9861    ... 2.07292   
+8          ... 2050       ... 19.4564    ... 2.1393    
+9          ... 2044       ... 19.8264    ... 2.24427   
+10         ... 2043       ... 16.7667    ... 1.9394    
+11         ... 2046       ... 20.0367    ... 1.84272   
+12         ... 2046       ... 20.2449    ... 2.15393   
+13         ... 2048       ... 19.6823    ... 2.17025   
+14         ... 2049       ... 19.7456    ... 1.98827   
+15         ... 2053       ... 22.5338    ... 1.94215   
+16         ... 2043       ... 21.5226    ... 2.06296   
+17         ... 2049       ... 20.2314    ... 1.93537   
+18         ... 2053       ... 20.7952    ... 2.16969   
+19         ... 2052       ... 20.512     ... 2.00115   
+20         ... 2051       ... 20.6642    ... 1.99882   
+21         ... 2050       ... 19.4081    ... 2.07762   
+22         ... 2046       ... 18.9364    ... 2.12699   
+23         ... 2047       ... 19.0242    ... 1.95635   
+24         ... 2051       ... 17.9929    ... 2.09883   
+25         ... 2049       ... 22.0382    ... 2.09897   
+26         ... 2053       ... 20.3688    ... 1.98851   
+27         ... 2046       ... 20.359     ... 1.97368   
+28         ... 2047       ... 18.0489    ... 1.82955   
+29         ... 2051       ... 18.9874    ... 2.04871   
+30         ... 2052       ... 18.6235    ... 1.96231   
+31         ... 2046       ... 20.6896    ... 1.96594   
+32         ... 2055       ... 21.4163    ... 2.11936   
+33         ... 2041       ... 19.72      ... 2.15788   
+34         ... 2048       ... 20.1053    ... 2.15038   
+35         ... 2049       ... 18.9513    ... 2.17055   
+36         ... 2043       ... 21.1485    ... 2.11976   
+37         ... 2045       ... 22.2305    ... 2.03098   
+38         ... 2044       ... 20.8036    ... 2.07802   
+39         ... 2048       ... 19.212     ... 1.7605    
+40         ... 2049       ... 18.6302    ... 1.99902   
+41         ... 2045       ... 18.9056    ... 1.8561    
+42         ... 2049       ... 21.0247    ... 1.85542   
+43         ... 2044       ... 19.902     ... 2.18104   
+44         ... 2049       ... 20.4131    ... 1.95238   
+45         ... 2047       ... 19.4191    ... 2.10106   
+46         ... 2049       ... 21.6086    ... 2.07681   
+47         ... 2055       ... 20.186     ... 1.95418   
+48         ... 2049       ... 20.4778    ... 1.88363   
+49         ... 2047       ... 20.0531    ... 2.13989   
+50         ... 2049       ... 19.3277    ... 2.08994   
+51         ... 2050       ... 20.3304    ... 1.90418   
+52         ... 2046       ... 19.4455    ... 1.92329   
+53         ... 2051       ... 20.6893    ... 1.97643   
+54         ... 2049       ... 19.3009    ... 1.77039   
+55         ... 2046       ... 19.5168    ... 1.8632    
+56         ... 2048       ... 21.07      ... 2.02611   
+57         ... 2048       ... 19.0879    ... 1.98444   
+58         ... 2046       ... 21.9009    ... 1.79322   
+59         ... 2049       ... 20.6111    ... 2.03818   
+60         ... 2044       ... 21.4767    ... 2.15554   
+61         ... 2044       ... 20.6532    ... 2.15776   
+62         ... 2050       ... 17.1471    ... 2.07897   
+63         ... 2045       ... 20.0935    ... 2.10019   
+64         ... 2052       ... 18.1841    ... 2.02584   
+65         ... 2044       ... 20.116     ... 2.0899    
+66         ... 2052       ... 20.3761    ... 1.94798   
+67         ... 2046       ... 18.841     ... 1.94914   
+68         ... 2054       ... 18.6835    ... 1.92378   
+69         ... 2052       ... 19.609     ... 2.04002   
+70         ... 2045       ... 20.2695    ... 2.06153   
+71         ... 2045       ... 19.9793    ... 1.93746   
+72         ... 2052       ... 18.2024    ... 2.01261   
+73         ... 2048       ... 21.2785    ... 1.88269   
+74         ... 2041       ... 19.9723    ... 1.92739   
+75         ... 2045       ... 20.1185    ... 1.94557   
+76         ... 2048       ... 20.6396    ... 2.06159   
+77         ... 2047       ... 20.1361    ... 2.00355   
+78         ... 2044       ... 19.4561    ... 2.02026   
+79         ... 2046       ... 20.9387    ... 1.9237    
+80         ... 2042       ... 21.0201    ... 1.90663   
+81         ... 2046       ... 19.7068    ... 2.01405   
+82         ... 2048       ... 18.3627    ... 1.92249   
+83         ... 2054       ... 19.0523    ... 1.95963   
+84         ... 2048       ... 21.3534    ... 2.09132   
+85         ... 2054       ... 20.703     ... 1.94334   
+86         ... 2054       ... 20.5941    ... 2.13065   
+87         ... 2046       ... 20.5638    ... 2.07122   
+88         ... 2057       ... 20.1253    ... 2.0506    
+89         ... 2045       ... 20.7833    ... 1.96132   
+90         ... 2051       ... 19.0764    ... 1.92471   
+91         ... 2046       ... 17.0713    ... 2.03926   
+92         ... 2043       ... 19.8134    ... 2.0295    
+93         ... 2049       ... 22.6047    ... 1.93852   
+94         ... 2047       ... 19.7133    ... 2.04391   
+95         ... 2048       ... 20.1184    ... 2.18337   
+96         ... 2050       ... 20.2693    ... 2.02545   
+97         ... 2042       ... 19.9163    ... 1.99442   
+98         ... 2048       ... 18.8258    ... 2.12586   
+99         ... 2046       ... 19.888     ... 2.15735   
+100        ... 2050       ... 19.9243    ... 1.87153   
+101        ... 2050       ... 19.7026    ... 2.11892   
+102        ... 2049       ... 18.2787    ... 1.81497   
+103        ... 2047       ... 20.9578    ... 1.91146   
+104        ... 2047       ... 19.4325    ... 1.98372   
+105        ... 2048       ... 19.9645    ... 1.96431   
+106        ... 2050       ... 21.5256    ... 1.9807    
+107        ... 2052       ... 20.5532    ... 1.8166    
+108        ... 2053       ... 19.4549    ... 2.08509   
+109        ... 2049       ... 21.1404    ... 2.03058   
+110        ... 2049       ... 19.545     ... 1.95731   
+111        ... 2050       ... 18.9933    ... 1.95602   
+112        ... 2043       ... 21.8686    ... 2.03092   
+113        ... 2052       ... 20.4745    ... 2.06063   
+114        ... 2050       ... 18.8631    ... 2.03746   
+115        ... 2051       ... 20.1587    ... 1.99472   
+116        ... 2047       ... 20.4089    ... 1.92898   
+117        ... 2043       ... 18.9964    ... 2.09051   
+118        ... 2046       ... 21.2663    ... 1.972     
+119        ... 2049       ... 19.6624    ... 2.11738   
+120        ... 2047       ... 18.8035    ... 2.16646   
+121        ... 2042       ... 19.2325    ... 1.93185   
+122        ... 2051       ... 19.6045    ... 2.01558   
+123        ... 2050       ... 19.5108    ... 1.91117   
+124        ... 2049       ... 17.7666    ... 1.9784    
+125        ... 2047       ... 19.7498    ... 1.94941   
+126        ... 2052       ... 20.1972    ... 2.09111   
+127        ... 2047       ... 19.2062    ... 2.14178   
+128        ... 2045       ... 19.7968    ... 1.98001   
+129        ... 2045       ... 20.3303    ... 2.09021   
+130        ... 2048       ... 20.7381    ... 1.99066   
+131        ... 2054       ... 19.6361    ... 1.90781   
+132        ... 2049       ... 21.253     ... 2.07438   
+133        ... 2045       ... 21.4106    ... 2.04483   
+134        ... 2052       ... 19.2371    ... 1.81773   
+135        ... 2048       ... 19.2383    ... 1.8977    
+136        ... 2049       ... 19.304     ... 1.94483   
+137        ... 2045       ... 19.5895    ... 1.89898   
+138        ... 2049       ... 19.5686    ... 1.96304   
+139        ... 2049       ... 20.5236    ... 1.92891   
+140        ... 2047       ... 19.9357    ... 1.93699   
+141        ... 2047       ... 21.9514    ... 2.00516   
+142        ... 2049       ... 18.825     ... 1.91035   
+143        ... 2049       ... 19.4776    ... 1.96835   
+
+%MSG
+%MSG-i PhotonVisibilityService:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+PhotonVisbilityService initializing
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+Getting Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+Getting 2D Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 19-Jul-2016 17:41:47 CDT JobSetup
+ using the field response provided from a .root file 
+%MSG
+19-Jul-2016 17:41:48 CDT  Initiating request to open file /build/kterao/PhysicsRun-2016_6_28_22_16_0-0006698-00000_20160629T063354_bnb_20160629T104358_merged.root
+19-Jul-2016 17:41:48 CDT  Successfully opened file /build/kterao/PhysicsRun-2016_6_28_22_16_0-0006698-00000_20160629T063354_bnb_20160629T104358_merged.root
+%MSG-d BranchID:  RandomNumberSaver:rns@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [3254840925] from branch name: "art::RNGsnapshots_rns__BNBNuSuperaLArLite."
+%MSG
+%MSG-i RawDigitBinAverageAlg:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitBinAverageAlg configured
+
+%MSG
+%MSG-i ChannelGroups:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+ChannelGroups configured
+
+%MSG
+%MSG-i RawDigitCharacterizationAlg:   RawDigitFilterUBooNE:digitfilter@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+RawDigitCharacterizationAlg configured
+
+%MSG
+%MSG-i RawDigitFFTAlg:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitFFTAlg configured
+
+%MSG
+%MSG-i RawDigitCorrelatedCorrectionAlg:   RawDigitFilterUBooNE:digitfilter@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+RawDigitCorrelatedCorrectionAlg configured
+
+%MSG
+%MSG-i ChannelGroups:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+ChannelGroups configured
+
+%MSG
+%MSG-i RawDigitCharacterizationAlg:   RawDigitFilterUBooNE:digitfilter@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+RawDigitCharacterizationAlg configured
+
+%MSG
+%MSG-i RawDigitBinAverageAlg:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitBinAverageAlg configured
+
+%MSG
+%MSG-i RawDigitFilterAlg:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitFilterAlg configured
+
+%MSG
+%MSG-i RawDigitFFTAlg:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitFFTAlg configured
+
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+RawDigitFilterUBooNE configured
+
+%MSG
+%MSG-d BranchID:  RawDigitFilterUBooNE:digitfilter@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+Product created with branch id: [4097921809] from branch name: "raw::RawDigits_digitfilter__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  CalWireROI:caldata@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [1761039079] from branch name: "raw::RawDigitrecob::Wirevoidart::Assns_caldata__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  CalWireROI:caldata@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [1915257201] from branch name: "recob::Wires_caldata__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpDigitSaturationCorrection:saturation@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+Product created with branch id: [4067048292] from branch name: "raw::OpDetWaveforms_saturation__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpHitFinder:ophit@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [2287824098] from branch name: "recob::OpHits_ophit__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpFlashFinder:opflash@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [2241780461] from branch name: "recob::OpFlashrecob::OpHitvoidart::Assns_opflash__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpFlashFinder:opflash@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [3427415427] from branch name: "recob::OpFlashs_opflash__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpHitFinder:ophitSat@Construction 19-Jul-2016 17:41:48 CDT  ModuleConstruction
+Product created with branch id: [1310573391] from branch name: "recob::OpHits_ophitSat__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpFlashFinder:opflashSat@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+Product created with branch id: [4122156619] from branch name: "recob::OpFlashrecob::OpHitvoidart::Assns_opflashSat__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  OpFlashFinder:opflashSat@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+Product created with branch id: [4020371910] from branch name: "recob::OpFlashs_opflashSat__BNBNuSuperaLArLite."
+%MSG
+%MSG-d BranchID:  TriggerResultInserter:TriggerResults@Construction  19-Jul-2016 17:41:48 CDT ModuleConstruction
+Product created with branch id: [2445532639] from branch name: "art::TriggerResults_TriggerResults__BNBNuSuperaLArLite."
+%MSG
+%MSG-w LoadNewGeometry:  PostSourceRun 19-Jul-2016 17:41:48 CDT run: 6698
+cannot find sumdata::RunData object to grab detector name
+this is expected if generating MC files
+using default geometry from configuration file
+
+%MSG
+Begin processing the 1st record. run: 6698 subRun: 0 event: 1 at 19-Jul-2016 17:41:48 CDT
+%MSG-i MemoryPeak:  Source 19-Jul-2016 17:41:48 CDT PostBeginSubRun
+MemoryPeak: source VMPEAK 771.6 MiB
+%MSG
+%MSG-d RANDOM:  PostSource 19-Jul-2016 17:41:48 CDT run: 6698 subRun: 0 event: 1
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i MemoryPeak:  RandomNumberSaver:rns 19-Jul-2016 17:41:48 CDT  run: 6698 subRun: 0 event: 1
+MemoryPeak: module rns:RandomNumberSaver VMPEAK 777.7 MiB
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:49 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77918, truncMean: 2048.9, pedestal: 0.14624
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.40428, truncMean: 2034.07, pedestal: 0.127808
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.40428, truncMean: 2034.07, pedestal: 0.127808
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 431, rmsVal: 0.999264, truncMean: 2046.88, pedestal: 0.0736084
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 623, rmsVal: 600.728, truncMean: 2003.36, pedestal: -39.9132
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:50 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 671, rmsVal: 252.17, truncMean: 2073.75, pedestal: 36.0525
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:53 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 2687, rmsVal: 2.86428, truncMean: 2045.12, pedestal: 0.102539
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:53 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 2735, rmsVal: 2.98338, truncMean: 2052.01, pedestal: -0.090332
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:54 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 3119, rmsVal: 6.23709, truncMean: 2047.32, pedestal: 0.773315
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:57 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 4895, rmsVal: 3.02906, truncMean: 482.17, pedestal: -0.269592
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:41:59 CDT run: 6698 subRun: 0 event: 1
+--> Rejecting channel for large rms, channel: 7007, rmsVal: 2.54292, truncMean: 474.933, pedestal: -0.429047
+%MSG
+%MSG-i MemoryPeak:  RawDigitFilterUBooNE:digitfilter 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1
+MemoryPeak: module digitfilter:RawDigitFilterUBooNE VMPEAK 1238.8 MiB
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:791
+Setting MicroBooNE electronics response function...
+%MSG
+%MSG-d SignalShapingMicroBooNE:  CalWireROI:caldata 19-Jul-2016 17:42:00 CDT  run: 6698 subRun: 0 event: 1 SignalShapingServiceMicroBooNE_service.cc:851
+ Done.
+%MSG
+%MSG-i MemoryPeak:  CalWireROI:caldata 19-Jul-2016 17:42:02 CDT  run: 6698 subRun: 0 event: 1
+MemoryPeak: module caldata:CalWireROI VMPEAK 1253.8 MiB
+%MSG
+%MSG-i MemoryPeak:  OpDigitSaturationCorrection:saturation  19-Jul-2016 17:42:02 CDT run: 6698 subRun: 0 event: 1
+MemoryPeak: module saturation:OpDigitSaturationCorrection VMPEAK 1258.8 MiB
+%MSG
+%MSG-i MemoryPeak:  LiteScanner:wire 19-Jul-2016 17:42:03 CDT  run: 6698 subRun: 0 event: 1
+MemoryPeak: module wire:LiteScanner VMPEAK 1296.3 MiB
+%MSG
+%MSG-i Root_Information:  LiteScanner:opreco TClass::TClass()  19-Jul-2016 17:42:03 CDT run: 6698 subRun: 0 event: 1
+no dictionary for class pair<larlite::product_id,map<larlite::product_id,unsigned long> > is available
+%MSG
+%MSG-i Root_Information:  LiteScanner:opreco TClass::TClass()  19-Jul-2016 17:42:03 CDT run: 6698 subRun: 0 event: 1
+no dictionary for class pair<larlite::product_id,unsigned long> is available
+%MSG
+Begin processing the 2nd record. run: 6698 subRun: 0 event: 16 at 19-Jul-2016 17:42:03 CDT
+%MSG-i MemoryPeak:  Source 19-Jul-2016 17:42:03 CDT PostProcessEvent
+MemoryPeak: source VMPEAK 1296.3 MiB
+%MSG
+%MSG-d RANDOM:  PostSource 19-Jul-2016 17:42:03 CDT  run: 6698 subRun: 0 event: 16
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:04 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.75928, truncMean: 2048.95, pedestal: 0.204102
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 335, rmsVal: 3.66164, truncMean: 2034.37, pedestal: 0.430176
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 335, rmsVal: 3.66164, truncMean: 2034.37, pedestal: 0.430176
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 431, rmsVal: 0.979942, truncMean: 2046.88, pedestal: 0.0675049
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.539998, truncMean: 2046.11, pedestal: 2.83679
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:05 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 671, rmsVal: 221.516, truncMean: 1975.1, pedestal: -62.6017
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:08 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 2687, rmsVal: 2.32586, truncMean: 2044.98, pedestal: -0.0389404
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:08 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 2735, rmsVal: 2.57518, truncMean: 2052.36, pedestal: 0.262451
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:09 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 3119, rmsVal: 5.5986, truncMean: 2046.1, pedestal: -0.453003
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:11 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 4895, rmsVal: 3.00395, truncMean: 482.076, pedestal: -0.364502
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:12 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 5375, rmsVal: 4.00103, truncMean: 467.735, pedestal: -1.07727
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:13 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 6719, rmsVal: 3.52359, truncMean: 475.025, pedestal: 0.0544128
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:13 CDT run: 6698 subRun: 0 event: 16
+--> Rejecting channel for large rms, channel: 6719, rmsVal: 3.52359, truncMean: 475.025, pedestal: 0.0544128
+%MSG
+%MSG-i MemoryPeak:  LiteScanner:wire 19-Jul-2016 17:42:17 CDT  run: 6698 subRun: 0 event: 16
+MemoryPeak: module wire:LiteScanner VMPEAK 1306.3 MiB
+%MSG
+Begin processing the 3rd record. run: 6698 subRun: 0 event: 33 at 19-Jul-2016 17:42:17 CDT
+%MSG-i MemoryPeak:  Source 19-Jul-2016 17:42:17 CDT PostProcessEvent
+MemoryPeak: source VMPEAK 1306.3 MiB
+%MSG
+%MSG-d RANDOM:  PostSource 19-Jul-2016 17:42:17 CDT  run: 6698 subRun: 0 event: 33
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:18 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.74685, truncMean: 2048.95, pedestal: 0.19751
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 335, rmsVal: 3.63604, truncMean: 2034.01, pedestal: 0.0699463
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 335, rmsVal: 3.63604, truncMean: 2034.01, pedestal: 0.0699463
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 431, rmsVal: 0.955144, truncMean: 2046.86, pedestal: 0.0491943
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.930376, truncMean: 2048.14, pedestal: 4.8728
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:19 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 671, rmsVal: 263.398, truncMean: 2069.88, pedestal: 32.1829
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:22 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 2687, rmsVal: 2.18028, truncMean: 2045.02, pedestal: -0.00244141
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:22 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 2735, rmsVal: 2.46225, truncMean: 2052.06, pedestal: -0.0380859
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:23 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 3119, rmsVal: 5.72611, truncMean: 2047, pedestal: 0.450684
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:25 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 4895, rmsVal: 2.90038, truncMean: 482.772, pedestal: 0.33197
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:28 CDT run: 6698 subRun: 0 event: 33
+--> Rejecting channel for large rms, channel: 7487, rmsVal: 3.10774, truncMean: 474.784, pedestal: 0.279175
+%MSG
+Begin processing the 4th record. run: 6698 subRun: 0 event: 39 at 19-Jul-2016 17:42:31 CDT
+%MSG-i MemoryPeak:  Source 19-Jul-2016 17:42:31 CDT PostProcessEvent
+MemoryPeak: source VMPEAK 1306.3 MiB
+%MSG
+%MSG-d RANDOM:  PostSource 19-Jul-2016 17:42:31 CDT  run: 6698 subRun: 0 event: 39
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:32 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.72199, truncMean: 2048.95, pedestal: 0.197021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.21647, truncMean: 2033.56, pedestal: -0.384399
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.21647, truncMean: 2033.56, pedestal: -0.384399
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 431, rmsVal: 0.979755, truncMean: 2046.87, pedestal: 0.0628662
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 623, rmsVal: 0.495057, truncMean: 2046.09, pedestal: 2.82178
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:33 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 671, rmsVal: 227.917, truncMean: 2007.74, pedestal: -29.9615
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:36 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 2687, rmsVal: 2.27572, truncMean: 2044.84, pedestal: -0.178345
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:36 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 2735, rmsVal: 2.83031, truncMean: 2052, pedestal: -0.104248
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:37 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 3119, rmsVal: 6.03832, truncMean: 2046.74, pedestal: 0.185669
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:39 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 4895, rmsVal: 3.11394, truncMean: 482.103, pedestal: -0.336548
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:42 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 7583, rmsVal: 2.9019, truncMean: 464.7, pedestal: 0.0923462
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:42 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 7583, rmsVal: 2.9019, truncMean: 464.7, pedestal: 0.0923462
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:42 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 7583, rmsVal: 2.9019, truncMean: 464.7, pedestal: 0.0923462
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:42 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 7583, rmsVal: 2.9019, truncMean: 464.7, pedestal: 0.0923462
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:42 CDT run: 6698 subRun: 0 event: 39
+--> Rejecting channel for large rms, channel: 7583, rmsVal: 2.9019, truncMean: 464.7, pedestal: 0.0923462
+%MSG
+%MSG-i MemoryPeak:  LiteScanner:wire 19-Jul-2016 17:42:45 CDT  run: 6698 subRun: 0 event: 39
+MemoryPeak: module wire:LiteScanner VMPEAK 1315.1 MiB
+%MSG
+Begin processing the 5th record. run: 6698 subRun: 0 event: 40 at 19-Jul-2016 17:42:45 CDT
+%MSG-i MemoryPeak:  Source 19-Jul-2016 17:42:45 CDT PostProcessEvent
+MemoryPeak: source VMPEAK 1315.1 MiB
+%MSG
+%MSG-d RANDOM:  PostSource 19-Jul-2016 17:42:45 CDT  run: 6698 subRun: 0 event: 40
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:46 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 47, rmsVal: 1.77571, truncMean: 2048.95, pedestal: 0.196289
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.06357, truncMean: 2033.55, pedestal: -0.393921
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 335, rmsVal: 4.06357, truncMean: 2033.55, pedestal: -0.393921
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 431, rmsVal: 1.00202, truncMean: 2046.9, pedestal: 0.09021
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 623, rmsVal: 1.2061, truncMean: 2048.89, pedestal: 5.62378
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:47 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 671, rmsVal: 246.234, truncMean: 2034.67, pedestal: -3.02905
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:50 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 2687, rmsVal: 2.50034, truncMean: 2045.04, pedestal: 0.0172119
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:50 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 2735, rmsVal: 3.0685, truncMean: 2051.72, pedestal: -0.375244
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:51 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 3119, rmsVal: 5.60837, truncMean: 2045.66, pedestal: -0.889282
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:53 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 4895, rmsVal: 3.09829, truncMean: 482.089, pedestal: -0.350708
+%MSG
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter  19-Jul-2016 17:42:56 CDT run: 6698 subRun: 0 event: 40
+--> Rejecting channel for large rms, channel: 7679, rmsVal: 3.37629, truncMean: 465.691, pedestal: -0.387024
+%MSG
+19-Jul-2016 17:42:59 CDT  Closed file /build/kterao/PhysicsRun-2016_6_28_22_16_0-0006698-00000_20160629T063354_bnb_20160629T104358_merged.root
+%MSG-i RawDigitFilterUBooNE:  RawDigitFilterUBooNE:digitfilter@EndJob  19-Jul-2016 17:42:59 CDT PostEndRun
+Looked at 5 events
+%MSG
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 5 passed = 5 failed = 0
+
+TrigReport ------ Modules in End-Path: end_path ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     0    0          5          5          0          0 wire
+TrigReport     0    0          5          5          0          0 opdigit
+TrigReport     0    0          5          5          0          0 opreco
+
+TimeReport ---------- Time  Summary ---[sec]----
+TimeReport CPU = 71.090945 Real = 70.114343
+
+
+Summary of seeds computed by the SeedService
+Random policy: 'random'
+  master seed: 536892954
+  seed within: [ 1 ; 900000000 ]
+
+%MSG-d RANDOM:  LiteScanner:wire@EndJob 19-Jul-2016 17:43:00 CDT PostEndRun
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i MemoryPeak:  LiteScanner:wire@EndJob 19-Jul-2016 17:43:00 CDT PostEndRun
+MemoryPeak: end VMPEAK 1315.1 MiB
+%MSG

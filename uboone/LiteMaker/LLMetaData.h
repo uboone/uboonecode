@@ -41,8 +41,8 @@ namespace larlite {
       std::string application_version;
       FileCatalogMetaData_t() : file_format ("larlite")
 			      , file_type   (" ")
-			      , group       (" ")
-			      , application_family  (" ")
+			      , group       ("uboone")
+			      , application_family  ("art")
 			      , application_name    (" ")
 			      , application_version (" ")
 
