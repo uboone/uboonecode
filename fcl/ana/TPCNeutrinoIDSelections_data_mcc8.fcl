@@ -1,6 +1,5 @@
 #include "reco_uboone_data_mcc8.fcl"
 #include "tpcneutrinoidfilter_microboone.fcl"
-#include "litemaker_base.fcl"
 
 process_name: TPCNeutrinoIDFilterSelectionsMCC8
 
@@ -13,7 +12,6 @@ services:
   message:               @local::standard_info
 
   @table::microboone_reco_data_services
-  LLMetaMaker: {Enable: false}
 }
 
 #source is now a root file
@@ -35,14 +33,13 @@ physics:
    NuMuCCSelIIFilter: @local::microboone_tpcneutrinoidfilter
  }
 
- analyzers:{
-   litescannersel2: @local::litemaker_base
- }
+ analyzers:
+  {}
 
  chargetrack: [ ChargedTrackMultiplicity, CTMFilter ]
  numusel2:    [ NuMuCCSelectionII, NuMuCCSelIIFilter ]
  
- stream1:       [ outsel1, outsel2, litescannersel2 ]
+ stream1:       [ outsel1, outsel2 ]
 
  trigger_paths: [ chargetrack, numusel2 ]
 
@@ -87,52 +84,3 @@ physics.filters.NuMuCCSelIIFilter.VertexModuleLabelVec:                    ["pan
 physics.filters.NuMuCCSelIIFilter.VtxTrackAssnModuleLabelVec:              ["NuMuCCSelectionII"]
 physics.filters.NuMuCCSelIIFilter.Cluster2DCosmicProducerLabel:            ""
 physics.filters.NuMuCCSelIIFilter.Cluster2DCosmicClusterAssns:             ""
-
-# Larlite stuff
-
-physics.analyzers.litescannersel2.SelectEvents: [ numusel2 ]
-physics.analyzers.litescannersel2.unique_filename: false
-physics.analyzers.litescannersel2.out_filename: "larlite_sel2.root"
-physics.analyzers.litescannersel2.DataLookUpMap:{
-  trigger:    ["daq"]
-  swtrigger:  ["swtrigger"]
-  opdigit:    ["saturation"]
-  ophit:      ["ophitBeam","ophitCosmic"]
-  opflash:    ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
-  hit:        ["gaushit","pandoraCosmicHitRemoval"]
-  cluster:    ["pandoraNu","pandoraCosmic"]
-  sps:        ["pandoraCosmic","pandoraNu"]
-  pcaxis:     ["pandoraCosmic","pandoraNu"]
-  vertex:     ["pandoraCosmic","pandoraNu"]
-  track:      ["pandoraCosmic","pandoraNu"]
-  seed:       ["pandoraCosmic","pandoraNu"]
-  shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
-  pfpart:     ["pandoraCosmic","pandoraNu"]
-  cosmictag:  ["pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
-  partid:     ["pandoraCosmicpid","pandoraNupid"]
-}
-physics.analyzers.litescannersel2.AssociationLookUpMap:{
-  ophit:   ["ophitBeam","ophitCosmic"]
-  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
-  hit:        ["gaushit","pandoraCosmicHitRemoval"]
-  cluster:    ["pandoraNu","pandoraCosmic"]
-  sps:        ["pandoraCosmic","pandoraNu"]
-  vertex:     ["pandoraNu","pandoraCosmic"]
-  track:      ["pandoraCosmic","pandoraNu"]
-  seed:       ["pandoraCosmic","pandoraNu"]
-  shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
-  pfpart:     ["pandoraCosmic","pandoraNu"]
-  cosmictag:  ["pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
-  partid:     ["pandoraCosmicpid","pandoraNupid"]
-}
-physics.analyzers.litescannersel2.AssLabelToSave: ["simpleFlashBeam",
-						   "simpleFlashCosmic",
-						   "opflashBeam",
-						   "opflashCosmic"]
-microboone_tfile_metadata:
-{
-  JSONFileName:          "larlite_sel2.root.json"
-  GenerateTFileMetadata: true
-  dataTier:              "larlite"
-  fileFormat:            "root"
-}

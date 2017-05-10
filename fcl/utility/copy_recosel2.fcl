@@ -1,4 +1,5 @@
 #include "services_microboone.fcl"
+#include "litemaker_base.fcl"
 
 process_name: Copy
 
@@ -7,6 +8,7 @@ services:
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   message:      @local::standard_warning
   FileCatalogMetadata:  @local::art_file_catalog_data
+  LLMetaMaker: {Enable: false}
 }
 
 source:
@@ -17,9 +19,12 @@ source:
 
 physics:
 {
+ analyzers:{
+   litescannersel2: @local::litemaker_base
+ }
 
  #define the output stream, there could be more than one if using filters 
- stream1:  [ outsel2 ]
+ stream1:  [ outsel2, litescannersel2 ]
 
  #end_paths is a keyword and contains the paths that do not modify the art::Event, 
  #ie analyzers and output streams.  these all run simultaneously
@@ -36,4 +41,55 @@ outputs:
    streamName:  "outsel2"
    compressionLevel: 3
  }
+}
+
+# Larlite stuff
+
+physics.analyzers.litescannersel2.unique_filename: false
+physics.analyzers.litescannersel2.out_filename: "larlite_sel2.root"
+physics.analyzers.litescannersel2.DataLookUpMap:{
+  trigger:    ["daq"]
+  swtrigger:  ["swtrigger"]
+  opdigit:    ["saturation"]
+  ophit:      ["ophitBeam","ophitCosmic"]
+  opflash:    ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+  hit:        ["gaushit","pandoraCosmicHitRemoval"]
+  cluster:    ["pandoraNu","pandoraCosmic"]
+  sps:        ["pandoraCosmic","pandoraNu"]
+  pcaxis:     ["pandoraCosmic","pandoraNu"]
+  vertex:     ["pandoraCosmic","pandoraNu"]
+  track:      ["pandoraCosmic","pandoraNu"]
+  seed:       ["pandoraCosmic","pandoraNu"]
+  shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
+  pfpart:     ["pandoraCosmic","pandoraNu"]
+  cosmictag:  ["pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
+  partid:     ["pandoraCosmicpid","pandoraNupid"]
+  calo:       ["pandoraNucalo"]
+}
+physics.analyzers.litescannersel2.AssociationLookUpMap:{
+  ophit:   ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+  hit:        ["gaushit","pandoraCosmicHitRemoval"]
+  cluster:    ["pandoraNu","pandoraCosmic"]
+  sps:        ["pandoraCosmic","pandoraNu"]
+  vertex:     ["pandoraNu","pandoraCosmic"]
+  track:      ["pandoraCosmic","pandoraNu"]
+  seed:       ["pandoraCosmic","pandoraNu"]
+  shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
+  pfpart:     ["pandoraCosmic","pandoraNu"]
+  cosmictag:  ["pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
+  partid:     ["pandoraCosmicpid","pandoraNupid"]
+  calo:       ["pandoraNucalo"]
+}
+physics.analyzers.litescannersel2.AssociationProducers: ["NuMuCCSelectionII"]
+physics.analyzers.litescannersel2.AssLabelToSave: ["simpleFlashBeam",
+						   "simpleFlashCosmic",
+						   "opflashBeam",
+						   "opflashCosmic"]
+microboone_tfile_metadata:
+{
+  JSONFileName:          "larlite_sel2.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "larlite"
+  fileFormat:            "root"
 }
