@@ -7,11 +7,14 @@ genie_microboone_eventweight:
   #Use this to reweight one parameter at a time (to study the effect of varying one single parameter)
   #weight_functions: [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf, genie_IntraNukeNmfp, genie_IntraNukeNcex, genie_IntraNukeNel, genie_IntraNukeNinel, genie_IntraNukeNabs, genie_IntraNukeNpi, genie_IntraNukePImfp, genie_IntraNukePIcex, genie_IntraNukePIel, genie_IntraNukePIinel, genie_IntraNukePIabs, genie_IntraNukePIpi   ]
 
+  #weight_functions: [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf, genie_IntraNukeNmfp, genie_IntraNukeNcex, genie_IntraNukeNel, genie_IntraNukeNinel, genie_IntraNukeNabs, genie_IntraNukeNpi, genie_IntraNukePImfp, genie_IntraNukePIcex, genie_IntraNukePIel, genie_IntraNukePIinel, genie_IntraNukePIabs, genie_IntraNukePIpi   ]
+  weight_functions: [ genie_qema, Fv3technote, Fa3technote ]
+
   #This was used for the Ma+-1sigma in the Neutrino2016 CC incl tech-note
   #weight_functions: [ genie_qema_ccincltechnote ]
 
   #Use to reweight all GENIE parameters at the same time (see below for definition)
-  weight_functions: [ genie_all ]
+  #weight_functions: [ genie_all ]
 
   #throw exception if weight outside limits
   min_weight: 0
@@ -39,6 +42,25 @@ genie_microboone_eventweight:
 #
 #########################################
 
+# Libo's!
+ Fv3technote : {
+          type: XSecRatio
+          random_seed: 3
+          parameter_list: ["Fv3"]
+          parameter_sigma: [1]
+          mode: multisim
+          number_of_multisims: 100
+        }
+
+ Fa3technote : {
+          type: XSecRatio
+          random_seed: 4
+          parameter_list: ["Fa3"]
+          parameter_sigma: [1]
+          mode: multisim
+          number_of_multisims: 100
+        }
+
 # MaCCQE for ccincl technote
  genie_qema_ccincltechnote : {
           type: Genie
@@ -55,8 +77,8 @@ genie_microboone_eventweight:
           random_seed: 1
 	  parameter_list:        ["QEMA"] 
           parameter_sigma:       [1     ] 
-          mode: pm1sigma
-	  number_of_multisims: 15
+          mode: multisim
+	  number_of_multisims: 100
  	}
 # MaNCEL 
  genie_ncelAxial: {
@@ -64,8 +86,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NCELaxial"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # EtaNCEL
  genie_ncelEta: {
@@ -73,17 +95,17 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NCELeta"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # CCQE_VecFF
  genie_qevec: {
           type: Genie
-          random_seed: 1
+          random_seed: 2
           parameter_list:        ["QEVec"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 100
         }
 # MaCCRES
  genie_ccresAxial: {
@@ -91,8 +113,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["CCResAxial"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15 
+          mode: multisim
+          number_of_multisims: 50 
         }
 # MvCCRES
  genie_ccresVector: {
@@ -100,8 +122,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["CCResVector"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # MaNCRES
  genie_ncresAxial: {
@@ -109,8 +131,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NCResAxial"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # MvNCRES
  genie_ncresVector: {
@@ -118,8 +140,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NCResVector"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 
 # MaCCRES && MvCCRES && MaNCRES && MvNCRES
@@ -128,8 +150,8 @@ genie_microboone_eventweight:
 #          random_seed: 1
 #          parameter_list:        ["ResGanged"]
 #          parameter_sigma:       [1     ]
-#          mode: pm1sigma
-#          number_of_multisims: 15
+#          mode: multisim
+#          number_of_multisims: 50
 #        }
 
 # MaCOHPi
@@ -138,8 +160,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["CohMA"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # R0COHPi
  genie_cohR0: {
@@ -147,8 +169,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["CohR0"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # ReweightNonResRvp1pi
  genie_NonResRvp1pi: {
@@ -156,8 +178,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NonResRvp1pi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # NonResRvbarp1pi
  genie_NonResRvbarp1pi: {
@@ -165,8 +187,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NonResRvbarp1pi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # NonResRvp2pi
  genie_NonResRvp2pi: {
@@ -174,8 +196,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NonResRvp2pi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # NonResRvbarp2pi
  genie_NonResRvbarp2pi: {
@@ -183,8 +205,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NonResRvbarp2pi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # ResDecayGamma
  genie_ResDecayGamma: {
@@ -192,8 +214,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["ResDecayGamma"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # ResDecayEta
  genie_ResDecayEta: {
@@ -201,8 +223,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["ResDecayEta"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # ResDecayTheta
  genie_ResDecayTheta: {
@@ -210,8 +232,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["ResDecayTheta"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # NC
  genie_NC: {
@@ -219,8 +241,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["NC"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # DISAth
  genie_DISAth: {
@@ -228,8 +250,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["DISAth"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # DISBth
  genie_DISBth: {
@@ -237,8 +259,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["DISBth"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # DISCv1u
  genie_DISCv1u: {
@@ -246,8 +268,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["DISCv1u"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # DISCv2u
  genie_DISCv2u: {
@@ -255,8 +277,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["DISCv2u"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 
 # DISnucl
@@ -265,8 +287,8 @@ genie_microboone_eventweight:
 #          random_seed: 1
 #          parameter_list:        ["DISnucl"]
 #          parameter_sigma:       [1     ]
-#          mode: pm1sigma
-#          number_of_multisims: 15
+#          mode: multisim
+#          number_of_multisims: 50
 #        }
 
 # AGKYxF
@@ -275,8 +297,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["AGKYxF"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # AGKYpT
  genie_AGKYpT: {
@@ -284,8 +306,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["AGKYpT"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # FormZone
  genie_FormZone: {
@@ -293,8 +315,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["FormZone"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # FermiGasModelKf
  genie_FermiGasModelKf: {
@@ -302,8 +324,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["FermiGasModelKf"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # FermiGasModelSf
  genie_FermiGasModelSf: {
@@ -311,8 +333,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["FermiGasModelSf"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukeNmfp
  genie_IntraNukeNmfp: {
@@ -320,8 +342,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNmfp"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukeNcex
  genie_IntraNukeNcex: {
@@ -329,8 +351,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNcex"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukeNel
  genie_IntraNukeNel: {
@@ -338,8 +360,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNel"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukeNinel
  genie_IntraNukeNinel: {
@@ -347,8 +369,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNinel"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukeNabs
  genie_IntraNukeNabs: {
@@ -356,8 +378,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNabs"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukeNpi
  genie_IntraNukeNpi: {
@@ -365,8 +387,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukeNpi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukePImfp
  genie_IntraNukePImfp: {
@@ -374,8 +396,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePImfp"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         } 
 # IntraNukePIcex
  genie_IntraNukePIcex: {
@@ -383,8 +405,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePIcex"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukePIel
  genie_IntraNukePIel: {
@@ -392,8 +414,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePIel"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukePIinel
  genie_IntraNukePIinel: {
@@ -401,8 +423,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePIinel"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukePIabs
  genie_IntraNukePIabs: {
@@ -410,8 +432,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePIabs"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 # IntraNukePIpi
  genie_IntraNukePIpi: {
@@ -419,8 +441,8 @@ genie_microboone_eventweight:
           random_seed: 1
           parameter_list:        ["IntraNukePIpi"]
           parameter_sigma:       [1     ]
-          mode: pm1sigma
-          number_of_multisims: 15
+          mode: multisim
+          number_of_multisims: 50
         }
 
 # Here the GENIE parameters are reweighted all at once (40 parameters)
@@ -449,7 +471,7 @@ genie_all: {
 #	  			  1     , 1    , 1  ,   
 #				  1     , 1    , 1  ]  
 #          mode: multisim
-#	  number_of_multisims: 15
+#	  number_of_multisims: 50
 # 	}
 #
 }	

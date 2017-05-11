@@ -1,4 +1,3 @@
-BEGIN_PROLOG
 litemaker_base:
 {
   # module name
@@ -63,4 +62,3 @@ litemaker_base:
 
 
 }
-END_PROLOG

@@ -10,7 +10,7 @@ litemc_eventweight.DataLookUpMap:
   # the output larlite file. The key represents the data product
   # type which is uniquely defined for larlite::data::kDATA_TREE_NAME
   # string array.
-  eventweight: ["eventweight"]
+  mceventweight: ["eventweight"]
 }
 
 
