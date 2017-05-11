@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_reco3d_cctrack: @local::litemaker_base
 
 litemc_reco3d_cctrack.out_filename: "larlite_reco3d_cctrack.root"
@@ -32,4 +34,4 @@ litemc_reco3d_cctrack.AssociationLookUpMap:
   pfpart:     ["cctrack"]
 }
 
-
+END_PROLOG

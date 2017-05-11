@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_reco3d_kalmanhit: @local::litemaker_base
 
 litemc_reco3d_kalmanhit.out_filename: "larlite_reco3d_kalmanhit.root"
@@ -41,4 +43,4 @@ litemc_reco3d_kalmanhit.AssociationLookUpMap:
                "stitchkalmanhitpid"]
 }
 
-
+END_PROLOG

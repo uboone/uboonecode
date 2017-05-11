@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_reco3d_cluster3d: @local::litemaker_base
 
 litemc_reco3d_cluster3d.out_filename: "larlite_reco3d_cluster3d.root"
@@ -43,3 +45,4 @@ litemc_reco3d_cluster3d.AssociationLookUpMap:
                "stitchkalmanhitpidc3d"]
 }
 
+END_PROLOG

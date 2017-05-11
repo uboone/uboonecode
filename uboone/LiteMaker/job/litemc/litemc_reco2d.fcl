@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_reco2d: @local::litemaker_base
 
 litemc_reco2d.out_filename: "larlite_reco2d.root"
@@ -20,4 +22,4 @@ litemc_reco2d.AssociationLookUpMap:
   endpoint2d: []
 }
 
-
+END_PROLOG

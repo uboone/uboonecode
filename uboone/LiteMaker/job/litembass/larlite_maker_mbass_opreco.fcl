@@ -44,17 +44,17 @@ physics:
   ophitCosmic    : @local::microboone_ophit_cosmic_highgain
   ophitCosmicLow : @local::microboone_ophit_cosmic_lowgain
 
-  ophitT   : @local::ub_ophitfinder_t
-  ophitFW  : @local::ub_ophitfinder_fw
-  ophitSW  : @local::ub_ophitfinder_sw
-  ophitCFD : @local::ub_ophitfinder_cfd
+  #ophitT   : @local::ub_ophitfinder_t
+  #ophitFW  : @local::ub_ophitfinder_fw
+  #ophitSW  : @local::ub_ophitfinder_sw
+  #ophitCFD : @local::ub_ophitfinder_cfd
 
   ophitSat    : @local::microboone_ophit_saturation
 
-  ophitSatT   : @local::ub_ophitfinder_satt
-  ophitSatFW  : @local::ub_ophitfinder_satfw
-  ophitSatSW  : @local::ub_ophitfinder_satsw
-  ophitSatCFD : @local::ub_ophitfinder_satcfd
+  #ophitSatT   : @local::ub_ophitfinder_satt
+  #ophitSatFW  : @local::ub_ophitfinder_satfw
+  #ophitSatSW  : @local::ub_ophitfinder_satsw
+  #ophitSatCFD : @local::ub_ophitfinder_satcfd
 
   ### Saturation correction module
   saturation : @local::correct_saturation
@@ -65,17 +65,17 @@ physics:
   opflashCosmic    : @local::microboone_opflash_cosmic_highgain
   opflashCosmicLow : @local::microboone_opflash_cosmic_lowgain
 
-  sflashT   : @local::ub_sflash_t
-  sflashFW  : @local::ub_sflash_fw
-  sflashSW  : @local::ub_sflash_sw
-  sflashCFD : @local::ub_sflash_cfd
+  #sflashT   : @local::ub_sflash_t
+  #sflashFW  : @local::ub_sflash_fw
+  #sflashSW  : @local::ub_sflash_sw
+  #sflashCFD : @local::ub_sflash_cfd
 
   opflashSat   : @local::microboone_opflash_saturation
 
-  sflashSatT   : @local::ub_sflash_satt
-  sflashSatFW  : @local::ub_sflash_satfw
-  sflashSatSW  : @local::ub_sflash_satsw
-  sflashSatCFD : @local::ub_sflash_satcfd
+  #sflashSatT   : @local::ub_sflash_satt
+  #sflashSatFW  : @local::ub_sflash_satfw
+  #sflashSatSW  : @local::ub_sflash_satsw
+  #sflashSatCFD : @local::ub_sflash_satcfd
  }
 
  analyzers:
@@ -92,10 +92,10 @@ physics:
  }
 
  reco: [ saturation,
-         ophitT, ophitFW, ophitSW, ophitCFD,
-         sflashT, sflashFW, sflashSW, sflashCFD,
-         ophitSatT, ophitSatFW, ophitSatSW, ophitSatCFD,
-         sflashSatT, sflashSatFW, sflashSatSW, sflashSatCFD,
+         #ophitT, ophitFW, ophitSW, ophitCFD,
+         #sflashT, sflashFW, sflashSW, sflashCFD,
+         #ophitSatT, ophitSatFW, ophitSatSW, ophitSatCFD,
+         #sflashSatT, sflashSatFW, sflashSatSW, sflashSatCFD,
          ophit,
          ophitSat,
          ophitLow,
