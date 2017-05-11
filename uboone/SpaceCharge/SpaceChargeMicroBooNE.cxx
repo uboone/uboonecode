@@ -9,8 +9,6 @@
 
 // C++ language includes
 #include <string>
-#include <vector>
-#include <memory> // std::unique_ptr<>
 #include <cassert>
 
 // LArSoft includes
@@ -213,53 +211,45 @@ bool spacecharge::SpaceChargeMicroBooNE::EnableCorrSCE() const
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides position offsets to be
 /// used in ionization electron drift
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(geo::Point_t const& point) const
 {
-  std::vector<double> thePosOffsets;
+  if (!EnableSimSpatialSCE()) return {}; // no correction, zero displacement
+  if(!IsInsideBoundaries(point)) return {}; // zero-initialised
+  switch (fRepresentationType) {
+    
+    case SpaceChargeRepresentation_t::kParametric:
+      return GetPosOffsetsParametric(point);
+    
+    case SpaceChargeRepresentation_t::kUnknown:
+      assert(false); // logic error: can't be unknown
+      return {}; // zero-initialised
+    
+  } // switch
 
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
-  {
-    thePosOffsets.resize(3,0.0);
-  }
-  else
-  {
-    switch (fRepresentationType) {
-      case SpaceChargeRepresentation_t::kParametric:
-        thePosOffsets = GetPosOffsetsParametric(xVal,yVal,zVal);
-        break;
-      case SpaceChargeRepresentation_t::kUnknown:
-        assert(false); // logic error: can't be unknown
-        thePosOffsets.resize(3,0.0);
-        break;
-    } // switch
-  }
-
-  return thePosOffsets;
+  assert(false); // logic error: can't be here
+  return {};
 }
 
 //----------------------------------------------------------------------------
 /// Provides position offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetPosOffsetsParametric
+  (geo::Point_t const& point) const
 {
-  std::vector<double> thePosOffsetsParametric;
-
-  double xValNew = TransformX(xVal);
-  double yValNew = TransformY(yVal);
-  double zValNew = TransformZ(zVal);
-
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricX(xValNew,yValNew,zValNew));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricY(xValNew,yValNew,zValNew));
-  thePosOffsetsParametric.push_back(GetOnePosOffsetParametricZ(xValNew,yValNew,zValNew));
-
-  return thePosOffsetsParametric;
+  geo::Point_t transformedPoint = Transform(point);
+  return {
+    GetOnePosOffsetParametricX(transformedPoint),
+    GetOnePosOffsetParametricY(transformedPoint),
+    GetOnePosOffsetParametricZ(transformedPoint)
+    };
 }
 
 //----------------------------------------------------------------------------
 double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricX
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[5][7];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 7; j++) 
   {
     parA[0][j] = g1_x[j].Eval(zValNew);
@@ -281,7 +271,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricX
   f4_x.SetParameters(parA[3]);
   f5_x.SetParameters(parA[4]);
 
-  double const aValNew = yValNew;
+  double const aValNew = point.Y();
   double const parB[] = {
     f1_x.Eval(aValNew),
     f2_x.Eval(aValNew),
@@ -290,17 +280,18 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricX
     f5_x.Eval(aValNew)
   };
   
-  double const bValNew = xValNew;
+  double const bValNew = point.X();
   return 100.0*fFinal_x_poly_t::Eval(bValNew, parB);
 }
 
 //----------------------------------------------------------------------------
 /// Provides one position offset using a parametric representation, for Y axis
 double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[6][6];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 6; j++)
   {
     parA[0][j] = g1_y[j].Eval(zValNew);
@@ -325,7 +316,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY
   f5_y.SetParameters(parA[4]);
   f6_y.SetParameters(parA[5]);
   
-  double const aValNew = xValNew;
+  double const aValNew = point.X();
   
   double const parB[] = {
     f1_y.Eval(aValNew),
@@ -336,7 +327,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY
     f6_y.Eval(aValNew)
   };
   
-  double const bValNew = yValNew;
+  double const bValNew = point.Y();
   return 100.0*fFinal_y_poly_t::Eval(bValNew, parB);
 } // spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY()
 
@@ -345,10 +336,11 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricY
 /// Provides one position offset using a parametric representation, for a given
 /// axis
 double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[4][5];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 5; j++)
   {
     parA[0][j] = g1_z[j].Eval(zValNew);
@@ -367,7 +359,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
   f3_z.SetParameters(parA[2]);
   f4_z.SetParameters(parA[3]);
   
-  double const aValNew = yValNew;
+  double const aValNew = point.Y();
   double const parB[] = {
     f1_z.Eval(aValNew),
     f2_z.Eval(aValNew),
@@ -375,7 +367,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
     f4_z.Eval(aValNew)
   };
   
-  double const bValNew = xValNew;
+  double const bValNew = point.X();
   return 100.0*fFinal_z_poly_t::Eval(bValNew, parB);
   
 } // spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ()
@@ -384,58 +376,47 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
 //----------------------------------------------------------------------------
 /// Primary working method of service that provides E field offsets to be
 /// used in charge/light yield calculation (e.g.)
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(geo::Point_t const& point) const
 {
-  std::vector<double> theEfieldOffsets;
-
-  if(IsInsideBoundaries(xVal,yVal,zVal) == false)
-  {
-    theEfieldOffsets.resize(3,0.0);
-  }
-  else
-  {
-    switch (fRepresentationType) {
-      case SpaceChargeRepresentation_t::kParametric:
-        theEfieldOffsets = GetEfieldOffsetsParametric(xVal,yVal,zVal);
-        break;
-      case SpaceChargeRepresentation_t::kUnknown:
-        assert(false); // logic error: can't be unknown
-        theEfieldOffsets.resize(3,0.0);
-        break;
-    } // switch
-  }
-
-  theEfieldOffsets.at(0) = -1.0*theEfieldOffsets.at(0);
-  theEfieldOffsets.at(1) = -1.0*theEfieldOffsets.at(1);
-  theEfieldOffsets.at(2) = -1.0*theEfieldOffsets.at(2);
-
-  return theEfieldOffsets;
+  if (!EnableSimEfieldSCE()) return {}; // no correction, zero distortion
+  if(!IsInsideBoundaries(point)) return {}; // zero-initialised
+  
+  switch (fRepresentationType) {
+    
+    case SpaceChargeRepresentation_t::kParametric:
+      return -GetEfieldOffsetsParametric(point);
+    
+    case SpaceChargeRepresentation_t::kUnknown:
+      assert(false); // logic error: can't be unknown
+      return {};
+    
+  } // switch
+  
+  assert(false); // logic error: can't get here
+  return {};
 }
 
 //----------------------------------------------------------------------------
 /// Provides E field offsets using a parametric representation
-std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
+geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsetsParametric
+  (geo::Point_t const& point) const
 {
-  std::vector<double> theEfieldOffsetsParametric;
-
-  double xValNew = TransformX(xVal);
-  double yValNew = TransformY(yVal);
-  double zValNew = TransformZ(zVal);
-
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricX(xValNew,yValNew,zValNew));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricY(xValNew,yValNew,zValNew));
-  theEfieldOffsetsParametric.push_back(GetOneEfieldOffsetParametricZ(xValNew,yValNew,zValNew));
-
-  return theEfieldOffsetsParametric;
+  geo::Point_t const transformedPoint = Transform(point);
+  return {
+    GetOneEfieldOffsetParametricX(transformedPoint),
+    GetOneEfieldOffsetParametricY(transformedPoint),
+    GetOneEfieldOffsetParametricZ(transformedPoint)
+    };
 }
 
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for x axis
 double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[5][7];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 7; j++)
   {
     parA[0][j] = g1_Ex[j].Eval(zValNew);
@@ -457,7 +438,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX
   f4_Ex.SetParameters(parA[3]);
   f5_Ex.SetParameters(parA[4]);
   
-  double const aValNew = yValNew;
+  double const aValNew = point.Y();
   double const parB[] = {
     f1_Ex.Eval(aValNew),
     f2_Ex.Eval(aValNew),
@@ -466,7 +447,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX
     f5_Ex.Eval(aValNew)
   };
   
-  double const bValNew = xValNew;
+  double const bValNew = point.X();
   return fFinal_Ex_poly_t::Eval(bValNew, parB);
   
 } // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX()
@@ -474,10 +455,11 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricX
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for y axis
 double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[6][6];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 6; j++)
   {
     parA[0][j] = g1_Ey[j].Eval(zValNew);
@@ -502,7 +484,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY
   f5_Ey.SetParameters(parA[4]);
   f6_Ey.SetParameters(parA[5]);
 
-  double const aValNew = xValNew;
+  double const aValNew = point.X();
   double const parB[] = {
     f1_Ey.Eval(aValNew),
     f2_Ey.Eval(aValNew),
@@ -512,7 +494,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY
     f6_Ey.Eval(aValNew)
   };
   
-  double const bValNew = yValNew;
+  double const bValNew = point.Y();
   return fFinal_Ey_poly_t::Eval(bValNew, parB);
   
 } // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY()
@@ -521,10 +503,11 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricY
 //----------------------------------------------------------------------------
 /// Provides one E field offset using a parametric representation, for z axis
 double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ
-  (double xValNew, double yValNew, double zValNew) const
+  (geo::Point_t const& point) const
 {
   
   double parA[4][5];
+  double const zValNew = point.Z();
   for(size_t j = 0; j < 5; j++)
   {
     parA[0][j] = g1_Ez[j].Eval(zValNew);
@@ -543,7 +526,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ
   f3_Ez.SetParameters(parA[2]);
   f4_Ez.SetParameters(parA[3]);
 
-  double const aValNew = yValNew;
+  double const aValNew = point.Y();
   double const parB[] = {
     f1_Ez.Eval(aValNew),
     f2_Ez.Eval(aValNew),
@@ -551,7 +534,7 @@ double spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ
     f4_Ez.Eval(aValNew)
   };
   
-  double const bValNew = xValNew;
+  double const bValNew = point.X();
   return fFinal_Ez_poly_t::Eval(bValNew, parB);
 } // spacecharge::SpaceChargeMicroBooNE::GetOneEfieldOffsetParametricZ()
 
@@ -589,17 +572,22 @@ double spacecharge::SpaceChargeMicroBooNE::TransformZ(double zVal) const
 }
 
 //----------------------------------------------------------------------------
-/// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool spacecharge::SpaceChargeMicroBooNE::IsInsideBoundaries(double xVal, double yVal, double zVal) const
+geo::Point_t spacecharge::SpaceChargeMicroBooNE::Transform
+  (geo::Point_t const& point) const
 {
-  bool isInside = true;
+  return
+    { TransformX(point.X()), TransformY(point.Y()), TransformZ(point.Z()) };
+}
 
-  if((xVal < 0.0) || (xVal > 260.0) || (yVal < -120.0) || (yVal > 120.0) || (zVal < 0.0) || (zVal > 1050.0))
-  {
-    isInside = false;
-  }
-
-  return isInside;
+//----------------------------------------------------------------------------
+/// Check to see if point is inside boundaries of map (allow to go slightly out of range)
+bool spacecharge::SpaceChargeMicroBooNE::IsInsideBoundaries(geo::Point_t const& point) const
+{
+  return !(
+       (point.X() <    0.0) || (point.X() >  260.0)
+    || (point.Y() < -120.0) || (point.Y() >  120.0)
+    || (point.Z() <    0.0) || (point.Z() > 1050.0)
+    );
 }
 
 

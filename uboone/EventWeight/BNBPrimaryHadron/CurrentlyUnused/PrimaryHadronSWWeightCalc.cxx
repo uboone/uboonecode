@@ -3,8 +3,6 @@
 
 #include "../WeightCalcCreator.h"
 #include "../WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
-
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
@@ -31,7 +29,6 @@ using namespace std;
 namespace evwgh {
   class PrimaryHadronSWWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     PrimaryHadronSWWeightCalc();
     void Configure(fhicl::ParameterSet const& p);
@@ -203,12 +200,14 @@ namespace evwgh {
     fhicl::ParameterSet const &pset=p.get<fhicl::ParameterSet> (GetName());
     std::cout << pset.to_string() << std::endl;
 
-    fParameter_list			=   pset.get<std::vector<std::string> >("parameter_list");
-    fParameter_sigma		=   pset.get<float>("parameter_sigma");
-    primaryHad					=   pset.get<int>("PrimaryHadronGeantCode");
-    fNmultisims      = 			pset.get<int>("number_of_multisims");
-    std::string dataInput       =   pset.get< std::string >("ExternalData");
-    ExternalDataInput = IFDH.fetch(dataInput);
+    fParameter_list	   =   pset.get<std::vector<std::string> >("parameter_list");
+    fParameter_sigma	   =   pset.get<float>("parameter_sigma");
+    primaryHad		   =   pset.get<int>("PrimaryHadronGeantCode");
+    fNmultisims            =   pset.get<int>("number_of_multisims");
+    std::string dataInput  =   pset.get< std::string >("ExternalData");
+
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string ExternalDataInput = sp.find_file(dataInput);
    
     //Prepare random generator
     art::ServiceHandle<art::RandomNumberGenerator> rng;

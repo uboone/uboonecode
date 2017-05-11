@@ -9,11 +9,11 @@ art_make( BASENAME_ONLY
 			larcore_Geometry
 			${LIBWDA}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ROOT_BASIC_LIB_LIST}
-			art_Utilities canvas_Utilities
+			art_Utilities canvas
           MODULE_LIBRARIES larcore_Geometry
                         larcore_Geometry_Geometry_service
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
@@ -30,13 +30,13 @@ art_make( BASENAME_ONLY
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                        art_Persistency_Common canvas_Persistency_Common
-                        art_Persistency_Provenance canvas_Persistency_Provenance
-                        art_Utilities canvas_Utilities
+                        art_Persistency_Common canvas
+                        art_Persistency_Provenance canvas
+                        art_Utilities canvas
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}
-                        ${CETLIB}
+                        cetlib cetlib_except
                         ${CLHEP}
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}
@@ -47,14 +47,14 @@ art_make( BASENAME_ONLY
 		      uboone_Database
                       ${ART_FRAMEWORK_PRINCIPAL}
                       ${ART_FRAMEWORK_SERVICES_REGISTRY}
-                      art_Persistency_Common canvas_Persistency_Common
-                      art_Persistency_Provenance canvas_Persistency_Provenance
+                      art_Persistency_Common canvas
+                      art_Persistency_Provenance canvas
                       ${ART_FRAMEWORK_SERVICES_BASIC}
                       ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                       ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                       ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
                       ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-                      art_Utilities canvas_Utilities
+                      art_Utilities canvas
 	                    larevt_CalibrationDBI_IOVData
 			    lardataobj_RawData
 			    larcore_Geometry
@@ -64,9 +64,9 @@ art_make( BASENAME_ONLY
                             ${ART_FRAMEWORK_PRINCIPAL}
                             ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                             ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                            art_Persistency_Common canvas_Persistency_Common
-                            art_Persistency_Provenance canvas_Persistency_Provenance
-			    art_Utilities canvas_Utilities
+                            art_Persistency_Common canvas
+                            art_Persistency_Provenance canvas
+			    art_Utilities canvas
 			    ${FHICLCPP}
 			    ${ROOT_BASIC_LIB_LIST}
 )

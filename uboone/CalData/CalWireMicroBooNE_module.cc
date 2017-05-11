@@ -298,7 +298,7 @@ namespace caldata {
         // add an association between the last object in wirecol
         // (that we just inserted) and digitVec
         if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn, fSpillName)) {
-          throw art::Exception(art::errors::InsertFailure)
+          throw art::Exception(art::errors::ProductRegistrationFailure)
             << "Can't associate wire #" << (wirecol->size() - 1)
             << " with raw digit #" << digitVec.key();
         } // if failed to add association
@@ -418,7 +418,7 @@ namespace caldata {
           // add an association between the last object in wirecol
           // (that we just inserted) and digitVec
           if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn, fSpillName)) {
-            throw art::Exception(art::errors::InsertFailure)
+            throw art::Exception(art::errors::ProductRegistrationFailure)
               << "Can't associate wire #" << (wirecol->size() - 1)
               << " with raw digit #" << digitVec.key();
           } // if failed to add association
@@ -527,8 +527,8 @@ namespace caldata {
     int numBins = deconvVec.size();
     int window = TMath::Min(windowSize,numBins);
     window = TMath::Max(window,20);    
-    double baselineVec[numBins];
-    double newValVec[numBins];
+    std::vector<double> baselineVec(numBins,0.);
+    std::vector<double> newValVec(numBins,0.);
     
     // find first baseline adjustment
     double baselineVal = 0.0;
@@ -586,9 +586,9 @@ namespace caldata {
     int numBins = deconvVec.size();
     int window = TMath::Min(windowSize,numBins);
     int minWindowBins = window/2;
-    bool isNearSigVec[numBins];
-    double baselineVec[numBins];
-    bool isFilledVec[numBins];
+    std::vector<bool> isNearSigVec(numBins,0);
+    std::vector<double> baselineVec(numBins,0.);
+    std::vector<bool> isFilledVec(numBins,0);
   
     // initialize signal region array
     for(int j = 0; j < numBins; j++) {

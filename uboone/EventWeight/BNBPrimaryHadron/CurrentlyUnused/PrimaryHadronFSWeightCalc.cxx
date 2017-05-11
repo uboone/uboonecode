@@ -2,8 +2,6 @@
 
 #include "../WeightCalcCreator.h"
 #include "../WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
-
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
@@ -31,7 +29,6 @@ using namespace std;
 namespace evwgh {
   class PrimaryHadronFSWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     PrimaryHadronFSWeightCalc();
     void Configure(fhicl::ParameterSet const& p);
@@ -54,6 +51,7 @@ namespace evwgh {
     TMatrixD crossSection;
     TMatrixD covarianceMatrix;
     std::string ExternalDataInput;
+    TFile* file;
     
      DECLARE_WEIGHTCALC(PrimaryHadronFSWeightCalc)
   };
@@ -71,22 +69,22 @@ namespace evwgh {
   void PrimaryHadronFSWeightCalc::ExternalData(std::vector<double>& xSecFitParameters, std::vector< std::vector<double> >& fitCovarianceMatrix)
   {
 
-    TFile file(ExternalDataInput.c_str(),"READ");
+
 
     std::string pname;
 
     pname = "FS/KPlus/FSKPlusFitVal";
-    TArrayD* FSKPlusFitValArray = (TArrayD*) file.Get(pname.c_str());
+    TArrayD* FSKPlusFitValArray = (TArrayD*) file->Get(pname.c_str());
     if (!FSKPlusFitValArray) {
       throw art::Exception(art::errors::NotFound)
         << "Could not find parameter '" << pname << "' in file '"
-        << file.GetPath() << "'\n";
+        << file->GetPath() << "'\n";
     }
     std::vector<double> FSKPlusFitVal = PrimaryHadronFSWeightCalc::ConvertToVector(FSKPlusFitValArray);
     delete FSKPlusFitValArray;
 
     pname = "FS/KPlus/FSKPlusFitCov";
-    TMatrixD* FSKPlusFitCov = (TMatrixD*) file.Get(pname.c_str());
+    TMatrixD* FSKPlusFitCov = (TMatrixD*) file->Get(pname.c_str());
 
 
     //// Get fit values and covariances for specific particle type and method ///////
@@ -159,7 +157,11 @@ namespace evwgh {
   double e = xSecFitParameterstmp.at(4);//c5
   double f = xSecFitParameterstmp.at(5);//c6
   double g = xSecFitParameterstmp.at(6);//c7
+  
 
+  for(unsigned int para = 0; para < xSecFitParameterstmp.size(); para++){
+    std::cout << "Parameter " << para << " is " << xSecFitParameterstmp.at(para) << std::endl; 
+  }
 
   //  std::cout<<" primary hadron momentum   "<<had.P()<< "incident proton momentum  "<< incidentP.P()<<std::endl;
   //  std::cout<<" primary hadron theta wrt proton  "<<had.Theta()<<std::endl;
@@ -185,8 +187,11 @@ namespace evwgh {
     fNmultisims			=   pset.get<int>("number_of_multisims");
     primaryHad			=   pset.get<int>("PrimaryHadronGeantCode");//debiera ser un vector
     std::string dataInput       =   pset.get< std::string >("ExternalData");
-    ExternalDataInput = IFDH.fetch(dataInput);
- 
+
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string ExternalDataInput = sp.find_file(dataInput);
+    file = new TFile(Form("%s",ExternalDataInput.c_str()));
+
     //Prepare random generator
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::RandGaussQ GaussRandom(rng->getEngine(GetName()));

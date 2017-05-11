@@ -32,8 +32,6 @@
 
 #include "nusimdata/SimulationBase/MCTruth.h"
 
-///#include "ifdh.h" /// to handle external files
-
 namespace evwgh {
 
 class EventWeight : public art::EDProducer {

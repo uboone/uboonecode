@@ -1,0 +1,5 @@
+#include "reco_uboone_mcc8_driver_stage1.fcl"
+
+process_name: McRecoStage1StretchResp
+
+services.SignalShapingServiceMicroBooNE.FieldResponseFVersion:  [ "v3.13", "v3.13" ]

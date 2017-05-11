@@ -2,7 +2,6 @@
 
 #include "../WeightCalcCreator.h"
 #include "../WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
@@ -32,7 +31,6 @@ using namespace std;
 namespace evwgh {
   class PrimaryHadronSplinesWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     PrimaryHadronSplinesWeightCalc();
     void Configure(fhicl::ParameterSet const& p);
@@ -44,8 +42,9 @@ namespace evwgh {
     int thetaSplineSampling;
     TMatrixD covarianceMatrix;
     TMatrixD crossSection;
+    std::string dataInput;
 
-    void ExternalData(TMatrixD& crossSection, std::vector<double>& momentumBounds,std::vector<double>& thetaBounds,TMatrixD& covarianceMatrix);
+    void ExternalData(TFile* file, TMatrixD& crossSection, std::vector<double>& momentumBounds,std::vector<double>& thetaBounds,TMatrixD& covarianceMatrix);
 
   private:
  
@@ -60,6 +59,7 @@ namespace evwgh {
     CLHEP::RandGaussQ *GaussRandom;
     std::vector<TMatrixD> fakeData;
     std::string ExternalDataInput;
+    TFile* file;
 
     DECLARE_WEIGHTCALC(PrimaryHadronSplinesWeightCalc)
   };
@@ -74,39 +74,37 @@ namespace evwgh {
     return v;
   } // ConvertToVector()
 
-  void PrimaryHadronSplinesWeightCalc::ExternalData(TMatrixD& crossSection, std::vector<double>& momentumBounds,std::vector<double>& thetaBounds,TMatrixD& covarianceMatrix)
+  void PrimaryHadronSplinesWeightCalc::ExternalData(TFile* file, TMatrixD& crossSection, std::vector<double>& momentumBounds,std::vector<double>& thetaBounds, TMatrixD& covarianceMatrix)
   {
-    TFile file(ExternalDataInput.c_str(),"READ");
-
     std::string pname;
 
     ///reading Pi+ information from external file
 
     pname = "HARPData/PiPlus/PPCrossSection";
 
-    TMatrixD* PiPluscrossSection = (TMatrixD*) file.Get(pname.c_str());
+    TMatrixD* PiPluscrossSection = (TMatrixD*) file->Get(pname.c_str());
     if (!PiPluscrossSection) {
       throw art::Exception(art::errors::NotFound)
         << "Could not find parameter '" << pname << "' in file '"
-        << file.GetPath() << "'\n";
+        << file->GetPath() << "'\n";
     }
 
     pname = "HARPData/PiPlus/PPcovarianceMatrix";
 
-    TMatrixD* PiPluscovarianceMatrix = (TMatrixD*) file.Get(pname.c_str());
+    TMatrixD* PiPluscovarianceMatrix = (TMatrixD*) file->Get(pname.c_str());
     if (!PiPluscovarianceMatrix) {
       throw art::Exception(art::errors::NotFound)
         << "Could not find parameter '" << pname << "' in file '"
-        << file.GetPath() << "'\n";
+        << file->GetPath() << "'\n";
     }
 
     pname = "HARPData/PiPlus/PPmomentumBoundsArray";
 
-    TArrayD* PiPlusmomentumBoundsArray = (TArrayD*) file.Get(pname.c_str());
+    TArrayD* PiPlusmomentumBoundsArray = (TArrayD*) file->Get(pname.c_str());
     if (!PiPlusmomentumBoundsArray) {
       throw art::Exception(art::errors::NotFound)
         << "Could not find parameter '" << pname << "' in file '"
-        << file.GetPath() << "'\n";
+        << file->GetPath() << "'\n";
     }
 
     std::vector<double> PiPlusmomentumBounds = PrimaryHadronSplinesWeightCalc::ConvertToVector(PiPlusmomentumBoundsArray);
@@ -114,11 +112,11 @@ namespace evwgh {
 
     pname = "HARPData/PiPlus/PPthetaBoundsArray";
 
-    TArrayD* PiPlusthetaBoundsArray = (TArrayD*) file.Get(pname.c_str());
+    TArrayD* PiPlusthetaBoundsArray = (TArrayD*) file->Get(pname.c_str());
     if (!PiPlusthetaBoundsArray) {
       throw art::Exception(art::errors::NotFound)
         << "Could not find parameter '" << pname << "' in file '"
-        << file.GetPath() << "'\n";
+        << file->GetPath() << "'\n";
     }
 
     std::vector<double> PiPlusthetaBounds = PrimaryHadronSplinesWeightCalc::ConvertToVector(PiPlusthetaBoundsArray);
@@ -126,8 +124,11 @@ namespace evwgh {
 
     if(primaryHad == 211){
  
-      crossSection.ResizeTo(13,6);///*** do it more generic//read #rows #columns
-      covarianceMatrix.ResizeTo(78,78);
+      //  Changed it to be more generic and guard against row/column swapping
+      //  crossSection.ResizeTo(13,6);
+      //  covarianceMatrix.ResizeTo(78,78);
+      crossSection.ResizeTo(PiPluscrossSection->GetNrows(), PiPluscrossSection->GetNcols());
+      covarianceMatrix.ResizeTo(PiPluscovarianceMatrix->GetNrows(), PiPluscovarianceMatrix->GetNcols());
 
       crossSection = *PiPluscrossSection;
       momentumBounds = PiPlusmomentumBounds;
@@ -143,16 +144,19 @@ namespace evwgh {
 
     double requestedP = had.P();
     double requestedT = had.Theta();
-
+ 
     std::vector<double> thetaBinCenter;
     std::vector<double> momentumBinCenter;
 
     for(unsigned int t = 0; t < thetaBoundstmp.size()-1; ++t){
+      //      std::cout << "Theta Bin Centers : " << 0.5*(thetaBoundstmp[t]+thetaBoundstmp[t+1]) << std::endl; 
       thetaBinCenter.push_back(0.5*(thetaBoundstmp[t]+thetaBoundstmp[t+1]));
+      
     }      
 
     for(unsigned int p = 0; p < momentumBoundstmp.size()-1; ++p){
-      momentumBinCenter.push_back(0.5*(momentumBoundstmp[p]+momentumBoundstmp[p+1]));
+      //      std::cout << "Momentum Bin Centers : " << 0.5*(momentumBoundstmp[p]+momentumBoundstmp[p+1]) << std::endl;
+     momentumBinCenter.push_back(0.5*(momentumBoundstmp[p]+momentumBoundstmp[p+1]));
     }
 
     //step 1: spline the xsec arg across constant theta bins
@@ -166,7 +170,9 @@ namespace evwgh {
 	  {
 	    primaryHistConstT.SetBinContent(p+1,myXSecSurfacetmp[p][t]);
 	  }
+
 	TSpline3 thetaSpline(&primaryHistConstT);
+
 	thetaSplines.push_back(thetaSpline);
       }//loop over theta bins
 
@@ -177,9 +183,24 @@ namespace evwgh {
     for(unsigned int t = 0; t < thetaSplines.size(); ++t)
       {
 	histConstantP.SetBinContent(t+1,thetaSplines[t].Eval(requestedP));
-
       }
+
     TSpline3 splineConstantP(&histConstantP);
+
+    if(splineConstantP.Eval(requestedT) < 0){
+      std::cout << "You got a negative value...Let's check EVERYTHING!" << std::endl;
+      std::cout << "Theta Requested " << requestedT << std::endl;
+      std::cout << "Momentum Requested " << requestedP << std::endl;
+      std::cout << "Spline for fixed P at requested T " << splineConstantP.Eval(requestedT) << std::endl;
+      std::cout << "Let's take a step back, what did the constant momentum bins look like? " << std::endl;
+      for(unsigned int t = 0; t < thetaSplines.size(); ++t)
+	{	  
+	  std::cout << "in bin " << t  << " or with width " << thetaBoundstmp[t]  << " to " << thetaBoundstmp[t+1] << " we see \n\t Constant P : " <<  histConstantP.GetBinContent(t+1) << " and \n\t Theta Spline at P : " << thetaSplines[t].Eval(requestedP) << std::endl;
+	
+	}
+
+      
+    } 
 
     return splineConstantP.Eval(requestedT);
   }//xsec_spline function definition
@@ -196,11 +217,13 @@ namespace evwgh {
     fParameter_sigma		=   pset.get<float>("parameter_sigma");
     primaryHad			=   pset.get<int>("PrimaryHadronGeantCode");
     fNmultisims                 =   pset.get<int>("number_of_multisims");
-    std::string dataInput       =   pset.get< std::string >("ExternalData");
-    ExternalDataInput = IFDH.fetch(dataInput);
+    dataInput       =   pset.get< std::string >("ExternalData");
     
-    PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
- 
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string ExternalDataInput = sp.find_file(dataInput);
+    file = new TFile(Form("%s",ExternalDataInput.c_str()));
+
+    PrimaryHadronSplinesWeightCalc::ExternalData(file, crossSection, momentumBounds, thetaBounds, covarianceMatrix);
 
   }
 
@@ -211,7 +234,7 @@ namespace evwgh {
     std::vector<TMatrixD> myFakeData;
     std::vector<double> thetaBinCenter;
     std::vector<double> momentumBinCenter;
-    PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
+    PrimaryHadronSplinesWeightCalc::ExternalData(file, crossSection, momentumBounds, thetaBounds, covarianceMatrix);
 
     for(unsigned int t = 0; t < thetaBounds.size(); ++t){
       thetaBinCenter.push_back(0.5*(thetaBounds[t]+thetaBounds[t+1]));
@@ -224,8 +247,8 @@ namespace evwgh {
     //Transform crossSection vector of vectors into a flat TArrayD
 	
     int dim = int((thetaBinCenter.size()-1)*(momentumBinCenter.size()-1));
-    double cvArray[dim];
-    crossSection.GetMatrix2Array(cvArray);
+    std::vector<double> cvArray(dim,0.);
+    crossSection.GetMatrix2Array(cvArray.data());
 
     //test
     /*
@@ -253,7 +276,7 @@ namespace evwgh {
 	GaussRandom.fireArray(dim, rands.data());
 		
 	//make some constrained fake data
-	double fakeDataArray[dim];
+	std::vector<double> fakeDataArray(dim,0.);
 	for(int col = 0; col < dim; ++col)
 	  {
 	    double weightFromU = 0.;
@@ -287,27 +310,38 @@ namespace evwgh {
 
   std::vector<std::vector<double> >  PrimaryHadronSplinesWeightCalc::GetWeight(art::Event & e)
   {
+    //Collect the event's Flux information
+    //     This specifically deals with the neutrino type and parentage
+    art::Handle< std::vector<simb::MCFlux> > mcFluxHandle;
+    e.getByLabel(fGenieModuleLabel,mcFluxHandle);
+    std::vector<simb::MCFlux> const& fluxlist = *mcFluxHandle;
+
+    //Collect event's MC truth information
+    //  This specifically deals with the neutrino energy and
+    //  counting how many interactions there are per event
+    //  (neutrino counting is CRITICALLY important for applying the
+    //   correct weights and not ending up with unphysical values)
+    art::Handle< std::vector<simb::MCTruth> > mctruthHandle;
+    e.getByLabel(fGenieModuleLabel,mctruthHandle);
+    std::vector<simb::MCTruth> const& mclist = *mctruthHandle;
+
     //calculate weight(s) here 
     std::vector<std::vector<double> > weight;
+    weight.resize(mclist.size());
 
-    //get the MC generator information out of the event       
-    //these are all handles to mc information.
-    art::Handle< std::vector<simb::MCFlux> > mcFluxHandle;
+    // No neutrinos in this event
+    if(mclist.size() == 0) return weight;
+    
+    for ( unsigned int inu = 0; inu < mclist.size(); ++inu )//each neutrino
+      {	
+	//Resize vector to the number of universes you want to generate
+	weight[inu].resize(fNmultisims);
 
-    //actually go and get the stuff
-    e.getByLabel(fGenieModuleLabel,mcFluxHandle);
-   
-    std::vector<simb::MCFlux> const& fluxlist = *mcFluxHandle;
-    std::vector<double> weightsForOneNeutrino;
-
-    for ( unsigned int inu = 0; inu < fluxlist.size(); ++inu )//each neutrino
-      {
+	// Want to check the flavor of the hadron parent at the target
 	if (fluxlist[inu].ftptype != primaryHad){ 
-	  for(int it =0; it<fNmultisims; it++) weightsForOneNeutrino.push_back(1.);
-	  weight.push_back(weightsForOneNeutrino);
+	  std::fill(weight[inu].begin(), weight[inu].end(), 1);
+	  continue;
 	}
-
-	if (fluxlist[inu].ftptype != primaryHad) continue;
 
     	//determine mass
     	double m = 0; //mass
@@ -329,21 +363,15 @@ namespace evwgh {
 	    }
 
 	  }
-	/*
-	double px = fluxlist[inu].fpdpx;
-	double py = fluxlist[inu].fpdpy;
-	double pz = fluxlist[inu].fpdpz;
-	std::cout<<"particle type  "<<fluxlist[inu].fptype<<std::endl;
-	std::cout<<"particle type accoding default "<<fluxlist[inu].ftptype<<std::endl;
-	*/
 	
+	//find neutrino parent-at-target kinimatics  
 	double px = fluxlist[inu].ftpx;
 	double py = fluxlist[inu].ftpy;
 	double pz = fluxlist[inu].ftpz;
 	double e  = sqrt(px*px + py*py + pz*pz + m*m);
 	TLorentzVector hadronVec;
 	hadronVec.SetPxPyPzE(px,py,pz,e);
-
+	
 	//find hadron's incident proton info
 	TLorentzVector incidentPVec;
 	//	double px_proton = fluxlist[inu].fbeampx;
@@ -356,7 +384,7 @@ namespace evwgh {
 	double e_proton  = sqrt(px_proton*px_proton + py_proton*py_proton + pz_proton*pz_proton + m_proton*m_proton);  
 	incidentPVec.SetPxPyPzE(px_proton,py_proton,pz_proton,e_proton);
 
-	PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
+	PrimaryHadronSplinesWeightCalc::ExternalData(file, crossSection, momentumBounds, thetaBounds, covarianceMatrix);
 
 	double crossSection_at_pt = xsec_splines(hadronVec, incidentPVec, crossSection,momentumBounds, thetaBounds);
 
@@ -367,11 +395,14 @@ namespace evwgh {
 	  {
 	    double fakeCrossSection_at_pt = xsec_splines(hadronVec, incidentPVec, fakeData[i],momentumBounds, thetaBounds);
 
-	    weightsForOneNeutrino.push_back(fakeCrossSection_at_pt/crossSection_at_pt);
-	  }//over number of sims
-	
-	weight.push_back(weightsForOneNeutrino);
+	    if(i == 0){
+	      std::cout << "For Neutrino " << inu << std::endl;
+	      std::cout << "Weight for Parent " <<  fluxlist[inu].ftptype << " is " << fakeCrossSection_at_pt/crossSection_at_pt << std::endl;
+	      std::cout << "Cross Section : " << crossSection_at_pt << ", Fake Cross Section " << fakeCrossSection_at_pt << std::endl;
+	    }
+	    weight[inu][i] = (fakeCrossSection_at_pt/crossSection_at_pt);
 
+	  }//over number of sims
       } //loop over each neutrino
 
     return weight;

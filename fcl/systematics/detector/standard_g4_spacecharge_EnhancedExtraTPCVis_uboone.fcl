@@ -1,0 +1,18 @@
+#include "standard_g4_uboone.fcl"
+
+outputs.out1.fileName: "%ifb_%tc_g4_spacecharge.root"
+
+services.SpaceCharge.EnableSimSpatialSCE: true
+services.SpaceCharge.EnableSimEfieldSCE: true
+
+#  April 17th, 2017
+#
+#  This fcl file points to a modified photon look-up library
+#  which is assessed at 70 kV (without space charge corrections) 
+#  in the fashion that is used in MCC8 but with a 50% enhancment 
+#  to the visibility it the region outside of the TPC
+#
+#  fcl file and photon-lookup library author J.Zennamo (jaz8600@fnal.gov)
+#
+
+services.PhotonVisibilityService.LibraryFile: "PhotonPropagation/LibraryData/uboone_photon_library_v6_70kV_EnhancedExtraTPCVis.root" 

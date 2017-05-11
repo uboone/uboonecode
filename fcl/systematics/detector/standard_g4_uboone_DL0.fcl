@@ -1,0 +1,5 @@
+#include "standard_g4_uboone.fcl"
+
+process_name: G4DL0
+
+services.LArG4Parameters.LongitudinalDiffusion:0.0

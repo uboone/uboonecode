@@ -11,6 +11,7 @@
 
 // LArSoft libraries
 #include "larevt/SpaceCharge/SpaceCharge.h"
+#include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h"
 
 // FHiCL libraries
 #include "fhiclcpp/ParameterSet.h"
@@ -159,33 +160,35 @@ namespace spacecharge {
       bool EnableSimSpatialSCE() const override;
       bool EnableSimEfieldSCE() const override;
       bool EnableCorrSCE() const override;
-      std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const override;
-      std::vector<double> GetEfieldOffsets(double xVal, double yVal, double zVal) const override;
+      geo::Vector_t GetPosOffsets(geo::Point_t const& point) const override;
+      geo::Vector_t GetEfieldOffsets(geo::Point_t const& point) const override;
       
     protected:
 
       static SpaceChargeRepresentation_t ParseRepresentationType
         (std::string repr_str);
       
-      std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
-      double GetOnePosOffsetParametricX(double xValNew, double yValNew, double zValNew) const;
-      double GetOnePosOffsetParametricY(double xValNew, double yValNew, double zValNew) const;
-      double GetOnePosOffsetParametricZ(double xValNew, double yValNew, double zValNew) const;
+      geo::Vector_t GetPosOffsetsParametric(geo::Point_t const& point) const;
+      double GetOnePosOffsetParametricX(geo::Point_t const& point) const;
+      double GetOnePosOffsetParametricY(geo::Point_t const& point) const;
+      double GetOnePosOffsetParametricZ(geo::Point_t const& point) const;
 
-      std::vector<double> GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const;
-      double GetOneEfieldOffsetParametricX(double xVal, double yVal, double zVal) const;
-      double GetOneEfieldOffsetParametricY(double xVal, double yVal, double zVal) const;
-      double GetOneEfieldOffsetParametricZ(double xVal, double yVal, double zVal) const;
+      geo::Vector_t GetEfieldOffsetsParametric(geo::Point_t const& point) const;
+      double GetOneEfieldOffsetParametricX(geo::Point_t const& point) const;
+      double GetOneEfieldOffsetParametricY(geo::Point_t const& point) const;
+      double GetOneEfieldOffsetParametricZ(geo::Point_t const& point) const;
       double TransformX(double xVal) const;
       double TransformY(double yVal) const;
       double TransformZ(double zVal) const;
-      bool IsInsideBoundaries(double xVal, double yVal, double zVal) const;
+      geo::Point_t Transform(geo::Point_t const& point) const;
+
+      bool IsInsideBoundaries(geo::Point_t const& point) const;
 
       bool fEnableSimSpatialSCE;
       bool fEnableSimEfieldSCE;
       bool fEnableCorrSCE;
       
-      SpaceChargeRepresentation_t fRepresentationType;
+      SpaceChargeRepresentation_t fRepresentationType = kUnknown;
       std::string fInputFilename;
       
       std::array<gsl::Interpolator, 7U> g1_x;
