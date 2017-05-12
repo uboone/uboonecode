@@ -20,7 +20,7 @@ art_make(LIBRARY EventWeightAnalysis
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
               ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
               ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-	      art_Persistency_Common canvas canvas
+              art_Persistency_Common canvas canvas
               art_Persistency_Provenance canvas canvas
               art_Utilities canvas canvas
               cetlib cetlib_except
@@ -29,7 +29,6 @@ art_make(LIBRARY EventWeightAnalysis
               ${CLHEP}
               ${Boost_SYSTEM_LIBRARY}
         ) 
-
 
 install_headers()
 install_fhicl()

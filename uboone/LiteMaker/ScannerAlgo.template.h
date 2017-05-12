@@ -1228,7 +1228,7 @@ namespace larlite {
 
       art::Ptr<::evwgh::MCEventWeight> weight_ptr(dh,i);
 
-      larlite::mceventweight lite_weight(weight_ptr->fWeight);
+      larlite::mceventweight lite_weight(*weight_ptr);
 
       lite_data->push_back(lite_weight);
     }

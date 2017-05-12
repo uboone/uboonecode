@@ -3,19 +3,11 @@ BEGIN_PROLOG
 microboone_eventweight: {
   module_type: "EventWeight"
  
-  # All available weighting functions
-  weight_functions: [
-    @sequence::weight_functions_beam,
-    @sequence::weight_functions_genie,
-    @sequence::weight_functions_xsr
-  ]
- 
   # Throw exception if weight outside limits
   min_weight: 0
   max_weight: 100
  
   genie_module_label: generator  
-
  
   ##########################################################
   ## Beam-related
@@ -686,8 +678,19 @@ microboone_eventweight: {
     mode: multisim
     number_of_multisims: 100
   }
- 
+
 }
 
+
+##########################################################
+## All available weight functions
+##########################################################
+
+microboone_eventweight.weight_functions: [
+  @sequence::microboone_eventweight.weight_functions_beam,
+  @sequence::microboone_eventweight.weight_functions_genie,
+  @sequence::microboone_eventweight.weight_functions_xsr
+]
+ 
 END_PROLOG
 

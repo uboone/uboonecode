@@ -9,7 +9,7 @@ covariance_matrix: {
   # Choose which weights to use. The total weight of an event is the
   # product of all weighting functions named here.
   UseWeights: [ "*" ]
-}	
+}
 
 END_PROLOG
 

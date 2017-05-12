@@ -129,13 +129,13 @@ void EventWeight::produce(art::Event & e)
       if(weights.size() == 0){
 	std::vector< double > empty;
 	std::pair<std::string, std::vector <double> > p("empty",empty);
-	mcwgh.fWeight.insert(p);
+	mcwgh.insert(p);
       }	
       else{
 	std::pair<std::string, std::vector<double> > 
 	  p(it->first+"_"+it->second->fWeightCalcType,
 	    weights[inu]);
-	mcwgh.fWeight.insert(p);
+	mcwgh.insert(p);
       }
 
     }

@@ -4509,7 +4509,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
     const std::vector< evwgh::MCEventWeight > * evtwgt_vec = evtWeights.product();
 
     evwgh::MCEventWeight evtwgt = evtwgt_vec->at(0); // just for the first neutrino interaction
-    std::map<std::string, std::vector<double>> evtwgt_map = evtwgt.fWeight;
+    std::map<std::string, std::vector<double>> evtwgt_map = evtwgt;
     int countFunc = 0;
     // loop over the map and save the name of the function and the vector of weights for each function
     for(std::map<std::string, std::vector<double>>::iterator it = evtwgt_map.begin(); it != evtwgt_map.end(); ++it) {

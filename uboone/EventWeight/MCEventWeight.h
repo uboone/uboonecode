@@ -1,13 +1,15 @@
 #ifndef _MCEVENTWEIGHT_H_
 #define _MCEVENTWEIGHT_H_
 
+#include <map>
 #include <vector>
 #include <string>
 
 namespace evwgh {
-  struct MCEventWeight
-  {
-    std::map<std::string, std::vector<double> > fWeight;
-  };
+
+  typedef std::map<std::string, std::vector<double> > MCEventWeight;
+
 }
-#endif //_MCEVENTWEIGHT_H_
+
+#endif  //_MCEVENTWEIGHT_H_
+

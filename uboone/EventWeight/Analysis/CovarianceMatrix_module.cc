@@ -330,8 +330,7 @@ void CovarianceMatrix::analyze(art::Event const& e) {
     return;
   }
 
-  evwgh::MCEventWeight wgh = wghv->at(0);
-  std::map<std::string, std::vector<double>> mcWeight = wgh.fWeight;
+  evwgh::MCEventWeight mcWeight = wghv->at(0);
 
   std::vector<double> weights;
 
