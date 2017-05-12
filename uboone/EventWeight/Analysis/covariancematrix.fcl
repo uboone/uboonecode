@@ -2,8 +2,14 @@ BEGIN_PROLOG
 
 covariance_matrix: {
   module_type: "CovarianceMatrix"
+
+  # Write the event weights to a file for input into external code
   OutputFile: "cov.txt"
+
+  # Choose which weights to use. The total weight of an event is the
+  # product of all weighting functions named here.
   UseWeights: [ "*" ]
 }	
 
 END_PROLOG
+

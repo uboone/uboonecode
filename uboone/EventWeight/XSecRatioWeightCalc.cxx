@@ -1,6 +1,6 @@
 #include "WeightCalcCreator.h"
 #include "WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
+//#include "uboone/EventWeight/IFDHFileTransfer.h"
 
 #include <iostream>
 
@@ -62,14 +62,13 @@ namespace evwgh {
 
      private:
 
-       evwgh::IFDHFileTransfer IFDH;
-
        CLHEP::RandGaussQ* fGaussRandom; 
      
        std::vector<double> fWeightArray;
        int fNmultisims;
        std::string fMode;
        std::string fGenieModuleLabel;
+       std::string fHistogramFile;
 
      DECLARE_WEIGHTCALC(XSecRatioWeightCalc)
   };
@@ -86,6 +85,7 @@ namespace evwgh {
     // Calc config
     fNmultisims = pset.get<int>("number_of_multisims");
     fMode = pset.get<std::string>("mode");
+    fHistogramFile = pset.get<std::string>("histogram_file");
 
     std::vector<std::string> pars = pset.get<std::vector<std::string> >("parameter_list");
     std::vector<float> parsigmas = pset.get<std::vector<float> >("parameter_sigma");
@@ -142,8 +142,8 @@ namespace evwgh {
 
   void XSecRatioWeightCalc::GetXSecRatio() {
     // Load nue/numu xsec rations from a file
-    std::string hfile = \
-      IFDH.fetch("/pnfs/uboone/persistent/users/mastbaum/2DhistogramsForJoseph.root");
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string hfile = sp.find_file(fHistogramFile);
 
     TFile* inputf = TFile::Open(hfile.c_str());
 

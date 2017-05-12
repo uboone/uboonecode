@@ -144,15 +144,15 @@ CovarianceMatrix::EventSample::~EventSample() {
 
 
 TGraphErrors* CovarianceMatrix::EventSample::EnuCollapsed() {
-  size_t nbins = enu->GetNbinsX();
+  const size_t nbins = enu->GetNbinsX();
 
   // Compute the mean and standard deviation across universes using
   // Welford's method, cf. Art of Computer Programming (D. Knuth)
-  double x[nbins];
-  double y[nbins];
-  double y0[nbins];
-  double s[nbins];
-  double s0[nbins];
+  double* x  = new double[nbins];
+  double* y  = new double[nbins];
+  double* y0 = new double[nbins];
+  double* s  = new double[nbins];
+  double* s0 = new double[nbins];
 
   if (enu_syst.empty()) {
     std::cout << "CovarianceMatrix::EventSample::EnuCollapsed: "
@@ -177,7 +177,15 @@ TGraphErrors* CovarianceMatrix::EventSample::EnuCollapsed() {
     s[i] = sqrt(s[i] / enu_syst.size());
   }
 
-  return new TGraphErrors(nbins, x, y, nullptr, s);
+  TGraphErrors* g = new TGraphErrors(nbins, x, y, nullptr, s);
+
+  delete[] x;
+  delete[] y;
+  delete[] y0;
+  delete[] s;
+  delete[] s0;
+
+  return g;
 }
 
 
@@ -281,17 +289,6 @@ void CovarianceMatrix::reconfigure(fhicl::ParameterSet const& p) {
 
   std::string out_file = p.get<std::string>("OutputFile");
   ofs.open(out_file, std::ofstream::out);
-
-  //// FIXME: Move to config file.
-  //use_weights = {
-  //  "Fv3technote_XSecRatio",
-  //  //   "*"
-  //  "genie_qema_Genie"
-  //  //,"genie_ncelAxial_Genie"
-  //  //,"genie_qevec_Genie"
-  //  //,"genie_ccresAxial_Genie"
-  //  //,"genie_ccresVector_Genie"
-  //};
 
   std::cout << "CovarianceMatrix: Initialized. Weights: ";
   for (auto it : use_weights) {
@@ -408,7 +405,7 @@ void CovarianceMatrix::endJob() {
 
   fFile->cd();
 
-  // Write out sample=-wise distributions
+  // Write out sample-wise distributions
   for (size_t i=0; i<samples.size(); i++) {
     samples[i]->enu->Write();
     total_bins += samples[i]->enu->GetNbinsX();
