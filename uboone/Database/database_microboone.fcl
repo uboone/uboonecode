@@ -101,12 +101,18 @@ microboone_pmtgain_provider:
     UseDB: true
     UseFile: false
     
-    DefaultGain:       20.0
-    DefaultGainErr:    0.02
+    DefaultGain:       130.0
+    DefaultGainErr:    0.1
+    
+    DefaultAmplitudeGain:  20.0
+    DefaultAmplitudeGainErr: 0.01
+    
+    DefaultBaselineMean: 0.0
+    DefaultBaselineRms:  0.6 
 }
-microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "pmtgains_data"
+microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "detpmtgains_data"
 microboone_pmtgain_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
-microboone_pmtgain_provider.DatabaseRetrievalAlg.DBTag: "v1r1"
+microboone_pmtgain_provider.DatabaseRetrievalAlg.DBTag: "v1r0"
 
 microboone_pmtgain_service:
 {

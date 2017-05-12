@@ -262,11 +262,6 @@ namespace evwgh {
           
       //Let's make a weights based on the calculator you have requested       
       
-      //
-      // Failed Random Number 
-      //
-      int NFail = 0;
-      int NPass = 0;
       if(fMode.find("multisim") != std::string::npos){       
 	for (unsigned int i = 0; int(weight[inu].size()) < fNmultisims; i++) {
 
@@ -285,18 +280,11 @@ namespace evwgh {
 	      MiniBooNEWeightCalc(fluxlist[inu], fWeightArray[i]);
 
 	    if(test_weight.first){
-	      NPass++;
 	      weight[inu].push_back(test_weight.second);
 	    }
-	    else{NFail++;}
 	  }
 	}//Iterate through the number of universes      
       } // make sure we are multisiming
-      
-      if(NFail != 0){
-	std::cout << "Number of Failed Jobs : " << NFail << " out of " << NPass+NFail << std::endl;
-      }
-      
     }//Iterating through each neutrino 
 
     
@@ -595,6 +583,7 @@ namespace evwgh {
                                   //  but it is set to 1 before it is set to zero 
       //  This locks in a max weight for all universes 
       if(weight > 30) weight = 30;
+      if(weight != weight) weight = 30; //From MiniBooNE; in Fortran Nan > 30
       
      
       std::pair<bool, double> output(parameters_pass, weight);

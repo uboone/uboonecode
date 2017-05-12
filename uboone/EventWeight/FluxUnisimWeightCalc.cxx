@@ -272,19 +272,37 @@ namespace evwgh {
     if(fWeightArray[uni] > 0){      
       double syst = fWeightArray[uni]*((scaled_pos/fCV[ptype][ntype][bin])-1);
       weight = 1 + (syst);
+      
+      if(scaled_pos == 0) weight = 1;
+
     }
     else if(noNeg == true){      
       double syst = fWeightArray[uni]*( (2 - (scaled_pos/fCV[ptype][ntype][bin])) - 1);           
       weight = 1 - (syst);      
       
+      if(scaled_pos == 0) weight = 1;
+
     }
     else{
       double syst = fWeightArray[uni]*((scaled_neg/fCV[ptype][ntype][bin])-1);
       weight = 1 - (syst);    
+
+      if(scaled_neg == 0) weight = 1;
+
     }
 
+    if(fCV[ptype][ntype][bin] == 0) weight = 1;
+    if(fCV[ptype][ntype][bin] < 1.e-12) weight = 1;
+
     if(weight < 0) weight = 1; 
-   
+    if(weight > 30) weight = 30;
+    if(weight != weight) weight = 30;
+
+    if( (ntype == 0 || ntype == 1) && ptype == 1) weight = 1;
+
+    if( (ntype == 1 || ntype == 3) && ptype == 3) weight = 1;
+
+     
     return weight;
   }
   

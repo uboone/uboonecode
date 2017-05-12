@@ -168,13 +168,12 @@ namespace evwgh {
 
     // Let's start by iterating through each of the neutrino interactions 
     for(unsigned int inu = 0; inu < fluxlist.size(); inu++){
-
       // First let's check that the parent of the neutrino we are looking for is 
       //  the particle we intended it to be, if not set all weights to 1
       // 
       //  There are three types of particles we want to check:
       //  K0S, K0L, and K0 (specific PDG CODE)
-      if (std::find(fprimaryHad.begin(), fprimaryHad.end(), fluxlist[inu].ftptype)
+      if (std::find(fprimaryHad.begin(), fprimaryHad.end(), abs(fluxlist[inu].ftptype))
 	  == fprimaryHad.end()){	
 	weight[inu].resize(fNmultisims);
 	std::fill(weight[inu].begin(), weight[inu].end(), 1);
@@ -211,12 +210,9 @@ namespace evwgh {
 	}//Iterate through the number of universes      
       } // make sure we are multisiming
 
-        
 
     }//Iterating through each neutrino 
-
     
-
     return weight;
   }
 
@@ -245,7 +241,7 @@ namespace evwgh {
     //
     
     // We need to guard against unphysical parameters 
-    bool parameters_pass = false;
+    bool parameters_pass = true;
 
     // Get Neutrino Parent Kinimatics       
     double HadronMass;
@@ -259,7 +255,7 @@ namespace evwgh {
       }
       else{ 
 	throw art::Exception(art::errors::StdException)
-	  << "Sanford-Wang is only configured for Netrual Long Kaons";
+	  << "Sanford-Wang is only configured for Netrual Kaons";
       }
 
       TLorentzVector HadronVec; 
@@ -286,8 +282,7 @@ namespace evwgh {
                              ProtonMass*ProtonMass);
       ProtonVec.SetPxPyPzE(ProtonPx,ProtonPy,ProtonPz,ProtonE);
       
-      // Define the scale central value cross section
-      
+      // Define the central value cross section
       // Pull out the parameters for the Sanford-Wang Fit
       double c1 = SWK0FitVal.at(0);     
       double c2 = SWK0FitVal.at(1);     
@@ -299,6 +294,8 @@ namespace evwgh {
       double c8 = SWK0FitVal.at(7);     
       double c9 = SWK0FitVal.at(8);     
 
+
+
       //Sanford-Wang Parameterization 
       //  Eq 11 from PhysRevD.79.072002
       
@@ -308,15 +305,17 @@ namespace evwgh {
 	exp(-1. * c6 * HadronVec.Theta() *(HadronVec.P() - c7 * ProtonVec.P() * pow(cos(HadronVec.Theta()), c8)));
       
       // Check taken from MiniBooNE code
-      if(HadronVec.P() > (ProtonVec.P() - c9)){CV = 0;} 
+      if(HadronVec.P() > (ProtonVec.P() - c9)){
+	CV = 0;
+      } 
            
       // Define the variations around that cross section
       //    To do this we will call the a function from WeightCalc
       //    that will generate a set of smeared parameters based 
       //    on the covariance matrix that we imported
-      std::vector< double > SWK0FitSmeared = WeightCalc::MultiGaussianSmearing(SWK0FitVal, SWK0FitCov, rand); 
-      
-// Pull out the smeared parameters for the Sanford-Wang Fit
+      std::vector< double > SWK0FitSmeared = WeightCalc::MultiGaussianSmearing(SWK0FitVal, SWK0FitCov, rand);       
+
+      // Pull out the smeared parameters for the Sanford-Wang Fit
       double smeared_c1 = SWK0FitSmeared.at(0);     
       double smeared_c2 = SWK0FitSmeared.at(1);     
       double smeared_c3 = SWK0FitSmeared.at(2);     
@@ -328,10 +327,10 @@ namespace evwgh {
       double smeared_c9 = SWK0FitSmeared.at(8);     
 
       /// Perform the MiniBooNE 
-      if(smeared_c1 > 0 && 
-	 smeared_c3 > 0 && 
-	 smeared_c6 > 0){
-	parameters_pass = true;	
+      if(smeared_c1 < 0 || 
+	 smeared_c3 < 0 || 
+	 smeared_c6 < 0){
+	parameters_pass = false;	
       }
         
       double RW = smeared_c1 * pow(HadronVec.P(), smeared_c2) * 
@@ -339,8 +338,11 @@ namespace evwgh {
 	exp(-1. * smeared_c3 * pow(HadronVec.P(), smeared_c4) / pow(ProtonVec.P(), smeared_c5)) *
 	exp(-1. * smeared_c6 * HadronVec.Theta() *(HadronVec.P() - smeared_c7 * ProtonVec.P() * pow(cos(HadronVec.Theta()), smeared_c8)));
 
-      //      if(RW < 0) RW = 0;
-      
+      // Check taken from MiniBooNE code
+      if(HadronVec.P() > (ProtonVec.P() - smeared_c9)){
+	RW = 0;
+      } 
+           
       double weight = 1; 
 
       if(RW == 0 || CV == 0){
@@ -354,7 +356,8 @@ namespace evwgh {
       }
 
       if(weight < 0) weight = 1;
-      if(weight >30) weight = 30;
+      if(weight > 30) weight = 30;
+      if(weight != weight) weight = 30;//From MiniBooNE; in Fortran Nan > 30
 
       std::pair<bool, double> output(parameters_pass, weight);
 
