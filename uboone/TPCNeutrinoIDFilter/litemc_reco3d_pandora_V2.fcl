@@ -1,0 +1,44 @@
+#include "litemaker_base.fcl"
+
+litemc_reco3d_pandorav2: @local::litemaker_base
+
+litemc_reco3d_pandorav2.out_filename: "larlite_reco3d_pandora.root"
+
+litemc_reco3d_pandorav2.DataLookUpMap:
+{
+#  cluster:    ["pandoraNu","pandoraCosmic"]
+  sps:        ["pandoraCosmic","pandoraNu",
+               "pandoraCosmicKHit","pandoraNuKHit"]
+  pcaxis:     []
+  vertex:     ["pandoraNu","pandoraCosmic"]
+  track:      ["pandoraNu","pandoraNuKHit","pandoraCosmicKHit"]
+  seed:       ["pandoraCosmic","pandoraNu"]
+  shower:     ["showerrecopandora"]
+  pfpart:     ["pandoraCosmic","pandoraNu"]
+  cosmictag:  ["pandoraCosmicKHittag","pandoraNuKHittag",
+               "pandoraCosmicKHitFlashMatch","pandoraNuKHitFlashMatch",
+               "pandoraCosmicKHitPFPart"]
+  calo:       ["pandoraNuKHitcalo","pandoraCosmicKHitcalo","pandoraNucalo"]
+  partid:     ["pandoraNuKHitpid","pandoraCosmicKHitpid"]
+               
+}
+
+litemc_reco3d_pandorav2.AssociationLookUpMap:
+{
+  hit:        ["gaushit","pandoraCosmicKHitRemoval","pandoraCosmicHitRemoval"]
+  cluster:    ["pandoraNu","pandoraCosmic"]
+  sps:        ["pandoraCosmic","pandoraNu",
+               "pandoraCosmicKHit","pandoraNuKHit"]
+  vertex:     ["pandoraNu","pandoraCosmic"]
+  track:      ["pandoraNu","pandoraNuKHit","pandoraCosmicKHit"]
+  seed:       ["pandoraCosmic","pandoraNu"]
+  shower:     ["showerrecopandora"]
+  pfpart:     ["pandoraCosmic","pandoraNu"]
+  cosmictag:  ["pandoraCosmicKHittag","pandoraNuKHittag",
+               "pandoraCosmicKHitFlashMatch","pandoraNuKHitFlashMatch",
+               "pandoraCosmicKHitPFPart"]
+  calo:       ["pandoraNuKHitcalo","pandoraCosmicKHitcalo","pandoraNucalo"]
+  partid:     ["pandoraNuKHitpid","pandoraCosmicKHitpid"]
+}
+
+
