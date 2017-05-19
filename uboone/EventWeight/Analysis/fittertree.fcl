@@ -1,0 +1,15 @@
+BEGIN_PROLOG
+
+fitter_tree: {
+  module_type: "FitterTree"
+
+  # Generator labels for MC truth and MCEventWeights
+  GeneratorLabel: "generator"
+  WeightLabel: "eventweight"
+
+  # Output TTree object name
+  TreeName: "fittree"
+}
+
+END_PROLOG
+
