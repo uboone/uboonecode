@@ -30,6 +30,7 @@ ProcessDriver: {
       Verbosity: 2
       OutImageLabel:    "wire"
       LArWireProducer:  "caldata"
+      #LArWireProducer:  "calmod"
       MinTime:          2400
       MinWire:          0
       TimeOffset:       2400

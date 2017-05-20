@@ -809,8 +809,14 @@ namespace larlite {
       
       std::vector<double> pe_per_opdet;
       pe_per_opdet.reserve(geo->NOpChannels());
-      for(size_t j=0; j<geo->NOpChannels(); ++j)
-	pe_per_opdet.push_back(flash_ptr->PE(j));
+      double pe_total = flash_ptr->TotalPE();
+      for(size_t j=0; j<geo->NOpChannels(); ++j) {
+	if(pe_total>0.) {
+	  pe_total -= flash_ptr->PE(j);
+	  pe_per_opdet.push_back(flash_ptr->PE(j));
+	}else
+	  pe_per_opdet.push_back(0.);
+      }
       
       ::larlite::opflash lite_flash( flash_ptr->Time(),
 				     flash_ptr->TimeWidth(),

@@ -7,6 +7,7 @@ dlmc_services:
 {
   RandomNumberGenerator:   {} #ART native random number generator                                                                                          
   LLMetaMaker: {Enable: true}
+  LArCVMetaMaker: {Enable: true}
   @table::microboone_simulation_services
 }
 

@@ -1,6 +1,7 @@
 #include "dldata_fclbase_services.fcl"
 #include "dldata_fclbase_analyzers.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "litemc_rawdigit.fcl"
 
 BEGIN_PROLOG
 SuperaModule: {
@@ -9,6 +10,14 @@ SuperaModule: {
   out_filename:    "larcv.root"
   unique_filename: true
   stream:          "data"
+}
+
+VPlaneHandler: {
+  module_type: "VPlaneHandler"
+  ProducerLabel: "caldata"
+  Smooth: true
+  HandlePlateau: true
+  Shift: true
 }
 END_PROLOG
 
@@ -51,23 +60,17 @@ source_reprocess:
 
 physics:
 {
+ producers: { calmod: @local::VPlaneHandler }
  analyzers: { 
         supera: @local::SuperaModule 
+        digit:  @local::litemc_rawdigit
         @table::dldata_analyzers
         }
- ana: [opdigit, opreco, reco2d, supera]
+ #reco: [calmod]
+ ana: [opdigit, opreco, reco2d, wire, supera, digit]
  end_paths: [ana]
+ #trigger_paths: [reco]
  trigger_paths: []
 }
 
-outputs:
-{
- out1:
- {
-   module_type: RootOutput
-   fileName:    "larsoft.root" #default file name, can override from command line with -o or --output
-   dataTier:    "postreco"
-   compressionLevel: 1
- }
-}
-
+physics.analyzers.digit.DataLookUpMap.rawdigit: ["wcNoiseFilter"]

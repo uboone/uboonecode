@@ -42,9 +42,10 @@ dldata_producers.caldata.NumSigma:                                 [9, 9, 9]  # 
 dldata_producers.caldata.DodQdxCalib:                              false
 
 dldata_producers.gaushit.CalDataModuleLabel:                       "caldata"
-dldata_producers.gaushit.MinSig:                                   [3.25, 4.0, 3.75]
-dldata_producers.gaushit.MinWidth:                                 [1.0, 1.0, 1.0]
-dldata_producers.gaushit.MaxMultiHit:                              6
+dldata_producers.gaushit.MinSig:                                   [2.6,  3.4,  3.4]
+dldata_producers.gaushit.MinWidth:                                 [1.0,  1.0,  1.0]
+dldata_producers.gaushit.LongMaxHits:                              [ 25, 25, 25]
+dldata_producers.gaushit.MaxMultiHit:                              4
 dldata_producers.gaushit.TryNplus1Fits:                            false
 dldata_producers.gaushit.Chi2NDF:                                  50.
 

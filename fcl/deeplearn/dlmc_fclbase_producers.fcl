@@ -15,6 +15,14 @@
 
 BEGIN_PROLOG
 
+VPlaneHandler: {
+  module_type: "VPlaneHandler"
+  ProducerLabel: "caldata"
+  Smooth: true
+  HandlePlateau: true
+  Shift: true
+}
+
 dlmc_producers:
  {
    generator: @local::microboone_genie_uniform_flux_cc
@@ -38,6 +46,8 @@ dlmc_producers:
    caldata           : @local::microboone_calroi
    gaushit           : @local::microboone_gaushitfinder
 
+   calmod            : @local::VPlaneHandler
+
    rns:       { module_type: "RandomNumberSaver" }
 }
 
@@ -52,7 +62,7 @@ dlmc_process_all: [ rns, generator,
                     saturation,
                     ophitBeam, ophitCosmic,
                     simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                    daq, wcNoiseFilter, caldata, gaushit, swtrigger]
+                    daq, wcNoiseFilter, caldata, gaushit, calmod, swtrigger]
 
 dlmc_process_genfilter: [ rns, generator, finalstatefilter,
                           largeant, mcreco,
@@ -60,7 +70,7 @@ dlmc_process_genfilter: [ rns, generator, finalstatefilter,
                           saturation,
                           ophitBeam, ophitCosmic,
                           simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                          daq, wcNoiseFilter, caldata, gaushit, swtrigger]
+                          daq, wcNoiseFilter, caldata, gaushit, calmod, swtrigger]
 
 dlmc_process_trigfilter: [ rns, generator,
                            largeant, mcreco,
@@ -68,13 +78,13 @@ dlmc_process_trigfilter: [ rns, generator,
                            saturation,
                            ophitBeam, ophitCosmic,
                            simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                           daq, wcNoiseFilter, caldata, gaushit]
+                           daq, wcNoiseFilter, caldata, gaushit, calmod]
 
 dlmc_reprocess_mcc8: [ rns, 
                        saturation,
                        ophitBeam, ophitCosmic,
                        simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                       daq, wcNoiseFilter, caldata, gaushit ]
+                       daq, wcNoiseFilter, caldata, gaushit, calmod ]
 
 # generator
 dlmc_producers.generator: @local::microboone_genie_simple
@@ -113,9 +123,10 @@ dlmc_producers.caldata.DodQdxCalib:                              false
 #dlmc_producers.gaushit.Chi2NDF:                                  50.
 
 dlmc_producers.gaushit.CalDataModuleLabel:                       "caldata"
-dlmc_producers.gaushit.MinSig:                                   [3.25, 4.0, 3.75]
+dlmc_producers.gaushit.MinSig:                                   [2.6,  3.4,  3.4]
 dlmc_producers.gaushit.MinWidth:                                 [1.0,  1.0,  1.0]
-dlmc_producers.gaushit.MaxMultiHit:                              6
+dlmc_producers.gaushit.LongMaxHits:                              [ 25, 25, 25]
+dlmc_producers.gaushit.MaxMultiHit:                              4
 dlmc_producers.gaushit.TryNplus1Fits:                            false
 dlmc_producers.gaushit.Chi2NDF:                                  50.
 

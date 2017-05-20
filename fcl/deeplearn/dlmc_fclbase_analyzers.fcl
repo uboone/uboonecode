@@ -7,6 +7,16 @@
 
 BEGIN_PROLOG
 
+SuperaModule: {
+  module_type:     "LArSoftSuperaSriver"
+  #supera_params:   "supera_basic.fcl"
+  supera_params:   "supera_segment_calmod.fcl"
+  out_filename:    "larcv.root"
+  unique_filename: true
+  stream:          "mc"
+}
+
+
 dlmc_analyzers:
  {
    mcinfo:  @local::litemc_mcinfo
@@ -17,11 +27,13 @@ dlmc_analyzers:
    opreco:  @local::litemc_opreco
 
    reco2d:  @local::litemc_reco2d
+
+   supera:  @local::SuperaModule
 }
 
-dlmc_analyze_all: [ simch, mcinfo, opdigit, opreco, wire, reco2d ]
+dlmc_analyze_all: [ simch, mcinfo, opdigit, opreco, wire, reco2d, supera ]
 
-dlmc_analyze_cosmic: [ mcinfo, opdigit, opreco, wire, reco2d ]
+dlmc_analyze_cosmic: [ mcinfo, opdigit, opreco, wire, reco2d, supera ]
 
 dlmc_analyzers.mcinfo.stream:      "mcinfo"
 dlmc_analyzers.simch.stream:      "simch"
