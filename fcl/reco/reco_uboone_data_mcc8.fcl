@@ -388,7 +388,7 @@ microboone_reco_data_producers.caldata.DodQdxCalib:                             
 microboone_reco_data_producers.gaushit.CalDataModuleLabel:                       "caldata"
 microboone_reco_data_producers.gaushit.MinSig:                                   [2.6,  3.4,  3.4]
 microboone_reco_data_producers.gaushit.MinWidth:                                 [1.0,  1.0,  1.0]
-microboone_reco_mcc8_producers.gaushit.LongMaxHits:                              [ 25, 25, 25]
+microboone_reco_data_producers.gaushit.LongMaxHits:                              [ 25, 25, 25]
 microboone_reco_data_producers.gaushit.MaxMultiHit:                              4
 microboone_reco_data_producers.gaushit.TryNplus1Fits:                            false
 microboone_reco_data_producers.gaushit.Chi2NDF:                                  50.

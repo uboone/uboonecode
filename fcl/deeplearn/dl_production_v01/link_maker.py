@@ -5,6 +5,9 @@ import pprint as pp
 
 ########READ XML                                                                                                                                                                
 XMLFILE=sys.argv[1]
+#KEYWORD='larlite'
+#if len(sys.argv)>2:
+#    KEYWORD=sys.argv[2]
 print
 
 if not XMLFILE.endswith('.xml'):
@@ -43,9 +46,9 @@ INPUT_DIR   = project['outs']
 UNIQUE_NAME = INPUT_DIR.split('/')[-2]
 OUTPUT_DIR  = '/uboone/data/users/kterao/dl_production_symlink_v01/%s' % UNIQUE_NAME
 print 'SymLink directory:\033[95m',UNIQUE_NAME,'\033[00m'
-if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
-    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
-    sys.exit(1)
+#if os.path.isdir(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)):
+#    print '\033[93mERROR\033[00m: SymLink directory is not empty... aborting!\n'
+#    sys.exit(1)
 if not os.path.isdir(OUTPUT_DIR):
     os.system('mkdir %s; chmod -R 775 %s' % (OUTPUT_DIR,OUTPUT_DIR))
 
@@ -61,14 +64,13 @@ for d in jobdirs:
 
     jobid = int(d.split('_')[-1])
     jobdir = '%s/%s' % (INPUT_DIR,d)
-    lite_files = [x for x in os.listdir(jobdir) if ( ( (x.startswith('larlite') and x.endswith('.root')) or
-                                                       (x.startswith('mc_hist'))
-                                                       ) and
-                                                     os.path.getsize('%s/%s' % (jobdir,x)) > 1000 )
+    lite_files = [x for x in os.listdir(jobdir) if ( ((x.startswith('larlite') or x.startswith('larcv')) and x.endswith('.root'))
+                                                     and os.path.getsize('%s/%s' % (jobdir,x)) > 1000 )
                   ]
+    #print jobdir,len(lite_files)
     for f in lite_files:
 
-        flavor = f.split('_')[1]
+        flavor = f.split('_')[0] + '_' + f.split('_')[1]
         if flavor == 'mc':
             flavor = 'mcinfo'
         if not flavor in lite_files_map:
@@ -79,7 +81,11 @@ for d in jobdirs:
             print f
             print lite_files_map[flavor]
             raise Exception
-        lite_files_map[flavor][jobid]='%s/%s' % (jobdir,f)
+        full_fname = '%s/%s' % (jobdir,f)
+        if os.path.getsize(full_fname) < 1e6:
+            print 'Ignoring a small file:',full_fname
+            continue
+        lite_files_map[flavor][jobid]=full_fname
 
     if len(lite_files):
         ctr += 1
@@ -123,7 +129,11 @@ for flavor,fmap in lite_files_map.iteritems():
         if flavor == 'hist':
             target_link = '%s/anatree_%04d.root' % (OUTPUT_DIR,jobid)
         else:
-            target_link = '%s/larlite_%s_%04d.root' % (OUTPUT_DIR,flavor,jobid)
+            target_link = '%s/%s_%04d.root' % (OUTPUT_DIR,flavor,jobid)
+
+        if os.path.islink(target_link):
+            print 'Symlink already exists:',target_link
+            sys.exit(1)
 
         if not os.path.isfile(target_link):
             cmd = 'ln -s %s %s' % (target_fname,target_link)
