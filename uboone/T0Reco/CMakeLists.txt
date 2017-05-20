@@ -1,19 +1,18 @@
 
 art_make(	
 	  LIB_LIBRARIES
-                        lardata_Utilities_LArFFT_service
 			${ART_FRAMEWORK_CORE}
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 			cetlib cetlib_except
+                   	larpandora_LArPandoraInterface	
                         ${Boost_SYSTEM_LIBRARY}
 			${ROOT_BASIC_LIB_LIST}
           MODULE_LIBRARIES 
+		   	larpandora_LArPandoraInterface	
 			larcore_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_MCCheater_BackTracker_service
-			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 			lardataobj_RecoBase
 			lardataobj_AnalysisBase	
 			lardata_RecoObjects larreco_Deprecated  

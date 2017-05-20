@@ -23,6 +23,7 @@
 #include "ubflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
 #include "wirecellmodules_microboone.fcl"
+#include "microboone_dlpmtprecuts.fcl"
 
 BEGIN_PROLOG
 
@@ -58,6 +59,13 @@ microboone_containment_tag:{ module_type: TrackContainmentTagger
                                FillOutputTree: true
                              }
                            }
+microboone_flashfilter: { module_type: "OpFlashFilter"
+   		  	  OpFlashTag: ""
+		  	  Verbose: false
+		  	  FlashCuts: [
+			       	       [ { MinPE:40 MinTime:2.9 MaxTime:5.2 } ]
+		  	     	     ]
+   		        }
 
 
 ### This is the complete list of all producers! ###
@@ -91,7 +99,7 @@ microboone_reco_data_producers:
 
   ### noise filtering (if needed)
 
-  digitfilter:                    @local::microboone_rawdigitfilter
+  #digitfilter:                    @local::microboone_rawdigitfilter
   wcNoiseFilter:                  @local::microboone_wirecellnoisefilter
 
   ### calwire producers
@@ -226,7 +234,9 @@ microboone_reco_data_producers:
 }
 
 microboone_reco_data_filters:
-{ 
+{
+  flashfilter:  @local::microboone_flashfilter
+  dlpmtprecuts: @local::microboone_dlpmtprecuts
 }
 
 
@@ -378,7 +388,7 @@ microboone_reco_data_MucSTags: [         #MuCSTrackTaggertrackkalmanhit,
 ### These are for MCC 7
 
 # this turns on the truncation of the RawDigits
-microboone_reco_data_producers.digitfilter.TruncateTicks:                        true
+#microboone_reco_data_producers.digitfilter.TruncateTicks:                        true
 
 microboone_reco_data_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
 microboone_reco_data_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
@@ -505,12 +515,12 @@ microboone_reco_data_producers.pandoraCosmicKHitFlashMatch.FlashModuleLabel:    
 microboone_reco_data_producers.pandoraCosmicKHitFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
 
 # Remove hits, based on geometry and Flashes                                     Geometry tagger                   Flash tagger
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.CosmicProducerLabels:    ["pandoraCosmicKalmanTrackPFPart", "pandoraCosmicKHitFlashTag" ]
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.TrackProducerLabels:     ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.AssnProducerLabels:      ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.CosmicTagThresholds:     [0.6,                              0.99                        ]
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.PFParticleProducerLabel: "pandoraCosmic"
-microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.EndTickPadding:          75
+microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicProducerLabels:    ["pandoraCosmicKalmanTrackPFPart", "pandoraCosmicKHitFlashTag" ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.TrackProducerLabels:     ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.AssnProducerLabels:      ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicTagThresholds:     [0.6,                              0.99                        ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.PFParticleProducerLabel: "pandoraCosmic"
+microboone_reco_data_producers.pandoraCosmicHitRemoval.EndTickPadding:          75
 
 # Pandora neutrino pass related
 microboone_reco_data_producers.pandoraNu.GeantModuleLabel:                       "largeant"
@@ -634,4 +644,6 @@ microboone_reco_data_producers.MuCSTrackTaggerpandoraCosmicKHit.TrackModuleLabel
 microboone_reco_data_producers.MuCSTrackTaggerpmtrack.BoxExtension: 20
 microboone_reco_data_producers.MuCSTrackTaggerpmtrack.TrackModuleLabel: "pmtrack"
 
+microboone_reco_data_filters.flashfilter.OpFlashTag: "simpleFlashBeam"
+microboone_reco_data_filters.dlpmtprecuts.OpHitProducer: "ophitBeam"
 END_PROLOG

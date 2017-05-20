@@ -117,16 +117,16 @@ template <class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValV
     fftr2c->Transform();
     
     // In the second step we recover the power spectrum
-    std::vector<double> realVals(fftDataSize);
-    std::vector<double> imaginaryVals(fftDataSize);
+    size_t halfFFTDataSize(fftDataSize/2 + 1);
+    
+    std::vector<double> realVals(halfFFTDataSize);
+    std::vector<double> imaginaryVals(halfFFTDataSize);
     
     fftr2c->GetPointsComplex(realVals.data(), imaginaryVals.data());
     
-    size_t halfFFTDataSize(fftDataSize/2);
-    
     std::vector<double> powerVec(halfFFTDataSize);
     
-    std::transform(realVals.begin(), realVals.begin() + halfFFTDataSize, imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
+    std::transform(realVals.begin(), realVals.end(), imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
     
     // Third step is to zap those bins under threshold
     for(size_t idx = 0; idx < halfFFTDataSize; idx++)
@@ -134,9 +134,7 @@ template <class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValV
         if (powerVec[idx] < minPowerThreshold)
         {
             realVals[idx]                  = 0.;
-            realVals[fftDataSize-idx]      = 0.;
             imaginaryVals[idx]             = 0.;
-            imaginaryVals[fftDataSize-idx] = 0.;
         }
     }
     
@@ -151,9 +149,6 @@ template <class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValV
     double normFctr = 1. / double(fftDataSize);
     
     std::transform(fftOutputArray, fftOutputArray + fftDataSize, corValVec.begin(), [normFctr](const double& real){return real * normFctr;});
-    
-    delete fftc2r;
-    delete fftr2c;
     
     return;
 }
@@ -177,16 +172,16 @@ template<class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValVe
     fftr2c->Transform();
     
     // In the second step we recover the power spectrum
-    std::vector<double> realVals(fftDataSize);
-    std::vector<double> imaginaryVals(fftDataSize);
+    size_t halfFFTDataSize(fftDataSize/2 + 1);
+    
+    std::vector<double> realVals(halfFFTDataSize);
+    std::vector<double> imaginaryVals(halfFFTDataSize);
     
     fftr2c->GetPointsComplex(realVals.data(), imaginaryVals.data());
     
-    size_t halfFFTDataSize(fftDataSize/2);
-    
     std::vector<double> powerVec(halfFFTDataSize);
     
-    std::transform(realVals.begin(), realVals.begin() + halfFFTDataSize, imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
+    std::transform(realVals.begin(), realVals.end(), imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
     
     // Zero all bins above selected frequency
     std::fill(realVals.begin()      + maxBin, realVals.begin()      + fftDataSize - maxBin, 0.);
@@ -203,9 +198,6 @@ template<class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValVe
     double normFctr = 1. / double(fftDataSize);
     
     std::transform(fftOutputArray, fftOutputArray + fftDataSize, corValVec.begin(), [normFctr](const double& real){return real * normFctr;});
-    
-    delete fftc2r;
-    delete fftr2c;
     
     return;
 }
@@ -238,16 +230,16 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
         fftr2c->Transform();
     
         // Recover the power spectrum...
-        std::vector<double> realVals(fftDataSize);
-        std::vector<double> imaginaryVals(fftDataSize);
+        size_t halfFFTDataSize(fftDataSize/2 + 1);
+        
+        std::vector<double> realVals(halfFFTDataSize);
+        std::vector<double> imaginaryVals(halfFFTDataSize);
     
         fftr2c->GetPointsComplex(realVals.data(), imaginaryVals.data());
     
-        size_t halfFFTDataSize(fftDataSize/2);
-    
         std::vector<double> powerVec(halfFFTDataSize);
     
-        std::transform(realVals.begin(), realVals.begin() + halfFFTDataSize, imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
+        std::transform(realVals.begin(), realVals.end(), imaginaryVals.begin(), powerVec.begin(), [](const double& real, const double& imaginary){return std::sqrt(real*real + imaginary*imaginary);});
     
         if (fFillHistograms && view == 0 && wire >= lowWire && wire < hiWire)
         {
@@ -289,9 +281,7 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
             for(const auto& idx : magic_bins)
             {
                 realVals[idx]                  = 0.;
-                realVals[fftDataSize-idx]      = 0.;
                 imaginaryVals[idx]             = 0.;
-                imaginaryVals[fftDataSize-idx] = 0.;
             }
         }
 
@@ -299,10 +289,8 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
         {
             for(size_t idx = fZigZagCorrectBin; idx < halfFFTDataSize; idx++)
             {
-                realVals[idx]                  = 0.;
-                realVals[fftDataSize-idx]      = 0.;
-                imaginaryVals[idx]             = 0.;
-                imaginaryVals[fftDataSize-idx] = 0.;
+                realVals[idx]      = 0.;
+                imaginaryVals[idx] = 0.;
             }
         }
     
@@ -320,9 +308,6 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
         
         if (fFillHistograms && view == 0 && wire >= lowWire && wire < hiWire)
             for(int idx = 0; idx < fftDataSize; idx++) fFFTCorValHistVec[wire-lowWire]->Fill(idx, rawadc[idx] - pedestal, 1.);
-        
-        delete fftc2r;
-        delete fftr2c;
     }
     
     return;

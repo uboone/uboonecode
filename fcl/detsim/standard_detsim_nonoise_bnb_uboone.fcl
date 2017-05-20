@@ -1,0 +1,7 @@
+#include "standard_detsim_nonoise_uboone.fcl"
+
+process_name: DetsimNoNoiseBNB
+
+#adjust timing of hw trigger
+physics.producers.triggersim.BNBTrigger: [-414.0625]
+

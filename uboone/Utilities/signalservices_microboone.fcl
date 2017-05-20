@@ -17,8 +17,6 @@ microboone_signalshapingservice:
 
   NoiseFactVec:    [ [ 1.12, 0.86, 0.60, 0.55 ], [ 1.12, 0.86, 0.60, 0.55 ], [ 0.89, 0.66, 0.48, 0.43 ] ]
 
-  NViews:                  3
-  ViewIndex:             [0, 1, 2]  # gives the larsoft plane number corresponding to each local plane number
   ViewForNormalization:   2         # lets say this is the local plane number, may need to rethink
 
 
@@ -27,15 +25,7 @@ microboone_signalshapingservice:
   # there is commented code in SignalShapingService to test vector of vector of vectors... works!
   #TestParams:       [[[1.0, 2.0],[3.0, 4.0]], [[5.0,6.0],[7.0, 8.0]]]
 
-
-#-------------------------------------------------------------
-# Switching between Calibrated and Old field response
-
-#UseCalibratedResponses: true
-#FieldResponseFNameBase: "uboone_response_70kV"
-#CalibResponseTOffset: [-21.61, -21.61, -21.61]   # in us time offset to align all three planes
-			
-UseCalibratedResponses: false
+	
 FieldResponseFNameBase: "uboone_response"
 CalibResponseTOffset: [0.0, 2.0, 0.0]   # in us time offset to align all three planes
 
@@ -64,10 +54,8 @@ CalibResponseTOffset: [0.0, 2.0, 0.0]   # in us time offset to align all three p
   YZdependentResponse:  true          # flag to use YZ-dependent field responses
   datadrivenResponse:   true          # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)
   YZchargeScaling:      [ [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0] ] # scale charge; from transparency effects - ramification of shorted wires
-  #YZwireOverlap:        [ [ [296, 671], [2400, 3071], [4800, 6143] ], [ [1168, 1903], [3568, 4303], [7136, 7263] ] ] # channel ranges for shorted wires and corresponding channel ranges for wires effected on other planes
 
   IncludeMisconfiguredU: false
-  MisconfiguredU:	[ [2016, 2095], [2192, 2303], [2352, 2382] ]	# channel range of misconfigured U-plane wires during run 1
 
   DeconNorm: 200.
 

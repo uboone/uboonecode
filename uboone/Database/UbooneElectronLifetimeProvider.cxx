@@ -80,16 +80,16 @@ namespace lariov {
       ElectronLifetimeContainer dp(fLifetimeChannel);
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');	
-	float exp_offset = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float exp_offset        = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float exp_offset_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float exp_offset_err    = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float time_constant = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float time_constant     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float time_constant_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float time_constant_err = std::stof( line.substr(current_comma+1) );
 
 	dp.SetChannel(fLifetimeChannel);
 	dp.SetExpOffset(exp_offset);

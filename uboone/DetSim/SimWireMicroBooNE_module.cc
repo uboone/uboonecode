@@ -392,8 +392,6 @@ namespace detsim {
     // or data driven field responses
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> sss;
     std::vector<std::vector<size_t> > N_RESPONSES;
-    std::vector<std::vector<double> > YZchargeScaling = sss->GetYZchargeScaling();
-    //std::vector<std::vector<std::vector<int> > > YZwireOverlap = sss->GetYZwireOverlap();
     bool YZresponse = sss->IsResponseYZDependent();
     bool datadrivenresponse = sss->IsdatadrivenResponse();
     if(!YZresponse) {
@@ -406,7 +404,6 @@ namespace detsim {
     const size_t N_VIEWS = N_RESPONSES[0].size();
 
     bool IsUMisconfigured = sss->IsMisconfiguredUIncluded();
-    const std::vector<std::vector<int> > MisconfiguredU = sss->GetMisconfiguredU();
     
     
     //--------------------------------------------------------------------
