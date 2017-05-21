@@ -4,7 +4,6 @@
 
 add_subdirectory(fcl)
 
-simple_plugin( DLPMTPreCuts "module"
 art_make_library( LIBRARY_NAME uboone_LEEPreCutAlgo
 		  SOURCE LEEPreCutAlgo.cxx
 		)

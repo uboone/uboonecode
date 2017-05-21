@@ -1,6 +1,9 @@
 #ifndef SCANNERALGO_TEMPLATE_H
 #define SCANNERALGO_TEMPLATE_H
 
+#include "uboone/Geometry/UBOpChannelTypes.h"
+#include "uboone/Geometry/UBOpReadoutMap.h"
+
 #include "DataFormat/event_ass.h"
 #include "DataFormat/sparse_vector.h"
 #include "DataFormat/opdetwaveform.h"
@@ -801,21 +804,25 @@ namespace larlite {
     fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;  
     //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
     auto lite_data = (::larlite::event_opflash*)lite_dh;
-    art::ServiceHandle<::geo::Geometry> geo;
+
+    art::ServiceHandle<::geo::UBOpReadoutMap> ub_pmt_channel_map;
+    auto const channel_set = ub_pmt_channel_map->GetReadoutChannelSet();
 
     for(size_t i=0; i<dh->size(); ++i) {
 
       art::Ptr<::recob::OpFlash> flash_ptr(dh,i);
       
       std::vector<double> pe_per_opdet;
-      pe_per_opdet.reserve(geo->NOpChannels());
-      double pe_total = flash_ptr->TotalPE();
-      for(size_t j=0; j<geo->NOpChannels(); ++j) {
-	if(pe_total>0.) {
-	  pe_total -= flash_ptr->PE(j);
-	  pe_per_opdet.push_back(flash_ptr->PE(j));
+      pe_per_opdet.reserve((*(channel_set.rbegin())));
+      double pe_larsoft = flash_ptr->TotalPE();
+      double pe_larlite = 0.;
+      for(auto const& ch : channel_set) {
+	pe_per_opdet.resize(ch+1);
+	if(pe_larsoft > pe_larlite) {
+	  pe_larlite += flash_ptr->PE(ch);
+	  pe_per_opdet[ch] = flash_ptr->PE(ch);
 	}else
-	  pe_per_opdet.push_back(0.);
+	  pe_per_opdet[ch] = 0.;
       }
       
       ::larlite::opflash lite_flash( flash_ptr->Time(),
@@ -834,7 +841,6 @@ namespace larlite {
 				     flash_ptr->WireWidths());
       
       //fPtrIndex_opflash[flash_ptr] = std::make_pair(lite_data->size(),name_index);
-
       lite_data->push_back(lite_flash);
     }
   }
