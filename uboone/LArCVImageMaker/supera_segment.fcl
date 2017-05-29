@@ -3,8 +3,8 @@ ProcessDriver: {
   Verbosity:    2
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMask","WireMask"]
-  ProcessName:  ["SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMaskWire","WireMaskSegment"]
+  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMask","WireMask"]
+  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMaskWire","WireMaskSegment"]
 
   IOManager: {
     Verbosity:   2
@@ -18,6 +18,37 @@ ProcessDriver: {
   }
 
   ProcessList: {
+    PulledPorkMaker: {
+      LArSimChProducer: "largeant"
+      LArMCTruthProducer: "generator"
+      PulledPork: {
+        Verbosity: 1
+        Origin: 1
+        WidthArray:    [171.16552,88.681001347526518,153.6]
+        MinCoordinate: [0.,-116.5,0.]
+        MaxCoordinate: [256.35,116.5,1036.8]
+        Padding: [10,10,10]
+        TimePixels: 3072
+        WirePixels: [512,512,512]
+        EventCompRows: [6,6,6]
+        EventCompCols: [1,1,1]
+        ApplySCE: true
+        T0G4ns: 0
+        ConstraintX: []
+        ConstraintY: []
+        ConstraintZ: []
+      }
+    }
+    SuperaMetaMaker: {
+      MetaConfig: {
+        MinTime:          2400
+        MinWire:          0
+        EventImageRows:   [1008,1008,1008]
+        EventImageCols:   [3456,3456,3456]
+        EventCompRows:    [6,6,6]
+        EventCompCols:    [1,1,1]
+      }
+    }
     WireMaskWire: {
       ChStatusProducer: "wire"
       ImageProducer: "wire"
@@ -34,13 +65,7 @@ ProcessDriver: {
       Verbosity: 2
       OutImageLabel:    "wire"
       LArWireProducer:  "caldata"
-      MinTime:          2400
-      MinWire:          0
       TimeOffset:       2400
-      EventImageRows:   [1008,1008,1008]
-      EventImageCols:   [3456,3456,3456]
-      EventCompRows:    [6,6,6]
-      EventCompCols:    [1,1,1]
     }
     SuperaSimCh: {
       Verbosity: 2
@@ -50,14 +75,8 @@ ProcessDriver: {
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "largeant"
-      MinTime:          2400
-      MinWire:          0
-      TimeOffset:       2400
-      EventImageRows:   [1008,1008,1008]
-      EventImageCols:   [3456,3456,3456]
-      EventCompRows:    [6,6,6]
-      EventCompCols:    [1,1,1]
       Origin: 1
+      TimeOffset:       2400
     }
     SuperaMCROI: {
       Verbosity: 2
@@ -66,14 +85,7 @@ ProcessDriver: {
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "largeant"
-      MinTime:          2400
-      MinWire:          0
       TimeOffset:       2400
-      EventImageRows:   [1008,1008,1008]
-      EventImageCols:   [3456,3456,3456]
-      EventCompRows:    [6,6,6]
-      EventCompCols:    [1,1,1]
-
       Origin: 0
       StoreG4SecondaryROI:  false
       StoreG4PrimaryROI:    true
@@ -86,7 +98,6 @@ ProcessDriver: {
       TrackDepEMin:   20
       FilterROIMinRows: 0
       FilterROIMinCols: 0
-
       MCParticleTree: {
         Verbosity:    2
         UseG4Primary: false

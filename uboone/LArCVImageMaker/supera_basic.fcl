@@ -3,8 +3,8 @@ ProcessDriver: {
   Verbosity:    2
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaWire","SuperaChStatus","WireMask"]
-  ProcessName:  ["SuperaWire","SuperaChStatus","WireMask"]
+  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaChStatus","WireMask"]
+  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaChStatus","WireMask"]
 
   IOManager: {
     Verbosity:   2
@@ -18,6 +18,16 @@ ProcessDriver: {
   }
 
   ProcessList: {
+    SuperaMetaMaker: {
+      MetaConfig: {
+        MinTime:          2400
+        MinWire:          0
+        EventImageRows:   [1008,1008,1008]
+        EventImageCols:   [3456,3456,3456]
+        EventCompRows:    [6,6,6]
+        EventCompCols:    [1,1,1]
+      }
+    }
     WireMask: {
       ChStatusProducer: "wire"
       ImageProducer: "wire"
@@ -31,13 +41,7 @@ ProcessDriver: {
       OutImageLabel:    "wire"
       LArWireProducer:  "caldata"
       #LArWireProducer:  "calmod"
-      MinTime:          2400
-      MinWire:          0
       TimeOffset:       2400
-      EventImageRows:   [1008,1008,1008]
-      EventImageCols:   [3456,3456,3456]
-      EventCompRows:    [6,6,6]
-      EventCompCols:    [1,1,1]
     }
   }
 }

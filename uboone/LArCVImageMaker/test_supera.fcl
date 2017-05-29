@@ -63,11 +63,12 @@ physics:
  producers: { calmod: @local::VPlaneHandler }
  analyzers: { 
         supera: @local::SuperaModule 
-        digit:  @local::litemc_rawdigit
+        #digit:  @local::litemc_rawdigit
         @table::dldata_analyzers
         }
  #reco: [calmod]
- ana: [opdigit, opreco, reco2d, wire, supera, digit]
+ #ana: [opdigit, opreco, reco2d, wire, supera, digit]
+ ana: [opdigit, opreco, reco2d, wire, supera]
  end_paths: [ana]
  #trigger_paths: [reco]
  trigger_paths: []
