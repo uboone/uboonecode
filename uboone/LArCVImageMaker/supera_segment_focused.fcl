@@ -90,7 +90,7 @@ ProcessDriver: {
       FilterROIMinCols: 0
       MCParticleTree: {
         Verbosity:    2
-        UseG4Primary: false
+        UseG4Primary: true
 	DTMax:        10000
       }
       MCROIMaker: {

@@ -150,6 +150,11 @@ void UBFlashFinder::GetFlashLocation(std::vector<double> pePerOpChannel,
 
   for (unsigned int opch = 0; opch < pePerOpChannel.size(); opch++) {
 
+    if (opch > 31 && opch < 200){
+      //  std::cout << "Ignoring channel " << opch << " as it's not a real channel" << std::endl;                                                                                             
+      continue;
+    }
+
     // Get physical detector location for this opChannel
     double PMTxyz[3];
     ::pmtana::OpDetCenterFromOpChannel(opch, PMTxyz);
