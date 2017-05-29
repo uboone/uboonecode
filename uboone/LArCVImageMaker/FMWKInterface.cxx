@@ -60,17 +60,78 @@ namespace supera {
     
     return (unsigned int)wire;
   }
+
+  unsigned int NearestWire(const double* xyz, unsigned int plane)
+  {
+    double min_wire=0;
+    double max_wire=Nwires(plane)-1;
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    
+    double wire = geom->WireCoordinate(xyz[1],xyz[2],plane,0,0) + 0.5;
+    if(wire<min_wire) wire = min_wire;
+    if(wire>max_wire) wire = max_wire;
+    
+    return (unsigned int)wire;
+  }
+
+  double WireAngleToVertical(unsigned int plane)
+  {
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    return geom->WireAngleToVertical(geo::View_t(plane));
+  }
+
+  double WirePitch(size_t plane)
+  {
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    return geom->WirePitch(0,1,plane);
+  }
+
+  double DetHalfWidth() 
+  {
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    return geom->DetHalfWidth();
+  }
+
+  double DetHalfHeight() 
+  {
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    return geom->DetHalfHeight();
+  }
+
+  double DetLength() 
+  {
+    auto const* geom = ::lar::providerFrom<geo::Geometry>();
+    return geom->DetLength();
+  }
   
   int TPCG4Time2Tick(double ns)
   { 
     auto const* ts = ::lar::providerFrom<detinfo::DetectorClocksService>();      
     return ts->TPCG4Time2Tick(ns); 
   }
+
+  int TPCG4Time2TDC(double ns)
+  {
+    auto const* ts = ::lar::providerFrom<detinfo::DetectorClocksService>();
+    return ts->TPCG4Time2TDC(ns);
+  }
   
   double TPCTDC2Tick(double tdc)
   { 
     auto const* ts = ::lar::providerFrom<detinfo::DetectorClocksService>();
     return ts->TPCTDC2Tick(tdc); 
+  }
+
+  double TPCTickPeriod()
+  {
+    auto const* ts = ::lar::providerFrom<detinfo::DetectorClocksService>();
+    return ts->TPCClock().TickPeriod();
+  }
+
+  double TriggerOffsetTPC()
+  {
+    auto const* ts = ::lar::providerFrom<detinfo::DetectorClocksService>();
+    return ts->TriggerOffsetTPC();
   }
   
   double PlaneTickOffset(size_t plane0, size_t plane1)
@@ -88,7 +149,7 @@ namespace supera {
     pt.SetZ(pt.Z() + pos.Z());
   }
 
-  void ApplySCE(double x, double y, double z)
+  void ApplySCE(double& x, double& y, double& z)
   {
     static geo::Point_t pt;
     pt.SetX(x);

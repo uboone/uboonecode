@@ -31,15 +31,20 @@ namespace supera {
   
   //typedef ::fhicl::ParameterSet Config_t;
 
-  /// Channel number to wire ID
-  ::geo::WireID ChannelToWireID(unsigned int ch);
-  
+  //
+  // LArProperties
+  //
+
   /// DriftVelocity in cm/us
   double DriftVelocity();
-  
-  /// Number of time ticks
-  unsigned int NumberTimeSamples();
-  
+
+  //
+  // Geometry
+  //
+
+  /// Channel number to wire ID
+  ::geo::WireID ChannelToWireID(unsigned int ch);
+
   /// Number of channels
   unsigned int Nchannels();
   
@@ -48,25 +53,64 @@ namespace supera {
   
   /// Number of wires
   unsigned int Nwires(unsigned int plane);
-  
+
   /// Nearest wire
   unsigned int NearestWire(const TVector3& xyz, unsigned int plane);
+
+  /// Nearest wire
+  unsigned int NearestWire(const double* xyz, unsigned int plane);
+
+  /// Angle from z-axis
+  double WireAngleToVertical(unsigned int plane);
+
+  /// Wire pitch
+  double WirePitch(size_t plane);
+
+  /// Detector height
+  double DetHalfHeight();
+
+  /// Detector width
+  double DetHalfWidth();
+
+  /// Detector length
+  double DetLength();
+
+  //
+  // DetectorClockService
+  //
+  
+  /// Number of time ticks
+  unsigned int NumberTimeSamples();
   
   /// G4 time to TPC tick
   int TPCG4Time2Tick(double ns);
+
+  /// G4 time to TPC tick
+  int TPCG4Time2TDC(double ns);
+
+  /// per-plane tick offset
+  double PlaneTickOffset(size_t plane0, size_t plane1);
   
   /// TPC TDC to Tick
   double TPCTDC2Tick(double tdc);
 
-  /// per-plane tick offset
-  double PlaneTickOffset(size_t plane0, size_t plane1);
+  /// Trigger tick
+  double TriggerOffsetTPC();
 
+  /// TPC sampling period
+  double TPCTickPeriod();
+
+  //
+  // SpaceChargeService
+  // 
+
+  /// Truth position to shifted
   void ApplySCE(geo::Point_t& pt);
-
-  void ApplySCE(double x, double y, double z);
-
+  /// Truth position to shifted
+  void ApplySCE(double& x, double& y, double& z);
+  /// Truth position to shifted
   void ApplySCE(double* xyz);
-
+  /// Truth position to shifted
   void ApplySCE(TVector3& xyz);
   
 }
