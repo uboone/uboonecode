@@ -324,6 +324,8 @@ void MultiPartVertex::produce(art::Event & e)
   
   simb::MCTruth mct;
 
+  mct.SetOrigin(simb::kBeamNeutrino);
+
   std::vector<simb::MCParticle> part_v;
 
   auto const param_idx_v = GenParticles();

@@ -15,6 +15,7 @@ physics.analyzers.opdigit.SelectEvents: [ sim ]
 physics.analyzers.opreco.SelectEvents:  [ sim ]
 physics.analyzers.wire.SelectEvents:    [ sim ]
 physics.analyzers.reco2d.SelectEvents:  [ sim ]
+physics.analyzers.superaFocusedView.SelectEvents: [ sim ]
 
 physics.producers.generator: @local::microboone_singlep
 physics.producers.generator.PDG: [ 11 ]            # eminus
