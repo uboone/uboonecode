@@ -107,8 +107,8 @@ dlmc_producers.daq.GenNoise: 0
 #wirecell noise filtering
 dlmc_producers.wcNoiseFilter.DigitModuleLabel:    "daq"
 dlmc_producers.wcNoiseFilter.DoNoiseFiltering:    false
-dlmc_producers.wcNoiseFilter.NumTicksToDropFront: 2400
-dlmc_producers.wcNoiseFilter.WindowSize:          6400
+dlmc_producers.wcNoiseFilter.NumTicksToDropFront: 0     # OUR OWN for simulating from scratch
+dlmc_producers.wcNoiseFilter.WindowSize:          6400  # OUR OWN for simulating from scratch
 
 dlmc_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
 dlmc_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...

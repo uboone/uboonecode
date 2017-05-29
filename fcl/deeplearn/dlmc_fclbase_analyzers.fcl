@@ -7,15 +7,16 @@
 
 BEGIN_PROLOG
 
-SuperaModule: {
+SuperaWholeView: {
   module_type:     "LArSoftSuperaSriver"
-  #supera_params:   "supera_basic.fcl"
-  supera_params:   "supera_segment_calmod.fcl"
+  supera_params:   "supera_segment.fcl"
   out_filename:    "larcv.root"
   unique_filename: true
   stream:          "mc"
 }
 
+SuperaFocusedView: @local::SuperaWholeView
+SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
 
 dlmc_analyzers:
  {
@@ -28,19 +29,20 @@ dlmc_analyzers:
 
    reco2d:  @local::litemc_reco2d
 
-   supera:  @local::SuperaModule
+   superaWholeView:   @local::SuperaWholeView
+   superaFocusedView: @local::SuperaFocusedView
 }
 
-dlmc_analyze_all: [ simch, mcinfo, opdigit, opreco, wire, reco2d, supera ]
+dlmc_analyze_all:    [ mcinfo, opreco, reco2d ]
 
-dlmc_analyze_cosmic: [ mcinfo, opdigit, opreco, wire, reco2d, supera ]
+dlmc_analyze_cosmic: [ mcinfo, opreco, reco2d ]
 
-dlmc_analyzers.mcinfo.stream:      "mcinfo"
+dlmc_analyzers.mcinfo.stream:     "mcinfo"
 dlmc_analyzers.simch.stream:      "simch"
-dlmc_analyzers.opdigit.stream:     "opdigit"
-dlmc_analyzers.opreco.stream:      "opreco"
-dlmc_analyzers.wire.stream:        "wire"
-dlmc_analyzers.reco2d.stream:      "reco2d"
+dlmc_analyzers.opdigit.stream:    "opdigit"
+dlmc_analyzers.opreco.stream:     "opreco"
+dlmc_analyzers.wire.stream:       "wire"
+dlmc_analyzers.reco2d.stream:     "reco2d"
 
 dlmc_analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
 dlmc_analyzers.simch.out_filename:      "larlite_simch.root"

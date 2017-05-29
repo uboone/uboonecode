@@ -40,10 +40,10 @@ dlmc_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0,
 dlmc_services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
 dlmc_services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
 
-#dlmc_services.DetectorPropertiesService.NumberTimeSamples:        6400
-#dlmc_services.DetectorPropertiesService.ReadOutWindowSize:        6400
-#dlmc_services.DetectorClocksService.InheritClockConfig:           false
-#dlmc_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+dlmc_services.DetectorPropertiesService.NumberTimeSamples:        6400
+dlmc_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+dlmc_services.DetectorClocksService.InheritClockConfig:           false
+dlmc_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 
 dlmc_services.SpaceCharge.EnableSimSpatialSCE: true
 dlmc_services.SpaceCharge.EnableSimEfieldSCE: true
