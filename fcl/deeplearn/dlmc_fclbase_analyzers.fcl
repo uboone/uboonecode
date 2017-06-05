@@ -14,9 +14,10 @@ SuperaWholeView: {
   unique_filename: true
   stream:          "mc"
 }
-
 SuperaFocusedView: @local::SuperaWholeView
 SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
+SuperaBasic: @local::SuperaWholeView
+SuperaBasic.supera_params: "supera_basic.fcl"
 
 dlmc_analyzers:
  {
