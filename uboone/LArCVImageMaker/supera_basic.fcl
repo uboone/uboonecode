@@ -39,8 +39,8 @@ ProcessDriver: {
     SuperaWire: {
       Verbosity: 2
       OutImageLabel:    "wire"
-      LArWireProducer:  "caldata"
-      #LArWireProducer:  "calmod"
+      #LArWireProducer:  "caldata"
+      LArWireProducer:  "calmod"
       TimeOffset:       2400
     }
   }

@@ -80,11 +80,14 @@ dlmc_process_trigfilter: [ rns, generator,
                            simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
                            daq, wcNoiseFilter, caldata, gaushit, calmod]
 
+#dlmc_reprocess_mcc8: [ rns, 
+#                       saturation,
+#                       ophitBeam, ophitCosmic,
+#                       simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
+#                       daq, wcNoiseFilter, caldata, gaushit, calmod ]
 dlmc_reprocess_mcc8: [ rns, 
-                       saturation,
-                       ophitBeam, ophitCosmic,
                        simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                       daq, wcNoiseFilter, caldata, gaushit, calmod ]
+                       calmod ]
 
 # generator
 dlmc_producers.generator: @local::microboone_genie_simple
