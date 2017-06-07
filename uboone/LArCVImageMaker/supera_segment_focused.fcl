@@ -88,6 +88,14 @@ ProcessDriver: {
       TrackDepEMin:   20
       FilterROIMinRows: 0
       FilterROIMinCols: 0
+      MetaConfig: {
+        MinTime:          2400
+        MinWire:          0
+        EventImageRows:   [1008,1008,1008]
+        EventImageCols:   [3456,3456,3456]
+        EventCompRows:    [6,6,6]
+        EventCompCols:    [1,1,1]
+      }
       MCParticleTree: {
         Verbosity:    2
         UseG4Primary: true

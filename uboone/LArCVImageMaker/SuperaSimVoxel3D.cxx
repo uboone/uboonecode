@@ -46,12 +46,19 @@ namespace larcv {
       LARCV_CRITICAL() << "Meta not created!" << std::endl;
       throw larbys();
     }
+
+    //
+    // Create output data product container
+    //
     auto ev_voxel3d = (EventVoxel3D*)(mgr.get_data(kProductVoxel3D,OutVoxel3DLabel()));
     if(!ev_voxel3d) {
       LARCV_CRITICAL() << "Output voxel3d could not be created!" << std::endl;
       throw larbys();
     }
-
+    
+    //
+    // Loop over mctracks to select relevant MC charge deposition to make the image for
+    //
     std::vector<int> track_v;
     for(auto const& mctrack : LArData<supera::LArMCTrack_t>()) {
 
@@ -69,6 +76,8 @@ namespace larcv {
 	track_v.resize(mctrack.AncestorTrackID()+1,0);
       track_v[mctrack.AncestorTrackID()] = 1;
     }
+
+
     for(auto const& mcshower : LArData<supera::LArMCShower_t>()) {
 
       if(_origin && ((unsigned short)(mcshower.Origin())) != _origin) continue;

@@ -37,6 +37,7 @@ struct PartGenParam {
   std::vector<double    > mass;
   std::array <size_t, 2 > multi;
   std::array <double, 2 > kerange;
+  bool use_mom;
   double weight;
 };
 
@@ -136,12 +137,24 @@ MultiPartVertex::MultiPartVertex(fhicl::ParameterSet const & p)
   auto const part_cfg = p.get<fhicl::ParameterSet>("ParticleParameter");
 
   _param_v.clear();
-  auto const pdg_v     = part_cfg.get<std::vector<std::vector<int>    > > ("PDGCode");
-  auto const kerange_v = part_cfg.get<std::vector<std::vector<double> > > ("KERange");
-  auto const minmult_v = part_cfg.get<std::vector<unsigned short> > ("MinMulti"); 
-  auto const maxmult_v = part_cfg.get<std::vector<unsigned short> > ("MaxMulti"); 
-  auto const weight_v  = part_cfg.get<std::vector<double> > ("ProbWeight"); 
+  auto const pdg_v      = part_cfg.get<std::vector<std::vector<int>    > > ("PDGCode");
+  auto const minmult_v  = part_cfg.get<std::vector<unsigned short> > ("MinMulti"); 
+  auto const maxmult_v  = part_cfg.get<std::vector<unsigned short> > ("MaxMulti"); 
+  auto const weight_v   = part_cfg.get<std::vector<double> > ("ProbWeight"); 
 
+  auto kerange_v  = part_cfg.get<std::vector<std::vector<double> > > ("KERange");
+  auto momrange_v = part_cfg.get<std::vector<std::vector<double> > > ("MomRange");
+
+  if( (kerange_v.empty() && momrange_v.empty()) ||
+      (!kerange_v.empty() && !momrange_v.empty()) ) {
+    this->abort("Only one of KERange or MomRange must be empty!");
+  }      
+  
+  bool use_mom = false;
+  if(kerange_v.empty()){
+    kerange_v = momrange_v;
+    use_mom = true;
+  } 
   // sanity check
   if( pdg_v.size() != kerange_v.size() ||
       pdg_v.size() != minmult_v.size() ||
@@ -198,6 +211,7 @@ MultiPartVertex::MultiPartVertex(fhicl::ParameterSet const & p)
     auto const& pdg     = pdg_v[idx];
     auto const& kerange = kerange_v[idx];
     PartGenParam param;
+    param.use_mom    = use_mom;
     param.pdg        = pdg;
     param.kerange[0] = kerange[0];
     param.kerange[1] = kerange[1];
@@ -219,7 +233,8 @@ MultiPartVertex::MultiPartVertex(fhicl::ParameterSet const & p)
       std::cout << "Generating particle (PDG";
       for(auto const& pdg : param.pdg) std::cout << " " << pdg;
       std::cout << ")" << std::endl
-		<< "    KE range ....... " << param.kerange[0] << " => " << param.kerange[1] << " MeV" << std::endl
+		<< (param.use_mom ? "    KE range ....... " : "    Mom range ....... ") 
+		<< param.kerange[0] << " => " << param.kerange[1] << " MeV" << std::endl
 		<< std::endl;
     }
 
@@ -288,7 +303,12 @@ void MultiPartVertex::GenPosition(double& x, double& y, double& z) {
 
 void MultiPartVertex::GenMomentum(const PartGenParam& param, const double& mass, double& px, double& py, double& pz) {
 
-  double tot_energy = fFlatRandom->fire(param.kerange[0],param.kerange[1]) + mass;
+  double tot_energy = 0;
+  if(param.use_mom) 
+    tot_energy = sqrt(pow(fFlatRandom->fire(param.kerange[0],param.kerange[1]),2) + pow(mass,2));
+  else
+    tot_energy = fFlatRandom->fire(param.kerange[0],param.kerange[1]) + mass;
+
   double mom_mag = sqrt(pow(tot_energy,2) - pow(mass,2));
 
   px = fFlatRandom->fire(-1.,1.);

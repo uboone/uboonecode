@@ -308,19 +308,19 @@ namespace supera {
       // Check if target pixel is within 1 tick
       int pixel_count_raw = wire_range.second - wire_range.first + 1;
       int pixel_count_offset = (int)(pixel_count) - pixel_count_raw;
-      if(std::abs(pixel_count_offset) > 1) {
-	LARCV_CRITICAL() << "Plane " << plane
-		  << " wire range " << wire_range.first
-		  << " => " << wire_range.second
-		  << " does not match expected pixel count " << pixel_count
-		  << std::endl;
-	throw std::exception();
+      if(std::abs(pixel_count_offset) < 1) {
+	LARCV_INFO() << "Plane " << plane
+		     << " wire range " << wire_range.first
+		     << " => " << wire_range.second
+		     << " good match for expected pixel count " << pixel_count
+		     << std::endl;
+      }else{
+	LARCV_WARNING() << "Plane " << plane
+			<< " wire range " << wire_range.first
+			<< " => " << wire_range.second
+			<< " does not match exactly for expected pixel count " << pixel_count
+			<< std::endl;
       }
-      LARCV_INFO() << "Plane " << plane
-		   << " wire range " << wire_range.first
-		   << " => " << wire_range.second
-		   << " good match for expected pixel count " << pixel_count
-		   << std::endl;
       // If pixel count does not match exactly, extend
       if(pixel_count_offset > 0) {
 	bool extend_to_lower = ( wire_range.first > ((int)(supera::Nwires(plane)) - wire_range.second) );
