@@ -10,12 +10,8 @@ namespace supera {
     _comp_rows  = cfg.get<std::vector<size_t> >("EventCompRows");
     _comp_cols  = cfg.get<std::vector<size_t> >("EventCompCols");
 
-    if(_comp_rows.size() != supera::Nplanes()) {
-      std::cerr << "EventCompRows size != # planes..." << std::endl;
-      throw std::exception();
-    }
-    if(_comp_cols.size() != supera::Nplanes()) {
-      std::cerr << "EventCompCols size != # planes..." << std::endl;
+    if(_comp_rows.size() != _comp_cols.size()) {
+      std::cerr << "EventCompRows size != EventCompCols size" << std::endl;
       throw std::exception();
     }
   }  

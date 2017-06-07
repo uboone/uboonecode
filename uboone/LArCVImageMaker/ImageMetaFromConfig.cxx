@@ -16,12 +16,13 @@ namespace supera {
     auto const& comp_rows = RowCompressionFactor();
     auto const& comp_cols = ColCompressionFactor();
 
-    if(image_rows.size() != supera::Nplanes()) {
-      std::cerr << "EventImageRows size != # planes..." << std::endl;
+    if(image_rows.size() != comp_rows.size()) {
+      std::cerr << "EventImageRows size != EventCompRows..." << std::endl;
       throw std::exception();
     }
-    if(image_cols.size() != supera::Nplanes()) {
-      std::cerr << "EventImageCols size != # planes..." << std::endl;
+
+    if(image_rows.size() != image_cols.size()) {
+      std::cerr << "EventImageRows size != EventImageCols..." << std::endl;
       throw std::exception();
     }
     

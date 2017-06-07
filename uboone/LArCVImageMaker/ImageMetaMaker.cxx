@@ -9,7 +9,7 @@ namespace supera {
 
   void ImageMetaMaker::configure(const supera::Config_t& cfg)
   {
-    if(_meta_maker) delete _meta_maker;
+    if(_meta_maker) { delete _meta_maker; }
     _meta_maker = supera::CreateImageMetaMaker(cfg);
   }
   
