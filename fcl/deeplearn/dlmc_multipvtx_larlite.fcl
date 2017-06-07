@@ -1,7 +1,15 @@
 #include "multipvtx.fcl"
-#include "dlmc_singlep_common.fcl"
-
+#include "singles_microboone.fcl"
+#include "dlmc_fclbase_driver.fcl"
 process_name: MultiPartVertex
+
+source: @local::source_gen
+
+physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView ]
+physics.sim: [ @sequence::dlmc_process_trigfilter ]
+physics.end_paths:     [ ana ]
+physics.trigger_paths: [ sim ]
+
 services.TFileService.fileName: "multipvtx_%tc.root"
 
 physics.analyzers.mcinfo.SelectEvents:  [ sim ]
@@ -21,8 +29,11 @@ physics.producers.generator.YRange       : [30]
 physics.producers.generator.ZRange       : [30]
 physics.producers.generator.MultiMax     : 4
 physics.producers.generator.MultiMin     : 1
-physics.producers.generator.ParticleParameter.PDGCode      : [    [11,13],        [22], [211,-211],      [2212]]
-physics.producers.generator.ParticleParameter.MinMulti     : [          1,           0,          0,           0]
-physics.producers.generator.ParticleParameter.MaxMulti     : [          3,           2,          2,           3]
-physics.producers.generator.ParticleParameter.ProbWeight   : [          1,           1,          1,           1]
-physics.producers.generator.ParticleParameter.KERange      : [ [0.05,1.0],  [0.05,1.0],  [0.05,1.0], [0.05,0.4]]
+physics.producers.generator.ParticleParameter.PDGCode      : [    [11,13],        [22],      [111],        [211],      [2212]]
+physics.producers.generator.ParticleParameter.MinMulti     : [          1,           0,          1,            0,           0]
+physics.producers.generator.ParticleParameter.MaxMulti     : [          2,           1,          1,            1,           3]
+physics.producers.generator.ParticleParameter.ProbWeight   : [          2,           2,          2,            1,           3]
+physics.producers.generator.ParticleParameter.KERange      : [ [0.05,0.5],  [0.05,0.4],  [0.05,0.4],  [0.05,0.4],  [0.05,0.3]]
+physics.producers.generator.ParticleParameter.MomRange     : []
+
+physics.producers.daq.GenNoise: 3

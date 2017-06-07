@@ -18,6 +18,9 @@ SuperaWholeView: {
 SuperaFocusedView: @local::SuperaWholeView
 SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
 
+SuperaFocusedView3D: @local::SuperaWholeView
+SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"
+
 dlmc_analyzers:
  {
    mcinfo:  @local::litemc_mcinfo
@@ -31,6 +34,7 @@ dlmc_analyzers:
 
    superaWholeView:   @local::SuperaWholeView
    superaFocusedView: @local::SuperaFocusedView
+   superaFocusedView3D: @local::SuperaFocusedView3D
 }
 
 dlmc_analyze_all:    [ mcinfo, opreco, reco2d ]
