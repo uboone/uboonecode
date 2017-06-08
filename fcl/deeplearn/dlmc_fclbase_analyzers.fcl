@@ -17,7 +17,7 @@ SuperaWholeView: {
 SuperaFocusedView: @local::SuperaWholeView
 SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
 SuperaBasic: @local::SuperaWholeView
-SuperaBasic.supera_params: "supera_basic.fcl"
+SuperaBasic.supera_params: "supera_basic_calmod.fcl"
 
 SuperaFocusedView3D: @local::SuperaWholeView
 SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"

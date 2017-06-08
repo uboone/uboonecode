@@ -12,6 +12,7 @@
 #include "swtrigger_microboone.fcl"
 #include "ubflashfinder.fcl" 
 #include "filters.fcl" 
+#include "microboone_dlpmtprecuts.fcl"
 
 BEGIN_PROLOG
 
@@ -54,6 +55,7 @@ dlmc_producers:
 dlmc_filters: { 
     swtrigger: @local::microboone_swtrigger_mc_bnb 
     finalstatefilter: @local::microboone_finalstateselectfilter
+    dlpmtprecuts: @local::microboone_dlpmtprecuts
 }
 
 dlmc_process_all: [ rns, generator,
@@ -85,7 +87,7 @@ dlmc_process_trigfilter: [ rns, generator,
 #                       ophitBeam, ophitCosmic,
 #                       simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
 #                       daq, wcNoiseFilter, caldata, gaushit, calmod ]
-dlmc_reprocess_mcc8: [ rns, 
+dlmc_reprocess_mcc8: [ rns, dlpmtprecuts,
                        simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
                        calmod ]
 

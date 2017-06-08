@@ -5,10 +5,17 @@ process_name: MultiPartVertex
 
 source: @local::source_gen
 
+#physics.analyzers.superaFocusedView.supera_params: "supera_segment_focused_plus.fcl"
+
 physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView ]
 physics.sim: [ @sequence::dlmc_process_trigfilter ]
-physics.end_paths:     [ ana ]
+
+#physics.trigger_paths: [ sim ]
+#physics.stream:        [out1]
+#physics.end_paths:     [ ana, stream ]
+
 physics.trigger_paths: [ sim ]
+physics.end_paths:     [ ana ]
 
 services.TFileService.fileName: "multipvtx_%tc.root"
 

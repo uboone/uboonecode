@@ -57,6 +57,7 @@ physics:
 
  analyzers: { @table::dlmc_analyzers }
 
+ stream: []
  end_paths: []
  trigger_paths: []
 }
