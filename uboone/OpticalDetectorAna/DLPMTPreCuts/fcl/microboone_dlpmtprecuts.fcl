@@ -3,7 +3,7 @@ BEGIN_PROLOG
 microboone_dlpmtprecuts: {
   module_type: "DLPMTPreCuts"
 
-  OpHitProducer: "ophit"
+  OpHitProducer: "ophitBeam"
   BinTickWidth: 6
   WinStartTick: 190
   WinEndTick: 320

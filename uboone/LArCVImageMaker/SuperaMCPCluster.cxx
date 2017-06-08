@@ -109,7 +109,8 @@ namespace larcv {
 
     auto const& roi_v = ev_roi->ROIArray();
     if(roi_v.size() != pxcluster_vv.size()) {
-      LARCV_CRITICAL() << "# PixelCluster does not match with # ROI!" << std::endl;
+      LARCV_CRITICAL() << "# PixelCluster (" << pxcluster_vv.size() 
+		       << ") does not match with # ROI (" << roi_v.size() << ")!" << std::endl;
       throw larbys();
     }
 
