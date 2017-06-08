@@ -1,8 +1,7 @@
 BEGIN_PROLOG
 SuperaModule: {
   module_type:     "LArSoftSuperaSriver"
-  #supera_params:   "supera_basic.fcl"
-  supera_params: "supera_segment_calmod.fcl"
+  supera_params: "supera_mcexample_calmod.fcl"
   out_filename:    "larcv.root"
   unique_filename: true
   stream:          "mc"
