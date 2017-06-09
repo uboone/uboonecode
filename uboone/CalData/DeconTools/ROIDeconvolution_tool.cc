@@ -76,7 +76,7 @@ void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
     if(pb_type == std::string("BaselineStandard")) {
       fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineStandard(pb));
     }
-    if(pb_type == std::string("BaselineMostProbAve")) {
+    else if(pb_type == std::string("BaselineMostProbAve")) {
       fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineMostProbAve(pb));
     }
     else {
