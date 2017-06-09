@@ -54,16 +54,14 @@ float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
     
     if (nbin > 0)
     {
-        std::vector<int> roiHistVec;
-        
-        roiHistVec.resize(nbin, 0);
+        std::vector<int> roiHistVec(nbin, 0);
         
         for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
             roiHistVec[std::floor(2. * (holder[binIdx] - min))]++;
         
-        std::vector<int>::iterator mpValItr = std::max_element(roiHistVec.begin(),roiHistVec.end());
+        std::vector<int>::const_iterator mpValItr = std::max_element(roiHistVec.cbegin(),roiHistVec.cend());
         
-        float mpVal   = min + 0.5 * std::distance(roiHistVec.begin(),mpValItr);
+        float mpVal   = min + 0.5 * std::distance(roiHistVec.cbegin(),mpValItr);
         int   baseCnt = 0;
         
         for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
