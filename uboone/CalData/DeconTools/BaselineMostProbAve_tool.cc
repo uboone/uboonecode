@@ -11,6 +11,7 @@
 #include "cetlib/exception.h"
 
 #include <fstream>
+#include <algorithm> // std::minmax_element()
 
 namespace uboone_tool
 {
@@ -50,8 +51,8 @@ float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
     // Basic idea is to find the most probable value in the ROI presented to us
     // From that, get the average value within range of the expected noise and
     // return that as the ROI baselin.
-    float min  = *std::min_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
-    float max  = *std::max_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
+    auto const minmax  = std::minmax_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
+    float const min = *(minmax.first), max = *(minmax.second);
 
     if (max > min) {
         // we are being generous and allow for one bin more,
