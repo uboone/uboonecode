@@ -31,7 +31,7 @@ void NoBaseline::configure(const fhicl::ParameterSet& pset)
 }
 
     
-float NoBaseline::GetBaseline(std::vector<float>& holder,
+float NoBaseline::GetBaseline(std::vector<float> const& holder,
                               raw::ChannelID_t    channel,
                               size_t              roiStart,
                               size_t              roiLen) const

@@ -21,9 +21,9 @@ public:
     void configure(const fhicl::ParameterSet& pset)              override;
     void outputHistograms(art::TFileDirectory&)            const override;
     
-    void Deconvolve(IROIFinder::Waveform&,
+    void Deconvolve(IROIFinder::Waveform const&,
                     raw::ChannelID_t,
-                    IROIFinder::CandidateROIVec&,
+                    IROIFinder::CandidateROIVec const&,
                     recob::Wire::RegionsOfInterest_t& )    const override;
     
 private:

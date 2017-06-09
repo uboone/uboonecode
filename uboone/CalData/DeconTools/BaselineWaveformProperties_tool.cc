@@ -35,7 +35,7 @@ void BaselineWaveformProperties::configure(const fhicl::ParameterSet& pset)
 }
 
     
-float BaselineWaveformProperties::GetBaseline(std::vector<float>& holder,
+float BaselineWaveformProperties::GetBaseline(std::vector<float> const& holder,
                                     raw::ChannelID_t    channel,
                                     size_t              roiStart,
                                     size_t              roiLen) const

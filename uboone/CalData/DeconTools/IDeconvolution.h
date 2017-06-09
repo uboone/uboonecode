@@ -34,9 +34,9 @@ namespace uboone_tool
         virtual void outputHistograms(art::TFileDirectory&)         const = 0;
         
         // Find the ROI's
-        virtual void Deconvolve(IROIFinder::Waveform&,
+        virtual void Deconvolve(IROIFinder::Waveform const&,
                                 raw::ChannelID_t,
-                                IROIFinder::CandidateROIVec&,
+                                IROIFinder::CandidateROIVec const&,
                                 recob::Wire::RegionsOfInterest_t& ) const = 0;
     };
 }

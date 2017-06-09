@@ -89,9 +89,9 @@ void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
     
     return;
 }
-void ROIDeconvolution::Deconvolve(IROIFinder::Waveform&             waveform,
+void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             waveform,
                                           raw::ChannelID_t                  channel,
-                                          IROIFinder::CandidateROIVec&      roiVec,
+                                          IROIFinder::CandidateROIVec const& roiVec,
                                           recob::Wire::RegionsOfInterest_t& ROIVec) const
 {
     double                   deconNorm = fSignalShaping->GetDeconNorm();
@@ -99,7 +99,7 @@ void ROIDeconvolution::Deconvolve(IROIFinder::Waveform&             waveform,
 //    size_t                   thePlane  = wids[0].Plane;
     
     // And now process them
-    for(auto& roi : roiVec)
+    for(auto const& roi : roiVec)
     {
         // First up: copy out the relevent ADC bins into the ROI holder
         size_t roiLen = roi.second - roi.first;

@@ -40,7 +40,7 @@ void BaselineStandard::configure(const fhicl::ParameterSet& pset)
 }
 
     
-float BaselineStandard::GetBaseline(std::vector<float>& holder,
+float BaselineStandard::GetBaseline(std::vector<float> const& holder,
                                     raw::ChannelID_t    channel,
                                     size_t              roiStart,
                                     size_t              roiLen) const

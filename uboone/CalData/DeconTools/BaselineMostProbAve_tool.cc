@@ -35,7 +35,7 @@ void BaselineMostProbAve::configure(const fhicl::ParameterSet& pset)
 }
 
     
-float BaselineMostProbAve::GetBaseline(std::vector<float>& holder,
+float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
                                     raw::ChannelID_t    channel,
                                     size_t              roiStart,
                                     size_t              roiLen) const
