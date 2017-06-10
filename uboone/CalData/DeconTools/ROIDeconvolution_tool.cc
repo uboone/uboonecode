@@ -34,8 +34,7 @@ ROIDeconvolution::~ROIDeconvolution()
 void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
 {
     // Start by recovering the parameters
-    fFFTSize                    = pset.get< size_t >("FFTSize"                );
-    fMinROIAverageTickThreshold = pset.get<float>   ("MinROIAverageTickThreshold",-0.5);
+    fFFTSize     = pset.get< size_t >("FFTSize"                );
     
     //wire-by-wire calibration
     fDodQdxCalib = pset.get< bool >("DodQdxCalib", false);
