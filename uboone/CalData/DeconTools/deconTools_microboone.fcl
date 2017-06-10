@@ -43,7 +43,6 @@ microboone_roideconvolution:
     DodQdxCalib:                false  # apply wire-by-wire calibration?
     dQdxCalibFileName:          "dQdxCalibrationPlanev1.txt"
     Baseline:                   @local::microboone_baselinemostprobave
-    MinROIAverageTickThreshold: -0.5
 }
 
 microboone_mcc7deconvolution:
@@ -52,9 +51,7 @@ microboone_mcc7deconvolution:
     DoBaselineSub:                       true
     DodQdxCalib:                         false  # apply wire-by-wire calibration?
     dQdxCalibFileName:                   "dQdxCalibrationPlanev1.txt"
-    MinROIAverageTickThreshold:          -0.5
-    DoBaselineSub_WaveformPropertiesAlg: false
-    ROIPropertiesAlg:                    { ROIAlgParams: @local::roiAlg_DigitAboveBaseline }
+    Baseline:                   @local::microboone_baselinemostprobave
 }
 
 

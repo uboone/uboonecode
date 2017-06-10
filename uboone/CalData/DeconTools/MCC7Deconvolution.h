@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "uboone/CalData/DeconTools/IDeconvolution.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
 #include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "uboone/CalData/DeconTools/WaveformPropertiesAlg.h"
@@ -27,19 +28,14 @@ public:
                     recob::Wire::RegionsOfInterest_t& )    const override;
     
 private:
-    // Preserve the "old" method of getting the best baseline
-    float SubtractBaseline(std::vector<float>&, float, float, size_t, size_t, size_t) const;
 
-    // Member variables from the fhicl file
-    bool                                                     fDoBaselineSub;              ///< Are we doing baseline correction?
-    float                                                    fMinROIAverageTickThreshold; ///< try to remove bad ROIs
     bool                                                     fDodQdxCalib;                ///< Do we apply wire-by-wire calibration?
     std::string                                              fdQdxCalibFileName;          ///< Text file for constants to do wire-by-wire calibration
     std::map<unsigned int, float>                            fdQdxCalib;                  ///< Map to do wire-by-wire calibration, key is channel
                                                                                           ///< number, content is correction factor
-    bool                                                     fDoBaselineSub_WaveformPropertiesAlg;
     
-    mutable util::WaveformPropertiesAlg<float>               fROIPropertiesAlg;
+    std::unique_ptr<uboone_tool::IBaseline>                  fBaseline;
+
     const geo::GeometryCore*                                 fGeometry = lar::providerFrom<geo::Geometry>();
     art::ServiceHandle<util::LArFFT>                         fFFT;
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;

@@ -12,6 +12,9 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
 
+#include "uboone/CalData/DeconTools/BaselineStandard.h"
+#include "uboone/CalData/DeconTools/BaselineMostProbAve.h"
+
 #include "TH1D.h"
 
 #include <fstream>
@@ -21,8 +24,7 @@ namespace uboone_tool
 
 //----------------------------------------------------------------------
 // Constructor.
-MCC7Deconvolution::MCC7Deconvolution(const fhicl::ParameterSet& pset) :
-                      fROIPropertiesAlg(pset.get<fhicl::ParameterSet>("ROIPropertiesAlg"))
+MCC7Deconvolution::MCC7Deconvolution(const fhicl::ParameterSet& pset)
 {
     configure(pset);
 }
@@ -34,10 +36,6 @@ MCC7Deconvolution::~MCC7Deconvolution()
 void MCC7Deconvolution::configure(const fhicl::ParameterSet& pset)
 {
     // Start by recovering the parameters
-    fDoBaselineSub                       = pset.get< bool >("DoBaselineSub"                      );
-    fMinROIAverageTickThreshold          = pset.get<float> ("MinROIAverageTickThreshold",    -0.5);
-    fDoBaselineSub_WaveformPropertiesAlg = pset.get< bool >("DoBaselineSub_WaveformPropertiesAlg");
-    
     //wire-by-wire calibration
     fDodQdxCalib = pset.get< bool >("DodQdxCalib", false);
     
@@ -68,6 +66,19 @@ void MCC7Deconvolution::configure(const fhicl::ParameterSet& pset)
             fdQdxCalib[channel] = constant;
             if (channel%1000==0) std::cout<<"Channel "<<channel<<" correction factor "<<fdQdxCalib[channel]<<std::endl;
         }
+    }
+    
+    // Recover the baseline tool
+    fhicl::ParameterSet pb = pset.get<fhicl::ParameterSet>("Baseline");
+    std::string pb_type = pb.get<std::string>("tool_type");
+    if(pb_type == std::string("BaselineStandard")) {
+        fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineStandard(pb));
+    }
+    else if(pb_type == std::string("BaselineMostProbAve")) {
+        fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineMostProbAve(pb));
+    }
+    else {
+        throw art::Exception(art::errors::Configuration) << "Unknown baseline tool type" << pb_type;
     }
     
     // Get signal shaping service.
@@ -122,69 +133,9 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
         std::transform(holder.begin(),holder.end(),holder.begin(),[deconNorm](float& deconVal){return deconVal/deconNorm;});
         
         // Now we do the baseline determination (and I'm left wondering if there is a better way using the entire waveform?)
-        bool  baseSet(false);
-        float base(0.);
-        if(fDoBaselineSub) // && fPreROIPad[thePlane] > 0 ) <-- this part doesn't make sense?
-        {
-            //1. Check Baseline match?
-            // If not, include next ROI(if none, go to the end of signal)
-            // If yes, proceed
-            size_t binsToAve(20);
-            float  basePre  = std::accumulate(holder.begin(),holder.begin()+binsToAve,0.) / float(binsToAve);
-            float  basePost = std::accumulate(holder.end()-binsToAve,holder.end(),0.) / float(binsToAve);
-            
-            // emulate method for refining baseline from original version of CalWireROI
-            float deconNoise = 1.26491 * fSignalShaping->GetDeconNoise(channel);    // 4./sqrt(10) * noise
-            
-            // If the estimated baseline from the front of the roi does not agree well with that from the end
-            // of the roi then we'll extend the roi hoping for good agreement
-            if (!(fabs(basePre - basePost) < deconNoise))
-            {
-                int   nTries(0);
-                
-                // get start of roi and find the maximum we can extend to
-                std::vector<float>::iterator rawAdcRoiStartItr = rawAdcLessPedVec.begin() + binOffset + roi.first;
-                std::vector<float>::iterator rawAdcMaxItr      = rawAdcLessPedVec.end()   - binOffset;
-                
-                // if this is not the last roi then limit max range to start of next roi
-                if (roiIdx < roiVec.size() - 1)
-                    rawAdcMaxItr = rawAdcLessPedVec.begin() + binOffset + roiVec[roiIdx+1].first;
-                
-                // Basically, allow roi to be extended until we get good agreement unless it seems pointless
-                while (!(fabs(basePre - basePost) < deconNoise) && nTries++ < 3)
-                {
-                    size_t nBinsToAdd(100);
-                    int    nBinsLeft      = std::distance(rawAdcRoiStartItr+roiLen,rawAdcMaxItr) > 0
-                    ? std::distance(rawAdcRoiStartItr+roiLen,rawAdcMaxItr) : 0;
-                    size_t roiLenAddition = std::min(nBinsToAdd, size_t(nBinsLeft));
-                    
-                    if (roiLenAddition > 0)
-                    {
-                        std::vector<float> additionVec(roiLenAddition);
-                        
-                        std::copy(rawAdcRoiStartItr + roiLen, rawAdcRoiStartItr + roiLen + roiLenAddition, additionVec.begin());
-                        
-                        holder.resize(holder.size() + roiLenAddition);
-                        std::transform(additionVec.begin(),additionVec.end(),holder.begin() + roiLen,[deconNorm](float& deconVal){return deconVal/deconNorm;});
-                        
-                        basePost = std::accumulate(holder.end()-binsToAve,holder.end(),0.) / float(binsToAve);
-                        
-                        roiLen = holder.size();
-                    }
-                    else break;
-                }
-            }
-            
-            baseSet = true;
-            base    = SubtractBaseline(holder, basePre,basePost,roi.first,roiLen,dataSize);
-        } // fDoBaselineSub ...
-        else if(fDoBaselineSub_WaveformPropertiesAlg)
-        {
-            baseSet = true;
-            base    = fROIPropertiesAlg.GetWaveformPedestal(holder);
-        }
+        float base = fBaseline->GetBaseline(holder, channel, 0, roiLen);
         
-        if (baseSet) std::transform(holder.begin(),holder.end(),holder.begin(),[base](float& adcVal){return adcVal - base;});
+        std::transform(holder.begin(),holder.end(),holder.begin(),[base](float& adcVal){return adcVal - base;});
         
         // apply wire-by-wire calibration
         if (fDodQdxCalib){
@@ -196,76 +147,12 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
                 }
             }
         }
-        
-        //wes 23.12.2016 --- sum up the roi, and if it's very negative get rid of it
-        float average_val = std::accumulate(holder.begin(),holder.end(),0.0) / holder.size();
-        float min = *std::min_element(holder.begin(),holder.end());
-        float max = *std::max_element(holder.begin(),holder.end());
-        if(average_val>fMinROIAverageTickThreshold || std::abs(min)<std::abs(max)){
-            // add the range into ROIVec
-            ROIVec.add_range(roi.first, std::move(holder));
-        }
+
+        // add the range into ROIVec
+        ROIVec.add_range(roi.first, std::move(holder));
     }
     
     return;
-}
-    
-    
-float MCC7Deconvolution::SubtractBaseline(std::vector<float>& holder,
-                                          float               basePre,
-                                          float               basePost,
-                                          size_t              roiStart,
-                                          size_t              roiLen,
-                                          size_t              dataSize) const
-{
-    float base=0;
-    
-    //can not trust the early part
-    if (roiStart < 20 && roiStart + roiLen < dataSize - 20){
-        base = basePost;
-        // can not trust the later part
-    }else if (roiStart >= 20 && roiStart + roiLen >= dataSize - 20){
-        base = basePre;
-        // can trust both
-    }else if (roiStart >= 20 && roiStart + roiLen < dataSize - 20){
-        if (fabs(basePre-basePost)<3){
-            base = (basePre+basePost)/2.;
-        }else{
-            if (basePre < basePost){
-                base = basePre;
-            }else{
-                base = basePost;
-            }
-        }
-        // can not use both
-    }else{
-        float min = 0,max=0;
-        for (unsigned int bin = 0; bin < roiLen; bin++){
-            if (holder[bin] > max) max = holder[bin];
-            if (holder[bin] < min) min = holder[bin];
-        }
-        int nbin = max - min;
-        if (nbin!=0){
-            TH1F *h1 = new TH1F("h1","h1",nbin,min,max);
-            for (unsigned int bin = 0; bin < roiLen; bin++){
-                h1->Fill(holder[bin]);
-            }
-            float ped = h1->GetMaximum();
-            float ave=0,ncount = 0;
-            for (unsigned int bin = 0; bin < roiLen; bin++){
-                if (fabs(holder[bin]-ped)<2){
-                    ave +=holder[bin];
-                    ncount ++;
-                }
-            }
-            if (ncount==0) ncount=1;
-            ave = ave/ncount;
-            h1->Delete();
-            base = ave;
-        }
-    }
-    
-    return base;
 }
 
     
