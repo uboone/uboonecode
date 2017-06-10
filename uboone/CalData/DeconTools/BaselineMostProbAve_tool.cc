@@ -67,8 +67,8 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
         for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
         {
             // Provide overkill protection against possibility of a bad index...
-            int    intIdx = std::floor(2. * holder.at(binIdx) - min);
-            size_t idx    = std::min(std::max(intIdx,int(nbin-1)),0);
+            int    intIdx = std::floor(2. * (holder.at(binIdx) - min));
+            size_t idx    = std::max(std::min(intIdx,int(nbin-1)),0);
             roiHistVec[idx]++;
         }
         
