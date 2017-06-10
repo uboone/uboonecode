@@ -16,10 +16,10 @@ public:
     
     ~BaselineMostProbAve();
     
-    void configure(const fhicl::ParameterSet& pset)                                override;
-    void outputHistograms(art::TFileDirectory&)                              const override;
+    void configure(const fhicl::ParameterSet& pset)                                      override;
+    void outputHistograms(art::TFileDirectory&)                                    const override;
     
-    float GetBaseline(std::vector<float> const&, raw::ChannelID_t, size_t, size_t) const override;
+    float GetBaseline(const std::vector<float>&, raw::ChannelID_t, size_t, size_t) const override;
     
 private:
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;

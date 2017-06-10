@@ -36,10 +36,10 @@ void BaselineMostProbAve::configure(const fhicl::ParameterSet& pset)
 }
 
     
-float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
-                                    raw::ChannelID_t    channel,
-                                    size_t              roiStart,
-                                    size_t              roiLen) const
+float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
+                                       raw::ChannelID_t          channel,
+                                       size_t                    roiStart,
+                                       size_t                    roiLen) const
 {
     if (roiLen < 2) return 0.0; // not enough information
 
@@ -52,9 +52,12 @@ float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
     // From that, get the average value within range of the expected noise and
     // return that as the ROI baselin.
     auto const minmax  = std::minmax_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
-    float const min = *(minmax.first), max = *(minmax.second);
+    
+    float min = *(minmax.first);
+    float max = *(minmax.second);
 
-    if (max > min) {
+    if (max > min)
+    {
         // we are being generous and allow for one bin more,
         // which is actually needed in the rare case where (max-min) is an integer
         size_t const nbin = 2 * std::ceil(max - min) + 1;
@@ -62,23 +65,32 @@ float BaselineMostProbAve::GetBaseline(std::vector<float> const& holder,
         std::vector<int> roiHistVec(nbin, 0);
         
         for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
-            roiHistVec[std::floor(2. * (holder[binIdx] - min))]++;
-        
-        std::vector<int>::const_iterator mpValItr = std::max_element(roiHistVec.cbegin(),roiHistVec.cend());
-        
-        float mpVal   = min + 0.5 * std::distance(roiHistVec.cbegin(),mpValItr);
-        int   baseCnt = 0;
-        
-        for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
         {
-            if (std::fabs(holder[binIdx] - mpVal) < deconNoise)
-            {
-                base += holder[binIdx];
-                baseCnt++;
-            }
+            // Provide overkill protection against possibility of a bad index...
+            int    intIdx = std::floor(2. * holder.at(binIdx) - min);
+            size_t idx    = std::min(std::max(intIdx,int(nbin-1)),0);
+            roiHistVec[idx]++;
         }
         
-        if (baseCnt > 0) base /= baseCnt;
+        std::vector<int>::const_iterator mpValItr = std::max_element(roiHistVec.cbegin(),roiHistVec.cend());
+
+        // Really can't see how this can happen...
+        if (mpValItr != roiHistVec.end())
+        {
+            float mpVal   = min + 0.5 * std::distance(roiHistVec.cbegin(),mpValItr);
+            int   baseCnt = 0;
+        
+            for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
+            {
+                if (std::fabs(holder.at(binIdx) - mpVal) < deconNoise)
+                {
+                    base += holder.at(binIdx);
+                    baseCnt++;
+                }
+            }
+        
+            if (baseCnt > 0) base /= baseCnt;
+        }
     }
     
     return base;
@@ -89,26 +101,6 @@ void BaselineMostProbAve::outputHistograms(art::TFileDirectory& histDir) const
     // It is assumed that the input TFileDirectory has been set up to group histograms into a common
     // folder at the calling routine's level. Here we create one more level of indirection to keep
     // histograms made by this tool separate.
-/*
-    std::string dirName = "BaselinePlane_" + std::to_string(fPlane);
-    
-    art::TFileDirectory dir = histDir.mkdir(dirName.c_str());
-    
-    auto const* detprop      = lar::providerFrom<detinfo::DetectorPropertiesService>();
-    double      samplingRate = detprop->SamplingRate();
-    double      numBins      = fBaselineVec.size();
-    double      maxFreq      = 500. / samplingRate;
-    std::string histName     = "BaselinePlane_" + std::to_string(fPlane);
-    
-    TH1D*       hist         = dir.make<TH1D>(histName.c_str(), "Baseline;Frequency(MHz)", numBins, 0., maxFreq);
-    
-    for(int bin = 0; bin < numBins; bin++)
-    {
-        double freq = maxFreq * double(bin + 0.5) / double(numBins);
-        
-        hist->Fill(freq, fBaselineVec.at(bin).Re());
-    }
-*/
     
     return;
 }
