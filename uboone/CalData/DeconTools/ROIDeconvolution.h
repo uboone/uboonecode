@@ -30,7 +30,6 @@ public:
 private:
     // Member variables from the fhicl file
     size_t                                                   fFFTSize;                    ///< FFT size for ROI deconvolution
-    float                                                    fMinROIAverageTickThreshold; ///< try to remove bad ROIs
     bool                                                     fDodQdxCalib;                ///< Do we apply wire-by-wire calibration?
     std::string                                              fdQdxCalibFileName;          ///< Text file for constants to do wire-by-wire calibration
     std::map<unsigned int, float>                            fdQdxCalib;                  ///< Map to do wire-by-wire calibration, key is channel
