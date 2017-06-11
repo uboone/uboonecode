@@ -48,13 +48,6 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
     // Recover the expected electronics noise on this channel
     float deconNoise = 1.26491 * fSignalShaping->GetDeconNoise(channel);
     
-    // Is it possible that we might run off the end of the buffer?
-    if (roiStart + roiLen > holder.size())
-    {
-        std::cout << "==> Found roiLen exceeding buffer size, roiStart: " << roiStart << ", roiLen: " << roiLen << ", size: " << holder.size() << std::endl;
-        roiLen = holder.size() - roiStart;
-    }
-    
     // Basic idea is to find the most probable value in the ROI presented to us
     // From that, get the average value within range of the expected noise and
     // return that as the ROI baseline.
@@ -69,10 +62,8 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
         // which is actually needed in the rare case where (max-min) is an integer
         size_t nbin = 2 * std::ceil(max - min) + 1;
         
-        if (nbin == 0)
-        {
-            std::cout << "==> Found nbin == 0, min: " << min << ", max: " << max << std::endl;
-        }
+        // In principle this can't happen...
+        if (nbin == 0) return base;
     
         std::vector<int> roiHistVec(nbin, 0);
         
@@ -84,8 +75,7 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
             try {
                 roiHistVec.at(idx)++;
             } catch (...) {
-                std::cout << "***** index out of range, idx: " << idx << ", nbin: " << nbin << ", val: " << holder.at(binIdx) << ", min/max: " << min << "/" << max << ", intIdx: " << intIdx << std::endl;
-                roiHistVec[idx]++;
+                std::cout << "***** index out of range, idx: " << idx << ", nbin: " << nbin << ", val: " << holder.at(binIdx) << ", min/max: " << min << "/" << max << ", intIdx: " << intIdx << ", channel: " << channel << std::endl;
             }
         }
         
