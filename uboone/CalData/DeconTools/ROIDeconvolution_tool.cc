@@ -88,10 +88,10 @@ void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
     
     return;
 }
-void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             waveform,
-                                          raw::ChannelID_t                  channel,
-                                          IROIFinder::CandidateROIVec const& roiVec,
-                                          recob::Wire::RegionsOfInterest_t& ROIVec) const
+void ROIDeconvolution::Deconvolve(const IROIFinder::Waveform&        waveform,
+                                  raw::ChannelID_t                   channel,
+                                  IROIFinder::CandidateROIVec const& roiVec,
+                                  recob::Wire::RegionsOfInterest_t&  ROIVec) const
 {
     double deconNorm = fSignalShaping->GetDeconNorm();
     
@@ -118,11 +118,18 @@ void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             wavefo
         
         std::vector<float> holder(deconSize);
         
+        // Pad with zeroes if the deconvolution buffer is larger than the input waveform
+        if (deconSize > waveform.size()) holder.resize(deconSize, 0.);
+        
+        // Watch for the case where the input ROI is long enough to want an deconvolution buffer that is
+        // larger than the input waveform.
+        size_t maxActualSize = std::min(deconSize, waveform.size());
+        
         // Extend the ROI to accommodate the extra bins for the FFT
         // The idea is to try to center the desired ROI in the buffer used by deconvolution
-        size_t halfLeftOver = (deconSize - roiLen) / 2;               // Number bins either side of ROI
-        size_t roiStart     = halfLeftOver;                           // Start in the buffer of the ROI
-        size_t roiStop      = halfLeftOver + roiLen;                  // Stop in the buffer of the ROI
+        size_t halfLeftOver = (maxActualSize - roiLen) / 2;           // Number bins either side of ROI
+        int    roiStartInt  = halfLeftOver;                           // Start in the buffer of the ROI
+        int    roiStopInt   = halfLeftOver + roiLen;                  // Stop in the buffer of the ROI
         int    firstOffset  = roi.first - halfLeftOver;               // Offset into the ADC vector of buffer start
         int    secondOffset = roi.second + halfLeftOver + roiLen % 2; // Offset into the ADC vector of buffer end
         
@@ -131,8 +138,8 @@ void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             wavefo
         // First is the case where we would be starting before the ADC vector
         if (firstOffset < 0)
         {
-            roiStart     += firstOffset;  // remember that firstOffset is negative
-            roiStop      += firstOffset;
+            roiStartInt  += firstOffset;  // remember that firstOffset is negative
+            roiStopInt   += firstOffset;
             secondOffset -= firstOffset;
             firstOffset   = 0;
         }
@@ -141,11 +148,14 @@ void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             wavefo
         {
             size_t overshoot = secondOffset - waveform.size();
             
-            roiStart     += overshoot;
-            roiStop      += overshoot;
+            roiStartInt  += overshoot;
+            roiStopInt   += overshoot;
             firstOffset  -= overshoot;
             secondOffset  = waveform.size();
         }
+        
+        size_t roiStart(roiStartInt);
+        size_t roiStop(roiStopInt);
         
         // Fill the buffer and do the deconvolution
         std::copy(waveform.begin()+firstOffset, waveform.begin()+secondOffset, holder.begin());
@@ -162,8 +172,9 @@ void ROIDeconvolution::Deconvolve(IROIFinder::Waveform const&             wavefo
         std::transform(holder.begin(),holder.end(),holder.begin(),[base](float& adcVal){return adcVal - base;});
         
         // Get rid of the leading and trailing "extra" bins needed to keep the FFT happy
-        std::copy(holder.begin() + roiStart, holder.begin() + roiStop, holder.begin());
+        if (roiStart > 0) std::copy(holder.begin() + roiStart, holder.begin() + roiStop, holder.begin());
         
+        // Resize the holder to the ROI length
         holder.resize(roiLen);
         
         // apply wire-by-wire calibration
