@@ -48,19 +48,31 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
     // Recover the expected electronics noise on this channel
     float deconNoise = 1.26491 * fSignalShaping->GetDeconNoise(channel);
     
+    // Is it possible that we might run off the end of the buffer?
+    if (roiStart + roiLen > holder.size())
+    {
+        std::cout << "==> Found roiLen exceeding buffer size, roiStart: " << roiStart << ", roiLen: " << roiLen << ", size: " << holder.size() << std::endl;
+        roiLen = holder.size() - roiStart;
+    }
+    
     // Basic idea is to find the most probable value in the ROI presented to us
     // From that, get the average value within range of the expected noise and
-    // return that as the ROI baselin.
+    // return that as the ROI baseline.
     auto const minmax  = std::minmax_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
     
-    float min = *(minmax.first);
-    float max = *(minmax.second);
+    float min = minmax.first  != holder.end() ? *(minmax.first)  : 0;
+    float max = minmax.second != holder.end() ? *(minmax.second) : 0;
 
     if (max > min)
     {
         // we are being generous and allow for one bin more,
         // which is actually needed in the rare case where (max-min) is an integer
-        size_t const nbin = 2 * std::ceil(max - min) + 1;
+        size_t nbin = 2 * std::ceil(max - min) + 1;
+        
+        if (nbin == 0)
+        {
+            std::cout << "==> Found nbin == 0, min: " << min << ", max: " << max << std::endl;
+        }
     
         std::vector<int> roiHistVec(nbin, 0);
         
