@@ -53,8 +53,8 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
     // return that as the ROI baseline.
     auto const minmax  = std::minmax_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
     
-    float min = minmax.first  != holder.end() ? *(minmax.first)  : 0;
-    float max = minmax.second != holder.end() ? *(minmax.second) : 0;
+    float min = *(minmax.first);
+    float max = *(minmax.second);
 
     if (max > min)
     {
@@ -72,16 +72,13 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
             // Provide overkill protection against possibility of a bad index...
             int    intIdx = std::floor(2. * (holder.at(binIdx) - min));
             size_t idx    = std::max(std::min(intIdx,int(nbin-1)),0);
-            try {
-                roiHistVec.at(idx)++;
-            } catch (...) {
-                std::cout << "***** index out of range, idx: " << idx << ", nbin: " << nbin << ", val: " << holder.at(binIdx) << ", min/max: " << min << "/" << max << ", intIdx: " << intIdx << ", channel: " << channel << std::endl;
-            }
+
+            roiHistVec.at(idx)++;
         }
         
         std::vector<int>::const_iterator mpValItr = std::max_element(roiHistVec.cbegin(),roiHistVec.cend());
 
-        // Really can't see how this can happen...
+        // Really can't see how this can happen... but check just to be sure
         if (mpValItr != roiHistVec.end())
         {
             float mpVal   = min + 0.5 * std::distance(roiHistVec.cbegin(),mpValItr);
