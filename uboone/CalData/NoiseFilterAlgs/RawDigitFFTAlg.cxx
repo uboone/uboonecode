@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <memory> // std::unique_ptr<>
 
 #include "TVirtualFFT.h"
 
@@ -139,7 +140,7 @@ template <class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValV
     }
     
     // Finally, we invert the resulting time domain values to recover the new waveform
-    TVirtualFFT* fftc2r = TVirtualFFT::FFT(1, &fftDataSize, "C2R M K");
+    std::unique_ptr<TVirtualFFT> fftc2r { TVirtualFFT::FFT(1, &fftDataSize, "C2R M K") };
     
     fftc2r->SetPointsComplex(realVals.data(),imaginaryVals.data());
     fftc2r->Transform();
@@ -188,7 +189,7 @@ template<class T> void RawDigitFFTAlg::getFFTCorrection(std::vector<T>& corValVe
     std::fill(imaginaryVals.begin() + maxBin, imaginaryVals.begin() + fftDataSize - maxBin, 0.);
     
     // Finally, we invert the resulting time domain values to recover the new waveform
-    TVirtualFFT* fftc2r = TVirtualFFT::FFT(1, &fftDataSize, "C2R M K");
+    std::unique_ptr<TVirtualFFT> fftc2r { TVirtualFFT::FFT(1, &fftDataSize, "C2R M K") };
     
     fftc2r->SetPointsComplex(realVals.data(),imaginaryVals.data());
     fftc2r->Transform();
@@ -215,7 +216,7 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
         int    fftDataSize = rawadc.size();
     
         TVirtualFFT* fftr2c = TVirtualFFT::FFT(1, &fftDataSize, "R2C");
-    
+        
         std::vector<double> fftInputVec(fftDataSize);
     
         for(size_t tick = 0; tick < rawadc.size(); tick++)
@@ -295,7 +296,7 @@ void RawDigitFFTAlg::filterFFT(std::vector<short>& rawadc, size_t view, size_t w
         }
     
         // Finally, we invert the resulting time domain values to recover the new waveform
-        TVirtualFFT* fftc2r = TVirtualFFT::FFT(1, &fftDataSize, "C2R M K");
+        std::unique_ptr<TVirtualFFT> fftc2r { TVirtualFFT::FFT(1, &fftDataSize, "C2R M K") };
     
         fftc2r->SetPointsComplex(realVals.data(),imaginaryVals.data());
         fftc2r->Transform();
