@@ -189,10 +189,16 @@ namespace pmtana{
       }
 
       // See if this flash is declarable
-      double pesum = 0;
-      for(size_t i=start_time; i<(start_time+integral_ctr); ++i)
+      if (start_time+integral_ctr > _pesum_v.size() && _debug)
+        std::cout << "Candidate @ " << min_time + start_time * _time_res
+                  << " starts less than one integration window before the end of the time range (" << max_time << ")."
+                  << " Its integration window will be " << (_pesum_v.size() - start_time) * _time_res
+                  << std::endl;
 
-	pesum += _pesum_v[i];
+      double pesum = 0;
+      for(size_t i=start_time; i<(start_time+integral_ctr) && i < _pesum_v.size(); ++i) {
+        pesum += _pesum_v[i];
+      }
 
       if(pesum < (_min_pe_flash + sum_baseline)) {
 	if(_debug) std::cout << "Skipping a candidate @ " << start_time  << " => " << start_time + integral_ctr
