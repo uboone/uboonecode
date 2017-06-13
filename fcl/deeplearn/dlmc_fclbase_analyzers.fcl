@@ -38,7 +38,7 @@ dlmc_analyzers:
    superaFocusedView3D: @local::SuperaFocusedView3D
 }
 
-dlmc_analyze_all:    [ mcinfo, opreco, reco2d ]
+dlmc_analyze_all:    [ simch, mcinfo, opreco, reco2d, opdigit, wire ]
 
 dlmc_analyze_cosmic: [ mcinfo, opreco, reco2d ]
 

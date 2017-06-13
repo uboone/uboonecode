@@ -68,11 +68,11 @@ dlmc_process_all: [ rns, generator,
 
 dlmc_process_genfilter: [ rns, generator, finalstatefilter,
                           largeant, mcreco,
-                          optdigitizer, optfem, triggersim, pmtreadout,
+                          optdigitizer, optfem, triggersim, pmtreadout, swtrigger,
                           saturation,
                           ophitBeam, ophitCosmic,
                           simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic,
-                          daq, wcNoiseFilter, caldata, gaushit, calmod, swtrigger]
+                          daq, wcNoiseFilter, caldata, gaushit, calmod ]
 
 dlmc_process_trigfilter: [ rns, generator,
                            largeant, mcreco,

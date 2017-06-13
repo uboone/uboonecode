@@ -6,10 +6,10 @@
 <!ENTITY release      "v06_37_00" >
 <!ENTITY file_type    "mc"        >
 <!ENTITY run_type     "physics"   >
-<!ENTITY name         "dlmc_multipvtx">
-<!ENTITY fcl          "dlmc_multipvtx_larlite.fcl">
+<!ENTITY name         "dlmc_1e1p">
+<!ENTITY fcl          "dlmc_1e1p_larlite.fcl">
 <!ENTITY dl_version   "v01"       >
-<!ENTITY dl_part      "p02"       >
+<!ENTITY dl_part      "p00"       >
 <!ENTITY tardir       "/pnfs/uboone/scratch/users/kterao/tars">
 ]>
 

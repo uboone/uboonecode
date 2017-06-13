@@ -65,7 +65,7 @@ for d in jobdirs:
     jobid = int(d.split('_')[-1])
     jobdir = '%s/%s' % (INPUT_DIR,d)
     lite_files = [x for x in os.listdir(jobdir) if ( ((x.startswith('larlite') or x.startswith('larcv')) and x.endswith('.root'))
-                                                     and os.path.getsize('%s/%s' % (jobdir,x)) > 1000 )
+                                                     and os.path.getsize('%s/%s' % (jobdir,x)) > 100000 )
                   ]
     #print jobdir,len(lite_files)
     for f in lite_files:
@@ -82,7 +82,7 @@ for d in jobdirs:
             print lite_files_map[flavor]
             raise Exception
         full_fname = '%s/%s' % (jobdir,f)
-        if os.path.getsize(full_fname) < 1e6:
+        if os.path.getsize(full_fname) < 1e5:
             print 'Ignoring a small file:',full_fname
             continue
         lite_files_map[flavor][jobid]=full_fname

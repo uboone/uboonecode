@@ -9,7 +9,7 @@ physics.producers.generator.YRange       : [30]
 physics.producers.generator.ZRange       : [30]
 physics.producers.generator.MultiMax     : 4
 physics.producers.generator.MultiMin     : 1
-physics.producers.generator.ParticleParameter.PDGCode      : [[11,22,111],      [13,211],     [2212]]
+physics.producers.generator.ParticleParameter.PDGCode      : [    [11,22],      [13,211],     [2212]]
 physics.producers.generator.ParticleParameter.MinMulti     : [          0,             0,          0]
 physics.producers.generator.ParticleParameter.MaxMulti     : [          3,             2,          3]
 physics.producers.generator.ParticleParameter.ProbWeight   : [          2,             1,          1]
