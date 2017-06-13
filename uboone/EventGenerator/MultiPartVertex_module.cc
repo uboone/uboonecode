@@ -311,14 +311,12 @@ void MultiPartVertex::GenMomentum(const PartGenParam& param, const double& mass,
 
   double mom_mag = sqrt(pow(tot_energy,2) - pow(mass,2));
 
-  px = fFlatRandom->fire(-1.,1.);
-  py = fFlatRandom->fire(-1.,1.);
-  pz = fFlatRandom->fire(-1.,1.);
+  double phi   = fFlatRandom->fire(0, 2 * 3.141592653589793238);
+  double theta = fFlatRandom->fire(0, 1 * 3.141592653589793238);
 
-  double unit_mag = sqrt(pow(px,2)+pow(py,2)+pow(pz,2));
-  px /= unit_mag;
-  py /= unit_mag;
-  pz /= unit_mag;
+  px = cos(phi) * sin(theta);
+  py = sin(phi) * sin(theta);
+  pz = cos(theta);
 
   if(_debug>1)
     std::cout << "    Direction : (" << px << "," << py << "," << pz << ")" << std::endl
