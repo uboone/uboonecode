@@ -153,7 +153,8 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   std::unique_ptr<std::vector<crt::CRTHit> > CRTHiteventCol(new std::vector<crt::CRTHit>);
   
   art::Handle< std::vector<artdaq::Fragment> > rawHandle;
-  evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle);
+  //  evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle);
+  evt.getByLabel(raw_data_label_, rawHandle);
   
   //check to make sure the data we asked for is valid                                                                                                  
   if(!rawHandle.isValid()){
@@ -166,6 +167,8 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   
   //get better access to the data                                                                                                        
   std::vector<artdaq::Fragment> const& rawFragments(*rawHandle);
+  std::cout<<" Fragments -> Size:  "<<rawFragments.size()<<std::endl;
+  getchar();
 
   //loop over the raw data fragments                                                                                                         
   //There should be one fragment per FEB in each event.                                                                                     
@@ -185,6 +188,10 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
     auto feb_tevt = FEB_ID;
     double FEB_del = crt::auxfunctions::getFEBDel(FEB_ID,FEBDel); //cable_length FEB delay in ns.         
 
+
+  std::cout<<" FEB:  "<<FEB_ID<<std::endl;
+  std::cout<<" nevents:  "<<nevents<<std::endl;
+  getchar();
 
     for(size_t i_e=0; i_e<nevents; ++i_e){//B_1
       BernZMQEvent const* this_event = bfrag.eventdata(i_e); //get the single hit/event                                                                    
