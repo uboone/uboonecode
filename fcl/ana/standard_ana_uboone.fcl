@@ -107,3 +107,5 @@ physics.analyzers.pandoraNuKHiteff.TrackModuleLabel:   "pandoraNuKHit"
 physics.analyzers.pmtrackeff.TrackModuleLabel:         "pmtrack"
 physics.analyzers.trackkalmanhiteff.TrackModuleLabel:  "trackkalmanhit"
 physics.analyzers.stitchkalmanhiteff.TrackModuleLabel: "stitchkalmanhit"
+
+services.SpaceCharge.EnableSimSpatialSCE: true

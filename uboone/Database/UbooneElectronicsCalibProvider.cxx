@@ -64,11 +64,13 @@ namespace lariov {
       
     }
     else if (fDataSource == DataSource::File) {
-      std::cout << "Using electronics calibrations from local file: "<<fileName<<"\n";
-      std::ifstream file(fileName);
+      cet::search_path sp("FW_SEARCH_PATH");
+      std::string abs_fp = sp.find_file(fileName);
+      std::cout << "Using electronics calibrations from local file: "<<abs_fp<<"\n";
+      std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("UbooneElectronicsCalibProvider")
-          << "File "<<fileName<<" is not found.";
+          << "File "<<abs_fp<<" is not found.";
       }
       
       std::string line;
@@ -76,19 +78,19 @@ namespace lariov {
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
         DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));     
-        float gain = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float gain             = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
         
         current_comma = line.find(',',current_comma+1);
-        float gain_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float gain_err         = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-        float shaping_time = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float shaping_time     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-        float shaping_time_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        float shaping_time_err = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
         
 	current_comma = line.find(',',current_comma+1);
-        int is_misconfigured = std::stoi(line.substr(current_comma+1, line.find(',',current_comma+1)));
+        int is_misconfigured  = std::stoi( line.substr(current_comma+1) );
         
 	CalibrationExtraInfo extra_info("ElectronicsCalib");
 	extra_info.AddOrReplaceBoolData("is_misconfigured", (bool)is_misconfigured);

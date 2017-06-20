@@ -67,27 +67,29 @@ namespace lariov {
  
     }
     else if (fDataSource == DataSource::File) {
-      std::cout << "Using pedestals from local file: "<<fileName<<"\n";
-      std::ifstream file(fileName);
+    cet::search_path sp("FW_SEARCH_PATH");
+      std::string abs_fp = sp.find_file(fileName);
+      std::cout << "Using pedestals from local file: "<<abs_fp<<"\n";
+      std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("UbooneElectronLifetimeProvider")
-	  << "File "<<fileName<<" is not found.";
+	  << "File "<<abs_fp<<" is not found.";
       }
       
       std::string line;
       ElectronLifetimeContainer dp(fLifetimeChannel);
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');	
-	float exp_offset = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float exp_offset        = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float exp_offset_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float exp_offset_err    = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float time_constant = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float time_constant     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 	
 	current_comma = line.find(',',current_comma+1);
-	float time_constant_err = std::stof(line.substr(current_comma+1, line.find(',',current_comma+1)));
+	float time_constant_err = std::stof( line.substr(current_comma+1) );
 
 	dp.SetChannel(fLifetimeChannel);
 	dp.SetExpOffset(exp_offset);

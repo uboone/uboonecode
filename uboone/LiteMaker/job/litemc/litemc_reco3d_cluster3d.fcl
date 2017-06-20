@@ -42,4 +42,3 @@ litemc_reco3d_cluster3d.AssociationLookUpMap:
   partid:     ["trackkalmanhitpidc3d",
                "stitchkalmanhitpidc3d"]
 }
-

@@ -28,4 +28,3 @@ litemc_reco3d_fuzzyshower.AssociationLookUpMap:
   shower:     ["showerrecofuzzy"]
   pfpart:     []
 }
-

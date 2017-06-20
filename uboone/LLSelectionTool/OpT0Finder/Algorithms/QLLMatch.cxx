@@ -260,7 +260,7 @@ namespace flashana {
       if(_mode == kLLHD) {
         /* Replaced block to be used in uboonecode
         _current_llhd -= std::log10(TMath::Poisson(O,H));
-        if(isnan(_current_llhd) || isinf(_current_llhd)) _current_llhd = 1.e6;
+        if(std::isnan(_current_llhd) || isinf(_current_llhd)) _current_llhd = 1.e6;
         */
         // Updated block
         double arg = TMath::Poisson(O,H);

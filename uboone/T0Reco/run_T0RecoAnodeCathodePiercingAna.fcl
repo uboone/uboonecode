@@ -58,8 +58,9 @@ physics:
 #block and put it in the trigger_paths then you need to put a SelectEvents: {SelectEvents: [XXX]}
 #entry in the output stream you want those to go to, where XXX is the label of the filter module(s)
 
-
-
+physics.analyzers.t0ana.UseMC: false
+physics.analyzers.t0ana.FlashProducer: pandoraCosmicT0Reco
+physics.analyzers.t0ana.T0Producer: pandoraCosmicT0Reco
 
 services.DetectorProperties.NumberTimeSamples:                             6400
 services.DetectorProperties.ReadOutWindowSize:                             6400

@@ -2,7 +2,6 @@
 
 #include "../WeightCalcCreator.h"
 #include "../WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
 
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/RandomNumberGenerator.h"
@@ -32,7 +31,6 @@ using namespace std;
 namespace evwgh {
   class PrimaryHadronSplinesWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     PrimaryHadronSplinesWeightCalc();
     void Configure(fhicl::ParameterSet const& p);
@@ -197,7 +195,9 @@ namespace evwgh {
     primaryHad			=   pset.get<int>("PrimaryHadronGeantCode");
     fNmultisims                 =   pset.get<int>("number_of_multisims");
     std::string dataInput       =   pset.get< std::string >("ExternalData");
-    ExternalDataInput = IFDH.fetch(dataInput);
+
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string ExternalDataInput = sp.find_file(dataInput);
     
     PrimaryHadronSplinesWeightCalc::ExternalData(crossSection, momentumBounds, thetaBounds, covarianceMatrix);
  
@@ -224,8 +224,8 @@ namespace evwgh {
     //Transform crossSection vector of vectors into a flat TArrayD
 	
     int dim = int((thetaBinCenter.size()-1)*(momentumBinCenter.size()-1));
-    double cvArray[dim];
-    crossSection.GetMatrix2Array(cvArray);
+    std::vector<double> cvArray(dim,0.);
+    crossSection.GetMatrix2Array(cvArray.data());
 
     //test
     /*
@@ -253,7 +253,7 @@ namespace evwgh {
 	GaussRandom.fireArray(dim, rands.data());
 		
 	//make some constrained fake data
-	double fakeDataArray[dim];
+	std::vector<double> fakeDataArray(dim,0.);
 	for(int col = 0; col < dim; ++col)
 	  {
 	    double weightFromU = 0.;

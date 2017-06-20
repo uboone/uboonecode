@@ -13,6 +13,7 @@ physics.producers.generator.TopVolume: "volCryostat"
 physics.producers.generator.BeamName: "booster"
 
 
+physics.filters.finalstatefilter.IsVerbose: false
 physics.filters.finalstatefilter.isInclusive: true
 physics.filters.finalstatefilter.PDG: [13, 111] #CC PiZero
 physics.filters.finalstatefilter.PDGCount: [1, 1]

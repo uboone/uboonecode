@@ -1,0 +1,12 @@
+#include "reco_uboone_data_mcc8_driver_common.fcl"
+
+process_name: DataRecoStage1and2OpticalFilter
+
+services.TFileService.fileName: "reco_stage_1and2_hist.root"
+physics.flashfilter:  [ rns, @sequence::microboone_reco_data_optical, flashfilter, @sequence::microboone_reco_data_signalprocessing, @sequence::microboone_reco_data_stage2 ]
+physics.dlpmtprecuts: [ rns, @sequence::microboone_reco_data_optical, dlpmtprecuts, @sequence::microboone_reco_data_signalprocessing , @sequence::microboone_reco_data_stage2 ]
+physics.trigger_paths: [ flashfilter, dlpmtprecuts ]
+outputs.out1.fileName: "%ifb_%tc_reco12.root"
+outputs.out1.dataTier: "reconstructed"
+outputs.out1.SelectEvents: [flashfilter,dlpmtprecuts]
+source.inputCommands: ["keep *_*_*_*", "drop *_*_*_Data*Reco*" ]

@@ -3,10 +3,10 @@ art_make(
 	  LIB_LIBRARIES
 
 			${ART_FRAMEWORK_CORE}
-			art_Utilities canvas_Utilities
+			art_Utilities canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
-			${CETLIB}
+			cetlib cetlib_except
                         ${Boost_SYSTEM_LIBRARY}
 			${ROOT_BASIC_LIB_LIST}
           MODULE_LIBRARIES 
@@ -31,13 +31,14 @@ art_make(
 			${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
 			${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			art_Persistency_Common canvas_Persistency_Common
-			art_Persistency_Provenance canvas_Persistency_Provenance
-			art_Utilities canvas_Utilities
+			art_Persistency_Common
+			art_Persistency_Provenance
+			art_Utilities
+                        canvas
 			${MF_MESSAGELOGGER}
 			${MF_UTILITIES}
 	                ${FHICLCPP}
-			${CETLIB}
+			cetlib cetlib_except
 			${CLHEP}
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}

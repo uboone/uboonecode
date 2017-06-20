@@ -1,6 +1,5 @@
 #include "WeightCalcCreator.h"
 #include "WeightCalc.h"
-#include "uboone/EventWeight/IFDHFileTransfer.h"
 
 #include <iostream>
 
@@ -22,7 +21,6 @@
 namespace evwgh {
   class FluxHistWeightCalc : public WeightCalc
   {
-    evwgh::IFDHFileTransfer IFDH;
   public:
     FluxHistWeightCalc();
     void Configure(fhicl::ParameterSet const& pset);
@@ -57,16 +55,12 @@ namespace evwgh {
     //calc config
     fNmultisims = pset.get<int>("number_of_multisims");
     fMode       = pset.get<std::string>("mode");		
+    std::string dataInput1 = pset.get< std::string >("cv_hist_file");
+    std::string dataInput2 = pset.get< std::string >("rw_hist_file");
 
-    //std::string cvfile = pset.get< std::string >("cv_hist_file");
-
-    std::string dataInput1       =   pset.get< std::string >("cv_hist_file");
-    std::string cvfile = IFDH.fetch(dataInput1);
-
-    //std::string rwfile = pset.get< std::string >("rw_hist_file");
-    std::string dataInput2       =   pset.get< std::string >("rw_hist_file");
-    std::string rwfile = IFDH.fetch(dataInput2);
-
+    cet::search_path sp("FW_SEARCH_PATH");
+    std::string cvfile = sp.find_file(dataInput1);
+    std::string rwfile = sp.find_file(dataInput2);
     
     std::string ptype[] = {"pi", "k", "k0", "mu"};
     std::string ntype[] = {"numu", "numubar", "nue", "nuebar"};
@@ -99,19 +93,24 @@ namespace evwgh {
     //calculate weight(s) here 
     // art::ServiceHandle<art::RandomNumberGenerator> rng;
     //    CLHEP::HepRandomEngine &engine = rng->getEngine(GetName());///***avisar Zarko q lo he quitado
+    std::vector<std::vector<double> > weight;
 
+    // * MC flux information
     art::Handle< std::vector<simb::MCFlux> > mcfluxListHandle;
     std::vector<art::Ptr<simb::MCFlux> > fluxlist;
     if (e.getByLabel(fGenieModuleLabel,mcfluxListHandle))
       art::fill_ptr_vector(fluxlist, mcfluxListHandle);
-    
+    else{ return weight;}
+
     // * MC truth information
     art::Handle< std::vector<simb::MCTruth> > mctruthListHandle;
     std::vector<art::Ptr<simb::MCTruth> > mclist;
     if (e.getByLabel(fGenieModuleLabel,mctruthListHandle))
       art::fill_ptr_vector(mclist, mctruthListHandle);
+    else{return weight;}
 
-    std::vector<std::vector<double> > weight(mclist.size());
+
+    weight.resize(mclist.size());
     for (unsigned int inu=0;inu<mclist.size();inu++) {
       weight[inu].resize(fNmultisims);
       

@@ -537,12 +537,14 @@ bool NuMuCCSelectionIIAlg::inFV(double x, double y, double z) const
     return false;
 }
 
+
+// These scalings apply to the updated mcc8 selectionII
 double NuMuCCSelectionIIAlg::scaledEdx(double x, int plane, bool isdata) const{
   double dEdx = 1.63;
-  double p0_data[3] = {1.927, 2.215, 1.936};
-  double p1_data[3] = {0.001495, 0.0001655, 0.001169};
-  double p0_mc[3] = {1.843, 1.904, 1.918};
-  double p1_mc[3] = {-0.0008329, -0.001357, -0.0007563};
+  double p0_data[3] = {1.53, 2.5, 1.4};
+  double p1_data[3] = {-0.0003125, 0.0027344, 0.0001953};
+  double p0_mc[3] = {1.7, 1.7, 1.6};
+  double p1_mc[3] = {0.0009766, 0.0009766, 0.0007812};
   if (isdata){
     return dEdx/(p0_data[plane]+x*p1_data[plane]);
   }
@@ -550,6 +552,22 @@ double NuMuCCSelectionIIAlg::scaledEdx(double x, int plane, bool isdata) const{
     return  dEdx/(p0_mc[plane]+x*p1_mc[plane]);
   }
 }
+
+//double NuMuCCSelectionIIAlg::scaledEdx(double x, int plane, bool isdata) const{
+//  double dEdx = 1.63;
+//  double p0_data[3] = {1.927, 2.215, 1.936};
+//  double p1_data[3] = {0.001495, 0.0001655, 0.001169};
+//  double p0_mc[3] = {1.843, 1.904, 1.918};
+//  double p1_mc[3] = {-0.0008329, -0.001357, -0.0007563};
+//  if (isdata){
+//    return dEdx/(p0_data[plane]+x*p1_data[plane]);
+//  }
+//  else{
+//    return  dEdx/(p0_mc[plane]+x*p1_mc[plane]);
+//  }
+//}
+
+
 
 
 } // namespace

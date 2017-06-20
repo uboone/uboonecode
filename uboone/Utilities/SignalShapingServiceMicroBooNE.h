@@ -123,12 +123,6 @@ namespace util {
     std::vector<std::vector<size_t> > GetNActiveResponses() { return fNActiveResponses; }
     std::vector<std::vector<size_t> > GetNYZActiveResponses() { return fNYZActiveResponses; }
     std::vector<std::vector<size_t> > GetNdatadrivenActiveResponses() { return fNdatadrivenActiveResponses; }
-    std::vector<std::vector<double> > GetYZchargeScaling()  { return fYZchargeScaling; }
-    //std::vector<std::vector<std::vector<int> > > GetYZwireOverlap() { return fYZwireOverlap; }
-    std::vector<std::vector<int> > GetMisconfiguredU()      { return fMisconfiguredU; }
-
-
-    std::vector<size_t> GetViewIndex()       { return fViewIndex; }
 
     bool IsResponseYZDependent()    { return fYZdependentResponse; }
     bool IsdatadrivenResponse()     { return fdatadrivenResponse; }
@@ -167,58 +161,49 @@ namespace util {
     // Private configuration methods.
 
     // Post-constructor initialization.
-
     void init() const{const_cast<SignalShapingServiceMicroBooNE*>(this)->init();}
     void init();
-
-    // Calculate response functions.
-    // Copied from SimWireMicroBooNE.
-
-    void SetTimeScaleFactor();
     
     void SetFieldResponse(size_t ktype);
-    // void SetElectResponse(size_t ktype);
-   
     void SetElectResponse(size_t ktype, double shapingtime, double gain);  //changed to read different peaking time for different planes
 
     // Calculate filter functions.
-
     void SetFilters();
 
     // Pick the electronics configuration
     size_t GetConfig(size_t channel) const;
-
-    // Attributes.
-
-    bool fInit;               ///< Initialization flag
-    bool fInitConfigMap;
-
-    mutable std::map<size_t, size_t> fConfigMap;
-    mutable size_t fConfigMapFirstChannel;
-    mutable size_t fConfigMapLastChannel;
-
+    
     // Sample the response function, including a configurable
     // drift velocity of electrons
-
     void SetResponseSampling(size_t ktype, size_t config, int mode=0, size_t channel=0);
 
-    void SetFieldResponseTOffsets( const TH1F* resp, const size_t ktype);
 
-    DoubleVec3 fTestParams;
 
+    // Attributes.
+    
+    
+    bool fInit;               ///< Initialization flag
+    
+    bool fInitConfigMap;
+    mutable std::map<size_t, size_t> fConfigMap;
     size_t fNConfigs;
-    size_t fNPlanes;
+    
     size_t fNViews;
 
-    // Fcl parameters.
-    std::vector<size_t>      fViewIndex;
-    std::map<size_t, size_t> fViewMap;
     size_t                   fViewForNormalization;
 
     double fDeconNorm;
     double fADCPerPCAtLowestASICGain; ///< Pulse amplitude gain for a 1 pc charge impulse after convoluting it the with field and electronics response with the lowest ASIC gain setting of 4.7 mV/fC
 
+    DoubleVec2 fASICGainInMVPerFC;       ///< Cold electronics ASIC gain setting in mV/fC
     DoubleVec2 fNoiseFactVec;       ///< RMS noise in ADCs for lowest gain setting
+
+    double fDefaultEField;
+    double fDefaultTemperature;
+
+    bool fYZdependentResponse;
+    bool fdatadrivenResponse;
+    bool fIncludeMisconfiguredU;
 
     std::vector<std::vector<size_t> > fNResponses;
     std::vector<std::vector<size_t> > fNYZResponses;
@@ -226,28 +211,11 @@ namespace util {
     std::vector<std::vector<size_t> > fNActiveResponses;
     std::vector<std::vector<size_t> > fNYZActiveResponses;
     std::vector<std::vector<size_t> > fNdatadrivenActiveResponses;
-
-    std::vector<std::vector<double> > fYZchargeScaling;
-    //std::vector<std::vector<std::vector<int> > > fYZwireOverlap;
-    std::vector<std::vector<int> > fMisconfiguredU;
-
-    bool fYZdependentResponse;
-    bool fdatadrivenResponse;
-    bool fIncludeMisconfiguredU;
-
-    DoubleVec2 fASICGainInMVPerFC;       ///< Cold electronics ASIC gain setting in mV/fC
-
-    DoubleVec fDefaultDriftVelocity;  ///< Default drift velocity of electrons in cm/usec
+    
     DoubleVec2  fFieldResponseTOffset;  ///< Time offset for field response in ns
 
-    bool fUseCalibratedResponses;         //Flag to use Calibrated Responses for 70kV  
-  
-    DoubleVec fCalibResponseTOffset; // calibrated time offset to align U/V/Y Signals 
-
-    // test
-
-    int fNFieldBins[2]; // BR
-    //size_t fNFieldBins[2];         		///< number of bins for field response
+    // testing
+    int fNFieldBins[2];         		///< number of bins for field response
     double fFieldLowEdge[2];           ///< low edge of the field response histo (for test output)
     double fFieldBin1Center[2];
     double fFieldBinWidth[2];       ///<  Bin with of the input field response.
@@ -256,6 +224,8 @@ namespace util {
 
     double fTimeScaleFactor;
     bool   fStretchFullResponse;
+    
+    DoubleVec fCalibResponseTOffset; // calibrated time offset to align U/V/Y Signals
     
     DoubleVec fFieldRespAmpVec;
     DoubleVec2 fShapeTimeConst; ///< time constants for exponential shaping
@@ -281,14 +251,10 @@ namespace util {
     DoubleVec fFilterICWireMaxFreq;
     DoubleVec fFilterICWireMaxVal;
 
-    
 
     bool fGetFilterFromHisto;   		///< Flag that allows to use a filter function from a histogram instead of the functional dependency
 
     TH1FVec4 fFieldResponseHistVec;
-
-    double fDefaultEField;
-    double fDefaultTemperature;
 
     DoubleVec fTimeScaleParams;
     
@@ -310,7 +276,6 @@ namespace util {
     std::vector<std::vector<TComplex> > FilterVec;
 
     bool fPrintResponses;
-    bool fManualInterpolation;
     
     // some diagnostic histograms
     

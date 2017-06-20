@@ -348,7 +348,7 @@ void RawDigitCorrelatedCorrectionAlg::removeCorrelatedNoise(RawDigitAdcIdxPair& 
         
         TVirtualFFT* fftr2c = TVirtualFFT::FFT(1, &fftDataSize, "R2C");
         
-        double fftInputArray[fftDataSize];
+        std::vector<double> fftInputArray(fftDataSize,0.);
         
         for(size_t tick = 0; tick < size_t(fftDataSize); tick++)
         {
@@ -357,16 +357,16 @@ void RawDigitCorrelatedCorrectionAlg::removeCorrelatedNoise(RawDigitAdcIdxPair& 
             fCorValHist[viewIdx]->Fill(tick,origCorValVec[tick]);
         }
         
-        fftr2c->SetPoints(fftInputArray);
+        fftr2c->SetPoints(fftInputArray.data());
         fftr2c->Transform();
         
         // Recover the power spectrum...
-        double realVals[fftDataSize];
-        double imaginaryVals[fftDataSize];
+        std::vector<double> realVals(fftDataSize,0.);
+        std::vector<double> imaginaryVals(fftDataSize,0.);
         double realPart(0.);
         double imaginaryPart(0.);
         
-        fftr2c->GetPointsComplex(realVals, imaginaryVals);
+        fftr2c->GetPointsComplex(realVals.data(), imaginaryVals.data());
             
         for(size_t idx = 0; idx < size_t(fftDataSize)/2; idx++)
         {
@@ -398,11 +398,11 @@ void RawDigitCorrelatedCorrectionAlg::removeCorrelatedNoise(RawDigitAdcIdxPair& 
         
             TVirtualFFT* fftr2c = TVirtualFFT::FFT(1, &fftDataSize, "R2C");
         
-            double fftInputArray[fftDataSize];
+            std::vector<double> fftInputArray(fftDataSize,0.);
         
             for(size_t idx = 0; idx < size_t(fftDataSize); idx++) fftInputArray[idx] = rawDataTimeVec[idx] - truncMeanWireVec[wireIdx];
         
-            fftr2c->SetPoints(fftInputArray);
+            fftr2c->SetPoints(fftInputArray.data());
             fftr2c->Transform();
         
             // Recover the power spectrum...
