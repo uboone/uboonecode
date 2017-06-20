@@ -9,6 +9,12 @@ art_make( BASENAME_ONLY
         CRTChannelMapAlg.cc 
         CRTGeometryHelper_service.cc
         CRTDetSim_module.cc
+        CRTDaqSim_module.cc
+	CRTCalibration_module.cc
+	CRTCoincidence_module.cc
+	CRTHitProducer_module.cc
+	CRTTrackProducer_module.cc
+	CRTMerger_module.cc
     LIBRARY_NAME  
         CRTData
     LIB_LIBRARIES
@@ -49,25 +55,25 @@ art_make_library( LIBRARY_NAME CRT
         cetlib cetlib_except
 )
 
-simple_plugin( CRTGeometryHelper service
-        larcore_Geometry
-        CRT
-        ${ART_FRAMEWORK_CORE}
-        ${ART_FRAMEWORK_IO_SOURCES}
-        ${ART_FRAMEWORK_PRINCIPAL}
-        art_Persistency_Common 
-        canvas
-        art_Persistency_Provenance 
-        canvas
-        art_Utilities 
-        canvas
-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
-        ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
-        ${ROOT_BASIC_LIB_LIST}
-        cetlib cetlib_except
-    BASENAME_ONLY
-)
+#simple_plugin( CRTGeometryHelper service
+#        larcore_Geometry
+#        CRT
+#        ${ART_FRAMEWORK_CORE}
+#        ${ART_FRAMEWORK_IO_SOURCES}
+#        ${ART_FRAMEWORK_PRINCIPAL}
+#        art_Persistency_Common 
+#        canvas
+#        art_Persistency_Provenance 
+#        canvas
+#        art_Utilities 
+#        canvas
+#        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+#        ${MF_MESSAGELOGGER}
+#        ${MF_UTILITIES}
+#        ${ROOT_BASIC_LIB_LIST}
+#        cetlib cetlib_except
+#    BASENAME_ONLY
+#)
 
 simple_plugin( CRTDetSim module
     CRT
@@ -84,27 +90,28 @@ simple_plugin( CRTDetSim module
   BASENAME_ONLY
 )
 
-simple_plugin( CRTDaqSim module
-    larcore_Geometry
-    CRTProducts
-    CRT
-    art_Utilities 
-    canvas_Utilities
-    ${ART_FRAMEWORK_SERVICES_REGISTRY}
-    ${MF_MESSAGELOGGER}
-    ${ROOT_BASIC_LIB_LIST}
-    ${CLHEP}
-    ${CETLIB}
-    bernfebdaq_core_overlays
-    ${ROOT_BASIC_LIB_LIST}
-    ${ART_UTILITIES}
-    ${ARTDAQ_CORE}
-    ${FHICLCPP}
-    ${MF_MESSAGELOGGER}
-    ${CETLIB}
-    ${GALLERY}  
-  BASENAME_ONLY
-)
+#simple_plugin( CRTDaqSim module
+#    larcore_Geometry
+#    CRTProducts
+#    CRT
+#    art_Utilities 
+#    canvas_Utilities
+#    ${ART_FRAMEWORK_SERVICES_REGISTRY}
+#    ${MF_MESSAGELOGGER}
+#    ${ROOT_BASIC_LIB_LIST}
+#    ${CLHEP}
+#    ${CETLIB}
+#    bernfebdaq-core_Overlays
+#    ${ROOT_BASIC_LIB_LIST}
+#    ${ART_UTILITIES}
+#    ${ARTDAQ_CORE}
+#    ${FHICLCPP}
+#    ${MF_MESSAGELOGGER}
+#    ${CETLIB}
+#    ${GALLERY}  
+#  BASENAME_ONLY
+#)
+
 simple_plugin( CRTGeometryHelper service
     larcore_Geometry
     CRT
@@ -118,7 +125,7 @@ simple_plugin( CRTGeometryHelper service
 
 simple_plugin(CRTCalibration "module"
         CRT
-          bernfebdaq_core_overlays
+          bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
@@ -126,7 +133,7 @@ simple_plugin(CRTCalibration "module"
 
 simple_plugin(CRTCoincidence "module"
             CRT
-              bernfebdaq_core_overlays
+              bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
@@ -135,7 +142,7 @@ simple_plugin(CRTCoincidence "module"
 
 simple_plugin(CRTHitProducer "module"
             CRT
-              bernfebdaq_core_overlays
+              bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
@@ -143,14 +150,14 @@ simple_plugin(CRTHitProducer "module"
 
 simple_plugin(CRTTrackProducer "module"
             CRT
-              bernfebdaq_core_overlays
+              bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} )
 
 #simple_plugin( CRTMerger module
-#  bernfebdaq_core_overlays
+#  bernfebdaq-core_Overlays
 #  ${ROOT_BASIC_LIB_LIST}
 #  ${ART_UTILITIES}
 #  ${ART_FRAMEWORK_SERVICES_REGISTRY}
