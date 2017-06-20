@@ -153,8 +153,8 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   std::unique_ptr<std::vector<crt::CRTHit> > CRTHiteventCol(new std::vector<crt::CRTHit>);
   
   art::Handle< std::vector<artdaq::Fragment> > rawHandle;
-  //  evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle);
-  evt.getByLabel(raw_data_label_, rawHandle);
+  //  evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle); //artdaq //daq
+  evt.getByLabel(raw_data_label_, rawHandle); //Converted files //crtdaq
   
   //check to make sure the data we asked for is valid                                                                                                  
   if(!rawHandle.isValid()){
@@ -167,8 +167,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   
   //get better access to the data                                                                                                        
   std::vector<artdaq::Fragment> const& rawFragments(*rawHandle);
-  std::cout<<" Fragments -> Size:  "<<rawFragments.size()<<std::endl;
-  getchar();
 
   //loop over the raw data fragments                                                                                                         
   //There should be one fragment per FEB in each event.                                                                                     
@@ -185,13 +183,9 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
     //auto time_end_ns = bfrag_metadata->time_end_nanosec();     //last second + 1s.                                                                  
     auto FEB_MAC =  bfrag_metadata->feb_id();     //mac addresss of this packet                                             
     auto FEB_ID = crt::auxfunctions::getFEBN(FEB_MAC); //FEB ID  
+    FEB_ID = FEB_MAC; //only for converted files
     auto feb_tevt = FEB_ID;
     double FEB_del = crt::auxfunctions::getFEBDel(FEB_ID,FEBDel); //cable_length FEB delay in ns.         
-
-
-  std::cout<<" FEB:  "<<FEB_ID<<std::endl;
-  std::cout<<" nevents:  "<<nevents<<std::endl;
-  getchar();
 
     for(size_t i_e=0; i_e<nevents; ++i_e){//B_1
       BernZMQEvent const* this_event = bfrag.eventdata(i_e); //get the single hit/event                                                                    
@@ -215,7 +209,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	keypair_tevt = std::make_pair(feb_tevt,timepair_tevt);
 	HitCollection[keypair_tevt]=this_event;
 	
-	
 	for(auto itA = begin(HitCollection); itA != end(HitCollection); ++itA){//C
 	  
 	  std::pair<int,std::pair<double,double> > keypair_st = (*itA).first;
@@ -226,7 +219,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	  timepair_st = keypair_st.second;
 	  double time_st_s = timepair_st.first;
 	  double time_st_ns = timepair_st.second;
-	  
+
 	  auto time_diff = abs( (time_tevt_ns) - (time_st_ns) );//in ns
 	  
 	  if( (time_tevt_s == time_st_s) && (time_diff<max_time_difference_) && (feb_st !=  feb_tevt) ){//D //COINCIDENCE without Tcorrection.
@@ -280,12 +273,11 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    pes_tevt.push_back(max2_tevt);
 	    std::vector<double> pos_tevt2 = crt::auxfunctions::getPos(key_tevt2, sensor_pos);
 
-
 	    double LBar = Lbar_;
 	    if(pos_tevt1[3]==3) LBar = Lbartop_;//for top	    
 	    std::vector<double> interpos_tevt = crt::auxfunctions::inter_X(pesmax_tevt1, pos_tevt1, pesmax_tevt2, pos_tevt2, LBar);
 	    double interpos_tevt_err = crt::auxfunctions::inter_X_error(pesmax_tevt1, pesmax_tevt2, LBar);
-	    
+
 	    
 	    std::vector<std::pair<int,double> > pes_st;//to be store                                                                                               
 	    double max_temp1_st = -1;
@@ -338,7 +330,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    
 	    std::vector<double> interpos_st = crt::auxfunctions::inter_X(pesmax_st1, pos_st1, pesmax_st2, pos_st2, LBar);
 	    double interpos_st_err = crt::auxfunctions::inter_X_error(pesmax_st1, pesmax_st2, LBar);
-	    
 	    
 	    double PEStot = pesmax_tevt1 + pesmax_tevt2 + pesmax_st1 + pesmax_st2;    
 	    hPEStot->Fill(PEStot);
@@ -430,8 +421,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      //Store CRTHit in Collection
 	      
 	      //quality plot
-	      
-	      
 	      if(plane==0){
 		HitDistBot->Fill(ztot,xtot);
 	      }                                               
