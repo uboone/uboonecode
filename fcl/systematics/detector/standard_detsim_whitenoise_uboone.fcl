@@ -1,0 +1,7 @@
+#include "standard_detsim_uboone.fcl"
+
+process_name: DetsimWhiteNoise
+
+physics.producers.daq.GenNoise: 1
+
+

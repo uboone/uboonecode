@@ -1,0 +1,11 @@
+###############################################################################
+#
+# This file includes standard_overlay_gen_driver.fcl and overrides GENIEGen
+# configuration to use ifdh flux file access, which is necessary for grid jobs.
+#
+###############################################################################
+
+#include "standard_overlay_gen_driver.fcl"
+
+physics.producers.generator.FluxCopyMethod: "IFDH" 
+physics.producers.generator.MaxFluxFileMB: 500

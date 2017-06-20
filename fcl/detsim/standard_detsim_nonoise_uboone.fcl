@@ -141,3 +141,4 @@ services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
 
+services.DetectorClocksService.InheritClockConfig: false

@@ -2,17 +2,22 @@
 
 BEGIN_PROLOG
 
-
+#===============================================
+#Standard uboone production database configuration
+#===============================================
 microboone_databaseretrievalalg: @local::standard_databaseretrievalalg
 microboone_databaseretrievalalg.DBUrl: "http://dbdata0vm.fnal.gov:8186/uboonecon_prod/app/"
-
 # for development db, use "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
 
 microboone_calibservicehelper:
 {
-    EventMixingModuleLabel: "mixer"
+    EventMixingModuleLabel: "retriever"
 }
 
+
+#===============================================
+#Uboone pedestal database configuration
+#===============================================
 microboone_pedestalretrievalalg:
 {
     DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg   
@@ -38,6 +43,9 @@ microboone_detpedestalservice:
 }
 
 
+#===============================================
+#Uboone channel status database configuration
+#===============================================
 microboone_channelstatus_provider:
 {
   DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg
@@ -46,7 +54,7 @@ microboone_channelstatus_provider:
   UseFile: false
 }
 microboone_channelstatus_provider.DatabaseRetrievalAlg.DBFolderName: "channelstatus_data"
-microboone_channelstatus_provider.DatabaseRetrievalAlg.DBTag: "v1r2"
+microboone_channelstatus_provider.DatabaseRetrievalAlg.DBTag: "v1r4"
 
 microboone_channelstatus_service:
 {
@@ -57,6 +65,9 @@ microboone_channelstatus_service:
 }
 
 
+#===============================================
+#Uboone electron lifetime database configuration
+#===============================================
 microboone_electronlifetime_provider:
 {
     DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg   
@@ -79,6 +90,10 @@ microboone_electronlifetime_service:
   ElectronLifetimeProvider: @local::microboone_electronlifetime_provider
 }
 
+
+#===============================================
+#Uboone detector pmt database configuration
+#===============================================
 microboone_pmtgain_provider:
 {
     DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg   
@@ -86,12 +101,18 @@ microboone_pmtgain_provider:
     UseDB: true
     UseFile: false
     
-    DefaultGain:       20.0
-    DefaultGainErr:    0.02
+    DefaultGain:       130.0
+    DefaultGainErr:    0.1
+    
+    DefaultAmplitudeGain:  20.0
+    DefaultAmplitudeGainErr: 0.01
+    
+    DefaultBaselineMean: 0.0
+    DefaultBaselineRms:  0.6 
 }
-microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "pmtgains_data"
+microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "detpmtgains_data"
 microboone_pmtgain_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
-microboone_pmtgain_provider.DatabaseRetrievalAlg.DBTag: "v1r1"
+microboone_pmtgain_provider.DatabaseRetrievalAlg.DBTag: "v1r0"
 
 microboone_pmtgain_service:
 {
@@ -101,11 +122,14 @@ microboone_pmtgain_service:
 }  
 
 
+#===============================================
+#Uboone electronics (ASICs) calibration database configuration
+#===============================================
 microboone_electronicscalib_provider:
 {
     DatabaseRetrievalAlg: @local::microboone_databaseretrievalalg   
     
-    UseDB: false
+    UseDB: true
     UseFile: false
     
     DefaultGain:           14.0
@@ -115,7 +139,7 @@ microboone_electronicscalib_provider:
 }
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBFolderName: "electronicscalib_data"
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
-microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBTag: "v1r1"
+microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBTag: "v1r2"
 
 microboone_electronicscalib_service:
 {

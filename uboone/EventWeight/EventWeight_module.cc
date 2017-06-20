@@ -32,8 +32,6 @@
 
 #include "nusimdata/SimulationBase/MCTruth.h"
 
-///#include "ifdh.h" /// to handle external files
-
 namespace evwgh {
 
 class EventWeight : public art::EDProducer {
@@ -117,15 +115,29 @@ void EventWeight::produce(art::Event & e)
   //actually go and get the stuff
   e.getByLabel(fGenieModuleLabel,mcTruthHandle);
   art::fill_ptr_vector(mclist, mcTruthHandle);
+    
 
   // contains the mctruth object from genie
+  
+ 
   for ( unsigned int inu=0; inu<mclist.size();inu++) { 
     MCEventWeight mcwgh;
     for (auto it=fWeightCalcMap.begin();it!=fWeightCalcMap.end();it++) {
-      std::pair<std::string, std::vector<double> > 
-	p(it->first+"_"+it->second->fWeightCalcType,
-	  it->second->GetWeight(e)[inu]);
-      mcwgh.fWeight.insert(p);
+
+      auto const & weights = it->second->GetWeight(e);
+      
+      if(weights.size() == 0){
+	std::vector< double > empty;
+	std::pair<std::string, std::vector <double> > p("empty",empty);
+	mcwgh.fWeight.insert(p);
+      }	
+      else{
+	std::pair<std::string, std::vector<double> > 
+	  p(it->first+"_"+it->second->fWeightCalcType,
+	    weights[inu]);
+	mcwgh.fWeight.insert(p);
+      }
+
     }
     (*mcwghvec).push_back(mcwgh);
   }

@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litemc_simch: @local::litemaker_base
 
 litemc_simch.out_filename: "larlite_simch.root"
@@ -13,4 +15,4 @@ litemc_simch.DataLookUpMap:
   simch: ["largeant"]
 }
 
-
+END_PROLOG

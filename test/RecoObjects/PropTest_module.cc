@@ -19,6 +19,10 @@
 #include "lardata/RecoObjects/SurfXYZPlane.h"
 #include "lardata/RecoObjects/PropAny.h"
 
+#include "nutools/RandomUtils/NuRandomService.h"
+#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
+#include "CLHEP/Random/RandFlat.h"
+
 #include "TMath.h"
 
 namespace trkf
@@ -43,7 +47,9 @@ namespace trkf
 
   PropTest::PropTest(const fhicl::ParameterSet& pset)
   : EDAnalyzer(pset)
-  {}
+  {
+    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
+  }
 
   void PropTest::beginJob()
   {
@@ -55,7 +61,11 @@ namespace trkf
       std::cerr << "Assert is disabled" << std::endl;
       abort();
     }
-
+    
+    // Prepare the random stream
+    CLHEP::RandFlat rndm
+      (art::ServiceHandle<art::RandomNumberGenerator>()->getEngine());
+    
     // Make a PropAny propagate to test.
 
     const trkf::Propagator* prop = new trkf::PropAny(10., true);
@@ -73,38 +83,38 @@ namespace trkf
 
       std::shared_ptr<const trkf::Surface> psurf;
       if(isurf < 10) {
-	double x0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double y0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double z0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double phi = TMath::TwoPi() * double(rand()) / double(RAND_MAX) - TMath::Pi();  // (-pi,pi)
+	double x0 = 10.* rndm() - 5.;  // (-5,5)
+	double y0 = 10.*rndm() - 5.;  // (-5,5)
+	double z0 = 10.*rndm() - 5.;  // (-5,5)
+	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfYZLine(x0, y0, z0, phi));
 	surfaces.push_back(psurf);
       }
       else if(isurf < 20) {
-	double x0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double y0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double z0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double phi = TMath::TwoPi() * double(rand()) / double(RAND_MAX) - TMath::Pi();  // (-pi,pi)
+	double x0 = 10.*rndm() - 5.;  // (-5,5)
+	double y0 = 10.*rndm() - 5.;  // (-5,5)
+	double z0 = 10.*rndm() - 5.;  // (-5,5)
+	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfYZPlane(x0, y0, z0, phi));
 	surfaces.push_back(psurf);
       }
       else {
-	double x0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double y0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double z0 = 10.*double(rand()) / double(RAND_MAX) - 5.;  // (-5,5)
-	double theta = std::acos(2. * double(rand()) / double(RAND_MAX) - 1.);  // (0, pi)
-	double phi = TMath::TwoPi() * double(rand()) / double(RAND_MAX) - TMath::Pi();  // (-pi,pi)
+	double x0 = 10.*rndm() - 5.;  // (-5,5)
+	double y0 = 10.*rndm() - 5.;  // (-5,5)
+	double z0 = 10.*rndm() - 5.;  // (-5,5)
+	double theta = std::acos(2. * rndm() - 1.);  // (0, pi)
+	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfXYZPlane(x0, y0, z0, theta, phi));
 	surfaces.push_back(psurf);
       }
 
       // Make random track vector.
 
-      double u = 100.*double(rand()) / double(RAND_MAX);  // (0,100)
-      double v = 100.*double(rand()) / double(RAND_MAX) - 50.;  // (-50, 50)
-      double dudw = 2.*double(rand()) / double(RAND_MAX) - 1.;  // (-1, 1)
-      double dvdw = 2.*double(rand()) / double(RAND_MAX) - 1.;  // (-1, 1)
-      double pinv = 0.9*double(rand()) / double(RAND_MAX) + 0.1;  // (0.1, 1.0)
+      double u = 100.*rndm();  // (0,100)
+      double v = 100.*rndm() - 50.;  // (-50, 50)
+      double dudw = 2.*rndm() - 1.;  // (-1, 1)
+      double dvdw = 2.*rndm() - 1.;  // (-1, 1)
+      double pinv = 0.9*rndm() + 0.1;  // (0.1, 1.0)
       trkf::TrackVector vec(5);
       vec(0) = u;
       vec(1) = v;
@@ -125,7 +135,7 @@ namespace trkf
       // Make random track direction.
 
       trkf::Surface::TrackDirection dir = trkf::Surface::FORWARD;
-      if(rand() % 2 == 0)
+      if(rndm() > 0.5)
 	dir = trkf::Surface::BACKWARD;
 
       // Make KETrack.
@@ -216,9 +226,9 @@ namespace trkf
 	double m1 = mom1[2]*mom2[0] - mom1[0]*mom2[2];
 	double m2 = mom1[0]*mom2[1] - mom1[1]*mom2[0];
 	std::cout << "mom1 x mom2 = " << m0 << ", " << m1 << ", " << m2 << std::endl;
-	assert(std::abs(m0) <= 1.e-8);
-	assert(std::abs(m1) <= 1.e-8);
-	assert(std::abs(m2) <= 1.e-8);
+	assert(std::abs(m0) <= 1.e-6);
+	assert(std::abs(m1) <= 1.e-6);
+	assert(std::abs(m2) <= 1.e-6);
 
 	// Make sure displacement vector is parallel to initial momentum.
 
@@ -267,7 +277,7 @@ namespace trkf
 
 	    double dij = (trk1b.getVector()(i) - trk1a.getVector()(i)) / (2.*small);
 	    std::cout << "(" << i << "," << j << "): " << dij << ", " << pm(i,j) << std::endl;
-	    assert(std::abs(dij - pm(i,j)) <= 1.e-4*std::max(std::abs(dij), 1.));
+	    assert(std::abs(dij - pm(i,j)) <= 1.e-3*std::max(std::abs(dij), 1.));
 	  }
 	}
 
@@ -286,9 +296,10 @@ namespace trkf
 	const trkf::TrackError& err2 = trk2.getError();
 	int n = vec1.size();
 	for(int i=0; i<n; ++i) {
-	  assert(std::abs(vec1(i) - vec2(i)) <= 1.e-8);
+	  assert(std::abs(vec1(i) - vec2(i)) <= 1.e-6);
 	  for(int j=0; j<n; ++j) {
-	    assert(std::abs(err1(i,j) - err2(i,j)) <= 1.e-4*std::max(std::abs(err1(i,j)), 1.));
+	    std::cout << "(" << i << "," << j << "): " << err1(i,j) << ", " << err2(i,j) << std::endl;
+	    assert(std::abs(err1(i,j) - err2(i,j)) <= 1.e-3*std::max(std::abs(err1(i,j)), 1.));
 	  }
 	}
       }
