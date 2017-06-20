@@ -1,11 +1,13 @@
 # canvas_utlities
 #include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 #include_directories( $ENV{NUTOOLS_INC} )
+
 art_make( BASENAME_ONLY
     EXCLUDE 
         CRTChannelMapAlg.cc 
         CRTGeometryHelper_service.cc
         CRTDetSim_module.cc
+        CRTCalibration_module.cc
     LIBRARY_NAME  
         CRTData
     LIB_LIBRARIES
@@ -77,16 +79,6 @@ simple_plugin( CRTDetSim module
   BASENAME_ONLY
 )
 
-simple_plugin( CRTGeometryHelper service
-    larcore_Geometry
-    CRT
-    art_Utilities 
-    ${ART_FRAMEWORK_SERVICES_REGISTRY}
-    ${MF_MESSAGELOGGER}
-    ${ROOT_BASIC_LIB_LIST}
-    ${CETLIB}
-  BASENAME_ONLY
-)
 
 simple_plugin(CRTCalibration "module"
         CRT
