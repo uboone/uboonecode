@@ -1,0 +1,170 @@
+BEGIN_PROLOG
+SuperaModule: {
+  module_type:     "LArSoftSuperaSriver"
+  supera_params:   "supera_mcexample_calmod.fcl"
+  out_filename:    "larcv.root"
+  unique_filename: true
+  stream:          "mc"
+}
+VPlaneHandler: {
+  module_type: "VPlaneHandler"
+  ProducerLabel: "caldata"
+  Smooth: true
+  HandlePlateau: true
+  Shift: true
+}
+END_PROLOG
+
+#include "dlmc_fclbase_producers.fcl"
+#include "dlmc_fclbase_driver.fcl"
+
+process_name: BNB1muNp
+
+services.TimeTracker.printSummary: true
+services.MemoryTracker.printSummaries: []
+services.MemoryTracker.includeMallocInfo: false
+services.MemoryTracker.dbOutput: {
+  filename: ""
+  overwrite: false
+}
+
+# Source: ROOT FILE
+
+source_reprocess:
+{
+  module_type: RootInput
+  maxEvents:   100000     # Number of events to create
+}
+
+# rebuild producers table w/ vplanehandle
+physics.producers: {
+  @table::dlmc_producers
+  calmod: @local::VPlaneHandler
+} 
+
+physics.filters: {
+  @table::dlmc_filters
+}
+
+# set the filters
+# example module parameter set
+#microboone_finalstateselectfilter:
+#{
+# isVerbose: false
+# module_type: "FinalStateSelectFilter"
+# GenieModuleLabel: "generator"
+# #Return an inclusive final state
+# isInclusive: true
+# 
+# # List of particles to search for
+# PDG: [ 13, -13, 11, -11, 2212, 22] #NC 1 photon
+#
+# # Will return events with this many of above particles
+# PDGCount: [0, 0, 0, 0, 1, 1]
+# # Will return events with only the specified number
+# PDGCountExclusivity: [true, true, true, true, false, true]
+# ######
+# # Commentary by Joseph
+# #
+# # This example allows for no charged leptons
+# # more than 1 proton and exactly 1 photon
+# #
+# ######
+#}
+
+# 1 electon and more than 1 proton
+physics.filters.finalstatefilter.IsVerbose: false
+physics.filters.finalstatefilter.PDGCount: [1,0,0,0,1,0]
+physics.filters.finalstatefilter.PDGCountExclusivity: [true,true,true,true,false,true]
+
+
+# rebuild analyzers table w/ supera
+physics.analyzers: {
+  @table::dlmc_analyzers
+  supera: @local::SuperaModule
+} 
+
+# Define processing paths
+physics.reprocess_path: [ rns, dlpmtprecuts, finalstatefilter, simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic, calmod ]
+physics.ana: [ @sequence::dlmc_analyze_all, supera ]
+physics.end_paths:     [ ana ]
+physics.trigger_paths: [ reprocess_path ]
+
+
+# Define the processing chain with the filter
+
+# Filter output: only analyze events that pass the following filters
+#physics.analyzers.mcinfo.SelectEvents:  []
+#physics.analyzers.simch.SelectEvents:   []
+#physics.analyzers.opdigit.SelectEvents: []
+#physics.analyzers.opreco.SelectEvents:  []
+#physics.analyzers.wire.SelectEvents:    []
+#physics.analyzers.reco2d.SelectEvents:  []
+
+physics.analyzers.mcinfo.SelectEvents:  [reprocess_path]
+physics.analyzers.simch.SelectEvents:   [reprocess_path]
+physics.analyzers.opdigit.SelectEvents: [reprocess_path]
+physics.analyzers.opreco.SelectEvents:  [reprocess_path]
+physics.analyzers.wire.SelectEvents:    [reprocess_path]
+physics.analyzers.reco2d.SelectEvents:  [reprocess_path]
+physics.analyzers.supera.SelectEvents:  [reprocess_path]
+
+# No PMT noise
+services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 0-35
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 36-47
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 100-135
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 136-147
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 200-236
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
+
+services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 0-35
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 36-47
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 100-135
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # logic channels 136-147
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, # channels 200-236
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
+
