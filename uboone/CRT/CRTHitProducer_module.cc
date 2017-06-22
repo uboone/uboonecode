@@ -259,9 +259,10 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    int key_tevt1 = feb_tevt*100+maxSipm1_tevt;
 	    int key_tevt2 = feb_tevt*100+maxSipm2_tevt;
 	    
-	    std::pair<double,double> gain_tevt1 = crt::auxfunctions::getGain(key_tevt1, SiPMgain);
+	    std::pair<double,double> gain_tevt1 = crt::auxfunctions::getGain(key_tevt1, SiPMgain); 
 	    std::pair<double,double> pedestal_tevt1 = crt::auxfunctions::getGain(key_tevt1, SiPMpedestal);
 	    double pesmax_tevt1 = (max_temp1_tevt - pedestal_tevt1.first) / gain_tevt1.first;
+	    
 	    std::pair<int,double> max1_tevt = std::make_pair(maxSipm1_tevt,pesmax_tevt1);
 	    pes_tevt.push_back(max1_tevt);
 	    std::vector<double> pos_tevt1 = crt::auxfunctions::getPos(key_tevt1, sensor_pos);
@@ -269,6 +270,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    std::pair<double,double> gain_tevt2 = crt::auxfunctions::getGain(key_tevt2, SiPMgain);
 	    std::pair<double,double> pedestal_tevt2 = crt::auxfunctions::getGain(key_tevt2, SiPMpedestal);
 	    double pesmax_tevt2 = (max_temp2_tevt - pedestal_tevt2.first) / gain_tevt2.first;
+	    
 	    std::pair<int,double> max2_tevt = std::make_pair(maxSipm2_tevt,pesmax_tevt2);
 	    pes_tevt.push_back(max2_tevt);
 	    std::vector<double> pos_tevt2 = crt::auxfunctions::getPos(key_tevt2, sensor_pos);
@@ -316,6 +318,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    std::pair<double,double> gain_st1 = crt::auxfunctions::getGain(key_st1, SiPMgain);
 	    std::pair<double,double> pedestal_st1 = crt::auxfunctions::getGain(key_st1, SiPMpedestal);
 	    double pesmax_st1 = (max_temp1_st - pedestal_st1.first) / gain_st1.first;                                                                 
+	    	    
 	    std::pair<int,double> max1_st = std::make_pair(maxSipm1_st,pesmax_st1);
 	    pes_st.push_back(max1_st);
 	    std::vector<double> pos_st1 = crt::auxfunctions::getPos(key_st1, sensor_pos);
@@ -324,6 +327,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    std::pair<double,double> gain_st2 = crt::auxfunctions::getGain(key_st2, SiPMgain);
 	    std::pair<double,double> pedestal_st2 = crt::auxfunctions::getGain(key_st2, SiPMpedestal);
 	    double pesmax_st2 = (max_temp2_st - pedestal_st2.first) / gain_st2.first;
+	    
 	    std::pair<int,double> max2_st = std::make_pair(maxSipm2_st,pesmax_st2);
 	    pes_st.push_back(max2_st);
 	    std::vector<double> pos_st2 = crt::auxfunctions::getPos(key_st2, sensor_pos);
@@ -381,7 +385,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      if( (interpos_st[6] !=2) && (interpos_tevt[6] != 2) ){ytot=(interpos_tevt[1] + interpos_st[1])/2;}	
 	      if( (interpos_st[6] !=3) && (interpos_tevt[6] != 3) ){ztot=(interpos_tevt[2] + interpos_st[2])/2;}
 	      
-
 	      hxtot->Fill(xtot);
 	      hytot->Fill(ytot);
 	      hztot->Fill(ztot);
@@ -521,12 +524,13 @@ void bernfebdaq::CRTHitProducer::beginJob()
   HitDistPipe->SetOption("COLZ");
 
   HitDistTop = tfs->make<TH2F>("hTop","Top",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
+  //HitDistTop = tfs->make<TH2F>("hTop","Top",1000,-5000,5000,1000,-5000,5000);
   HitDistTop->GetXaxis()->SetTitle("Lenght along the beam (cm)");
   HitDistTop->GetYaxis()->SetTitle("Lenght along the drift (cm)"); 
   HitDistTop->GetZaxis()->SetTitle("Entries/bin"); 
   HitDistTop->SetOption("COLZ");
 
-  FEBvsFEB = tfs->make<TH2F>("hFEBvsFEB","FEBvsFEB",100,0,100,100,0,100);
+  FEBvsFEB = tfs->make<TH2F>("hFEBvsFEB","FEBvsFEB",130,0,130,130,0,130);
   FEBvsFEB->GetXaxis()->SetTitle("FEB ID");
   FEBvsFEB->GetYaxis()->SetTitle("FEB ID");
   FEBvsFEB->SetOption("COLZ");

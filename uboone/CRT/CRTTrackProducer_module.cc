@@ -182,7 +182,8 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	  track_time_ns = (CRTHiteventA.ts0_ns + CRTHiteventB.ts0_ns)/2;
 	  track_time_s = CRTHiteventA.ts0_s;
 	  
-	  if(verbose_ == 1){
+	  if( verbose_ == 1 ){
+	  //if((verbose_ == 1) && ( (planeA==3) || (planeB==3) ) ){
 	    std::cout.precision(19);
 	    std::cout<<"tAs: "<<time_s_A<< " s" <<std::endl;
 	    std::cout<<"tAns: "<<time_ns_A<< " ns" <<std::endl;
@@ -251,7 +252,7 @@ void bernfebdaq::CRTTrackProducer::beginJob()
   my_tree_->Branch("track_theta", &theta, "Theta_xy (º)");
   my_tree_->Branch("track_phi", &phi, "Phi_xy (º)");
 
-  hplavspla = tfs->make<TH2F>("hplavspla","PlanevsPlane",4,0,3,4,0,3);
+  hplavspla = tfs->make<TH2F>("hplavspla","PlanevsPlane",4,0,4,4,0,4);
   hplavspla->GetXaxis()->SetTitle("Plane (0=Bottom, 1=FT, 2=Pipe, 3=Top)");
   hplavspla->GetYaxis()->SetTitle("Plane (0=Bottom, 1=FT, 2=Pipe, 3=Top)");
   hplavspla->GetZaxis()->SetTitle("Entries/bin");
