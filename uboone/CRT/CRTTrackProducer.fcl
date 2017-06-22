@@ -1,0 +1,63 @@
+# FHiCL document used to run the "driver" executable. To learn more
+#  about the FHiCL language, please look at
+#  cdcvs.fnal.gov/redmine/documents/327 , the "FHiCL Quick Start Guide"
+
+events_to_generate: 200
+run_number: 101
+
+services:{
+  TFileService: { fileName: "CRTTrackProducer_plots2_100ns.root" }
+}
+
+physics:
+{	
+  analyzers:
+  {
+   
+  }
+
+  producers:
+  {
+   crt:
+     {
+      module_type: CRTTrackProducer
+      data_label: "crt"
+      max_time_difference: 100.
+      store_track: 1
+      verbose: 0
+
+    }
+  }
+
+  a1: [ crt ]
+  p1: [ ]
+  e1: [ rootout ]
+  end_paths: [ a1, e1 ]
+}
+
+outputs:
+{
+
+ rootout:
+  {
+    module_type: RootOutput
+    fileName: "CRTdataTracks2_100ns.root"
+    compressionLevel: 1
+  }
+
+  out1:
+  {
+    module_type: FileDumperOutput
+    wantProductFriendlyClassName: true
+  }
+}
+
+source:
+{
+  module_type: RootInput
+}
+
+process_name: CRTTrackProducer
+
+
+

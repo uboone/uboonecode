@@ -1,0 +1,71 @@
+# FHiCL document used to run the "driver" executable. To learn more
+#  about the FHiCL language, please look at
+#  cdcvs.fnal.gov/redmine/documents/327 , the "FHiCL Quick Start Guide"
+
+events_to_generate: 200
+run_number: 101
+
+services:{
+  TFileService: { fileName: "CRTHitProducer_plots.root" }
+}
+
+physics:
+{	
+  analyzers:
+  {
+   
+  }
+
+  producers:
+  {
+   crt:
+     {
+      module_type: CRTHitProducer
+      ###raw_data_label: "daq"
+      raw_data_label: "crtdaq"
+      CRTpositions_file: "/uboone/app/users/dlorca/Cincinnati_retreat/develop/srcs/uboonecode/uboone/CRT/CRTpositionsSiPM-V8.txt" 
+      FEBDelays_file: "/uboone/app/users/dlorca/Cincinnati_retreat/develop/srcs/uboonecode/uboone/CRT/FEB_CableDelay-V8.txt" 
+      CRTgains_file: "/uboone/app/users/dlorca/Cincinnati_retreat/develop/srcs/uboonecode/uboone/CRT/CRTgains-V8.txt" 
+      CRTpedestals_file: "/uboone/app/users/dlorca/Cincinnati_retreat/develop/srcs/uboonecode/uboone/CRT/CRTpedestals-V8.txt" 
+      max_time_difference: 50.
+      Emin: 10.5
+      Lbar: 10.8
+      Lbartop: 11.2  
+      store_hit: 1
+      verbose: 0
+
+    }
+  }
+
+  a1: [ crt ]
+  p1: [ ]
+  e1: [ rootout ]
+  end_paths: [ a1, e1 ]
+}
+
+outputs:
+{
+
+ rootout:
+  {
+    module_type: RootOutput
+    fileName: "CRTdataHits.root"
+    compressionLevel: 1
+  }
+
+  out1:
+  {
+    module_type: FileDumperOutput
+    wantProductFriendlyClassName: true
+  }
+}
+
+source:
+{
+  module_type: RootInput
+}
+
+process_name: CRTHitProducer
+
+
+
