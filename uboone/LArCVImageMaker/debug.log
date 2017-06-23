@@ -1,0 +1,180 @@
+%MSG-i MF_INIT_OK:  lar 07-Jun-2017 13:01:24 CDT JobSetup
+Messagelogger initialization complete.
+%MSG
+%MSG-i path:  lar 07-Jun-2017 13:01:25 CDT JobSetup
+The following module label is not assigned to any path:
+'wire'
+
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Import() 07-Jun-2017 13:01:25 CDT  JobSetup
+Reading geometry from file: /build/kterao/mrbdev_v06_37_00/localProducts_larsoft_v06_37_00_e14_prof/uboonecode/v06_37_00/gdml/microboonev11.gdml
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::TGeoManager()  07-Jun-2017 13:01:25 CDT JobSetup
+Geometry GDMLImport, Geometry imported from GDML created
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::SetTopVolume()  07-Jun-2017 13:01:25 CDT JobSetup
+Top volume is volWorld. Master volume is volWorld
+%MSG
+%MSG-i Root_Information:  lar TGeoNavigator::BuildCache()  07-Jun-2017 13:01:25 CDT JobSetup
+--- Maximum geometry depth set to 100
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  07-Jun-2017 13:01:25 CDT JobSetup
+Fixing runtime shapes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CheckGeometry()  07-Jun-2017 13:01:25 CDT JobSetup
+...Nothing to fix
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  07-Jun-2017 13:01:25 CDT JobSetup
+Counting nodes...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::Voxelize() 07-Jun-2017 13:01:25 CDT  JobSetup
+Voxelizing...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  07-Jun-2017 13:01:26 CDT JobSetup
+Building cache...
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CountLevels()  07-Jun-2017 13:01:26 CDT JobSetup
+max level = 5, max placements = 3456
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  07-Jun-2017 13:01:26 CDT JobSetup
+11422 nodes/ 3084 volume UID's in Geometry imported from GDML
+%MSG
+%MSG-i Root_Information:  lar TGeoManager::CloseGeometry()  07-Jun-2017 13:01:26 CDT JobSetup
+----------------modeler ready----------------
+%MSG
+%MSG-i AuxDetGeometryCore:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+New detector geometry loaded from 
+	/build/kterao/mrbdev_v06_37_00/localProducts_larsoft_v06_37_00_e14_prof/uboonecode/v06_37_00/gdml/microboonev11.gdml
+	/build/kterao/mrbdev_v06_37_00/localProducts_larsoft_v06_37_00_e14_prof/uboonecode/v06_37_00/gdml/microboonev11.gdml
+
+%MSG
+%MSG-i GeometryCore:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+New detector geometry loaded from 
+	/build/kterao/mrbdev_v06_37_00/localProducts_larsoft_v06_37_00_e14_prof/uboonecode/v06_37_00/gdml/microboonev11.gdml
+	/build/kterao/mrbdev_v06_37_00/localProducts_larsoft_v06_37_00_e14_prof/uboonecode/v06_37_00/gdml/microboonev11_nowires.gdml
+
+%MSG
+%MSG-i GeometryCore:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+Sorting volumes...
+%MSG
+%MSG-i ChannelMapStandardAlg:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+Initializing Standard ChannelMap...
+%MSG
+%MSG-i setupProvider<DetectorPropertiesStandard>:  lar 07-Jun-2017 13:01:26 CDT  JobSetup
+Asked to ignore 1 keys: 'InheritNumberTimeSamples'
+%MSG
+%MSG-i PhotonVisibilityService:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+PhotonVisbilityService initializing
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+Getting Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+Getting 2D Filters from .fcl file
+%MSG
+%MSG-i SignalShapingServiceMicroBooNE:  lar 07-Jun-2017 13:01:26 CDT JobSetup
+ using the field response provided from a .root file 
+%MSG
+07-Jun-2017 13:01:26 CDT  Initiating request to open input file "/uboone/data/users/tmw/dl_test_files/testfile_mcc8_r6307_extunbiased.root"
+07-Jun-2017 13:01:27 CDT  Opened input file "/uboone/data/users/tmw/dl_test_files/testfile_mcc8_r6307_extunbiased.root"
+%MSG-d BranchID:  VPlaneHandler:calmod@Construction 07-Jun-2017 13:01:28 CDT  ModuleConstruction
+Product created with branch id: [1242948907] from branch name: "recob::Wires_calmod__LArLiteMeatSlicer."
+%MSG
+%MSG-d BranchID:  TriggerResultInserter:TriggerResults@Construction  07-Jun-2017 13:01:28 CDT ModuleConstruction
+Product created with branch id: [2581299798] from branch name: "art::TriggerResults_TriggerResults__LArLiteMeatSlicer."
+%MSG
+%MSG-w LoadNewGeometry:  PostSourceRun 07-Jun-2017 13:01:28 CDT run: 6307
+cannot find sumdata::RunData object to grab detector name
+this is expected if generating MC files
+using default geometry from configuration file
+
+%MSG
+Begin processing the 1st record. run: 6307 subRun: 0 event: 23 at 07-Jun-2017 13:01:28 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:29 CDT  run: 6307 subRun: 0 event: 23
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 2nd record. run: 6307 subRun: 1 event: 78 at 07-Jun-2017 13:01:32 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:32 CDT  run: 6307 subRun: 1 event: 78
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 3rd record. run: 6307 subRun: 3 event: 163 at 07-Jun-2017 13:01:34 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:34 CDT  run: 6307 subRun: 3 event: 163
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 4th record. run: 6307 subRun: 3 event: 169 at 07-Jun-2017 13:01:36 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:36 CDT  run: 6307 subRun: 3 event: 169
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 5th record. run: 6307 subRun: 3 event: 190 at 07-Jun-2017 13:01:38 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:38 CDT  run: 6307 subRun: 3 event: 190
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 6th record. run: 6307 subRun: 4 event: 202 at 07-Jun-2017 13:01:39 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:39 CDT  run: 6307 subRun: 4 event: 202
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 7th record. run: 6307 subRun: 4 event: 242 at 07-Jun-2017 13:01:41 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:41 CDT  run: 6307 subRun: 4 event: 242
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+Begin processing the 8th record. run: 6307 subRun: 4 event: 247 at 07-Jun-2017 13:01:43 CDT
+%MSG-d RANDOM:  PostSource 07-Jun-2017 13:01:43 CDT  run: 6307 subRun: 4 event: 247
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+07-Jun-2017 13:01:46 CDT  Closed input file "/uboone/data/users/tmw/dl_test_files/testfile_mcc8_r6307_extunbiased.root"
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 8 passed = 8 failed = 0
+
+TrigReport ------ Modules in End-Path: end_path ------------
+TrigReport  Trig Bit#        Run    Success      Error Name
+TrigReport     0    0          8          8          0 opdigit
+TrigReport     0    0          8          8          0 opreco
+TrigReport     0    0          8          8          0 reco2d
+TrigReport     0    0          8          8          0 supera
+
+TimeReport ---------- Time  Summary ---[sec]----
+TimeReport CPU = 15.703612 Real = 17.226480
+
+====================================================================================================================================
+TimeTracker printout (sec)                            Min           Avg           Max         Median          RMS         nEvts   
+====================================================================================================================================
+Full event                                          1.65883       2.15333       3.5707        1.88497      0.623986         8     
+------------------------------------------------------------------------------------------------------------------------------------
+vplanefix:calmod:VPlaneHandler                     0.0595355     0.142793      0.679638      0.0659192     0.202964         8     
+vplanefix:TriggerResults:TriggerResultInserter    2.4394e-05    3.10096e-05   7.3861e-05    2.49845e-05   1.61997e-05       8     
+end_path:opdigit:LiteScanner                       0.0100375     0.139629      0.993183      0.011158      0.323003         8     
+end_path:opreco:LiteScanner                       0.00419603     0.0445253     0.272862     0.00527798     0.0877341        8     
+end_path:reco2d:LiteScanner                        0.0312632     0.0579224     0.205581      0.0377623     0.0558949        8     
+end_path:supera:LArSoftSuperaSriver                 1.53197       1.76811       2.42182       1.70264      0.270411         8     
+====================================================================================================================================
+
+%MSG-d RANDOM:  LArSoftSuperaSriver:supera@EndJob 07-Jun-2017 13:01:46 CDT  PostEndRun
+RNGservice::takeSnapshot_() of the following engine labels:
+ |
+
+%MSG
+%MSG-i NuRandomService:  LArSoftSuperaSriver:supera@EndJob  07-Jun-2017 13:01:46 CDT PostEndRun
+
+Summary of seeds computed by the NuRandomService
+Random policy: 'random'
+  master seed: 296729903
+  seed within: [ 1 ; 900000000 ]
+
+%MSG

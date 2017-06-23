@@ -1,5 +1,5 @@
 #include "litemaker_base.fcl"
-
+BEGIN_PROLOG
 litemc_rawdigit: @local::litemaker_base
 
 litemc_rawdigit.out_filename: "larlite_rawdigit.root"
@@ -11,6 +11,6 @@ litemc_rawdigit.DataLookUpMap:
 
 litemc_rawdigit.AssociationLookUpMap:
 {}
-
+END_PROLOG
 
 

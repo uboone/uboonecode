@@ -1,0 +1,48 @@
+#include "services_microboone.fcl"
+#include "photpropservices_microboone.fcl"
+
+BEGIN_PROLOG
+
+dldata_services:
+{
+  RandomNumberGenerator:   {} #ART native random number generator                                                                                          
+  LLMetaMaker: {Enable: true}
+  LArCVMetaMaker: {Enable: true}
+  @table::microboone_simulation_services
+}
+
+dldata_services.FileCatalogMetadata.applicationVersion: "develop"
+dldata_services.FileCatalogMetadata.fileType: "data"
+dldata_services.FileCatalogMetadata.runType: "physics"
+dldata_services.FileCatalogMetadataMicroBooNE: {
+  FCLName: "data_to_larlite.fcl"
+  FCLVersion: "develop"
+  ProjectName: "LiteData"
+  ProjectStage: "LiteMaker"
+  ProjectVersion: "develop"
+}
+
+dldata_services.Geometry.ForceUseFCLOnly: true
+
+#dldata_services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
+#dldata_services.SignalShapingServiceMicroBooNE.NConfigs:            2
+#dldata_services.SignalShapingServiceMicroBooNE.FilterFuncVec:  [ "(x>0.0)*gaus", "(x>0.0)*gaus", "(x>0.0)*gaus" ]
+#dldata_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
+#dldata_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
+
+dldata_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
+dldata_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
+dldata_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
+dldata_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
+dldata_services.SignalShapingServiceMicroBooNE.DefaultTemperature: 89
+dldata_services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: false
+dldata_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 1.0, 1.0, 1.0]
+dldata_services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0.0, 2.0, 0.0]
+dldata_services.SignalShapingServiceMicroBooNE.FieldRespAmpVec: [0.555, 0.447, 1.46]
+
+dldata_services.DetectorPropertiesService.NumberTimeSamples:        6400
+dldata_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+dldata_services.DetectorClocksService.InheritClockConfig:           false
+dldata_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+
+END_PROLOG
