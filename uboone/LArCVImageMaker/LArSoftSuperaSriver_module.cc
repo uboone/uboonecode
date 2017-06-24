@@ -77,12 +77,13 @@ LArSoftSuperaSriver::LArSoftSuperaSriver(fhicl::ParameterSet const & p)
   for(auto const& proc_name : process_names) {
     std::string param_name = "CSV" + proc_name;
     auto constraint_file = p.get<std::string>(param_name.c_str(),"");
+    if(constraint_file.empty()) continue;
+
     std::string fullpath;
     if( !finder.find_file(constraint_file,fullpath) )
       throw cet::exception("LArSoftSuperaSriver") << "Unable to find CSV file "  << constraint_file << "\n";
 
-    if(!constraint_file.empty())
-      _supera.SetCSV(proc_name,fullpath);
+    _supera.SetCSV(proc_name,fullpath);
   }
 
   // Decide on output filename

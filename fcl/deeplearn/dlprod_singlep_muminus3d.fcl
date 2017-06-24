@@ -1,4 +1,4 @@
-#include "dlmc_singlep_common.fcl"
+#include "dlprod_singlep_common.fcl"
 physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView3D ]
 
 process_name: MuMinus

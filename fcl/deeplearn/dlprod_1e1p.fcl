@@ -1,8 +1,5 @@
-#include "dlmc_multipvtx_larlite.fcl"
+#include "dlprod_multipvtx_larlite.fcl"
 
-physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView3D ]
-
-physics.producers.generator: @local::MultiPartVertex
 physics.producers.generator.DebugMode    : 0
 physics.producers.generator.G4Time       : 3925.0
 physics.producers.generator.G4TimeJitter : 800
@@ -15,5 +12,5 @@ physics.producers.generator.ParticleParameter.PDGCode      : [      [11],      [
 physics.producers.generator.ParticleParameter.MinMulti     : [         1,           1]
 physics.producers.generator.ParticleParameter.MaxMulti     : [         1,           1]
 physics.producers.generator.ParticleParameter.ProbWeight   : [         1,           1]
-physics.producers.generator.ParticleParameter.KERange      : [ [0.05,0.8], [0.05,0.5]]
+physics.producers.generator.ParticleParameter.KERange      : [ [0.05,0.5], [0.05,0.3]]
 physics.producers.generator.ParticleParameter.MomRange     : []

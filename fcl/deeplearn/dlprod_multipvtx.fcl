@@ -1,6 +1,5 @@
 #include "multipvtx.fcl"
-#include "singles_microboone.fcl"
-#include "dlmc_fclbase_driver.fcl"
+#include "dlprod_fclbase_driver.fcl"
 process_name: MultiPartVertex
 
 source: @local::source_gen
@@ -8,7 +7,13 @@ source: @local::source_gen
 physics.analyzers.superaFocusedView.supera_params: "supera_segment_focused_plus.fcl"
 
 physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView ]
-physics.sim: [ @sequence::dlmc_process_trigfilter ]
+physics.sim: [ rns, 
+               @sequence::dlprod_simpart,
+               @sequence::dlprod_simpmt,
+               swtrigger,
+               @sequence::dlprod_simtpc,
+               @sequence::dlprod_pmtreco,
+               @sequence::dlprod_tpcreco ]
 
 #physics.trigger_paths: [ sim ]
 #physics.stream:        [out1]

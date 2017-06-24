@@ -1,4 +1,4 @@
-#include "dlmc_multipvtx_larlite.fcl"
+#include "dlprod_multipvtx_larlite.fcl"
 
 physics.producers.generator.DebugMode    : 0
 physics.producers.generator.G4Time       : 3925.0

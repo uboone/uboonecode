@@ -1,6 +1,6 @@
-#include "dlmc_fclbase_producers.fcl"
-#include "dlmc_fclbase_analyzers.fcl"
-#include "dlmc_fclbase_services.fcl"
+#include "dlprod_fclbase_producers.fcl"
+#include "dlprod_fclbase_analyzers.fcl"
+#include "dlprod_fclbase_services.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
 process_name: LArLite
@@ -13,7 +13,7 @@ services:
   MemoryTracker:           @local::microboone_memory_tracker
   message:                 @local::microboone_message_services_prod_debug
   FileCatalogMetadata:     @local::art_file_catalog_mc
-  @table::dlmc_services
+  @table::dlprod_services
 }
 
 services.TimeTracker.printSummary: false
@@ -51,11 +51,11 @@ source_reprocess:
 
 physics:
 {
- producers: { @table::dlmc_producers }
+ producers: { @table::dlprod_producers }
 
- filters: { @table::dlmc_filters }
+ filters: { @table::dlprod_filters }
 
- analyzers: { @table::dlmc_analyzers }
+ analyzers: { @table::dlprod_analyzers }
 
  stream: []
  end_paths: []

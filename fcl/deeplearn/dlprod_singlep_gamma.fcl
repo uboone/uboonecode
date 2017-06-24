@@ -1,4 +1,4 @@
-#include "dlmc_singlep_common.fcl"
+#include "dlprod_singlep_common.fcl"
 
 process_name: Gamma
 services.TFileService.fileName: "gamma_%tc.root"

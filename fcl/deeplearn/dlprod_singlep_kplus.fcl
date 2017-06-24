@@ -1,4 +1,4 @@
-#include "dlmc_singlep_common.fcl"
+#include "dlprod_singlep_common.fcl"
 
 process_name: KPlus
 services.TFileService.fileName: "kplus_%tc.root"

@@ -56,6 +56,9 @@ namespace supera {
 		 const int time_offset,
 		 const std::vector<int>& trackid_v);
 
+    void
+    GenerateMeta(const int time_offset);
+
     void ClearEventData();
 
     bool Test() const;

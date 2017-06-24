@@ -214,10 +214,7 @@ namespace supera {
 					const int  time_offset,
 					const std::vector<int>& trackid_v)
   { GenerateMeta(simch_v,time_offset,trackid_v,true); }
-    
-
-
-
+  
   void PulledPork3DSlicer::GenerateMeta(const std::vector<supera::LArSimCh_t>& simch_v,
 					const int time_offset,
 					const std::vector<int>& trackid_v,
@@ -272,6 +269,13 @@ namespace supera {
     _meta_v = DeriveMeta(point_v,time_offset);
   }
 
+  void PulledPork3DSlicer::GenerateMeta(const int time_offset) 
+  {
+    LARCV_INFO() << _slicer.PrintConfig() << std::flush;
+    std::vector<supera::GridPoint3D> point_v;
+    _meta_v = DeriveMeta(point_v,time_offset);
+  }
+  
   std::vector<larcv::ImageMeta>
   PulledPork3DSlicer::DeriveMeta(const std::vector<supera::GridPoint3D>& point_v,
 				 const int time_offset) const {

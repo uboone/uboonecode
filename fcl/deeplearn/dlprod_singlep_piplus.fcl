@@ -1,4 +1,4 @@
-#include "dlmc_singlep_common.fcl"
+#include "dlprod_singlep_common.fcl"
 
 process_name: PiMinus
 services.TFileService.fileName: "piplus_%tc.root"

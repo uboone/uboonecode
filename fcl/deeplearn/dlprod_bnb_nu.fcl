@@ -1,11 +1,18 @@
-#include "dlmc_fclbase_driver.fcl"
+#include "dlprod_fclbase_driver.fcl"
 
 process_name: BNBNuLArLite
 
 source: @local::source_gen
 
 physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView ]
-physics.sim: [ @sequence::dlmc_process_trigfilter ]
+physics.sim: [ rns,
+               @sequence::dlprod_simpart,
+               @sequence::dlprod_simpmt,
+               swtrigger,
+               @sequence::dlprod_simtpc,
+               @sequence::dlprod_pmtreco,
+               @sequence::dlprod_tpcreco 
+               ]
 physics.trigger_paths: [ sim ]
 physics.end_paths:     [ ana ]
 

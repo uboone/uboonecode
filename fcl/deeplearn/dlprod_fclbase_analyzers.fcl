@@ -1,0 +1,83 @@
+#include "litemc_mcinfo.fcl"
+#include "litemc_simch.fcl"
+#include "litemc_wire.fcl"
+#include "litemc_reco2d.fcl"
+#include "litemc_opreco.fcl"
+#include "litemc_opdigit.fcl"
+
+BEGIN_PROLOG
+
+SuperaWholeView: {
+  module_type:     "LArSoftSuperaSriver"
+  supera_params:   "supera_segment.fcl"
+  out_filename:    "larcv.root"
+  unique_filename: true
+  stream:          "mc"
+}
+
+SuperaFocusedView: @local::SuperaWholeView
+SuperaFocusedView.supera_params: "supera_segment_focused_plus.fcl"
+
+SuperaBasic: @local::SuperaWholeView
+SuperaBasic.supera_params: "supera_basic.fcl"
+
+SuperaFocusedView3D: @local::SuperaWholeView
+SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"
+
+SuperaMichelMC: @local::SuperaFocusedView
+SuperaMichelMC.CSVSuperaMetaMaker: "michel_constraint.fcl"
+
+SuperaMichelData: @local::SuperaFocusedView
+SuperaMichelData.supera_params: "supera_basic_focused.fcl"
+SuperaMichelData.CSVSuperaMetaMaker: "michel_constraint.fcl"
+
+dlprod_analyzers:
+ {
+   mcinfo:  @local::litemc_mcinfo
+   simch:   @local::litemc_simch
+
+   wire:    @local::litemc_wire
+   opdigit: @local::litemc_opdigit
+   opreco:  @local::litemc_opreco
+
+   reco2d:  @local::litemc_reco2d
+
+   superaWholeView:   @local::SuperaWholeView
+   superaFocusedView: @local::SuperaFocusedView
+   superaFocusedView3D: @local::SuperaFocusedView3D
+   superaMichelMC:    @local::SuperaMichelMC
+   superaMichelData:  @local::SuperaMichelData
+}
+
+dlprod_analyze_all:    [ simch, mcinfo, opreco, reco2d, opdigit, wire ]
+
+dlprod_analyze_cosmic: [ mcinfo, opreco, reco2d ]
+
+dlprod_analyzers.mcinfo.stream:     "mcinfo"
+dlprod_analyzers.simch.stream:      "simch"
+dlprod_analyzers.opdigit.stream:    "opdigit"
+dlprod_analyzers.opreco.stream:     "opreco"
+dlprod_analyzers.wire.stream:       "wire"
+dlprod_analyzers.reco2d.stream:     "reco2d"
+
+dlprod_analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
+dlprod_analyzers.simch.out_filename:      "larlite_simch.root"
+dlprod_analyzers.opdigit.out_filename:     "larlite_opdigit.root"
+dlprod_analyzers.opreco.out_filename:      "larlite_opreco.root"
+dlprod_analyzers.wire.out_filename:        "larlite_wire.root"
+dlprod_analyzers.reco2d.out_filename:      "larlite_reco2d.root"
+
+dlprod_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
+
+dlprod_analyzers.opreco.DataLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dlprod_analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+dlprod_analyzers.opreco.AssociationLookUpMap.ophit: ["ophitBeam","ophitCosmic"]
+dlprod_analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+
+dlprod_analyzers.reco2d.DataLookUpMap.hit: ["gaushit"]
+dlprod_analyzers.reco2d.DataLookUpMap.cluster: []
+dlprod_analyzers.reco2d.AssociationLookUpMap.wire: ["caldata"]
+dlprod_analyzers.reco2d.AssociationLookUpMap.hit: ["gaushit"]
+dlprod_analyzers.reco2d.AssociationLookUpMap.cluster: []
+dlprod_analyzers.reco2d.AssLabelToSave: ["gaushit"]
+END_PROLOG

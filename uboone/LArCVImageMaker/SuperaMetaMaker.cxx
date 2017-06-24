@@ -42,7 +42,8 @@ namespace larcv {
 
     if(supera::PulledPork3DSlicer::Is(_meta_maker)) {
       ((supera::PulledPork3DSlicer*)(_meta_maker))->ClearEventData();
-      ((supera::PulledPork3DSlicer*)(_meta_maker))->AddConstraint(LArData<supera::LArMCTruth_t>());
+      if(!LArDataLabel(supera::LArDataType_t::kLArMCTruth_t).empty())
+	((supera::PulledPork3DSlicer*)(_meta_maker))->AddConstraint(LArData<supera::LArMCTruth_t>());
       if(!CSV().empty() && _constraint_m.empty()) {
 	_constraint_m.clear();
 	supera::csvreader::read_constraint_file(CSV(),_constraint_m);
@@ -55,7 +56,10 @@ namespace larcv {
 	if(iter!=_constraint_m.end()) 
 	  ((supera::PulledPork3DSlicer*)(_meta_maker))->AddConstraint((*iter).second[0],(*iter).second[1],(*iter).second[2]);
       }
-      ((supera::PulledPork3DSlicer*)(_meta_maker))->GenerateMeta(LArData<supera::LArSimCh_t>(),TimeOffset());
+      if(!LArDataLabel(supera::LArDataType_t::kLArSimCh_t).empty())
+	((supera::PulledPork3DSlicer*)(_meta_maker))->GenerateMeta(LArData<supera::LArSimCh_t>(),TimeOffset());
+      else
+	((supera::PulledPork3DSlicer*)(_meta_maker))->GenerateMeta(TimeOffset());
     }
     
     return true;
