@@ -41,6 +41,7 @@ add_subdirectory(DataOverlay)
 add_subdirectory(PatternFilter)
 add_subdirectory(MicroBooNEPandora)
 add_subdirectory(QuietEvents)
+add_subdirectory(DLFilters)
 
 add_subdirectory(DQMTools)
 

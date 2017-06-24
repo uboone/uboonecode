@@ -1,0 +1,12 @@
+BEGIN_PROLOG
+
+DLSignalSample_filter: {
+  module_type: "DLSignalSample"
+  dWallcm: 10.0
+  Dist2Wall: 10.0
+  EnuRangeMeV: [200.0,50000.0]
+  MCTruthProducer: "generator"
+  ProtonMinKE_MeV: 30.0
+}
+
+END_PROLOG
