@@ -47,6 +47,7 @@ private:
   float fProtonMinKE;
   std::string fMCTruthProducer;
   std::vector<float> fEnuTrueRange;
+  int verbosity;
 
   float dwall( const std::vector<float>& pos );
 
@@ -58,6 +59,7 @@ DLSignalSample::DLSignalSample(fhicl::ParameterSet const & p)
 // Initialize member data here.
 {
   // Call appropriate produces<>() functions here.
+  verbosity = p.get<int>("Verbosity",0);
   fdWall = p.get<float>("dWallcm",0.0);
   fDist2Wall = p.get<float>("Dist2Wall",10.0);
   fEnuTrueRange = p.get< std::vector<float> >("EnuRangeMeV");
@@ -91,6 +93,7 @@ bool DLSignalSample::filter(art::Event & e)
   bool contained = true; // dist2wall. only applies to muons
   bool minproton = false; // final state proton with largest KE has threshold KE
   bool enucut = false; // within Enu Range
+  bool haslepton = false; // CC only for now
 
   for ( auto const& truthdata : (*truthHandle) ) {
     // check the origin. we want beam neutrinos.
@@ -118,14 +121,29 @@ bool DLSignalSample::filter(art::Event & e)
 	if ( posdwall>fdWall )
 	  in_fv = true;
 
-	if ( particle.E(0)>fEnuTrueRange[0] && particle.E(0)<fEnuTrueRange[1] )
+	if ( particle.E(0)*1000.0>fEnuTrueRange[0] && particle.E(0)*1000.0<fEnuTrueRange[1] )
 	  enucut = true;
+
+	if ( verbosity>0 ) {
+	  std::cout << "Found Neutrino:" << std::endl;
+	  std::cout << "  vertex (" << pos[0] << "," << pos[1] << "," << pos[2] << ")" << std::endl;
+	  std::cout << "  dwall: " << posdwall << std::endl;
+	  std::cout << "  Energy: " << particle.E(0)*1000.0 << " MeV" << std::endl;
+	  std::cout << "  InFV: " << in_fv << std::endl;
+	  std::cout << "  InEnuRange: " << enucut << std::endl;
+	}
       }
       else if ( particle.PdgCode()==2212 ) {
-	if ( particle.P(0)>max_proton_mom )
-	  max_proton_mom = particle.P(0);
+	if ( particle.P(0)*1000.0>max_proton_mom )
+	  max_proton_mom = particle.P(0)*1000.0;
+	if ( verbosity>0 ) {
+	  std::cout << "Found proton:" << std::endl;
+	  std::cout << "  init momentum: " << particle.P(0)*1000.0 << std::endl;
+	  std::cout << "  updated max proton mom: " << max_proton_mom << std::endl;
+	}
       }
-      else if ( particle.PdgCode()==14 || particle.PdgCode()==-14 ) {
+      else if ( particle.PdgCode()==13 || particle.PdgCode()==-13 ) {
+	haslepton = true;
 	std::vector<float> endpos(3,0);
 	endpos[0] = particle.EndX();
 	endpos[1] = particle.EndY();
@@ -133,24 +151,51 @@ bool DLSignalSample::filter(art::Event & e)
 	float end_dwall = dwall( endpos );
 	if ( end_dwall < fDist2Wall )
 	  contained = false;
+	if ( verbosity>0 ) {
+	  std::cout << "Found muon:" << std::endl;
+	  std::cout << "  end pos (" << endpos[0] << "," << endpos[1] << "," << endpos[2] << ")" << std::endl;
+	  std::cout << "  dist2wall: " << end_dwall << std::endl;
+	  std::cout << "  contained: " << contained << std::endl;
+	}
       }
-    }
+      else if ( particle.PdgCode()==11 || particle.PdgCode()==-11 ) {
+	haslepton = true;
+	if ( verbosity>0 ) {
+	  std::cout << "Found electron." << std::endl;
+	}
+      }
+    }//end of loop over MC particle data in truth class
     float max_proton_ke = sqrt(max_proton_mom*max_proton_mom + 938.20*938.20) - 938.20;
     if ( max_proton_ke>fProtonMinKE )
       minproton = true;
+    if ( verbosity>0 ) {
+      std::cout << "Max proton KE: " << max_proton_ke << std::endl;
+      std::cout << "Min Proton KE cut passes: " << minproton << std::endl;
+      std::cout << "Cut Summary: " << std::endl;
+      std::cout << "  haslepton: " << haslepton << std::endl;
+      std::cout << "  infv: " << in_fv << std::endl;      
+      std::cout << "  inenurange: " << enucut << std::endl;      
+      std::cout << "  contained: " << contained << std::endl;
+      std::cout << "  minproton: " << minproton << std::endl;
+    }
+
+  }//end of loop over truth classes
+
+  if ( verbosity>0 && (in_fv & contained & minproton & enucut & haslepton) ) {
+    std::cout << "PASSES run subrun event: " << e.run() << " " << e.subRun() << " " << e.event() << std::endl;
   }
   
-  return in_fv | contained | minproton | enucut;
+  return in_fv & contained & minproton & enucut & haslepton;
 }
 
 float DLSignalSample::dwall( const std::vector<float>& pos ) {
   
-  float dx1 = fabs(pos[0]);
-  float dx2 = fabs(258-pos[0]);
-  float dy1 = fabs(117.0-pos[1]);
-  float dy2 = fabs(-117.0-pos[1]);
-  float dz1 = fabs(pos[2]);
-  float dz2 = fabs(1036.0-pos[2]);
+  float dx1 = pos[0]-0.0;
+  float dx2 = 258.0-pos[0];
+  float dy1 = 117.0-pos[1];
+  float dy2 = pos[1] + 117.0; // - -117.0
+  float dz1 = pos[2];
+  float dz2 = 1036.0-pos[2];
   
   float fdwall = 1.0e9;
   

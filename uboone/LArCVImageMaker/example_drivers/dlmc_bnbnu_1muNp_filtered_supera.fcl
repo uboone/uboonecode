@@ -13,6 +13,15 @@ VPlaneHandler: {
   HandlePlateau: true
   Shift: true
 }
+DLSignalSample_filter: {
+  module_type: "DLSignalSample"
+  dWallcm: 10.0
+  Dist2Wall: 10.0
+  EnuRangeMeV: [200.0,50000.0]
+  MCTruthProducer: "generator"
+  ProtonMinKE_MeV: 30.0
+  Verbosity: 0
+}
 END_PROLOG
 
 #include "dlmc_fclbase_producers.fcl"
@@ -42,8 +51,10 @@ physics.producers: {
   calmod: @local::VPlaneHandler
 } 
 
+# rebuild filters table w/ signal filter
 physics.filters: {
   @table::dlmc_filters
+  sigfilter: @local::DLSignalSample_filter
 }
 
 # set the filters
@@ -85,7 +96,7 @@ physics.analyzers: {
 } 
 
 # Define processing paths
-physics.reprocess_path: [ rns, dlpmtprecuts, finalstatefilter, simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic, calmod ]
+physics.reprocess_path: [ rns, dlpmtprecuts, finalstatefilter, sigfilter, simpleFlashBeam, simpleFlashCosmic, opflashBeam, opflashCosmic, calmod ]
 physics.ana: [ @sequence::dlmc_analyze_all, supera ]
 physics.end_paths:     [ ana ]
 physics.trigger_paths: [ reprocess_path ]
