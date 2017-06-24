@@ -10,10 +10,12 @@ source.inputCommands: ["keep *_*_*_*",
                        "drop raw::OpDetWaveforms_saturation_*_*"]
 
 physics.ana: [ opreco, reco2d, superaMichelData ]
-physics.sim: [ rns, wcNoiseFilter, caldata, saturation, @sequence::dlprod_reprocess_mcc8 ]
+physics.sim: [ rns, wcNoiseFilter, saturation, @sequence::dlprod_reprocess_mcc8 ]
 
 physics.trigger_paths: [ sim ]
 physics.end_paths:     [ ana ]
+
+physics.producers.wcNoiseFilter.DoNoiseFiltering: true
 
 physics.analyzers.mcinfo.stream:      "mcinfo"
 physics.analyzers.opreco.stream:      "opreco"
