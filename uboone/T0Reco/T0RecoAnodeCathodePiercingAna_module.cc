@@ -71,7 +71,10 @@ private:
   std::string fCosmicTagProducer;
 
   bool        fUseMC;
-  double      fResolution; // cm resolution to allow mc-reco track matching. [Y,Z] must be within this distance
+  double      fMCResolution; // cm resolution to allow mc-reco track matching. [Y,Z] must be within this distance
+
+  // Declare a variable for the TPC resolution (fTPCResolution).
+  double fTPCResolution;
 
   // debug mode?
   bool _debug;
@@ -99,6 +102,17 @@ private:
   int    _cathode;
   int    _run, _subrun, _event;
 
+  // Add additional qualifications onto the face of the TPC that the track pierces.
+  // Entering
+  int    _enters_front;
+  int    _enters_back;
+  int    _enters_top;
+
+  // Exiting
+  int    _exits_front;
+  int    _exits_back;
+  int    _exits_bottom;
+
   TTree* _mucs_tree;
   double _reco_time;
 
@@ -121,12 +135,24 @@ private:
   bool   TrackExitsAnode    (const std::vector<TVector3>& sorted_trk);
   bool   TrackExitsSide     (const std::vector<TVector3>& sorted_trk);
 
+  // additional cathode-piercing functions
+  bool   TrackEntersCathode (const std::vector<TVector3>& sorted_trk);
+  bool   TrackExitsCathode  (const std::vector<TVector3>& sorted_trk);
+
+  // additional functions for the endcap-piercing tracks.
+  bool   TrackEntersFront   (const std::vector<TVector3>& sorted_trk);
+  bool   TrackEntersBack    (const std::vector<TVector3>& sorted_trk);
+  bool   TrackExitsFront    (const std::vector<TVector3>& sorted_trk);
+  bool   TrackExitsBack     (const std::vector<TVector3>& sorted_trk);
+
   // functions to be used for organization in the module
   void   SortTrackPoints      (const recob::Track& track,
 			       std::vector<TVector3>& sorted_trk);
 
   bool MatchTracks(const recob::Track& track, const sim::MCTrack& mctrk, const double& res);
 
+  // Declare a bool for if the loop has already been entered.
+  bool _has_loop_already_been_entered;
 };
 
 
@@ -141,16 +167,25 @@ T0RecoAnodeCathodePiercingAna::T0RecoAnodeCathodePiercingAna(fhicl::ParameterSet
   fHitProducer       = p.get<std::string>("HitProducer"      );
   fCosmicTagProducer = p.get<std::string>("CosmicTagProducer");
   fUseMC             = p.get<bool>       ("UseMC"            );
-  fResolution        = p.get<double>     ("Resolution"       );
+  fMCResolution      = p.get<double>     ("Resolution"       );
   _debug             = p.get<bool>       ("debug"            );
+
+  // Include a variable for the TPC resolution.
+  fTPCResolution     = 20.0;
 
   // get boundaries based on detector bounds
   auto const* geom = lar::providerFrom<geo::Geometry>();
 
-  _TOP    =   geom->DetHalfHeight() - fResolution;
-  _BOTTOM = - geom->DetHalfHeight() + fResolution;
-  _FRONT  =   fResolution;
-  _BACK   =   geom->DetLength() - fResolution;
+  _TOP    =   geom->DetHalfHeight() - fTPCResolution;
+  _BOTTOM = - geom->DetHalfHeight() + fTPCResolution;
+  _FRONT  =   fTPCResolution;
+  _BACK   =   geom->DetLength() - fTPCResolution;
+
+  std::cout << "The resolution value on the TPC boundaries = " << fTPCResolution << "." << std::endl;
+  std::cout << "The top of the TPC is located at = " << _TOP << "." << std::endl;
+  std::cout << "The bottom of the TPC is located at = " << _BOTTOM << "." << std::endl;
+  std::cout << "The front of the TPC is located at = " << _FRONT << "." << std::endl;
+  std::cout << "The back of the TPC is located at = " << _BACK << "." << std::endl;
 
 }
 
@@ -182,6 +217,12 @@ void T0RecoAnodeCathodePiercingAna::beginJob()
   // information on whether track enters/exits which sides
   _tree->Branch("_anode"  ,&_anode  ,"anode/I"  );
   _tree->Branch("_cathode",&_cathode,"cathode/I");
+  _tree->Branch("_enters_top",&_enters_top,"enters_top/I");
+  _tree->Branch("_enters_front",&_enters_front,"enters_front/I");
+  _tree->Branch("_enters_back",&_enters_back,"enters_back/I");
+  _tree->Branch("_exits_front",&_exits_front,"exits_front/I");
+  _tree->Branch("_exits_back",&_exits_back,"exits_back/I");
+  _tree->Branch("_exits_bottom",&_exits_bottom,"exits_bottom/I");
   _tree->Branch("_run",&_run,"run/I");
   _tree->Branch("_subrun",&_subrun,"subrun/I");
   _tree->Branch("_event",&_event,"event/I");
@@ -226,8 +267,6 @@ void T0RecoAnodeCathodePiercingAna::beginJob()
   _2dhit_tree->Branch("_rc_y_end",&_rc_y_end,"rc_y_end/D");
   _2dhit_tree->Branch("_rc_z_end",&_rc_z_end,"rc_z_end/D");
   _2dhit_tree->Branch("_t0",&_t0,"t0/D");
-
-  fResolution = 10; // cm
 
   // Use '_detp' to find 'efield' and 'temp'
   auto const* _detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
@@ -333,12 +372,45 @@ void T0RecoAnodeCathodePiercingAna::analyze(art::Event const & e)
       _py = (_rc_y_end - _rc_y_start) / _mag;
       _pz = (_rc_z_end - _rc_z_start) / _mag;
 
-      _anode = _cathode = 0;
+      // Has loop already been entered.
+      _has_loop_already_been_entered = false;
 
-      if ( (TrackExitsBottom(sorted_trk) == true) && (TrackEntersAnode(sorted_trk) == true)  ) { _anode = 1; _cathode = 0; }
-      if ( (TrackExitsBottom(sorted_trk) == true) && (TrackEntersAnode(sorted_trk) == false) ) { _anode = 0; _cathode = 1; }
-      if ( (TrackEntersTop(sorted_trk) == true)   && (TrackExitsAnode(sorted_trk) == true)   ) { _anode = 1; _cathode = 0; }
-      if ( (TrackEntersTop(sorted_trk) == true)   && (TrackExitsAnode(sorted_trk) == false)  ) { _anode = 0; _cathode = 1; }
+      // I am going to extend these to include a few more cases (the endcap-piercing cases).
+      _anode = _cathode = _enters_front = _enters_back = _enters_top = _exits_front = _exits_back = _exits_bottom = 0;
+
+      // Add on the cases for the endcap-piercing tracks.  The background for which it cannot be deduced whether the track entered or exited the face of the TPC in z have already been removed in the Producer. 
+
+      if ( (TrackExitsFront(sorted_trk) == true) && (TrackEntersAnode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _anode= 1;    _exits_front = 1; std::cout << "anode->front" << std::endl;}
+      if ( (TrackExitsFront(sorted_trk) == true) && (TrackEntersCathode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _cathode = 1; _exits_front = 1; std::cout << "cathode->front" << std::endl;}
+      if ( (TrackExitsBack(sorted_trk) == true) && (TrackEntersAnode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _anode = 1;   _exits_back = 1;  std::cout << "anode->back" << std::endl;}
+      if ( (TrackExitsBack(sorted_trk) == true) && (TrackEntersCathode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _cathode = 1; _exits_back = 1;  std::cout << "cathode->back" << std::endl;}
+
+      if ( (TrackEntersFront(sorted_trk) == true) && (TrackExitsAnode(sorted_trk) == true)  ) { _has_loop_already_been_entered = true; _anode = 1;   _enters_front = 1; std::cout << "front->anode" << std::endl;}
+      if ( (TrackEntersFront(sorted_trk) == true) && (TrackExitsCathode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _cathode = 1; _enters_front = 1; std::cout << "front->cathode" << std::endl;}
+      if ( (TrackEntersBack(sorted_trk) == true) && (TrackExitsAnode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _anode = 1;   _enters_back = 1;  std::cout << "back->anode" << std::endl;}
+      if ( (TrackEntersBack(sorted_trk) == true) && (TrackExitsCathode(sorted_trk) == true) ) { _has_loop_already_been_entered = true; _cathode = 1; _enters_back = 1;  std::cout << "back->cathode" << std::endl;}
+
+      if ( (TrackExitsBottom(sorted_trk) == true) && (TrackEntersAnode(sorted_trk) == true)  && (_has_loop_already_been_entered == false) ) { _anode = 1;   _exits_bottom = 1; std::cout << "anode->bottom" << std::endl;}
+      if ( (TrackExitsBottom(sorted_trk) == true) && (TrackEntersCathode(sorted_trk) == true) && (_has_loop_already_been_entered == false) ) { _cathode = 1; _exits_bottom = 1; std::cout << "cathode->bottom" << std::endl;}
+      if ( (TrackEntersTop(sorted_trk) == true)   && (TrackExitsAnode(sorted_trk) == true) && (_has_loop_already_been_entered == false) ) { _anode = 1;   _enters_top = 1; std::cout << "top->anode" << std::endl;}
+      if ( (TrackEntersTop(sorted_trk) == true)   && (TrackExitsCathode(sorted_trk) == true) && (_has_loop_already_been_entered == false) ) { _cathode = 1; _enters_top = 1; std::cout << "top->cathode" << std::endl;}
+
+
+      
+      // Print out all of the tracks information if anode and cathode are both 1.
+      if (_anode == 1 && _cathode == 1) {
+
+	std::cout << "This track is recorded to pierce both the anode and the cathode!" << std::endl;
+	std::cout << "rc_x_start: " << _rc_x_start << std::endl;
+	std::cout << "rc_y_start: " << _rc_y_start << std::endl;
+	std::cout << "rc_z_start: " << _rc_z_start << std::endl;
+	std::cout << "rc_x_end: " << _rc_x_end << std::endl;
+	std::cout << "rc_y_end: " << _rc_y_end << std::endl;
+	std::cout << "rc_z_end: " << _rc_z_end << std::endl;
+
+	continue;
+
+      }
 
       // reconstructed time comes from T0 object
       _rc_time = t0->Time();
@@ -356,13 +428,14 @@ void T0RecoAnodeCathodePiercingAna::analyze(art::Event const & e)
 
       // if we should use MC info -> continue w/ MC validation
       if (fUseMC == true){
+
 	// loop through MCTracks to find the one that matches.
 	for (size_t j=0; j < mctrk_h->size(); j++){
 	  
 	  auto const& mctrk = mctrk_h->at(j);
 	  
 	  // try matching to MC
-	  if (MatchTracks(track, mctrk, fResolution) == false)
+	  if (MatchTracks(track, mctrk, fMCResolution) == false)
 	    continue;
 	  
 	  // matched -> get MCTrack time and reconstructed track reconstructed T0
@@ -646,5 +719,90 @@ void   T0RecoAnodeCathodePiercingAna::SortTrackPoints(const recob::Track& track,
       sorted_trk.push_back( track.LocationAtPoint( N - i - 1) );
   }
 }
+
+// Place all of the additional functions here.
+
+bool   T0RecoAnodeCathodePiercingAna::TrackEntersCathode(const std::vector<TVector3>& sorted_trk)
+{
+
+  // we know the track enters either the                                                                                                                                            
+  // anode or cathode                                                                                                                                                                         
+  // at this point figure out                                                                                                                                                                     
+  // if it ENTERS the ANODE or CATHODE                                                                                                                                                             
+  // ANODE: top point must be at lower X-coord                                                                                                                                  
+  // than bottom point                                                                                                                                                                          
+  // CATHODE: top point must be at larger X-coord                                                                                                                               
+  // than bottom point                                                                                                                                                                       
+  // assume track has already been sorted                                                                                                                                                
+  // such that the 1st point is the most elevated in Y coord.                                                                                                       
+  // return TRUE if passes the ANODE                                                                                                                                                                   
+
+  auto const& top    = sorted_trk.at(0);
+  auto const& bottom = sorted_trk.at( sorted_trk.size() - 1 );
+
+  if (top.X() > bottom.X())
+    return true;
+
+  return false;
+}
+
+bool   T0RecoAnodeCathodePiercingAna::TrackExitsCathode(const std::vector<TVector3>& sorted_trk)
+{
+
+  auto const& top    = sorted_trk.at(0);
+  auto const& bottom = sorted_trk.at( sorted_trk.size() - 1 );
+
+  if (top.X() < bottom.X())
+    return true;
+
+  return false;
+}
+
+bool T0RecoAnodeCathodePiercingAna::TrackEntersBack(const std::vector<TVector3>& sorted_trk)
+{
+
+
+  auto const& top_pt    = sorted_trk.at(0);
+
+  if (top_pt.Z() > _BACK)
+    return true;
+
+  return false;
+}
+
+bool T0RecoAnodeCathodePiercingAna::TrackEntersFront(const std::vector<TVector3>& sorted_trk)
+{
+
+  auto const& top_pt = sorted_trk.at(0);
+
+  if (top_pt.Z() < _FRONT)
+    return true;
+
+  return false;
+}
+
+bool   T0RecoAnodeCathodePiercingAna::TrackExitsFront(const std::vector<TVector3>& sorted_trk)
+{
+
+  auto const& bottom_pt = sorted_trk.at(sorted_trk.size() - 1);
+
+  if (bottom_pt.Z() < _FRONT)
+    return true;
+
+  return false;
+}
+
+bool   T0RecoAnodeCathodePiercingAna::TrackExitsBack(const std::vector<TVector3>& sorted_trk)
+{
+
+  auto const& bottom_pt = sorted_trk.at(sorted_trk.size() - 1);
+
+  if (bottom_pt.Z() > _BACK)
+    return true;
+
+  return false;
+}
+
+
 
 DEFINE_ART_MODULE(T0RecoAnodeCathodePiercingAna)

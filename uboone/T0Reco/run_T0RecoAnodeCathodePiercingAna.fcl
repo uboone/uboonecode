@@ -8,7 +8,7 @@ services:
 {
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
-  TFileService:            { fileName: "T0RecoAna_ana.root" }
+  TFileService:            { fileName: "T0RecoAna_ana_extbnb.root" }
   TimeTracker:             {}
   ExptGeoHelperInterface:         @local::microboone_geometry_helper
   Geometry:                       @local::microboone_geo
@@ -33,7 +33,7 @@ outputs:{
  out1:
  {
    module_type: RootOutput
-   fileName:    "T0RecoAna.root"
+   fileName:    "T0RecoAna_extbnb.root"
    dataTier:    "ana"
    compressionLevel: 1
  }

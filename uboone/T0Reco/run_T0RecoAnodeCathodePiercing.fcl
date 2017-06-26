@@ -9,7 +9,7 @@ services:
 {
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
-  TFileService:            { fileName: "T0Reco_ana.root" }
+  TFileService:            { fileName: "T0Reco_ana_extbnb.root" }
   TimeTracker:             {}
   ExptGeoHelperInterface:         @local::microboone_geometry_helper
   Geometry:                       @local::microboone_geo
@@ -46,7 +46,7 @@ physics:
   rns:                 { module_type: RandomNumberSaver }
 
   ### flash finders
-  t0reco : @local::T0RecoAnodeCathodePiercing_mc
+  t0reco : @local::T0RecoAnodeCathodePiercing_mc_loose
  }
  analyzers:
  {
@@ -77,7 +77,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "T0Reco.root"
+   fileName:    "T0Reco_extbnb.root"
    dataTier:    "reco"
    compressionLevel: 1
    }

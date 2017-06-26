@@ -8,7 +8,7 @@ T0RecoAnodeCathodePiercingAna: {
  CaloProducer      : "pandoraCosmiccalo"
  HitProducer       : "pandoraCosmic"
  CosmicTagProducer : "pandoraCosmicKHittag"
- UseMC             : true
+ UseMC             : false
  Resolution        : 10
  debug             : false
 }

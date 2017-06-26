@@ -173,6 +173,14 @@ T0RecoAnodeCathodePiercing::T0RecoAnodeCathodePiercing(fhicl::ParameterSet const
   // Determine the drift velocity from 'efield' and 'temp'
   fDriftVelocity = _detp -> DriftVelocity(efield,temp);
 
+  std::cout << "The resolution on the TPC = " << fTPCResolution << "." << std::endl;
+  std::cout << "The timing resolution for anode-piercing tracks = " << fTimeResA << "." << std::endl;
+  std::cout << "The timing resolution for cathode-piercing tracks = " << fTimeResC << "."<< std::endl;
+
+  std::cout << "The offset on anode-piercing tracks = " << fRecoT0TimeOffsetA << "." << std::endl;
+  std::cout << "The offset on cathode-piercing tracks = " << fRecoT0TimeOffsetC <<  "."<< std::endl;
+  std::cout << "The drift velocity value = " << fDriftVelocity << std::endl;
+
 }
 
 void T0RecoAnodeCathodePiercing::produce(art::Event & e)
@@ -243,7 +251,7 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
     double trkT = 0.;
 
     // keep track of whether it goes thorugh the anode or cathode
-    bool anode = 0;
+    // bool anode = 0;
 
     // 1st category: tracks which ENTER SIDE
     if ( TrackEntersSide(sorted_trk) == true ) {
@@ -283,17 +291,17 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
       // The 'trkX' enters on the anode, the side of the TPC with a lower x value than the cathode
       if (enters_anode){
 	trkT = trkX / fDriftVelocity + fRecoT0TimeOffsetA;
-	anode = 1;
+	// anode = 1;
       }
       // This will also give a small T0 value, because the cathode is a distance of _det_width from the anode
       else{
 	trkT = (trkX - _det_width) / fDriftVelocity + fRecoT0TimeOffsetC; 
-	anode = 0;
+	// anode = 0;
       }
 
     }// if the track enters the side
 
-    // case in which the track exits the side
+    // 2nd category: tracks which EXIT SIDE
     if (TrackExitsSide(sorted_trk) == true) {
 
       if (_debug) std::cout << "\t track exits side" << std::endl;
@@ -321,22 +329,22 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
       if (tagged == false) continue;
 
       // figure out if it enters the anode or cathode                                                                                                              
-      bool enters_anode = TrackEntersAnode(sorted_trk);
+      bool exits_anode = TrackExitsAnode(sorted_trk);
       
       // get the X coordinate of the point piercing the anode/cathode (upon ENTERING) 
-      double trkX = GetEnteringTimeCoord(sorted_trk);
+      double trkX = GetExitingTimeCoord(sorted_trk);
       
       // reconstruct track T0 w.r.t. trigger time                                                                                                                              
 
       // The 'trkX' enters on the anode, the side of the TPC with a lower x value than the cathode
-      if (enters_anode){
+      if (exits_anode){
 	trkT = trkX / fDriftVelocity + fRecoT0TimeOffsetA;
-	anode = 1;
+	// anode = 1;
       }
       // This will also give a small T0 value, because the cathode is a distance of _det_width from the anode
       else{
 	trkT = (trkX - _det_width) / fDriftVelocity + fRecoT0TimeOffsetC; 
-	anode = 0;
+	// anode = 0;
       }
 
     }// if the track exits the side
@@ -350,16 +358,16 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
     // flash_match_result is std::pair
     // 1st element is dt w.r.t. closest flash of light in PMTs
     // 2nd element is index of PMT flash matched to
-    if ( (flash_match_result.first > fTimeResA) && (anode == 1) )
-      continue;
-    if ( (flash_match_result.first > fTimeResC) && (anode == 0) )
-      continue;
+    // if ( (flash_match_result.first > fTimeResA) && (anode == 1) )
+    // continue;
+    // if ( (flash_match_result.first > fTimeResC) && (anode == 0) )
+    // continue;
     
     // some T0 reconstructed values mean that the track hits were truncated due
     // to ADC waveform truncation. They can be identified by the distribution
     // of reconstructed T0s
-    if ( (trkT > fT0negMin) && (trkT < fT0negMax) ) continue;
-    if ( (trkT > fT0posMin) && (trkT < fT0posMax) ) continue;
+    // if ( (trkT > fT0negMin) && (trkT < fT0negMax) ) continue;
+    // if ( (trkT > fT0posMin) && (trkT < fT0posMax) ) continue;
 
     // DON'T CREATE the t0 object unless the reconstructed t0 is some value other than 0
 
