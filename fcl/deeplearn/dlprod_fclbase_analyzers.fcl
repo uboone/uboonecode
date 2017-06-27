@@ -16,7 +16,10 @@ SuperaWholeView: {
 }
 
 SuperaFocusedView: @local::SuperaWholeView
-SuperaFocusedView.supera_params: "supera_segment_focused_plus.fcl"
+SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
+
+SuperaFocusedViewPlus: @local::SuperaWholeView
+SuperaFocusedViewPlus.supera_params: "supera_segment_focused_plus.fcl"
 
 SuperaBasic: @local::SuperaWholeView
 SuperaBasic.supera_params: "supera_basic.fcl"

@@ -16,8 +16,6 @@ physics.sim: [ rns,
 physics.trigger_paths: [ sim ]
 physics.end_paths:     [ ana ]
 
-physics.analyzers.superaFocusedView.supera_params: "supera_segment_focused.fcl"
-
 # GENIE
 physics.producers.generator: @local::microboone_genie_simple
 physics.producers.generator.GlobalTimeOffset: 3125.

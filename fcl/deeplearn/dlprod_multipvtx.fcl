@@ -4,9 +4,7 @@ process_name: MultiPartVertex
 
 source: @local::source_gen
 
-physics.analyzers.superaFocusedView.supera_params: "supera_segment_focused_plus.fcl"
-
-physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView ]
+physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
 physics.sim: [ rns, 
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
