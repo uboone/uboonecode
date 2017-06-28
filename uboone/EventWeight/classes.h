@@ -1,10 +1,11 @@
 #include <map>
 #include <string>
+#include <vector>
 #include "canvas/Persistency/Common/Wrapper.h"
-
 #include "uboone/EventWeight/MCEventWeight.h"
 
 template class art::Wrapper<evwgh::MCEventWeight>;
 template class art::Wrapper<std::vector<evwgh::MCEventWeight> >;
 template class std::map<std::string, double>;
 template class std::map<std::string, std::vector<double> >;
+
