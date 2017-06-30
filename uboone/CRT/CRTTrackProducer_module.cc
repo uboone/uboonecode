@@ -88,7 +88,9 @@ private:
 
   TH2F* hplavspla;
   TH1F* hTlength;
+  TH1F* hTtime;
   TH2F* hTlengthvsTime;
+  TH2F* hTlengthvsTimeAbs;
   TH1F* htheta;
   TH1F* hphi;
   TH1F* hts0_ns;
@@ -218,15 +220,24 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	  CRTcanTrack.phizy = phi;
 	
 	  CRTTrackCol->emplace_back(CRTcanTrack);
+
+	  //std::cout.precision(10);
+	  //std::cout<<time_s_A<<"  "<<track_time_ns<<"  "<<xA<<"  "<<yA<<"  "<<zA<<"  "<<xB<<"  "<<yB<<"  "<<zB<<std::endl;
+
+
 	  
 	  ////quality plot
+	  //if(( planeA!=3) && (planeB!=3) ){ //Top not calibrated yet
 	  my_tree_->Fill();
 	  hplavspla->Fill(planeA,planeB);	
 	  hTlength->Fill(length);
+	  hTtime->Fill(time_diffABS);
+	  hTlengthvsTimeAbs->Fill(length,time_diffABS);
 	  hTlengthvsTime->Fill(length,time_diff);
 	  htheta->Fill(theta);
 	  hphi->Fill(phi);
 	  hts0_ns->Fill(track_time_ns);
+	  // }
 	  //quallity plots                                                                                                                                                 		
 	}//D
       }//C
@@ -265,14 +276,24 @@ void bernfebdaq::CRTTrackProducer::beginJob()
   hTvsH->SetOption("COLZ");
 
   hTlength = tfs->make<TH1F>("hTlength","Track_Length",1500,0,1500);
-  hTlength->GetXaxis()->SetTitle("Thack_Length (cm)");
+  hTlength->GetXaxis()->SetTitle("Track_Length (cm)");
   hTlength->GetYaxis()->SetTitle("Entries/bin");
+
+  hTtime = tfs->make<TH1F>("hTtime","Track_time",120,-10,110);
+  hTtime->GetXaxis()->SetTitle("Track_time (ns)");
+  hTtime->GetYaxis()->SetTitle("Entries/bin");
 
   hTlengthvsTime = tfs->make<TH2F>("hTlengthvsTime","Track_LengthvsTime",1500,0,1500,200,-100,100);
   hTlengthvsTime->GetXaxis()->SetTitle("Track_Length (cm)");
   hTlengthvsTime->GetYaxis()->SetTitle("Track_time (ns)");
   hTlengthvsTime->GetZaxis()->SetTitle("Entries/bin");
   hTlengthvsTime->SetOption("COLZ");
+
+  hTlengthvsTimeAbs = tfs->make<TH2F>("hTlengthvsTimeAbs","Track_LengthvsTimeAbs",1500,0,1500,110,-10,100);
+  hTlengthvsTimeAbs->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlengthvsTimeAbs->GetYaxis()->SetTitle("Track_time (ns)");
+  hTlengthvsTimeAbs->GetZaxis()->SetTitle("Entries/bin");
+  hTlengthvsTimeAbs->SetOption("COLZ");
 
   htheta = tfs->make<TH1F>("htheta","Track_theta",900,0,180);
   htheta->GetXaxis()->SetTitle("Theta_xy (º)");

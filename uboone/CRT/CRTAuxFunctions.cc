@@ -81,7 +81,7 @@ double crt::auxfunctions::getFEBDel(int ID,  std::map <int,double >& FEBDel){
 
 void crt::auxfunctions::FillGain(std::string fileGain,   std::map <int, std::pair<double,double> >& sensor_gain){ //key = FEB*100+ch            
   
-  std::cout<<"Reading SiPMs gain information"<<std::endl;
+  std::cout<<"Reading SiPMs gain/pedestal information"<<std::endl;
   
   std::ifstream in;
   in.open(fileGain.c_str());
