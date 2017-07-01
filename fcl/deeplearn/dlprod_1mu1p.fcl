@@ -1,4 +1,4 @@
-#include "dlprod_multipvtx_larlite.fcl"
+#include "dlprod_multipvtx.fcl"
 
 physics.producers.generator: @local::MultiPartVertex
 physics.producers.generator.DebugMode    : 0

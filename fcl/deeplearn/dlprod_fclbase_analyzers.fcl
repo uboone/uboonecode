@@ -47,6 +47,7 @@ dlprod_analyzers:
 
    superaWholeView:   @local::SuperaWholeView
    superaFocusedView: @local::SuperaFocusedView
+   superaFocusedViewPlus: @local::SuperaFocusedViewPlus
    superaFocusedView3D: @local::SuperaFocusedView3D
    superaMichelMC:    @local::SuperaMichelMC
    superaMichelData:  @local::SuperaMichelData
