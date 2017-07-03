@@ -70,7 +70,6 @@ class CalWireROI : public art::EDProducer
     void reconfigure(fhicl::ParameterSet const& p);
     
     void reconfFFT(int temp_fftsize);
-    void getTruncatedRMS(const std::vector<float>& waveform, float& truncRms) const;
     
   private:
     
@@ -83,9 +82,6 @@ class CalWireROI : public art::EDProducer
     int                                                      fSaveWireWF;                 ///< Save recob::wire object waveforms
     size_t                                                   fEventCount;                 ///< count of event processed
     int                                                      fMinAllowedChanStatus;       ///< Don't consider channels with lower status
-    
-    float                                                    fTruncRMSThreshold;          ///< Calculate RMS up to this threshold...
-    float                                                    fTruncRMSMinFraction;        ///< or at least this fraction of time bins
     
     std::unique_ptr<uboone_tool::IROIFinder>                 fROIFinder;
     std::unique_ptr<uboone_tool::IDeconvolution>             fDeconvolution;
@@ -169,9 +165,6 @@ void CalWireROI::reconfigure(fhicl::ParameterSet const& p)
     fFFTSize                    = p.get< size_t >        ("FFTSize"                );
     fSaveWireWF                 = p.get< int >           ("SaveWireWF"             );
     fMinAllowedChanStatus       = p.get< int >           ("MinAllowedChannelStatus");
-    
-    fTruncRMSThreshold          = p.get< float >         ("TruncRMSThreshold",    6.);
-    fTruncRMSMinFraction        = p.get< float >         ("TruncRMSMinFraction", 0.6);
     
     fSpillName.clear();
     
@@ -276,9 +269,6 @@ void CalWireROI::produce(art::Event& evt)
             float  rms_noise = digitVec->GetSigma();
             float  raw_noise = fSignalShaping->GetRawNoise(channel);
             
-            // Actually, need to recalculate this if using wirecell noise filter!
-            getTruncatedRMS(rawAdcLessPedVec, rms_noise);
-            
             if      (fNoiseSource == 1) raw_noise = rms_noise;
             else if (fNoiseSource != 2) raw_noise = std::max(raw_noise,rms_noise);
             
@@ -328,27 +318,6 @@ void CalWireROI::produce(art::Event& evt)
 
     return;
 } // produce
-    
-void CalWireROI::getTruncatedRMS(const std::vector<float>& waveform,
-                                 float&                    truncRms) const
-{
-    // do rms calculation - the old fashioned way and over all adc values
-    std::vector<float> locWaveform = waveform;
-    
-    // sort in ascending order so we can truncate the sume
-    std::sort(locWaveform.begin(), locWaveform.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});
-    
-    float threshold = fTruncRMSThreshold;
-    
-    std::vector<float>::iterator threshItr = std::find_if(locWaveform.begin(),locWaveform.end(),[threshold](const auto& val){return std::fabs(val) > threshold;});
-    
-    int minNumBins = std::max(int(fTruncRMSMinFraction * locWaveform.size()),int(std::distance(locWaveform.begin(),threshItr)));
-    
-    // Get the truncated sum
-    truncRms = std::inner_product(locWaveform.begin(), locWaveform.begin() + minNumBins, locWaveform.begin(), 0.);
-    truncRms = std::sqrt(std::max(0.,truncRms / double(minNumBins)));
-    
-    return;
-}
+
 
 } // end namespace caldata
