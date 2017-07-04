@@ -62,7 +62,7 @@ private:
   long int     ev_time;
   long int     ts1_time;
   long int     diff_time;
-
+  uint32_t     n_crt_frags;
   
 
 };
@@ -84,6 +84,7 @@ crt::CRTTS1Producer::CRTTS1Producer(fhicl::ParameterSet const & p)
   fTree->Branch("ts1_ns",&ts1_time_ns,"ts1_ns/i");
   fTree->Branch("ts1_time",&ts1_time,"ts1_time/L");
   fTree->Branch("diff_time",&diff_time,"diff_time/L");
+  fTree->Branch("n_crt_frags",&n_crt_frags,"n_crt_frags/i");
 
 
 }
@@ -95,6 +96,12 @@ void crt::CRTTS1Producer::produce(art::Event & e)
   ev_time_ns = e.time().timeLow();
   ev_time = ((long int)ev_time_s)*1000000000 + (long int)ev_time_ns;
 
+  ts1_time_s = 0;
+  ts1_time_ns = 0;
+  ts1_time = 0;
+  n_crt_frags=0;
+  diff_time = -999999999999;
+  
   std::unique_ptr<std::vector<bernfebdaq::BernZMQEvent> > ts1Col(new std::vector<bernfebdaq::BernZMQEvent>);
 
   art::Handle< std::vector<artdaq::Fragment> > fragHandle;
@@ -102,7 +109,7 @@ void crt::CRTTS1Producer::produce(art::Event & e)
   std::vector<artdaq::Fragment> const& fragVector(*fragHandle);
 
   bool first=true;
-  
+  n_crt_frags = fragVector.size();
   for(auto const& frag : fragVector){
     bernfebdaq::BernZMQFragment bfrag(frag);
 
@@ -114,11 +121,12 @@ void crt::CRTTS1Producer::produce(art::Event & e)
 	  ts1_time_ns = ts1Col->back().Time_TS0();
 	  ts1_time = ((long int)ts1_time_s)*1000000000 + (long int)ts1_time_ns;
 	  diff_time = ts1_time - ev_time;
-	  fTree->Fill();
 	  first=false;
 	}
       }
   }
+
+  fTree->Fill();
 
   e.put(std::move(ts1Col));
 }
