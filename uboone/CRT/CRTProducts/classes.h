@@ -12,6 +12,7 @@
 #include "CRTSimData.hh"
 #include "CRTHit.hh"
 #include "CRTTrack.hh"
+#include "bernfebdaq-core/Overlays/BernZMQFragment.hh"
 #include <utility>
 #include <vector>
 #include <map>
@@ -32,3 +33,6 @@ template class art::Wrapper< std::vector<crt::CRTHit> >;
 
 template class std::vector<crt::CRTTrack>;
 template class art::Wrapper< std::vector<crt::CRTTrack> >;
+
+template class std::vector<bernfebdaq::BernZMQEvent>;
+template class art::Wrapper< std::vector<bernfebdaq::BernZMQEvent> >;
