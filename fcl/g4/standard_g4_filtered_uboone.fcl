@@ -78,7 +78,7 @@ outputs:
  }
 }
 
-physics.filters.contfilter.isVerbose: false
+physics.filters.contfilter.IsVerbose: false
 physics.filters.contfilter.module_type: "ContainmentFilter"
 physics.filters.contfilter.GenieModuleLabel: "generator" 
 physics.filters.contfilter.MCRecoModuleLabel: "mcreco" 

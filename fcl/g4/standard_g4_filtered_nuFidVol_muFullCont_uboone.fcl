@@ -2,7 +2,7 @@
 
 outputs.out1.fileName: "%ifb_%tc_g4_NuFidVol_MuonFullContainment.root"
 
-physics.filters.contfilter.isVerbose: false
+physics.filters.contfilter.IsVerbose: false
 physics.filters.contfilter.module_type: "ContainmentFilter"
 physics.filters.contfilter.GenieModuleLabel: "generator" 
 physics.filters.contfilter.MCRecoModuleLabel: "mcreco" 
