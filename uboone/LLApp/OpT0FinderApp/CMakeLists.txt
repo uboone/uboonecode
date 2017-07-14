@@ -9,7 +9,7 @@ art_make( BASENAME_ONLY
 		   uboonecode_uboone_BasicTool_GeoAlgo
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 	   	   #Simulation
 		   #Utilities
@@ -47,7 +47,7 @@ art_make( BASENAME_ONLY
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
 
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase
