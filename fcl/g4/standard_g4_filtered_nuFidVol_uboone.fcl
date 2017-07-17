@@ -1,0 +1,28 @@
+#include "standard_g4_filtered_uboone.fcl"
+
+outputs.out1.fileName: "%ifb_%tc_g4_NuFidVol.root"
+
+physics.filters.contfilter.isVerbose: false
+physics.filters.contfilter.module_type: "ContainmentFilter"
+physics.filters.contfilter.GenieModuleLabel: "generator" 
+physics.filters.contfilter.MCRecoModuleLabel: "mcreco" 
+physics.filters.contfilter.FidDistX: 10         # Fiducial volume, in cm
+physics.filters.contfilter.FidDistY: 10         # Fiducial volume, in cm
+physics.filters.contfilter.FidDistZ: 10         # Fiducial volume, in cm
+physics.filters.contfilter.InclusiveSelection: false
+physics.filters.contfilter.CheckNeutrinoMuon: false
+physics.filters.contfilter.CheckNeutrinoElectron: false
+physics.filters.contfilter.CheckNeutrinoPhotons: false
+physics.filters.contfilter.CheckNeutrinoVertex: [true, true]
+physics.filters.contfilter.CheckMuonFullContainment: [false,false]
+physics.filters.contfilter.CheckMuonFracLength: [false, false]
+physics.filters.contfilter.CheckMuonFracEnergy: [false, false]
+physics.filters.contfilter.CheckElectronFracEnergy: [false, false]
+physics.filters.contfilter.CheckPhotonConversionLocation: [false, false]
+physics.filters.contfilter.CheckPhotonFracEnergy: [false, false]
+physics.filters.contfilter.OnlyExceptThisManyPhotons: [false, 2]
+physics.filters.contfilter.MinimumContainedTrackLength: 100  # Length of contained track, in cm
+physics.filters.contfilter.MinimumContainedTrackEnergy: .5   # Fraction of contained track energy
+physics.filters.contfilter.MinimumContainedShowerEnergy: .5  # Fraction of contained shower energy
+
+
