@@ -1,0 +1,22 @@
+#include "prodgenie_common_uboone_Filtered.fcl"
+
+process_name: GenieGenFiltered
+
+outputs.out1.fileName: "prodgenie_bnb_nu_filtered_CCPiZero_uboone_%tc_gen.root"
+
+source.maxEvents: 250
+
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volCryostat"
+physics.producers.generator.BeamName: "booster"
+physics.producers.generator.GenFlavors: [14,-14]
+
+physics.filters.finalstatefilter.IsVerbose: false
+physics.filters.finalstatefilter.isInclusive: false #exclusive
+physics.filters.finalstatefilter.PDG: [13, 2212] #1mu1p
+physics.filters.finalstatefilter.PDGCount: [1, 1]
+physics.filters.finalstatefilter.PDGCountExclusivity: [true, true] #1 and only 1
+physics.filters.finalstatefilter.PDGCountExclusivity: [true, true] #1 and only 1
+physics.filters.finalstatefilter.MinimumEnergy: [0.035, 0.06]
