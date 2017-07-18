@@ -11,7 +11,7 @@ physics.producers.generator.MultiMax     : 5
 physics.producers.generator.MultiMin     : 1
 physics.producers.generator.ParticleParameter.PDGCode      : [    [11,22],      [13,211],     [2212]]
 physics.producers.generator.ParticleParameter.MinMulti     : [          0,             0,          0]
-physics.producers.generator.ParticleParameter.MaxMulti     : [          3,             3,          3]
+physics.producers.generator.ParticleParameter.MaxMulti     : [          3,             3,          4]
 physics.producers.generator.ParticleParameter.ProbWeight   : [          2,             1,          1]
 physics.producers.generator.ParticleParameter.KERange      : []
 physics.producers.generator.ParticleParameter.MomRange     : [ [0.05,1.0],     [0.1,1.0],  [0.3,0.8]]

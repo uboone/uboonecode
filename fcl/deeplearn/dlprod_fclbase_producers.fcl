@@ -146,4 +146,7 @@ dlprod_producers.gaushit.Chi2NDF:                                  50.
 #dlprod_producers.gaushit.TryNplus1Fits:                            false
 #dlprod_producers.gaushit.Chi2NDF:                                  50.
 
+# PMT precuts
+dlprod_filters.dlpmtprecuts.OpHitProducer: "ophitBeam"
+
 END_PROLOG

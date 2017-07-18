@@ -24,6 +24,9 @@ SuperaFocusedViewPlus.supera_params: "supera_segment_focused_plus.fcl"
 SuperaBasic: @local::SuperaWholeView
 SuperaBasic.supera_params: "supera_basic.fcl"
 
+SuperaMCBasic: @local::SuperaWholeView
+SuperaMCBasic.supera_params: "supera_segment.fcl"
+
 SuperaFocusedView3D: @local::SuperaWholeView
 SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"
 
@@ -46,6 +49,7 @@ dlprod_analyzers:
    reco2d:  @local::litemc_reco2d
 
    superaWholeView:   @local::SuperaWholeView
+   superaWholeViewMC: @local::SuperaMCBasic
    superaFocusedView: @local::SuperaFocusedView
    superaFocusedViewPlus: @local::SuperaFocusedViewPlus
    superaFocusedView3D: @local::SuperaFocusedView3D
