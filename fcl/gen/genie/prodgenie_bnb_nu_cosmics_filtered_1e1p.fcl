@@ -1,10 +1,10 @@
-#include "prodgenie_common_uboone_Filtered.fcl"
+#include "prodgenie_common_cosmic_uboone_Filtered.fcl"
 
 process_name: GenieGenFiltered
 
-outputs.out1.fileName: "prodgenie_bnb_nu_filtered_1e1p_uboone_%tc_gen.root"
+outputs.out1.fileName: "prodgenie_bnb_nu_cosmics_filtered_1e1p_uboone_%tc_gen.root"
 
-source.maxEvents: 250
+source.maxEvents: 350
 
 physics.producers.generator: @local::microboone_genie_simple
 physics.producers.generator.GlobalTimeOffset: 3125.

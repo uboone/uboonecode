@@ -4,7 +4,7 @@ process_name: GenieGenFiltered
 
 outputs.out1.fileName: "prodgenie_bnb_nu_cosmics_filtered_NCPiZero_uboone_%tc_gen.root"
 
-source.maxEvents: 900
+source.maxEvents: 1500
 
 physics.producers.generator: @local::microboone_genie_simple
 physics.producers.generator.GlobalTimeOffset: 3125.
