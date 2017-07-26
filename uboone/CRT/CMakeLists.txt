@@ -12,6 +12,7 @@ art_make( BASENAME_ONLY
         CRTDaqSim_module.cc
 	CRTCalibration_module.cc
 	CRTCoincidence_module.cc
+	CRTTS1Producer_module.cc
 	CRTHitProducer_module.cc
 	CRTTrackProducer_module.cc
 	TimeExtraction_module.cc
@@ -141,6 +142,14 @@ simple_plugin(CRTCoincidence "module"
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} )
 
+
+simple_plugin(CRTTS1Producer "module"
+            CRT
+              bernfebdaq-core_Overlays
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
 
 simple_plugin(CRTHitProducer "module"
             CRT

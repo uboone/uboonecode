@@ -42,12 +42,12 @@
   </class>
   <class name="art::Wrapper<vector<crt::MSetCRTFrag> >" />
   <class name="std::vector<crt::MSetCRTFrag>"/>
-
+  
   <class name="bernfebdaq::BernZMQEvent" ClassVersion="10">
     <version ClassVersion="10" checksum="542148960"/>
   </class>
-  
   <class name="std::vector<bernfebdaq::BernZMQEvent>"/>
   <class name="art::Wrapper< std::vector<bernfebdaq::BernZMQEvent> >"/>
+
   
 </lcgdict>
