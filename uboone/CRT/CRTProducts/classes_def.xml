@@ -15,7 +15,9 @@
   <class name="art::Wrapper< std::vector<crt::CRTSimData> >"/>
  
   
-  <class name="crt::CRTHit" ClassVersion="11">
+  <class name="crt::CRTHit" ClassVersion="13">
+   <version ClassVersion="13" checksum="1364321833"/>
+   <version ClassVersion="12" checksum="1625646992"/>
    <version ClassVersion="11" checksum="2969044014"/>
     <version ClassVersion="10" checksum="1279492675"/>
   </class>
@@ -25,7 +27,8 @@
   <class name="std::map< unsigned char, std::vector< std::pair<int,double> > > "/>
   <class name="art::Wrapper< std::vector<crt::CRTHit> >"/>
   
-  <class name="crt::CRTTrack" ClassVersion="12">
+  <class name="crt::CRTTrack" ClassVersion="13">
+   <version ClassVersion="13" checksum="1459516781"/>
    <version ClassVersion="12" checksum="249137092"/>
    <version ClassVersion="11" checksum="1092796377"/>
     <version ClassVersion="10" checksum="1279492675"/>
@@ -33,5 +36,18 @@
   
   <class name="std::vector<crt::CRTTrack>"/>
   <class name="art::Wrapper< std::vector<crt::CRTTrack> >"/>
+
+  <class name="crt::MSetCRTFrag" ClassVersion="10">
+    <version ClassVersion="10" checksum="1184856394"/>
+  </class>
+  <class name="art::Wrapper<vector<crt::MSetCRTFrag> >" />
+  <class name="std::vector<crt::MSetCRTFrag>"/>
+
+  <class name="bernfebdaq::BernZMQEvent" ClassVersion="10">
+    <version ClassVersion="10" checksum="542148960"/>
+  </class>
+  
+  <class name="std::vector<bernfebdaq::BernZMQEvent>"/>
+  <class name="art::Wrapper< std::vector<bernfebdaq::BernZMQEvent> >"/>
   
 </lcgdict>

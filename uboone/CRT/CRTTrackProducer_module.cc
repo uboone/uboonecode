@@ -13,7 +13,7 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
-//#include "art/Utilities/InputTag.h"
+#include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -91,12 +91,17 @@ private:
   TH1F* hTtime;
   TH2F* hTlengthvsTime;
   TH2F* hTlengthvsTimeAbs;
+  TProfile* hTlengthvsTimeAbs_prof;
   TH1F* htheta;
   TH1F* hphi;
   TH1F* hts0_ns;
   TH2F* hTvsH;
 
- //quallity plots                                                                                                                                                      
+  TH2F* HitDistBot;
+  TH2F* HitDistFT;
+  TH2F* HitDistPipe;
+  TH2F* HitDistTop;
+ //quallity plots                                                                                                                                          
 
   //test                                                                                                                                         
   int verbose_ = 0;
@@ -141,13 +146,11 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
   //CRTTrack collection on this event                                                                                   
   std::unique_ptr<std::vector<crt::CRTTrack> > CRTTrackCol(new std::vector<crt::CRTTrack>);
   
-  // std::cout<<"  CRTHitCollection.size()  "<<CRTHitCollection.size()<<std::endl;
-  //getchar();
   
   int N_CRTHits = CRTHitCollection.size();
   int N_CRTTrack = 0;
   
-  for(std::vector<int>::size_type i = 0; i != CRTHitCollection.size(); i++) {//A //comparar solo con el resto del vector
+  for(std::vector<int>::size_type i = 0; i != CRTHitCollection.size(); i++) {//A 
     
     crt::CRTHit CRTHiteventA = CRTHitCollection[i];	
     
@@ -165,7 +168,6 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	int planeB = CRTHiteventB.plane; 
 	double time_diffABS = abs(time_ns_A - time_ns_B);
 	time_diff = time_ns_A - time_ns_B;
-	
 	
 	if( (planeA != planeB) && (time_s_A == time_s_B) && (time_diffABS<max_time_difference_)  ){//D
 	  
@@ -185,7 +187,6 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	  track_time_s = CRTHiteventA.ts0_s;
 	  
 	  if( verbose_ == 1 ){
-	  //if((verbose_ == 1) && ( (planeA==3) || (planeB==3) ) ){
 	    std::cout.precision(19);
 	    std::cout<<"tAs: "<<time_s_A<< " s" <<std::endl;
 	    std::cout<<"tAns: "<<time_ns_A<< " ns" <<std::endl;
@@ -201,43 +202,98 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	    getchar();
 	  }
 	  
-	  //do something
 	  
 	  crt::CRTTrack CRTcanTrack;
 	  CRTcanTrack.x1_pos = xA;
+	  CRTcanTrack.x1_err = CRTHiteventA.x_err;
 	  CRTcanTrack.y1_pos = yA;
+	  CRTcanTrack.y1_err = CRTHiteventA.y_err;
 	  CRTcanTrack.z1_pos = zA;
+	  CRTcanTrack.z1_err = CRTHiteventA.z_err;
 	  CRTcanTrack.x2_pos = xB;
+	  CRTcanTrack.x2_err = CRTHiteventB.x_err;
 	  CRTcanTrack.y2_pos = yB;
+	  CRTcanTrack.y2_err = CRTHiteventB.y_err;
 	  CRTcanTrack.z2_pos = zB;
-	  CRTcanTrack.ts0_s = time_s_A;
-	  CRTcanTrack.ts0_ns = track_time_ns;
-	  CRTcanTrack.ts0_ns_1 = time_ns_A; 
-	  CRTcanTrack.ts0_ns_2 = time_ns_B; 
+	  CRTcanTrack.z2_err = CRTHiteventB.z_err;
 
+	  CRTcanTrack.ts0_s = time_s_A;
+	  CRTcanTrack.ts0_s_err = sqrt(time_s_A);//error missing
+
+	  CRTcanTrack.ts0_ns = track_time_ns;
+	  CRTcanTrack.ts0_ns_err = sqrt(track_time_ns);//error missing
+
+	  CRTcanTrack.ts1_ns = (CRTHiteventA.ts1_ns + CRTHiteventB.ts1_ns)/2;
+	  CRTcanTrack.ts1_ns_err = sqrt((CRTHiteventA.ts1_ns + CRTHiteventB.ts1_ns)/2);//error missing
+	  
+	  CRTcanTrack.ts0_ns_h1 = time_ns_A; 
+	  CRTcanTrack.ts0_ns_err_h1 = sqrt(time_ns_A); 
+	  CRTcanTrack.ts0_ns_h2 = time_ns_B; 
+	  CRTcanTrack.ts0_ns_err_h2 = sqrt(time_ns_B); 
+	  
 	  CRTcanTrack.length = length;
 	  CRTcanTrack.thetaxy = theta;
 	  CRTcanTrack.phizy = phi;
-	
+	  
+	  std::vector<uint8_t> feb_id_track;
+	  std::vector<uint8_t> febsA = CRTHiteventA.feb_id;
+	  std::vector<uint8_t> febsB = CRTHiteventB.feb_id;
+	  
+	  for(unsigned int a=0; a<febsA.size(); a++)feb_id_track.push_back(febsA[a]);
+	  for(unsigned int b=0; b<febsB.size(); b++)feb_id_track.push_back(febsB[b]);
+	  
+	  std::map< uint8_t, std::vector<std::pair<int,double> > > pesmap_track;
+	  std::map< uint8_t, std::vector<std::pair<int,double> > > pesmapA = CRTHiteventA.pesmap;
+	  std::map< uint8_t, std::vector<std::pair<int,double> > > pesmapB = CRTHiteventB.pesmap;
+
+	  for(auto itA = begin(pesmapA); itA != end(pesmapA); ++itA)pesmap_track[(*itA).first] = (*itA).second;
+	  for(auto itB = begin(pesmapB); itB != end(pesmapB); ++itB)pesmap_track[(*itB).first] = (*itB).second;
+
+	  CRTcanTrack.feb_id = feb_id_track;
+	  CRTcanTrack.pesmap = pesmap_track;
+	  CRTcanTrack.peshit = CRTHiteventA.peshit + CRTHiteventB.peshit;
+	  
 	  CRTTrackCol->emplace_back(CRTcanTrack);
-
-	  //std::cout.precision(10);
-	  //std::cout<<time_s_A<<"  "<<track_time_ns<<"  "<<xA<<"  "<<yA<<"  "<<zA<<"  "<<xB<<"  "<<yB<<"  "<<zB<<std::endl;
-
-
+	  
 	  
 	  ////quality plot
-	  //if(( planeA!=3) && (planeB!=3) ){ //Top not calibrated yet
 	  my_tree_->Fill();
 	  hplavspla->Fill(planeA,planeB);	
 	  hTlength->Fill(length);
 	  hTtime->Fill(time_diffABS);
 	  hTlengthvsTimeAbs->Fill(length,time_diffABS);
+	  hTlengthvsTimeAbs_prof->Fill(length,time_diffABS);
 	  hTlengthvsTime->Fill(length,time_diff);
 	  htheta->Fill(theta);
 	  hphi->Fill(phi);
 	  hts0_ns->Fill(track_time_ns);
-	  // }
+
+	  
+	  if(planeA==0){
+	    HitDistBot->Fill(zA,xA);
+	  }
+	  if(planeA==1){
+	    HitDistFT->Fill(zA, yA);
+	  }
+	  if(planeA==2){
+	    HitDistPipe->Fill(zA, yA);
+	  }
+	  if(planeA==3){
+	    HitDistTop->Fill(zA,xA);
+	  }
+	  if(planeB==0){
+	    HitDistBot->Fill(zB,xB);
+	  }
+	  if(planeB==1){
+	    HitDistFT->Fill(zB, yB);
+	  }
+	  if(planeB==2){
+	    HitDistPipe->Fill(zB, yB);
+	  }
+	  if(planeB==3){
+	    HitDistTop->Fill(zB,xB);
+	  }
+	  
 	  //quallity plots                                                                                                                                                 		
 	}//D
       }//C
@@ -254,7 +310,7 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 
 void bernfebdaq::CRTTrackProducer::beginJob()
 {
-
+  
   my_tree_ = tfs->make<TTree>("my_tree","CRT Tree");
   my_tree_->Branch("track_time_s", &track_time_s, "time (s)");
   my_tree_->Branch("track_time_ns", &track_time_ns, "time (ns)");
@@ -295,6 +351,10 @@ void bernfebdaq::CRTTrackProducer::beginJob()
   hTlengthvsTimeAbs->GetZaxis()->SetTitle("Entries/bin");
   hTlengthvsTimeAbs->SetOption("COLZ");
 
+  hTlengthvsTimeAbs_prof = tfs->make<TProfile>("hTlengthvsTimeAbs_prof","Track_LengthvsTimeAbs_prof",1500,0,1500,"s");
+  hTlengthvsTimeAbs_prof->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlengthvsTimeAbs_prof->GetYaxis()->SetTitle("Track_time (ns)");
+
   htheta = tfs->make<TH1F>("htheta","Track_theta",900,0,180);
   htheta->GetXaxis()->SetTitle("Theta_xy (º)");
   htheta->GetYaxis()->SetTitle("Entries/bin");
@@ -307,6 +367,31 @@ void bernfebdaq::CRTTrackProducer::beginJob()
   hts0_ns->GetXaxis()->SetTitle("Track time (ns)");
   hts0_ns->GetYaxis()->SetTitle("Entries/bin");
 
+
+  double inch =2.54; //inch in cm                                                                                                                          
+  HitDistBot = tfs->make<TH2F>("hBottom","Bottom",125,-700+205*inch,-700+205*inch+125*10.89,60,-300+50.4*inch,-300+50.4*inch+60*10.89);
+  HitDistBot->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  HitDistBot->GetYaxis()->SetTitle("Lenght along the drift (cm)");
+  HitDistBot->GetZaxis()->SetTitle("Entries/bin");
+  HitDistBot->SetOption("COLZ");
+
+  HitDistFT = tfs->make<TH2F>("hFeedthroughSide","Feedthrough Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-308-19.1*inch,-308-19.1*inch+60*10.89);
+  HitDistFT->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  HitDistFT->GetYaxis()->SetTitle("Height (cm)");
+  HitDistFT->GetZaxis()->SetTitle("Entries/bin");
+  HitDistFT->SetOption("COLZ");
+
+  HitDistPipe = tfs->make<TH2F>("hPipeSide","Pipe Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-294-19.1*inch,-294-19.1*inch+60*10.89);
+  HitDistPipe->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  HitDistPipe->GetYaxis()->SetTitle("Height (cm)");
+  HitDistPipe->GetZaxis()->SetTitle("Entries/bin");
+  HitDistPipe->SetOption("COLZ");
+
+  HitDistTop = tfs->make<TH2F>("hTop","Top",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
+  HitDistTop->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  HitDistTop->GetYaxis()->SetTitle("Lenght along the drift (cm)");
+  HitDistTop->GetZaxis()->SetTitle("Entries/bin");
+  HitDistTop->SetOption("COLZ");
 
 }
 

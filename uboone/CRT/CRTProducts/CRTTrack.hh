@@ -27,10 +27,8 @@ namespace crt {
     uint16_t ts0_s_err;
     uint32_t ts0_ns;
     uint16_t ts0_ns_err;
-    //uint32_t ts1_s;                                                                        
-    //uint16_t ts1_s_err;                                                                                                                             
-    //uint32_t ts1_ns; 
-    //uint16_t ts1_ns_err;                                                                                                                             
+    uint32_t ts1_ns; 
+    uint16_t ts1_ns_err;                                                                                                                             
     double x1_pos;
     double x1_err;
     double y1_pos;
@@ -46,10 +44,10 @@ namespace crt {
     double length;
     double thetaxy;
     double phizy;
-    uint32_t ts0_ns_1;
-    uint16_t ts0_ns_err_1;
-    uint32_t ts0_ns_2;
-    uint16_t ts0_ns_err_2;
+    uint32_t ts0_ns_h1;
+    uint16_t ts0_ns_err_h1;
+    uint32_t ts0_ns_h2;
+    uint16_t ts0_ns_err_h2;
        
     CRTTrack() {}
     

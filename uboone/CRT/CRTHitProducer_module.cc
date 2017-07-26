@@ -13,7 +13,7 @@
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Principal/SubRun.h"
-//#include "art/Utilities/InputTag.h"
+#include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -124,7 +124,7 @@ private:
 
 
 bernfebdaq::CRTHitProducer::CRTHitProducer(fhicl::ParameterSet const & p)
-  : //EDProducer(p),
+  : 
   raw_data_label_(p.get<std::string>("raw_data_label")),
   SiPMpositions_(p.get<std::string>("CRTpositions_file")),
   FEBDelays_(p.get<std::string>("FEBDelays_file")),
@@ -153,7 +153,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   std::unique_ptr<std::vector<crt::CRTHit> > CRTHiteventCol(new std::vector<crt::CRTHit>);
   
   art::Handle< std::vector<artdaq::Fragment> > rawHandle;
-  //  evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle); //artdaq //daq
+  // evt.getByLabel(raw_data_label_, "BernZMQ", rawHandle); //artdaq //daq
   evt.getByLabel(raw_data_label_, rawHandle); //Converted files //crtdaq
   
   //check to make sure the data we asked for is valid                                                                                                  
@@ -167,9 +167,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
   
   //get better access to the data                                                                                                        
   std::vector<artdaq::Fragment> const& rawFragments(*rawHandle);
-
-  //loop over the raw data fragments                                                                                                         
-  //There should be one fragment per FEB in each event.                                                                                     
+  
   for(auto const& frag : rawFragments){//A
     //overlay this so it's in the "BernFragment" format. Same data!                                                     
     BernZMQFragment bfrag(frag);
@@ -195,11 +193,12 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
       
       if( (!sptevent0) && (!sptevent1)  ){//B_2
 	
-	auto time_ts0 = this_event->Time_TS0();         //grab the event time from last second                                                              
+	auto time_ts0 = this_event->Time_TS0();         //grab the event time from last second  //in ns
+	//auto time_ts0 = this_event->Time_TS1();         //grab the event time from last second                                                              
 	
 	double corrected_time = GetCorrectedTime(time_ts0,*bfrag_metadata);      //correct this time                                                         
 	corrected_time = corrected_time + FEB_del;// in ns
-	
+
 	double time_tevt_s = time_start_seconds;
 	double time_tevt_ns = corrected_time;
 	std::pair<double,double> timepair_tevt;
@@ -219,12 +218,10 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	  timepair_st = keypair_st.second;
 	  double time_st_s = timepair_st.first;
 	  double time_st_ns = timepair_st.second;
-
-	  auto time_diff = abs( (time_tevt_ns) - (time_st_ns) );//in ns
+	  
+	  auto time_diff = abs( (time_tevt_ns) - (time_st_ns) );//in ns	  
 	  
 	  if( (time_tevt_s == time_st_s) && (time_diff<max_time_difference_) && (feb_st !=  feb_tevt) ){//D //COINCIDENCE without Tcorrection.
-	    
-	    std::vector<std::pair<int,double> > pes_tevt;//to be store                                                                                       
 	    
 	    double max_temp1_tevt = -1;
 	    unsigned int maxSipm1_tevt = -1;
@@ -262,26 +259,18 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    std::pair<double,double> gain_tevt1 = crt::auxfunctions::getGain(key_tevt1, SiPMgain); 
 	    std::pair<double,double> pedestal_tevt1 = crt::auxfunctions::getGain(key_tevt1, SiPMpedestal);
 	    double pesmax_tevt1 = (max_temp1_tevt - pedestal_tevt1.first) / gain_tevt1.first;
-	    
-	    std::pair<int,double> max1_tevt = std::make_pair(maxSipm1_tevt,pesmax_tevt1);
-	    pes_tevt.push_back(max1_tevt);
 	    std::vector<double> pos_tevt1 = crt::auxfunctions::getPos(key_tevt1, sensor_pos);
 	    
 	    std::pair<double,double> gain_tevt2 = crt::auxfunctions::getGain(key_tevt2, SiPMgain);
 	    std::pair<double,double> pedestal_tevt2 = crt::auxfunctions::getGain(key_tevt2, SiPMpedestal);
 	    double pesmax_tevt2 = (max_temp2_tevt - pedestal_tevt2.first) / gain_tevt2.first;
-	    
-	    std::pair<int,double> max2_tevt = std::make_pair(maxSipm2_tevt,pesmax_tevt2);
-	    pes_tevt.push_back(max2_tevt);
 	    std::vector<double> pos_tevt2 = crt::auxfunctions::getPos(key_tevt2, sensor_pos);
 
 	    double LBar = Lbar_;
 	    if(pos_tevt1[3]==3) LBar = Lbartop_;//for top	    
 	    std::vector<double> interpos_tevt = crt::auxfunctions::inter_X(pesmax_tevt1, pos_tevt1, pesmax_tevt2, pos_tevt2, LBar);
 	    double interpos_tevt_err = crt::auxfunctions::inter_X_error(pesmax_tevt1, pesmax_tevt2, LBar);
-
 	    
-	    std::vector<std::pair<int,double> > pes_st;//to be store                                                                                               
 	    double max_temp1_st = -1;
             unsigned int maxSipm1_st = -1;
             double max_temp2_st = -1;
@@ -294,7 +283,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
               }
             }//1st max                                                                                                                                                        
 
-            if (maxSipm1_st % 2 == 0){//2nd max                                                                                                                             
+            if (maxSipm1_st % 2 == 0){//2nd max                                                                                                              
               maxSipm2_st = maxSipm1_st+1;
             } else if(maxSipm1_st % 2 == 1) {
               maxSipm2_st = maxSipm1_st-1;
@@ -318,18 +307,11 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    std::pair<double,double> gain_st1 = crt::auxfunctions::getGain(key_st1, SiPMgain);
 	    std::pair<double,double> pedestal_st1 = crt::auxfunctions::getGain(key_st1, SiPMpedestal);
 	    double pesmax_st1 = (max_temp1_st - pedestal_st1.first) / gain_st1.first;                                                                 
-	    	    
-	    std::pair<int,double> max1_st = std::make_pair(maxSipm1_st,pesmax_st1);
-	    pes_st.push_back(max1_st);
 	    std::vector<double> pos_st1 = crt::auxfunctions::getPos(key_st1, sensor_pos);
-	    
 	    
 	    std::pair<double,double> gain_st2 = crt::auxfunctions::getGain(key_st2, SiPMgain);
 	    std::pair<double,double> pedestal_st2 = crt::auxfunctions::getGain(key_st2, SiPMpedestal);
 	    double pesmax_st2 = (max_temp2_st - pedestal_st2.first) / gain_st2.first;
-	    
-	    std::pair<int,double> max2_st = std::make_pair(maxSipm2_st,pesmax_st2);
-	    pes_st.push_back(max2_st);
 	    std::vector<double> pos_st2 = crt::auxfunctions::getPos(key_st2, sensor_pos);
 	    
 	    std::vector<double> interpos_st = crt::auxfunctions::inter_X(pesmax_st1, pos_st1, pesmax_st2, pos_st2, LBar);
@@ -341,20 +323,20 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	    hPES->Fill(pesmax_tevt2);
 	    hPES->Fill(pesmax_st1);
 	    hPES->Fill(pesmax_st2);
-
-	    //pos vector/ 0=x 1=y 2=z 3=plane 4=layer 5=orientation;   //clean up!!!
-	    if(   (pos_tevt1[3]==pos_st1[3]) 
-	       && (pos_tevt1[4]!=pos_st1[4]) 
-	       && ( (std::abs(pos_tevt1[4]-pos_st1[4])<2) || ((pos_tevt1[3]==2) && (pos_tevt1[4]==0 && pos_st1[4]==2)) || ((pos_tevt1[3]==2) && (pos_tevt1[4]==2 && pos_st1[4]==0)) )
-	       && (pos_tevt1[5]!=pos_st1[5])
-	       && (max_temp1_tevt>500)  
-	       && (max_temp2_tevt>500) 
-	       && (max_temp1_st>500) 
-	       && (max_temp1_st>500) 
-   	       && (max_temp1_tevt<4000) 
-	       && (max_temp2_tevt<4000) 
-	       && (max_temp1_st<4000) 
-	       && (max_temp1_st<4000)   ){//E
+	    
+	    //pos vector/ 0=x 1=y 2=z 3=plane 4=layer 5=orientation;   //clean up!!! after MC
+	    if( (pos_tevt1[3]==pos_st1[3] ) 
+		&& (pos_tevt1[4]!=pos_st1[4]) 
+		&& ( (std::abs(pos_tevt1[4]-pos_st1[4])<2) || ((pos_tevt1[3]==2) && (pos_tevt1[4]==0 && pos_st1[4]==2)) || ((pos_tevt1[3]==2) && (pos_tevt1[4]==2 && pos_st1[4]==0)) )
+		&& (pos_tevt1[5]!=pos_st1[5])
+		&& (max_temp1_tevt>500)  
+		&& (max_temp2_tevt>500) 
+		&& (max_temp1_st>500) 
+		&& (max_temp1_st>500) 
+		&& (max_temp1_tevt<4000) 
+		&& (max_temp2_tevt<4000) 
+		&& (max_temp1_st<4000) 
+		&& (max_temp1_st<4000)   ){//E
 	      // && (PEStot>Emin_)
 	      	      
 	      
@@ -369,9 +351,9 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      FEBvsFEB->Fill(feb_tevt,feb_st);
 	      TimeDiff->Fill(time_diff);
 	      //quality plots
-
-	     	      
-	      if( (interpos_tevt[6]==1) && (interpos_st[6] != 1) ){xtot=interpos_tevt[0];} //CHECK for TOP
+	      
+	      
+	      if( (interpos_tevt[6]==1) && (interpos_st[6] != 1) ){xtot=interpos_tevt[0];} 
 	      if( (interpos_tevt[6]==2) && (interpos_st[6] != 2) ){ytot=interpos_tevt[1];}	
 	      if( (interpos_tevt[6]==3) && (interpos_st[6] != 3) ){ztot=interpos_tevt[2];}
 
@@ -390,7 +372,7 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      hztot->Fill(ztot);
 
 
-	      hit_time_ns = (time_tevt_ns + time_st_ns)/2; //errors!! calculate error
+	      hit_time_ns = (time_tevt_ns + time_st_ns)/2;
 	      hit_time_s = time_tevt_s;
 	      plane = pos_tevt1[3]; 
 	      
@@ -405,7 +387,12 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      
 	      CRTHitevent.ts0_s = hit_time_s; //errors!!  missing
 	      CRTHitevent.ts0_ns = hit_time_ns; //errors!!  missing
+	      CRTHitevent.ts0_s_err = sqrt(hit_time_s); //errors!!  missing //just filling
+	      CRTHitevent.ts0_ns_err = sqrt(hit_time_ns); //errors!!  missing
 	      
+	      CRTHitevent.ts1_ns = (this_event->Time_TS1() -  event_st->Time_TS1() ) /2    ; //errors!!  missing
+	      CRTHitevent.ts1_ns_err = sqrt ( (this_event->Time_TS1() -  event_st->Time_TS1() ) /2  )  ; //errors!!  missing
+	      	      
 	      CRTHitevent.plane = plane;
 	      
 	      std::vector<uint8_t> ids;
@@ -413,10 +400,32 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 	      ids.push_back(feb_st);
 	      CRTHitevent.feb_id = ids;
 	      
-	      //std::map< uint8_t, std::vector<std::pair<int,double> > > pesmap;
-	      pesmap[feb_tevt] = pes_tevt;
-	      pesmap[feb_st] = pes_st;
-	      CRTHitevent.pesmap = pesmap;
+	      std::vector<std::pair<int,double> > vec_pes_tevt;
+	      std::vector<std::pair<int,double> > vec_pes_st;
+	      
+	      for(size_t i_chan=0; i_chan<32; ++i_chan){ //1st max                                                                                         
+		int key_tevt = feb_tevt*100+i_chan;
+		std::pair<double,double> gain_tevt = crt::auxfunctions::getGain(key_tevt, SiPMgain);
+		std::pair<double,double> pedestal_tevt = crt::auxfunctions::getGain(key_tevt, SiPMpedestal);
+		double pes_tevt = ( (this_event->adc[i_chan]) - pedestal_tevt.first) / gain_tevt.first;
+		std::pair<int,double> pair_tevt = std::make_pair(i_chan,pes_tevt);
+		vec_pes_tevt.push_back(pair_tevt);
+		
+		int key_st = feb_st*100+i_chan;
+		std::pair<double,double> gain_st = crt::auxfunctions::getGain(key_st, SiPMgain);
+		std::pair<double,double> pedestal_st = crt::auxfunctions::getGain(key_st, SiPMpedestal);
+		double pes_st = ( (event_st->adc[i_chan]) - pedestal_st.first) / gain_st.first;
+		std::pair<int,double> pair_st = std::make_pair(i_chan,pes_st);
+		vec_pes_st.push_back(pair_st);
+	      }
+	      
+	      std::map< uint8_t, std::vector<std::pair<int,double> > > pesmap_hit;
+	      pesmap_hit[feb_tevt] = vec_pes_tevt;
+	      pesmap_hit[feb_st] = vec_pes_st;
+	      CRTHitevent.pesmap = pesmap_hit;
+	      
+	      CRTHitevent.peshit = pesmax_tevt1 + pesmax_tevt2 + pesmax_st1 + pesmax_st2;    
+	      
 	      
 	      //Store CRTHit in Collection
 	      CRTHiteventCol->emplace_back(CRTHitevent);
@@ -459,15 +468,6 @@ void bernfebdaq::CRTHitProducer::produce(art::Event & evt)
 		std::cout<<"Interpos_tevt x: "<<interpos_tevt[0]<<" y: "<<interpos_tevt[1]<<" z: "<<interpos_tevt[2]<< " in plane "<<interpos_tevt[3]<<" and layer "<<interpos_tevt[4]<<" with orientation "<<interpos_tevt[5]<<" interpolada en eje: "<<interpos_tevt[6]<<std::endl;
 		std::cout<<"Interpos_st   x: "<<interpos_st[0]<<" y: "<<interpos_st[1]<<" z: "<<interpos_st[2]<< " in plane "<<interpos_st[3]<<" and layer "<<interpos_st[4]<<" with orientation "<<interpos_st[5]<<" interpolada en eje: "<<interpos_st[6]<<std::endl;
 		
-		/*
-		for(size_t i_chan=0; i_chan<32; ++i_chan){                                                                                                    
-		  std::cout<<"event_tevt["<<i_chan<<"]: "<<this_event->adc[i_chan]<<std::endl;
-		}
-
-		for(size_t i_chan=0; i_chan<32; ++i_chan){                                                                                                    
-		  std::cout<<"event_st["<<i_chan<<"]: "<<event_st->adc[i_chan]<<std::endl;
-		}*/
-
 		getchar();
 	      }
 	      //verbose
@@ -524,7 +524,6 @@ void bernfebdaq::CRTHitProducer::beginJob()
   HitDistPipe->SetOption("COLZ");
 
   HitDistTop = tfs->make<TH2F>("hTop","Top",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
-  //HitDistTop = tfs->make<TH2F>("hTop","Top",1000,-5000,5000,1000,-5000,5000);
   HitDistTop->GetXaxis()->SetTitle("Lenght along the beam (cm)");
   HitDistTop->GetYaxis()->SetTitle("Lenght along the drift (cm)"); 
   HitDistTop->GetZaxis()->SetTitle("Entries/bin"); 

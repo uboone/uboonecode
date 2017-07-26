@@ -15,6 +15,7 @@ art_make( BASENAME_ONLY
 	CRTHitProducer_module.cc
 	CRTTrackProducer_module.cc
 	TimeExtraction_module.cc
+	MergeTest_module.cc
 	CRTMerger_module.cc
     LIBRARY_NAME  
         CRTData
@@ -158,6 +159,14 @@ simple_plugin(CRTTrackProducer "module"
           ${ROOT_BASIC_LIB_LIST} )
 
 simple_plugin(TimeExtraction "module"
+            CRT
+              bernfebdaq-core_Overlays
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
+
+simple_plugin(MergeTest "module"
             CRT
               bernfebdaq-core_Overlays
           art_Framework_Services_Optional
