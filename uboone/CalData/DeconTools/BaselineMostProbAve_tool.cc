@@ -40,42 +40,77 @@ float BaselineMostProbAve::GetBaseline(std::vector<float>& holder,
                                     size_t              roiStart,
                                     size_t              roiLen) const
 {
-    float base=0;
+    float base(0.);
     
-    // Recover the expected electronics noise on this channel
-    float deconNoise = 1.26491 * fSignalShaping->GetDeconNoise(channel);
-    
-    // Basic idea is to find the most probable value in the ROI presented to us
-    // From that, get the average value within range of the expected noise and
-    // return that as the ROI baselin.
-    float min  = *std::min_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
-    float max  = *std::max_element(holder.begin()+roiStart,holder.begin()+roiStart+roiLen);
-    int   nbin = 2 * std::ceil(max - min);
-    
-    if (nbin > 0)
+    if (roiLen > 1)
     {
-        std::vector<int> roiHistVec;
+        // Recover the expected electronics noise on this channel
+        float  deconNoise = 1.26491 * fSignalShaping->GetDeconNoise(channel);
+        int    binRange   = std::max(1, int(deconNoise));
+        size_t halfLen    = std::min(size_t(100),roiLen/2);
         
-        roiHistVec.resize(nbin, 0);
+        std::pair<float,int> baseFront = GetBaseline(holder, binRange, roiStart, halfLen);
+        std::pair<float,int> baseBack  = GetBaseline(holder, binRange, roiLen - halfLen, roiLen);
         
-        for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
-            roiHistVec[std::floor(2. * (holder[binIdx] - min))]++;
-        
-        std::vector<int>::iterator mpValItr = std::max_element(roiHistVec.begin(),roiHistVec.end());
-        
-        float mpVal   = min + 0.5 * std::distance(roiHistVec.begin(),mpValItr);
-        int   baseCnt = 0;
-        
-        for(size_t binIdx = roiStart; binIdx < roiStart+roiLen; binIdx++)
+        if (std::fabs(baseFront.first - baseBack.first) > deconNoise)
         {
-            if (std::fabs(holder[binIdx] - mpVal) < deconNoise)
+            if      (baseFront.second > 3 * baseBack.second  / 2) base = baseFront.first;
+            else if (baseBack.second  > 3 * baseFront.second / 2) base = baseBack.first;
+            else                                                  base = std::max(baseFront.first,baseBack.first);
+        }
+        else
+            base = (baseFront.first*baseFront.second + baseBack.first*baseBack.second)/float(baseFront.second+baseBack.second);
+    }
+    
+    return base;
+}
+    
+std::pair<float,int> BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
+                                                      int                       binRange,
+                                                      size_t                    roiStart,
+                                                      size_t                    roiLen) const
+{
+    std::pair<float,int> base(0.,1);
+    
+    if (roiLen > 1)
+    {
+        // Basic idea is to find the most probable value in the ROI presented to us
+        // From that we can develop an average of the true baseline of the ROI.
+        // To do that we employ a map based scheme
+        std::map<int,int> frequencyMap;
+        int               mpCount(0);
+        int               mpVal(0);
+        
+        for(size_t idx = roiStart; idx < roiLen; idx++)
+        {
+            int intVal = std::round(2.*holder.at(idx));
+            
+            frequencyMap[intVal]++;
+            
+            if (frequencyMap.at(intVal) > mpCount)
             {
-                base += holder[binIdx];
-                baseCnt++;
+                mpCount = frequencyMap.at(intVal);
+                mpVal   = intVal;
             }
         }
         
-        if (baseCnt > 0) base /= baseCnt;
+        // take a weighted average of two neighbor bins
+        int meanCnt  = 0;
+        int meanSum  = 0;
+        
+        for(int idx = -binRange; idx <= binRange; idx++)
+        {
+            std::map<int,int>::iterator neighborItr = frequencyMap.find(mpVal+idx);
+            
+            if (neighborItr != frequencyMap.end() && 5 * neighborItr->second > mpCount)
+            {
+                meanSum += neighborItr->first * neighborItr->second;
+                meanCnt += neighborItr->second;
+            }
+        }
+        
+        base.first  = 0.5 * float(meanSum) / float(meanCnt);
+        base.second = meanCnt;
     }
     
     return base;
