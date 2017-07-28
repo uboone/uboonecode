@@ -85,7 +85,6 @@ private:
   const std::vector<float> endPt2 = {-9999., -9999., -9999.};
 
   std::string _pfp_producer;
-  std::string _track_producer;
   std::string _opflash_producer_beam;
   std::string _opflash_producer_cosmic;
   std::string _trigger_producer;
@@ -110,8 +109,7 @@ private:
 
 CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
 {
-  _pfp_producer            = p.get<std::string>("PFParticleProducer");
-  _track_producer          = p.get<std::string>("TrackProducer");
+  _pfp_producer            = p.get<std::string>("PFPTrackAssProducer");
   _opflash_producer_beam   = p.get<std::string>("BeamOpFlashProducer");
   _opflash_producer_cosmic = p.get<std::string>("CosmicOpFlashProducer");
   _trigger_producer        = p.get<std::string>("TriggerProducer");
@@ -191,17 +189,6 @@ void CosmicFlashTagger::produce(art::Event & e)
   lar_pandora::TrackVector         trackVector; 
   lar_pandora::PFParticlesToTracks PFPtoTracks; 
   lar_pandora::LArPandoraHelper::CollectTracks(e, _pfp_producer, trackVector, PFPtoTracks);
-
-  // Get Tracks from the ART event
-  ::art::Handle<std::vector<recob::Track> > track_h;
-  e.getByLabel(_track_producer,track_h);
-  if( !track_h.isValid() || track_h->empty() )  {
-    mf::LogDebug("CosmicFlashTagger") << "Don't have tracks, or they are not valid." << std::endl;
-    e.put(std::move(cosmicTagTrackVector));
-    e.put(std::move(assnOutCosmicTagTrack));
-    e.put(std::move(assnOutCosmicTagPFParticle));
-    return;
-  }
 
   // Loop through beam flashes 
   _n_beam_flashes = 0;

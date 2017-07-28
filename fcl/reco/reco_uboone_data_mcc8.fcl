@@ -130,8 +130,8 @@ microboone_reco_data_producers:
 
   ### pandora cosmic pfparticle
   pandoraCosmicKHitPFPart:        @local::microboone_cosmicpfparticletagger
-  pandoraCosmicKalmanTrackPFPart: @local::microboone_cosmicpfparticletagger
-  pandoraCosmicKHitFlashTag:      @local::microboone_cosmicpfpflashtagger
+  pandoraCosmicPFPart:            @local::microboone_cosmicpfparticletagger
+  pandoraCosmicFlashTag:          @local::microboone_cosmicpfpflashtagger
 
   ### pandora analysis
   pandoraCosmicKHittag:           @local::microboone_cosmictracktagger
@@ -316,9 +316,9 @@ microboone_reco_data_pandoraCosmic: [    pandoraCosmic,
 #                                         pandoraCosmicPMA,
                                          pandoraCosmicKHitcalo,
                                          pandoraCosmicKHitpid,
-                                         pandoraCosmicKalmanTrackPFPart,
+                                         pandoraCosmicPFPart,         # Tag cosmics using geometry and out-of-time
                                          pandoraCosmicKHitPFPart,
-                                         pandoraCosmicKHitFlashTag,    # New flash tagger
+                                         pandoraCosmicFlashTag,       # Tag cosmics using optical info
                                          pandoraCosmicKHitFlashMatch,
                                          pandoraTrackPFPartMatch,
                                          pandoraCosmicHitRemoval,     # Remove hits, based on PFP geometry and flashes
@@ -508,23 +508,23 @@ microboone_reco_data_producers.pandoraCosmicKHitPFPart.EndTickPadding:          
 microboone_reco_data_producers.pandoraCosmicKHitPFPart.TPCYBoundary:             20
 microboone_reco_data_producers.pandoraCosmicKHitPFPart.TPCZBoundary:             5
 
-microboone_reco_data_producers.pandoraCosmicKalmanTrackPFPart.PFParticleModuleLabel: "pandoraCosmic"
-microboone_reco_data_producers.pandoraCosmicKalmanTrackPFPart.TrackModuleLabel:      "pandoraCosmicKalmanTrack"
-microboone_reco_data_producers.pandoraCosmicKalmanTrackPFPart.EndTickPadding:        75
-microboone_reco_data_producers.pandoraCosmicKalmanTrackPFPart.TPCYBoundary:          20
-microboone_reco_data_producers.pandoraCosmicKalmanTrackPFPart.TPCZBoundary:          5
+microboone_reco_data_producers.pandoraCosmicPFPart.PFParticleModuleLabel:        "pandoraCosmic"
+microboone_reco_data_producers.pandoraCosmicPFPart.TrackModuleLabel:             "pandoraCosmic"
+microboone_reco_data_producers.pandoraCosmicPFPart.EndTickPadding:               75
+microboone_reco_data_producers.pandoraCosmicPFPart.TPCYBoundary:                 20
+microboone_reco_data_producers.pandoraCosmicPFPart.TPCZBoundary:                 5
 
 microboone_reco_data_producers.pandoraCosmicKHitFlashMatch.TrackModuleLabel:     "pandoraCosmicKHit"
 microboone_reco_data_producers.pandoraCosmicKHitFlashMatch.FlashModuleLabel:     "simpleFlashCosmic"
 microboone_reco_data_producers.pandoraCosmicKHitFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
 
-# Remove hits, based on geometry and Flashes                                     Geometry tagger                   Flash tagger
-microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicProducerLabels:    ["pandoraCosmicKalmanTrackPFPart", "pandoraCosmicKHitFlashTag" ]
-microboone_reco_data_producers.pandoraCosmicHitRemoval.TrackProducerLabels:     ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
-microboone_reco_data_producers.pandoraCosmicHitRemoval.AssnProducerLabels:      ["pandoraCosmicKalmanTrack",       "pandoraCosmicKHit"         ]
-microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicTagThresholds:     [0.6,                              0.99                        ]
-microboone_reco_data_producers.pandoraCosmicHitRemoval.PFParticleProducerLabel: "pandoraCosmic"
-microboone_reco_data_producers.pandoraCosmicHitRemoval.EndTickPadding:          75
+# Remove hits                                                                    Geometry tagger         Flash tagger
+microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicProducerLabels:     ["pandoraCosmicPFPart", "pandoraCosmicFlashTag" ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.TrackProducerLabels:      ["pandoraCosmic",       "pandoraCosmic"         ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.AssnProducerLabels:       ["pandoraCosmic",       "pandoraCosmic"         ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.CosmicTagThresholds:      [0.6,                   0.99                    ]
+microboone_reco_data_producers.pandoraCosmicHitRemoval.PFParticleProducerLabel:  "pandoraCosmic"
+microboone_reco_data_producers.pandoraCosmicHitRemoval.EndTickPadding:           75
 
 # Pandora neutrino pass related
 microboone_reco_data_producers.pandoraNu.GeantModuleLabel:                       "largeant"
