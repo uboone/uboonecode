@@ -31,11 +31,20 @@ SuperaFocusedView3D: @local::SuperaWholeView
 SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"
 
 SuperaMichelMC: @local::SuperaFocusedView
-SuperaMichelMC.CSVSuperaMetaMaker: "michel_constraint.fcl"
+SuperaMichelMC.supera_params: "supera_michel_mc_focused.fcl"
+SuperaMichelMC.CSVSuperaMetaMaker: "michel_constraint_mcc7.fcl"
 
 SuperaMichelData: @local::SuperaFocusedView
 SuperaMichelData.supera_params: "supera_basic_focused.fcl"
 SuperaMichelData.CSVSuperaMetaMaker: "michel_constraint.fcl"
+
+SuperaCCPi0MC: @local::SuperaFocusedView
+SuperaCCPi0MC.supera_params: "supera_ccpi0_mc_focused.fcl"
+SuperaCCPi0MC.CSVSuperaMetaMaker: "ccpi0_constraint_mcc8.fcl"
+
+SuperaCCPi0Data: @local::SuperaFocusedView
+SuperaCCPi0Data.supera_params: "supera_basic_focused.fcl"
+SuperaCCPi0Data.CSVSuperaMetaMaker: "ccpi0_constraint.fcl"
 
 dlprod_analyzers:
  {
@@ -55,6 +64,8 @@ dlprod_analyzers:
    superaFocusedView3D: @local::SuperaFocusedView3D
    superaMichelMC:    @local::SuperaMichelMC
    superaMichelData:  @local::SuperaMichelData
+   superaCCPi0MC:     @local::SuperaCCPi0MC
+   superaCCPi0Data:   @local::SuperaCCPi0Data
 }
 
 dlprod_analyze_all:    [ simch, mcinfo, opreco, reco2d, opdigit, wire ]
@@ -68,12 +79,12 @@ dlprod_analyzers.opreco.stream:     "opreco"
 dlprod_analyzers.wire.stream:       "wire"
 dlprod_analyzers.reco2d.stream:     "reco2d"
 
-dlprod_analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
+dlprod_analyzers.mcinfo.out_filename:     "larlite_mcinfo.root"
 dlprod_analyzers.simch.out_filename:      "larlite_simch.root"
-dlprod_analyzers.opdigit.out_filename:     "larlite_opdigit.root"
-dlprod_analyzers.opreco.out_filename:      "larlite_opreco.root"
-dlprod_analyzers.wire.out_filename:        "larlite_wire.root"
-dlprod_analyzers.reco2d.out_filename:      "larlite_reco2d.root"
+dlprod_analyzers.opdigit.out_filename:    "larlite_opdigit.root"
+dlprod_analyzers.opreco.out_filename:     "larlite_opreco.root"
+dlprod_analyzers.wire.out_filename:       "larlite_wire.root"
+dlprod_analyzers.reco2d.out_filename:     "larlite_reco2d.root"
 
 dlprod_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
 

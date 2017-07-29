@@ -24,6 +24,11 @@ VPlaneHandler: {
   Shift: true
 }
 
+RSEFilter: {
+  module_type: "RSEFilter"
+  CSVName: ""
+}
+
 dlprod_producers:
  {
    generator: @local::microboone_genie_uniform_flux_cc
@@ -56,6 +61,7 @@ dlprod_filters: {
     swtrigger: @local::microboone_swtrigger_mc_bnb 
     finalstatefilter: @local::microboone_finalstateselectfilter
     dlpmtprecuts: @local::microboone_dlpmtprecuts
+    rsefilter: @local::RSEFilter
 }
 
 dlprod_simpart: [ generator, largeant, mcreco ]

@@ -4,7 +4,7 @@
 #include <map>
 #include <array>
 #include <iostream>
-
+#include "SuperaTypes.h"
 namespace supera {
 
   namespace csvreader {
