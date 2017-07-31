@@ -52,9 +52,14 @@ private:
 RSEFilter::RSEFilter(fhicl::ParameterSet const & p)
 {
 
-  auto constraint_file = p.get<std::string>("CSVName");
+  std::string runlist;
 
-  supera::csvreader::read_constraint_file(constraint_file, _event_m);
+  cet::search_path finder("FHICL_FILE_PATH");
+
+  if( !finder.find_file(p.get<std::string>("CSVName"),runlist) )
+    throw cet::exception("LArSoftSuperaSriver") << "Unable to find supera cfg in "  << finder.to_string() << "\n";
+
+  supera::csvreader::read_constraint_file(runlist, _event_m);
 }
 
 bool RSEFilter::filter(art::Event & e)

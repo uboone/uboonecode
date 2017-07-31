@@ -1,0 +1,122 @@
+#include "services_microboone.fcl"
+#include "analysistreemodule_microboone.fcl"
+#include "services_microboone.fcl"
+#include "trackfindermodules_microboone.fcl"
+#include "dlprod_fclbase_analyzers.fcl"
+
+process_name: Ana
+
+services:
+{
+  scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
+  # Load the service that manages root files for histograms.
+  TFileService: { fileName: "ana_hist.root" }
+  TimeTracker:  {}
+  MemoryTracker:     { ignoreTotal: 1 } # default is one
+  message:      @local::microboone_message_services_prod_debug
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  BackTracker: @local::microboone_backtracker
+  LLMetaMaker: {Enable: false}
+  LArCVMetaMaker: {Enable: false}
+  @table::microboone_services_reco
+}
+
+#source is now a root file
+source:
+{
+  module_type: RootInput
+  maxEvents:  10        # Number of events to create
+}
+
+# Define and configure some modules to do work on each event.
+# First modules are defined; they are scheduled later.
+# Modules are grouped by type.
+physics:
+{
+    analyzers:{
+        analysistree:        @local::microboone_analysistree
+        pandoraNueff:        @local::microboone_neutrinotrackingeff
+        pandoraCosmiceff:    @local::microboone_neutrinotrackingeff
+        pandoraNuPMAeff:     @local::microboone_neutrinotrackingeff
+        pandoraNuKHiteff:    @local::microboone_neutrinotrackingeff
+        pmtrackeff:          @local::microboone_neutrinotrackingeff
+        trackkalmanhiteff:   @local::microboone_neutrinotrackingeff
+        stitchkalmanhiteff:  @local::microboone_neutrinotrackingeff
+        @table::dlprod_analyzers
+    }
+
+ #define the output stream, there could be more than one if using filters 
+# stream1:  [ out1 ]
+
+ #define the producer and filter modules for this path, order matters, 
+ #filters reject all following items.  see lines starting physics.producers below
+ ana:  [ analysistree, pandoraNueff, pandoraCosmiceff, pandoraNuPMAeff, pandoraNuKHiteff, pmtrackeff, trackkalmanhiteff, opreco, mcinfo, superaWholeViewMC ]
+
+ #end_paths is a keyword and contains the paths that do not modify the art::Event, 
+ #ie analyzers and output streams.  these all run simultaneously
+# end_paths:     [stream1,ana]  
+ end_paths:     [ana]  
+}
+
+#block to define where the output goes.  if you defined a filter in the physics
+#block and put it in the trigger_paths then you need to put a SelectEvents: {SelectEvents: [XXX]}
+#entry in the output stream you want those to go to, where XXX is the label of the filter module(s)
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName:    "%ifb_%tc_merged.root"
+   dataTier:    "reconstructed"
+   compressionLevel: 1
+ }
+}
+
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+
+physics.analyzers.mcinfo.stream:      "mcinfo"
+physics.analyzers.opreco.stream:      "opreco"
+physics.analyzers.mcinfo.out_filename:      "larlite_mcinfo.root"
+physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
+
+### Here, we overwrite ALL module labels with the ones defined above.
+#physics.analyzers.analysistree:  @local::microboone_analysistree
+physics.analyzers.analysistree.OpFlashModuleLabel:              [ "simpleFlashBeam", "simpleFlashCosmic", "opflashBeam", "opflashCosmic", "simpleFlashBeamLowPE" ]
+physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
+physics.analyzers.analysistree.TrackModuleLabel:                ["trackkalmanhit","stitchkalmanhit","pandoraCosmic","pandoraCosmicKHit","pandoraNu","pandoraNuKHit","pandoraNuPMA","pmtrack"]
+physics.analyzers.analysistree.VertexModuleLabel:               ["cccluster", "pandoraNu", "pandoraCosmic","pmtrack","linecluster"]
+physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandoraNu"]
+physics.analyzers.analysistree.CalorimetryModuleLabel:          ["trackkalmanhitcalo","stitchkalmanhitcalo","pandoraCosmiccalo","pandoraCosmicKHitcalo","pandoraNucalo","pandoraNuKHitcalo","pandoraNuPMAcalo","pmtrackcalo"]
+physics.analyzers.analysistree.ParticleIDModuleLabel:           ["trackkalmanhitpid","stitchkalmanhitpid","pandoraCosmicpid","pandoraCosmicKHitpid","pandoraNupid","pandoraNuKHitpid","pandoraNuPMApid","pmtrackpid"]
+physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["trackkalmanhittag","stitchkalmanhittag","pandoraCosmictag","pandoraCosmicKHitPFPart","pandoraNutag","pandoraNuKHittag","pandoraNuPMAtag","pmtracktag"]
+physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["trackkalmanhitContTag","stitchkalmanhitContTag","pandoraCosmicContTag","dummy","pandoraNuContTag","dummy","pandoraNuPMAContTag","pmtrackContTag"]
+physics.analyzers.analysistree.FlashMatchAssocLabel:            ["trackkalmanhitflashmatch","stitchkalmanhitflashmatch","pandoraCosmicFlashMatch","pandoraCosmicKHitFlashMatch","pandoraNuFlashMatch","pandoraNuKHitFlashMatch","pandoraNuPMAFlashMath","pmtrackFlashMatch"]
+physics.analyzers.analysistree.PFParticleModuleLabel:           "pandoraNu"
+physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0","t0","t0","t0","t0"]
+physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0"]
+physics.analyzers.analysistree.T0RecoAnodeCathodePiercingLabel: ["t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco"]
+physics.analyzers.analysistree.CosmicScoreThresholds:           [0.0]
+physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
+physics.analyzers.analysistree.POTModuleLabel:                  "generator"
+physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
+physics.analyzers.analysistree.ShowerModuleLabel:               ["showerrecofuzzy","showerrecopandora"]
+physics.analyzers.analysistree.SWTriggerModuleLabel:            "swtrigger"
+
+physics.analyzers.analysistree.IgnoreMissingShowers:            true
+physics.analyzers.analysistree.SavePandoraNuVertexInfo:         true
+physics.analyzers.analysistree.SavePFParticleInfo:              true
+physics.analyzers.analysistree.SaveCryInfo:                     false
+physics.analyzers.analysistree.SaveSWTriggerInfo:               true
+
+physics.analyzers.pandoraNueff.TrackModuleLabel:       "pandoraNu"
+physics.analyzers.pandoraCosmiceff.TrackModuleLabel:   "pandoraCosmic"
+physics.analyzers.pandoraNuPMAeff.TrackModuleLabel:    "pandoraNuPMA"
+physics.analyzers.pandoraNuKHiteff.TrackModuleLabel:   "pandoraNuKHit"
+physics.analyzers.pmtrackeff.TrackModuleLabel:         "pmtrack"
+physics.analyzers.trackkalmanhiteff.TrackModuleLabel:  "trackkalmanhit"
+physics.analyzers.stitchkalmanhiteff.TrackModuleLabel: "stitchkalmanhit"
+
+services.SpaceCharge.EnableSimSpatialSCE: true
+
+
