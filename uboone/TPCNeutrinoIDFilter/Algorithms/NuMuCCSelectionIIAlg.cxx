@@ -83,6 +83,8 @@ void NuMuCCSelectionIIAlg::reconfigure(fhicl::ParameterSet const &inputPset)
     fMaxEnddEdx1stTrk        = pset.get<double>      ("MaxEnddEdx1stTrk",                      4.0);
     fDoHists                 = pset.get<bool>        ("FillHistograms",                      false);
     fDebug                   = pset.get<int>         ("Debug",                                   0);
+
+    std::cout<<"\n\n\nIN BEGIN JOb*******************************************************************************!\n";
 }
     
 void NuMuCCSelectionIIAlg::beginJob(art::ServiceHandle<art::TFileService>& tfs)
@@ -101,6 +103,8 @@ void NuMuCCSelectionIIAlg::produces(art::EDProducer* owner)
     
 bool NuMuCCSelectionIIAlg::findNeutrinoCandidates(art::Event & evt) const
 {
+    std::cout<<"\n\n\nEntering SelectionII Alg findNeutrinoCandidates ... " <<std::endl;
+
     // Agreed convention is to ALWAYS output to the event store so get a pointer to our collection
     std::unique_ptr<art::Assns<recob::Vertex, recob::Track>>      vertexTrackAssociations(new art::Assns<recob::Vertex, recob::Track>);
     std::unique_ptr<art::Assns<recob::Vertex, recob::PFParticle>> vertexPFParticleAssociations(new art::Assns<recob::Vertex, recob::PFParticle>);
@@ -129,10 +133,15 @@ bool NuMuCCSelectionIIAlg::findNeutrinoCandidates(art::Event & evt) const
     //check the flash info
     double FlashPEmax=0;
     int NuFlashID=-1;
+
+    std::cout<<"Number of flashes: "<<flashlist.size()<<std::endl;
+    std::cout<<"PE Thresh + Beam Min + Beam Max : "<<fPEThresh<<", "<<fBeamMin<<", "<<fBeamMax <<std::endl ;
    
     for (size_t i = 0; i<flashlist.size(); ++i){
+      std::cout<<"Flashes info : "<<flashlist[i]->TotalPE()<<", "<<flashlist[i]->Time()<<std::endl;
       if (flashlist[i]->TotalPE()>fPEThresh && flashlist[i]->Time()>fBeamMin && flashlist[i]->Time()<fBeamMax){
         if (flashlist[i]->TotalPE()>FlashPEmax){
+          std::cout<<"SETTING INFO! "<<std::endl ;
           FlashPEmax = flashlist[i]->TotalPE();
           NuFlashID = i;
         }
@@ -143,6 +152,7 @@ bool NuMuCCSelectionIIAlg::findNeutrinoCandidates(art::Event & evt) const
     if (NuFlashID == -1){
       evt.put(std::move(vertexTrackAssociations));
       evt.put(std::move(vertexPFParticleAssociations));
+      std::cout<<"CAN'T FIND FLASH... exiting "<<std::endl;
       return false;
     }
 
@@ -481,7 +491,7 @@ bool NuMuCCSelectionIIAlg::findNeutrinoCandidates(art::Event & evt) const
         }//second track is longer
         if (((trkstartdedx0>trkenddedx0&&
               trkstartdedx0>fMinStartdEdx1stTrk&&trkenddedx0<fMaxEnddEdx1stTrk)||
-               trkendy0>fDistToEdgeY)&&trklen1<fMinTrackLen2ndTrk)
+               trkendy0>fDistToEdgeY)&&trklen1<30) //fMinTrackLen2ndTrk)
           isMichel = true;
         
         if (isMichel){

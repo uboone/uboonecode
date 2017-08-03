@@ -63,6 +63,11 @@ services.DetectorPropertiesService.ReadOutWindowSize:                  6400
 services.DetectorClocksService.InheritClockConfig:                     false
 services.DetectorClocksService.TriggerOffsetTPC:                       -0.400e3
 
+physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.Debug:                1
+
+physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMin : 3.3 #
+physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMax : 4.9 #
+
 # define the list of LArSoft modules to run through the simulate path
 
 physics.producers.NuMuCCSelectionII.NeutrinoIDAlgName:                         "NuMuCCSelectionIIAlg"
