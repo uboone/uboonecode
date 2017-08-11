@@ -34,10 +34,7 @@ util::SignalShapingServiceMicroBooNE::SignalShapingServiceMicroBooNE(const fhicl
   
   //Before calling reconfigure(), initialize some of the diagnostic variables and histograms
   for(size_t i=0; i<3; ++i) {
-    fHRawResponse[i] = 0;
-    fHStretchedResponse[i] = 0;
     fHFullResponse[i] = 0;
-    fHistDone[i] = false;
     fHistDoneF[i] = false;
   }
         
@@ -45,6 +42,7 @@ util::SignalShapingServiceMicroBooNE::SignalShapingServiceMicroBooNE(const fhicl
 	
   fHist_FieldResponseHist = tfs->make<TH1D>("FRH","FRH", 1000, 0.0, 1000.0);
   fHist_FieldResponseVec  = tfs->make<TH1D>("FRV","FRV", 1000, 0.0, 1000.0);
+  fHist_TotalResponse     = tfs->make<TH1D>("TR","TR", 1000, 0.0, 1000.0);
   fHist_ResampledConvKernelRe = tfs->make<TH1D>("rICKR","rICKR", 8193, 0.0, 8193.0);
   fHist_ResampledConvKernelIm = tfs->make<TH1D>("rICKI","rICKI", 8193, 0.0, 8193.0);
   
@@ -76,8 +74,6 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
   size_t NViews = geo->Nplanes();
   
   art::ServiceHandle<art::TFileService> tfs;
-  
-  auto const* detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
  
   // Reset initialization flags.
   fInitForConvolution = false;
@@ -112,18 +108,9 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
   fFieldRespAmpVec      = pset.get<DoubleVec>("FieldRespAmpVec");
   fYZdependentResponse  = pset.get<bool>("YZdependentResponse");
   fdatadrivenResponse   = pset.get<bool>("datadrivenResponse");
-  fViewForNormalization = pset.get<size_t>("ViewForNormalization");
+  fCalibResponseTOffset = pset.get< DoubleVec >("CalibResponseTOffset");
 
   fFieldResponseVec.resize(NViews);
-
-
-  //Field Response time offset and stretching
-  f3DCorrectionVec      = pset.get<DoubleVec>("Drift3DCorrVec");  
-  fCalibResponseTOffset = pset.get< DoubleVec >("CalibResponseTOffset");
-  fStretchFullResponse  = pset.get<bool>("StretchFullResponse");
-  fTimeScaleParams      = pset.get<DoubleVec>("TimeScaleParams");	  
-  fDefaultEField        = pset.get<double>("DefaultEField");	 	  
-  fDefaultTemperature   = pset.get<double>("DefaultTemperature");	  
 
 
   //Noise
@@ -217,29 +204,6 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
     }
   }
   
-    
-    
-  //------------------------------------------------------------
-  //Set fTimeScaleFactor - used to the generate field response
-  //------------------------------------------------------------
-  
-  double defaultVelocity = detprop->DriftVelocity(fDefaultEField, fDefaultTemperature);
-  double thisVelocity    = detprop->DriftVelocity( detprop->Efield(0), detprop->Temperature() );
-  double vRatio = defaultVelocity/thisVelocity;
-  double vDiff = vRatio -1.0;
-
-  fTimeScaleFactor = 0.0;
-  double term = 1.0;
-
-  // the time scale params are from a fit to Garfield simulations at different E Fields
-  for(size_t i = 0;i<fTimeScaleParams.size(); ++i) {
-    fTimeScaleFactor += fTimeScaleParams[i]*term;
-    term *= vDiff;
-  }
-
-  std::cout << "Current E field = " << detprop->Efield(0) << " KV/cm, Ratio of drift velocities = " << vRatio << ", timeScaleFactor = " << fTimeScaleFactor << std::endl;
-
-
 
   //------------------------------------------------------------
   //Store field response histograms and determine time offsets
@@ -298,7 +262,7 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
 
       // get the offsets for each plane... use wire 0 and either peak or zero-crossing
       double tOffset = 0.0;	
-      if( (fdatadrivenResponse || rp==0) && vw==fViewForNormalization) { // this is for the standard response
+      if( (fdatadrivenResponse || rp==0) && vw==2) { // this is for the standard response
 	// for the collection plane, find the peak
 	int binMax = resp->GetMaximumBin();
 	tOffset = (resp->GetXaxis()->GetBinCenter(binMax) - resp->GetXaxis()->GetBinCenter(1));
@@ -336,9 +300,8 @@ void util::SignalShapingServiceMicroBooNE::reconfigure(const fhicl::ParameterSet
 	}
       }
       
-      std::cout<<"For view "<<vw<<" and response "<<response_name<<" toffset is: "<<tOffset<<std::endl;
-      tOffset *= f3DCorrectionVec[vw]*fTimeScaleFactor;
-      fFieldResponseTOffset[vw][response_name] = (-tOffset + fCalibResponseTOffset[vw])*1000.;
+      //std::cout<<"For view "<<vw<<" and response "<<response_name<<" toffset is: "<<tOffset<<std::endl;
+      fFieldResponseTOffset[vw][response_name] = -tOffset + fCalibResponseTOffset[vw];
 
     }//end loop over responses
   }//end loop over plane, done filling field response histograms
@@ -397,7 +360,24 @@ void util::SignalShapingServiceMicroBooNE::init()
 
     // Resample the response
     SetResponseSampling();
-    
+
+    //Make some histograms
+    if ( fDiagnosticChannel!=-1 && StoreThisResponse(fDiagnosticResponse, fDiagnosticChannel) ) {
+      size_t diagnostic_view = geo->View(fDiagnosticChannel);
+      
+      for (unsigned int bin=0; bin!=1000 && bin<fFieldResponseVec[diagnostic_view][fDiagnosticResponse].size(); ++bin) {
+	fHist_FieldResponseVec->SetBinContent(bin+1, fFieldResponseVec[diagnostic_view][fDiagnosticResponse][bin]);
+      }
+
+      for (unsigned int bin=0; bin!=fMaxElectResponseBins; ++bin) {
+	fHist_ElectResponse->SetBinContent(bin+1, fElectResponse[fDiagnosticChannel][bin]);
+      }   
+
+      for (unsigned int bin=0; bin!=1000 && bin<fSignalShapingVec[fDiagnosticChannel].Response(fDiagnosticResponse).Response().size(); ++bin) {
+        fHist_TotalResponse->SetBinContent(bin+1,fSignalShapingVec[fDiagnosticChannel].Response(fDiagnosticResponse).Response().at(bin));
+      }
+    }
+
     // Calculate convolution kernels
     for (unsigned int channel=0; channel!=geo->Nchannels(); ++channel) {
       size_t view = geo->View(channel);
@@ -408,7 +388,7 @@ void util::SignalShapingServiceMicroBooNE::init()
 	}
       }
     }
-    
+
     // Return to original fftsize
     //
     // Note: Currently we only have fine binning
@@ -422,18 +402,11 @@ void util::SignalShapingServiceMicroBooNE::init()
     
     //Set initialization flag
     fInitForConvolution = true;
-    
-    // Make some histograms
-    if ( fDiagnosticChannel!=-1 && StoreThisResponse(fDiagnosticResponse, fDiagnosticChannel) ) {
-      size_t diagnostic_view = geo->View(fDiagnosticChannel);
-      for (unsigned int bin=0; bin!=1000; ++bin) {
-	fHist_FieldResponseVec->SetBinContent(bin+1, fFieldResponseVec[diagnostic_view][fDiagnosticResponse][bin]);
-      }
-      for (unsigned int bin=0; bin!=4000; ++bin) {
-	fHist_ElectResponse->SetBinContent(bin+1, fElectResponse[fDiagnosticChannel][bin]);
-      }    
+
+    // Make convolution kernel histograms
+    if ( fDiagnosticChannel!=-1 && StoreThisResponse(fDiagnosticResponse, fDiagnosticChannel) ) { 
       const std::vector<ComplexF>& plot_conv_kernel = fSignalShapingVec[fDiagnosticChannel].Response(fDiagnosticResponse).ConvKernel();
-      for (unsigned int bin=0; bin!=8193; ++bin) {
+      for (unsigned int bin=0; bin!=8193 && bin < plot_conv_kernel.size(); ++bin) {
 	fHist_ResampledConvKernelRe->SetBinContent(bin+1, plot_conv_kernel.at(bin).Re);
 	fHist_ResampledConvKernelIm->SetBinContent(bin+1, plot_conv_kernel.at(bin).Im);
       }
@@ -490,7 +463,7 @@ void util::SignalShapingServiceMicroBooNE::init()
     //Set initialization flag
     fInitForDeconvolution = true;
   } //end if !fInitForDeconvolution
-   
+
 } //end init()
 
 
@@ -592,61 +565,32 @@ void util::SignalShapingServiceMicroBooNE::SetFieldResponse()
   
   art::ServiceHandle<geo::Geometry> geo;
   size_t NViews = geo->Nplanes();
-  
-  char buff0[80];
 
   // Ticks in nanosecond
   // Calculate the normalization of the collection plane
   std::string nominal_resp_name = "nominal";
-  double integral = fFieldResponseHistVec[fViewForNormalization][nominal_resp_name]->Integral();
-  double weight = 1./integral;
+  unsigned int collection_view = 2;
+  double weight = 1.0 / (fFieldResponseHistVec[collection_view][nominal_resp_name]->Integral());
 
-  // we adjust the size of the field response vector to account for the stretch
-  // and interpolate the histogram to fill the vector with the stretched response        
+  // fill the vector using the response histogram        
   for(unsigned int _vw=0; _vw<NViews; ++_vw) {
-    
-    double timeFactor = f3DCorrectionVec[_vw];
-    if(!fStretchFullResponse) timeFactor *= fTimeScaleFactor;
 
     for (auto itResp = fFieldResponseHistVec[_vw].begin(); itResp != fFieldResponseHistVec[_vw].end(); ++itResp) {
       
       std::string resp_name = itResp->first;
       TH1F* histPtr = fFieldResponseHistVec[_vw][resp_name];
       size_t nBins = histPtr->GetNbinsX();
-      size_t nResponseBins = nBins*timeFactor;
+      
       
       fFieldResponseVec[_vw][resp_name] = {0.0};
       FloatVec* responsePtr = &fFieldResponseVec[_vw][resp_name];
-      responsePtr->resize(nResponseBins);
+      responsePtr->resize(nBins);
       
       //fill response vector
-      double x0 = histPtr->GetBinCenter(1);
-      double xf = histPtr->GetBinCenter(nBins);
-      double deltaX = (xf - x0)/(nBins-1);
-      for(unsigned int _bn=1; _bn<=nResponseBins; ++_bn) {
-	double xVal = x0 + deltaX*(_bn-1)/timeFactor;
-	double yVal = histPtr->Interpolate(xVal);
-	responsePtr->at(_bn-1) = (float)yVal; 
-	responsePtr->at(_bn-1) *= (float)fFieldRespAmpVec[_vw]*weight;
+      for (unsigned int bin=0; bin<nBins; ++bin) {
+        responsePtr->at(bin) = (histPtr->GetBinContent(bin+1))*fFieldRespAmpVec[_vw]*weight;
       }
       
-      // fill some histos
-      if(itResp == fFieldResponseHistVec[_vw].begin() && !fHistDone[_vw]) {
-	sprintf(buff0, "hRawResp%i", (int)_vw);
-	fHRawResponse[_vw] = tfs->make<TH1D>(buff0, buff0, nBins, x0-0.5*deltaX, xf+0.5*deltaX);
-	sprintf(buff0, "hStretchedResp%i", (int)_vw);
-	double x0S = timeFactor*x0 - 0.5*deltaX/timeFactor;
-	double xfS = timeFactor*xf + 0.5*deltaX/timeFactor;
-	//std::cout << "title " << buff0 << std::endl;
-	fHStretchedResponse[_vw] = tfs->make<TH1D>(buff0, buff0, nResponseBins, x0S, xfS);
-	for(size_t i=0;i<nBins; ++i) {
-	  fHRawResponse[_vw]->SetBinContent(i, histPtr->GetBinContent(i));
-	}
-	for(size_t i=0;i<nResponseBins; ++i) {
-	  fHStretchedResponse[_vw]->SetBinContent(i+1, responsePtr->at(i));
-	}
-	fHistDone[_vw] = true;
-      }
     }//end loop over Responses     
   }//end loop over views
 
@@ -781,7 +725,7 @@ void util::SignalShapingServiceMicroBooNE::SetFilters()
       // now to scale the filter function!
       // only scale params 1,2 &3
       
-      double timeFactor = fTimeScaleFactor*f3DCorrectionVec[_vw]*fFilterWidthCorrectionFactor[_vw];
+      double timeFactor = fFilterWidthCorrectionFactor[_vw];
       for(size_t i=1;i<4;++i) {
         func->SetParameter(i, fFilterParamsVec[_vw][i]/timeFactor);
       }
@@ -833,9 +777,6 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
   
     size_t view = geo->View(ch);     
     double deltaInputTime = fFieldResponseHistVec[view][nominal_resp_name]->GetBinWidth(1)*1000.0;
-       
-    double timeFactor = f3DCorrectionVec[view];
-    if (fStretchFullResponse) timeFactor *= fTimeScaleFactor;
     
     for (auto itResp = fFieldResponseVec[view].begin(); itResp != fFieldResponseVec[view].end(); ++itResp) {
       
@@ -851,7 +792,7 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
       size_t nticks_input = pResp->size();
       DoubleVec InputTime(nticks_input, 0. );
       for (size_t itime = 0; itime < nticks_input; itime++ ) {
-	InputTime[itime] = (1.*itime) * deltaInputTime*timeFactor;
+	InputTime[itime] = (1.*itime) * deltaInputTime;
       }
       FloatVec SamplingResp(nticks, 0. );
       size_t SamplingCount = 0;
@@ -865,7 +806,6 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
 	    high = jtime;
 	    double interpolationFactor = ((*pResp)[high]-(*pResp)[low])/deltaInputTime;
 	    SamplingResp[itime] = ((*pResp)[low] + ( SamplingTime[itime] - InputTime[low] ) * interpolationFactor);
-	    SamplingResp[itime] /= timeFactor;
 	    SamplingCount++;
 	    startJ = jtime;
 	    break;
@@ -878,12 +818,11 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
         TH1F* raw_resp = fFieldResponseHistVec[view][resp_name];
      
         char buff0[80];
-        double plotTimeFactor = fStretchFullResponse ? 1.0 : f3DCorrectionVec[view]*fTimeScaleFactor;
-	double xLowF = (raw_resp->GetBinCenter(1) - 0.5*raw_resp->GetBinWidth(1))*plotTimeFactor;
-	double xHighF = xLowF + 0.001*(raw_resp->GetXaxis()->GetNbins()+1)*(raw_resp->GetBinWidth(1)*1000.0)*plotTimeFactor;
+	double xLowF = (raw_resp->GetBinCenter(1) - 0.5*raw_resp->GetBinWidth(1));
+	double xHighF = xLowF + 0.001*(raw_resp->GetXaxis()->GetNbins()+1)*(raw_resp->GetBinWidth(1)*1000.0);
 		
 	//previous sampling	 
-	size_t nBins = (raw_resp->GetXaxis()->GetNbins())*plotTimeFactor;
+	size_t nBins = (raw_resp->GetXaxis()->GetNbins());
 	sprintf(buff0, "FullResponse%i", (int)view);
 	fHFullResponse[view] = tfs->make<TH1D>(buff0, buff0, nBins, xLowF, xHighF);                
 	for (size_t i=0; i<nBins; ++i) {
@@ -891,9 +830,8 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
 	}
 	
 	//new sampling
-        plotTimeFactor = f3DCorrectionVec[view]*fTimeScaleFactor;
-	xLowF = (raw_resp->GetBinCenter(1) - 0.5*raw_resp->GetBinWidth(1))*plotTimeFactor;
-	xHighF = xLowF + 0.001*(raw_resp->GetXaxis()->GetNbins()+1)*(raw_resp->GetBinWidth(1)*1000.0)*plotTimeFactor;
+	xLowF = (raw_resp->GetBinCenter(1) - 0.5*raw_resp->GetBinWidth(1));
+	xHighF = xLowF + 0.001*(raw_resp->GetXaxis()->GetNbins()+1)*(raw_resp->GetBinWidth(1)*1000.0);
 	double binWidth = 0.5;
 	nBins = (xHighF-xLowF+1)/binWidth;
 	sprintf(buff0, "SampledResponse%i", (int)view);
@@ -916,7 +854,7 @@ void util::SignalShapingServiceMicroBooNE::SetResponseSampling()
 
 double util::SignalShapingServiceMicroBooNE::GetRawNoise(unsigned int const channel) const
 {
-  //no init needed - fFieldResponseTOffset is initialized in reconfigure()
+  //no init needed
 
   art::ServiceHandle<geo::Geometry> geom;
   geo::View_t view = geom->View(channel);
@@ -997,7 +935,7 @@ int util::SignalShapingServiceMicroBooNE::FieldResponseTOffset(unsigned int cons
   }
   auto tpc_clock = lar::providerFrom<detinfo::DetectorClocksService>()->TPCClock();
   
-  return tpc_clock.Ticks(time_offset/1.e3);
+  return tpc_clock.Ticks(time_offset);
 }
 
 //----------------------------------------------------------------------

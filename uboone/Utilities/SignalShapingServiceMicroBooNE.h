@@ -267,18 +267,10 @@ namespace util {
       DoubleVec                                       fFieldRespAmpVec;       ///< Amplitudes applied to adjusted field response   
       bool                                            fYZdependentResponse;   ///< Using YZ-dependent responses
       bool                                            fdatadrivenResponse;    ///< Using data-driven responses
-      size_t                                          fViewForNormalization;
-
-
-      // Time offset and scaling of field responses
-      std::vector< std::map<std::string, double> > fFieldResponseTOffset;  ///< Time offset for field response in ns. Vector elements correspond to plane, map key is a response name
-      DoubleVec  	      	      	           f3DCorrectionVec;	   ///< correction factor to account for 3D path of electrons, 1 for each plane (default = 1.0)  
-      DoubleVec  	      	      	           fCalibResponseTOffset;  ///< calibrated time offset to align U/V/Y Signals						 
-      bool       	      	      	           fStretchFullResponse;												 
-      double     	      	      	           fTimeScaleFactor;													 
-      DoubleVec  	      	      	           fTimeScaleParams;													 
-      double     	      	      	           fDefaultEField;													 
-      double     	      	      	           fDefaultTemperature; 												 
+      std::vector< std::map<std::string, double> >    fFieldResponseTOffset;  ///< Time offset for field response in ns. Vector elements correspond to plane, map key is a response name
+      DoubleVec  	      	      	              fCalibResponseTOffset;  ///< calibrated time offset to align U/V/Y Signals												 
+ 													 
+ 												 
 
 
       // Filter Parameters
@@ -314,16 +306,14 @@ namespace util {
       std::string fDiagnosticResponse;
       
       bool fPrintResponses;
-      bool fHistDone[3];
       bool fHistDoneF[3];   
-      TH1D* fHRawResponse[3];
-      TH1D* fHStretchedResponse[3];
       TH1D* fHFullResponse[3];
       TH1D* fHSampledResponse[3];
       
       TH1D* fHist_FieldResponseHist;
       TH1D* fHist_FieldResponseVec;
       TH1D* fHist_ElectResponse;
+      TH1D* fHist_TotalResponse;
       TH1D* fHist_ResampledConvKernelRe;
       TH1D* fHist_ResampledConvKernelIm;
       

@@ -12,6 +12,7 @@ microboone_signalshapingservice:
                                 #-1 means normalizes to min ADC count, +1 to max
 
 
+
   #------------------------------------------------------
   #Electronics response-related parameters
   #------------------------------------------------------
@@ -24,34 +25,18 @@ microboone_signalshapingservice:
   #------------------------------------------------------
   #Field response-related parameters
   #------------------------------------------------------
-  NResponses:           [2, 3, 2]                   #data-driven YZ-dependent responses per view
-                                                    #use [1, 2, 1] if YZ-dependent but not DDR
-						    #use [1, 1, 1] if not YZ-dependent
   FieldRespAmpVec:      [ 0.555, 0.447, 1.46 ]  
-  ViewForNormalization:   2                         # lets say this is the local plane number, may need to rethink
-  
+  CalibResponseTOffset: [0.0, 0.0, 0.0]             # in us time offset to align all three planes
   YZdependentResponse:    true                      # flag to use YZ-dependent field responses
   datadrivenResponse:     true                      # flag to use data driven field response (also by default uses specific electronics response for misconfigured U channels on FT 1)  
   FieldResponseFNameBase: "uboone_response"       
   FieldResponseHNameBase: "FieldResponse"
   FieldResponseFVersion:  "v3.11.1"
+  NResponses:           [2, 3, 2]                   #data-driven YZ-dependent responses per view
+                                                    #use [1, 2, 1] if YZ-dependent but not DDR
+						    #use [1, 1, 1] if not YZ-dependent
   FieldResponseNames:     [ ["nominal","shortedY"], ["nominal","shortedU","shortedY"], ["nominal","shortedU"] ]
-  
-  
-  
-  #------------------------------------------------------
-  #Field Response time offset and stretching
-  #------------------------------------------------------
-  Drift3DCorrVec:       [ 1.0, 1.0, 1.0 ]
-  CalibResponseTOffset: [0.0, 0.0, 0.0]   # in us time offset to align all three planes
-  StretchFullResponse:  false             # to maintain the original stretching scheme
-                                          # false means only the field response is stretched, not the electronic response
-  TimeScaleParams:   [ 1.0, 0.806 ]     # this does the scaling from full- to half-field
-                                        # good to ~0.2% over the range of the velocity ratio for 1-0.4 in the field
-                                        # and <2% between views (calibrated on the Y view)
-                                        #  not used for calibrated responses
-  DefaultEField:       0.273
-  DefaultTemperature:  89.0
+
   
   
   
@@ -68,6 +53,8 @@ microboone_signalshapingservice:
   #Diagnostics
   #------------------------------------------------------
   PrintResponses: false
+  DiagnosticChannel: -1
+  DiagnosticResponse: "nominal"
 
   
 
@@ -116,8 +103,6 @@ microboone_signalshapingservice:
 
 microboone_dic_signalshapingservice: @local::microboone_signalshapingservice
 microboone_dic_signalshapingservice.NResponses:       [5, 5, 5]  # number of responses per view, including primary.
-microboone_dic_signalshapingservice.CalibResponseTOffset: [0.0, 0.0, 0.0] # in us time offset to align all three planes
 microboone_dic_signalshapingservice.FieldResponseFVersion: "v2.1"
-microboone_dic_signalshapingservice.DeconNorm:  200.
 
 END_PROLOG
