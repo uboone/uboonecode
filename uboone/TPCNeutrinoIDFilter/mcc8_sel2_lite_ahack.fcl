@@ -106,8 +106,8 @@ services.DetectorClocksService.InheritClockConfig:                     false
 services.DetectorClocksService.TriggerOffsetTPC:                       -0.400e3
 
 physics.producers.NuMuCCSelectionII.NeutrinoIDAlgName:                         "NuMuCCSelectionIIAlg"
-physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMin : 3.65 #3.3 #3.65 #3.2 
-physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMax : 5.25 #4.9 #5.25 #4.8
+physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMin : 3.2 
+physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.BeamMax : 4.8 
 #physics.producers.NuMuCCSelectionII.NuMuCCSelectionIIAlg.PEThresh : 50 #4.9 #5.25 #4.8
 
 physics.filters.tpcneutrinoidfilter.VertexModuleLabelVec:                    ["pandoraNu"]
