@@ -266,6 +266,9 @@ bool NuMuCCSelectionIIAlg::findNeutrinoCandidates(art::Event & evt) const
           }
         }
         
+        //icalo = 2;
+        //totalnhits = calos[icalo]->dEdx().size() ;
+        
         double sumdEdxStart=0;
         double sumdEdxEnd=0;
         

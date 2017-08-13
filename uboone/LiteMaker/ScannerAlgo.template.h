@@ -1026,7 +1026,7 @@ namespace larlite {
       for(size_t i=0; i<track_ptr->NumberCovariance(); i++)
 	track_lite.add_covariance (track_ptr->CovarianceAtPoint(i));
       // Momentum
-      for(size_t i=0; i<track_ptr->NumberFitMomentum(); i++)
+      for(size_t i=0; i<track_ptr->NumberTrajectoryPoints(); i++)
 	track_lite.add_momentum   (track_ptr->MomentumAtPoint(i));
       
       // Store address map for downstream association
@@ -1064,6 +1064,8 @@ namespace larlite {
       lite_shower.set_length(shower_ptr->Length());
       lite_shower.set_direction(shower_ptr->Direction());
       lite_shower.set_direction_err(shower_ptr->DirectionErr());
+      lite_shower.set_direction_err(shower_ptr->DirectionErr());
+      lite_shower.set_opening_angle(shower_ptr->OpenAngle());
 
       //fPtrIndex_shower[shower_ptr] = std::make_pair(lite_data->size(),name_index);
       
