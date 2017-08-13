@@ -1,5 +1,5 @@
 #include "litemaker_base.fcl"
-
+BEGIN_PROLOG
 litedatamin_reco3d_pandoraNu: @local::litemaker_base
 litedatamin_reco3d_pandoraNu.out_filename: "larlite_datamin_reco3d_pandoraNu.root"
 litedatamin_reco3d_pandoraNu.DataLookUpMap:
@@ -83,5 +83,5 @@ litedatamin_reco3d_pandoraNu.AssociationLookUpMap:
     "pandoraNuKHitcalo"
   ]
 }
-
+END_PROLOG
 

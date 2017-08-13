@@ -1,26 +1,24 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litedatamin_opreco: @local::litemaker_base
-litedatamin_opreco.out_filename: "larlite_datamin_opreco.root"
+
+litedatamin_opreco.out_filename: "larlite_opreco.root"
+
 litedatamin_opreco.DataLookUpMap:
 {
-
-  ophit: ["ophit","ophitSat","ophitT","ophitFW","ophitSW","ophitCFD",
-          "ophitSatT","ophitSatFW","ophitSatSW","ophitSatCFD"]
-
-  opflash: ["opflash","opflashSat",
-            "sflashT","sflashFW","sflashSW","sflashCFD",
-            "sflashSatT","sflashSatFW","sflashSatSW","sflashSatCFD"]
+  trigger:    ["daq"]
+  swtrigger:  ["swtrigger"]
+  ophit:      ["ophitBeam","ophitCosmic"]
+  opflash:    ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 }
 
 litedatamin_opreco.AssociationLookUpMap:
 {
-  ophit: ["ophit","ophitSat","ophitT","ophitFW","ophitSW","ophitCFD",
-          "ophitSatT","ophitSatFW","ophitSatSW","ophitSatCFD"]
-
-  opflash: ["opflash","opflashSat",
-            "sflashT","sflashFW","sflashSW","sflashCFD",
-            "sflashSatT","sflashSatFW","sflashSatSW","sflashSatCFD"]
+  ophit:   ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 }
+litedatamin_opreco.AssLabelToSave: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
 
-
+END_PROLOG

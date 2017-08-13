@@ -45,18 +45,23 @@ namespace pmtana{
       _flash_veto_range_m.emplace(range_end_v[i],range_start_v[i]);
     }
 
-    auto const ch_list =  p.get<std::vector<size_t> >("OpChannel");
+    _index_to_opch_v =  p.get<std::vector<int> >("OpChannel");
     size_t valid_id=0;
     std::set<size_t> duplicate;
-    for(auto const& ch : ch_list) {
-      if(ch >= _opch_v.size()) _opch_v.resize(ch+1,-1);
+    for(auto const& ch : _index_to_opch_v) {
+      if(ch >= (int)(_opch_to_index_v.size())) _opch_to_index_v.resize(ch+1,-1);
       if(duplicate.find(ch) != duplicate.end()) {
 	std::cerr << "Channel number " << ch << " is duplicated!" << std::endl;
 	throw std::exception();
       }
-      _opch_v[ch] = valid_id;
+      _opch_to_index_v[ch] = valid_id;
       valid_id += 1;
       duplicate.insert(ch);
+    }
+
+    if(_opch_to_index_v.empty()) {
+      std::cerr << "Length of OpChannel array parameter is 0..." << std::endl;
+      throw std::exception();
     }
 
     if(_pe_baseline_v.size() != duplicate.size()) {
@@ -79,8 +84,8 @@ namespace pmtana{
   LiteOpFlashArray_t SimpleFlashAlgo::RecoFlash(const LiteOpHitArray_t ophits) {
 
     Reset();
-
-    const size_t NOpDet = _pe_baseline_v.size();
+    size_t max_ch = _opch_to_index_v.size() - 1;
+    size_t NOpDet = _index_to_opch_v.size();
 
     //static std::vector<double> pesum_v;
     static std::vector<double> mult_v;  //< this is not strictly a multiplicity of PMTs, but multiplicity of hits
@@ -112,7 +117,7 @@ namespace pmtana{
     // Fill _pesum_v
     for(size_t hitidx = 0; hitidx < ophits.size(); ++hitidx) {
       auto const& oph = ophits[hitidx];
-      if(oph.channel >= _opch_v.size() || _opch_v[oph.channel] < 0) {
+      if(oph.channel > max_ch || _opch_to_index_v[oph.channel] < 0) {
 	if(_debug) std::cout << "Ignoring OpChannel " << oph.channel << std::endl;
 	continue;
       }
@@ -123,7 +128,7 @@ namespace pmtana{
       size_t index = (size_t)((oph.peak_time - min_time) / _time_res);
       _pesum_v[index] += oph.pe;
       mult_v[index] += 1;
-      pespec_v[index][_opch_v[oph.channel]] += oph.pe;
+      pespec_v[index][_opch_to_index_v[oph.channel]] += oph.pe;
       hitidx_v[index].push_back(hitidx);
     }
 
@@ -189,16 +194,10 @@ namespace pmtana{
       }
 
       // See if this flash is declarable
-      if (start_time+integral_ctr > _pesum_v.size() && _debug)
-        std::cout << "Candidate @ " << min_time + start_time * _time_res
-                  << " starts less than one integration window before the end of the time range (" << max_time << ")."
-                  << " Its integration window will be " << (_pesum_v.size() - start_time) * _time_res
-                  << std::endl;
-
       double pesum = 0;
-      for(size_t i=start_time; i<(start_time+integral_ctr) && i < _pesum_v.size(); ++i) {
-        pesum += _pesum_v[i];
-      }
+      for(size_t i=start_time; i<std::min(nbins_pesum_v,(start_time+integral_ctr)); ++i)
+
+	pesum += _pesum_v[i];
 
       if(pesum < (_min_pe_flash + sum_baseline)) {
 	if(_debug) std::cout << "Skipping a candidate @ " << start_time  << " => " << start_time + integral_ctr
@@ -219,16 +218,23 @@ namespace pmtana{
       auto const& period = flash_period_v[flash_idx].second;
       auto const& time   = flash_time_v[flash_idx];
 
-      std::vector<double> pe_v(NOpDet,0);
+      std::vector<double> pe_v(max_ch+1,0);
       for(size_t index=start; index<(start+period) && index<pespec_v.size(); ++index) {
 
-	for(size_t pmt=0; pmt<NOpDet; ++pmt) pe_v[pmt] += pespec_v[index][pmt];
+	for(size_t pmt_index=0; pmt_index<NOpDet; ++pmt_index) 
+
+	  pe_v[_index_to_opch_v[pmt_index]] += pespec_v[index][pmt_index];
 	  
       }
 
-      for(size_t pmt=0; pmt<NOpDet; ++pmt) {
-	pe_v[pmt] -= _pe_baseline_v[pmt];
-	if(pe_v[pmt] < 0) pe_v[pmt] = 0.;
+      for(size_t opch=0; opch<max_ch; ++opch) {
+
+	if(_opch_to_index_v[opch]<0) continue;
+
+	pe_v[opch] -= _pe_baseline_v[_opch_to_index_v[opch]];
+
+	if(pe_v[opch]<0) pe_v[opch]=0;
+
       }
 
       std::vector<unsigned int> asshit_v;
