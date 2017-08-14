@@ -10,8 +10,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "litedatamin_reco2d.fcl"
 #include "litedatamin_opreco.fcl"
-#include "litedatamin_reco3d_pandoraNu.fcl"
-#include "litedatamin_reco3d_pandoraCosmic.fcl"
+#include "litedatamin_reco3d_pandora.fcl"
 
 process_name: TPCNeutrinoIDFilterVTX
 
@@ -51,8 +50,7 @@ physics:
   {
    opreco:  @local::litedatamin_opreco
    reco2d:  @local::litedatamin_reco2d
-   pandoraNu:     @local::litedatamin_reco3d_pandoraNu
-   pandoraCosmic:     @local::litedatamin_reco3d_pandoraCosmic
+   pandora:     @local::litedatamin_reco3d_pandora
   }
 
  reco:          [ NuMuCCSelectionII, tpcneutrinoidfilter ]
@@ -61,7 +59,7 @@ physics:
 
  trigger_paths: [ reco ]
 
- ana: [ reco2d, pandoraNu, pandoraCosmic]
+ ana: [ reco2d, pandora ]
 
  #end_paths:     [ stream1, ana ]    
  end_paths:     [ ana ]    
@@ -111,22 +109,19 @@ physics.filters.tpcneutrinoidfilter.VtxTrackAssnModuleLabelVec:              ["N
 physics.filters.tpcneutrinoidfilter.Cluster2DCosmicProducerLabel:            ""
 physics.filters.tpcneutrinoidfilter.Cluster2DCosmicClusterAssns:             ""
 
-physics.analyzers.pandoraNu.AssociationProducers: ["NuMuCCSelectionII"]
+physics.analyzers.pandora.AssociationProducers: ["NuMuCCSelectionII"]
 
 physics.analyzers.reco2d.stream:      "reco2d"
 #physics.analyzers.opreco.stream:      "opreco"
-physics.analyzers.pandoraNu.stream:      "pandoraNu"
-physics.analyzers.pandoraCosmic.stream:      "pandoraCosmic"
+physics.analyzers.pandora.stream:      "pandora"
 
 physics.analyzers.reco2d.SelectEvents: [ reco ] 
 #physics.analyzers.opreco.SelectEvents: [ reco ] 
-physics.analyzers.pandoraNu.SelectEvents: [ reco ] 
-physics.analyzers.pandoraCosmic.SelectEvents: [ reco ] 
+physics.analyzers.pandora.SelectEvents: [ reco ] 
 
 physics.analyzers.reco2d.out_filename:      "larlite_reco2d.root"
 #physics.analyzers.opreco.out_filename:      "larlite_opreco.root"
-physics.analyzers.pandoraNu.out_filename:      "larlite_pandoraNu.root"
-physics.analyzers.pandoraCosmic.out_filename:      "larlite_pandoraCosmic.root"
+physics.analyzers.pandora.out_filename:      "larlite_pandora.root"
 
 #physics.analyzers.opreco.DataLookUpMap.ophit: ["ophit","ophitSat"]
 #physics.analyzers.opreco.DataLookUpMap.opflash: ["opflash","opflashSat"]
