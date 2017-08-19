@@ -610,6 +610,9 @@ microboone_reco_mcc8_producers.pandoraNuPMAContTag.ApplyTags:                   
 microboone_reco_mcc8_producers.pmtrackContTag.TrackModuleLabels:                 ["pmtrack"]
 microboone_reco_mcc8_producers.pmtrackContTag.ApplyTags:                         [true]
 
+microboone_reco_mcc8_producers.pandoraNuMCSMu.inputs.inputLabel: "pandoraNu"
+microboone_reco_mcc8_producers.pmtrackMCSMu.inputs.inputLabel:   "pmtrack"
+
 microboone_reco_mcc8_producers.pandoraCosmicKHitT0Reco.TrackProducer: "pandoraCosmicKHit"
 microboone_reco_mcc8_producers.pandoraCosmicT0Reco.TrackProducer:     "pandoraCosmic"
 microboone_reco_mcc8_producers.pmtrackT0Reco.TrackProducer:           "pmtrack"
