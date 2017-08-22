@@ -13,6 +13,14 @@ microboone_genie_hist.BeamCenter:    [1.25, 0., 0.]
 microboone_genie_hist.BeamDirection: [0., 0., 1.]    
 microboone_genie_hist.BeamRadius:    4.              
 
+microboone_genie_nuesig:               @local::microboone_genie
+microboone_genie_nuesig.FluxType:       "histogram"
+microboone_genie_nuesig.FluxSearchPaths:"/pnfs/uboone/persistent/uboonebeam/nuesignal_hist/nuesignal_hist_fluxes_07.11.2017_470/"
+microboone_genie_nuesig.FluxFiles:     ["FluxHist_volAVTPC_Electron_Signal.root"] 
+microboone_genie_nuesig.BeamCenter:    [1.25, 0., 0.]  
+microboone_genie_nuesig.BeamDirection: [0., 0., 1.]    
+microboone_genie_nuesig.BeamRadius:    4.              
+
 microboone_genie_simple:                   @local::microboone_genie
 microboone_genie_simple.FluxType:          "simple_flux"
 microboone_genie_simple.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470/"

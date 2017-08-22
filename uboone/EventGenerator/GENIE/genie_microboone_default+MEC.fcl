@@ -8,12 +8,21 @@ microboone_genie.GlobalTimeOffset:   1.6e6                  #microboone reads ou
 microboone_genie.EventGeneratorList:      "Default+MEC"
 # Other EventGeneratorLists can be found here:
 #     $GENIE/config/EventGeneratorListAssembler.xml
+
 microboone_genie_hist:               @local::microboone_genie
 microboone_genie_hist.FluxType:       "histogram"
 microboone_genie_hist.FluxFiles:     ["flux/bnb/current/histograms/ub470_r200_bnb_fhc/numode_bnb_470m_r200.root"] 
 microboone_genie_hist.BeamCenter:    [1.25, 0., 0.]  
 microboone_genie_hist.BeamDirection: [0., 0., 1.]    
 microboone_genie_hist.BeamRadius:    4.              
+
+microboone_genie_nuesig:               @local::microboone_genie
+microboone_genie_nuesig.FluxType:       "histogram"
+microboone_genie_nuesig.FluxSearchPaths:"/pnfs/uboone/persistent/uboonebeam/nuesignal_hist/nuesignal_hist_fluxes_07.11.2017_470/"
+microboone_genie_nuesig.FluxFiles:     ["FluxHist_volAVTPC_Electron_Signal.root"] 
+microboone_genie_nuesig.BeamCenter:    [1.25, 0., 0.]  
+microboone_genie_nuesig.BeamDirection: [0., 0., 1.]    
+microboone_genie_nuesig.BeamRadius:    4.              
 
 microboone_genie_simple:                   @local::microboone_genie
 microboone_genie_simple.FluxType:          "simple_flux"

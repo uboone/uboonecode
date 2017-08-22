@@ -1,0 +1,11 @@
+#include "prodgenie_common_cosmic_uboone.fcl"
+
+process_name: GenieGen
+
+outputs.out1.fileName: "prodgenie_signal_nue_cosmic_uboone_%tc_gen.root"
+
+physics.producers.generator: @local::microboone_genie_nuesig
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName: "booster"
