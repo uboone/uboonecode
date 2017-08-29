@@ -1,0 +1,8 @@
+BEGIN_PROLOG
+
+microboone_dqmflashes:
+{
+  module_type: DQMFlashModule 
+}
+
+END_PROLOG
