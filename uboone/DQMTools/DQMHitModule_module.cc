@@ -40,7 +40,7 @@
 #include "uboone/DQMTools/DQMHitAlg.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 
-#include "lardataobj/RecoBase/OpFlash.h"
+//#include "lardataobj/RecoBase/OpFlash.h"
 
 #include "TH1F.h"
 
@@ -81,6 +81,8 @@ private:
 
   //TTree *wireDataTree;
   //std::vector<TTree *> hitDataTree;
+
+  TH1F *RunNumber;
 
   TH1F *NHits_Plane0;
   TH1F *NHits_Plane1;
@@ -195,8 +197,9 @@ void dqm::DQMHitModule::analyze(art::Event const & e)
   std::vector<recob::Wire> const& wireVector(*wireHandle);
 
   //get the flash data
+  /*
   art::Handle< std::vector<recob::OpFlash> > flashHandle;
-  std::string _flash_producer_name = "opflashSat";
+  std::string _flash_producer_name = "simpleFlashBeam";
   e.getByLabel(_flash_producer_name,flashHandle);
   if(!flashHandle.isValid()) {
       std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::OpFlash from "
@@ -204,6 +207,7 @@ void dqm::DQMHitModule::analyze(art::Event const & e)
       throw std::exception();
   }
   std::vector<recob::OpFlash> const& flashVector(*flashHandle);
+  */
  
 
   //get the MC hits
@@ -252,8 +256,8 @@ void dqm::DQMHitModule::analyze(art::Event const & e)
   }
 
   //run the analzyer alg
-  analysisAlg.AnalyzeWires(wireVector,/*mcHitVector,WireMCHitAssocVector,*/ts,eventNumber,runNumber, NHits_Plane0, NHits_Plane1, NHits_Plane2, HitTimeMean_Plane0, HitTimeMean_Plane1, HitTimeMean_Plane2, HitTimeVar_Plane0,  HitTimeVar_Plane1, HitTimeVar_Plane2, HitTimeSkew_Plane0, HitTimeSkew_Plane1, HitTimeSkew_Plane2, HitChargeMean_Plane0, HitChargeMean_Plane1, HitChargeMean_Plane2, HitChargeVar_Plane0, HitChargeVar_Plane1, HitChargeVar_Plane2, HitChargeSkew_Plane0, HitChargeSkew_Plane1, HitChargeSkew_Plane2);
-  analysisAlg.AnalyzeFlashes(flashVector, NFlashes, MeanFlashLight);
+  analysisAlg.AnalyzeWires(wireVector,/*mcHitVector,WireMCHitAssocVector,*/ts,eventNumber,runNumber, RunNumber, NHits_Plane0, NHits_Plane1, NHits_Plane2, HitTimeMean_Plane0, HitTimeMean_Plane1, HitTimeMean_Plane2, HitTimeVar_Plane0,  HitTimeVar_Plane1, HitTimeVar_Plane2, HitTimeSkew_Plane0, HitTimeSkew_Plane1, HitTimeSkew_Plane2, HitChargeMean_Plane0, HitChargeMean_Plane1, HitChargeMean_Plane2, HitChargeVar_Plane0, HitChargeVar_Plane1, HitChargeVar_Plane2, HitChargeSkew_Plane0, HitChargeSkew_Plane1, HitChargeSkew_Plane2);
+  //analysisAlg.AnalyzeFlashes(flashVector, NFlashes, MeanFlashLight);
 }
 
 void dqm::DQMHitModule::beginJob()
@@ -262,6 +266,7 @@ void dqm::DQMHitModule::beginJob()
   //wireDataTree = tfs->make<TTree>("wireDataTree","WireDataTree");
   //analysisAlg.SetWireDataTree(wireDataTree);
 
+  RunNumber    = tfs->make<TH1F>("RunNumber", "Run Number", 100000, 0, 100000);
   NHits_Plane0 = tfs->make<TH1F>("NHits_Plane0", "# hits in plane 0", 150, 0, 30000);
   NHits_Plane1 = tfs->make<TH1F>("NHits_Plane1", "# hits in plane 1", 150, 0, 30000);
   NHits_Plane2 = tfs->make<TH1F>("NHits_Plane2", "# hits in plane 2", 150, 0, 30000);
@@ -286,8 +291,8 @@ void dqm::DQMHitModule::beginJob()
   HitChargeSkew_Plane1 = tfs->make<TH1F>("HitChargeSkew_Plane1", "Skewness on hit charge in plane 1", 100, -100, 100);
   HitChargeSkew_Plane2 = tfs->make<TH1F>("HitChargeSkew_Plane2", "Skewness on hit charge in plane 2", 100, -100, 100);
 
-  NFlashes       = tfs->make<TH1F>("NFlashes"      , "# of flashes"        , 300, 0, 300);
-  MeanFlashLight = tfs->make<TH1F>("MeanFlashLight", "Mean light per flash", 50, 0, 50);
+  //NFlashes       = tfs->make<TH1F>("NFlashes"      , "# of flashes"        , 300, 0, 300);
+  //MeanFlashLight = tfs->make<TH1F>("MeanFlashLight", "Mean light per flash", 50, 0, 50);
  
   // The below creates a Tree with one branch - a recob::Hit branch - for each 
   // Hit module specified in the fcl file. So, don't run this module once per Hit

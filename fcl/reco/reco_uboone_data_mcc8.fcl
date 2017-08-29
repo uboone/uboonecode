@@ -25,6 +25,11 @@
 #include "wirecellmodules_microboone.fcl"
 #include "microboone_dlpmtprecuts.fcl"
 
+#include "microboone_dqmhits.fcl"
+#include "microboone_dqmflashes.fcl"
+#include "microboone_dqmchannels.fcl"
+#include "microboone_dqmgoodruns.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_data_services:
@@ -235,6 +240,14 @@ microboone_reco_data_producers:
   
 }
 
+microboone_reco_data_analyzers:
+{
+  DQMHits:     @local::microboone_dqmhits
+  DQMFlashes:  @local::microboone_dqmflashes
+  DQMChannels: @local::microboone_dqmchannels
+  DQMGoodRuns: @local::microboone_dqmgoodruns
+}
+
 microboone_reco_data_filters:
 {
   flashfilter:  @local::microboone_flashfilter
@@ -386,6 +399,11 @@ microboone_reco_data_MucSTags: [         #MuCSTrackTaggertrackkalmanhit,
                                          MuCSTrackTaggerpandoraCosmic, 
                                          MuCSTrackTaggerpandoraCosmicKHit, 
                                          MuCSTrackTaggerpmtrack ]
+
+microboone_dqm_ana: [                    DQMHits,
+                                         DQMFlashes,
+                                         DQMChannels,
+                                         DQMGoodRuns ]
 
 ### Below we include overrides for the modules above
 ### These are for MCC 7

@@ -53,10 +53,15 @@ physics:
   @table::microboone_reco_data_filters
  }
 
+ analyzers:
+ {
+  @table::microboone_reco_data_analyzers
+ }
+
  #reco sequence and trigger_paths to be defined elsewhere
 
  stream1:  [ out1 ]
- end_paths:     [stream1]  
+ end_paths:     [stream1, ana]  
 
 }
 

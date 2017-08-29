@@ -3,8 +3,8 @@ art_make(
           LIB_LIBRARIES
 			lardataobj_RawData
 			lardataobj_RecoBase 
-                        larcorealg_Geometry
-                        larcore_Geometry_Geometry_service
+#larcore_Geometry
+#larcore_Geometry_Geometry_service
 			art_Persistency_Common canvas
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
@@ -20,8 +20,8 @@ art_make(
 			larreco_RecoAlg
                         lardataobj_RecoBase
 			lardataobj_MCBase
-                        larcorealg_Geometry
-                        larcore_Geometry_Geometry_service
+#larcore_Geometry
+#larcore_Geometry_Geometry_service
                         lardata_Utilities
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation nutools_ParticleNavigation lardataobj_Simulation
                         nusimdata_SimulationBase
