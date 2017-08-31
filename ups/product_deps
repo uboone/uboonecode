@@ -34,9 +34,9 @@ table_fragment_end
 
 product          version
 swtrigger       v02_02_05a
-larlite         v06_33_00
-larcv		v06_36_00
-dlpmtprecutalgo v01_00_00
+larlite         v06_45_01
+larcv		v06_47_00
+dlpmtprecutalgo v06_47_00
 genie_xsec      v2_12_0
 larsoft         v06_37_00
 ubutil          v06_37_00
@@ -50,10 +50,10 @@ end_product_list
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes". 
 qualifier	larlite		larcv		swtrigger	genie_xsec		larsoft		ubutil		uboonedata	uboonedaq_datatypes	dlpmtprecutalgo    notes
-e14:debug	e14:prof	e14:prof	e14:debug	DefaultPlusMECWithNC	e14:debug	e14:debug	-nq-		e14:debug		e10:prof
-e14:opt		e14:prof	e14:prof	e14:opt		DefaultPlusMECWithNC	e14:opt		e14:opt		-nq-        	e14:opt			e10:prof
-e14:prof	e14:prof	e14:prof	e14:prof	DefaultPlusMECWithNC	e14:prof	e14:prof	-nq-        	e14:prof		e10:prof
-e14:prof:fg	e14:prof	e14:prof	e14:prof	LocalFGNievesQEAndMEC	e14:prof	e14:prof	-nq-        	e14:prof		e10:prof
+e14:debug	e14:prof	e14:prof	e14:debug	DefaultPlusMECWithNC	e14:debug	e14:debug	-nq-		e14:debug		e10:nu:prof
+e14:opt		e14:prof	e14:prof	e14:opt		DefaultPlusMECWithNC	e14:opt		e14:opt		-nq-        	e14:opt			e10:nu:prof
+e14:prof	e14:prof	e14:prof	e14:prof	DefaultPlusMECWithNC	e14:prof	e14:prof	-nq-        	e14:prof		e10:nu:prof
+e14:prof:fg	e14:prof	e14:prof	e14:prof	LocalFGNievesQEAndMEC	e14:prof	e14:prof	-nq-        	e14:prof		e10:nu:prof
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
