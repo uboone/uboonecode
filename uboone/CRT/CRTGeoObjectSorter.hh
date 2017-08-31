@@ -24,7 +24,7 @@
 #ifndef CRTGeoObjectSorter_hh_
 #define CRTGeoObjectSorter_hh_
 
-#include "larcore/Geometry/AuxDetGeoObjectSorter.h"
+#include "larcorealg/Geometry/AuxDetGeoObjectSorter.h"
 #include <vector>
 
 namespace crt {

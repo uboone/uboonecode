@@ -113,7 +113,7 @@ namespace evwgh {
     weight.resize(mclist.size());
     for (unsigned int inu=0;inu<mclist.size();inu++) {
       weight[inu].resize(fNmultisims);
-      
+     
       int ptype=-9999;
       int ntype=-9999;
       int bin=-9999;
@@ -135,9 +135,14 @@ namespace evwgh {
       }
       
       double enu=mclist[inu]->GetNeutrino().Nu().E();
-      bin=enu/0.05;
+      bin=enu/0.05;     
       for (int i=0;i<fNmultisims;i++) {
-	weight[inu][i]=1-(1-fRW[ptype][ntype][bin]/fCV[ptype][ntype][bin])*fWeightArray[i];
+	double test = 1-(1-fRW[ptype][ntype][bin]/fCV[ptype][ntype][bin])*fWeightArray[i];
+	
+	// Guards against inifinite weights
+	if(isfinite(test)){ weight[inu][i] = test;}
+	else{weight[inu][i] = 1;}
+
       }
     }
     return weight;

@@ -136,6 +136,8 @@ microboone_electronicscalib_provider:
     DefaultGainErr:        0.0
     DefaultShapingTime:    2.0
     DefaultShapingTimeErr: 0.0
+    
+    OnlyMisconfigStatusFromDB: true
 }
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBFolderName: "electronicscalib_data"
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"

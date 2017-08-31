@@ -10,6 +10,16 @@ namespace larcv {
     , _supera_chstatus_ptr(nullptr)
   {}
 
+  void LArCVSuperaDriver::SetCSV(std::string proc_name, std::string fname)
+  {
+    auto const pid = _driver.process_id(proc_name);
+    if(pid >= _driver.process_names().size()) {
+      LARCV_CRITICAL() << "Invalid process name (" << proc_name << ") to set CSV file for..." << std::endl;
+      throw larbys();
+    }
+    ((SuperaBase*)(_driver.process_ptr(pid)))->SetCSV(fname);
+  }
+
   void LArCVSuperaDriver::configure(const std::string cfg_file)
   {
     _driver.configure(cfg_file);
@@ -63,7 +73,7 @@ namespace larcv {
 	  _data_request_m[(supera::LArDataType_t)(data_type)].insert(label);
 	}
       }
-      
+
       if(_driver.process_ptr(idx)->is("SuperaChStatus")) {
 	_supera_chstatus_ptr = (SuperaChStatus*)(_driver.process_ptr(idx));
 	for(size_t data_type=0; data_type<(size_t)(supera::LArDataType_t::kLArDataTypeMax); ++data_type) {

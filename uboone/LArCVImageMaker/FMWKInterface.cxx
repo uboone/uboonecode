@@ -151,6 +151,7 @@ namespace supera {
 
   void ApplySCE(double& x, double& y, double& z)
   {
+    //auto xyz = ::lar::providerFrom<spacecharge::SpaceChargeService>()->GetPosOffsets(x,y,z);
     static geo::Point_t pt;
     pt.SetX(x);
     pt.SetY(y);
@@ -159,30 +160,33 @@ namespace supera {
     x = pt.X();
     y = pt.Y();
     z = pt.Z();
+    /*
+    x = x - pt.X() + 0.7;
+    y = y + pt.Y();
+    z = z + pt.Z();
+    */
   }
 
   void ApplySCE(double* xyz)
   {
-    static geo::Point_t pt;
-    pt.SetX(xyz[0]);
-    pt.SetY(xyz[1]);
-    pt.SetZ(xyz[2]);
-    ApplySCE(pt);
-    xyz[0] = pt.X();
-    xyz[1] = pt.Y();
-    xyz[2] = pt.Z();
+    double x = xyz[0];
+    double y = xyz[1];
+    double z = xyz[2];
+    ApplySCE(x,y,z);
+    xyz[0] = x;
+    xyz[1] = y;
+    xyz[2] = z;
   }
 
   void ApplySCE(TVector3& xyz)
   {
-    static geo::Point_t pt;
-    pt.SetX(xyz[0]);
-    pt.SetY(xyz[1]);
-    pt.SetZ(xyz[2]);
-    ApplySCE(pt);
-    xyz[0] = pt.X();
-    xyz[1] = pt.Y();
-    xyz[2] = pt.Z();
+    double x = xyz[0];
+    double y = xyz[1];
+    double z = xyz[2];
+    ApplySCE(x,y,z);
+    xyz[0] = x;
+    xyz[1] = y;
+    xyz[2] = z;
   }
 
 }

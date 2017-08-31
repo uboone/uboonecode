@@ -12,7 +12,7 @@ services : {
 
   TFileService: { fileName: "DataOverlayMixer_hist.root" }
   TimeTracker:  {}
-  MemoryTracker:     { ignoreTotal: 1 }     #default is one
+  MemoryTracker:     { }     #default is one
   RandomNumberGenerator: {}                     #ART native random number generator
 
   @table::microboone_reco_data_services

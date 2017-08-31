@@ -83,301 +83,425 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceMacros.h"
-#include "lardata/Utilities/SignalShaping.h"
+#include "SignalShapingLite.h"
 #include "TF1.h"
 #include "TH1D.h"
 
 // LArSoft include
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/TPCGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/TPCGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
 
 using DoubleVec  = std::vector<double>;
+using FloatVec   = std::vector<float>;
 using DoubleVec2 = std::vector< DoubleVec >;
-using DoubleVec3 = std::vector< DoubleVec2 >;
-using DoubleVec4 = std::vector< DoubleVec3 >;
-using TH1FVec4   = std::vector<std::vector<std::vector<std::vector<TH1F*> > > >;
 
 
 namespace util {
-  class SignalShapingServiceMicroBooNE {
-  public:
 
-    // Constructor, destructor.
-
-    SignalShapingServiceMicroBooNE(const fhicl::ParameterSet& pset,
-				   art::ActivityRegistry& reg);
-    ~SignalShapingServiceMicroBooNE();
-
-    // Update configuration parameters.
-
-    void reconfigure(const fhicl::ParameterSet& pset);
-
-    // Accessors.
-
-    DoubleVec2 GetNoiseFactVec()                { return fNoiseFactVec; }
- 
-    std::vector<std::vector<size_t> > GetNResponses()       { return fNResponses; }
-    std::vector<std::vector<size_t> > GetNYZResponses()     { return fNYZResponses; }
-    std::vector<std::vector<size_t> > GetNdatadrivenResponses()     { return fNdatadrivenResponses; }
-    std::vector<std::vector<size_t> > GetNActiveResponses() { return fNActiveResponses; }
-    std::vector<std::vector<size_t> > GetNYZActiveResponses() { return fNYZActiveResponses; }
-    std::vector<std::vector<size_t> > GetNdatadrivenActiveResponses() { return fNdatadrivenActiveResponses; }
-
-    bool IsResponseYZDependent()    { return fYZdependentResponse; }
-    bool IsdatadrivenResponse()     { return fdatadrivenResponse; }
-    bool IsMisconfiguredUIncluded() { return fIncludeMisconfiguredU; }
-
-    double GetASICGain(unsigned int const channel) const;
-    double GetShapingTime(unsigned int const channel) const; 
-
-    double GetRawNoise(unsigned int const channel) const ;
-    double GetDeconNoise(unsigned int const channel) const;
-
-    const std::vector<TComplex>& GetConvKernel(unsigned int channel, unsigned int wire) const;  // M. Mooney
-    double Get2DFilterVal(size_t planeNum, size_t freqDimension, double binFrac) const;  // M. Mooney
-    double Get2DFilterNorm(size_t planeNum) const;  // M. Mooney
-
-    const util::SignalShaping& SignalShaping(size_t channel, size_t wire = 0, size_t ktype = 0) const;
-
-    int FieldResponseTOffset(unsigned int const channel, size_t ktype) const;
-
-    // Do convolution calcution (for simulation).
-
-    template <class T> void Convolute(size_t channel, std::vector<T>& func) const;
-    template <class T> void Convolute(size_t channel, size_t wire, std::vector<T>& func) const;
+  // helper class
+  class SignalShapingContainer {
   
-    // Do deconvolution calcution (for reconstruction).
-
-    template <class T> void Deconvolute(size_t channel, std::vector<T>& func) const;
-    template <class T> void Deconvolute(size_t channel, size_t wire, std::vector<T>& func) const;
+    public:
     
-    void SetDecon(size_t fftsize, size_t channel);
-    double GetDeconNorm(){return fDeconNorm;};
-
-
-  private:
-
-    // Private configuration methods.
-
-    // Post-constructor initialization.
-    void init() const{const_cast<SignalShapingServiceMicroBooNE*>(this)->init();}
-    void init();
-    
-    void SetFieldResponse(size_t ktype);
-    void SetElectResponse(size_t ktype, double shapingtime, double gain);  //changed to read different peaking time for different planes
-
-    // Calculate filter functions.
-    void SetFilters();
-
-    // Pick the electronics configuration
-    size_t GetConfig(size_t channel) const;
-    
-    // Sample the response function, including a configurable
-    // drift velocity of electrons
-    void SetResponseSampling(size_t ktype, size_t config, int mode=0, size_t channel=0);
-
-
-
-    // Attributes.
-    
-    
-    bool fInit;               ///< Initialization flag
-    
-    bool fInitConfigMap;
-    mutable std::map<size_t, size_t> fConfigMap;
-    size_t fNConfigs;
-    
-    size_t fNViews;
-
-    size_t                   fViewForNormalization;
-
-    double fDeconNorm;
-    double fADCPerPCAtLowestASICGain; ///< Pulse amplitude gain for a 1 pc charge impulse after convoluting it the with field and electronics response with the lowest ASIC gain setting of 4.7 mV/fC
-
-    DoubleVec2 fASICGainInMVPerFC;       ///< Cold electronics ASIC gain setting in mV/fC
-    DoubleVec2 fNoiseFactVec;       ///< RMS noise in ADCs for lowest gain setting
-
-    double fDefaultEField;
-    double fDefaultTemperature;
-
-    bool fYZdependentResponse;
-    bool fdatadrivenResponse;
-    bool fIncludeMisconfiguredU;
-
-    std::vector<std::vector<size_t> > fNResponses;
-    std::vector<std::vector<size_t> > fNYZResponses;
-    std::vector<std::vector<size_t> > fNdatadrivenResponses;
-    std::vector<std::vector<size_t> > fNActiveResponses;
-    std::vector<std::vector<size_t> > fNYZActiveResponses;
-    std::vector<std::vector<size_t> > fNdatadrivenActiveResponses;
-    
-    DoubleVec2  fFieldResponseTOffset;  ///< Time offset for field response in ns
-
-    // testing
-    int fNFieldBins[2];         		///< number of bins for field response
-    double fFieldLowEdge[2];           ///< low edge of the field response histo (for test output)
-    double fFieldBin1Center[2];
-    double fFieldBinWidth[2];       ///<  Bin with of the input field response.
-
-    DoubleVec f3DCorrectionVec;  ///< correction factor to account for 3D path of electrons, 1 for each plane (default = 1.0)
-
-    double fTimeScaleFactor;
-    bool   fStretchFullResponse;
-    
-    DoubleVec fCalibResponseTOffset; // calibrated time offset to align U/V/Y Signals
-    
-    DoubleVec fFieldRespAmpVec;
-    DoubleVec2 fShapeTimeConst; ///< time constants for exponential shaping
-    std::vector<int> fDeconvPol;         ///< switch for DeconvKernel normalization sign (+ -> max pos ADC, - -> max neg ADC). Entry 0,1,2 = U,V,Y plane settings
-    std::vector<TF1*> fFilterTF1Vec;     ///< Vector of Parameterized filter functions
-    std::vector<std::string> fFilterFuncVec;
-    std::vector<std::vector<TComplex> > fFilterVec;
-    DoubleVec2 fFilterParamsVec;
-    DoubleVec fFilterWidthCorrectionFactor;  // a knob
-
-    // Induced charge deconvolution additions (M. Mooney)
-    std::vector<TF1*> fFilterTF1VecICTime;
-    std::vector<std::string> fFilterFuncVecICTime;
-    std::vector<TF1*> fFilterTF1VecICWire;
-    std::vector<std::string> fFilterFuncVecICWire;
-    DoubleVec fFilterScaleVecICTime;
-    DoubleVec fFilterScaleVecICWire;
-    DoubleVec fFilterNormVecIC;
-
-    std::vector<double> fFilterICTimeMaxFreq;
-    DoubleVec fFilterICTimeMaxVal;
-
-    DoubleVec fFilterICWireMaxFreq;
-    DoubleVec fFilterICWireMaxVal;
-
-
-    bool fGetFilterFromHisto;   		///< Flag that allows to use a filter function from a histogram instead of the functional dependency
-
-    TH1FVec4 fFieldResponseHistVec;
-
-    DoubleVec fTimeScaleParams;
-    
-    std::vector<TH1D*> fFilterHistVec;
-    
-    // Following attributes hold the convolution and deconvolution kernels
-
-    std::vector<std::vector<std::vector<std::vector<util::SignalShaping> > > > fSignalShapingVec;
-    // Field response.
-
-    std::vector<DoubleVec4 >fFieldResponseVec;
-
-    // Electronics response.
-
-    std::vector<DoubleVec> fElectResponse;
-
-    // Filters.
-
-    std::vector<std::vector<TComplex> > FilterVec;
-
-    bool fPrintResponses;
-    
-    // some diagnostic histograms
-    
-    TH1D* fHRawResponse[3];
-    TH1D* fHStretchedResponse[3];
-    TH1D* fHFullResponse[3];
-    TH1D* fHSampledResponse[3];
-    
-    bool fHistDone[3];
-    bool fHistDoneF[3];
+      SignalShapingContainer() {
+        this->ResetAll();
+      }
+      
+      ~SignalShapingContainer() {}
+      
+      SignalShapingLite& Response(const std::string& response_name) {
+        return fResponseMap[response_name];
+      }
+      
+      const SignalShapingLite& Response(const std::string& response_name) const {
+        return fResponseMap.at(response_name);
+      }
+      
+      void ResetAll() {
+        for (auto& resp : fResponseMap) {
+	  resp.second.Reset();
+	}
+      }
+      
+    private:
+      
+      std::map<std::string, SignalShapingLite> fResponseMap;
   };
-}
+  
+  // little helper class to hold the parameters for charge deposition
+  class ResponseParams {
+    public:
+      ResponseParams(double charge, double y, double z, size_t index) : m_charge(charge), m_y(y), m_z(z), m_index(index) {}
+      double getCharge() { return m_charge; }
+      double getY() { return m_y; }
+      double getZ() { return m_z; }
+      size_t getIndex()   { return m_index; }
+    private:
+      double m_charge;
+      double m_y;
+      double m_z;
+      size_t m_index;
+  };
 
+  class SignalShapingServiceMicroBooNE {
+ 
+    public:
+
+      //------------------------------------------------------------
+      // Constructor, destructor, and configuration.
+      //------------------------------------------------------------
+      SignalShapingServiceMicroBooNE(const fhicl::ParameterSet& pset, art::ActivityRegistry& reg);   
+      ~SignalShapingServiceMicroBooNE();
+
+      void reconfigure(const fhicl::ParameterSet& pset);
+
+
+      //------------------------------------------------------------
+      // Convolution (for simulation) and Deconvolution (for reconstruction)
+      //------------------------------------------------------------
+
+      // Do convolution calculation (for simulation).
+      template <class T> void Convolute(size_t channel, std::vector<T>& func, double y, double z) const;
+      template <class T> void Convolute(size_t channel, std::vector<T>& func, const std::vector<std::unique_ptr<ResponseParams> >& params) const;
+      template <class T> void Convolute(size_t channel, std::vector<T>& func, const std::string& response_name) const;
+
+      // Do deconvolution calculation (for reconstruction).
+      template <class T> void Deconvolute(size_t channel, std::vector<T>& func, double y, double z);
+      template <class T> void Deconvolute(size_t channel, std::vector<T>& func, const std::string& response_name);
+
+
+      //------------------------------------------------------------
+      // Accessors.
+      //------------------------------------------------------------
+
+      // Responses and Kernels
+      const util::SignalShapingLite& SignalShaping(size_t channel, const std::string& response_name="") const;
+      const std::vector<ComplexF>&   GetConvKernel(unsigned int channel, const std::string& response_name ) const;  // M. Mooney 
+      void  SetDecon(size_t datasize);
+      const std::vector<unsigned int>&   GetNResponses() const { return fNResponses; } 
+      
+      int FieldResponseTOffset(unsigned int const channel, const std::string& response_name) const;
+
+
+      // Filter-related    
+      double Get2DFilterVal(size_t planeNum, size_t freqDimension, double binFrac) const;  // M. Mooney
+      double Get2DFilterNorm(size_t planeNum) const;  // M. Mooney
+
+
+      // Noise-related
+      const DoubleVec2& GetNoiseFactVec() const { return fNoiseFactVec; }
+      double     GetDeconNorm() const { return fDeconNorm; }
+      double     GetRawNoise(unsigned int const channel) const;
+      double     GetDeconNoise(unsigned int const channel) const; 
+      
+      
+      //U- and Y-Shorted Channels and YZ-Regions
+      // Determine if YZ coordinate overlaps with the U-shorted YZ region
+      static bool IsUShortedYZRegion(double y, double z);
+      
+      // Determine if Z coordinate overlaps with the Y-shorted Z region
+      static bool IsYShortedZRegion(double z);
+      
+      // Determine if channel's wire overlaps with the U-shorted wires
+      static bool IsUShortedOverlapChannel(unsigned int channel);
+      
+      // Determine if channel's wire overlaps with the Y-shorted wires
+      static bool IsYShortedOverlapChannel(unsigned int channel);
+
+    private:
+
+      //------------------------------------------------------------
+      // Private configuration methods.
+      //------------------------------------------------------------
+
+      // Post-constructor initialization.
+      void init() const{const_cast<SignalShapingServiceMicroBooNE*>(this)->init();}
+      void init();
+
+      void SetFieldResponse();
+      void SetElectResponse();  //changed to read different peaking time for different planes
+
+      // Calculate filter functions.
+      void SetFilters();
+
+      // Sample the response function, including a configurable
+      // drift velocity of electrons
+      void SetResponseSampling();
+
+      // Get the name of the (possibly YZ-dependent) response to use, 
+      // as well as a charge_fraction for scaling before convolution/deconvolution
+      std::string DetermineResponseName(unsigned int chan, double y, double z, double& charge_fraction) const;
+      
+      // Determine whether the response indicated by response_name should be stored for channel
+      bool StoreThisResponse(const std::string& response_name, unsigned int channel) const;
+      
+
+
+      //------------------------------------------------------------
+      // Private Attributes.
+      //------------------------------------------------------------     
+
+      bool fInitForConvolution;       ///< True if initialized for convolution
+      bool fInitForDeconvolution;     ///< True if initialized for deconvolution
+      bool fSetDeconKernelsUponInit;  ///< If true, deconvolution kernels are calculated and set in init().  Otherwise, must use SetDecon()
+
+
+      //Convolution and Deconvolution
+      std::vector<util::SignalShapingContainer> fSignalShapingVec; ///< Stores the convolution and deconvolution kernels   
+      unsigned int fConvFFTSize;                                   ///< Stores the FFTSize used for convolution 
+      std::vector<int>                          fDeconvPol;        ///< switch for DeconvKernel normalization sign (+ -> max pos ADC, - -> max neg ADC). Entry 0,1,2 = U,V,Y plane settings
+
+
+      // Electronics Response    
+      std::vector<FloatVec>  fElectResponse;            ///< Stores electronics response. Vector elements correspond to channel, then response bins
+      unsigned int           fMaxElectResponseBins;     ///< Maximum number of bins to use to store the electronics response
+      double                 fADCPerPCAtLowestASICGain; ///< Pulse amplitude gain for a 1 pc charge impulse after convoluting it the with field and electronics response with the lowest ASIC gain setting of 4.7 mV/fC
+      bool                   fIgnoreMisconfigStatus;    ///< If true, use nominal (default) gain and shaping time to calculate electronics response of misconfigured channels.  Useful for deconvolution if noise filtering already performed the correction
+      
+
+      // Field Response
+      std::vector< std::map<std::string, FloatVec> >  fFieldResponseVec;      ///< Stores adjusted field response. Vector elements corespond to plane, map key is a response name
+      std::vector< std::map<std::string, TH1F*> >     fFieldResponseHistVec;  ///< Stores input field response.  Vector elements correspond to planes, map key is a response name
+      std::vector<unsigned int>                       fNResponses;            ///< Number of input field responses per view
+      DoubleVec                                       fFieldRespAmpVec;       ///< Amplitudes applied to adjusted field response   
+      bool                                            fYZdependentResponse;   ///< Using YZ-dependent responses
+      bool                                            fdatadrivenResponse;    ///< Using data-driven responses
+      size_t                                          fViewForNormalization;
+
+
+      // Time offset and scaling of field responses
+      std::vector< std::map<std::string, double> > fFieldResponseTOffset;  ///< Time offset for field response in ns. Vector elements correspond to plane, map key is a response name
+      DoubleVec  	      	      	           f3DCorrectionVec;	   ///< correction factor to account for 3D path of electrons, 1 for each plane (default = 1.0)  
+      DoubleVec  	      	      	           fCalibResponseTOffset;  ///< calibrated time offset to align U/V/Y Signals						 
+      bool       	      	      	           fStretchFullResponse;												 
+      double     	      	      	           fTimeScaleFactor;													 
+      DoubleVec  	      	      	           fTimeScaleParams;													 
+      double     	      	      	           fDefaultEField;													 
+      double     	      	      	           fDefaultTemperature; 												 
+
+
+      // Filter Parameters
+      bool                                fGetFilterFromHisto;    ///< Flag that allows to use a filter function from a histogram instead of the functional dependency
+      std::vector<TH1D*>                  fFilterHistVec;
+      std::vector<TF1*>                   fFilterTF1Vec;          ///< Vector of Parameterized filter functions
+      std::vector<std::string>            fFilterFuncVec;
+      std::vector<std::vector<TComplex> > fFilterVec;
+      DoubleVec2                          fFilterParamsVec;
+      DoubleVec                           fFilterWidthCorrectionFactor;  // a knob
+
+      // Filter Parameters - Induced charge deconvolution additions (M. Mooney)
+      std::vector<TF1*>        fFilterTF1VecICTime;
+      std::vector<std::string> fFilterFuncVecICTime;
+      std::vector<TF1*>        fFilterTF1VecICWire;
+      std::vector<std::string> fFilterFuncVecICWire;
+      DoubleVec                fFilterScaleVecICTime;
+      DoubleVec                fFilterScaleVecICWire;
+      DoubleVec                fFilterNormVecIC;
+      std::vector<double>      fFilterICTimeMaxFreq;
+      DoubleVec                fFilterICTimeMaxVal;
+      DoubleVec                fFilterICWireMaxFreq;
+      DoubleVec                fFilterICWireMaxVal;
+
+
+      // Noise
+      DoubleVec2 fNoiseFactVec;       ///< RMS noise in ADCs for lowest gain setting
+      double     fDeconNorm;          ///< Set Decon Noise Scale
+
+
+      // Diagnostics
+      int fDiagnosticChannel;
+      std::string fDiagnosticResponse;
+      
+      bool fPrintResponses;
+      bool fHistDone[3];
+      bool fHistDoneF[3];   
+      TH1D* fHRawResponse[3];
+      TH1D* fHStretchedResponse[3];
+      TH1D* fHFullResponse[3];
+      TH1D* fHSampledResponse[3];
+      
+      TH1D* fHist_FieldResponseHist;
+      TH1D* fHist_FieldResponseVec;
+      TH1D* fHist_ElectResponse;
+      TH1D* fHist_ResampledConvKernelRe;
+      TH1D* fHist_ResampledConvKernelIm;
+      
+      TH1D* fHist_PreConv;
+      TH1D* fHist_PostConv;
+      TH1D* fHist_PostOffset;
+      TH1D* fHist_PreDeconv;
+      TH1D* fHist_PostDeconvOffset;
+    
+  };
+} //namespace util
 
 
 
 //----------------------------------------------------------------------
 // Do convolution.
-template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(size_t channel, std::vector<T>& func) const
+template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(size_t channel, 
+									       std::vector<T>& func, 
+									       const std::vector<std::unique_ptr<util::ResponseParams> >& params) const
 {
-  SignalShaping(channel, 0).Convolute(func);
 
-  //negative number
-  int time_offset = FieldResponseTOffset(channel,0);
-  
-  std::vector<T> temp;
-  if (time_offset <=0){
-    temp.assign(func.begin(),func.begin()-time_offset);
-    func.erase(func.begin(),func.begin()-time_offset);
-    func.insert(func.end(),temp.begin(),temp.end());
-  }else{
-    temp.assign(func.end()-time_offset,func.end());
-    func.erase(func.end()-time_offset,func.end());
-    func.insert(func.begin(),temp.begin(),temp.end());
+  //loop over params and construct input functions for each of the channel's responses
+  std::map<std::string, std::vector<T> > input_map;
+  for (const auto& item : params) {
+    double charge_fraction = 1.0;
+    std::string response_name = this->DetermineResponseName(channel, item->getY(), item->getZ(), charge_fraction);
+    
+    if (input_map.find(response_name)==input_map.end()) {
+      input_map[response_name].resize(func.size(), 0.0);
+    }
+    
+    if (item->getIndex() < 0 || item->getIndex() >= func.size()) continue;
+    input_map[response_name].at(item->getIndex()) += item->getCharge()*charge_fraction;
   }
   
+  //convolute each input function, and add to output
+  std::vector<T> output;
+  output.resize(func.size(), 0.0);
+  for (auto input : input_map) {
+    this->Convolute(channel, input.second, input.first);
+    std::transform(input.second.begin(), input.second.end(), output.begin(), output.begin(), std::plus<T>()); 
+  }
+  
+  //copy to func
+  func = output;
 }
-
+    
+      
+//----------------------------------------------------------------------
 // Do convolution.
-template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(size_t channel, size_t wire, std::vector<T>& func) const
+template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(size_t channel, std::vector<T>& func, double y, double z) const
 {
-  SignalShaping(channel, wire).Convolute(func);
-  //negative number
-  int time_offset = FieldResponseTOffset(channel,0);
+
+  double charge_fraction = 1.0;
+  std::string response_name = this->DetermineResponseName(channel, y, z, charge_fraction);
+  if (charge_fraction != 1.0) {
+    for (auto& element : func) {
+      element *= charge_fraction;
+    }
+  }
+
+  this->Convolute(channel, func, response_name); 
+}
+
+//----------------------------------------------------------------------
+// Do convolution.
+template <class T> inline void util::SignalShapingServiceMicroBooNE::Convolute(size_t channel, std::vector<T>& func, const std::string& response_name) const
+{
+
+  init();
   
+  if ( !StoreThisResponse(response_name, channel) ) {
+    throw cet::exception(__FUNCTION__) << "You requested to use an invalid response "<<response_name<<" for channel "<<channel<<std::endl;
+  }
+  
+  //make diagnostic histogram
+  if ((int)channel==fDiagnosticChannel && response_name==fDiagnosticResponse) {
+    for (unsigned int bin=0; bin!=func.size(); ++bin) {
+      fHist_PreConv->SetBinContent(bin+1, func.at(bin));
+    }
+  }
+  
+  //convolute
+  fSignalShapingVec[channel].Response(response_name).Convolute(func);
+
+  //make diagnostic histogram
+  if ((int)channel==fDiagnosticChannel && response_name==fDiagnosticResponse) {
+    for (unsigned int bin=0; bin!=func.size(); ++bin) {
+      fHist_PostConv->SetBinContent(bin+1, func.at(bin));
+    }
+  }
+  
+  //Add time offset
+  int time_offset = FieldResponseTOffset(channel,response_name);  
   std::vector<T> temp;
   if (time_offset <=0){
     temp.assign(func.begin(),func.begin()-time_offset);
     func.erase(func.begin(),func.begin()-time_offset);
     func.insert(func.end(),temp.begin(),temp.end());
-  }else{
+  }
+  else{
     temp.assign(func.end()-time_offset,func.end());
     func.erase(func.end()-time_offset,func.end());
     func.insert(func.begin(),temp.begin(),temp.end());
   }
   
-}
-
-//----------------------------------------------------------------------
-// Do deconvolution.
-template <class T> inline void util::SignalShapingServiceMicroBooNE::Deconvolute(size_t channel, std::vector<T>& func) const
-{
-  size_t ktype = 1;
-  SignalShaping(channel, 0, ktype).Deconvolute(func);
-
-  int time_offset = FieldResponseTOffset(channel,ktype);
-  
-  std::vector<T> temp;
-  if (time_offset <=0){
-    temp.assign(func.end()+time_offset,func.end());
-    func.erase(func.end()+time_offset,func.end());
-    func.insert(func.begin(),temp.begin(),temp.end());
-  }else{
-    temp.assign(func.begin(),func.begin()+time_offset);
-    func.erase(func.begin(),func.begin()+time_offset);
-    func.insert(func.end(),temp.begin(),temp.end());
-
-    
+  //make diagnostic histogram
+  if ((int)channel==fDiagnosticChannel && response_name==fDiagnosticResponse) {
+    for (unsigned int bin=0; bin!=func.size(); ++bin) {
+      fHist_PostOffset->SetBinContent(bin+1, func.at(bin));
+    }
   }
+  
 }
+
 
 //----------------------------------------------------------------------
 // Do deconvolution.
-
-template <class T> inline void util::SignalShapingServiceMicroBooNE::Deconvolute(size_t channel, size_t wire, std::vector<T>& func) const
+template <class T> inline void util::SignalShapingServiceMicroBooNE::Deconvolute(size_t channel, std::vector<T>& func, double y, double z)
 {
-  size_t ktype = 1;
-  SignalShaping(channel, wire, ktype).Deconvolute(func);
-
-  int time_offset = FieldResponseTOffset(channel,ktype);
   
+  double charge_fraction = 1.0;
+  std::string response_name = this->DetermineResponseName(channel, y, z, charge_fraction);
+  if (charge_fraction != 1.0 && charge_fraction > 0.0) {
+    for (auto& element : func) {
+      element /= charge_fraction;
+    }
+  }
+
+  this->Deconvolute(channel, func, response_name); 
+}  
+  
+
+//----------------------------------------------------------------------
+// Do deconvolution.
+template <class T> inline void util::SignalShapingServiceMicroBooNE::Deconvolute(size_t channel, std::vector<T>& func, const std::string& response_name)
+{
+
+  init();
+  
+  if ( !StoreThisResponse(response_name, channel) ) {
+    throw cet::exception(__FUNCTION__) << "You requested to use an invalid response "<<response_name<<" for channel "<<channel<<std::endl;
+  }
+  
+  //Initialize deconvolution kernels (necessary if this wasn't done in init())
+  if (!fInitForDeconvolution) {
+    this->SetDecon(func.size());
+  }
+  
+  //make diagnostic histogram
+  if ((int)channel==fDiagnosticChannel && response_name==fDiagnosticResponse) {
+    for (unsigned int bin=0; bin!=func.size(); ++bin) {
+      fHist_PreDeconv->SetBinContent(bin+1, func.at(bin));
+    }
+  }
+  
+  //Do deconvolution
+  fSignalShapingVec[channel].Response(response_name).Deconvolute(func);
+
+  //Add Time Offset
+  int time_offset = FieldResponseTOffset(channel,response_name); 
   std::vector<T> temp;
   if (time_offset <=0){
     temp.assign(func.end()+time_offset,func.end());
     func.erase(func.end()+time_offset,func.end());
     func.insert(func.begin(),temp.begin(),temp.end());
-  }else{
+  }
+  else{
     temp.assign(func.begin(),func.begin()+time_offset);
     func.erase(func.begin(),func.begin()+time_offset);
-    func.insert(func.end(),temp.begin(),temp.end());
-
-    
+    func.insert(func.end(),temp.begin(),temp.end());   
+  }
+  
+  //make diagnostic histogram
+  if ((int)channel==fDiagnosticChannel && response_name==fDiagnosticResponse) {
+    for (unsigned int bin=0; bin!=func.size(); ++bin) {
+      fHist_PostDeconvOffset->SetBinContent(bin+1, func.at(bin));
+    }
   }
 
 }

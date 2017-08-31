@@ -90,6 +90,7 @@ private:
     unsigned int         fNumTicksToDropFront;   ///< # ticks to drop from front of waveform
     std::vector<float>   fRmsRejectionCutHi;     ///< Maximum rms for input channels, reject if larger
     std::vector<float>   fRmsRejectionCutLow;    ///< Minimum rms to consider channel "alive"
+    std::vector<float>   fMaxMinMaxCut;          ///< Cut on the range of ADC values in waveform
 
     // Statistics.
     int fNumEvent;        ///< Number of events seen.
@@ -150,17 +151,18 @@ RawDigitFilterUBooNE::~RawDigitFilterUBooNE()
 ///
 void RawDigitFilterUBooNE::reconfigure(fhicl::ParameterSet const & pset)
 {
-    fDigitModuleLabel      = pset.get<std::string>        ("DigitModuleLabel",                                        "daq");
-    fProcessNoise          = pset.get<bool>               ("ProcessNoise",                                             true);
-    fApplyBinAverage       = pset.get<bool>               ("ApplyBinAverage",                                          true);
-    fApplyTopHatFilter     = pset.get<bool>               ("ApplyTopHatFilter",                                        true);
-    fSmoothCorrelatedNoise = pset.get<bool>               ("SmoothCorrelatedNoise",                                    true);
-    fNumWiresToGroup       = pset.get<std::vector<size_t>>("NumWiresToGroup",          std::vector<size_t>() = {48, 48, 96});
-    fTruncateTicks         = pset.get<bool>               ("TruncateTicks",                                           false);
-    fWindowSize            = pset.get<size_t>             ("WindowSize",                                               6400);
-    fNumTicksToDropFront   = pset.get<size_t>             ("NumTicksToDropFront",                                      2400);
-    fRmsRejectionCutHi     = pset.get<std::vector<float>> ("RMSRejectionCutHi",     std::vector<float>() = {25.0,25.0,25.0});
-    fRmsRejectionCutLow    = pset.get<std::vector<float>> ("RMSRejectionCutLow",    std::vector<float>() = {0.70,0.70,0.70});
+    fDigitModuleLabel      = pset.get<std::string>        ("DigitModuleLabel",                                           "daq");
+    fProcessNoise          = pset.get<bool>               ("ProcessNoise",                                                true);
+    fApplyBinAverage       = pset.get<bool>               ("ApplyBinAverage",                                             true);
+    fApplyTopHatFilter     = pset.get<bool>               ("ApplyTopHatFilter",                                           true);
+    fSmoothCorrelatedNoise = pset.get<bool>               ("SmoothCorrelatedNoise",                                       true);
+    fNumWiresToGroup       = pset.get<std::vector<size_t>>("NumWiresToGroup",             std::vector<size_t>() = {48, 48, 96});
+    fTruncateTicks         = pset.get<bool>               ("TruncateTicks",                                              false);
+    fWindowSize            = pset.get<size_t>             ("WindowSize",                                                  6400);
+    fNumTicksToDropFront   = pset.get<size_t>             ("NumTicksToDropFront",                                         2400);
+    fRmsRejectionCutHi     = pset.get<std::vector<float>> ("RMSRejectionCutHi",     std::vector<float>()    = {25.0,25.0,25.0});
+    fRmsRejectionCutLow    = pset.get<std::vector<float>> ("RMSRejectionCutLow",    std::vector<float>()    = {0.70,0.70,0.70});
+    fMaxMinMaxCut          = pset.get<std::vector<float>> ("MinMaxRejectionCut",    std::vector<float>() = {2500.,2500.,2500.});
 }
 
 //----------------------------------------------------------------------------
@@ -353,6 +355,11 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                 continue;
             }
             
+            if (channel > 3070 && channel < 3120)
+            {
+                std::cout << "--> channel: " << channel << ", trunc ave/rms: " << truncMeanWireVec.at(wireIdx) << "/" << truncRmsWireVec.at(wireIdx) << ", minMax: " << minMaxWireVec.at(wireIdx) << std::endl;
+            }
+
             // If we are not performing noise corrections then we are done with this wire
             // Store it and move on
             if (!fSmoothCorrelatedNoise)
@@ -371,12 +378,8 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
             }
             
             // Add this wire to the map and try to do some classification here
-            if (!fCharacterizationAlg.classifyRawDigitVec(rawadc, view, wire, truncRmsWireVec[wireIdx], minMaxWireVec[wireIdx], meanWireVec[wireIdx],skewnessWireVec[wireIdx], neighborRatioWireVec[wireIdx], groupToDigitIdxPairMap))
-            {
-                // If the waveform was not classified then we need to baseline correct...
-                std::transform(rawadc.begin(),rawadc.end(),rawadc.begin(),std::bind2nd(std::minus<short>(),pedCorWireVec[wireIdx]));
-            }
-
+            fCharacterizationAlg.classifyRawDigitVec(rawadc, view, wire, truncRmsWireVec[wireIdx], minMaxWireVec[wireIdx], meanWireVec[wireIdx],skewnessWireVec[wireIdx], neighborRatioWireVec[wireIdx], groupToDigitIdxPairMap);
+            
             // Are we at the correct boundary for dealing with the noise?
             if (!((wireIdx + 1) % fNumWiresToGroup[view]))
             {
@@ -386,7 +389,7 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                 for(auto& groupToDigitIdxPair : groupToDigitIdxPairMap)
                 {
                     fCorCorrectAlg.removeCorrelatedNoise(groupToDigitIdxPair.second,
-                                                         view,
+                                                         channel,
                                                          truncMeanWireVec,
                                                          truncRmsWireVec,
                                                          minMaxWireVec,
@@ -407,23 +410,30 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                     }
                     
                     // recalculate rms for the output
-                    float rmsVal   = 0.;
-                    float pedestal = truncMeanWireVec[locWireIdx];
-                    float pedCor   = pedCorWireVec[locWireIdx];
-                    float deltaPed = pedestal - pedCor;
+                    float truncMean(0.);
+                    float truncRms(0.);
+                    float minMax(0.);
+                    float pedCor(0.);
                     
                     caldata::RawDigitVector& rawDataVec = rawDataWireTimeVec[locWireIdx];
                     
-                    fCharacterizationAlg.getTruncatedRMS(rawDataVec, deltaPed, rmsVal);
+                    fCharacterizationAlg.getMeanRmsMinMaxAndPedCor(rawDataVec, channelWireVec[locWireIdx], truncMean, truncRms, minMax, pedCor);
+                    
+                    if (channel > 3072 && channel < 3121)
+                    {
+                        std::cout << "    locWireIdx: " << locWireIdx << ", trunc ave/rms: " << truncMean << "/" << truncRms << ", minMax: " << minMax << std::endl;
+                    }
                     
                     // The ultra high noise channels are simply zapped
-                    if (rmsVal < fRmsRejectionCutHi[view]) // && ImAGoodWire(view,baseWireIdx + locWireIdx))
+                    if (minMax < fMaxMinMaxCut[view])
                     {
-                        saveRawDigits(filteredRawDigit, channelWireVec[locWireIdx], rawDataVec, pedestal, rmsVal);
+                        std::transform(rawDataVec.begin(),rawDataVec.end(),rawDataVec.begin(),std::bind2nd(std::minus<short>(),pedCor));
+                        
+                        saveRawDigits(filteredRawDigit, channelWireVec[locWireIdx], rawDataVec, truncMean, truncRms);
                     }
                     else
                     {
-                        mf::LogInfo("RawDigitFilterUBooNE") <<  "--> Rejecting channel for large rms, channel: " << channelWireVec[locWireIdx] << ", rmsVal: " << rmsVal << ", truncMean: " << pedestal << ", pedestal: " << pedCor << std::endl;
+                        mf::LogInfo("RawDigitFilterUBooNE") <<  "--> Rejecting channel for large rms, channel: " << channelWireVec[locWireIdx] << ", rmsVal: " << truncRms << ", truncMean: " << truncMean << ", pedestal: " << pedCor << std::endl;
                     }
                 }
                 

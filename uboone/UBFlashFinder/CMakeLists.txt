@@ -7,7 +7,7 @@ link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} )
 art_make( BASENAME_ONLY
 	  LIBRARY_NAME  uboone_UBFlashFinder
 	  LIB_LIBRARIES
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
                    UBOpReadoutMap_service
 		   lardataobj_RecoBase
@@ -33,7 +33,7 @@ art_make( BASENAME_ONLY
 
           MODULE_LIBRARIES
 		   uboone_UBFlashFinder
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
 		   ${UBOONECODE_LIB}

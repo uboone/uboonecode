@@ -53,6 +53,11 @@ namespace larcv {
     template <class T>
     void LArData(const T&);
 
+    inline void SetCSV(const std::string& fname)
+    { _csv_fname = fname; }
+
+    void ClearEventData();
+
     //
     // Getter
     //
@@ -62,8 +67,8 @@ namespace larcv {
     const std::vector<T>& LArData() const;
 
     int TimeOffset() const { return _time_offset; }
-    
-    void ClearEventData();
+
+    const std::string& CSV() const { return _csv_fname; }
 
   private:
 
@@ -77,6 +82,7 @@ namespace larcv {
     std::vector<supera::LArMCTruth_t>*  _ptr_mctruth_v;
     std::vector<supera::LArMCTrack_t>*  _ptr_mct_v;
     std::vector<supera::LArMCShower_t>* _ptr_mcs_v;
+    std::string _csv_fname;
   };
 
   //

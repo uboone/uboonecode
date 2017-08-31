@@ -11,7 +11,7 @@ art_make(
 			${ROOT_BASIC_LIB_LIST}
           MODULE_LIBRARIES 
 		   	larpandora_LArPandoraInterface	
-			larcore_Geometry
+			larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			lardataobj_RecoBase
 			lardataobj_AnalysisBase	

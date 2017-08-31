@@ -7,7 +7,7 @@ art_make( BASENAME_ONLY
 	                ${FHICLCPP}
 			cetlib cetlib_except
 			${ROOT_BASIC_LIB_LIST}
-	  MODULE_LIBRARIES larcore_Geometry
+	  MODULE_LIBRARIES larcorealg_Geometry
 	                CalData
   	  		NoiseFilterAlgs
 	  		larcore_Geometry_Geometry_service
@@ -39,6 +39,7 @@ art_make( BASENAME_ONLY
         )
 
 add_subdirectory(NoiseFilterAlgs)
+add_subdirectory(DeconTools)
 
 install_headers()
 install_fhicl()

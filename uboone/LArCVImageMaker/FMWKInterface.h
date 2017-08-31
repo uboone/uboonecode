@@ -103,7 +103,6 @@ namespace supera {
   //
   // SpaceChargeService
   // 
-
   /// Truth position to shifted
   void ApplySCE(geo::Point_t& pt);
   /// Truth position to shifted

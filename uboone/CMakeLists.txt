@@ -42,13 +42,13 @@ add_subdirectory(PatternFilter)
 add_subdirectory(MicroBooNEPandora)
 add_subdirectory(QuietEvents)
 add_subdirectory(DLFilters)
-
+add_subdirectory(FakeNEWS)
 add_subdirectory(DQMTools)
 
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
-#     "larcore_Geometry",
+#     "larcorealg_Geometry",
 #     "larcoreobj_SummaryData",
 #     "lardataobj_RawData",
 #     "lardataobj_RecoBase",

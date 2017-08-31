@@ -47,7 +47,7 @@ namespace opdet {
 				       (LogicChannel)\
 				       (NumUBOpticalChannelGains) )
   
-    UBOpticalChannelType_t GetUBTypeFromCategory( UBOpticalChannelCategory_t cat ) {
+    inline UBOpticalChannelType_t GetUBTypeFromCategory( UBOpticalChannelCategory_t cat ) {
 
     UBOpticalChannelType_t chtype = Undefined;
     switch ( cat ) {

@@ -25,12 +25,12 @@ ProcessDriver: {
       PulledPork: {
         Verbosity: 1
         Origin: 0
-        WidthArray:    [171.16552,88.681001347526518,153.6]
+        WidthArray: [171.16552,88.681001347526518,153.6]
+        TimePixels: 3072
+        WirePixels: [512,512,512]
         MinCoordinate: [0.,-116.5,0.]
         MaxCoordinate: [256.35,116.5,1036.8]
         Padding: [10,10,10]
-        TimePixels: 3072
-        WirePixels: [512,512,512]
         EventCompRows: [6,6,6]
         EventCompCols: [1,1,1]
         ApplySCE: true
@@ -55,7 +55,7 @@ ProcessDriver: {
     SuperaWire: {
       Verbosity: 1
       OutImageLabel:    "wire"
-      LArWireProducer:  "calmod"
+      LArWireProducer:  "caldata"
       TimeOffset:       2400
     }
     SuperaSimCh: {

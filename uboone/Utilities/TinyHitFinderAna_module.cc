@@ -42,8 +42,8 @@ extern "C" {
 
 // LArSoft includes
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/TPCGeo.h"
+#include "larcorealg/Geometry/CryostatGeo.h"
+#include "larcorealg/Geometry/TPCGeo.h"
 
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardata/Utilities/LArFFT.h"

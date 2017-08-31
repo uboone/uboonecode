@@ -7,6 +7,7 @@
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/RandGaussQ.h"
 
+#include "TMatrixD.h"
 #include <string>
 #include <map>
 
@@ -18,7 +19,7 @@ namespace evwgh {
   {    
   public:
     virtual void                Configure(fhicl::ParameterSet const& pset) = 0;
-    virtual std::vector<std::vector<double> > GetWeight(art::Event & e) = 0;  
+    virtual std::vector<std::vector<double> > GetWeight(art::Event & e) = 0; 
     void                        SetName(std::string name) {fName=name;}
     std::string                 GetName() {return fName;}
     
@@ -36,6 +37,19 @@ namespace evwgh {
 			std::vector<double> const& centralValues,
 			std::vector< std::vector<double>> const& inputCovarianceMatrix,
 			int n_multisims, CLHEP::RandGaussQ& GaussRandom);
+
+    static std::vector<double>              MultiGaussianSmearing(
+			                        std::vector<double> const& centralValue, 
+                                                TMatrixD* const& inputCovarianceMatrix, 
+                                                std::vector<double> rand);
+
+    static std::vector<double>              MultiGaussianSmearing(
+			                        std::vector<double> const& centralValue, 
+                                                TMatrixD* const& LowerTriangleCovarianceMatrix, 
+						bool isDecomposed,
+                                                std::vector<double> rand);
+    
+
   private:
     std::string fName;
   };

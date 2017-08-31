@@ -20,7 +20,7 @@
 
 // LArSoft libraries
 #include "uboone/SpaceCharge/SpaceChargeMicroBooNE.h"
-#include "larcore/TestUtils/ProviderTestHelpers.h"
+#include "larcorealg/TestUtils/ProviderTestHelpers.h"
 
 // framework and utility libraries
 #include "fhiclcpp/ParameterSet.h"

@@ -1,6 +1,6 @@
 simple_plugin(KalmanFilterTest "module"
               lardata_RecoObjects larreco_Deprecated
-	      larcore_Geometry
+	      larcorealg_Geometry
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_PRINCIPAL}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -21,7 +21,7 @@ simple_plugin(KalmanFilterTest "module"
 
 simple_plugin(PropTest "module"
               lardata_RecoObjects larreco_Deprecated
-	      larcore_Geometry
+	      larcorealg_Geometry
 	      nutools_RandomUtils_NuRandomService_service
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
@@ -37,7 +37,7 @@ simple_plugin(PropTest "module"
 
 simple_plugin(InteractTest "module"
               lardata_RecoObjects larreco_Deprecated
-	      larcore_Geometry
+	      larcorealg_Geometry
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_PRINCIPAL}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}

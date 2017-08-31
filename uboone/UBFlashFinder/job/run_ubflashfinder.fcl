@@ -40,7 +40,6 @@ services.Geometry.ForceUseFCLOnly: true
 services.TimeTracker.printSummary: false
 services.TimeTracker.dbOutput: {}
 
-services.MemoryTracker.printSummaries: []
 services.MemoryTracker.includeMallocInfo: false
 services.MemoryTracker.dbOutput.filename: ""
 

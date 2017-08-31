@@ -54,7 +54,7 @@ ProcessDriver: {
     SuperaWire: {
       Verbosity: 1
       OutImageLabel:    "wire"
-      LArWireProducer:  "calmod"
+      LArWireProducer:  "caldata"
       TimeOffset:       2400
     }
     SuperaSimCh: {
@@ -83,9 +83,9 @@ ProcessDriver: {
       FilterTargetInitEMin: []
       FilterTargetDepEMin:  []
       ShowerInitEMin: 0
-      ShowerDepEMin:  20
+      ShowerDepEMin:  10
       TrackInitEMin:  0
-      TrackDepEMin:   20
+      TrackDepEMin:   10
       FilterROIMinRows: 0
       FilterROIMinCols: 0
       MetaConfig: {

@@ -24,7 +24,7 @@
 
 #include "larcore/Geometry/Geometry.h"
 
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 
 #include "nusimdata/SimulationBase/MCParticle.h"
 

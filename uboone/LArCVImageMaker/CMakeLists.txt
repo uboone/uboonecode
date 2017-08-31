@@ -12,10 +12,10 @@ art_make( EXCLUDE LArCVMetaMaker_service.cc
 	  BASENAME_ONLY
 	  LIBRARY_NAME     uboonecode_uboone_LArCVImageMaker
 	  LIB_LIBRARIES
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   uboone_Geometry
 		   uboonecode_uboone_MuCS
-		   larcore_Geometry_Geometry_service
+		   #larcorealg_Geometry_Geometry_service
 	   	   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 		   lardataobj_RecoBase
 		   nusimdata_SimulationBase
@@ -39,7 +39,8 @@ art_make( EXCLUDE LArCVMetaMaker_service.cc
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   cetlib cetlib_except
+		   ${CETLIB}
+		   #cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -51,9 +52,9 @@ art_make( EXCLUDE LArCVMetaMaker_service.cc
 	      	   FileCatalogMetadataMicroBooNE_service
 		   LArCVMetaMaker_service
 		   uboonecode_uboone_MuCS
-		   larcore_Geometry
+		   larcorealg_Geometry
 		   uboone_Geometry
-		   larcore_Geometry_Geometry_service
+		   #larcorealg_Geometry_Geometry_service
 		   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
@@ -83,7 +84,8 @@ art_make( EXCLUDE LArCVMetaMaker_service.cc
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   cetlib cetlib_except
+		   ${CETLIB}
+		   #cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -94,11 +96,12 @@ simple_plugin(LArCVMetaMaker "service"
 	      TFileMetadataMicroBooNE_service
 	      FileCatalogMetadataMicroBooNE_service
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
-	      art_Utilities canvas
+	      art_Utilities #canvas_Utilities
 	      ${MF_MESSAGELOGGER}
 	      ${MF_UTILITIES}
 	      ${FHICLCPP}
-	      cetlib cetlib_except
+	      ${CETLIB}
+	      #cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}
               BASENAME_ONLY
 )

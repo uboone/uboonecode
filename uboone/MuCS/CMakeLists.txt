@@ -10,7 +10,7 @@ include_directories( $ENV{IFDHC_FQ_DIR}/inc )
 
 art_make( BASENAME_ONLY
 	    LIBRARY_NAME  uboonecode_uboone_MuCS
-      MODULE_LIBRARIES larcore_Geometry
+      MODULE_LIBRARIES larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			larcoreobj_SummaryData
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation

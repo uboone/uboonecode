@@ -82,9 +82,10 @@ void RawDigitFilterAlg::doTopHatFilter(RawDigitVector& dataVec, size_t wire) con
     // We need to start by collecting mean/rms
     float truncMean;
     float rmsVal;
+    float minMax;
     float fracBins(2.*fTruncMeanFraction);
     
-    fCharacterizationAlg.getMeanAndRms(dataVec, truncMean, rmsVal, fracBins);
+    fCharacterizationAlg.getMeanRmsAndMinMax(dataVec, truncMean, rmsVal, minMax, fracBins);
     
     // round the mean to the nearest integer
     truncMean = std::round(truncMean);
@@ -250,8 +251,9 @@ void RawDigitFilterAlg::doAdaptiveFilter(RawDigitVector& dataVec) const
     // We need to start by collecting mean/rms
     float truncMean;
     float rmsVal;
+    float minMax;
     
-    fCharacterizationAlg.getMeanAndRms(dataVec, truncMean, rmsVal, fTruncMeanFraction);
+    fCharacterizationAlg.getMeanRmsAndMinMax(dataVec, truncMean, rmsVal, minMax, fTruncMeanFraction);
     
     // Declare erosion vector
     std::vector<float> meanVec;

@@ -1,6 +1,6 @@
 art_make( BASENAME_ONLY
           EXCLUDE SimWireMicroBooNE_module.cc 
-          MODULE_LIBRARIES larcore_Geometry
+          MODULE_LIBRARIES larcorealg_Geometry
                         larcore_Geometry_Geometry_service
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                         lardata_Utilities
@@ -31,7 +31,7 @@ art_make( BASENAME_ONLY
 
 simple_plugin(SimWireMicroBooNE "module"
           BASENAME_ONLY
-              larcore_Geometry
+              larcorealg_Geometry
               larcore_Geometry_Geometry_service
               larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
               lardata_Utilities

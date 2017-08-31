@@ -38,6 +38,7 @@ microboone_reco_data_services.DetectorPropertiesService.ReadOutWindowSize:      
 microboone_reco_data_services.DetectorClocksService.InheritClockConfig:           false
 microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 microboone_reco_data_services.DetectorClocksService.TrigModuleName:               "daq"
+microboone_reco_data_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus: true
 
 microboone_reco_data_services_fullrawdigits:
 {
@@ -92,10 +93,11 @@ microboone_reco_data_producers:
   saturation : @local::correct_saturation
 
   ### flash finders
-  simpleFlashBeam   : @local::UBFlashBeam
-  simpleFlashCosmic : @local::UBFlashCosmic
-  opflashBeam       : @local::microboone_opflash_saturation_beam
-  opflashCosmic     : @local::microboone_opflash_saturation_cosmic
+  simpleFlashBeam      : @local::UBFlashBeam
+  simpleFlashBeamLowPE : @local::UBFlashBeam
+  simpleFlashCosmic    : @local::UBFlashCosmic
+  opflashBeam          : @local::microboone_opflash_saturation_beam
+  opflashCosmic        : @local::microboone_opflash_saturation_cosmic
 
   ### noise filtering (if needed)
 
@@ -248,7 +250,8 @@ microboone_reco_data_optical: [ saturation,
                                 opflashCosmic,
                                 opflashBeam,
                                 simpleFlashCosmic,
-                                simpleFlashBeam]
+                                simpleFlashBeam,
+                                simpleFlashBeamLowPE]
 
 microboone_reco_data_signalprocessing: [ #digitfilter,
 				         wcNoiseFilter,
@@ -393,6 +396,8 @@ microboone_reco_data_MucSTags: [         #MuCSTrackTaggertrackkalmanhit,
 microboone_reco_data_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
 microboone_reco_data_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
 microboone_reco_data_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
+microboone_reco_data_producers.caldata.ROIFinder.Threshold:                      [0, 0, 0]
+microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                       [9, 9, 9]
 microboone_reco_data_producers.caldata.DodQdxCalib:                              false
 
 microboone_reco_data_producers.gaushit.CalDataModuleLabel:                       "caldata"
@@ -644,6 +649,9 @@ microboone_reco_data_producers.MuCSTrackTaggerpandoraCosmicKHit.TrackModuleLabel
 microboone_reco_data_producers.MuCSTrackTaggerpmtrack.BoxExtension: 20
 microboone_reco_data_producers.MuCSTrackTaggerpmtrack.TrackModuleLabel: "pmtrack"
 
+microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold: 6
+
 microboone_reco_data_filters.flashfilter.OpFlashTag: "simpleFlashBeam"
 microboone_reco_data_filters.dlpmtprecuts.OpHitProducer: "ophitBeam"
+
 END_PROLOG

@@ -149,6 +149,9 @@ namespace supera {
     return (meta_v.size() == supera::Nplanes());
   }
 
+  void PulledPork3DSlicer::AddConstraint(double x, double y, double z)
+  { _slicer.AddConstraint(x,y,z); }
+
   void PulledPork3DSlicer::AddConstraint(const std::vector<supera::LArMCTruth_t>& mctruth_v) {
     for(auto const& mct : mctruth_v)
       this->AddConstraint(mct);
@@ -190,7 +193,7 @@ namespace supera {
       // shift X coodrinate for T0 correction
       x += (pos.T() - _t0_g4ns) / 1.e3 * supera::DriftVelocity();
       
-      _slicer.AddConstraint(x,y,z);
+      AddConstraint(x,y,z);
     }
   }
 
@@ -211,10 +214,7 @@ namespace supera {
 					const int  time_offset,
 					const std::vector<int>& trackid_v)
   { GenerateMeta(simch_v,time_offset,trackid_v,true); }
-    
-
-
-
+  
   void PulledPork3DSlicer::GenerateMeta(const std::vector<supera::LArSimCh_t>& simch_v,
 					const int time_offset,
 					const std::vector<int>& trackid_v,
@@ -269,6 +269,13 @@ namespace supera {
     _meta_v = DeriveMeta(point_v,time_offset);
   }
 
+  void PulledPork3DSlicer::GenerateMeta(const int time_offset) 
+  {
+    LARCV_INFO() << _slicer.PrintConfig() << std::flush;
+    std::vector<supera::GridPoint3D> point_v;
+    _meta_v = DeriveMeta(point_v,time_offset);
+  }
+  
   std::vector<larcv::ImageMeta>
   PulledPork3DSlicer::DeriveMeta(const std::vector<supera::GridPoint3D>& point_v,
 				 const int time_offset) const {

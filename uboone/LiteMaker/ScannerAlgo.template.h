@@ -1556,13 +1556,23 @@ namespace larlite {
 				    art::Handle<std::vector<T> > &dh,
 				    ::larlite::event_ass* lite_dh)
   { 
-    art::FindManyP<U> ptr_coll_v(dh, e, lite_dh->name());
+    std::string producer(lite_dh->name());
+    /*
+    std::string instance("");
+    if(producer.find("::")<producer.size()) {
+      instance = producer.substr(producer.find("::")+2,producer.size()-producer.find("::")-2);
+      producer = producer.substr(0,producer.find("::")) + ":" + instance;
+    }
+    */
+    art::FindManyP<U> ptr_coll_v(dh, e, producer);
+
     auto ass_type_a = LiteDataType<T>();
     auto ass_type_b = LiteDataType<U>();
 
     //std::cout << "    <<ScanAssociation>> looking up " << ass_type_a << " by " << lite_dh->name() << " => " << ass_type_b << " ... " << std::flush;
 
-    larlite::product_id ass_id_a(ass_type_a,dh.provenance()->moduleLabel());
+    //larlite::product_id ass_id_a(ass_type_a,dh.provenance()->moduleLabel());
+    larlite::product_id ass_id_a(ass_type_a,lite_dh->name());
 
     try{
       if(!ptr_coll_v.size()) {
@@ -1570,16 +1580,17 @@ namespace larlite {
 	return;
       }
       const std::vector<art::Ptr<U> > ptr_coll = ptr_coll_v.at(0);
-      /*
-      std::cout << "Got " << ptr_coll_v.size() << " associations!" << std::flush;
+
+      //std::cout << "Got " << ptr_coll_v.size() << " associations!" << std::flush;
       if(!ptr_coll.empty()) {
 	auto const& aptr = ptr_coll.front();
 	auto const& pid  = aptr.id();
 	art::Handle< std::vector<U> > u_handle;
 	e.get(pid,u_handle);
-	std::cout << " first product by " << u_handle.provenance()->moduleLabel() << std::endl;
+	//std::cout << " first product by " << u_handle.provenance()->moduleLabel() << std::endl;
       }
-      */
+      //else{ std::cout << std::endl; }
+
     }catch( art::Exception const& e){
       //std::cout << "Something went wrong!" << std::endl;
       return;

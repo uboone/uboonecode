@@ -27,6 +27,37 @@ namespace supera {
   template<> LArDataType_t LArDataType<supera::LArMCTrack_t>();
   template<> LArDataType_t LArDataType<supera::LArMCShower_t>();
   template<> LArDataType_t LArDataType<supera::LArSimCh_t>();
+
+  class RSEID {
+  public:
+    RSEID(size_t run_val=0, size_t subrun_val=0, size_t event_val=0)
+      : run(run_val)
+      , subrun(subrun_val)
+      , event(event_val)
+    {}
+    ~RSEID(){}
+
+    inline bool operator < (const RSEID& rhs) const
+    { if(run < rhs.run) return true;
+      if(run > rhs.run) return false;
+      if(subrun < rhs.subrun) return true;
+      if(subrun > rhs.subrun) return false;
+      if(event < rhs.event) return true;
+      if(event > rhs.event) return false;
+      return false;
+    }
+
+    inline bool operator == (const RSEID& rhs) const
+    { return (run == rhs.run && subrun == rhs.subrun && event == rhs.event); }
+
+    inline bool operator != (const RSEID& rhs) const
+    { return !( (*this) == rhs ); }
+
+    inline bool operator > (const RSEID& rhs) const
+    { return ( (*this) != rhs && !((*this) < rhs) ); }
+
+    size_t run, subrun, event;
+  };
   
 }
 //#endif

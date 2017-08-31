@@ -28,9 +28,9 @@
 #define CRTChannelMapAlg_hh_
 
 #include "uboone/CRT/CRTGeoObjectSorter.hh"
-#include "larcore/Geometry/GeoObjectSorterStandard.h"
-#include "larcore/Geometry/AuxDetChannelMapAlg.h"
-#include "larcore/Geometry/AuxDetGeo.h"
+#include "larcorealg/Geometry/GeoObjectSorterStandard.h"
+#include "larcorealg/Geometry/AuxDetChannelMapAlg.h"
+#include "larcorealg/Geometry/AuxDetGeo.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "TVector3.h"
 #include <iostream>

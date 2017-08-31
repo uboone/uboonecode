@@ -69,9 +69,22 @@ LArSoftSuperaSriver::LArSoftSuperaSriver(fhicl::ParameterSet const & p)
   cet::search_path finder("FHICL_FILE_PATH");
 
   if( !finder.find_file(p.get<std::string>("supera_params"), supera_cfg) )
-    throw cet::exception("LArSOftSuperaSriver") << "Unable to find supera cfg in "  << finder.to_string() << "\n";
+    throw cet::exception("LArSoftSuperaSriver") << "Unable to find supera cfg in "  << finder.to_string() << "\n";
 
   _supera.configure(supera_cfg);
+
+  auto process_names = _supera.ProcessNames();
+  for(auto const& proc_name : process_names) {
+    std::string param_name = "CSV" + proc_name;
+    auto constraint_file = p.get<std::string>(param_name.c_str(),"");
+    if(constraint_file.empty()) continue;
+
+    std::string fullpath;
+    if( !finder.find_file(constraint_file,fullpath) )
+      throw cet::exception("LArSoftSuperaSriver") << "Unable to find CSV file "  << constraint_file << "\n";
+
+    _supera.SetCSV(proc_name,fullpath);
+  }
 
   // Decide on output filename
   auto out_fname = p.get<std::string>("out_filename","");

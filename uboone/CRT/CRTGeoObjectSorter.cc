@@ -1,6 +1,6 @@
 #include "uboone/CRT/CRTGeoObjectSorter.hh"
-#include "larcore/Geometry/AuxDetGeo.h"
-#include "larcore/Geometry/AuxDetSensitiveGeo.h"
+#include "larcorealg/Geometry/AuxDetGeo.h"
+#include "larcorealg/Geometry/AuxDetSensitiveGeo.h"
 
 #include <sstream>
 #include <string>

@@ -41,6 +41,8 @@ namespace supera {
 
     void configure(const supera::Config_t&);
 
+    void AddConstraint(double x, double y, double z);
+
     void AddConstraint(const supera::LArMCTruth_t& mctruth);
 
     void AddConstraint(const std::vector<supera::LArMCTruth_t>& mctruth_v);
@@ -53,6 +55,9 @@ namespace supera {
     GenerateMeta(const std::vector<supera::LArSimCh_t>& simch_v,
 		 const int time_offset,
 		 const std::vector<int>& trackid_v);
+
+    void
+    GenerateMeta(const int time_offset);
 
     void ClearEventData();
 

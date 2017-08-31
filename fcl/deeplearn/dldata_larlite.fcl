@@ -1,9 +1,0 @@
-#include "dldata_fclbase_driver.fcl"
-
-process_name: DataRecoLArLite
-
-physics.producers: { }
-physics.analyzers: { @table::dldata_analyzers }
-physics.reco: [ ]
-physics.trigger_paths: [ ]
-

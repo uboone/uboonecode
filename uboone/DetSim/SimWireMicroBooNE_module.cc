@@ -52,7 +52,7 @@
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/GeometryCore.h"
 #include "lardata/Utilities/LArFFT.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksServiceStandard.h" // FIXME: this is not portable
@@ -131,23 +131,9 @@ namespace detsim {
 
     ::detinfo::ElecClock fClock; ///< TPC electronics clock
 
-    TH1D* hTest[5] = {0, 0, 0, 0, 0};
-
-    // little helper class to hold the params of each charge dep
-    class ResponseParams {
-    public:
-      ResponseParams(double charge, size_t time) : m_charge(charge), m_time(time) {}
-      double getCharge() { return m_charge; }
-      size_t getTime()   { return m_time; }
-    private:
-      double m_charge;
-      size_t m_time;
-    };
-
     //
     // Needed for post-filter noise (pfn) generator
     //
-    std::vector<double> _pfn_shaping_time_v;
     TF1  *_pfn_f1;
     TF1  *_pfn_MyPoisson;
     TVirtualFFT *_pfn_ifft;
@@ -168,7 +154,6 @@ namespace detsim {
   //-------------------------------------------------
   SimWireMicroBooNE::SimWireMicroBooNE(fhicl::ParameterSet const& pset)
   : fNoiseHist(0)
-    , _pfn_shaping_time_v()
     , _pfn_f1(nullptr)
     , _pfn_MyPoisson(nullptr)
     , _pfn_ifft(nullptr)
@@ -255,18 +240,6 @@ namespace detsim {
     // get access to the TFile service
     art::ServiceHandle<art::TFileService> tfs;
 
-    if(hTest[0] == 0) {
-      char buffer[80];
-      //char buffer1[80];
-
-      if(fSample>=0) {
-        for(size_t i=0;i<5;++i) {
-          sprintf(buffer, "hTest%i",(int)i);
-          hTest[i] = tfs->make<TH1D>(buffer, buffer, 500, -250., 250.);
-        }
-      }
-    }
-
     return;
   }
 
@@ -323,7 +296,6 @@ namespace detsim {
 
   void SimWireMicroBooNE::produce(art::Event& evt)
   {
-
 
     //--------------------------------------------------------------------
     //
@@ -385,27 +357,11 @@ namespace detsim {
     // get the geometry to be able to figure out signal types and chan -> plane mappings
     art::ServiceHandle<geo::Geometry> geo;
     const size_t N_CHANNELS = geo->Nchannels();
+    const size_t N_VIEWS = geo->Nplanes();
 
-    //Get N_RESPONSES from SignalShapingService, on the fly
-    // flag added to use nominal one response per plane or multiple responses
-    // per plane and scaling for YZ dependent responses 
-    // or data driven field responses
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> sss;
-    std::vector<std::vector<size_t> > N_RESPONSES;
-    bool YZresponse = sss->IsResponseYZDependent();
-    bool datadrivenresponse = sss->IsdatadrivenResponse();
-    if(!YZresponse) {
-      N_RESPONSES = sss->GetNActiveResponses();
-      }
-    else if(YZresponse){
-      if(datadrivenresponse == true){ N_RESPONSES = sss->GetNdatadrivenActiveResponses(); }
-      else { N_RESPONSES = sss->GetNYZActiveResponses(); }
-    }
-    const size_t N_VIEWS = N_RESPONSES[0].size();
 
-    bool IsUMisconfigured = sss->IsMisconfiguredUIncluded();
-    
-    
+   
     //--------------------------------------------------------------------
     //
     // Get the SimChannels, which we will use to produce RawDigits
@@ -433,352 +389,58 @@ namespace detsim {
     std::unique_ptr< std::vector<raw::RawDigit>> digcol(new std::vector<raw::RawDigit>);
     digcol->reserve(N_CHANNELS);
 
-    //std::vector<std::vector<std::vector<std::unique_ptr<ResponseParams> > > > responseParamsVec(N_CHANNELS);
-    std::vector<std::vector<std::vector<std::unique_ptr<ResponseParams> > > > responseParamsVec;
-    /*
-    _wr = 0;
-    _ch = 0;
-    for (auto& channel : responseParamsVec) {
-      size_t view = (size_t)geo->View(_ch);
-      channel.resize(2*N_RESPONSES[0][view]-1);
-    }
-    */
-
-    // resize the vector to incorporate the number of responses corresponding 
-    // to each channel; note that this is plane dependent 
+    //first vector index is channel
+    std::vector< std::vector<std::unique_ptr<util::ResponseParams> > > responseParamsVec;
     responseParamsVec.resize(N_CHANNELS);
-    for(unsigned int i = 0; i<N_CHANNELS; i++){
-      size_t view = (size_t)geo->View((int)i);
-      responseParamsVec[i].resize(N_RESPONSES[0][view]);
-    }
     
-    // In this version we assume that adjacent channels <-> adjacent wires, in the same plane/view
-    // Is this always true?
+   
+    //--------------------------------------------------------------------
+    //
+    // Store energy deposits in ResponseParams objects
+    //
+    //--------------------------------------------------------------------
     std::vector<int> first_channel_in_view(N_VIEWS,-1);
+    for(unsigned int chan = 0; chan < N_CHANNELS; ++chan) {	
+      size_t view = (size_t)geo->View(chan);
 
-    // scale ionization depending on plane, wire and YZ location 
-    if(YZresponse){
-      for(unsigned int chan = 0; chan < N_CHANNELS; chan++) {
-	
-	auto wid = geo->ChannelToWire(chan);
-	size_t view = (size_t)geo->View(chan);
-	
-	if (first_channel_in_view[view] == -1) {
-	  first_channel_in_view[view] = chan;
+      if (first_channel_in_view[view] == -1) {
+	first_channel_in_view[view] = chan;
+      }
+
+      const sim::SimChannel* sc = channels.at(chan);
+      if( !sc ) continue;
+
+      auto const& timeSlices = sc->TDCIDEMap();
+
+      // remove the time offset
+      int time_offset = 0;//sss->FieldResponseTOffset(chan);
+
+      for(auto timeSlice : timeSlices) {
+	auto tdc = timeSlice.first;
+	if( tdc < 0 ) continue;
+	auto t = ts->TPCTDC2Tick(tdc)+1; // +1 added because nominal detsim rounds up (B. Russell)
+
+	int raw_digit_index = (int)( (t + time_offset) >= 0 ? t+time_offset : (fNTicks + (t+time_offset)) );
+	if(raw_digit_index <= 0 || raw_digit_index >= (int)fNTicks) continue;
+
+	auto const& energyDeposits = timeSlice.second;
+	for(auto energyDeposit : energyDeposits) {
+	  double charge = (double)energyDeposit.numElectrons;
+	  double y = (double)energyDeposit.y;
+	  double z = (double)energyDeposit.z;
+	  if(charge == 0) continue;
+	  responseParamsVec[chan].emplace_back(new util::ResponseParams(charge, y, z, raw_digit_index));
 	}
+      }
+    } // channels
 
-	const sim::SimChannel* sc = channels.at(chan);
-	if( !sc ) continue;
-
-	auto const& timeSlices = sc->TDCIDEMap();
-
-	// remove the time offset
-	int time_offset = 0;//sss->FieldResponseTOffset(chan);
-
-	for(auto timeSlice : timeSlices) {
-	  auto tdc = timeSlice.first;
-	  if( tdc < 0 ) continue;
-	  auto t = ts->TPCTDC2Tick(tdc)+1; // +1 added because nominal detsim rounds up (B. Russell)
-
-	  int raw_digit_index = (int)( (t + time_offset) >= 0 ? t+time_offset : (fNTicks + (t+time_offset)) );
-	  if(raw_digit_index <= 0 || raw_digit_index >= (int)fNTicks) continue;
-	  
-	  auto const& energyDeposits = timeSlice.second;
-	  for(auto energyDeposit : energyDeposits) {
-	    double charge = (double)energyDeposit.numElectrons;
-	    if(charge == 0) continue;
-
-	    double y = (double)energyDeposit.y;
-	    double z = (double)energyDeposit.z;
-
-	    for(int wire = -(N_RESPONSES[0][view]-1); wire < (int)N_RESPONSES[0][view]; ++wire) {
-	      auto wireIndex = (size_t) wire + N_RESPONSES[0][view] - 1;
-	      if((int)wireIndex >= (int)N_RESPONSES[0][view]) continue;
-	      int wireChan = (int) chan;
-	      if(wireChan < 0 || wireChan >= (int)N_CHANNELS) continue;
-	      if((size_t)geo->View(wireChan) != view) continue;
-
-	      bool YZflag = true;	      
-	      if(view == 0) { // U-plane
-		if( (int)chan >= 1168 && (int)chan <= 1903 ){ // wires overlap with Y-plane shorted wires
-		  //if(z >= 701 && z <= 738){ // YZ region overlaps with Y-plane shorted wires
-		  if( (z > 700.9 && z < 720.1) ||
-                      (z > 720.4 && z < 724.6) ||
-                      (z > 724.9 && z < 739.3) ){ // YZ region overlaps with Y-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 1){ YZflag = false; } }
-		    else{ charge = charge * 0.98; }
-		  }
-		  else{ // nominal region
-		    if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-		    else{ charge = charge * 1; }
-		  }
-		}
-		else if( (IsUMisconfigured == true) && elec_provider.ExtraInfo(chan).GetBoolData("is_misconfigured") ){ // misconfigured U-channels (from FT1)
-		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false;} }
-		    else{ charge = charge * 1; }
-		}
-		else{ // nominal region
-		  if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-		  else{ charge = charge * 1; }
-		} 
-	      }
-	      else if(view == 1) { // V-plane
-		if( (int)chan >= 2400 && (int)chan < 3568 ){ // wires overlap with U-plane shorted wires
-		  //if( (y < (z*0.577)+14.595) && (y > (z*0.577)-115.308) ){ // YZ region overlaps with U-plane shorted wires
-		  if( ( (y < (z*0.577)+14.769) && (y > (z*0.577)+14.422) ) || 
-		      ( (y < (z*0.577)+14.076) && (y > (z*0.577)+7.840) ) || 
-		      ( (y < (z*0.577)+7.494) && (y > (z*0.577)+7.148) ) || 
-		      ( (y < (z*0.577)+6.801) && (y > (z*0.577)+3.683) ) || 
-		      ( (y < (z*0.577)+0.912) && (y > (z*0.577)+0.219) ) || 
-		      ( (y < (z*0.577)-1.513) && (y > (z*0.577)-2.552) ) || 
-		      ( (y < (z*0.577)-3.245) && (y > (z*0.577)-4.630) ) || 
-		      ( (y < (z*0.577)-12.944) && (y > (z*0.577)-21.604) ) || 
-		      ( (y < (z*0.577)-24.722) && (y > (z*0.577)-37.193) ) || 
-		      ( (y < (z*0.577)-37.539) && (y > (z*0.577)-50.703) ) || 
-		      ( (y < (z*0.577)-56.245) && (y > (z*0.577)-57.284) ) || 
-		      ( (y < (z*0.577)-57.631) && (y > (z*0.577)-63.174) ) || 
-		      ( (y < (z*0.577)-63.520) && (y > (z*0.577)-64.559) ) || 
-		      ( (y < (z*0.577)-68.370) && (y > (z*0.577)-76.684) ) || 
-		      ( (y < (z*0.577)-77.030) && (y > (z*0.577)-88.115) ) || 
-		      ( (y < (z*0.577)-88.808) && (y > (z*0.577)-90.194) ) || 
-		      ( (y < (z*0.577)-90.540) && (y > (z*0.577)-101.971) ) || 
-		      ( (y < (z*0.577)-102.318) && (y > (z*0.577)-108.900) ) || 
-		      ( (y < (z*0.577)-109.246) && (y > (z*0.577)-109.592) ) || 
-		      ( (y < (z*0.577)-109.934) && (y > (z*0.577)-115.417) ) ){ // YZ region overlaps with U-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 1){ YZflag = false; } }
-		    else{
-		      if(wireIndex == 1){ charge = charge * 0.685; }
-		      if(wireIndex == 0){ YZflag = false; }
-		    }
-		  }
-		  else{ // nominal
-                    if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-                    else{
-                      if(wireIndex == 1){ charge = charge * 0.7; }
-                      if(wireIndex == 0){ YZflag = false; }
-                    }
-                  }
-		}
-		else if( (int)chan >= 3568 && (int)chan <= 3743){ // wires overlap with U-plane AND Y-plane shorted wires
-		  if( (y < (z*0.577)+14.595) && (y > (z*0.577)-115.308) ){ // YZ region overlaps with U-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 1){ YZflag = false; } }
-		    else{
-		      if(wireIndex == 1){ charge = charge * 0.685; }
-		      if(wireIndex == 0){ YZflag = false; }
-		    }
-		  }
-		  else if(z >= 701 && z <= 738){ // YZ region overlaps with Y-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false; } }
-		    else{
-		      if(wireIndex == 0){ charge = charge * 0.7; }
-		      if(wireIndex == 1){ YZflag = false; }
-		    }
-		  }
-		  else{ // nominal
-                    if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-                    else{
-                      if(wireIndex == 1){ charge = charge * 0.7; }
-                      if(wireIndex == 0){ YZflag = false; }
-                    }
-                  }
-		}
-		else if( (int)chan > 3743 && (int)chan <= 4303 ){ // wires overlap with Y-plane shorted wires
-		  //if(z >= 701 && z <= 739){ // YZ region overlaps with Y-plane shorted wires
-		  if( (z > 700.9 && z < 720.1) ||
-		      (z > 720.4 && z < 724.6) ||
-		      (z > 724.9 && z < 739.3) ){ // YZ region overlaps with Y-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false; } }
-		    else{
-		      if(wireIndex == 0){ charge = charge * 0.7; }
-		      if(wireIndex == 1){ YZflag = false; }
-		    }
-		  }
-		  else{ // nominal
-		    if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-		    else{
-		      if(wireIndex == 1){ charge = charge * 0.7; }
-		      if(wireIndex == 0){ YZflag = false; }
-		    }
-		  }
-		}
-		else{ // nominal region
-		  if(datadrivenresponse){ if(wireIndex != 2){ YZflag = false; } }
-		  else{ 
-		    if(wireIndex == 1){ charge = charge * 0.7; }
-		    if(wireIndex == 0){ YZflag = false; }
-		  }
-		}
-	      } 
-
-	      else if(view == 2) { // Y-plane
-		if( (int)chan >= 4800 && (int)chan <= 6143 ){ // wires overlap with U-plane shorted wires
-		  //if( (y < (z*0.577)+14.595) && (y > (z*0.577)-115.308) ){ // YZ region overlaps with U-plane shorted wires
-		  if( ( (y < (z*0.577)+14.769) && (y > (z*0.577)+14.422) ) || 
-		      ( (y < (z*0.577)+14.076) && (y > (z*0.577)+7.840) ) || 
-		      ( (y < (z*0.577)+7.494) && (y > (z*0.577)+7.148) ) || 
-		      ( (y < (z*0.577)+6.801) && (y > (z*0.577)+3.683) ) || 
-		      ( (y < (z*0.577)+0.912) && (y > (z*0.577)+0.219) ) || 
-		      ( (y < (z*0.577)-1.513) && (y > (z*0.577)-2.552) ) || 
-		      ( (y < (z*0.577)-3.245) && (y > (z*0.577)-4.630) ) || 
-		      ( (y < (z*0.577)-12.944) && (y > (z*0.577)-21.604) ) || 
-		      ( (y < (z*0.577)-24.722) && (y > (z*0.577)-37.193) ) || 
-		      ( (y < (z*0.577)-37.539) && (y > (z*0.577)-50.703) ) || 
-		      ( (y < (z*0.577)-56.245) && (y > (z*0.577)-57.284) ) || 
-		      ( (y < (z*0.577)-57.631) && (y > (z*0.577)-63.174) ) || 
-		      ( (y < (z*0.577)-63.520) && (y > (z*0.577)-64.559) ) || 
-		      ( (y < (z*0.577)-68.370) && (y > (z*0.577)-76.684) ) || 
-		      ( (y < (z*0.577)-77.030) && (y > (z*0.577)-88.115) ) || 
-		      ( (y < (z*0.577)-88.808) && (y > (z*0.577)-90.194) ) || 
-		      ( (y < (z*0.577)-90.540) && (y > (z*0.577)-101.971) ) || 
-		      ( (y < (z*0.577)-102.318) && (y > (z*0.577)-108.900) ) || 
-		      ( (y < (z*0.577)-109.246) && (y > (z*0.577)-109.592) ) || 
-		      ( (y < (z*0.577)-109.934) && (y > (z*0.577)-115.417) ) ){ // YZ region overlaps with U-plane shorted wires
-		    if(datadrivenresponse){ if(wireIndex != 0){ YZflag = false; } }
-		    else{ charge = charge * 0.8; }
-		  }
-		  else{ // nominal region                                                                                                                                                                  
-		    if(datadrivenresponse){ if(wireIndex != 1){ YZflag = false; } }
-		    else{ charge = charge * 1.0; }
-		  }
-		}
-		else{ // nominal region
-		  if(datadrivenresponse){ if(wireIndex != 1){ YZflag = false; } }
-		  else{ charge = charge * 1.0; }
-		}
-	      } 
-	      if(YZflag == true){
-		responseParamsVec[wireChan][wireIndex].emplace_back(new ResponseParams(charge, raw_digit_index));
-	      }	      
-	    } // wire
-	  } // energyDeposits
-	} // timeSlices
-	  //} // SimChannels
-      } // channels
-    } // YZ response
-
-    //--------------------------------------------------------------------                                                                                                                           
-    //                                                                                                                                                                                                  
-    // I'm not sure about the purpose of this first for-loop: experts please update this comment!                                                                                                         
-    //                                                                                                                                                                                                    
-    //-------------------------------------------------------------------- 
-    //LOOP OVER ALL CHANNELS 
-    // In this version we assume that adjacent channels <-> adjacent wires, in the same plane/view                                                       
-    // Is this always true?
-
-      if(!YZresponse) {
-
-	for(unsigned int chan = 0; chan < N_CHANNELS; chan++) {
-	  auto wid = geo->ChannelToWire(chan);
-	  size_t view = (size_t)geo->View(chan);
-
-	  if(first_channel_in_view[view] == -1) {
-	    first_channel_in_view[view] = chan;
-	  }
-
-	  // get the sim::SimChannel for this channel
-	  const sim::SimChannel* sc = channels.at(chan);
-	  if( !sc ) continue;
-
-	  // remove the time offset
-	  int time_offset = 0; //sss->FieldResponseTOffset(chan);
-
-	  // loop over the tdcs and grab the number of electrons for each
-	  for(int t = 0; t < (int)fNTicks; ++t) {
-
-	    int tdc = ts->TPCTick2TDC(t);
-	    // continue if tdc < 0
-	    if( tdc < 0 ) continue;
-	    double charge = sc->Charge(tdc);
-	    if(charge==0) continue;
-
-	    // Apply artificial time offset to take care of field response convolution
-	    // wrap the negative times to the end of the buffer
-	    // The offset should be take care of in shaping service, by shifting the response
-
-	    int raw_digit_index = 
-	      ( (t + time_offset) >= 0 ? t+time_offset : (fNTicks + (t+time_offset)) );
-
-	    if(raw_digit_index <= 0 || raw_digit_index >= (int)fNTicks) continue;
-
-	    // here fill ResponseParams... all the wires!
-	    //  for(int wire = 0; wire < (int)N_RESPONSES[0][view]; ++wire) {
-	    for(int wire = -(N_RESPONSES[0][view]-1); wire<(int)N_RESPONSES[0][view]; ++wire) {
-	      auto wireIndex = (size_t)wire+N_RESPONSES[0][view] - 1;
-	      if((int)wireIndex == (int)N_RESPONSES[0][view]) continue;
-	      //int wireChan = (int)chan + wire;
-	      int wireChan = (int) chan;
-	      if(wireChan<0 || wireChan>= (int)N_CHANNELS) continue;
-	      if((size_t)geo->View(wireChan)!=view) continue;
-
-	      responseParamsVec[wireChan][wireIndex].emplace_back(new ResponseParams(charge, raw_digit_index));
-	    } // loop over wires
-	  } // loop over tdcs
-	} // loop over channels
-      } // not YZ-dependent response
-
-
+    
     //--------------------------------------------------------------------
     //
-    // Make the noise vector that will be used for generating noise
+    // Loop over channels, generating pedestal and noise
+    // Then loop over channel's energy deposits and convolute appropriate response
     //
-    //--------------------------------------------------------------------   
-//    DoubleVec             noiseFactVec(N_VIEWS,0.);
-//    auto tempNoiseVec = sss->GetNoiseFactVec();
-//    for (size_t v = 0; v != N_VIEWS; ++v) {
-//
-//      //the current sss only allows retrieval by channel, even though these things only change by view
-//      //If these ever do change by channel, then this code automatically becomes incorrect!
-//      double shapingTime = sss->GetShapingTime(first_channel_in_view[v]);
-//      double asicGain    = sss->GetASICGain(first_channel_in_view[v]);
-//
-//      if (fShapingTimeOrder.find( shapingTime ) != fShapingTimeOrder.end() ) {
-//        noiseFactVec[v]  = tempNoiseVec[v].at( fShapingTimeOrder.find( shapingTime )->second );
-//	      noiseFactVec[v] *= asicGain/4.7;
-//      }
-//      else {//Throw exception...
-//        throw cet::exception("SimWireMicroBooNE")
-//        << "\033[93m"
-//        << "Shaping Time received from signalservices_microboone.fcl is not one of allowed values"
-//        << std::endl
-//        << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
-//        << "\033[00m"
-//        << std::endl;
-//      }
-//    }
-
-        DoubleVec             noiseFactVec(N_VIEWS,0.);
-    auto tempNoiseVec = sss->GetNoiseFactVec();	
-    for (size_t v = 0; v != N_VIEWS; ++v) {
-      	
-      //the current sss only allows retrieval by channel, even though these things only change by view
-      //If these ever do change by channel, then this code automatically becomes incorrect!
-      double shapingTime = sss->GetShapingTime(first_channel_in_view[v]);	
-      double asicGain    = sss->GetASICGain(first_channel_in_view[v]);
-      
-      if (fShapingTimeOrder.find( shapingTime ) != fShapingTimeOrder.end() ) {
-        if(_pfn_shaping_time_v.size()<=v) _pfn_shaping_time_v.resize(v+1,-1);
-        if(_pfn_shaping_time_v[v]<0) _pfn_shaping_time_v[v]=shapingTime;
-        noiseFactVec[v]  = tempNoiseVec[v].at( fShapingTimeOrder.find( shapingTime )->second );
-        noiseFactVec[v] *= asicGain/4.7;
-      }
-      else {//Throw exception...
-        throw cet::exception("SimWireMicroBooNE")
-        << "\033[93m"
-        << "Shaping Time received from signalservices_microboone.fcl is not one of allowed values"
-        << std::endl
-        << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
-        << "\033[00m"
-        << std::endl;
-      }
-    }
-
-
     //--------------------------------------------------------------------
-    //
-    // Loop over channels a second time and produce the RawDigits by adding together 
-    // pedestal, noise, and direct&induced charges
-    //
-    //-------------------------------------------------------------------- 
        
     // vectors for working in the following for loop
     std::vector<short>    adcvec(fNTimeSamples, 0);
@@ -787,18 +449,6 @@ namespace detsim {
     std::vector<float>    noisetmp(fNTicks,0.);
     
     int step = 0;
-
-    // various constants: not fcl-configurable
-    double slope0[5] = { 0., 2.1575, 6.4725 , 13.946, 40.857};
-    double t0[5] =     { 4450., 6107., 6170., 6305., 6695. };
-    double wire0[3] =  { 337., 332., -0.7 };
-    double factor[3] = { 2.0, 2.0, 1.0 };
-    int tickCut = 250;
-
-
-
-        // loop over the collected responses
-    //   this is needed because hits generate responses on adjacent wires!
     for(unsigned int chan = 0; chan < N_CHANNELS; chan++) {
 
       //clean up working vectors from previous iteration of loop
@@ -814,59 +464,45 @@ namespace detsim {
         throw std::range_error("SimWireMicroBooNE: chargeWork vector too small");
 	
       //use channel number to set some useful numbers
-      auto wid = geo->ChannelToWire(chan);
-      size_t wireNum = wid[0].Wire;
-      auto& thisChan = responseParamsVec[chan];
       size_t view = (size_t)geo->View(chan);
-      
-      
+           
       //Get pedestal with random gaussian variation
       CLHEP::RandGaussQ rGaussPed(engine, 0.0, pedestalRetrievalAlg.PedRms(chan));
       float ped_mean = pedestalRetrievalAlg.PedMean(chan) + rGaussPed.fire();
-     
-     
+        
       //Generate Noise
+      if (fGenNoise) {
+	double noise_factor = 0.0;
+	auto tempNoiseVec = sss->GetNoiseFactVec();
+	double shapingTime = elec_provider.ShapingTime(chan);
+	double asicGain    = elec_provider.Gain(chan);
+	
+	double st_diff = 99999999.9;
+	for (auto iST = fShapingTimeOrder.begin(); iST != fShapingTimeOrder.end(); ++iST) {
+	  if ( fabs(iST->first - shapingTime) < st_diff ) {
+	    st_diff = fabs(iST->first - shapingTime);
+	    noise_factor = tempNoiseVec[view][iST->second];
+	  }
+	}
+	noise_factor *= asicGain/4.7;
 
-
-
-      double             noise_factor;
-      auto tempNoiseVec = sss->GetNoiseFactVec();
-      double shapingTime = sss->GetShapingTime(chan);
-      double asicGain    = sss->GetASICGain(chan);
-      //nanostd::cout << "Sim params: " << chan << " " << shapingTime << " " << asicGain << std::endl;
-
-      if (fShapingTimeOrder.find( shapingTime ) != fShapingTimeOrder.end() ) {
-        noise_factor  = tempNoiseVec[view].at( fShapingTimeOrder.find( shapingTime )->second );
-        noise_factor *= asicGain/4.7;
-      }
-      else {//Throw exception...
-        throw cet::exception("SimWireMicroBooNE")
-        << "\033[93m"
-        << "Shaping Time received from signalservices_microboone.fcl is not one of allowed values"
-        << std::endl
-        << "Allowed values: 0.5, 1.0, 2.0, 3.0 usec"
-        << "\033[00m"
-        << std::endl;
-      }
-
-      if (fGenNoise){
         if (fGenNoise==1)
           GenNoiseInTime(noisetmp, noise_factor);
         else if(fGenNoise==2)
           GenNoiseInFreq(noisetmp, noise_factor);
 	else if(fGenNoise==3)
 	  GenNoisePostFilter(noisetmp, noise_factor, view, chan);
-      }
+	    
    
-      //Add Noise to NoiseDist Histogram
-      //geo::SigType_t sigtype = geo->SignalType(chan);
-      geo::View_t vw = geo->View(chan);
-      if(fMakeNoiseDists) {
-        for (size_t i=step; i < fNTimeSamples; i+=1000) {
-          fNoiseDist[vw]->Fill(noisetmp[i]);
-        }
-      }
-      ++step;
+	//Add Noise to NoiseDist Histogram
+	if(fMakeNoiseDists) {
+          for (size_t i=step; i < fNTimeSamples; i+=1000) {
+            fNoiseDist[view]->Fill(noisetmp[i]);
+          }
+	  ++step;
+	}	
+      }//end Generate Noise
+
 
       //If the channel is bad, we can stop here
       //if you are using the UbooneChannelStatusService, then this removes disconnected, "dead", and "low noise" channels
@@ -875,67 +511,33 @@ namespace detsim {
         raw::RawDigit rd(chan, fNTimeSamples, adcvec, fCompression);
         rd.SetPedestal(ped_mean);
         digcol->push_back(std::move(rd));
-        continue;
+        continue; //on to next channel
       }
       
       
-      //Channel is good, so fill the chargeWork vector with charges
-      int tick0 = 0;
-      if(fSample>=0) tick0 = t0[fSample] - factor[view]*slope0[fSample]*(wireNum-wire0[view]) + 0.5;
-
-      for(int wire=-(N_RESPONSES[0][view]-1); wire<(int)N_RESPONSES[0][view];++wire) {
-      //for(int wire = 0; wire<(int)N_RESPONSES[0][view]; ++wire) {
-	int wireChan = chan;
-        //int wireChan = chan + wire;
-        if(wireChan<0 || wireChan>= (int)N_CHANNELS) continue;
-        if ((size_t)geo->View(wireChan)!=view) continue;
-	//int wireIndex = wire;
-        size_t wireIndex = (size_t)(wire + (int)N_RESPONSES[0][view] - 1);
-	if((int)wireIndex >= (int)N_RESPONSES[0][view]) continue;
-
-        auto & thisWire = thisChan[wireIndex];
-        if(thisWire.empty()) continue;
+      //Channel is good, so convolute response onto all charges and fill the chargeWork vector
+      sss->Convolute(chan, tempWork, responseParamsVec[chan]);
+      for(size_t bin = 0; bin < fNTicks; ++bin) {
+        chargeWork[bin] += tempWork[bin];
+      }
+      
+      
+      /*for (auto& item : responseParamsVec[chan]) {
         std::fill(tempWork.begin(), tempWork.end(), 0.);
-
-        for(auto& item : thisWire) {
-          auto charge = item->getCharge();
-          if(charge==0) continue;
-	  auto raw_digit_index = item->getTime();
-	  if(raw_digit_index > 0 && raw_digit_index < fNTicks) {
-            tempWork.at(raw_digit_index) += charge;
-	  }
-        }
-        // now we have the tempWork for the adjacent wire of interest
-        // convolve it with the appropriate response function
-	sss->Convolute(chan, fabs(wire), tempWork);
-
-	// this is to generate some plots
-        if(view==1 && wireNum==360 && fSample>=0) {
-          if(abs(wire)>2) continue;
-          size_t index = wire + 2;
-          bool printWF = false;
-          if(printWF)std::cout << "printout of waveform, index = " << index << std::endl;
-          for(int i=tick0-tickCut; i<tick0+tickCut;++i) {
-            double val = tempWork[i];
-            if(printWF) {
-              if((i+1)%10==0) std::cout << std::endl << i << " " << i-tick0 << " ";
-              std::cout << val << " " ;
-            }
-            hTest[index]->Fill(i*1.-tick0, val);
-          }
-          if(printWF) std::cout << std::endl;
-
-        }
-
+	auto charge = item->getCharge();
+        if(charge==0) continue;
+	auto raw_digit_index = item->getTime();
+	if(raw_digit_index > 0 && raw_digit_index < fNTicks) {
+          tempWork.at(raw_digit_index) += charge;
+	}
+	
+	sss->Convolute(chan, tempWork, item->getY(), item->getZ());
+        
         // now add the result into the "charge" vector
         for(size_t bin = 0; bin < fNTicks; ++bin) {
           chargeWork[bin] += tempWork[bin];
         }
-        // or:
-        //std::transform(chargeWork.begin(), chargeWork.end(), tempWork.begin(),
-        //               chargeWork.begin(), std::plus<double>());
-
-      }//end loop over response wires
+      }*/
 
 
       // add this digit to the collection;
@@ -949,7 +551,8 @@ namespace detsim {
       raw::RawDigit rd(chan, fNTimeSamples, adcvec, fCompression);
       rd.SetPedestal(ped_mean);
       digcol->push_back(std::move(rd)); // we do move the raw digit copy, though
-    }// end of 2nd loop over channels
+      
+    }// end of loop over channels
 
  
     evt.put(std::move(digcol));
@@ -1075,14 +678,16 @@ namespace detsim {
 
   void SimWireMicroBooNE::GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan)
   {
+    
+     //electronics conditions
+    const lariov::ElectronicsCalibProvider& elec_provider 
+       = art::ServiceHandle<lariov::ElectronicsCalibService>()->GetProvider();
+    
     // noise is a vector of size fNTicks, which is the number of ticks
     const size_t waveform_size = noise.size();
-    
-    if(_pfn_shaping_time_v.size()<=view || _pfn_shaping_time_v[view]<0)
-      throw cet::exception("SimWireMicroBooNE")
-	<< "GenNoisePostFilter encounters unknown view!" << std::endl;    
+       
 
-    Double_t ShapingTime = _pfn_shaping_time_v[view];
+    Double_t ShapingTime = elec_provider.ShapingTime(chan);
 
       if(!_pfn_f1) _pfn_f1 = new TF1("_pfn_f1", "([0]*exp(-0.5*(((x*9592/2)-[1])/[2])**2)*exp(-0.5*pow(x*9592/(2*[3]),[4]))+[5])", 0.0, (double)waveform_size/2);
 
@@ -1094,7 +699,7 @@ namespace detsim {
     Double_t params[1] = {0.};
     Double_t fitpar[6] = {0.};
 
-    if(ShapingTime==2.0) {
+    if(ShapingTime > 1.5 && ShapingTime <= 2.5) {
       params[0] = 3.3708; //2us
 
       // wiener-like
@@ -1107,7 +712,7 @@ namespace detsim {
 
 
     }
-    else if(ShapingTime==1.0) {
+    else if(ShapingTime > 0.75 && ShapingTime <= 1.5) {
       params[0] = 3.5125; //1us
       fitpar[0] = 14.4;
       fitpar[1] = 35.1;

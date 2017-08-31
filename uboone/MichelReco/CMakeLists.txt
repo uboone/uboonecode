@@ -12,7 +12,7 @@ art_make(
           MODULE_LIBRARIES 
 			uboone_MichelReco_Fmwk
 			uboone_MichelReco_Algo
-			larcore_Geometry
+			larcorealg_Geometry
 			larcore_Geometry_Geometry_service
 			larsim_MCCheater_BackTracker_service
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation

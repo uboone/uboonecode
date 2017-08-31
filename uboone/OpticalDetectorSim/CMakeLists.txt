@@ -5,7 +5,7 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc OpticalDRAMReadout_module.cc
           LIB_LIBRARIES UBOpticalChConfig_service
 			lardataobj_RawData
 			lardata_Utilities
-			larcore_Geometry
+			larcorealg_Geometry
                         nusimdata_SimulationBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}
@@ -51,7 +51,7 @@ simple_plugin(UBOpticalChConfig "service"
 	      uboone_Geometry
 	      UBOpReadoutMap_service	
 	      larcore_Geometry_Geometry_service
-	      larcore_Geometry
+	      larcorealg_Geometry
 #	      uboonecode_uboone_OpticalDetectorSim
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}

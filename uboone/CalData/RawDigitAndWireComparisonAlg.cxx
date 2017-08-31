@@ -6,7 +6,7 @@
  *
  */
 
-#include "RawDigitAndWireComparisonAlg.h"
+#include "uboone/CalData/RawDigitAndWireComparisonAlg.h"
 
 #include "lardataobj/RawData/raw.h" // raw::Uncompress()
 

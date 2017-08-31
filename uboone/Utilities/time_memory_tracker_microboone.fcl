@@ -9,7 +9,6 @@ microboone_time_tracker: {
 }
 
 microboone_memory_tracker: {
-  printSummaries    : ["*"] # or any combination of ["general","event","module"]
   includeMallocInfo : true
   dbOutput     : {
     filename   :  "mem.db"

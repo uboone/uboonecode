@@ -25,7 +25,6 @@
 
 #include "mchitmodules.fcl"
 #include "mcreco.fcl"
-#include "eventweight_microboone.fcl"
 
 BEGIN_PROLOG
 
@@ -87,10 +86,11 @@ microboone_reco_mcc8_producers:
   saturation : @local::correct_saturation_mc
 
   ### flash finders
-  simpleFlashBeam   : @local::UBFlashBeamMC
-  simpleFlashCosmic : @local::UBFlashCosmicMC
-  opflashBeam       : @local::microboone_opflash_saturation_beam
-  opflashCosmic     : @local::microboone_opflash_saturation_cosmic
+  simpleFlashBeam      : @local::UBFlashBeamMC
+  simpleFlashBeamLowPE : @local::UBFlashBeamMC
+  simpleFlashCosmic    : @local::UBFlashCosmicMC
+  opflashBeam          : @local::microboone_opflash_saturation_beam
+  opflashCosmic        : @local::microboone_opflash_saturation_cosmic
 
   ### noise filtering (if needed)
   #digitfilter:                    @local::microboone_rawdigitfilter
@@ -221,9 +221,6 @@ microboone_reco_mcc8_producers:
   #stitchkalmanhitT0RecoBeam:     @local::T0RecoAnodeCathodePiercing_mc_beamgate
   #trackkalmanhitT0RecoBeam:      @local::T0RecoAnodeCathodePiercing_mc_beamgate
 
-  ### Adds the necessary event weights for the MC
-  eventweight:                   @local::microboone_eventweight
-
 }
 
 microboone_reco_mcc8_filters:
@@ -239,7 +236,8 @@ microboone_reco_mcc8_optical: [ saturation,
                                 opflashCosmic,
                                 opflashBeam,
                                 simpleFlashCosmic,
-                                simpleFlashBeam]
+                                simpleFlashBeam,
+                                simpleFlashBeamLowPE]
 
 microboone_reco_mcc8_signalprocessing: [ #digitfilter,
                                          wcNoiseFilter,
@@ -341,8 +339,7 @@ microboone_reco_mcc8_pandoraNu: [        pandoraNu,
 microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandoraCosmic,
                                          @sequence::microboone_reco_mcc8_pandoraNu ]
 
-microboone_reco_mcc8_mcreco: [           mchitfinder,
-                                         eventweight]
+microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
 microboone_reco_mcc8: [                  rns,
                                          @sequence::microboone_reco_mcc8_mcreco,
@@ -398,6 +395,8 @@ physics.producers.saturation.CalibrationCorr : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.
 microboone_reco_mcc8_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
 microboone_reco_mcc8_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
 microboone_reco_mcc8_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
+microboone_reco_mcc8_producers.caldata.ROIFinder.Threshold:                      [0, 0, 0]
+microboone_reco_mcc8_producers.caldata.ROIFinder.NumSigma:                       [9, 9, 9]
 microboone_reco_mcc8_producers.caldata.DodQdxCalib:                              false
 
 microboone_reco_mcc8_producers.gaushit.CalDataModuleLabel:                       "caldata"
@@ -434,8 +433,8 @@ microboone_reco_mcc8_producers.gaushit.Chi2NDF:                                 
 #microboone_reco_mcc8_producers.trackkalmanhittag.ClusterModuleLabel:             "fuzzycluster"
 #microboone_reco_mcc8_producers.trackkalmanhittag.TrackModuleLabel:               "trackkalmanhit"
 #microboone_reco_mcc8_producers.trackkalmanhittag.EndTickPadding:                 75
-#microboone_reco_data_producers.trackkalmanhittag.TPCYBoundary:                   20
-#microboone_reco_data_producers.trackkalmanhittag.TPCZBoundary:                   5
+#microboone_reco_mcc8_producers.trackkalmanhittag.TPCYBoundary:                   20
+#microboone_reco_mcc8_producers.trackkalmanhittag.TPCZBoundary:                   5
 
 #microboone_reco_mcc8_producers.stitchkalmanhittag.ClusterModuleLabel:            "fuzzycluster"
 #microboone_reco_mcc8_producers.stitchkalmanhittag.TrackModuleLabel:              "stitchkalmanhit"
@@ -627,5 +626,7 @@ microboone_reco_mcc8_producers.pandoraCosmicT0RecoBeam.TrackProducer:     "pando
 microboone_reco_mcc8_producers.pmtrackT0RecoBeam.TrackProducer:           "pmtrack"
 #microboone_reco_mcc8_producers.stitchkalmanhitT0RecoBeam.TrackProducer:   "stitchkalmanhit"
 #microboone_reco_mcc8_producers.trackkalmanhitT0RecoBeam.TrackProducer:    "trackkalmanhit"
+
+microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold: 6
 
 END_PROLOG

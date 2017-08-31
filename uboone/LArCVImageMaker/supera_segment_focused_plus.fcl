@@ -3,8 +3,8 @@ ProcessDriver: {
   Verbosity:    2
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaMCPCluster","SuperaKeyPointCluster","ImageFromPixel2D","WireMask","WireMask","WireMask"]
-  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaMCPCluster","SuperaKeyPointCluster","ImagePCluster","WireMaskWire","WireMaskSegment","WireMaskISeg"]
+  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaMCPCluster","SuperaKeyPointCluster","ImageFromPixel2D","ImageFromPixel2D","WireMask","WireMask","WireMask","WireMask"]
+  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaMCPCluster","SuperaKeyPointCluster","ImagePCluster","ImageKeyPointCluster","WireMaskWire","WireMaskSegment","WireMaskISeg","WireMaskKeyPoint"]
   #ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaKeyPointCluster","WireMask","WireMask"]
   #ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","SuperaKeyPointCluster","WireMaskWire","WireMaskSegment"]
 
@@ -53,6 +53,10 @@ ProcessDriver: {
       ChStatusProducer: "wire"
       ImageProducer: "iseg"
     }
+    WireMaskKeyPoint: {
+      ChStatusProducer: "wire"
+      ImageProducer: "keypt"
+    }
     SuperaChStatus: {
       LArChStatusProducer: "chstatus"
       OutChStatusLabel: "wire"
@@ -60,7 +64,7 @@ ProcessDriver: {
     SuperaWire: {
       Verbosity: 1
       OutImageLabel:    "wire"
-      LArWireProducer:  "calmod"
+      LArWireProducer:  "caldata"
       TimeOffset:       2400
     }
     SuperaSimCh: {
@@ -181,6 +185,12 @@ ProcessDriver: {
       PixelProducer:  "iseg"
       ImageProducer:  "wire"
       OutputProducer: "iseg"
+      PIType: 2
+    }
+    ImageKeyPointCluster: {
+      PixelProducer:  "keypt"
+      ImageProducer:  "wire"
+      OutputProducer: "keypt"
       PIType: 2
     }
   }

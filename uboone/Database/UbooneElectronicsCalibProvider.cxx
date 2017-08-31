@@ -31,6 +31,12 @@ namespace lariov {
     bool UseDB      = p.get<bool>("UseDB", false);
     bool UseFile    = p.get<bool>("UseFile", false);
     std::string fileName = p.get<std::string>("FileName", "");
+    fOnlyMisconfigStatusFromDB = p.get<bool>("OnlyMisconfigStatusFromDB");
+    
+    fDefaultGain           = p.get<float>("DefaultGain");
+    fDefaultGainErr        = p.get<float>("DefaultGainErr");
+    fDefaultShapingTime    = p.get<float>("DefaultShapingTime");
+    fDefaultShapingTimeErr = p.get<float>("DefaultShapingTimeErr");
 
     //priority:  (1) use db, (2) use table, (3) use defaults
     //If none are specified, use defaults
@@ -38,20 +44,27 @@ namespace lariov {
     else if (UseFile) fDataSource = DataSource::File;
     else              fDataSource = DataSource::Default;
 
-    if (fDataSource == DataSource::Default) {
-      float default_gain     = p.get<float>("DefaultGain");
-      float default_gain_err = p.get<float>("DefaultGainErr");
-      float default_st       = p.get<float>("DefaultShapingTime");
-      float default_st_err   = p.get<float>("DefaultShapingTimeErr");
-
+    if (  fDataSource == DataSource::Default ||
+         (fOnlyMisconfigStatusFromDB && fDataSource == DataSource::Database) ) {
+      
+      
+      if (!fOnlyMisconfigStatusFromDB) {
+        std::cout<<"Using default electronics calibrations"<<std::endl;
+      }
+      else {
+        std::cout<<"Using default electronics calibrations for properly-configured channels, and database for misconfigured channels"<<std::endl;
+      }
+      
       ElectronicsCalib defaultCalib(0);
       CalibrationExtraInfo extra_info("ElectronicsCalib");
       extra_info.AddOrReplaceBoolData("is_misconfigured", false);
+      extra_info.AddOrReplaceFloatData("DefaultGain", fDefaultGain);
+      extra_info.AddOrReplaceFloatData("DefaultShapingTime", fDefaultShapingTime);
 
-      defaultCalib.SetGain(default_gain);
-      defaultCalib.SetGainErr(default_gain_err);
-      defaultCalib.SetShapingTime(default_st);
-      defaultCalib.SetShapingTimeErr(default_st_err);     
+      defaultCalib.SetGain(fDefaultGain);
+      defaultCalib.SetGainErr(fDefaultGainErr);
+      defaultCalib.SetShapingTime(fDefaultShapingTime);
+      defaultCalib.SetShapingTimeErr(fDefaultShapingTimeErr);     
       defaultCalib.SetExtraInfo(extra_info);
       
       art::ServiceHandle<geo::Geometry> geo;
@@ -94,6 +107,8 @@ namespace lariov {
         
 	CalibrationExtraInfo extra_info("ElectronicsCalib");
 	extra_info.AddOrReplaceBoolData("is_misconfigured", (bool)is_misconfigured);
+	extra_info.AddOrReplaceFloatData("DefaultGain", fDefaultGain);
+        extra_info.AddOrReplaceFloatData("DefaultShapingTime", fDefaultShapingTime);
 
         dp.SetChannel(ch);
         dp.SetGain(gain);
@@ -112,7 +127,9 @@ namespace lariov {
 
   bool UbooneElectronicsCalibProvider::Update(DBTimeStamp_t ts) {
     
-    if (fDataSource != DataSource::Database) return false;
+    //Must be using the database, either for everything or for just misconfigured status
+    if ( fDataSource != DataSource::Database &&
+         !(fDataSource == DataSource::Default && fOnlyMisconfigStatusFromDB) ) return false;
       
     if (!this->UpdateFolder(ts)) return false;
 
@@ -126,15 +143,26 @@ namespace lariov {
 
       double gain, gain_err, shaping_time, shaping_time_err;
       bool is_misconfigured;
-      fFolder->GetNamedChannelData(*it, "gain",     gain);
-      fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
-      fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
-      fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
-      fFolder->GetNamedChannelData(*it, "is_misconfigured", is_misconfigured);
       
+      fFolder->GetNamedChannelData(*it, "is_misconfigured", is_misconfigured);
+      if (fOnlyMisconfigStatusFromDB && !is_misconfigured) {
+        gain             = fDefaultGain;
+	gain_err         = fDefaultGainErr;
+	shaping_time     = fDefaultShapingTime;
+	shaping_time_err = fDefaultShapingTimeErr;
+      }
+      else {
+        fFolder->GetNamedChannelData(*it, "gain",     gain);
+        fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
+        fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
+        fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
+      }
+           
       ElectronicsCalib pg(*it);
       CalibrationExtraInfo extra_info("ElectronicsCalib");
       extra_info.AddOrReplaceBoolData("is_misconfigured", is_misconfigured);
+      extra_info.AddOrReplaceFloatData("DefaultGain", fDefaultGain);
+      extra_info.AddOrReplaceFloatData("DefaultShapingTime", fDefaultShapingTime);
       
       pg.SetGain( (float)gain );
       pg.SetGainErr( (float)gain_err );

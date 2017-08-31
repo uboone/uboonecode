@@ -9,7 +9,7 @@ art_make( BASENAME_ONLY
     LIBRARY_NAME  
         CRTData
     LIB_LIBRARIES
-        larcore_Geometry
+        larcorealg_Geometry
         larcore_Geometry_Geometry_service
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
@@ -32,7 +32,7 @@ art_make( BASENAME_ONLY
 art_make_library( LIBRARY_NAME CRT
     SOURCE
         CRTChannelMapAlg.cc
-    LIBRARIES larcore_Geometry
+    LIBRARIES larcorealg_Geometry
         CRTData
         ${MF_MESSAGELOGGER}
         ${MF_UTILITIES}
@@ -43,7 +43,7 @@ art_make_library( LIBRARY_NAME CRT
 )
 
 simple_plugin( CRTGeometryHelper service
-        larcore_Geometry
+        larcorealg_Geometry
         CRT
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
@@ -59,10 +59,9 @@ simple_plugin( CRTGeometryHelper service
         ${MF_UTILITIES}
         ${ROOT_BASIC_LIB_LIST}
         cetlib cetlib_except
-    BASENAME_ONLY
 )
 simple_plugin( CRTDetSim module
-        larcore_Geometry
+        larcorealg_Geometry
         CRT
 		CRTData
         ${ART_FRAMEWORK_CORE}

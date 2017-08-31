@@ -6,7 +6,7 @@ art_make( BASENAME_ONLY
           LIB_LIBRARIES 
 			larevt_CalibrationDBI_IOVData
 			larevt_CalibrationDBI_Providers
-			larcore_Geometry
+			larcorealg_Geometry
 			${LIBWDA}
 	                ${FHICLCPP}
 			cetlib cetlib_except
@@ -14,7 +14,7 @@ art_make( BASENAME_ONLY
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
 			${ROOT_BASIC_LIB_LIST}
 			art_Utilities canvas
-          MODULE_LIBRARIES larcore_Geometry
+          MODULE_LIBRARIES larcorealg_Geometry
                         larcore_Geometry_Geometry_service
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                         lardata_Utilities
@@ -57,7 +57,7 @@ art_make( BASENAME_ONLY
                       art_Utilities canvas
 	                    larevt_CalibrationDBI_IOVData
 			    lardataobj_RawData
-			    larcore_Geometry
+			    larcorealg_Geometry
 			    larcore_Geometry_Geometry_service
 			    ${ART_FRAMEWORK_SERVICES_REGISTRY}
 			    ${ART_FRAMEWORK_CORE}

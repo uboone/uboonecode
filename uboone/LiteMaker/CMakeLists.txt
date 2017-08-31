@@ -16,10 +16,10 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	  LIBRARY_NAME     uboonecode_uboone_LiteMaker
 	  LIB_LIBRARIES
 		   uboone_RawData
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   uboone_Geometry
 		   uboonecode_uboone_MuCS
-		   larcore_Geometry_Geometry_service
+		   #larcore_Geometry_Geometry_service
 	   	   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 		   lardataobj_RecoBase
 		   nusimdata_SimulationBase
@@ -55,7 +55,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	      	   FileCatalogMetadataMicroBooNE_service
 		   LLMetaMaker_service
 		   uboonecode_uboone_MuCS
-		   larcore_Geometry
+		   larcorealg_Geometry
 		   uboone_Geometry
 		   larcore_Geometry_Geometry_service
 		   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation

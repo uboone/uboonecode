@@ -1,5 +1,5 @@
 art_make( LIB_LIBRARIES
-          #  larcore_Geometry
+          #  larcorealg_Geometry
           #  ${MF_MESSAGELOGGER}
           #  ${MF_UTILITIES}
             cetlib cetlib_except

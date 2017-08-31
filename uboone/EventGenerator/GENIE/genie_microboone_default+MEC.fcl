@@ -5,20 +5,20 @@ BEGIN_PROLOG
 microboone_genie:                    @local::standard_genie
 microboone_genie.BeamName:           "booster"
 microboone_genie.GlobalTimeOffset:   1.6e6                  #microboone reads out 1.6ms before the spill
-microboone_genie.EventGeneratorList:      "Default+MEC"
+microboone_genie.EventGeneratorList:      "Default+CCMEC+NCMEC"
 # Other EventGeneratorLists can be found here:
 #     $GENIE/config/EventGeneratorListAssembler.xml
 microboone_genie_hist:               @local::microboone_genie
 microboone_genie_hist.FluxType:       "histogram"
-microboone_genie_hist.FluxFiles:     ["flux/bnb/current/histograms/ub470_r200_bnb_fhc/numode_bnb_470m_r200.root"] 
+microboone_genie_hist.FluxFiles:     ["/pnfs/uboone/persistent/uboonebeam/bnb_hist/bnb_hist_fluxes_07.11.2017_470/FluxHist_volAVTPC.root"] 
 microboone_genie_hist.BeamCenter:    [1.25, 0., 0.]  
 microboone_genie_hist.BeamDirection: [0., 0., 1.]    
 microboone_genie_hist.BeamRadius:    4.              
 
 microboone_genie_simple:                   @local::microboone_genie
 microboone_genie_simple.FluxType:          "simple_flux"
-microboone_genie_simple.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470/"
-microboone_genie_simple.FluxFiles:         ["gsimple_microboone-470-onaxis_mc_nu_dummy_ntrd_*.root"]
+microboone_genie_simple.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_07.11.2017_470/"
+microboone_genie_simple.FluxFiles:         ["converted_beammc_*.root"]
 microboone_genie_simple.EventsPerSpill:    0
 microboone_genie_simple.POTPerSpill:       5e12
 
@@ -56,8 +56,8 @@ microboone_genie_uniform_flux_cc.GeomScan:      "flux: 10000 1.1"
 
 microboone_genie_simple_dirt:                   @local::microboone_genie
 microboone_genie_simple_dirt.FluxType:          "simple_flux"
-microboone_genie_simple_dirt.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_dirt/"
-microboone_genie_simple_dirt.FluxFiles:         ["gsimple_microboone-470-onaxis-dirt_mc_nu_dummy_ntrd_*.root"]
+microboone_genie_simple_dirt.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_07.11.2017_470_dirt/"
+microboone_genie_simple_dirt.FluxFiles:         ["converted_beammc_dirt_*.root"]
 microboone_genie_simple_dirt.EventsPerSpill:    0
 microboone_genie_simple_dirt.POTPerSpill:       5e12
 

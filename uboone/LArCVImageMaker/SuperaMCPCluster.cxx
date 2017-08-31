@@ -108,9 +108,9 @@ namespace larcv {
 						     TimeOffset());
 
     auto const& roi_v = ev_roi->ROIArray();
-    if(roi_v.size() != pxcluster_vv.size()) {
+    if(roi_v.size() < pxcluster_vv.size()) {
       LARCV_CRITICAL() << "# PixelCluster (" << pxcluster_vv.size() 
-		       << ") does not match with # ROI (" << roi_v.size() << ")!" << std::endl;
+		       << ") is greater than # ROI (" << roi_v.size() << ")!" << std::endl;
       throw larbys();
     }
 
@@ -118,7 +118,7 @@ namespace larcv {
     for(auto& meta: meta_v) meta.update(meta.rows() / RowCompressionFactor().at(meta.plane()),
 					meta.cols() / ColCompressionFactor().at(meta.plane()));
     
-    for(size_t roi_idx=0; roi_idx<roi_v.size(); ++roi_idx) {
+    for(size_t roi_idx=0; roi_idx<pxcluster_vv.size(); ++roi_idx) {
 
       auto const& pc_v = pxcluster_vv.at(roi_idx);
 

@@ -4,8 +4,8 @@ art_make( BASENAME_ONLY
 	  LIB_LIBRARIES
                         ${ROOT_BASIC_LIB_LIST}
 	  MODULE_LIBRARIES 
-			larcore_Geometry
-	  	        larcore_Geometry_Geometry_service
+			larcorealg_Geometry
+	  	        #larcore_Geometry_Geometry_service
 		        lardata_Utilities
 	                uboone_Geometry
 			lardataobj_RecoBase

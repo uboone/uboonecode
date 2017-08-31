@@ -67,6 +67,11 @@ namespace larcv {
     bool process(size_t run, size_t subrun, size_t event);
     void finalize();
 
+    void SetCSV(std::string proc_name, std::string fname);
+
+    inline std::vector<std::string> ProcessNames() const
+    { return _driver.process_names(); }
+
   private:
 
     ProcessDriver _driver;
@@ -74,6 +79,7 @@ namespace larcv {
 
     std::map<supera::LArDataType_t,std::set<std::string> > _data_request_m;
     SuperaChStatus* _supera_chstatus_ptr;
+
   };
 
 }

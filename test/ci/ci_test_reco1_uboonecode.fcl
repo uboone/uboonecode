@@ -4,5 +4,5 @@ services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234
 services.NuRandomService.fuzzycluster: 1234
 
-services.RandomNumberGenerator.restoreFrom: "Reco1RandomSeeds_Ref.dat"
-services.RandomNumberGenerator.saveTo: "Reco1RandomSeeds.dat"
+#services.RandomNumberGenerator.restoreFrom: "Reco1RandomSeeds_Ref.dat"
+#services.RandomNumberGenerator.saveTo: "Reco1RandomSeeds.dat"

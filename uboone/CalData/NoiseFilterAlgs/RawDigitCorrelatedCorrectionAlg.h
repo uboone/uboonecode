@@ -58,7 +58,7 @@ public:
     void initializeHists(art::ServiceHandle<art::TFileService>&);
     
     void removeCorrelatedNoise(RawDigitAdcIdxPair& digitIdxPair,
-                               unsigned int        viewIdx,
+                               raw::ChannelID_t    channel,
                                std::vector<float>& truncMeanWireVec,
                                std::vector<float>& truncRmsWireVec,
                                std::vector<short>& minMaxWireVec,
@@ -66,12 +66,30 @@ public:
                                std::vector<float>& skewnessWireVec,
                                std::vector<float>& neighborRatioWireVec,
                                std::vector<float>& pedCorWireVec) const;
+    
+    void getTruncatedMeanRMS(const RawDigitVector& waveform, float& mean, float& rms) const;
 
 private:
     
-    void smoothCorrectionVec(std::vector<float>&, unsigned int&) const;
+    void smoothCorrectionVec(std::vector<float>&, raw::ChannelID_t) const;
     
     template<class T> T getMedian(std::vector<T>&, T) const;
+    
+    float getMostProbable(const std::vector<float>&, float) const;
+    
+    void getErosionDilationAverageDifference(const RawDigitVector& inputWaveform,
+                                             RawDigitVector&       erosionVec,
+                                             RawDigitVector&       dilationVec,
+                                             std::vector<float>&   averageVec,
+                                             RawDigitVector&       differenceVec) const;
+    
+    void getErosionDilationAverageDifference(const std::vector<float>& inputWaveform,
+                                             std::vector<float>&       erosionVec,
+                                             std::vector<float>&       dilationVec,
+                                             std::vector<float>&       averageVec,
+                                             std::vector<float>&       differenceVec) const;
+    
+    void getTruncatedMeanRMS(const std::vector<float>& waveform, float& mean, float& rms) const;
 
     // Fcl parameters.
     float                fTruncMeanFraction;     ///< Fraction for truncated mean
@@ -105,6 +123,14 @@ private:
     std::vector<std::vector<TProfile*>> fWaveCorHists;
     
     TProfile2D*          fFFTvsMBProf[3];
+    
+    std::vector<std::map<int,TH1D*>> fCorrectionHistVec;
+    std::vector<std::map<int,TH1D*>> fCorrFixedHistVec;
+    std::vector<std::map<int,TH1D*>> fErosionHistVec;
+    std::vector<std::map<int,TH1D*>> fDilationHistVec;
+    std::vector<std::map<int,TH1D*>> fAverageHistVec;
+    std::vector<std::map<int,TH1D*>> fDiffHistVec;
+    int                              fCorMaxHists;
     
     std::vector<std::set<size_t>> fBadWiresbyViewAndWire;
     

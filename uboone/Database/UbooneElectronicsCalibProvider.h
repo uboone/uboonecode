@@ -65,6 +65,13 @@ namespace lariov {
       DataSource::ds fDataSource;
           
       Snapshot<ElectronicsCalib> fData;
+      
+      bool fOnlyMisconfigStatusFromDB;
+      
+      float fDefaultGain;
+      float fDefaultGainErr;
+      float fDefaultShapingTime;
+      float fDefaultShapingTimeErr;
   };
 }//end namespace lariov
 

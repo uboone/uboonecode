@@ -321,15 +321,15 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
       if (tagged == false) continue;
 
       // figure out if it enters the anode or cathode                                                                                                              
-      bool enters_anode = TrackEntersAnode(sorted_trk);
+      bool exits_anode = TrackExitsAnode(sorted_trk);
       
       // get the X coordinate of the point piercing the anode/cathode (upon ENTERING) 
-      double trkX = GetEnteringTimeCoord(sorted_trk);
+      double trkX = GetExitingTimeCoord(sorted_trk);
       
       // reconstruct track T0 w.r.t. trigger time                                                                                                                              
 
       // The 'trkX' enters on the anode, the side of the TPC with a lower x value than the cathode
-      if (enters_anode){
+      if (exits_anode){
 	trkT = trkX / fDriftVelocity + fRecoT0TimeOffsetA;
 	anode = 1;
       }

@@ -19,7 +19,7 @@ art_make_library(LIBRARY_NAME WeightCalculators
                       art_Utilities canvas canvas
                       cetlib cetlib_except
 		      ${FHICLCPP}
-                      ${MF_MESSAGELOGGER}
+                      #${MF_MESSAGELOGGER}
 		      ${CLHEP}
                       ${ROOT_BASIC_LIB_LIST}
                       ${Boost_SYSTEM_LIBRARY}
@@ -32,13 +32,14 @@ art_make(LIBRARY_NAME   EventWeight
 	 LIB_LIBRARIES
                       BNBPrimaryHadronWeightCalculators
 		      WeightCalculators
-                      ${MF_MESSAGELOGGER}
-                      ${MF_UTILITIES}
+                      #${MF_MESSAGELOGGER}
+                      #${MF_UTILITIES}
                       ${Boost_SYSTEM_LIBRARY}
         MODULE_LIBRARIES EventWeight
 			 WeightCalculators
                          BNBPrimaryHadronWeightCalculators
-
+			 ${MF_MESSAGELOGGER}
+                     	 ${MF_UTILITIES}
 	)
 
 

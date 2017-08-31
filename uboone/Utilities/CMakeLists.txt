@@ -1,13 +1,33 @@
 cet_enable_asserts()
 
+art_make ( NO_PLUGINS
+           BASENAME_ONLY
+	   LIB_LIBRARIES lardata_Utilities_LArFFT_service
+	   	         ${ART_FRAMEWORK_CORE}
+                         ${ART_FRAMEWORK_PRINCIPAL}
+			 ${ART_FRAMEWORK_SERVICES_BASIC}
+                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
+			 ${MF_MESSAGELOGGER}
+			 ${MF_UTILITIES}
+			 art_Persistency_Common canvas
+			 art_Persistency_Provenance canvas
+			 art_Utilities canvas
+			 cetlib cetlib_except
+			 ${ROOT_BASIC_LIB_LIST}
+	                 ${FHICLCPP}
+			 ${Boost_FILESYSTEM_LIBRARY}
+			 ${Boost_SYSTEM_LIBRARY}
+	  )
+
 set( uboone_util_lib_list lardata_Utilities_LArFFT_service
-			larcore_Geometry
+			larcorealg_Geometry
 			larevt_CalibrationDBI_IOVData
 			larevt_CalibrationDBI_Providers
 			larreco_HitFinder
 			lardataobj_RecoBase
 			larcore_Geometry_Geometry_service
 			lardata_Utilities
+			uboone_Utilities
 			nutools_RandomUtils_NuRandomService_service
   			${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_PRINCIPAL}

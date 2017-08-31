@@ -318,6 +318,8 @@ void MultiPartVertex::GenMomentum(const PartGenParam& param, const double& mass,
   py = sin(phi) * sin(theta);
   pz = cos(theta);
 
+  std::cout<<"LOGME,"<<phi<<","<<theta<<","<<px<<","<<py<<","<<pz<<std::endl;
+
   if(_debug>1)
     std::cout << "    Direction : (" << px << "," << py << "," << pz << ")" << std::endl
 	      << "    Momentum  : " << mom_mag << " [MeV/c]" << std::endl
@@ -325,7 +327,7 @@ void MultiPartVertex::GenMomentum(const PartGenParam& param, const double& mass,
   px *= mom_mag;
   py *= mom_mag;
   pz *= mom_mag;
-  
+
 }
 
 void MultiPartVertex::produce(art::Event & e)

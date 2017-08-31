@@ -3,8 +3,8 @@ ProcessDriver: {
   Verbosity:    2
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMask","WireMask"]
-  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMaskWire","WireMaskSegment"]
+  ProcessType:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMask","WireMask","MaskImage"]
+  ProcessName:  ["SuperaMetaMaker","SuperaWire","SuperaSimCh","SuperaChStatus","SuperaMCROI","WireMaskWire","WireMaskSegment","MaskSegment"]
 
   IOManager: {
     Verbosity:   2
@@ -35,6 +35,13 @@ ProcessDriver: {
     WireMaskSegment: {
       ChStatusProducer: "wire"
       ImageProducer: "segment"
+    }
+    MaskSegment: {
+      Verbosity: 2
+      MinPIThreshold: 2
+      MaskValue: 0
+      ReferenceProducer: "wire"
+      TargetProducer: "segment"
     }
     SuperaChStatus: {
       LArChStatusProducer: "chstatus"

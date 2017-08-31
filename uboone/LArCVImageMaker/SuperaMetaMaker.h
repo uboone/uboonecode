@@ -34,6 +34,8 @@ namespace larcv {
     /// Default destructor
     ~SuperaMetaMaker(){ if(_meta_maker) delete _meta_maker; }
 
+    bool is(const std::string question) const;
+
     void configure(const PSet&);
 
     void initialize();
@@ -45,7 +47,7 @@ namespace larcv {
   private:
 
     supera::ImageMetaMakerBase* _meta_maker;
-
+    std::map<supera::RSEID,std::array<double,3> > _constraint_m;
   };
 
   /**
