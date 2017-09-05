@@ -22,6 +22,7 @@
 #include "ubflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
 #include "wirecellmodules_microboone.fcl"
+#include "mctrutht0matching.fcl"
 
 #include "mchitmodules.fcl"
 #include "mcreco.fcl"
@@ -236,19 +237,19 @@ microboone_reco_mcc8_producers:
   
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
-  TruthMatch_pandoraCosmicKHit:            @local::standard_mctrutht0matching
-  TruthMatch_pandoraCosmicKalmanTrack:     @local::standard_mctrutht0matching
-  TruthMatch_pandoraCosmic:                @local::standard_mctrutht0matching
-  TruthMatch_pandoraNuKHit:                @local::standard_mctrutht0matching
-  TruthMatch_pandoraNuKalmanShower:        @local::standard_mctrutht0matching
-  TruthMatch_pandoraNuKalmanTrack:         @local::standard_mctrutht0matching
-  TruthMatch_pandoraNuPMA:                 @local::standard_mctrutht0matching
-  TruthMatch_pandoraNu:                    @local::standard_mctrutht0matching
-  TruthMatch_pmtrack:                      @local::standard_mctrutht0matching
+  TruthMatchPandoraCosmicKHit:            @local::standard_mctrutht0matching
+  TruthMatchPandoraCosmicKalmanTrack:     @local::standard_mctrutht0matching
+  TruthMatchPandoraCosmic:                @local::standard_mctrutht0matching
+  TruthMatchPandoraNuKHit:                @local::standard_mctrutht0matching
+  TruthMatchPandoraNuKalmanShower:        @local::standard_mctrutht0matching
+  TruthMatchPandoraNuKalmanTrack:         @local::standard_mctrutht0matching
+  TruthMatchPandoraNuPMA:                 @local::standard_mctrutht0matching
+  TruthMatchPandoraNu:                    @local::standard_mctrutht0matching
+  TruthMatchPmtrack:                      @local::standard_mctrutht0matching
   # Showers
-  TruthMatch_showerrecopandora:            @local::standard_mctrutht0matching
+  TruthMatchShowerrecopandora:            @local::standard_mctrutht0matching
   # PFParticles
-  TruthMatch_trajcluster:                  @local::standard_mctrutht0matching
+  TruthMatchTrajcluster:                  @local::standard_mctrutht0matching
 
 }
 
@@ -381,19 +382,19 @@ microboone_reco_mcc8_mcreco: [           mchitfinder,
                                          eventweight]
 
 
-microboone_reco_mcc8_truthmath: [        TruthMatch_pandoraCosmicKHit,
-                                         TruthMatch_pandoraCosmicKalmanTrack,
-                                         TruthMatch_pandoraCosmic,
-                                         TruthMatch_pandoraNuKHit,
-                                         TruthMatch_pandoraNuKalmanShower,
-                                         TruthMatch_pandoraNuKalmanTrack,
-                                         TruthMatch_pandoraNuPMA,
-                                         TruthMatch_pandoraNu,
-                                         TruthMatch_pmtrack,
+microboone_reco_mcc8_truthmatch: [       TruthMatchPandoraCosmicKHit,
+                                         TruthMatchPandoraCosmicKalmanTrack,
+                                         TruthMatchPandoraCosmic,
+                                         TruthMatchPandoraNuKHit,
+                                         TruthMatchPandoraNuKalmanShower,
+                                         TruthMatchPandoraNuKalmanTrack,
+                                         TruthMatchPandoraNuPMA,
+                                         TruthMatchPandoraNu,
+                                         TruthMatchPmtrack,
                                          # Showers
-                                         TruthMatch_showerrecopandora,
+                                         TruthMatchShowerrecopandora,
                                          # PFParticles
-                                         TruthMatch_trajcluster  ]
+                                         TruthMatchTrajcluster  ]
 
 microboone_reco_mcc8: [                  rns,
                                          @sequence::microboone_reco_mcc8_mcreco,
@@ -724,68 +725,68 @@ microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold: 6
 
 ## Truth matching configuration
 # General (tracks, possibly plus showers and/or pfparticles)
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKHit.TrackModuleLabel: "pandoraCosmicKHit"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKHit.ShowerModuleLabel: "pandoraCosmicKHit"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKHit.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKHit.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKHit.TrackModuleLabel: "pandoraCosmicKHit"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKHit.ShowerModuleLabel: "pandoraCosmicKHit"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKHit.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKHit.makePFParticleAssns: false
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKalmanTrack.TrackModuleLabel: "pandoraCosmicKalmanTrack"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKalmanTrack.ShowerModuleLabel: "pandoraCosmicKalmanTrack"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKalmanTrack.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmicKalmanTrack.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKalmanTrack.TrackModuleLabel: "pandoraCosmicKalmanTrack"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKalmanTrack.ShowerModuleLabel: "pandoraCosmicKalmanTrack"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKalmanTrack.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmicKalmanTrack.makePFParticleAssns: false
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmic.TrackModuleLabel: "pandoraCosmic"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmic.ShowerModuleLabel: "pandoraCosmic"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmic.PFParticleModuleLabel: "pandoraCosmic"
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmic.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraCosmic.makePFParticleAssns: true
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmic.TrackModuleLabel: "pandoraCosmic"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmic.ShowerModuleLabel: "pandoraCosmic"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmic.PFParticleModuleLabel: "pandoraCosmic"
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmic.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraCosmic.makePFParticleAssns: true
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKHit.TrackModuleLabel: "pandoraNuKHit"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKHit.ShowerModuleLabel: "pandoraNuKHit"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKHit.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKHit.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKHit.TrackModuleLabel: "pandoraNuKHit"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKHit.ShowerModuleLabel: "pandoraNuKHit"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKHit.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKHit.makePFParticleAssns: false
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanShower.TrackModuleLabel: "pandoraNuKalmanShower"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanShower.ShowerModuleLabel: "pandoraNuKalmanShower"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanShower.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanShower.makePFParticleAssns: false
-
-
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanTrack.TrackModuleLabel: "pandoraNuKalmanTrack"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanTrack.ShowerModuleLabel: "pandoraNuKalmanTrack"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanTrack.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuKalmanTrack.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanShower.TrackModuleLabel: "pandoraNuKalmanShower"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanShower.ShowerModuleLabel: "pandoraNuKalmanShower"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanShower.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanShower.makePFParticleAssns: false
 
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuPMA.TrackModuleLabel: "pandoraNuPMA"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuPMA.ShowerModuleLabel: "pandoraNuPMA"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuPMA.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraNuPMA.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanTrack.TrackModuleLabel: "pandoraNuKalmanTrack"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanTrack.ShowerModuleLabel: "pandoraNuKalmanTrack"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanTrack.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuKalmanTrack.makePFParticleAssns: false
 
-microboone_reco_mcc8_producers.TruthMatch_pandoraNu.TrackModuleLabel: "pandoraNu"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNu.ShowerModuleLabel: "pandoraNu"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNu.PFParticleModuleLabel: "pandoraNu"
-microboone_reco_mcc8_producers.TruthMatch_pandoraNu.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pandoraNu.makePFParticleAssns: true
 
-microboone_reco_mcc8_producers.TruthMatch_pmtrack.TrackModuleLabel: "pmtrack"
-microboone_reco_mcc8_producers.TruthMatch_pmtrack.ShowerModuleLabel: "pmtrack"
-microboone_reco_mcc8_producers.TruthMatch_pmtrack.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_pmtrack.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuPMA.TrackModuleLabel: "pandoraNuPMA"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuPMA.ShowerModuleLabel: "pandoraNuPMA"
+microboone_reco_mcc8_producers.TruthMatchPandoraNuPMA.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNuPMA.makePFParticleAssns: false
+
+microboone_reco_mcc8_producers.TruthMatchPandoraNu.TrackModuleLabel: "pandoraNu"
+microboone_reco_mcc8_producers.TruthMatchPandoraNu.ShowerModuleLabel: "pandoraNu"
+microboone_reco_mcc8_producers.TruthMatchPandoraNu.PFParticleModuleLabel: "pandoraNu"
+microboone_reco_mcc8_producers.TruthMatchPandoraNu.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPandoraNu.makePFParticleAssns: true
+
+microboone_reco_mcc8_producers.TruthMatchPmtrack.TrackModuleLabel: "pmtrack"
+microboone_reco_mcc8_producers.TruthMatchPmtrack.ShowerModuleLabel: "pmtrack"
+microboone_reco_mcc8_producers.TruthMatchPmtrack.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchPmtrack.makePFParticleAssns: false
 
 
 # Shower only
-microboone_reco_mcc8_producers.TruthMatch_showerrecopandora.TrackModuleLabel: "showerrecopandora"
-microboone_reco_mcc8_producers.TruthMatch_showerrecopandora.ShowerModuleLabel: "showerrecopandora"
-microboone_reco_mcc8_producers.TruthMatch_showerrecopandora.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_showerrecopandora.makePFParticleAssns: false
+microboone_reco_mcc8_producers.TruthMatchShowerrecopandora.TrackModuleLabel: "showerrecopandora"
+microboone_reco_mcc8_producers.TruthMatchShowerrecopandora.ShowerModuleLabel: "showerrecopandora"
+microboone_reco_mcc8_producers.TruthMatchShowerrecopandora.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchShowerrecopandora.makePFParticleAssns: false
 
 # PFParticle only
-microboone_reco_mcc8_producers.TruthMatch_trajcluster.TrackModuleLabel: "trajcluster"
-microboone_reco_mcc8_producers.TruthMatch_trajcluster.ShowerModuleLabel: "trajcluster"
-microboone_reco_mcc8_producers.TruthMatch_trajcluster.PFParticleModuleLabel: "trajcluster"
-microboone_reco_mcc8_producers.TruthMatch_trajcluster.makeT0Assns: false
-microboone_reco_mcc8_producers.TruthMatch_trajcluster.makePFParticleAssns: true
+microboone_reco_mcc8_producers.TruthMatchTrajcluster.TrackModuleLabel: "trajcluster"
+microboone_reco_mcc8_producers.TruthMatchTrajcluster.ShowerModuleLabel: "trajcluster"
+microboone_reco_mcc8_producers.TruthMatchTrajcluster.PFParticleModuleLabel: "trajcluster"
+microboone_reco_mcc8_producers.TruthMatchTrajcluster.makeT0Assns: false
+microboone_reco_mcc8_producers.TruthMatchTrajcluster.makePFParticleAssns: true
 
 
 
