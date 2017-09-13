@@ -1,0 +1,24 @@
+#include "standard_ana_larcv_uboone.fcl"
+
+process_name: Ana
+
+services.FileCatalogMetadata:  @local::art_file_catalog_data
+
+physics.analyzers.analysistree.SaveCryInfo:     false
+physics.analyzers.analysistree.SaveGenieInfo:   false
+physics.analyzers.analysistree.SaveGeantInfo:   false
+physics.analyzers.analysistree.SaveMCShowerInfo:false 
+physics.analyzers.analysistree.SaveMCTrackInfo: false 
+physics.analyzers.analysistree.SaveShowerInfo:  false 
+physics.analyzers.analysistree.SaveCaloCosmics: true
+physics.analyzers.analysistree.SaveSWTriggerInfo: false
+
+physics.ana: [analysistree]
+physics.larcv: [ opreco, superaWholeView ]
+
+microboone_tfile_metadata.JSONCFILENAME: [ "ana_hist.root.json",
+                                           "larlite_opreco.root.json",
+                                           "larcv.root.json" ]
+microboone_tfile_metadata.GenerateTFileMetaData: [true, true, true]
+microboone_tfile_metadata.dataTier: ["root-tuple", "larlite", "larcv"]
+microboone_tfile_metadata.fileFormat: ["root","root","root"]

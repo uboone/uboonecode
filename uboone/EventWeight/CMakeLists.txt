@@ -38,7 +38,6 @@ art_make(LIBRARY_NAME   EventWeight
         MODULE_LIBRARIES EventWeight
 			 WeightCalculators
                          BNBPrimaryHadronWeightCalculators
-
 	)
 
 

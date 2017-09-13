@@ -5,12 +5,17 @@
 //
 // FCL parameters: GenerateTFileMetadata: This needs to be set to "true" in the fcl file
 //				    to generate metadata (default value: false)
+//                 JSONFileName: Name of generates .json file.
 //	     	   dataTier: Currrently this needs to be parsed by the user
 //		     	     for ntuples, dataTier = root-tuple; 
 //		             for histos, dataTier = root-histogram
 //		             (default value: root-tuple)
 //	           fileFormat: This is currently specified by the user,
 //			       the fileFormat for Tfiles is "root" (default value: root)	
+//
+//                 These parameters can be scalars or sequences.  In case of sequences
+//                 with length greater than one, multiple json files will be
+//                 generated.  Sequences must be equal length.
 //
 // Other notes: 1. This service uses the ART's standard file_catalog_metadata service
 //		to extract some of the common (common to both ART and TFile outputs)
@@ -95,16 +100,46 @@ util::TFileMetadataMicroBooNE::~TFileMetadataMicroBooNE()
 //--------------------------------------------------------------------
 // Set service paramters
 void util::TFileMetadataMicroBooNE::reconfigure(fhicl::ParameterSet const& pset)
-  {    
-    // Get parameters.
-    fGenerateTFileMetadata = pset.get<bool>("GenerateTFileMetadata", false);
-    fJSONFileName = pset.get<std::string>("JSONFileName");
-    
-    if (!fGenerateTFileMetadata) return;
+{    
+  // Get parameters.
+  fGenerateTFileMetadata.erase(fGenerateTFileMetadata.begin(), fGenerateTFileMetadata.end());
+  if(pset.is_key_to_atom("GenerateTFileMetadata"))
+    fGenerateTFileMetadata.push_back(pset.get<bool>("GenerateTFileMetadata"));
+  else if(pset.is_key_to_sequence("GenerateTFileMetadata"))
+    fGenerateTFileMetadata = pset.get<std::vector<bool> >("GenerateTFileMetadata");
 
-    md.fdata_tier  	   = pset.get<std::string>("dataTier","root-tuple");	   
-    md.ffile_format	   = pset.get<std::string>("fileFormat","root");              
-   }
+  fJSONFileName.erase(fJSONFileName.begin(), fJSONFileName.end());
+  if(pset.is_key_to_atom("JSONFileName"))
+    fJSONFileName.push_back(pset.get<std::string>("JSONFileName"));
+  else if(pset.is_key_to_sequence("JSONFileName"))
+    fJSONFileName = pset.get<std::vector<std::string> >("JSONFileName");
+  if(fJSONFileName.size() != fGenerateTFileMetadata.size())
+    throw cet::exception("TFileMetadataMicroBooNE") << "FCL sequence size mismatch.\n";
+    
+  fDataTier.erase(fDataTier.begin(), fDataTier.end());
+  if(pset.is_key_to_atom("dataTier"))
+    fDataTier.push_back(pset.get<std::string>("dataTier"));
+  else if(pset.is_key_to_sequence("dataTier"))
+    fDataTier = pset.get<std::vector<std::string> >("dataTier");
+  if(fDataTier.size() != fGenerateTFileMetadata.size())
+    throw cet::exception("TFileMetadataMicroBooNE") << "FCL sequence size mismatch.\n";
+
+  fFileFormat.erase(fFileFormat.begin(), fFileFormat.end());
+  if(pset.is_key_to_atom("fileFormat"))
+    fFileFormat.push_back(pset.get<std::string>("fileFormat"));
+  else if(pset.is_key_to_sequence("fileFormat"))
+    fFileFormat = pset.get<std::vector<std::string> >("fileFormat");
+  if(fFileFormat.size() != fGenerateTFileMetadata.size())
+    throw cet::exception("TFileMetadataMicroBooNE") << "FCL sequence size mismatch.\n";
+
+  fEnable = false;
+  for(bool enable : fGenerateTFileMetadata) {
+    if(enable) {
+      fEnable = true;
+      break;
+    }
+  }
+}
 
 //--------------------------------------------------------------------
 // PostBeginJob callback.
@@ -112,7 +147,7 @@ void util::TFileMetadataMicroBooNE::reconfigure(fhicl::ParameterSet const& pset)
 void util::TFileMetadataMicroBooNE::postBeginJob()
 { 
   // only generate metadata when this is true
-  if (!fGenerateTFileMetadata) return;
+  if (!fEnable) return;
     
   // get the start time  
   md.fstart_time = time(0); 
@@ -154,7 +189,7 @@ void util::TFileMetadataMicroBooNE::postBeginJob()
 // PostOpenFile callback.
 void util::TFileMetadataMicroBooNE::postOpenFile(std::string const& fn)
 {
-  if (!fGenerateTFileMetadata) return;
+  if (!fEnable) return;
   
   // save parent input files here
   md.fParents.insert(fn);
@@ -166,7 +201,7 @@ void util::TFileMetadataMicroBooNE::postOpenFile(std::string const& fn)
 void util::TFileMetadataMicroBooNE::postEvent(art::Event const& evt)
 {
  
-  if(!fGenerateTFileMetadata) return;	
+  if(!fEnable) return;	
   
   art::RunNumber_t run = evt.run();
   art::SubRunNumber_t subrun = evt.subRun();
@@ -192,7 +227,7 @@ void util::TFileMetadataMicroBooNE::postEvent(art::Event const& evt)
 void util::TFileMetadataMicroBooNE::postBeginSubRun(art::SubRun const& sr)
 {
 
-  if(!fGenerateTFileMetadata) return;
+  if(!fEnable) return;
 
   art::RunNumber_t run = sr.run();
   art::SubRunNumber_t subrun = sr.subRun();
@@ -211,7 +246,7 @@ void util::TFileMetadataMicroBooNE::postEndJob()
 {
 	
    // Do nothing if generating TFile metadata is disabled.	
-  if(!fGenerateTFileMetadata) return;	
+  if(!fEnable) return;	
   
   //get job submission related paramters from FileCatalogMetadataMicroBooNE service
         
@@ -233,55 +268,63 @@ void util::TFileMetadataMicroBooNE::postEndJob()
   strftime(endbuf,sizeof(endbuf),"%Y-%m-%dT%H:%M:%S",&tstruct);
   tstruct = *localtime(&md.fstart_time);
   strftime(startbuf,sizeof(startbuf),"%Y-%m-%dT%H:%M:%S",&tstruct);
+
+  // Loop over TFiles.
+
+  for(unsigned int i=0; i<fGenerateTFileMetadata.size(); ++i) {
+
+    if(fGenerateTFileMetadata[i]) {
   
-  // open a json file and write everything from the struct md complying to the 
-  // samweb json format. This json file holds the below information temporarily. 
-  // If you submitted a grid job invoking this service, the information from 
-  // this file is appended to a final json file and this file will be removed
+      // open a json file and write everything from the struct md complying to the 
+      // samweb json format. This json file holds the below information temporarily. 
+      // If you submitted a grid job invoking this service, the information from 
+      // this file is appended to a final json file and this file will be removed
   
-  std::ofstream jsonfile;
-  jsonfile.open(fJSONFileName);
-  jsonfile<<"{\n  \"application\": {\n    \"family\": "<<std::get<0>(md.fapplication)<<",\n    \"name\": ";
-  jsonfile<<std::get<1>(md.fapplication)<<",\n    \"version\": "<<std::get<2>(md.fapplication)<<"\n  },\n  ";
-  jsonfile<<"\"data_tier\": \""<<md.fdata_tier<<"\",\n  ";
-  jsonfile<<"\"end_time\": \""<<endbuf<<"\",\n  ";
-  jsonfile<<"\"event_count\": "<<md.fevent_count<<",\n  ";
-  jsonfile<<"\"fcl.name\": \""<<md.ffcl_name<<"\",\n  ";
-  jsonfile<<"\"fcl.version\":  \""<<md.ffcl_version<<"\",\n  ";
-  jsonfile<<"\"file_format\": \""<<md.ffile_format<<"\",\n  ";
-  jsonfile<<"\"file_type\": "<<md.ffile_type<<",\n  ";
-  jsonfile<<"\"first_event\": "<<md.ffirst_event<<",\n  ";
-  jsonfile<<"\"group\": "<<md.fgroup<<",\n  ";
-  jsonfile<<"\"last_event\": "<<md.flast_event<<",\n  ";
-  //if (md.fdataTier != "generated"){
-    unsigned int c=0;
-    jsonfile<<"\"parents\": [\n";
-    for(auto parent : md.fParents) {
-      c++;
-      size_t n = parent.find_last_of('/');
-      size_t f1 = (n == std::string::npos ? 0 : n+1);
-      jsonfile<<"    {\n     \"file_name\": \""<<parent.substr(f1)<<"\"\n    }";
-      if (md.fParents.size()==1 || c==md.fParents.size()) jsonfile<<"\n";
-      else jsonfile<<",\n"; 
-    }      
-    jsonfile<<"  ],\n  "; 
-  //}   
-  c=0;
-  jsonfile<<"\"runs\": [\n";
-  for(auto &t : md.fruns){
-   c++;
-   jsonfile<<"    [\n     "<<std::get<0>(t)<<",\n     "<<std::get<1>(t)<<",\n     "<<std::get<2>(t)<<"\n    ]";
-   if (md.fruns.size()==1 || c==md.fruns.size()) jsonfile<<"\n";
-   else jsonfile<<",\n"; 
-  }
-  jsonfile<<"  ],";          
-  jsonfile<<"\n  \"start_time\": \""<<startbuf<<"\",\n";  
-  jsonfile<<"  \"ub_project.name\": \""<<md.fproject_name<<"\",\n  ";
-  jsonfile<<"\"ub_project.stage\": \""<<md.fproject_stage;
-  jsonfile<<"\",\n  \"ub_project.version\": \""<<md.fproject_version<<"\"\n";
+      std::ofstream jsonfile;
+      jsonfile.open(fJSONFileName[i]);
+      jsonfile<<"{\n  \"application\": {\n    \"family\": "<<std::get<0>(md.fapplication)<<",\n    \"name\": ";
+      jsonfile<<std::get<1>(md.fapplication)<<",\n    \"version\": "<<std::get<2>(md.fapplication)<<"\n  },\n  ";
+      jsonfile<<"\"data_tier\": \""<<fDataTier[i]<<"\",\n  ";
+      jsonfile<<"\"end_time\": \""<<endbuf<<"\",\n  ";
+      jsonfile<<"\"event_count\": "<<md.fevent_count<<",\n  ";
+      jsonfile<<"\"fcl.name\": \""<<md.ffcl_name<<"\",\n  ";
+      jsonfile<<"\"fcl.version\":  \""<<md.ffcl_version<<"\",\n  ";
+      jsonfile<<"\"file_format\": \""<<fFileFormat[i]<<"\",\n  ";
+      jsonfile<<"\"file_type\": "<<md.ffile_type<<",\n  ";
+      jsonfile<<"\"first_event\": "<<md.ffirst_event<<",\n  ";
+      jsonfile<<"\"group\": "<<md.fgroup<<",\n  ";
+      jsonfile<<"\"last_event\": "<<md.flast_event<<",\n  ";
+      //if (md.fdataTier != "generated"){
+      unsigned int c=0;
+      jsonfile<<"\"parents\": [\n";
+      for(auto parent : md.fParents) {
+	c++;
+	size_t n = parent.find_last_of('/');
+	size_t f1 = (n == std::string::npos ? 0 : n+1);
+	jsonfile<<"    {\n     \"file_name\": \""<<parent.substr(f1)<<"\"\n    }";
+	if (md.fParents.size()==1 || c==md.fParents.size()) jsonfile<<"\n";
+	else jsonfile<<",\n"; 
+      }      
+      jsonfile<<"  ],\n  "; 
+      //}   
+      c=0;
+      jsonfile<<"\"runs\": [\n";
+      for(auto &t : md.fruns){
+	c++;
+	jsonfile<<"    [\n     "<<std::get<0>(t)<<",\n     "<<std::get<1>(t)<<",\n     "<<std::get<2>(t)<<"\n    ]";
+	if (md.fruns.size()==1 || c==md.fruns.size()) jsonfile<<"\n";
+	else jsonfile<<",\n"; 
+      }
+      jsonfile<<"  ],";          
+      jsonfile<<"\n  \"start_time\": \""<<startbuf<<"\",\n";  
+      jsonfile<<"  \"ub_project.name\": \""<<md.fproject_name<<"\",\n  ";
+      jsonfile<<"\"ub_project.stage\": \""<<md.fproject_stage;
+      jsonfile<<"\",\n  \"ub_project.version\": \""<<md.fproject_version<<"\"\n";
   
-  jsonfile<<"}";
-  jsonfile.close();  
+      jsonfile<<"}";
+      jsonfile.close();
+    }
+  } 
 }
 
 

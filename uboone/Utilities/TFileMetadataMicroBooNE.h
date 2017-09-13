@@ -36,10 +36,8 @@ namespace util{
       std::tuple<std::string, std::string, std::string> fapplication;
       //no crc information yet
       //std::vector<std::string> fcrcs;
-      std::string fdata_tier;
       time_t fend_time;
       unsigned int fevent_count=0;
-      std::string ffile_format;
       std::string ffile_type;
       art::EventNumber_t ffirst_event=0;
       std::string fgroup; 
@@ -73,10 +71,15 @@ namespace util{
 
     // Data members.
 
-    // Fcl parameters.
-    bool fGenerateTFileMetadata;  
+    bool fEnable;                          // Global enable.
     std::string frunType;                     
-    std::string fJSONFileName;
+
+    // Fcl parameters.
+
+    std::vector<bool> fGenerateTFileMetadata;
+    std::vector<std::string> fJSONFileName;
+    std::vector<std::string> fDataTier;
+    std::vector<std::string> fFileFormat;
 
   }; // class TFileMetadataMicroBooNE
 

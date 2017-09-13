@@ -1,5 +1,6 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
 litemc_reco3d_trajcluster: @local::litemaker_base
 
 litemc_reco3d_trajcluster.out_filename: "larlite_reco3d_trajcluster.root"
@@ -36,4 +37,6 @@ litemc_reco3d_trajcluster.AssociationLookUpMap:
   calo:       []
   partid:     []
 }
+
+END_PROLOG
 

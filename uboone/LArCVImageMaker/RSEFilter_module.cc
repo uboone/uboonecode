@@ -54,7 +54,8 @@ RSEFilter::RSEFilter(fhicl::ParameterSet const & p)
 
   std::string runlist;
 
-  cet::search_path finder("FHICL_FILE_PATH");
+  //cet::search_path finder("FHICL_FILE_PATH");
+  cet::search_path finder("FW_SEARCH_PATH");
 
   if( !finder.find_file(p.get<std::string>("CSVName"),runlist) )
     throw cet::exception("LArSoftSuperaSriver") << "Unable to find supera cfg in "  << finder.to_string() << "\n";

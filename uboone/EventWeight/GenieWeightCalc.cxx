@@ -164,7 +164,7 @@ namespace evwgh {
       for (int j = 0; j < number_of_multisims; j ++) {
 	if (mode.find("multisim") != std::string::npos )
 	  reweightingSigmas[i][j] = parsigmas[i]*fGaussRandom->shoot(&rng->getEngine(GetName()),0.,1.);
-        if (mode.find("pm1sigma") != std::string::npos )
+        else if (mode.find("pm1sigma") != std::string::npos )
           reweightingSigmas[i][j] = (j == 0 ? 1.: -1.); // j==0 => 1; j==1 => -1 if pm1sigma is specified
 	else
 	  reweightingSigmas[i][j] = parsigmas[i];

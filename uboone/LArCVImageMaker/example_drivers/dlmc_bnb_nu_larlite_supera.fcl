@@ -3,7 +3,7 @@ SuperaModule: {
   module_type:     "LArSoftSuperaSriver"
   supera_params: "supera_mcexample_calmod.fcl"
   out_filename:    "larcv.root"
-  unique_filename: true
+  unique_filename: false
   stream:          "mc"
 }
 VPlaneHandler: {

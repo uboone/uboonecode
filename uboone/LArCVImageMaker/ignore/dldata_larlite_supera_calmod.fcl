@@ -8,7 +8,7 @@ SuperaModule: {
   #supera_params:   "supera_basic.fcl"
   supera_params: "supera_basic.fcl"
   out_filename:    "larcv.root"
-  unique_filename: true
+  unique_filename: false
   stream:          "data"
 }
 VPlaneHandler: {

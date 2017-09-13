@@ -22,6 +22,8 @@ public:
     float GetBaseline(const std::vector<float>&, raw::ChannelID_t, size_t, size_t) const override;
     
 private:
+    std::pair<float,int> GetBaseline(const std::vector<float>&, int, size_t, size_t) const;
+    
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
 };
     

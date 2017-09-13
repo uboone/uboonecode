@@ -1,5 +1,5 @@
 #include "mchitmodules.fcl"
-#include "eventweight_microboone.fcl"
+#include "eventweight_microboone_BNBcorrectionOnly.fcl"
 #include "reco_uboone_data_mcc8_driver_common.fcl"
 
 process_name: McRecoStage1

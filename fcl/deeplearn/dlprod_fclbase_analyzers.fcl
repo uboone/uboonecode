@@ -11,7 +11,8 @@ SuperaWholeView: {
   module_type:     "LArSoftSuperaSriver"
   supera_params:   "supera_segment.fcl"
   out_filename:    "larcv.root"
-  unique_filename: true
+  #unique_filename: true
+  unique_filename: false
   stream:          "mc"
 }
 
@@ -57,7 +58,7 @@ dlprod_analyzers:
 
    reco2d:  @local::litemc_reco2d
 
-   superaWholeView:   @local::SuperaWholeView
+   superaWholeView:   @local::SuperaBasic
    superaWholeViewMC: @local::SuperaMCBasic
    superaFocusedView: @local::SuperaFocusedView
    superaFocusedViewPlus: @local::SuperaFocusedViewPlus
