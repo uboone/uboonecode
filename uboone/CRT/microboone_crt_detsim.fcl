@@ -4,26 +4,41 @@ microboone_crtdetsim:
 {
   module_type: "CRTDetSim"
   ProducerName: "largeant"
-  TDelayNorm: 1.
-  TDelayShift: 1.
-  TDelaySigma: 0.1
-  TDelayOffset: 0.0
-  TDelayRMSGausNorm: 0.1
-  TDelayRMSGausShift: 0.5
-  TDelayRMSGausSigma: 0.2
-  TDelayRMSExpNorm: 0.5
-  TDelayRMSExpShift: 0.3
-  TDelayRMSExpScale: 0.1
-  PropDelay: 2.0
-  PropDelayError: 0.2
-  TResInterpolator: 0.1
-  NpeScaleNorm: 0.7
-  NpeScaleShift: 0.2
-  Q0: 0.
-  QPed: 0.
-  QSlope: 0.0
-  QRMS: 0.0
-  AbsLenEff: 0.0
+  
+  // Shape parameters for mean time delay vs. Npe
+  TDelayNorm: 4125.74
+  TDelayShift: -300.31
+  TDelaySigma: 90.392
+  TDelayOffset: -1.525
+
+  // Shape parameters for time delay RMS vs. Npe
+  TDelayRMSGausNorm: 2.09138
+  TDelayRMSGausShift: 7.23993
+  TDelayRMSGausSigma: 170.027
+  TDelayRMSExpNorm: 1.6544
+  TDelayRMSExpShift: 75.6183
+  TDelayRMSExpScale: 79.3543
+
+  // Propagation delay [ns/cm]
+  PropDelay: 0.0061
+  PropDelayError: 0.007
+
+  // Interpolator time resolution [ns]
+  TResInterpolator: 1.268
+
+  // Model parameters for Npe vs. distance along strip
+  NpeScaleNorm: 5.261e7
+  NpeScaleShift: -1085.0
+
+  // Mean deposited charge for mips [GeV]
+  Q0: 1.75e-3
+
+  // ADC model: Pedestal offset [ADC], slope [ADC/photon], RMS [ADC]
+  QPed: 63.6
+  QSlope: 131.9
+  QRMS: 15.
+  // Effective absorption length (for transverse response) [cm]
+  AbsLenEff: 8.5
 }
 
 END_PROLOG

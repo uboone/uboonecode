@@ -131,3 +131,7 @@ simple_plugin(CRTMerger "module"
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} 
 )
+
+install_headers()
+install_source()
+install_fhicl()
