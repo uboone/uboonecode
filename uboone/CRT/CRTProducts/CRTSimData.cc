@@ -5,11 +5,12 @@ namespace crt{
   CRTSimData::CRTSimData(): fChannel(0), fT0(0), fT1(0){
   }
   CRTSimData::CRTSimData(uint32_t channel, uint32_t t0, 
-    uint32_t t1, uint32_t adc):
+    uint32_t t1, uint32_t adc, uint32_t trackID):
     fChannel(channel),
     fT0(t0),
     fT1(t1),
-    fADC(adc) {
+    fADC(adc),
+    fTrackID(trackID) {
     }
   CRTSimData::~CRTSimData(){
   }
@@ -24,5 +25,8 @@ namespace crt{
   }
   uint32_t CRTSimData::ADC(){
     return this->fADC;
+  }
+  uint32_t CRTSimData::TrackID(){
+    return this->fTrackID;
   }
 }

@@ -57,7 +57,8 @@ namespace crt{
             for(auto adc_channel =0; adc_channel<32; adc_channel++){
 
               unsigned channel = pc_id*1000+feb_id*100+adc_channel;
-              crt::CRTSimData myNewHit(channel, bernfrag.eventdata(i)->Time_TS0(), bernfrag.eventdata(i)->Time_TS1(), bernfrag.eventdata(i)->ADC(adc_channel));
+              // Using trackID -1 since we don't have access to originating track
+              crt::CRTSimData myNewHit(channel, bernfrag.eventdata(i)->Time_TS0(), bernfrag.eventdata(i)->Time_TS1(), bernfrag.eventdata(i)->ADC(adc_channel),-1);
               crtHits->push_back(myNewHit);
             }
           }

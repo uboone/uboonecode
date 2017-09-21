@@ -120,12 +120,8 @@ namespace crt{
       // Simulate the CRT response for each hit
       for (auto ide : adsc.AuxDetIDEs()) {
 
-        // bool activeIDE = (ide.energyDeposited>0);
-
-      	// printf("X [entry/exit]: (%.1f,%.1f)\n",ide.entryX,ide.exitX);
-      	// printf("Y [entry/exit]: (%.1f,%.1f)\n",ide.entryY,ide.exitY);
-      	// printf("Z [entry/exit]: (%.1f,%.1f)\n",ide.entryZ,ide.exitZ);
-      	// printf("Energy deposited: %.1f\n",ide.energyDeposited);
+        // Get Geant4 supplied track ID for IDE
+        int trackID = ide.trackID;
 
         // Get the hit position in strip's local coordinates
         double x = (ide.entryX + ide.exitX) / 2;
@@ -141,10 +137,7 @@ namespace crt{
 
         // The expected number of PE
         double qr = ide.energyDeposited / fQ0;  // Scale linearly with charge
-        printf("deposit: %.10f\n", ide.energyDeposited);
-        printf("qr: %.10f\n", qr);
         double npeExpected = (fNpeScaleNorm / pow(distToReadout - fNpeScaleShift, 2) * qr);
-        printf("npeExpected: %.10f\n", npeExpected);
 
         // Put PE on channels weighted by distance
         double d0 = abs(-adsGeo.HalfWidth1() - svHitPosLocal[0]);  // L
@@ -153,14 +146,10 @@ namespace crt{
         double abs1 = exp(-d1 / fAbsLenEff);
         double npeExp0 = npeExpected * abs0 / (abs0 + abs1);
         double npeExp1 = npeExpected * abs1 / (abs0 + abs1);
-        printf("npeExp0: %.10f\n", npeExp0);
-        printf("npeExp1: %.10f\n", npeExp1);
 
         // Observed PE
         long npe0 = CLHEP::RandPoisson::shoot(engine, npeExp0);
         long npe1 = CLHEP::RandPoisson::shoot(engine, npeExp1);
-        printf("npe0: %ld\n", npe0);
-        printf("npe1: %ld\n", npe1);
 
         // Time relative to trigger
         double tTrue = (ide.entryT + ide.exitT) / 2;
@@ -173,8 +162,6 @@ namespace crt{
         // SiPM and ADC response: Npe to ADC counts
         short q0 = CLHEP::RandGauss::shoot(engine, fQPed + fQSlope * npe0, fQRMS * npe0);
         short q1 = CLHEP::RandGauss::shoot(engine, fQPed + fQSlope * npe1, fQRMS * npe1);
-        printf("q0: %i\n", q0);
-        printf("q1: %i\n", q1);
 
         // Adjacent channels on a strip are numbered sequentially
         //uint32_t moduleID = adsc.AuxDetID();
@@ -183,10 +170,8 @@ namespace crt{
         uint32_t channel1ID = adsc.AuxDetID()*2+1;
 
         // Write AuxDetDigit for each channel
-        crtHits->push_back(CRTSimData(channel0ID, t0, ppsTicks, q0));
-        crtHits->push_back(CRTSimData(channel1ID, t1, ppsTicks, q1));
-        printf("Creating CrtHits 0: [Channel=%u, ADC=%u, t=(%u,%u)]\n", channel0ID, q0, t0, ppsTicks);
-        printf("Creating CrtHits 1: [Channel=%u, ADC=%u, t=(%u,%u)]\n\n", channel1ID, q1, t1, ppsTicks);
+        crtHits->push_back(CRTSimData(channel0ID, t0, ppsTicks, q0, trackID));
+        crtHits->push_back(CRTSimData(channel1ID, t1, ppsTicks, q1, trackID));
       }
     }
 

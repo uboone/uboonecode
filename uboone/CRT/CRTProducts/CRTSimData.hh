@@ -36,11 +36,13 @@ namespace crt {
     uint32_t fT1;
     /// ADC value returned by CRT
     uint32_t fADC;
+    /// Geant4 supplied track ID for the track responsible for the AuxDetIDE
+    uint32_t fTrackID;
    public:
     /// Default constructor
     CRTSimData();
     /// To be used when constructing from existing data
-    CRTSimData(uint32_t channel, uint32_t t0, uint32_t t1, uint32_t adc);
+    CRTSimData(uint32_t channel, uint32_t t0, uint32_t t1, uint32_t adc, uint32_t trackID);
     virtual ~CRTSimData();
     /// Channel getter
     uint32_t Channel();
@@ -50,6 +52,9 @@ namespace crt {
     uint32_t T1();
     /// ADC Getter
     uint32_t ADC();
+    /// trackId Getter
+    uint32_t TrackID();
+
   };
 
 }
