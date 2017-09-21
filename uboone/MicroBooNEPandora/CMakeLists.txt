@@ -6,4 +6,5 @@ install_fhicl()
 install_source()
 
 add_subdirectory(scripts)
+add_subdirectory(consolidation)
 
