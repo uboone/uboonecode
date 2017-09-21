@@ -9,6 +9,7 @@
 //
 
 #include "canvas/Persistency/Common/Wrapper.h"
+#include "lardataobj/Simulation/AuxDetSimChannel.h"
 #include "CRTSimData.hh"
 #include "CRTHit.hh"
 #include "CRTTrack.hh"
@@ -32,3 +33,9 @@ template class art::Wrapper< std::vector<crt::CRTHit> >;
 
 template class std::vector<crt::CRTTrack>;
 template class art::Wrapper< std::vector<crt::CRTTrack> >;
+
+// Added by SDP
+template class art::Assns<crt::CRTSimData,sim::AuxDetSimChannel>;
+template class art::Assns<sim::AuxDetSimChannel,crt::CRTSimData>;
+template class art::Wrapper<art::Assns<crt::CRTSimData,sim::AuxDetSimChannel> >;
+template class art::Wrapper<art::Assns<sim::AuxDetSimChannel,crt::CRTSimData> >;

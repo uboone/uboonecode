@@ -16,6 +16,7 @@ art_make( BASENAME_ONLY
     LIB_LIBRARIES
         larcore_Geometry
         larcore_Geometry_Geometry_service
+        lardata_Utilities
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}

@@ -2,6 +2,7 @@
 #include "uboone/CRT/CRTDetSim.hh"
 
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "lardata/Utilities/PtrMaker.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "lardataobj/Simulation/AuxDetSimChannel.h"
@@ -25,7 +26,8 @@ namespace crt{
     art::ServiceHandle<rndm::NuRandomService> Seeds;
     Seeds->createEngine(*this, "HepJamesRandom", "crt", pSet, "Seed");
     this->reconfigure(pSet);
-    produces< std::vector<CRTSimData> >();
+    produces< std::vector<crt::CRTSimData> >();
+    produces< art::Assns<crt::CRTSimData,sim::AuxDetSimChannel> >();
 
   }
 
@@ -90,8 +92,10 @@ namespace crt{
 
   void CRTDetSim::produce(art::Event& evt)
   {
-    std::unique_ptr<std::vector<crt::CRTSimData> > crtHits(
-        new std::vector<crt::CRTSimData>);
+    // Declare products to store
+    std::unique_ptr<std::vector<crt::CRTSimData>> crtHits (new std::vector<crt::CRTSimData>);
+    std::unique_ptr<art::Assns<crt::CRTSimData,sim::AuxDetSimChannel>> assnChannel(new art::Assns<crt::CRTSimData,sim::AuxDetSimChannel>);
+    lar::PtrMaker<CRTSimData> makeCrtPtr(evt, *this);
 
     art::ServiceHandle<geo::AuxDetGeometry> geoService;
 
@@ -111,7 +115,11 @@ namespace crt{
     const geo::AuxDetGeometryCore* geoServiceProvider = geometry->GetProviderPtr();
 
     // Loop through truth AD channels
-    for (auto& adsc : *channels) {
+    // for (auto& adsc : *channels) {
+    for(std::vector<int>::size_type i=0; i!=(*channels).size(); i++) {
+
+      auto adsc = (*channels).at(i);
+      auto adscPtr =  art::Ptr<sim::AuxDetSimChannel>(channels, i);
 
       const geo::AuxDetGeo& adGeo = geoServiceProvider->AuxDet(adsc.AuxDetID());
 
@@ -119,6 +127,7 @@ namespace crt{
 
       // Simulate the CRT response for each hit
       for (auto ide : adsc.AuxDetIDEs()) {
+
 
         // Get Geant4 supplied track ID for IDE
         int trackID = ide.trackID;
@@ -170,12 +179,20 @@ namespace crt{
         uint32_t channel1ID = adsc.AuxDetID()*2+1;
 
         // Write AuxDetDigit for each channel
-        crtHits->push_back(CRTSimData(channel0ID, t0, ppsTicks, q0, trackID));
-        crtHits->push_back(CRTSimData(channel1ID, t1, ppsTicks, q1, trackID));
+        CRTSimData crt1 = CRTSimData(channel0ID, t0, ppsTicks, q0, trackID);
+        crtHits->push_back(crt1);
+        art::Ptr<crt::CRTSimData> crtPtr1 = makeCrtPtr(crtHits->size()-1);
+        assnChannel->addSingle(crtPtr1, adscPtr);
+
+        CRTSimData crt2 = CRTSimData(channel1ID, t1, ppsTicks, q1, trackID);
+        crtHits->push_back(crt2);
+        art::Ptr<crt::CRTSimData> crtPtr2 = makeCrtPtr(crtHits->size()-1);
+        assnChannel->addSingle(crtPtr2, adscPtr);
       }
     }
 
     evt.put(std::move(crtHits));
+    evt.put(std::move(assnChannel));
   }
 
   DEFINE_ART_MODULE(CRTDetSim)

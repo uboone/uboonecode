@@ -33,5 +33,11 @@
   
   <class name="std::vector<crt::CRTTrack>"/>
   <class name="art::Wrapper< std::vector<crt::CRTTrack> >"/>
+
+  <!-- Added by SDP -->
+  <class name="art::Assns<crt::CRTSimData,sim::AuxDetSimChannel>"/>
+  <class name="art::Assns<sim::AuxDetSimChannel,crt::CRTSimData>"/>
+  <class name="art::Wrapper<art::Assns<crt::CRTSimData,sim::AuxDetSimChannel> >"/>
+  <class name="art::Wrapper<art::Assns<sim::AuxDetSimChannel,crt::CRTSimData> >"/>
   
 </lcgdict>
