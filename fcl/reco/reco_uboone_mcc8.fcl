@@ -116,6 +116,10 @@ microboone_reco_mcc8_producers:
   ### pandora
   # pattern recognition - single pass full output: n CR particle hierarchies and one (or zero) Nu particle hierarchy
   pandora:                          @local::microboone_pandoraFull
+  
+  # Split the single pass pandora reconstruction into the CR and Nu hierarchies
+  pandoraNu:                        @local::pandora_splitting_neutrino
+  pandoraCosmic:                    @local::pandora_splitting_cosmic
 
   # pattern recognition - process all provided hits under CR hypothesis (input: all hits)
   pandoraAllHitCRHypothesis:        @local::microboone_pandoraAllHitsCR
@@ -312,6 +316,8 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
                                          @sequence::microboone_reco_mcc8_cctracks ]
 
 microboone_reco_mcc8_pandoraFull: [                 pandora,
+                                                    pandoraCosmic,
+                                                    pandoraNu,
                                                     pandoratag,
                                                     pandoraContTag,
                                                     pandoraT0Reco,
@@ -503,6 +509,10 @@ microboone_reco_mcc8_producers.pandora.HitFinderModuleLabel:                    
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesis.HitFinderModuleLabel:    "gaushit"
 microboone_reco_mcc8_producers.pandoraSlicesCRHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
 microboone_reco_mcc8_producers.pandoraSlicesNuHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
+
+# pandora splitting of consolidated output
+microboone_reco_mcc8_producers.pandoraNu.InputProducerLabel:                      "pandora"
+microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                  "pandora"
 
 # pandora downstream processing for single pass full output
 microboone_reco_mcc8_producers.pandoratag.TrackModuleLabel:                       "pandora"

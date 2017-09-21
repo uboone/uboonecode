@@ -123,7 +123,10 @@ PandoraSplitting::PandoraSplitting(fhicl::ParameterSet const & p)
 // :
 // Initialize member data here.
 {
-  // Call appropriate produces<>() functions here.
+
+  reconfigure(p);
+  
+  produces<std::vector<recob::PFParticle>>();
 }
 
 // ---------------------------------------------------------------------------------------
