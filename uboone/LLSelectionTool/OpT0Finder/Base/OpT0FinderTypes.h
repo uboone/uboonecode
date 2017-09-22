@@ -154,6 +154,15 @@ namespace flashana {
       source_type = kUnknownAncestor;
     }
   };
+
+  /// Struct to represent a spacepoint with associated hit charge
+  struct Hit3D_t {
+    double x;
+    double y;
+    double z;
+    double q;
+    int plane;
+  };
   
   namespace msg {
     /// Verbosity message level
