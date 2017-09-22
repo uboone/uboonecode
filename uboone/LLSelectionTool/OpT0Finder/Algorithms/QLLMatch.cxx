@@ -55,21 +55,24 @@ namespace flashana {
     }
     for (auto &pt : _raw_trk) pt.x -= min_x;
 
-    auto res1 = PESpectrumMatch(pt_v,flash,true);
-    auto res2 = PESpectrumMatch(pt_v,flash,false);
-    /*
-    std::cout << "Using   mid-x-init: " << res1.tpc_point.x << " [cm] @ " << res1.score << std::endl;
-    std::cout << "Without mid-x-init: " << res2.tpc_point.x << " [cm] @ " << res2.score << std::endl;
-    */
+    auto res1 = PESpectrumMatch(pt_v,flash,1);
+    auto res2 = PESpectrumMatch(pt_v,flash,ActiveXMax()-10.);
+    auto res3 = PESpectrumMatch(pt_v,flash,(ActiveXMax() / 2.));
+    
+    //std::cout << "Using zero-x-init: "<< res1.tpc_point.x << " [cm] @ " << res1.score << std::endl;
+    //std::cout << "Using end-x-init: " << res2.tpc_point.x << " [cm] @ " << res2.score << std::endl;
+    //std::cout << "Using mid-x-init: " << res3.tpc_point.x << " [cm] @ " << res3.score << std::endl;
+    
 
     auto res = (res1.score > res2.score ? res1 : res2);
+    res = (res.score > res3.score ? res : res3);
 
     if(res.score < _onepmt_score_threshold) {
 
       auto res_onepmt = OnePMTMatch(flash);
 
       if(res_onepmt.score >= 0.)
-	return res_onepmt;
+	      return res_onepmt;
     }
 
     return res;
@@ -309,7 +312,7 @@ namespace flashana {
     return;
   }
   
-  double QLLMatch::CallMinuit(const QCluster_t &tpc, const Flash_t &pmt, const bool init_x0) {
+    double QLLMatch::CallMinuit(const QCluster_t &tpc, const Flash_t &pmt, const double init_x0) {
     
     if (_measurement.pe_v.empty()) {
       _measurement.pe_v.resize(NOpDets(), 0.);
@@ -348,9 +351,7 @@ namespace flashana {
     
     if (!_minuit_ptr) _minuit_ptr = new TMinuit(4);
     
-    double reco_x = 0.;
-    if (!init_x0)
-      reco_x = (ActiveXMax() - (_raw_xmax_pt.x - _raw_xmin_pt.x)) / 2.;
+    double reco_x = init_x0;
     double reco_x_err = (ActiveXMax() - (_raw_xmax_pt.x - _raw_xmin_pt.x)) / 2.;
     double MinFval;
     int ierrflag, npari, nparx, istat;
@@ -395,7 +396,7 @@ namespace flashana {
     fValue[0] = reco_x;
     // Transfer the minimization variables:
     MIN_vtx_qll(nPar, grad, Fmin,
-		fValue, ierrflag);
+    fValue, ierrflag);
     //static bool show = true;
     /*
       if(show){
