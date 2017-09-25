@@ -2,8 +2,16 @@
 #define MCPARTICLETREE_CXX
 
 #include "MCParticleTree.h"
+#include <sstream>
 
 namespace supera {
+
+  std::string MCNode::dump() const
+  {
+    std::stringstream ss;
+    ss << "Source " << (int)(source_type) << " Origin: " << origin << " PDG " << pdg << " TrackID " << track_id << std::endl;
+    return ss.str();
+  }
 
   bool MCRoot::is_daughter(const size_t& parent_id) const
   {
@@ -38,6 +46,21 @@ namespace supera {
       if(dt>0 && (min_dt<0 || dt < min_dt)) min_dt = dt;
     }
     return min_dt;
+  }
+
+  void MCParticleTree::dump() const
+  {
+    auto const& primary_v = PrimaryArray();
+    for(size_t idx=0; idx<primary_v.size(); ++idx) {
+      auto const& primary = primary_v[idx];
+      std::cout << "Primary " << idx << std::endl
+		<< primary.roi.dump() << std::endl
+		<< "... or as MCNode: " << ((MCNode)primary).dump().c_str() << std::endl;
+      std::cout<< "Dumping secondaries..." << std::endl;
+      for(auto const& secondary : primary.daughter_v)
+	std::cout << "    " << secondary.dump();
+    }
+    std::cout<<"... all dumped" << std::endl;
   }
 
   size_t MCParticleTree::FindPrimary(const larcv::Vertex& start,

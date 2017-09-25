@@ -48,6 +48,8 @@ namespace supera {
     larcv::Vertex end;
     size_t source_index;
     SourceType_t source_type;
+
+    std::string dump() const;
   };
 
   class MCRoot : public MCNode{
@@ -72,6 +74,7 @@ namespace supera {
 
     std::vector<supera::MCNode> daughter_v;
     ::larcv::ROI roi;
+
   };
 
   /**
@@ -107,6 +110,8 @@ namespace supera {
 
     const std::vector<supera::MCRoot>& PrimaryArray() const
     { return _primary_v; }
+
+    void dump() const;
     
   private:
 

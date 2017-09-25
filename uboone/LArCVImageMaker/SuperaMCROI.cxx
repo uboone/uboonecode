@@ -99,6 +99,8 @@ namespace larcv {
     _mcpt.Register(LArData<supera::LArMCTruth_t>(),
 		   LArData<supera::LArMCTrack_t>(),
 		   LArData<supera::LArMCShower_t>());
+    
+    _mcpt.dump();
 
     auto primary_v = _mcpt.PrimaryArray();
     LARCV_INFO() << "Found " << primary_v.size() << " primary particles" << std::endl;

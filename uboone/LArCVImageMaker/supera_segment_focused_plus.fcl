@@ -93,7 +93,7 @@ ProcessDriver: {
       UseScattering:     false
     }
     SuperaMCROI: {
-      Verbosity: 1
+      Verbosity: 0
       OutROILabel:         "segment"
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
@@ -122,7 +122,7 @@ ProcessDriver: {
       }
       MCParticleTree: {
         Verbosity:    2
-        UseG4Primary: true
+        UseG4Primary: false
 	DTMax:        10000
       }
       MCROIMaker: {

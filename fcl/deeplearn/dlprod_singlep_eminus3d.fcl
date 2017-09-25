@@ -1,0 +1,8 @@
+#include "dlprod_singlep_common.fcl"
+physics.ana: [ mcinfo, opreco, reco2d, superaFocusedView3D ]
+
+process_name: EMinus
+services.TFileService.fileName: "eminus_%tc.root"
+physics.producers.generator.PDG:    [ 11 ]            # eminus
+physics.producers.generator.P0:     [ 0.41775 ]
+physics.producers.generator.SigmaP: [ 0.38225 ]
