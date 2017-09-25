@@ -512,7 +512,10 @@ microboone_reco_mcc8_producers.pandoraSlicesNuHypothesis.HitFinderModuleLabel:  
 
 # pandora splitting of consolidated output
 microboone_reco_mcc8_producers.pandoraNu.InputProducerLabel:                      "pandora"
+microboone_reco_mcc8_producers.pandoraNu.HitProducerLabel:                        "gaushit"
+
 microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                  "pandora"
+microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                    "gaushit"
 
 # pandora downstream processing for single pass full output
 microboone_reco_mcc8_producers.pandoratag.TrackModuleLabel:                       "pandora"

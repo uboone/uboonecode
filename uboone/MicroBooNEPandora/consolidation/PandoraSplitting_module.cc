@@ -28,8 +28,10 @@
 #include "lardataobj/RecoBase/Track.h"
 #include "lardataobj/RecoBase/Shower.h"
 #include "lardataobj/RecoBase/PCAxis.h"
+#include "lardataobj/RecoBase/Hit.h"
 
 #include <memory>
+#include <algorithm>
 
 /*!
  *  \breif   A module that splits collections from a single Pandora instance into multiple collections
@@ -119,38 +121,53 @@ private:
    *  \param  associatedU      output vector of objects of type U associated with anObject
    */
   template < class T, class U >
-  void CollectAssociated( const art::Ptr< T > & anObject, const art::FindManyP< U > & associationTtoU, std::unique_ptr< std::vector< U > > & associatedU );
+  void CollectAssociated( const art::Ptr< T > & anObject, const art::FindManyP< U > & associationTtoU, std::vector< art::Ptr< U > > & associatedU );
+
 
   /*!
-   *  \brief  Makes associations between two collections (A and B) based on the associations between the input collections of the same types
+   *  \brief  Adds the given vector of objects to the event as a new collection
    *
-   *  Example usage: 
+   *  \param  event       the current event
+   *  \param  collection  the collection to add
+   */
+  template < class T >
+  void MakeCollection( art::Event & event, const std::vector< art::Ptr< T > > & collection );
+
+  /*!
+   *  \brief  Adds associations (type <A, B>) to the event between two collections (A and B) based on the associations between the input collections of the same types
    *
-   *  Suppose you have an input collection of SpacePoints (A) and PFParticles (B) from a single Pandora instance. 
+   *  Example use-case: 
+   *
+   *  Suppose you have an input collection of, say, SpacePoints (A) and PFParticles (B) from a single Pandora instance. 
    *  You also have associations between these collections (inputAssnAtoB)
    *
-   *  You have already decided which objects in these collections you want to persist. 
+   *  You have already selected which objects in these collections you want to persist. 
    *  These are in your output collections (collectionA and collectionB). 
    *
-   *  Now you need to produce output associations (outputAssnAtoB) only between the objects that are in collectionA and collectionB.
-   *  First make an empty association, and then use this function as follows:
+   *  Now you need to produce output associations only between the objects that are in collectionA and collectionB.
    *
-   *  \code
-   *  // Example usage
-   *  std::unique_ptr< art::Assns<recob::PFParticle, recob::SpacePoint > > outputParticlesToSpacePoints( new art::Assns<recob::PFParticle, recob::SpacePoint> );
-   *  this->MakeAssociation( outputSpacePoints, outputParticles, assnPFParticleSpacePoint, outputParticlesToSpacePoints);
-   *  \code
+   *  This function will make an art::Assns< A, B >, and add it to the event.
    *
+   *  \param  prod            the producer (usually *this)
+   *  \param  event           the current event
    *  \param  collectionA     an collection of type A
    *  \param  collectionB     an collection of type B
    *  \param  inputAssnAtoB   input assocations between the full collections of type A and B
-   *  \param  outputAssnAtoB  outuput associations between collectionA and collectionB
    */
-  template < class A, class B >
-  void MakeAssociation( const std::unique_ptr< std::vector< A > > & collectionA,  std::unique_ptr< std::vector< B > > & collectionB, const art::FindManyP< A > & inputAssnAtoB, std::unique_ptr< art::Assns< B, A > > & outputAssnAtoB );
+  template < class PRODUCER, class A, class B >
+  void MakeAssociation( PRODUCER const & prod, art::Event & event, const std::vector< art::Ptr< A > > & collectionA, const std::vector< art::Ptr< B > > & collectionB, const art::FindManyP< B > & inputAssnAtoB );
+
+  /*!
+   *  \brief  Produces a vector of Hits from an input handle
+   *
+   *  \param  hitHandle  input handle to a vector of hits
+   *  \param  hitVect    output vector of art::Ptr to the hits
+   */
+  void GetHitVector( const art::Handle< std::vector< recob::Hit > > & hitHandle, std::vector< art::Ptr< recob::Hit > > & hitVect );
 
   // FHicL congifurable parameters
   std::string     fInputProducerLabel;           ///< Label for the Pandora instance that produced the collections we want to split up
+  std::string     fHitProducerLabel;             ///< Label for the hit producer that was used as input to the Pandora instance specified
   bool            fShouldProduceNeutrinos;       ///< If we should produce collections related to neutrino top-level PFParticles
   bool            fShouldProduceCosmics;         ///< If we should produce collections related to cosmic (== non-neutrino) top-level PFParticles
 
@@ -184,7 +201,6 @@ PandoraSplitting::PandoraSplitting(fhicl::ParameterSet const & p)
   produces< std::vector<recob::Shower> >();
   produces< std::vector<recob::PCAxis> >();
 
-  /*
   produces< art::Assns<recob::PFParticle, recob::SpacePoint> >();
   produces< art::Assns<recob::PFParticle, recob::Cluster> >();
   produces< art::Assns<recob::PFParticle, recob::Seed> >();
@@ -198,7 +214,6 @@ PandoraSplitting::PandoraSplitting(fhicl::ParameterSet const & p)
   produces< art::Assns<recob::SpacePoint, recob::Hit> >();
   produces< art::Assns<recob::Cluster, recob::Hit> >();
   produces< art::Assns<recob::Seed, recob::Hit> >();
-  */
 }
 
 // ---------------------------------------------------------------------------------------
@@ -219,6 +234,8 @@ void PandoraSplitting::produce(art::Event & e)
   art::Handle< std::vector<recob::Track>      > trackHandle;
   art::Handle< std::vector<recob::Shower>     > showerHandle;
   art::Handle< std::vector<recob::PCAxis>     > pcAxisHandle;
+  
+  art::Handle< std::vector<recob::Hit>        > hitHandle;
 
   e.getByLabel(fInputProducerLabel, pfParticleHandle);
   e.getByLabel(fInputProducerLabel, spacePointHandle);
@@ -229,6 +246,10 @@ void PandoraSplitting::produce(art::Event & e)
   e.getByLabel(fInputProducerLabel, showerHandle);
   e.getByLabel(fInputProducerLabel, pcAxisHandle);
 
+  e.getByLabel(fHitProducerLabel  , hitHandle);
+  std::vector< art::Ptr< recob::Hit > > hitVect;
+  this->GetHitVector( hitHandle, hitVect );
+
   // Get the associations
   art::FindManyP< recob::SpacePoint > assnPFParticleSpacePoint( pfParticleHandle, e, fInputProducerLabel );
   art::FindManyP< recob::Cluster    > assnPFParticleCluster(    pfParticleHandle, e, fInputProducerLabel );
@@ -237,6 +258,14 @@ void PandoraSplitting::produce(art::Event & e)
   art::FindManyP< recob::Track      > assnPFParticleTrack(      pfParticleHandle, e, fInputProducerLabel );
   art::FindManyP< recob::Shower     > assnPFParticleShower(     pfParticleHandle, e, fInputProducerLabel );
   art::FindManyP< recob::PCAxis     > assnPFParticlePCAxis(     pfParticleHandle, e, fInputProducerLabel );
+
+  art::FindManyP< recob::Hit        > assnSpacePointHit( spacePointHandle, e, fInputProducerLabel );
+  art::FindManyP< recob::Hit        > assnClusterHit(    clusterHandle   , e, fInputProducerLabel );
+  art::FindManyP< recob::Hit        > assnSeedHit(       seedHandle      , e, fInputProducerLabel );
+  art::FindManyP< recob::Hit        > assnTrackHit(      trackHandle     , e, fInputProducerLabel );
+  art::FindManyP< recob::Hit        > assnShowerHit(     showerHandle    , e, fInputProducerLabel );
+
+  art::FindManyP< recob::PCAxis     > assnShowerPCAxis(  showerHandle    , e, fInputProducerLabel );
 
   // ---------------------------------------------------------------------------------------
   // Identify the PFParticles to persist
@@ -257,68 +286,62 @@ void PandoraSplitting::produce(art::Event & e)
   this->GetDownstreamPFParticles( persistentPrimaryPFParticles, idToPFParticleMap, idToSelectedPFParticleMap);
 
   // ---------------------------------------------------------------------------------------
-  // Output the required collections
+  // Find all other objects related to the selected PFParticles
   // ---------------------------------------------------------------------------------------
 
-  // Setup the output collections
-  std::unique_ptr< std::vector<recob::PFParticle> > outputParticles(   new std::vector<recob::PFParticle> );
-  std::unique_ptr< std::vector<recob::SpacePoint> > outputSpacePoints( new std::vector<recob::SpacePoint> );
-  std::unique_ptr< std::vector<recob::Cluster>    > outputClusters(    new std::vector<recob::Cluster>    );
-  std::unique_ptr< std::vector<recob::Seed>       > outputSeeds(       new std::vector<recob::Seed>       );
-  std::unique_ptr< std::vector<recob::Vertex>     > outputVertices(    new std::vector<recob::Vertex>     );
-  std::unique_ptr< std::vector<recob::Track>      > outputTracks(      new std::vector<recob::Track>      );
-  std::unique_ptr< std::vector<recob::Shower>     > outputShowers(     new std::vector<recob::Shower>     ); 
-  std::unique_ptr< std::vector<recob::PCAxis>     > outputPCAxes(      new std::vector<recob::PCAxis>     );
+  std::vector< art::Ptr< recob::PFParticle> > selectedParticles;
+  std::vector< art::Ptr< recob::SpacePoint> > selectedSpacePoints;
+  std::vector< art::Ptr< recob::Cluster>    > selectedClusters;
+  std::vector< art::Ptr< recob::Seed>       > selectedSeeds;
+  std::vector< art::Ptr< recob::Vertex>     > selectedVertices;
+  std::vector< art::Ptr< recob::Track>      > selectedTracks;
+  std::vector< art::Ptr< recob::Shower>     > selectedShowers; 
+  std::vector< art::Ptr< recob::PCAxis>     > selectedPCAxes;
 
-  // Setup the output associations
-  /*
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::SpacePoint > > outputParticlesToSpacePoints( new art::Assns<recob::PFParticle, recob::SpacePoint> );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::Cluster >    > outputParticlesToClusters(    new art::Assns<recob::PFParticle, recob::Cluster>    );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::Seed >       > outputParticlesToSeeds(       new art::Assns<recob::PFParticle, recob::Seed>       );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::Vertex >     > outputParticlesToVertices(    new art::Assns<recob::PFParticle, recob::Vertex>     );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::Track >      > outputParticlesToTracks(      new art::Assns<recob::PFParticle, recob::Track>      );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::Shower >     > outputParticlesToShowers(     new art::Assns<recob::PFParticle, recob::Shower>     );
-  std::unique_ptr< art::Assns<recob::PFParticle, recob::PCAxis >     > outputParticlesToPCAxes(      new art::Assns<recob::PFParticle, recob::PCAxis>     );
-
-  std::unique_ptr< art::Assns<recob::Track     , recob::Hit >        > outputTracksToHits(           new art::Assns<recob::Track,      recob::Hit>        );
-  std::unique_ptr< art::Assns<recob::Shower    , recob::Hit >        > outputShowersToHits(          new art::Assns<recob::Shower,     recob::Hit>        );
-  std::unique_ptr< art::Assns<recob::SpacePoint, recob::Hit >        > outputSpacePointsToHits(      new art::Assns<recob::SpacePoint, recob::Hit>        );
-  std::unique_ptr< art::Assns<recob::Cluster   , recob::Hit >        > outputClustersToHits(         new art::Assns<recob::Cluster,    recob::Hit>        );
-  std::unique_ptr< art::Assns<recob::Seed      , recob::Hit >        > outputSeedsToHits(            new art::Assns<recob::Seed,       recob::Hit>        );
-
-  std::unique_ptr< art::Assns<recob::Shower    , recob::PCAxis >     > outputShowersToPCAxes(        new art::Assns<recob::Shower,     recob::PCAxis>     );
-  */
-
-  // Output the collections related to the selected PFParticles
   for ( std::map< size_t, art::Ptr< recob::PFParticle > >::const_iterator selectedParticleIt=idToSelectedPFParticleMap.begin(); selectedParticleIt != idToSelectedPFParticleMap.end(); ++selectedParticleIt ) {
       art::Ptr< recob::PFParticle > part = selectedParticleIt->second;
     
-      // Add the particle to the ouput collection
-      outputParticles->push_back( *part );
+      selectedParticles.push_back( part );
 
       // Collect all other associated objects
-      this->CollectAssociated( part, assnPFParticleSpacePoint, outputSpacePoints );
-      this->CollectAssociated( part, assnPFParticleCluster   , outputClusters    );
-      this->CollectAssociated( part, assnPFParticleSeed      , outputSeeds       );
-      this->CollectAssociated( part, assnPFParticleVertex    , outputVertices    );
-      this->CollectAssociated( part, assnPFParticleTrack     , outputTracks      );
-      this->CollectAssociated( part, assnPFParticleShower    , outputShowers     );
-      this->CollectAssociated( part, assnPFParticlePCAxis    , outputPCAxes      );
+      this->CollectAssociated( part, assnPFParticleSpacePoint, selectedSpacePoints );
+      this->CollectAssociated( part, assnPFParticleCluster   , selectedClusters    );
+      this->CollectAssociated( part, assnPFParticleSeed      , selectedSeeds       );
+      this->CollectAssociated( part, assnPFParticleVertex    , selectedVertices    );
+      this->CollectAssociated( part, assnPFParticleTrack     , selectedTracks      );
+      this->CollectAssociated( part, assnPFParticleShower    , selectedShowers     );
+      this->CollectAssociated( part, assnPFParticlePCAxis    , selectedPCAxes      );
   }
 
-  // Make associations between the output objects
-  //this->MakeAssociation( outputSpacePoints, outputParticles, assnPFParticleSpacePoint, outputParticlesToSpacePoints);
+  // ---------------------------------------------------------------------------------------
+  // Output the selected collections
+  // ---------------------------------------------------------------------------------------
 
-  // Put the new collections into the event
-  e.put( std::move( outputParticles   ) );
-  e.put( std::move( outputSpacePoints ) );
-  e.put( std::move( outputClusters    ) );
-  e.put( std::move( outputSeeds       ) );
-  e.put( std::move( outputVertices    ) );
-  e.put( std::move( outputTracks      ) );
-  e.put( std::move( outputShowers     ) );
-  e.put( std::move( outputPCAxes      ) );
-  
+  this->MakeCollection( e, selectedParticles   );
+  this->MakeCollection( e, selectedSpacePoints );
+  this->MakeCollection( e, selectedClusters    );
+  this->MakeCollection( e, selectedSeeds       );
+  this->MakeCollection( e, selectedVertices    );
+  this->MakeCollection( e, selectedTracks      );
+  this->MakeCollection( e, selectedShowers     );
+  this->MakeCollection( e, selectedPCAxes      );
+
+  this->MakeAssociation( *this, e, selectedParticles,   selectedSpacePoints, assnPFParticleSpacePoint );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedClusters   , assnPFParticleCluster    );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedSeeds      , assnPFParticleSeed       );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedVertices   , assnPFParticleVertex     );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedTracks     , assnPFParticleTrack      );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedShowers    , assnPFParticleShower     );
+  this->MakeAssociation( *this, e, selectedParticles,   selectedPCAxes     , assnPFParticlePCAxis     );
+
+  this->MakeAssociation( *this, e, selectedSpacePoints, hitVect            , assnSpacePointHit        );
+  this->MakeAssociation( *this, e, selectedClusters   , hitVect            , assnClusterHit           );
+  this->MakeAssociation( *this, e, selectedSeeds      , hitVect            , assnSeedHit              );
+  this->MakeAssociation( *this, e, selectedTracks     , hitVect            , assnTrackHit             );
+  this->MakeAssociation( *this, e, selectedShowers    , hitVect            , assnShowerHit            );
+
+  this->MakeAssociation( *this, e, selectedShowers    , selectedPCAxes     , assnShowerPCAxis         );
+
 }
 
 // ---------------------------------------------------------------------------------------
@@ -326,6 +349,7 @@ void PandoraSplitting::produce(art::Event & e)
 void PandoraSplitting::reconfigure(fhicl::ParameterSet const & p)
 {
   fInputProducerLabel     = p.get<std::string>("InputProducerLabel");
+  fHitProducerLabel       = p.get<std::string>("HitProducerLabel");
   fShouldProduceNeutrinos = p.get<bool>("ShouldProduceNeutrinos", false);
   fShouldProduceCosmics   = p.get<bool>("ShouldProduceCosmics"  , false);
 }
@@ -404,11 +428,57 @@ void PandoraSplitting::GetDownstreamPFParticles( const std::vector< art::Ptr< re
 // ---------------------------------------------------------------------------------------
 
 template < class T, class U >
-void PandoraSplitting::CollectAssociated( const art::Ptr< T > & anObject, const art::FindManyP< U > & associationTtoU, std::unique_ptr< std::vector< U > > & associatedU )
+void PandoraSplitting::CollectAssociated( const art::Ptr< T > & anObject, const art::FindManyP< U > & associationTtoU, std::vector< art::Ptr< U > > & associatedU )
 {
   std::vector< art::Ptr< U > > associatedObjects = associationTtoU.at( anObject.key() );
   for ( art::Ptr< U > associatedObject : associatedObjects )
-      associatedU->push_back( *associatedObject );
+      associatedU.push_back( associatedObject );
+}
+
+// ---------------------------------------------------------------------------------------
+
+template < class T >
+void PandoraSplitting::MakeCollection( art::Event & event, const std::vector< art::Ptr< T > > & collection )
+{
+  std::unique_ptr< std::vector< T > > output( new std::vector< T > );
+
+  for ( art::Ptr< T > object : collection )
+    output->push_back( *object );
+  
+  event.put( std::move( output ) );
+}
+
+// ---------------------------------------------------------------------------------------
+
+template < class PRODUCER, class A, class B >
+void PandoraSplitting::MakeAssociation( PRODUCER const & prod, art::Event & event, const std::vector< art::Ptr< A > > & collectionA, const std::vector< art::Ptr< B > > & collectionB, const art::FindManyP< B > & inputAssnAtoB )
+{
+  
+  // Setup the output association
+  std::unique_ptr< art::Assns< A, B > > outputAssn( new art::Assns< A, B > );
+
+  for ( art::Ptr< A > objectA : collectionA ) {
+    for ( art::Ptr< B > associatedObjectB : inputAssnAtoB.at( objectA.key() ) ) {
+
+        // Check that the associatedObjectB is in collectionB
+        typename std::vector< art::Ptr< B > >::const_iterator associatedObjectIter = std::find( collectionB.begin(), collectionB.end(), associatedObjectB );
+        if ( associatedObjectIter == collectionB.end() ) continue;
+        
+        util::CreateAssn( prod, event, associatedObjectB, objectA, *outputAssn );
+    }
+  }
+
+  event.put( std::move( outputAssn ) );
+}
+
+// ---------------------------------------------------------------------------------------
+
+void PandoraSplitting::GetHitVector( const art::Handle< std::vector< recob::Hit > > & hitHandle, std::vector< art::Ptr< recob::Hit > > & hitVect )
+{
+  for( size_t iHit = 0; iHit != hitHandle->size(); iHit++ ) {
+      art::Ptr< recob::Hit > hit( hitHandle, iHit );
+      hitVect.push_back( hit );
+  }
 }
 
 // ---------------------------------------------------------------------------------------
