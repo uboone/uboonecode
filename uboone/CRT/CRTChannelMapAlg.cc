@@ -1,8 +1,9 @@
 #include "uboone/CRT/CRTChannelMapAlg.hh"
-
+#include "larcore/Geometry/GeoObjectSorterStandard.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "larcore/Geometry/AuxDetGeometryCore.h"
-
+#include "fhiclcpp/ParameterSet.h"
+#include "TVector3.h"
 #include <sstream>
 
 namespace crt {
