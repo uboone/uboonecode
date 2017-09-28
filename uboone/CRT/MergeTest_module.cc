@@ -49,6 +49,7 @@
 #include <utility>
 #include <typeinfo>
 
+
 namespace crt {
   class MergeTest;
 }
@@ -67,7 +68,7 @@ public:
 
   // Required functions.
   void analyze(art::Event const & e) override;
-
+  
   // Selected optional functions.
   void beginJob() override;
   void endJob() override;
@@ -77,7 +78,7 @@ private:
   art::ServiceHandle<art::TFileService> tfs;
   // Declare member data here.
   
-  int fEvtNum; //Number of current event                       
+  uint32_t fEvtNum; //Number of current event                       
   uint32_t frunNum;                //Run Number taken from event  
   uint32_t fsubRunNum;             //Subrun Number taken from event         
   std::string  data_label_;
@@ -85,16 +86,32 @@ private:
   int fOffset_;
   int verbose_;
   int diff_tra_flaMAX_;
-  
+
+
   //art::InputTag opFlashTag("opflashSat");
 
-  TTree*       my_tree_;
+  TTree*       fTree;
   TH1F* hFlashTimeDis;
   TH2F* hNFlavsNTra;
   TH1F* hYdiff;
   TH1F* hZdiff;
 
   TH1F* hTFvsTT;
+  TH1F* hMulFT;
+  TH2F* hMulFTvsTdis;
+
+  int max_difff = 0;
+
+
+  //for Tree
+  uint32_t fTriTim_sec;
+  uint32_t fTriTim_nsec;
+  double fY;
+  double fZ;
+  double fTimFla;
+  double fAbsTimFla;
+  
+  //for Tree
 
   
 };
@@ -108,7 +125,16 @@ crt::MergeTest::MergeTest(fhicl::ParameterSet const & p)
     verbose_(p.get<int>("verbose")),
     diff_tra_flaMAX_(p.get<int>("diff_tra_flaMAX"))//,
     // More initializers here.
-{}
+{
+  fTree = tfs->make<TTree>("flash_tree","Flash_Tree");
+  fTree->Branch("event", &fEvtNum, "event/I");
+  fTree->Branch("trigger_ts", &fTriTim_sec, "Time (s)/I");
+  fTree->Branch("trigger_tns", &fTriTim_nsec, "Time (ns)/I");
+  fTree->Branch("Y_reco", &fY, "Y (cm)/D");
+  fTree->Branch("Z_reco", &fZ, "Z (cm)/D");
+  fTree->Branch("T_flash", &fTimFla, "Flash time w.r.t trigger (us)/D");
+  fTree->Branch("Abs_T_flash", &fAbsTimFla, "Absolute flash time (ns)/D");
+}
 
 void crt::MergeTest::analyze(art::Event const & evt)
 {
@@ -117,11 +143,22 @@ void crt::MergeTest::analyze(art::Event const & evt)
   frunNum    = evt.run();
   fsubRunNum = evt.subRun();
   fEvtNum = evt.event();
-  
+
+  std::cout <<"evt.run() is: " <<typeid(evt.run()).name() <<  " and frunNum is : "<< typeid(frunNum).name() <<std::endl;
+  std::cout <<"evt.subrun() is: " <<typeid(evt.subRun()).name() <<  " and fsubRunNum is : "<< typeid(fsubRunNum).name() <<std::endl;  
+  std::cout <<"evt.event() is: " <<typeid(evt.event()).name() <<  " and fEvtNum is : "<< typeid(fEvtNum).name() <<std::endl;
+
   art::Timestamp evtTime = evt.time();
   auto evt_time_sec = evtTime.timeHigh();
   auto evt_time_nsec = evtTime.timeLow();
  
+  fTriTim_sec = evtTime.timeHigh();
+  fTriTim_nsec = evtTime.timeLow();
+
+  std::cout <<"evtTime.timeHigh() is: " <<typeid(evtTime.timeHigh()).name() <<  " and fTriTim_sec is : "<< typeid(fTriTim_sec).name() <<std::endl;
+  std::cout <<"evtTime.timeLow() is: " <<typeid(evtTime.timeLow()).name() <<  " and fTriTim_nsec is : "<< typeid(fTriTim_nsec).name() <<std::endl;
+
+
   if(verbose_==1){  
     std::cout.precision(19);
     std::cout<< "Run:  "<<frunNum << "   subRun: " <<fsubRunNum<<std::endl;
@@ -145,7 +182,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
   }
     //getchar(); 
   //get Optical Flash
-
+  /*
   //get CRTTracks
   art::Handle< std::vector<crt::CRTTrack> > rawHandle;
   evt.getByLabel(data_label_, rawHandle); //what is the product instance name? no BernZMQ                                              
@@ -159,7 +196,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
     return;
   }
 
-
+  
   //get better access to the data    //CRTTrack collection on this event                                                
   std::vector<crt::CRTTrack> const& CRTTrackCollection(*rawHandle);
   if(verbose_==1){ 
@@ -171,35 +208,61 @@ void crt::MergeTest::analyze(art::Event const & evt)
   if(CRTTrackCollection.size()>0){//A-1
     
     hNFlavsNTra->Fill(OpFlashCollection.size(),CRTTrackCollection.size());
-    
+  */
+
     for(std::vector<int>::size_type i = 0; i != OpFlashCollection.size(); i++) {//A
       
       recob::OpFlash my_OpFlash = OpFlashCollection[i];
       
-      auto Yflash = my_OpFlash.YCenter();
-      auto Zflash = my_OpFlash.ZCenter();
+      //auto Yflash = my_OpFlash.YCenter();
+      //auto Zflash = my_OpFlash.ZCenter();
       //auto PEflash = my_OpFlash.TotalPE();
       auto Timeflash = my_OpFlash.Time(); //in us from trigger time
       
-      //std::cout<<"Flash: "<<i<<std::endl;
-      // std::cout<<"Zflash: "<<Zflash<<std::endl;
+      fY = my_OpFlash.YCenter();
+      fZ = my_OpFlash.ZCenter();
+      fTimFla = my_OpFlash.Time();
+      fAbsTimFla = evt_time_nsec + (Timeflash * 1000);
+      fTree->Fill();
+      
+      std::cout <<"my_OpFlash.YCenter() is : "<< typeid(my_OpFlash.YCenter()).name() << " and fY is:  "<<typeid(fY).name() <<std::endl;
+      std::cout <<"my_OpFlash.ZCenter() is : "<< typeid(my_OpFlash.ZCenter()).name() << " and fZ is:  "<<typeid(fZ).name() <<std::endl;
+      std::cout <<"my_OpFlash.Time() is : "<< typeid(my_OpFlash.Time()).name() << " and fTimFla is:  "<<typeid(fTimFla).name() <<std::endl;
+      std::cout <<"fAbsTimFla  is : "<< typeid(fAbsTimFla).name() <<std::endl;
+      //getchar();
+     
+      std::cout<<"event: "<<fEvtNum<<std::endl;
+      std::cout<<"Flash: "<<i<<std::endl;
+      std::cout<<"Zflash: "<<fZ<<std::endl;
+      std::cout<<"Yflash: "<<fY<<std::endl;
+      std::cout<<"Flash time: "<<fTimFla<< "  us w.r.t to trigger"<<std::endl;
+      std::cout.precision(19);
+      std::cout<<"Trigger s: "<<fTriTim_sec<<std::endl;
+      std::cout<<"Trigger ns: "<<fTriTim_nsec<<std::endl;
+      
+      //      getchar();
+
       //std::cout<<"Yflash: "<<Yflash<<std::endl;
       // std::cout<<"PEflash: "<<PEflash<<std::endl;
-      
+      /*
       hFlashTimeDis->Fill(Timeflash);
       
-      if( (Timeflash>0) && (Timeflash<20) ){//A2 //in us
+      //if( (Timeflash>0) && (Timeflash<20) ){//A2 //in us
+      if( Timeflash<5000000 ){//A2 //in us
 	std::cout.precision(19);            
 	//std::cout<<"Flash["<<i<<"]::Time_us: "<<Timeflash<<"   us w.r.t. trigger time"<<std::endl;  
 	//std::cout<<"Flash["<<i<<"]::Time_ns: "<<Timeflash * 1000<<"   ns w.r.t. trigger time"<<std::endl;        
 	int flash_time_GPS_ns = evt_time_nsec + (Timeflash * 1000);            
 	//std::cout<<"Flash time in GPS units: "<<flash_time_GPS_ns <<" nanoseconds"<<std::endl;	  
 	//getchar();
-	
+
+	int counterFvsT = 0;	
+
 	for(std::vector<int>::size_type j = 0; j != CRTTrackCollection.size(); j++) {//B
 	  
 	  crt::CRTTrack my_CRTTrack = CRTTrackCollection[j];
 	  
+	  std::vector<uint8_t> feb_id = my_CRTTrack.feb_id;
 	  auto Track_Z = (my_CRTTrack.z1_pos - my_CRTTrack.z2_pos)/2;
 	  auto Track_Y = (my_CRTTrack.y1_pos - my_CRTTrack.y2_pos)/2;
 	  //auto Track_X = (my_CRTTrack.x1_pos - my_CRTTrack.x2_pos)/2;
@@ -207,13 +270,15 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	  
 	  auto Track_time_s = my_CRTTrack.ts0_s + fOffset_;
 	  auto Track_time_ns = my_CRTTrack.ts0_ns;
-	  auto Track_time_ns1 =  my_CRTTrack.ts0_ns_1;
-	  auto Track_time_ns2 =  my_CRTTrack.ts0_ns_2;
+	  auto Track_time_ns1 =  my_CRTTrack.ts0_ns_h1;
+	  auto Track_time_ns2 =  my_CRTTrack.ts0_ns_h2;
 	  
 	  int diff_tra_fla = Track_time_ns - flash_time_GPS_ns; //in ns
 	  diff_tra_fla=std::abs(diff_tra_fla);
 	  
-	  /*
+	  if(diff_tra_fla>max_difff) max_difff = diff_tra_fla;
+
+	  
 	  if(verbose_==1){
 	    std::cout<<" "<<std::endl;
 	    std::cout<<"Timestamp_sec (Trigger time):   "<<evt_time_sec<< "   " <<std::endl;
@@ -236,17 +301,18 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	    std::cout<<"Track-Flash time: "<< diff_tra_fla <<"  nanoseconds"<<std::endl;	  
 	    getchar();
 	  }
-	  */
+	  
 	  
 	  if((evt_time_sec-Track_time_s) == 0){//A3
 	    
-	    //if(diff_tra_fla<diff_tra_flaMAX_){//A4  //in ns
-	    if(diff_tra_fla<10000000){//A4  //in ns
-	      
+	    if(diff_tra_fla<diff_tra_flaMAX_){//A4  //in ns
+	   	      
 	      hZdiff->Fill(std::abs(Track_Z - Zflash));
 	      hYdiff->Fill(std::abs(Track_Y - Yflash));
 	      hTFvsTT->Fill(diff_tra_fla);	
 	      
+	      // if( (diff_tra_fla>790000) && (diff_tra_fla<810000))verbose_=1;
+	      counterFvsT++;
 	      if(verbose_==1){
 		std::cout<<" "<<std::endl;
 		
@@ -265,38 +331,33 @@ void crt::MergeTest::analyze(art::Event const & evt)
 		std::cout<<"Track["<<j<<"]::Time_ns_1: "<<Track_time_ns1<<std::endl;
 		std::cout<<"Track["<<j<<"]::Time_ns_2: "<<Track_time_ns2<<std::endl;
 		std::cout<<"Track_length: "<<Track_length<<" cm"<<std::endl;	   
+		std::cout<<"Track_pos1:  x1: "<<my_CRTTrack.x1_pos<<"  y1: "<<my_CRTTrack.y1_pos<<"  z1: "<<my_CRTTrack.z1_pos<<std::endl;
+		std::cout<<"Track_pos2:  x2: "<<my_CRTTrack.x2_pos<<"  y2: "<<my_CRTTrack.y2_pos<<"  z2: "<<my_CRTTrack.z2_pos<<std::endl;
+		std::cout<<"Pos_diff:  x: "<<abs(my_CRTTrack.x1_pos-my_CRTTrack.x2_pos)<<"  y: "<<abs(my_CRTTrack.y1_pos-my_CRTTrack.y2_pos)<<"  z: "<<abs(my_CRTTrack.z1_pos-my_CRTTrack.z2_pos)<<std::endl;
+		std::cout<<"feb size: "<<feb_id.size()<<std::endl;
+
+		//for(int a=0; a < 6; a++){
+		//std::cout<<feb_id[a]<<std::endl;
+		//}
 		std::cout<<" "<<std::endl;
 		std::cout<<"Time_diff::Track_s-event_s: "<<evt_time_sec-Track_time_s<<" seconds and"<<std::endl; 	
 		std::cout<<"Track-Flash time: "<< diff_tra_fla <<"  nanoseconds"<<std::endl;	  
 		getchar();
+		//verbose_=0;
 	      }
-	      
+	      hMulFTvsTdis->Fill(counterFvsT,diff_tra_fla);
 	    }//A4
 	  }//A3
 	  
 	}//B
+	hMulFT->Fill(counterFvsT);
 	
       }//A2
+*/
     }//A
-  }//A-1
-  
-  /*
-    CRTcanTrack.x1_pos = xA;
-    CRTcanTrack.y1_pos = yA;
-    CRTcanTrack.z1_pos = zA;
-    CRTcanTrack.x2_pos = xB;
-    CRTcanTrack.y2_pos = yB;
-    CRTcanTrack.z2_pos = zB;
-    CRTcanTrack.ts0_s = time_s_A;
-    CRTcanTrack.ts0_ns = track_time_ns;
-    CRTcanTrack.ts0_ns_1 = time_ns_A; 
-    CRTcanTrack.ts0_ns_2 = time_ns_B; 
-    
-    CRTcanTrack.length = length;
-    CRTcanTrack.thetaxy = theta;
-    CRTcanTrack.phizy = phi;
-  */
-  //double track_time = ((long int)track.ts0_s - (long int)(ev.eventAuxiliary().time().timeHigh()))*1000000. + ((long int)track.ts0_ns - (long int)(ev.eventAuxiliary().time().timeLow()))*0.001;
+/* 
+ }//A-1
+*/
   
 }
 
@@ -304,15 +365,15 @@ void crt::MergeTest::beginJob()
 {
   // Implementation of optional member function here.
 
-  my_tree_ = tfs->make<TTree>("crt_tree","CRT_Tree");
 
+  /*
   hFlashTimeDis = tfs->make<TH1F>("hFlashTimDis","hFlashTimDis",3500,-3500,3500);
   hFlashTimeDis->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
   hFlashTimeDis->GetYaxis()->SetTitle("Entries/bin");
     
-  hNFlavsNTra = tfs->make<TH2F>("hNFlavsNTra","hNFlavsNTra",100,0,100,100,0,100);
+  hNFlavsNTra = tfs->make<TH2F>("hNFlavsNTra","hNFlavsNTra",200,0,200,200,0,200);
   hNFlavsNTra->GetXaxis()->SetTitle("Number of Flash");
-  hNFlavsNTra->GetYaxis()->SetTitle("Numbe of CRT Tracks");
+  hNFlavsNTra->GetYaxis()->SetTitle("Number of CRT Tracks");
   hNFlavsNTra->GetZaxis()->SetTitle("Entries/bin");
   hNFlavsNTra->SetOption("COLZ");
 
@@ -324,15 +385,30 @@ void crt::MergeTest::beginJob()
   hYdiff->GetXaxis()->SetTitle("YTrack - YFlash (cm)");
   hYdiff->GetYaxis()->SetTitle("Entries/bin");
 
-  hTFvsTT = tfs->make<TH1F>("hTFvsTT","hTFvsTT",1500000,0,1500000);
+  hTFvsTT = tfs->make<TH1F>("hTFvsTT","hTFvsTT",1000000,0,10000000);//1ms max
   hTFvsTT->GetXaxis()->SetTitle("Track time - Flash time (ns)");
   hTFvsTT->GetYaxis()->SetTitle("Entries/bin");
 
+  hMulFT = tfs->make<TH1F>("hMulFT","hMulFT",50,0,50);//
+  hMulFT->GetXaxis()->SetTitle("Multiplicity (Tracks per Flash)");
+  hMulFT->GetYaxis()->SetTitle("Entries/bin");
+
+
+  hMulFTvsTdis = tfs->make<TH2F>("hMulFTvsTdis","hMulFTvsTdis",50,0,50,1000000,0,10000000);
+  hMulFTvsTdis->GetXaxis()->SetTitle("Multiplicity (Tracks per Flash)");
+  hMulFTvsTdis->GetYaxis()->SetTitle("Track time - Flash time (ns)");
+  hMulFTvsTdis->GetZaxis()->SetTitle("Entries/bin");
+  hMulFTvsTdis->SetOption("COLZ");
+  */
 }
 
 void crt::MergeTest::endJob()
 {
   // Implementation of optional member function here.
+  std::cout<<"max_difff: "<<max_difff<<"  ns"<<std::endl;
+
+  //fTree->Write();
+
 }
 
 DEFINE_ART_MODULE(crt::MergeTest)
