@@ -121,6 +121,10 @@ microboone_reco_mcc8_producers:
   pandoraNu:                        @local::pandora_splitting_neutrino
   pandoraCosmic:                    @local::pandora_splitting_cosmic
 
+  # Merge the output from multiple pandora instances into CR an Nu hierarchies
+  pandoraNuTest:                    @local::pandora_merging_neutrino
+  pandoraCosmicTest:                @local::pandora_merging_cosmic
+
   # pattern recognition - process all provided hits under CR hypothesis (input: all hits)
   pandoraAllHitCRHypothesis:        @local::microboone_pandoraAllHitsCR
 
@@ -355,7 +359,9 @@ microboone_reco_mcc8_pandoraConsolidation: [        ### TODO consolidated output
 microboone_reco_mcc8_pandora: [                     @sequence::microboone_reco_mcc8_pandoraFull,
                                                     @sequence::microboone_reco_mcc8_pandoraAllHitCRHypothesis,
                                                     @sequence::microboone_reco_mcc8_pandoraSlicesCRHypothesis,
-                                                    @sequence::microboone_reco_mcc8_pandoraSlicesNuHypothesis ]#,
+                                                    @sequence::microboone_reco_mcc8_pandoraSlicesNuHypothesis,
+                                                    pandoraCosmicTest,
+                                                    pandoraNuTest ]#,
                                                     # @sequence::microboone_reco_mcc8_pandoraConsolidation ] TODO
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
@@ -510,12 +516,28 @@ microboone_reco_mcc8_producers.pandoraAllHitCRHypothesis.HitFinderModuleLabel:  
 microboone_reco_mcc8_producers.pandoraSlicesCRHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
 microboone_reco_mcc8_producers.pandoraSlicesNuHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
 
-# pandora splitting of consolidated output
+# pandora splitting / merging of consolidated output
 microboone_reco_mcc8_producers.pandoraNu.InputProducerLabel:                      "pandora"
 microboone_reco_mcc8_producers.pandoraNu.HitProducerLabel:                        "gaushit"
 
 microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                  "pandora"
 microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                    "gaushit"
+
+microboone_reco_mcc8_producers.pandoraNuTest.AllHitsCRProducerLabel:              "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitsCRProducerLabel:            "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitsNuProducerLabel:            "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraNuTest.AllHitProducerLabel:                 "gaushit"
+microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitProducerLabel:               "pandoraAllHitCRHypothesisHitRemoval"
+microboone_reco_mcc8_producers.pandoraNuTest.ClearCRTagProducerLabel:             "pandoraAllHitCRHypothesisKalmanTrackPFPart"
+microboone_reco_mcc8_producers.pandoraNuTest.NuIdCRTagProducerLabel:              "TODO"
+
+microboone_reco_mcc8_producers.pandoraCosmicTest.AllHitsCRProducerLabel:          "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitsCRProducerLabel:        "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitsNuProducerLabel:        "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraCosmicTest.AllHitProducerLabel:             "gaushit"
+microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitProducerLabel:           "pandoraAllHitCRHypothesisHitRemoval"
+microboone_reco_mcc8_producers.pandoraNuTest.ClearCRTagProducerLabel:             "pandoraAllHitCRHypothesisKalmanTrackPFPart"
+microboone_reco_mcc8_producers.pandoraNuTest.NuIdCRTagProducerLabel:              "TODO"
 
 # pandora downstream processing for single pass full output
 microboone_reco_mcc8_producers.pandoratag.TrackModuleLabel:                       "pandora"

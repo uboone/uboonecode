@@ -70,17 +70,24 @@ microboone_pandorawriter.EnableProduction:                          false
 
 pandora_splitting:
 {
-  module_type:                                          "PandoraSplitting"
-
-  ShouldProduceNeutrinos:                               false
-  ShouldProduceCosmics:                                 false
+  module_type:                                          "CollectionSplitting"
 }
 
 pandora_splitting_neutrino:                             @local::pandora_splitting
 pandora_splitting_neutrino.ShouldProduceNeutrinos:      true
 
 pandora_splitting_cosmic:                               @local::pandora_splitting
-pandora_splitting_cosmic.ShouldProduceCosmics:          true
+pandora_splitting_neutrino.ShouldProduceNeutrinos:      false
 
+pandora_merging:
+{
+  module_type:                                          "CollectionMerging"
+}
+
+pandora_merging_neutrino:                             @local::pandora_merging
+pandora_merging_neutrino.ShouldProduceNeutrinos:      true
+
+pandora_merging_cosmic:                               @local::pandora_merging
+pandora_merging_neutrino.ShouldProduceNeutrinos:      false
 
 END_PROLOG
