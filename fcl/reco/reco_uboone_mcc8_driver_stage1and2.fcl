@@ -4,7 +4,8 @@ process_name: McRecoStage1and2
 
 services.TFileService.fileName: "reco_stage_1and2_hist.root"
 services.BackTracker:  @local::microboone_backtracker
-physics.reco: [@sequence::microboone_reco_mcc8_stage1, @sequence::microboone_reco_mcc8_stage2]
+physics.producers.btload:   { module_type: BackTrackerLoader }
+physics.reco: [@sequence::microboone_reco_mcc8_stage1, btload, @sequence::microboone_reco_mcc8_stage2]
 physics.trigger_paths: [ reco ]
 outputs.out1.fileName: "%ifb_%tc_reco12.root"
 outputs.out1.dataTier: "reconstructed"
