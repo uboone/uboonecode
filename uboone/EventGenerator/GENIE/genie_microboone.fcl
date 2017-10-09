@@ -20,6 +20,8 @@ microboone_genie_nuesig.FluxFiles:     ["FluxHist_volAVTPC_Electron_Signal.root"
 microboone_genie_nuesig.BeamCenter:    [1.25, 0., 0.]  
 microboone_genie_nuesig.BeamDirection: [0., 0., 1.]    
 microboone_genie_nuesig.BeamRadius:    4.              
+microboone_genie_nuesig.EventsPerSpill:    0
+microboone_genie_nuesig.POTPerSpill:       5e12
 
 microboone_genie_simple:                   @local::microboone_genie
 microboone_genie_simple.FluxType:          "simple_flux"
