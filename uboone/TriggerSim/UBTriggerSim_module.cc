@@ -239,7 +239,7 @@ namespace trigger {
 	  //auto const elec_time = ts->G4ToElecTime(beam_ptr->Start());
 	  auto const elec_time = ts->G4ToElecTime(fNuMIFireTime);
 	  clock.SetTime(clock.Sample(elec_time),clock.Frame(elec_time));
-	  fAlg.AddTriggerBNB(clock);
+	  fAlg.AddTriggerNuMI(clock);
 	}
 	else
 	  throw UBTrigException(Form("Beam type %d not supported!",beam_ptr->BeamType()));
