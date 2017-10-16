@@ -6,7 +6,7 @@ flashmatch_config : {
 # Manager configuration
 #
 FlashMatchManager: {
-  Verbosity: 3
+  Verbosity: 0
   AllowReuseFlash: false
   StoreFullResult: false
   FlashFilterAlgo: ""
@@ -28,12 +28,12 @@ QLLMatch: {
   PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
   #PEPenaltyThreshold: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]
   #PEPenaltyValue: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
-  XPenaltyThreshold: 30
-  ZPenaltyThreshold: 30
-  OnePMTScoreThreshold:  0.00001
-  OnePMTXDiffThreshold:  35.
-  OnePMTPESumThreshold:  500
-  OnePMTPEFracThreshold: 0.3
+  XPenaltyThreshold: 0
+  ZPenaltyThreshold: 0
+  OnePMTScoreThreshold:  0.0
+  OnePMTXDiffThreshold:  0.
+  OnePMTPESumThreshold:  0
+  OnePMTPEFracThreshold: 0.
 }
 
 QWeightPoint: {
@@ -86,6 +86,11 @@ LightPath: {
     SegmentSize: 0.5
     LightYield:  40000
     MIPdEdx:     2.07
+}
+
+LightCharge: {
+  PlaneNumber:  2
+  ChargeToLight:1.0
 }
 
 #

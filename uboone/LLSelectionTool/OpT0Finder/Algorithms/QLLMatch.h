@@ -69,7 +69,7 @@ namespace flashana {
 
     double CallMinuit(const QCluster_t& tpc,
 		      const Flash_t& pmt,
-		      const bool init_x0=true);
+		      const double init_x0);
 
     const std::vector<double>& HistoryLLHD() const { return _minimizer_record_llhd_v; }
     const std::vector<double>& HistoryChi2() const { return _minimizer_record_chi2_v; }
