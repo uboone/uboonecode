@@ -89,9 +89,11 @@ private:
   std::string fDAQHeaderModule;
   std::string fOpDataModule;
   std::string fOpFlashModule;
+  bool fPMT18On;
   size_t fNChannels;
   size_t fFEMslot;
   size_t fMinReadoutTicks;
+  bool fIsPMT18Dead;
 
   // Beam Window Tree
   TTree* fTwindow;
@@ -160,12 +162,14 @@ SWTrigger::SWTrigger(fhicl::ParameterSet const & p)
   fDAQHeaderModule = p.get<std::string>("DAQHeaderModule");
   fOpDataModule    = p.get<std::string>("OpDataModule");
   fOpFlashModule   = p.get<std::string>("OpFlashModule");
+  fPMT18On         = p.get<std::string>("PMT18On");
   fNChannels       = p.get<int>("NumberOfChannels");
   fFEMslot         = 0;
   fMinReadoutTicks = p.get<int>("MinReadoutTicks");
   std::vector<std::string> triggertypes = p.get<std::vector<std::string>>("swtrg_algotype");
   std::vector<std::string> triggernames = p.get<std::vector<std::string>>("swtrg_algonames");
   std::vector<unsigned int> triggerbits = p.get<std::vector<unsigned int>>("swtrg_bits");
+  fIsPMT18Dead     = p.get<bool>("IsPMT18Dead");
   //size_t beam_window_size = p.get<size_t>( "swtrg_beam_window_size" );
 
   fTconfig = out_file->make<TTree>( "femconfig", "FEM emulator config. parameters" );
@@ -401,9 +405,12 @@ bool SWTrigger::filter(art::Event & evt)
       return false;
     }
     wfms[ch].resize( fMinReadoutTicks, 0 );
-    for (size_t i=0; i<fMinReadoutTicks; i++)
-      wfms[ch][i] = (int)wfm[i];
+    for (size_t i=0; i<fMinReadoutTicks; i++){
+      if (fPMT18On && ch==17) wfms[ch][i] = 0;
+      else wfms[ch][i] = (int)wfm[i];
+    }
   }
+
 
   // Make sure nothing missing
   bool missing=false;

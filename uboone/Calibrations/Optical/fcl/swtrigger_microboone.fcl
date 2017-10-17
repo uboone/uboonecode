@@ -9,6 +9,7 @@ microboone_swtrigger_data:
     OpFlashModule:    "opflashsat"
     NumberOfChannels: 32
     MinReadoutTicks:  1499
+    IsPmt18Dead:      True
 
     drop_event : true
     swtrg_algonames : ["EXT_BNBwin","EXT_NUMIwin","EXT_unbiased","BNB","BNB_unbiased","NUMI","NUMI_unbiased"]
