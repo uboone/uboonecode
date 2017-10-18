@@ -114,25 +114,42 @@ microboone_reco_mcc8_producers:
   mchitfinder:                    @local::standard_mchitfinder
 
   ### pandora
+
+  ## pandora - single pass full output
   # pattern recognition - single pass full output: n CR particle hierarchies and one (or zero) Nu particle hierarchy
   pandora:                          @local::microboone_pandoraFull
+  pandoraTrack:                     @local::pandora_track_creation
+  pandoraShower:                    @local::pandora_shower_creation
   
   # Split the single pass pandora reconstruction into the CR and Nu hierarchies
-  pandoraNu:                        @local::pandora_splitting_neutrino
-  pandoraCosmic:                    @local::pandora_splitting_cosmic
+  pandoraFullNu:                    @local::pandora_splitting_neutrino
+  pandoraFullCosmic:                @local::pandora_splitting_cosmic
 
-  # Merge the output from multiple pandora instances into CR an Nu hierarchies
-  pandoraNuTest:                    @local::pandora_merging_neutrino
-  pandoraCosmicTest:                @local::pandora_merging_cosmic
-
+  ## pandora - multiple pass consolidated output
   # pattern recognition - process all provided hits under CR hypothesis (input: all hits)
   pandoraAllHitCRHypothesis:        @local::microboone_pandoraAllHitsCR
+  pandoraAllHitCRHypothesisTrack:   @local::pandora_track_creation
+  pandoraAllHitCRHypothesisShower:  @local::pandora_shower_creation
+  # Make the track, shower and PFParticle production all have the same module label
+  pandoraAllHitCRHypothesisAll:     @local::pandora_splitting_all
 
   # pattern recognition - divide all provided hits into slices and reconstruct each under CR hypothesis (input: CR removed hits)
   pandoraSlicesCRHypothesis:        @local::microboone_pandoraAllHitsSliceCR
+  pandoraSlicesCRHypothesisTrack:   @local::pandora_track_creation
+  pandoraSlicesCRHypothesisShower:  @local::pandora_shower_creation
 
   # pattern recognition - divide all provided hits into slices and reconstruct each under Nu hypothesis (input: CR removed hits)
   pandoraSlicesNuHypothesis:        @local::microboone_pandoraAllHitsSliceNu
+  pandoraSlicesNuHypothesisTrack:   @local::pandora_track_creation
+  pandoraSlicesNuHypothesisShower:  @local::pandora_shower_creation
+
+  # Identify the most likely neutrino slice
+  pandoraNeutrinoId:                @local::pandora_neutrino_id
+
+  # Merge the output from multiple pandora instances into CR an Nu hierarchies
+  pandoraNu:                        @local::pandora_merging_neutrino
+  pandoraCosmic:                    @local::pandora_merging_cosmic
+
 
   # pandora downstream processing for single pass full output
   pandoratag:                       @local::microboone_cosmictracktagger
@@ -320,49 +337,60 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
                                          @sequence::microboone_reco_mcc8_cctracks ]
 
 microboone_reco_mcc8_pandoraFull: [                 pandora,
-                                                    pandoraCosmic,
-                                                    pandoraNu,
-                                                    pandoratag,
-                                                    pandoraContTag,
-                                                    pandoraT0Reco,
-                                                    pandoraT0RecoLoose,
-                                                    pandoraT0RecoBeam,
-                                                    pandoracalo,
-                                                    pandorapid,
-                                                    pandoraKHit,
-                                                    pandoraPMA,
-                                                    pandoraKalmanTrack ]
+                                                    pandoraTrack,
+                                                    pandoraShower,
+                                                    pandoraFullCosmic,
+                                                    pandoraFullNu ] #,
+                                                    #pandoratag,
+                                                    #pandoraContTag,
+                                                    #pandoraT0Reco,
+                                                    #pandoraT0RecoLoose,
+                                                    #pandoraT0RecoBeam,
+                                                    #pandoracalo,
+                                                    #pandorapid,
+                                                    #pandoraKHit,
+                                                    #pandoraPMA,
+                                                    #pandoraKalmanTrack ]
 
 microboone_reco_mcc8_pandoraAllHitCRHypothesis: [   pandoraAllHitCRHypothesis,
+                                                    pandoraAllHitCRHypothesisTrack,
+                                                    pandoraAllHitCRHypothesisShower,
+                                                    pandoraAllHitCRHypothesisAll,
                                                     pandoraAllHitCRHypothesisKHit,
                                                     pandoraAllHitCRHypothesisKHitFlashTag,
                                                     pandoraAllHitCRHypothesisKalmanTrack,
                                                     pandoraAllHitCRHypothesisKalmanTrackPFPart,
                                                     pandoraAllHitCRHypothesisHitRemoval ]
 
-microboone_reco_mcc8_pandoraSlicesCRHypothesis: [   pandoraSlicesCRHypothesis ]
+microboone_reco_mcc8_pandoraSlicesCRHypothesis: [   pandoraSlicesCRHypothesis,
+                                                    pandoraSlicesCRHypothesisTrack,
+                                                    pandoraSlicesCRHypothesisShower ]
 
-microboone_reco_mcc8_pandoraSlicesNuHypothesis: [   pandoraSlicesNuHypothesis ]
+microboone_reco_mcc8_pandoraSlicesNuHypothesis: [   pandoraSlicesNuHypothesis,
+                                                    pandoraSlicesNuHypothesisTrack,
+                                                    pandoraSlicesNuHypothesisShower ]
 
 microboone_reco_mcc8_pandoraConsolidation: [        ### TODO consolidated output, selecting from pandoraAllHitCRHypothesis, pandoraSlicesCRHypothesis and pandoraSlicesNuHypothesis
-                                                    pandoraConsolidatedtag,
-                                                    pandoraConsolidatedContTag,
-                                                    pandoraConsolidatedT0Reco,
-                                                    pandoraConsolidatedT0RecoLoose,
-                                                    pandoraConsolidatedT0RecoBeam,
-                                                    pandoraConsolidatedcalo,
-                                                    pandoraConsolidatedpid,
-                                                    pandoraConsolidatedKHit,
-                                                    pandoraConsolidatedPMA,
-                                                    pandoraConsolidatedKalmanTrack ]
+                                                    pandoraNeutrinoId,
+                                                    pandoraCosmic,
+                                                    pandoraNu ] #,
+
+                                                    #pandoraConsolidatedtag,
+                                                    #pandoraConsolidatedContTag,
+                                                    #pandoraConsolidatedT0Reco,
+                                                    #pandoraConsolidatedT0RecoLoose,
+                                                    #pandoraConsolidatedT0RecoBeam,
+                                                    #pandoraConsolidatedcalo,
+                                                    #pandoraConsolidatedpid,
+                                                    #pandoraConsolidatedKHit,
+                                                    #pandoraConsolidatedPMA,
+                                                    #pandoraConsolidatedKalmanTrack ]
 
 microboone_reco_mcc8_pandora: [                     @sequence::microboone_reco_mcc8_pandoraFull,
                                                     @sequence::microboone_reco_mcc8_pandoraAllHitCRHypothesis,
                                                     @sequence::microboone_reco_mcc8_pandoraSlicesCRHypothesis,
                                                     @sequence::microboone_reco_mcc8_pandoraSlicesNuHypothesis,
-                                                    pandoraCosmicTest,
-                                                    pandoraNuTest ]#,
-                                                    # @sequence::microboone_reco_mcc8_pandoraConsolidation ] TODO
+                                                    @sequence::microboone_reco_mcc8_pandoraConsolidation ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -516,28 +544,65 @@ microboone_reco_mcc8_producers.pandoraAllHitCRHypothesis.HitFinderModuleLabel:  
 microboone_reco_mcc8_producers.pandoraSlicesCRHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
 microboone_reco_mcc8_producers.pandoraSlicesNuHypothesis.HitFinderModuleLabel:    "pandoraAllHitCRHypothesisHitRemoval"
 
-# pandora splitting / merging of consolidated output
-microboone_reco_mcc8_producers.pandoraNu.InputProducerLabel:                      "pandora"
-microboone_reco_mcc8_producers.pandoraNu.HitProducerLabel:                        "gaushit"
+# pandora track and shower creation
+microboone_reco_mcc8_producers.pandoraTrack.PFParticleLabel:                      "pandora"
+microboone_reco_mcc8_producers.pandoraShower.PFParticleLabel:                     "pandora"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisTrack.PFParticleLabel:    "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisShower.PFParticleLabel:   "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraSlicesCRHypothesisTrack.PFParticleLabel:    "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraSlicesCRHypothesisShower.PFParticleLabel:   "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraSlicesNuHypothesisTrack.PFParticleLabel:    "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraSlicesNuHypothesisShower.PFParticleLabel:   "pandoraSlicesNuHypothesis"
 
-microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                  "pandora"
-microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                    "gaushit"
+# splitting of single full pandora outputs
+microboone_reco_mcc8_producers.pandoraFullNu.InputProducerLabel:                  "pandora"
+microboone_reco_mcc8_producers.pandoraFullNu.TrackProducerLabel:                  "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraFullNu.ShowerProducerLabel:                 "pandoraShower"
+microboone_reco_mcc8_producers.pandoraFullNu.HitProducerLabel:                    "gaushit"
 
-microboone_reco_mcc8_producers.pandoraNuTest.AllHitsCRProducerLabel:              "pandoraAllHitCRHypothesis"
-microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitsCRProducerLabel:            "pandoraSlicesCRHypothesis"
-microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitsNuProducerLabel:            "pandoraSlicesNuHypothesis"
-microboone_reco_mcc8_producers.pandoraNuTest.AllHitProducerLabel:                 "gaushit"
-microboone_reco_mcc8_producers.pandoraNuTest.CRRemHitProducerLabel:               "pandoraAllHitCRHypothesisHitRemoval"
-microboone_reco_mcc8_producers.pandoraNuTest.ClearCRTagProducerLabel:             "pandoraAllHitCRHypothesisKalmanTrackPFPart"
-microboone_reco_mcc8_producers.pandoraNuTest.NuIdCRTagProducerLabel:              "TODO"
+microboone_reco_mcc8_producers.pandoraFullCosmic.InputProducerLabel:              "pandora"
+microboone_reco_mcc8_producers.pandoraFullCosmic.TrackProducerLabel:              "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraFullCosmic.ShowerProducerLabel:             "pandoraShower"
+microboone_reco_mcc8_producers.pandoraFullCosmic.HitProducerLabel:                "gaushit"
 
-microboone_reco_mcc8_producers.pandoraCosmicTest.AllHitsCRProducerLabel:          "pandoraAllHitCRHypothesis"
-microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitsCRProducerLabel:        "pandoraSlicesCRHypothesis"
-microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitsNuProducerLabel:        "pandoraSlicesNuHypothesis"
-microboone_reco_mcc8_producers.pandoraCosmicTest.AllHitProducerLabel:             "gaushit"
-microboone_reco_mcc8_producers.pandoraCosmicTest.CRRemHitProducerLabel:           "pandoraAllHitCRHypothesisHitRemoval"
-microboone_reco_mcc8_producers.pandoraNuTest.ClearCRTagProducerLabel:             "pandoraAllHitCRHypothesisKalmanTrackPFPart"
-microboone_reco_mcc8_producers.pandoraNuTest.NuIdCRTagProducerLabel:              "TODO"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisAll.InputProducerLabel:   "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisAll.TrackProducerLabel:   "pandoraAllHitCRHypothesisTrack"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisAll.ShowerProducerLabel:  "pandoraAllHitCRHypothesisShower"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisAll.HitProducerLabel:     "gaushit"
+
+# merging of multiple pandora outputs
+microboone_reco_mcc8_producers.pandoraNu.AllHitsCRProducerLabel:                  "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraNu.AllHitsCRTrackProducerLabel:             "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraNu.AllHitsCRShowerProducerLabel:            "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsCRProducerLabel:                "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsCRTrackProducerLabel:           "pandoraSlicesCRHypothesisTrack"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsCRShowerProducerLabel:          "pandoraSlicesCRHypothesisShower"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsNuProducerLabel:                "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsNuTrackProducerLabel:           "pandoraSlicesNuHypothesisTrack"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitsNuShowerProducerLabel:          "pandoraSlicesNuHypothesisShower"
+microboone_reco_mcc8_producers.pandoraNu.AllHitProducerLabel:                     "gaushit"
+microboone_reco_mcc8_producers.pandoraNu.CRRemHitProducerLabel:                   "pandoraAllHitCRHypothesisHitRemoval"
+microboone_reco_mcc8_producers.pandoraNu.ClearCRTagProducerLabel:                 "pandoraAllHitCRHypothesisKalmanTrackPFPart"
+microboone_reco_mcc8_producers.pandoraNu.NuIdCRTagProducerLabel:                  "pandoraNeutrinoId"
+
+microboone_reco_mcc8_producers.pandoraCosmic.AllHitsCRProducerLabel:              "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraCosmic.AllHitsCRTrackProducerLabel:         "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraCosmic.AllHitsCRShowerProducerLabel:        "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsCRProducerLabel:            "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsCRTrackProducerLabel:       "pandoraSlicesCRHypothesisTrack"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsCRShowerProducerLabel:      "pandoraSlicesCRHypothesisShower"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsNuProducerLabel:            "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsNuTrackProducerLabel:       "pandoraSlicesNuHypothesisTrack"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitsNuShowerProducerLabel:      "pandoraSlicesNuHypothesisShower"
+microboone_reco_mcc8_producers.pandoraCosmic.AllHitProducerLabel:                 "gaushit"
+microboone_reco_mcc8_producers.pandoraCosmic.CRRemHitProducerLabel:               "pandoraAllHitCRHypothesisHitRemoval"
+microboone_reco_mcc8_producers.pandoraCosmic.ClearCRTagProducerLabel:             "pandoraAllHitCRHypothesisKalmanTrackPFPart"
+microboone_reco_mcc8_producers.pandoraCosmic.NuIdCRTagProducerLabel:              "pandoraNeutrinoId"
+
+# pandora neutrino slice identification
+microboone_reco_mcc8_producers.pandoraNeutrinoId.CRProducerLabel:                 "pandoraSlicesCRHypothesis"
+microboone_reco_mcc8_producers.pandoraNeutrinoId.NuProducerLabel:                 "pandoraSlicesNuHypothesis"
+microboone_reco_mcc8_producers.pandoraNeutrinoId.HitProducerLabel:                "pandoraAllHitCRHypothesisHitRemoval"
 
 # pandora downstream processing for single pass full output
 microboone_reco_mcc8_producers.pandoratag.TrackModuleLabel:                       "pandora"
@@ -593,23 +658,23 @@ microboone_reco_mcc8_producers.pandoraConsolidatedKalmanTrack.options.trackFromP
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.UseClusterHits:                        false
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.UsePFParticleHits:                     true
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.Track3DKalmanHitAlg.SelfSeed:          true
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.ClusterModuleLabel:                    "pandoraAllHitCRHypothesis"
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.PFParticleModuleLabel:                 "pandoraAllHitCRHypothesis"
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.inputs.inputPFParticleLabel:    "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.ClusterModuleLabel:                    "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKHit.PFParticleModuleLabel:                 "pandoraAllHitCRHypothesisAll"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.inputs.inputPFParticleLabel:    "pandoraAllHitCRHypothesisAll"
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.inputs.inputTracksLabel:        ""
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.inputs.inputCaloLabel:          ""
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.inputs.inputPidLabel:           ""
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.options.trackFromPF:            true
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.PFParticleModuleLabel:    "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrack.options.trackFromPF:            true 
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.PFParticleModuleLabel:    "pandoraAllHitCRHypothesisAll"
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.TrackModuleLabel:         "pandoraAllHitCRHypothesisKalmanTrack"
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.EndTickPadding:           75
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.TPCYBoundary:             20
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisKalmanTrackPFPart.TPCZBoundary:             5
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.CosmicProducerLabels:            ["pandoraAllHitCRHypothesisKalmanTrackPFPart", "pandoraAllHitCRHypothesisKHitFlashTag" ]
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.TrackProducerLabels:             ["pandoraAllHitCRHypothesisKalmanTrack",       "pandoraAllHitCRHypothesisKHit"         ]
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.AssnProducerLabels:              ["pandoraAllHitCRHypothesisKalmanTrack",       "pandoraAllHitCRHypothesisKHit"         ]
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.AssnProducerLabels:              ["pandoraAllHitCRHypothesisKalmanTrack",       "pandoraAllHitCRHypothesisKHit"         ] 
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.CosmicTagThresholds:             [0.6,                              0.99                        ]
-microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.PFParticleProducerLabel:         "pandoraAllHitCRHypothesis"
+microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.PFParticleProducerLabel:         "pandoraAllHitCRHypothesisAll"
 microboone_reco_mcc8_producers.pandoraAllHitCRHypothesisHitRemoval.EndTickPadding:                  75
 
 

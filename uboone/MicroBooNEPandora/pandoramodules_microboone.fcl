@@ -1,5 +1,9 @@
 BEGIN_PROLOG
 
+# -----------------------------------------------------------------------------------------------------
+# Settings for standard Pandora
+# -----------------------------------------------------------------------------------------------------
+
 microboone_pandora:
 {
   module_type:                                          "StandardPandora"
@@ -67,27 +71,62 @@ microboone_pandorawriter.EnableMCParticles:                         true
 microboone_pandorawriter.EnableProduction:                          false
 
 
+# -----------------------------------------------------------------------------------------------------
+# Settings for track and shower creation from Pandora output products
+# -----------------------------------------------------------------------------------------------------
+
+pandora_track_creation:
+{
+    module_type:                                        "LArPandoraTrackCreation"
+}
+
+# -----------------------------------------------------------------------------------------------------
+
+pandora_shower_creation:
+{
+    module_type:                                        "LArPandoraShowerCreation"
+}
+
+# -----------------------------------------------------------------------------------------------------
+# Settings for collection splitting / merging modules to build a consolidated Pandora output
+# -----------------------------------------------------------------------------------------------------
 
 pandora_splitting:
 {
-  module_type:                                          "CollectionSplitting"
+    module_type:                                        "CollectionSplitting"
+    ShouldProduceNeutrinos:                             true
+    ShouldProduceCosmics:                               true
 }
 
 pandora_splitting_neutrino:                             @local::pandora_splitting
-pandora_splitting_neutrino.ShouldProduceNeutrinos:      true
+pandora_splitting_neutrino.ShouldProduceCosmics:        false
 
 pandora_splitting_cosmic:                               @local::pandora_splitting
-pandora_splitting_neutrino.ShouldProduceNeutrinos:      false
+pandora_splitting_cosmic.ShouldProduceNeutrinos:        false
+
+pandora_splitting_all:                                  @local::pandora_splitting
+
+# -----------------------------------------------------------------------------------------------------
 
 pandora_merging:
 {
-  module_type:                                          "CollectionMerging"
+    module_type:                                        "CollectionMerging"
 }
 
-pandora_merging_neutrino:                             @local::pandora_merging
-pandora_merging_neutrino.ShouldProduceNeutrinos:      true
+pandora_merging_neutrino:                               @local::pandora_merging
+pandora_merging_neutrino.ShouldProduceNeutrinos:        true
 
-pandora_merging_cosmic:                               @local::pandora_merging
-pandora_merging_neutrino.ShouldProduceNeutrinos:      false
+pandora_merging_cosmic:                                 @local::pandora_merging
+pandora_merging_cosmic.ShouldProduceNeutrinos:          false
+
+
+# -----------------------------------------------------------------------------------------------------
+# Settings for the neutrino identification module
+# -----------------------------------------------------------------------------------------------------
+
+pandora_neutrino_id:
+{
+    module_type:                                        "LArPandoraNeutrinoId"    
+}
 
 END_PROLOG
