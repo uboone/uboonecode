@@ -2,4 +2,6 @@
 
 process_name: DetsimNoShortedResp
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
+
 services.SignalShapingServiceMicroBooNE.FieldResponseFVersion:  [ "v3.12", "v3.12" ]

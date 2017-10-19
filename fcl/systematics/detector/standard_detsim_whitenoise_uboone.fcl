@@ -2,6 +2,8 @@
 
 process_name: DetsimWhiteNoise
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
+
 physics.producers.daq.GenNoise: 1
 
 

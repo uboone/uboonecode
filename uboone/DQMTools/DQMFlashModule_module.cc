@@ -66,7 +66,7 @@ void dqm::DQMFlashModule::analyze(art::Event const & e)
 {
   //get the flash data
   art::Handle< std::vector<recob::OpFlash> > flashHandle;
-  std::string _flash_producer_name = "opflashSat";
+  std::string _flash_producer_name = "simpleFlashBeam";
   e.getByLabel(_flash_producer_name,flashHandle);
   if(!flashHandle.isValid()) {
       std::cerr << "\033[93m[ERROR]\033[00m Could not retrieve recob::OpFlash from "

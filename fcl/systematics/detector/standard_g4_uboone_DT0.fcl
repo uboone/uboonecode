@@ -2,4 +2,6 @@
 
 process_name: G4DT0
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*"]
+
 services.LArG4Parameters.TransverseDiffusion:0.0

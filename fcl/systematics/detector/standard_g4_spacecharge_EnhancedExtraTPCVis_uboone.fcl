@@ -2,6 +2,8 @@
 
 outputs.out1.fileName: "%ifb_%tc_g4_spacecharge.root"
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*"]
+
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true
 

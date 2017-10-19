@@ -2,6 +2,8 @@
 
 process_name: DetsimWithDIC
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
+
 services.SignalShapingServiceMicroBooNE.YZdependentResponse:  false
 services.SignalShapingServiceMicroBooNE.datadrivenResponse:   false
 services.SignalShapingServiceMicroBooNE.NResponses:       [ [5, 5, 5], [5, 5, 5] ]

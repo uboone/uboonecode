@@ -2,6 +2,7 @@
 
 process_name: DetsimNoPENoise
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
 
 #services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 #                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 

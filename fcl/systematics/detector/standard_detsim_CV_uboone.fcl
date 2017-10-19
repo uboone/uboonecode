@@ -5,7 +5,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "swtrigger_microboone.fcl"
 
-process_name: Detsim
+process_name: DetsimCV
 
 services:
 {
@@ -84,4 +84,3 @@ services.DetectorPropertiesService.NumberTimeSamples: 9600
 services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
-

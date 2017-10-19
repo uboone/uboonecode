@@ -136,8 +136,12 @@ microboone_eventweight:
  bnbcorrection: {
         
         type: FluxHist
-        cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root"
-        rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root"
+        ### To Flux without K+ Constraint
+        #cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root"
+        #rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root"
+        ### To Flux with K+ Constraint
+        cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_09.7.2017_470_rwhist/bnb_oldflux_volAVTPC.root"
+        rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_09.7.2017_470_rwhist/bnb_newflux_volAVTPC.root"
         
         random_seed: 985
         mode: reweight

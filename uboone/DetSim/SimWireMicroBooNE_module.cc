@@ -176,6 +176,7 @@ namespace detsim {
     , _pfn_value_re()
     , _pfn_value_im()
   {
+
     this->reconfigure(pset);
 
     produces< std::vector<raw::RawDigit>   >();
@@ -189,7 +190,6 @@ namespace detsim {
     art::ServiceHandle<rndm::NuRandomService> Seeds;
     Seeds->createEngine(*this, "HepJamesRandom", "noise", pset, "Seed");
     Seeds->createEngine(*this, "HepJamesRandom", "pedestal", pset, "SeedPedestal");
-
   }
 
   //-------------------------------------------------
@@ -319,11 +319,12 @@ namespace detsim {
 
   //-------------------------------------------------
   void SimWireMicroBooNE::endJob()
-  {}
+  {
+
+  }
 
   void SimWireMicroBooNE::produce(art::Event& evt)
   {
-
 
     //--------------------------------------------------------------------
     //
@@ -407,8 +408,7 @@ namespace detsim {
 
     bool IsUMisconfigured = sss->IsMisconfiguredUIncluded();
     const std::vector<std::vector<int> > MisconfiguredU = sss->GetMisconfiguredU();
-    
-    
+
     //--------------------------------------------------------------------
     //
     // Get the SimChannels, which we will use to produce RawDigits
@@ -452,7 +452,12 @@ namespace detsim {
     responseParamsVec.resize(N_CHANNELS);
     for(unsigned int i = 0; i<N_CHANNELS; i++){
       size_t view = (size_t)geo->View((int)i);
-      responseParamsVec[i].resize(N_RESPONSES[0][view]);
+      if(!YZresponse) {
+        responseParamsVec[i].resize(2*N_RESPONSES[0][view]-1);
+      }
+      else {
+        responseParamsVec[i].resize(N_RESPONSES[0][view]);
+      }
     }
     
     // In this version we assume that adjacent channels <-> adjacent wires, in the same plane/view
@@ -707,9 +712,9 @@ namespace detsim {
 	    //  for(int wire = 0; wire < (int)N_RESPONSES[0][view]; ++wire) {
 	    for(int wire = -(N_RESPONSES[0][view]-1); wire<(int)N_RESPONSES[0][view]; ++wire) {
 	      auto wireIndex = (size_t)wire+N_RESPONSES[0][view] - 1;
-	      if((int)wireIndex == (int)N_RESPONSES[0][view]) continue;
-	      //int wireChan = (int)chan + wire;
-	      int wireChan = (int) chan;
+	      //if((int)wireIndex == (int)N_RESPONSES[0][view]) continue;
+	      int wireChan = (int)chan + wire;
+	      //int wireChan = (int) chan;
 	      if(wireChan<0 || wireChan>= (int)N_CHANNELS) continue;
 	      if((size_t)geo->View(wireChan)!=view) continue;
 
@@ -718,7 +723,6 @@ namespace detsim {
 	  } // loop over tdcs
 	} // loop over channels
       } // not YZ-dependent response
-
 
     //--------------------------------------------------------------------
     //
@@ -860,7 +864,7 @@ namespace detsim {
 	else if(fGenNoise==3)
 	  GenNoisePostFilter(noisetmp, noise_factor, view, chan);
       }
-   
+
       //Add Noise to NoiseDist Histogram
       //geo::SigType_t sigtype = geo->SignalType(chan);
       geo::View_t vw = geo->View(chan);
@@ -940,7 +944,6 @@ namespace detsim {
 
       }//end loop over response wires
 
-
       // add this digit to the collection;
       // adcvec is copied, not moved: in case of compression, adcvec will show
       // less data: e.g. if the uncompressed adcvec has 9600 items, after
@@ -954,7 +957,6 @@ namespace detsim {
       digcol->push_back(std::move(rd)); // we do move the raw digit copy, though
     }// end of 2nd loop over channels
 
- 
     evt.put(std::move(digcol));
     return;
   }
@@ -963,7 +965,6 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireMicroBooNE::MakeADCVec(std::vector<short>& adcvec, std::vector<float> const& noisevec, 
                                      std::vector<double> const& chargevec, float ped_mean) const {
-
 
     for(unsigned int i = 0; i < fNTimeSamples; ++i) {
 
@@ -990,6 +991,7 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireMicroBooNE::GenNoiseInTime(std::vector<float> &noise, double noise_factor) const
   {
+
     //ART random number service
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::HepRandomEngine &engine = rng->getEngine("noise");
@@ -1007,6 +1009,7 @@ namespace detsim {
   //-------------------------------------------------
   void SimWireMicroBooNE::GenNoiseInFreq(std::vector<float> &noise, double noise_factor) const
   {
+
     art::ServiceHandle<art::RandomNumberGenerator> rng;
     CLHEP::HepRandomEngine &engine = rng->getEngine("noise");
     CLHEP::RandFlat flat(engine,-1,1);
@@ -1078,6 +1081,7 @@ namespace detsim {
 
   void SimWireMicroBooNE::GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan)
   {
+
     // noise is a vector of size fNTicks, which is the number of ticks
     const size_t waveform_size = noise.size();
     

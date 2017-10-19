@@ -2,4 +2,6 @@
 
 process_name: G410msLt
 
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*"]
+
 services.DetectorPropertiesService.Electronlifetime: 10.0e3 # in microseconds

@@ -2,8 +2,9 @@
 
 process_name: DetsimHighShapingTime
 
-# Increase shaping time from nominal by 10%.
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
 
+# Increase shaping time from nominal by 10%.
 services.SignalShapingServiceMicroBooNE.ShapeTimeConst:  [ [2.2, 2.2, 2.2], [ 1.1, 2.2, 2.2] ]
 
 # Nonstandard shaping time forces use of NoiseFactVec[i][3].

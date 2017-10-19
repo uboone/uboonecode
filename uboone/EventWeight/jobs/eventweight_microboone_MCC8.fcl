@@ -140,8 +140,13 @@ microboone_eventweight:
   
  bnbcorrection: {        
         type: FluxHist
-        cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root"
-        rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root"        
+        ### To Flux without K+ Constraint
+        #cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/gsimple_uboone_flux.root"
+        #rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_02.28.2014_470_rwhist/redecay_uboone_flux.root"
+        ### To Flux with K+ Constraint
+        cv_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_09.7.2017_470_rwhist/bnb_oldflux_volAVTPC.root"
+        rw_hist_file: "uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_09.7.2017_470_rwhist/bnb_newflux_volAVTPC.root"
+
         random_seed: 985
         mode: reweight
         number_of_multisims: 1
@@ -186,13 +191,13 @@ microboone_eventweight:
         PrimaryHadronGeantCode: 321 # geant code for particle production on Be
         weight_calculator: "MicroBooNE" # "MicroBooNE" OR "MiniBooNE"
 	### Uncertainties without SciBooNE Contraint
-        parameter_list: ["kplusOld"]
-        scale_factor: 2   
-        ExternalData:"beamData/ExternalData/BNBExternalData_uBooNE_KPlus_withoutSciBooNE.root"      
+        #parameter_list: ["kplusOld"]
+        #scale_factor: 2   
+        #ExternalData:"beamData/ExternalData/BNBExternalData_uBooNE_KPlus_withoutSciBooNE.root"      
 	### Uncertainties with SciBooNE Constraint
-        #parameter_list: ["kplus"]
-        #scale_factor: 1         
-        #ExternalData:"beamData/ExternalData/BNBExternalData_uBooNE.root"	
+        parameter_list: ["kplus"]
+        scale_factor: 1         
+        ExternalData:"beamData/ExternalData/BNBExternalData_uBooNE.root"	
 	use_MiniBooNE_random_numbers: false
         }
 

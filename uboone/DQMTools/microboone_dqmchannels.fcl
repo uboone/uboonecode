@@ -1,0 +1,10 @@
+BEGIN_PROLOG
+
+microboone_dqmchannels:
+{
+  module_type: DQMChannelNoiseModule 
+  DigitModuleLabel: "wcNoiseFilter"
+  ChannelsToHistogram: []
+}
+
+END_PROLOG
