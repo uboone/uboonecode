@@ -69,6 +69,7 @@ microboone_genie_simple_numi.EventsPerSpill:    0
 microboone_genie_simple_numi.FluxType:          "simple_flux"
 microboone_genie_simple_numi.FluxSearchPaths:   "/pnfs/uboone/persistent/uboonebeam/numi_gsimple/numi_gsimple_fluxes_12.17.2015_470/"
 microboone_genie_simple_numi.FluxFiles:         ["gsimple_*.root"]					      
+microboone_genie_simple_numi.EventGeneratorList: "Default+MEC"
 
 microboone_genie_simple_numi_dirt:              @local::microboone_genie_simple_numi
 microboone_genie_simple_numi_dirt.BeamName:     "numi"
