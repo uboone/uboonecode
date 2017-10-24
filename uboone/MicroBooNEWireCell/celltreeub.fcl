@@ -1,7 +1,7 @@
 BEGIN_PROLOG
 celltreeub: {
  module_type : "CellTreeUB"
- OutFile                       : "celltree.root"
+ #OutFile                       : "celltree.root"
  TPC_rawLabel                  : "wcNoiseFilter"
  #TPC_rawLabel                  : "daq"
  TPC_deconWienerProducer       : "nfsp"
@@ -35,14 +35,14 @@ celltreeub: {
  SaveTPC_deconGaussian         : true
  SaveTPC_badChannelList        : true
  SaveTPC_channelThreshold      : true
- SavePMT_raw                   : true
+ SavePMT_raw                   : false
  SavePMT_wfmSaturation         : false
- SavePMT_reco                  : true
- SavePMT_gain                  : true
- SaveHWTrigger                 : true
- SaveSWTrigger                 : true
- SaveBeam                      : true
- SavePOT                       : true
+ SavePMT_reco                  : false
+ SavePMT_gain                  : false
+ SaveHWTrigger                 : false
+ SaveSWTrigger                 : false
+ SaveBeam                      : false
+ SavePOT                       : false
  UseLGBeamForHGCosmic          : true
  FlashMultPEThreshold          : 5
  DeconRebin                    : 4

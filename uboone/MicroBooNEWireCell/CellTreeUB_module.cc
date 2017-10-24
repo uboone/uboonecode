@@ -74,7 +74,6 @@ namespace wc{
     void processPOT(const art::SubRun& subrun);
     void SetUpChannelMap();
   private:
-    std::string fOutFileName;
     std::string fTPC_rawLabel;
     std::string fTPC_deconWienerLabel;
     std::string fTPC_deconGaussianLabel;
@@ -117,7 +116,7 @@ namespace wc{
     bool fSavePOT;
     int deconRebin;
     float flashMultPEThreshold;
-    TFile *fOutFile;
+
     TTree *fEventTree;
     int fEvent;
     int fRun;
@@ -215,8 +214,6 @@ namespace wc{
     int fgoodspills_bnbETOR875;
     int fgoodspills_numiETORTGT;
     int fgoodspills_bnbETOR860;
-
-    int rebin = 4;
   }; // class CellTreeUB
 
   CellTreeUB::CellTreeUB(fhicl::ParameterSet const& pset)
@@ -229,7 +226,6 @@ namespace wc{
   }
 
   void CellTreeUB::reconfigure(fhicl::ParameterSet const& pset){
-    fOutFileName = pset.get<std::string>("OutFile");
     fTPC_rawLabel = pset.get<std::string>("TPC_rawLabel");
     fTPC_deconWienerLabel = pset.get<std::string>("TPC_deconWienerLabel");
     fTPC_deconGaussianLabel = pset.get<std::string>("TPC_deconGaussianLabel");
@@ -271,10 +267,12 @@ namespace wc{
 
   void CellTreeUB::initOutput(){
     TDirectory* tmpDir = gDirectory;
-    fOutFile = new TFile(fOutFileName.c_str(), "update");
-    TDirectory* subDir = fOutFile->mkdir("Event");
-    subDir->cd();
-    fEventTree = new TTree("Sim", "");
+
+    art::ServiceHandle<art::TFileService> tfs;
+    TDirectory* Event = tfs->make<TDirectory>("Event","Event");
+    Event->cd();
+
+    fEventTree = tfs->make<TTree>("Sim","");
     fEventTree->Branch("eventNo", &fEvent);
     fEventTree->Branch("runNo", &fRun);
     fEventTree->Branch("subRunNo", &fSubRun);
@@ -398,11 +396,6 @@ namespace wc{
   }
 
   void CellTreeUB::endJob(){
-    TDirectory* tmpDir = gDirectory;
-    fOutFile->cd("/Event");
-    fEventTree->Write(0,TObject::kWriteDelete,0);
-    gDirectory = tmpDir;
-    fOutFile->Close();
   }
 
   void CellTreeUB::beginRun(const art::Run& ){
@@ -518,7 +511,6 @@ namespace wc{
     fTPCraw_nChannel = rd_v.size();
     int i=0;
     for(auto const& rd : rd_v){
-      //std::cout << "TPC Channel: " << rd->Channel() << std::endl;
       if(rd->Channel()<3566 || rd->Channel()>4305) continue; // save select V-plane channels
       fTPCraw_channelId.push_back(rd->Channel());
       int nSamples = rd->Samples();
@@ -785,6 +777,13 @@ namespace wc{
 	fOp_gainerror.push_back(gain_provider.GainErr(a));
       }
     }
+
+    /* // dummy gain values
+    for(int i=0; i<32; i++){
+      fOp_gain.push_back(125.0);
+      fOp_gainerror.push_back(0.064);
+    }
+*/
   }
 
   void CellTreeUB::processHWTrigger(const art::Event& evt){
