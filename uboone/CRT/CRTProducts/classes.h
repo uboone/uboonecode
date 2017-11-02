@@ -9,6 +9,7 @@
 //
 
 #include "canvas/Persistency/Common/Wrapper.h"
+#include "canvas/Persistency/Common/Assns.h"
 #include "lardataobj/Simulation/AuxDetSimChannel.h"
 #include "CRTSimData.hh"
 #include "CRTHit.hh"

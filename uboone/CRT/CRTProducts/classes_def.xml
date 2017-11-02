@@ -7,7 +7,8 @@
 
 <lcgdict>
 
-  <class name="crt::CRTSimData" ClassVersion="10">
+  <class name="crt::CRTSimData" ClassVersion="11">
+   <version ClassVersion="11" checksum="99883665"/>
     <version ClassVersion="10" checksum="3886338717"/>
   </class>
   
@@ -35,9 +36,9 @@
   <class name="art::Wrapper< std::vector<crt::CRTTrack> >"/>
 
   <!-- Added by SDP -->
-  <class name="art::Assns<crt::CRTSimData,sim::AuxDetSimChannel>"/>
-  <class name="art::Assns<sim::AuxDetSimChannel,crt::CRTSimData>"/>
-  <class name="art::Wrapper<art::Assns<crt::CRTSimData,sim::AuxDetSimChannel> >"/>
-  <class name="art::Wrapper<art::Assns<sim::AuxDetSimChannel,crt::CRTSimData> >"/>
+  <class name="art::Assns<crt::CRTSimData,sim::AuxDetSimChannel,void>" />
+  <class name="art::Assns<sim::AuxDetSimChannel,crt::CRTSimData,void>" />
+  <class name="art::Wrapper<art::Assns<crt::CRTSimData,sim::AuxDetSimChannel,void> >" />
+  <class name="art::Wrapper<art::Assns<sim::AuxDetSimChannel,crt::CRTSimData,void> >" />
   
 </lcgdict>

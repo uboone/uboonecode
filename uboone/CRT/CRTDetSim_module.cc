@@ -61,19 +61,19 @@ namespace crt{
   }
 
   double CRTDetSim::getChannelTriggerTicks(CLHEP::HepRandomEngine* engine,
-                                           detinfo::ElecClock& clock,
-                                           float t0, float npeMean, float r) {
+   detinfo::ElecClock& clock,
+   float t0, float npeMean, float r) {
     // Hit timing, with smearing and NPE dependence
     double tDelayMean = \
-      fTDelayNorm *
-        exp(-0.5 * pow((npeMean - fTDelayShift) / fTDelaySigma, 2)) +
-      fTDelayOffset;
+    fTDelayNorm *
+    exp(-0.5 * pow((npeMean - fTDelayShift) / fTDelaySigma, 2)) +
+    fTDelayOffset;
 
     double tDelayRMS = \
-      fTDelayRMSGausNorm *
-        exp(-pow(npeMean - fTDelayRMSGausShift, 2) / fTDelayRMSGausSigma) +
-      fTDelayRMSExpNorm *
-        exp(-(npeMean - fTDelayRMSExpShift) / fTDelayRMSExpScale);
+    fTDelayRMSGausNorm *
+    exp(-pow(npeMean - fTDelayRMSGausShift, 2) / fTDelayRMSGausSigma) +
+    fTDelayRMSExpNorm *
+    exp(-(npeMean - fTDelayRMSExpShift) / fTDelayRMSExpScale);
 
     double tDelay = CLHEP::RandGauss::shoot(engine, tDelayMean, tDelayRMS);
 
@@ -125,7 +125,7 @@ namespace crt{
 
       const geo::AuxDetSensitiveGeo& adsGeo = adGeo.SensitiveVolume(adsc.AuxDetSensitiveID());
 
-      // Simulate the CRT response for each hit
+        // Simulate the CRT response for each hit
       for (auto ide : adsc.AuxDetIDEs()) {
 
 
