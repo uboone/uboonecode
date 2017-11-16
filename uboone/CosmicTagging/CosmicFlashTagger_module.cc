@@ -88,8 +88,6 @@ private:
   std::string _opflash_producer_beam;
   std::string _opflash_producer_cosmic;
   std::string _trigger_producer;
-  std::string _beam_window_start_BNB;
-  std::string _beam_window_end_BNB;
   double _flash_trange_start;
   double _flash_trange_end;
   int    _min_trj_pts;
@@ -103,7 +101,6 @@ private:
   std::vector<std::vector<double>> _beam_flash_spec, _pfp_hypo_spec;
   std::vector<int> _pfp_id;
   std::vector<double> _beam_flash_time;
-  int _beam_flash_exists; // 0 == no;  1 == yes
 };
 
 
@@ -116,8 +113,6 @@ CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
   _flash_trange_start      = p.get<double>     ("FlashVetoTimeStart");
   _flash_trange_end        = p.get<double>     ("FlashVetoTimeEnd");
   _min_trj_pts             = p.get<int>        ("MinimumNumberOfTrajectoryPoints");
-  _beam_window_start_BNB   = p.get<int>        ("BeamWindowStartBNB");
-  _beam_window_end_BNB     = p.get<int>        ("BeamWindowEndBNB");
   _min_track_length        = p.get<double>     ("MinimumTrackLength");
   _debug                   = p.get<bool>       ("DebugMode");
 
@@ -142,7 +137,6 @@ CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
     _tree1->Branch("n_beam_flashes",&_n_beam_flashes,"n_beam_flashes/I");
     _tree1->Branch("beam_flash_spec","std::vector<std::vector<double>>",&_beam_flash_spec);
     _tree1->Branch("beam_flash_time","std::vector<double>",&_beam_flash_time);
-    _tree1->Branch("beam_flash_exists",&_beam_flash_exists,"beam_flash_exists/I");
     _tree1->Branch("n_pfp",&_n_pfp,"n_pfp/I");
     _tree1->Branch("pfp_hypo_spec","std::vector<std::vector<double>>",&_pfp_hypo_spec);
     _tree1->Branch("pfp_id","std::vector<int>",&_pfp_id);
@@ -192,15 +186,11 @@ void CosmicFlashTagger::produce(art::Event & e)
 
   // Loop through beam flashes 
   _n_beam_flashes = 0;
-  _beam_flash_exists = 0;
   beam_flashes.clear();
   for (size_t n = 0; n < beamflash_h->size(); n++) {
 
     auto const& flash = (*beamflash_h)[n];
 
-    if(flash.Time() > _beam_window_start_BNB && flash.Time() < _beam_window_end_BNB){
-      _beam_flash_exists = 1;
-    }
     if(flash.Time() < _flash_trange_start || _flash_trange_end < flash.Time()) {
       mf::LogDebug("CosmicFlashTagger") << "Flash is in veto region (flash time is " << flash.Time() << "). Continue." << std::endl;
       continue;
