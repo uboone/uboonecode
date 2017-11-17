@@ -1,6 +1,5 @@
 link_libraries( -L$ENV{BOOST_LIB} -lboost_system -lboost_filesystem)
 
-add_subdirectory(job)
 
 art_make( BASENAME_ONLY
 
@@ -76,6 +75,8 @@ art_make( BASENAME_ONLY
                         ${ROOT_BASIC_LIB_LIST}
         )
 
-# install_headers()
+add_subdirectory(job)
+
+install_headers()
 install_fhicl()
 install_source()
