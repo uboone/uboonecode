@@ -997,9 +997,37 @@ bool FillTreeVariables::OldDeltaRadFilter(art::Event const & e,
 
 bool FillTreeVariables::PassedSWTrigger(art::Event const & e) const {
   
-  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =
-    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("swtrigger");
+  //*****************************
+  //
+  // Software Trigger
+  //
+  //***************************** 
+/*
+  if (fSaveSWTriggerInfo) {
+    art::Handle<raw::ubdaqSoftwareTriggerData> softwareTriggerHandle;
+    evt.getByLabel(fSWTriggerLabel, softwareTriggerHandle);
 
+    if (!softwareTriggerHandle.isValid() || softwareTriggerHandle.failedToGet()){
+      std::cerr << "Failed to get software trigget data product with label " << fSWTriggerLabel << std::endl;
+    }
+
+    int nAlgo = softwareTriggerHandle->getNumberOfAlgorithms();
+    std::vector<std::string> algoNames = softwareTriggerHandle->getListOfAlgorithms();
+    if ((unsigned int)nAlgo != algoNames.size()) {
+      std::cerr << "Inconsistency. Check software trigger." << std::endl;
+    }
+
+    fData->swtrigger_name.resize(nAlgo);
+    fData->swtrigger_triggered.resize(nAlgo);
+
+    for (int trigger = 0; trigger < nAlgo; trigger++){
+      fData->swtrigger_name[trigger]      = algoNames[trigger];
+      fData->swtrigger_triggered[trigger] = softwareTriggerHandle->passedAlgo(algoNames[trigger]);
+    }
+  } // swtrigger
+*/
+
+  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt = e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("daq");
   std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
 
   std::string const int_str = "BNB_FEMBeamTriggerAlgo";

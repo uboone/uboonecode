@@ -43,34 +43,34 @@
 #include "RecoTrueHelper.h"
 
 namespace xsecAna {
-class RecoTrueTest;
+	class RecoTrueTest;
 }
 
 class xsecAna::RecoTrueTest : public art::EDProducer {
-public:
-explicit RecoTrueTest(fhicl::ParameterSet const & p);
-// The compiler-generated destructor is fine for non-base
-// classes without bare pointers or other resource use.
+	public:
+		explicit RecoTrueTest(fhicl::ParameterSet const & p);
+		// The compiler-generated destructor is fine for non-base
+		// classes without bare pointers or other resource use.
 
-// Plugins should not be copied or assigned.
-RecoTrueTest(RecoTrueTest const &) = delete;
-RecoTrueTest(RecoTrueTest &&) = delete;
-RecoTrueTest & operator = (RecoTrueTest const &) = delete;
-RecoTrueTest & operator = (RecoTrueTest &&) = delete;
+		// Plugins should not be copied or assigned.
+		RecoTrueTest(RecoTrueTest const &) = delete;
+		RecoTrueTest(RecoTrueTest &&) = delete;
+		RecoTrueTest & operator = (RecoTrueTest const &) = delete;
+		RecoTrueTest & operator = (RecoTrueTest &&) = delete;
 
-// Required functions.
-void produce(art::Event & e) override;
+		// Required functions.
+		void produce(art::Event & e) override;
 
-private:
+	private:
 
-std::string _pfp_producer;
-std::string _spacepointLabel;
-std::string _hitfinderLabel;
-std::string _geantModuleLabel;
+		std::string _pfp_producer;
+		std::string _spacepointLabel;
+		std::string _hitfinderLabel;
+		std::string _geantModuleLabel;
 
-bool _is_data;
-bool _debug;
-bool _cosmic_only;
+		bool _is_data;
+		bool _debug;
+		bool _cosmic_only;
 };
 
 

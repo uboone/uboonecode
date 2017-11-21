@@ -30,68 +30,68 @@ class flash;
 
 class flash : public art::EDAnalyzer {
 
-public:
+	public:
 
-  explicit flash(fhicl::ParameterSet const & p);
-  // The compiler-generated destructor is fine for non-base
-  // classes without bare pointers or other resource use.
+		explicit flash(fhicl::ParameterSet const & p);
+		// The compiler-generated destructor is fine for non-base
+		// classes without bare pointers or other resource use.
 
-  // Plugins should not be copied or assigned.
-  flash(flash const &) = delete;
-  flash(flash &&) = delete;
-  flash & operator = (flash const &) = delete;
-  flash & operator = (flash &&) = delete;
+		// Plugins should not be copied or assigned.
+		flash(flash const &) = delete;
+		flash(flash &&) = delete;
+		flash & operator = (flash const &) = delete;
+		flash & operator = (flash &&) = delete;
 
-  // Required functions.
-  void analyze(art::Event const & e) override;
+		// Required functions.
+		void analyze(art::Event const & e) override;
 
-private:
+	private:
 
-  std::string fopflash_producer;
+		std::string fopflash_producer;
 
-  TTree * ftree;
+		TTree * ftree;
 
-  double ftime;
-  double fpe;
+		double ftime;
+		double fpe;
 
-  void reset();
+		void reset();
 
 };
 
 
 flash::flash(fhicl::ParameterSet const & p) :
-  EDAnalyzer(p) {
+	EDAnalyzer(p) {
 
-  fopflash_producer = p.get<std::string>("opflash_producer");
-  
-  art::ServiceHandle<art::TFileService> tfs;
-  ftree = tfs->make<TTree>("flash_tree", "");
-  ftree->Branch("time", &ftime, "time/D");
-  ftree->Branch("pe", &fpe, "pe/D");
+		fopflash_producer = p.get<std::string>("opflash_producer");
 
-}
+		art::ServiceHandle<art::TFileService> tfs;
+		ftree = tfs->make<TTree>("flash_tree", "");
+		ftree->Branch("time", &ftime, "time/D");
+		ftree->Branch("pe", &fpe, "pe/D");
+
+	}
 
 
 void flash::reset() {
 
-  ftime = -1;
-  fpe = -1;
+	ftime = -1;
+	fpe = -1;
 
 }
 
 
 void flash::analyze(art::Event const & e) {
 
-  art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf =
-    e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producer);
-  
-  for(recob::OpFlash const & opf : *ev_opf) {
-    reset();
-    ftime = opf.Time();
-    fpe = opf.TotalPE();
-    ftree->Fill();
-  }
-  
+	art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf =
+		e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producer);
+
+	for(recob::OpFlash const & opf : *ev_opf) {
+		reset();
+		ftime = opf.Time();
+		fpe = opf.TotalPE();
+		ftree->Fill();
+	}
+
 }
 
 DEFINE_ART_MODULE(flash)
