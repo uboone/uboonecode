@@ -149,8 +149,9 @@ class FillTreeVariables {
   double longest_asso_track_true_endx; 
   double longest_asso_track_true_endy; 
   double longest_asso_track_true_endz;    
-  int longest_asso_track_from_ncdeltarad;
-  int longest_asso_track_is_ncdeltarad_track;
+  int longest_asso_track_from_ncdeltarad_interaction;
+  int longest_asso_track_matched_to_ncdeltarad_photon;
+  int longest_asso_track_matched_to_ncdeltarad_proton;
   double longest_asso_track_true_thetayx;
   double longest_asso_track_true_thetaxz;
   double longest_asso_track_true_thetayz;
@@ -177,9 +178,10 @@ class FillTreeVariables {
   double shower_true_startz;    
   double shower_true_endx; 
   double shower_true_endy; 
-  double shower_true_endz;    
-  int shower_from_ncdeltarad;
-  int shower_is_ncdeltarad_shower;
+  double shower_true_endz;
+  int shower_from_ncdeltarad_interaction;
+  int shower_matched_to_ncdeltarad_photon;
+  int shower_matched_to_ncdeltarad_proton;
   double shower_true_dist; 
   double shower_true_distx;
   double shower_true_disty;
@@ -340,12 +342,22 @@ public:
   void FillTruth(art::Event const & e,
 		 size_t & delta_rad_mct_index);
   bool PassedSWTrigger(art::Event const & e) const;
+  void GetExitingDeltaPhotonAndNucleon(art::Event const & e,
+				       size_t const delta_rad_mct_index,
+				       size_t & delta_photon_index,
+				       size_t & delta_proton_index);
   void GetDeltaMCShowerMCTrackIndices(art::Event const & e,
 				      size_t const delta_rad_mct_index,
-				      int & delta_photon_index,
-				      int & delta_mcshower_index,
-				      int & delta_proton_index,
-				      int & delta_mctrack_index);
+				      size_t & delta_photon_index,
+				      size_t & delta_mcshower_index,
+				      size_t & delta_proton_index,
+				      size_t & delta_mctrack_index);
+  void GetDeltaTrackIDs(art::Event const & e,
+			size_t const delta_rad_mct_index,
+			size_t & deltarad_external_photon_index,
+			size_t & deltarad_external_proton_index,
+			size_t & deltarad_photon_mcshower_index,
+			size_t & deltarad_proton_mctrack_index);
   double DistToClosestTPCWall(geoalgo::Point_t const & pos);
   double GetShowerHelperEnergy(art::Event const & e,
 			       size_t const shower_index);
@@ -362,10 +374,12 @@ public:
 				size_t const most_energetic_associated_shower_index,
 				size_t const delta_rad_mct_index,
 				size_t const delta_mcshower_index,
+				size_t const delta_mctrack_index,
 				lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles);
   void FillTrackRecoMCMatching(art::Event const & e,
 			       size_t const longest_asso_track_index,
 			       size_t const delta_rad_mct_index,
+			       size_t const delta_mcshower_index,
 			       size_t const delta_mctrack_index,
 			       lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles);
   void FillVertexTree(art::Event const & e,
