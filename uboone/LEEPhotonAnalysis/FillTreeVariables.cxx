@@ -1001,8 +1001,8 @@ bool FillTreeVariables::OldDeltaRadFilter(art::Event const & e,
 
 bool FillTreeVariables::PassedSWTrigger(art::Event const & e) const {
   
-  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =
-    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("swtrigger");
+  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("daq");
+  //art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("swtrigger");
 
   std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
 
