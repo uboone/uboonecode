@@ -1,9 +1,10 @@
 #include "services_microboone.fcl"
 #include "messageservice.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "beamdata_microboone.fcl"
+
 
 process_name : LEEPhotonAnalysisProcess
-
 services:
 {
 
@@ -33,7 +34,7 @@ physics:
     {
       module_type: "LEEPhotonAnalysis"
       mcordata: "data"
-      pot: "beamdata"
+      pot_producer: "beamdata"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
       opflash_producer: "simpleFlashBeam"

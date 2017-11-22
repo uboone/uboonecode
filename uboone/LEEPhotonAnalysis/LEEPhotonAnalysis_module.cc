@@ -73,6 +73,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 	std::string fshower_producer;
 	std::string fopflash_producer;
 
+
 	TTree * fPOTtree;
 	int fnumber_of_events;
 	double fpot;
@@ -134,7 +135,10 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 	}
 	p.get_if_present<bool>("mcrecomatching", fmcrecomatching);
 	p.get_if_present<std::string>("pot_producer", fpot_producer);
-	if(fpot_producer != "") fPOTtree->Branch("pot", &fpot, "pot/D");
+	if(fpot_producer != ""){
+		fPOTtree->Branch("pot", &fpot, "pot/D");
+
+	}
 	p.get_if_present<std::string>("pfp_producer", fpfp_producer);
 	ftrack_producer = p.get<std::string>("track_producer");
 	fshower_producer = p.get<std::string>("shower_producer");
@@ -170,8 +174,39 @@ void LEEPhotonAnalysis::beginJob() {
 
 void LEEPhotonAnalysis::beginSubRun(art::SubRun const & sr) {
 
-	if(fpot_producer != "") fpot += sr.getValidHandle<sumdata::POTSummary>(fpot_producer)->totgoodpot;
+	if(fpot_producer != ""){
+		if(fpot_producer == "generator"){
+			fpot += sr.getValidHandle<sumdata::POTSummary>(fpot_producer)->totgoodpot;
+		}else{
+			art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR875;
+			if (sr.getByLabel("beamdata","bnbETOR875",potSummaryHandlebnbETOR875)){
+				fpot += potSummaryHandlebnbETOR875->totpot; 
+			}
+		}
+	}
 
+	/*art::Handle< sumdata::POTSummary > potListHandle;
+	if(sr.getByLabel("generator",potListHandle))
+		fpot +=potListHandle->totpot;
+	
+	
+	art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR860;
+	if (sr.getByLabel("beamdata","bnbETOR860",potSummaryHandlebnbETOR860)){
+		std::cout<<"B0: "<<potSummaryHandlebnbETOR860->totpot<<std::endl;
+	}
+
+	art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR875;
+	if (sr.getByLabel("beamdata","bnbETOR875",potSummaryHandlebnbETOR875)){
+		std::cout<<"B1: "<<potSummaryHandlebnbETOR875->totpot<<std::endl;
+	}
+
+	art::Handle<sumdata::POTSummary> potSummaryHandlenumiETORTGT;
+	if (sr.getByLabel("beamdata","numiETORTGT",potSummaryHandlenumiETORTGT)){
+		std::cout<<"B2: "<< potSummaryHandlenumiETORTGT->totpot<<std::endl;
+	}
+	*/
+	
+	
 }
 
 
