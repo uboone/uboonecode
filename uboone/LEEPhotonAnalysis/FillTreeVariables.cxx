@@ -247,8 +247,9 @@ void FillTreeVariables::SetUpTreeBranches() {
     fvertex_tree->Branch("longest_asso_track_matched_to_mcshower", &longest_asso_track_matched_to_mcshower, "longest_asso_track_matched_to_mcshower/I");
     fvertex_tree->Branch("longest_asso_track_matched_to_mctrack", &longest_asso_track_matched_to_mctrack, "longest_asso_track_matched_to_mctrack/I");
     fvertex_tree->Branch("longest_asso_track_matched_to_mcparticle", &longest_asso_track_matched_to_mcparticle, "longest_asso_track_matched_to_mcparticle/I");
-    fvertex_tree->Branch("longest_asso_track_from_ncdeltarad", &longest_asso_track_from_ncdeltarad, "longest_asso_track_from_ncdeltarad/I");
-    fvertex_tree->Branch("longest_asso_track_is_ncdeltarad_track", &longest_asso_track_is_ncdeltarad_track, "longest_asso_track_is_ncdeltarad_track/I");
+    fvertex_tree->Branch("longest_asso_track_from_ncdeltarad_interaction", &longest_asso_track_from_ncdeltarad_interaction, "longest_asso_track_from_ncdeltarad_interaction/I");
+    fvertex_tree->Branch("longest_asso_track_matched_to_ncdeltarad_photon", &longest_asso_track_matched_to_ncdeltarad_photon, "longest_asso_track_matched_to_ncdeltarad_photon/I");
+    fvertex_tree->Branch("longest_asso_track_matched_to_ncdeltarad_proton", &longest_asso_track_matched_to_ncdeltarad_proton, "longest_asso_track_matched_to_ncdeltarad_proton/I");
     fvertex_tree->Branch("longest_asso_track_true_pdg", &longest_asso_track_true_pdg, "longest_asso_track_true_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_parent_pdg", &longest_asso_track_true_parent_pdg, "longest_asso_track_true_parent_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_ancestor_pdg", &longest_asso_track_true_ancestor_pdg, "longest_asso_track_true_ancestor_pdg/I");
@@ -276,8 +277,9 @@ void FillTreeVariables::SetUpTreeBranches() {
     fvertex_tree->Branch("shower_matched_to_mcshower", &shower_matched_to_mcshower, "shower_matched_to_mcshower/I");
     fvertex_tree->Branch("shower_matched_to_mctrack", &shower_matched_to_mctrack, "shower_matched_to_mctrack/I");
     fvertex_tree->Branch("shower_matched_to_mcparticle", &shower_matched_to_mcparticle, "shower_matched_to_mcparticle/I");
-    fvertex_tree->Branch("shower_from_ncdeltarad", &shower_from_ncdeltarad, "shower_from_ncdeltarad/I");
-    fvertex_tree->Branch("shower_is_ncdeltarad_shower", &shower_is_ncdeltarad_shower, "shower_is_ncdeltarad_shower/I");
+    fvertex_tree->Branch("shower_from_ncdeltarad_interaction", &shower_from_ncdeltarad_interaction, "shower_from_ncdeltarad_interaction/I");
+    fvertex_tree->Branch("shower_matched_to_ncdeltarad_photon", &shower_matched_to_ncdeltarad_photon, "shower_matched_to_ncdeltarad_photon/I");
+    fvertex_tree->Branch("shower_matched_to_ncdeltarad_proton", &shower_matched_to_ncdeltarad_proton, "shower_matched_to_ncdeltarad_proton/I");
     fvertex_tree->Branch("shower_true_pdg", &shower_true_pdg, "shower_true_pdg/I");
     fvertex_tree->Branch("shower_true_parent_pdg", &shower_true_parent_pdg, "shower_true_parent_pdg/I");
     fvertex_tree->Branch("shower_true_ancestor_pdg", &shower_true_ancestor_pdg, "shower_true_ancestor_pdg/I");
@@ -731,8 +733,9 @@ void FillTreeVariables::ResetVertex() {
   longest_asso_track_true_endx = -1; 
   longest_asso_track_true_endy = -120; 
   longest_asso_track_true_endz = -1;    
-  longest_asso_track_from_ncdeltarad = -1;
-  longest_asso_track_is_ncdeltarad_track = -1;
+  longest_asso_track_from_ncdeltarad_interaction = -1;
+  longest_asso_track_matched_to_ncdeltarad_photon = -1;
+  longest_asso_track_matched_to_ncdeltarad_proton = -1;
   longest_asso_track_true_thetayx = -2;
   longest_asso_track_true_thetaxz = -2;
   longest_asso_track_true_thetayz = -2;
@@ -752,8 +755,9 @@ void FillTreeVariables::ResetVertex() {
   shower_true_endx = -1; 
   shower_true_endy = -120;
   shower_true_endz = -1;    
-  shower_from_ncdeltarad = -1;
-  shower_is_ncdeltarad_shower = -1;
+  shower_from_ncdeltarad_interaction = -1;
+  shower_matched_to_ncdeltarad_photon = -1;
+  shower_matched_to_ncdeltarad_proton = -1;
   shower_true_dist = -1; 
   shower_true_distx = -1;
   shower_true_disty = -120;
@@ -1131,12 +1135,43 @@ void FillTreeVariables::FillTruth(art::Event const & e,
 }
 
 
+
+void FillTreeVariables::GetExitingDeltaPhotonAndNucleon(art::Event const & e,
+							size_t const delta_rad_mct_index,
+							size_t & delta_photon_index,
+							size_t & delta_proton_index) {
+  
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
+    e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
+
+  simb::MCTruth const & mct = ev_mctruth->at(delta_rad_mct_index);
+
+  std::vector<int> exiting_particle_indices;
+  std::vector<int> exiting_particle_parent_indices;
+  for(int i = 0; i < mct.NParticles(); ++i) {
+    simb::MCParticle const & mcp = mct.GetParticle(i);
+    std::cout << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.StatusCode() << "\n";
+    if((mcp.PdgCode() != 22 && abs(mcp.PdgCode()) != 2212 && abs(mcp.PdgCode()) != 2112) || mcp.StatusCode() != 1) continue;
+    std::cout << "Pass\n";
+    exiting_particle_indices.push_back(i);
+    exiting_particle_parent_indices.push_back(mcp.Mother());
+  }
+
+  for(int const i : exiting_particle_indices) {
+    simb::MCParticle const & mcp = mct.GetParticle(i);
+    std::cout << i << " " << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.StatusCode() << "\n";
+  }
+
+}
+
+
+
 void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
 						       size_t const delta_rad_mct_index,
-						       int & delta_photon_index,
-						       int & delta_mcshower_index,
-						       int & delta_proton_index,
-						       int & delta_mctrack_index) {
+						       size_t & delta_photon_index,
+						       size_t & delta_mcshower_index,
+						       size_t & delta_proton_index,
+						       size_t & delta_mctrack_index) {
 
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
     e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
@@ -1216,7 +1251,7 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
   delta_proton_index = iproton_index;
 
   delta_photon_energy = mct.GetParticle(delta_photon_index).Trajectory().E(0);
-  if(delta_proton_index != -1) 
+  if(delta_proton_index != SIZE_MAX) 
     delta_proton_energy = mct.GetParticle(delta_proton_index).Trajectory().E(0);
     
   double const diffd = 1e-10;
@@ -1271,7 +1306,7 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
     delta_mcshower_index = mcs_it->second;
   }
     
-  if(delta_mcshower_index != -1) {
+  if(delta_mcshower_index != SIZE_MAX) {
     sim::MCShower const & mcs = ev_mcshower->at(delta_mcshower_index);
     delta_mcshower_true_pdg = mcs.PdgCode();
     delta_mcshower_true_energy = mcs.Start().E();
@@ -1356,7 +1391,7 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
     delta_mctrack_index = mctr_it->second;    
   }
 
-  if(delta_mctrack_index != -1) {
+  if(delta_mctrack_index != SIZE_MAX) {
     sim::MCTrack const & mctr = ev_mctrack->at(delta_mctrack_index);
     delta_mctrack_true_pdg = mctr.PdgCode();
     delta_mctrack_true_energy = mctr.Start().E();
@@ -1364,6 +1399,39 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
   }
     
 }
+
+
+
+void FillTreeVariables::GetDeltaTrackIDs(art::Event const & e,
+					 size_t const delta_rad_mct_index,
+					 size_t & deltarad_external_photon_index,
+					 size_t & deltarad_external_proton_index,
+					 size_t & deltarad_photon_mcshower_index,
+					 size_t & deltarad_proton_mctrack_index) {
+
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
+    e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp =
+    e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+  
+  simb::MCTruth const & mct = ev_mctruth->at(delta_rad_mct_index);
+  std::cout << "\nMCTruth\n";
+  for(int i = 0; i < mct.NParticles(); ++i) {
+    simb::MCParticle const & mcp = mct.GetParticle(i);
+    if(mcp.StatusCode() != 1) continue;
+    std::cout << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.Px() << " " << mcp.Py() << " " << mcp.Pz() << " " << mcp.StatusCode() << "\n";
+  }
+
+  art::ServiceHandle<cheat::BackTracker> bt;
+
+  std::cout << "\nMCParticle\n";
+  for(simb::MCParticle const & mcp : *ev_mcp) {
+    if(bt->TrackIDToMCTruth(mcp.TrackId()).key() != delta_rad_mct_index || mcp.Mother() != 0) continue;
+    std::cout << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.Px() << " " << mcp.Py() << " " << mcp.Pz() << "\n";
+  }
+
+}
+
 
 
 double FillTreeVariables::DistToClosestTPCWall(geoalgo::Point_t const & pos) {
@@ -1577,6 +1645,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
 						 size_t const most_energetic_associated_shower_index,
 						 size_t const delta_rad_mct_index,
 						 size_t const delta_mcshower_index,
+						 size_t const delta_mctrack_index,
 						 lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles) {
   
   size_t mcparticle_index = SIZE_MAX;
@@ -1644,10 +1713,6 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
       shower_true_endy = mcs.End().Position().Y();
       shower_true_endz = mcs.End().Position().Z();
       if(shower_true_origin == 1) {
-	shower_from_ncdeltarad = 0;
-	if(mct.key() == delta_rad_mct_index) shower_from_ncdeltarad = 1;
-	shower_is_ncdeltarad_shower = 0;
-	if(mcs_index == delta_mcshower_index) shower_is_ncdeltarad_shower = 1;
 	geoalgo::Point_t const nuvert(mct->GetNeutrino().Nu().Position(0));
 	shower_true_dist = nuvert.Dist(mcs.Start().Position());
 	shower_true_distx = nuvert.at(0) - mcs.Start().Position().X();
@@ -1695,6 +1760,14 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
       shower_true_thetayz = atan(particle_dir.at(1)/particle_dir.at(2));
       shower_true_energy = mcp.E(0) * 1e-3;
     }
+    if(shower_true_origin == 1) {
+      shower_from_ncdeltarad_interaction = 0;
+      if(mct.key() == delta_rad_mct_index) shower_from_ncdeltarad_interaction = 1;
+      shower_matched_to_ncdeltarad_photon = 0;
+      if(mcs_index == delta_mcshower_index) shower_matched_to_ncdeltarad_photon = 1;
+      shower_matched_to_ncdeltarad_proton = 0;
+      if(mcs_index == delta_mctrack_index) shower_matched_to_ncdeltarad_proton = 1;
+    }
   }
   
 }
@@ -1704,8 +1777,10 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
 void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
 						size_t const longest_asso_track_index,
 						size_t const delta_rad_mct_index,
+						size_t const delta_mcshower_index,
 						size_t const delta_mctrack_index,
 						lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles) {
+
   size_t mcparticle_index = SIZE_MAX;
   for(auto const & p : matchedMCToPFParticles) {
     if(p.second.key() == longest_asso_track_index) {
@@ -1789,12 +1864,6 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
       longest_asso_track_true_endx = mctr.End().Position().X(); 
       longest_asso_track_true_endy = mctr.End().Position().Y();
       longest_asso_track_true_endz = mctr.End().Position().Z();
-      if(longest_asso_track_true_origin == 1) {
-	longest_asso_track_from_ncdeltarad = 0;
-	if(mct.key() == delta_rad_mct_index) longest_asso_track_from_ncdeltarad = 1;
-	longest_asso_track_is_ncdeltarad_track = 0;
-	if(mctr_index == delta_mctrack_index) longest_asso_track_is_ncdeltarad_track = 1;
-      }
       geoalgo::Point_t const track_dir(mctr.Start().Momentum());
       longest_asso_track_true_thetayx = atan(track_dir.at(1)/track_dir.at(0));
       longest_asso_track_true_thetaxz = atan(track_dir.at(0)/track_dir.at(2));
@@ -1816,6 +1885,14 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
       longest_asso_track_true_thetaxz = atan(particle_dir.at(0)/particle_dir.at(2));
       longest_asso_track_true_thetayz = atan(particle_dir.at(1)/particle_dir.at(2));
       longest_asso_track_true_energy = mcp.E(0) * 1e-3;
+    }
+    if(longest_asso_track_true_origin == 1) {
+      longest_asso_track_from_ncdeltarad_interaction = 0;
+      if(mct.key() == delta_rad_mct_index) longest_asso_track_from_ncdeltarad_interaction = 1;
+      longest_asso_track_matched_to_ncdeltarad_photon = 0;
+      if(mcs_index == delta_mcshower_index) longest_asso_track_matched_to_ncdeltarad_photon = 1;
+      longest_asso_track_matched_to_ncdeltarad_proton = 0;
+      if(mcs_index == delta_mctrack_index) longest_asso_track_matched_to_ncdeltarad_proton = 1;
     }
   }
 
@@ -1884,6 +1961,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     
   if(fverbose) std::cout << "End, most energetic shower index: " << most_energetic_associated_shower_index  << " with energy: " << most_shower_energy << "\n";
 
+  size_t longest_asso_track_index = SIZE_MAX;
   double track_length = 0;
   summed_associated_reco_shower_energy = 0;
   summed_associated_helper_shower_energy = 0;
@@ -1898,13 +1976,8 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
       recob::Track const & t = ev_t->at(original_index);
       track_length = geoalgo::Point_t(t.Vertex()).Dist(t.End());
       if(track_length > longest_asso_track_length) {
+	longest_asso_track_index = original_index;
 	longest_asso_track_length = track_length;
-	longest_asso_track_reco_dirx = t.VertexDirection().X();
-	longest_asso_track_reco_diry = t.VertexDirection().Y();
-	longest_asso_track_reco_dirz = t.VertexDirection().Z();
-	longest_asso_track_thetayx = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirx);
-	longest_asso_track_thetaxz = atan(longest_asso_track_reco_dirx/longest_asso_track_reco_dirz);
-	longest_asso_track_thetayz = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirz);
       }
     }
     if(detos.GetRecoType(n) == detos.fshower_reco_type) {
@@ -1915,6 +1988,16 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
       double const dist = ShowerZDistToClosestFlash(e, original_index);
       if(dist < closest_asso_shower_dist_to_flashzcenter) closest_asso_shower_dist_to_flashzcenter = dist;
     }
+  }
+
+  if(longest_asso_track_index != SIZE_MAX) {
+    recob::Track const & t = ev_t->at(longest_asso_track_index);
+    longest_asso_track_reco_dirx = t.VertexDirection().X();
+    longest_asso_track_reco_diry = t.VertexDirection().Y();
+    longest_asso_track_reco_dirz = t.VertexDirection().Z();
+    longest_asso_track_thetayx = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirx);
+    longest_asso_track_thetaxz = atan(longest_asso_track_reco_dirx/longest_asso_track_reco_dirz);
+    longest_asso_track_thetayz = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirz);
   }
 
   if(fverbose) std::cout << "Get shortest shower to vertex distance\n";
@@ -2001,8 +2084,19 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 			       most_energetic_associated_shower_index,
 			       delta_rad_mct_index,
 			       delta_mcshower_index,
+			       delta_mctrack_index,
 			       matchedMCToPFParticles);
     }
+
+    if(longest_asso_track_index != SIZE_MAX && fmcrecomatching) {
+      FillTrackRecoMCMatching(e,
+			      longest_asso_track_index,
+			      delta_rad_mct_index,
+			      delta_mcshower_index,
+			      delta_mctrack_index,
+			      matchedMCToPFParticles);
+    }
+
   
   }
 
@@ -2021,8 +2115,10 @@ void FillTreeVariables::Fill(art::Event const & e,
   lar_pandora::MCParticlesToHits matchedParticleHits;
 
   size_t delta_rad_mct_index = SIZE_MAX;
-  int delta_mcshower_index = -1;
-  int delta_mctrack_index = -1;
+  size_t delta_mcshower_index = -1;
+  size_t delta_mctrack_index = -1;
+  size_t delta_photon_index = -1;
+  size_t delta_proton_index = -1;
   
   if(fmcordata == "mc") {
     
@@ -2040,17 +2136,26 @@ void FillTreeVariables::Fill(art::Event const & e,
     
     mctracknumber = ev_mctr->size();
     mcshowernumber = ev_mcs->size();
-
-    int delta_photon_index = -1;
-    int delta_proton_index = -1;
     
     if(is_delta_rad == 1) {
+      GetExitingDeltaPhotonAndNucleon(e,
+				      delta_rad_mct_index,
+				      delta_photon_index,
+				      delta_proton_index);
       GetDeltaMCShowerMCTrackIndices(e,
 				     delta_rad_mct_index,
 				     delta_photon_index,
 				     delta_mcshower_index,
 				     delta_proton_index,
 				     delta_mctrack_index);
+      /*
+      GetDeltaTrackIDs(e,
+		       delta_rad_mct_index,
+		       delta_photon_index,
+		       delta_mcshower_index,
+		       delta_proton_index,
+		       delta_mctrack_index);
+      */
     }
 
     _recotruehelper_instance.Configure(e, ftrack_producer, ftrack_producer, "pandoraCosmicHitRemoval", "largeant");
