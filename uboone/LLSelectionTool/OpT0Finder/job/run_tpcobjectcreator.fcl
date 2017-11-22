@@ -32,7 +32,6 @@ services : {
   #LArFFT:                         @local::microboone_larfft
   #SignalShapingServiceMicroBooNE: @local::microboone_signalshapingservice
   #BackTracker:                    @local::microboone_backtracker  
-  #MemoryPeakReporter: {}
   #OpDigiProperties:               @local::microboone_opdigiproperties
 
   message:      @local::standard_info
