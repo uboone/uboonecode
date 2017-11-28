@@ -8,7 +8,7 @@
 BEGIN_PROLOG
 
 SuperaWholeView: {
-  module_type:     "LArSoftSuperaSriver"
+  module_type:     "LArSoftSuperaDriver"
   supera_params:   "supera_segment.fcl"
   out_filename:    "larcv.root"
   #unique_filename: true
@@ -16,36 +16,21 @@ SuperaWholeView: {
   stream:          "mc"
 }
 
-SuperaFocusedView: @local::SuperaWholeView
-SuperaFocusedView.supera_params: "supera_segment_focused.fcl"
-
-SuperaFocusedViewPlus: @local::SuperaWholeView
-SuperaFocusedViewPlus.supera_params: "supera_segment_focused_plus.fcl"
-
 SuperaBasic: @local::SuperaWholeView
 SuperaBasic.supera_params: "supera_basic.fcl"
+SuperaBasicFocused: @local::SuperaWholeView
+SuperaBasicFocused.supera_params: "supera_basic_focused.fcl"
 
-SuperaMCBasic: @local::SuperaWholeView
-SuperaMCBasic.supera_params: "supera_segment.fcl"
+SuperaBasicMC: @local::SuperaWholeView
+SuperaBasicMC.supera_params: "supera_basic_mc.fcl"
+SuperaBasicMCFocused: @local::SuperaWholeView
+SuperaBasicMCFocused.supera_params: "supera_basic_mc_focused.fcl"
 
-SuperaFocusedView3D: @local::SuperaWholeView
-SuperaFocusedView3D.supera_params: "supera_segment_pork3d.fcl"
+SuperaMCFocused: @local::SuperaWholeView
+SuperaMCFocused.supera_params: "supera_mc_focused.fcl"
 
-SuperaMichelMC: @local::SuperaFocusedView
-SuperaMichelMC.supera_params: "supera_michel_mc_focused.fcl"
-SuperaMichelMC.CSVSuperaMetaMaker: "michel_constraint_mcc7.fcl"
-
-SuperaMichelData: @local::SuperaFocusedView
-SuperaMichelData.supera_params: "supera_basic_focused.fcl"
-SuperaMichelData.CSVSuperaMetaMaker: "michel_constraint.fcl"
-
-SuperaCCPi0MC: @local::SuperaFocusedView
-SuperaCCPi0MC.supera_params: "supera_ccpi0_mc_focused.fcl"
-SuperaCCPi0MC.CSVSuperaMetaMaker: "ccpi0_constraint_mcc8.fcl"
-
-SuperaCCPi0Data: @local::SuperaFocusedView
-SuperaCCPi0Data.supera_params: "supera_basic_focused.fcl"
-SuperaCCPi0Data.CSVSuperaMetaMaker: "ccpi0_constraint.fcl"
+SuperaMCOnly3D: @local::SuperaWholeView
+SuperaMCOnly3D.supera_params: "supera_mc_only3d.fcl"
 
 dlprod_analyzers:
  {
@@ -58,15 +43,12 @@ dlprod_analyzers:
 
    reco2d:  @local::litemc_reco2d
 
-   superaWholeView:   @local::SuperaBasic
-   superaWholeViewMC: @local::SuperaMCBasic
-   superaFocusedView: @local::SuperaFocusedView
-   superaFocusedViewPlus: @local::SuperaFocusedViewPlus
-   superaFocusedView3D: @local::SuperaFocusedView3D
-   superaMichelMC:    @local::SuperaMichelMC
-   superaMichelData:  @local::SuperaMichelData
-   superaCCPi0MC:     @local::SuperaCCPi0MC
-   superaCCPi0Data:   @local::SuperaCCPi0Data
+   superaBasic:   @local::SuperaBasic
+   superaBasicFocused: @local::SuperaBasicFocused
+   superaBasicMC: @local::SuperaBasicMC
+   superaBasicMCFocused: @local::SuperaBasicMCFocused
+   superaMCFocused: @local::SuperaMCFocused
+   superaMCOnly3D: @local::SuperaMCOnly3D
 }
 
 dlprod_analyze_all:    [ simch, mcinfo, opreco, reco2d, opdigit, wire ]

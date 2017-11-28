@@ -4,7 +4,13 @@ process_name: SinglePCommon
 
 source: @local::source_gen
 
-physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaBasic ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaBasicFocused ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaBasicMC ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaBasicMCFocused ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaMCFocused ]
+physics.ana: [ superaMCOnly3D ]
 physics.sim: [ rns,
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,

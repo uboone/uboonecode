@@ -5,3 +5,5 @@ services.TFileService.fileName: "proton_%tc.root"
 physics.producers.generator.PDG:    [ 2212  ]
 physics.producers.generator.P0:     [ 0.5375 ]
 physics.producers.generator.SigmaP: [ 0.2625 ]
+#physics.producers.generator.P0:     [ 0.3 ]
+#physics.producers.generator.SigmaP: [ 0.0001 ]
