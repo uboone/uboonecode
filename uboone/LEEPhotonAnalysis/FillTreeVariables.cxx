@@ -722,6 +722,7 @@ void FillTreeVariables::ResetVertex() {
 
 	reco_true_nuvert_dist = -1;
 
+	longest_asso_track_length =-1; 
 	longest_asso_track_matched_to_mcshower = -1;
 	longest_asso_track_matched_to_mctrack = -1;
 	longest_asso_track_matched_to_mcparticle = -1;
@@ -1937,6 +1938,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 	double most_shower_energy = 0;
 	size_t most_energetic_associated_shower_index = SIZE_MAX;
 	for(size_t const n : pa.GetObjectIndices()) {
+
 		size_t const original_index = detos.GetDetectorObject(n).foriginal_index;
 		if(fverbose) std::cout << "\tsize_t: " << n << " original_index: " << original_index << "\n";
 		if(detos.GetRecoType(n) == detos.fshower_reco_type) {
@@ -1970,13 +1972,17 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 	closest_asso_shower_dist_to_flashzcenter = DBL_MAX;
 	for(size_t const n : pa.GetObjectIndices()) {
 		if(fverbose) std::cout << "\tObject index: " << n << "\n";
+		if(fverbose) std::cout << "\tTRK: longest : "<<longest_asso_track_length<<" in event "<<e.id().event()<<std::endl;
 		size_t const original_index = detos.GetDetectorObject(n).foriginal_index;
 		if(fverbose) std::cout << "\tOriginal index: " << n << "\n";
 		if(detos.GetRecoType(n) == detos.ftrack_reco_type) {
 			++reco_asso_tracks;
 			recob::Track const & t = ev_t->at(original_index);
 			track_length = geoalgo::Point_t(t.Vertex()).Dist(t.End());
+			
+			if(fverbose) std::cout << "\t\tTRK: reco_asso_tracks: " <<reco_asso_tracks<<" track_length: "<<track_length<<" longest: "<<longest_asso_track_length<<std::endl;
 			if(track_length > longest_asso_track_length) {
+
 				longest_asso_track_index = original_index;
 				longest_asso_track_length = track_length;
 			}
@@ -2075,8 +2081,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 
 	if(fmcordata == "mc") {
 
-		art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct =
-			e.getValidHandle<std::vector<simb::MCTruth>>("generator");      
+		art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");      
 
 		reco_true_nuvert_dist = reco_vertex.Dist(ev_mct->at(delta_rad_mct_index).GetNeutrino().Nu().Position(0));
 
