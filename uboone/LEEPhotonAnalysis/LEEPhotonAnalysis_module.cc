@@ -72,6 +72,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 	std::string ftrack_producer;
 	std::string fshower_producer;
 	std::string fopflash_producer;
+	std::string fswtrigger_product;
 
 
 	TTree * fPOTtree;
@@ -143,12 +144,14 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 	ftrack_producer = p.get<std::string>("track_producer");
 	fshower_producer = p.get<std::string>("shower_producer");
 	fopflash_producer = p.get<std::string>("opflash_producer");
+	fswtrigger_product = p.get<std::string>("trigger_product");
 
 	fftv.SetProducers(fmcordata,
 			fmcrecomatching,
 			ftrack_producer,
 			fshower_producer,
-			fopflash_producer);
+			fopflash_producer,
+			fswtrigger_product);
 
 	if(p.get<bool>("fill_vertex_builder_tree")) fvbt.Setup(); 
 
@@ -185,36 +188,34 @@ void LEEPhotonAnalysis::beginSubRun(art::SubRun const & sr) {
 		}
 	}
 
+
 	/*art::Handle< sumdata::POTSummary > potListHandle;
-	if(sr.getByLabel("generator",potListHandle))
-		fpot +=potListHandle->totpot;
-	
-	
-	art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR860;
-	if (sr.getByLabel("beamdata","bnbETOR860",potSummaryHandlebnbETOR860)){
-		std::cout<<"B0: "<<potSummaryHandlebnbETOR860->totpot<<std::endl;
-	}
+	  if(sr.getByLabel("generator",potListHandle))
+	  fpot +=potListHandle->totpot;
 
-	art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR875;
-	if (sr.getByLabel("beamdata","bnbETOR875",potSummaryHandlebnbETOR875)){
-		std::cout<<"B1: "<<potSummaryHandlebnbETOR875->totpot<<std::endl;
-	}
+	  art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR860;
+	  if (sr.getByLabel("beamdata","bnbETOR860",potSummaryHandlebnbETOR860)){
+	  std::cout<<"B0: "<<potSummaryHandlebnbETOR860->totpot<<std::endl;
+	  }
 
-	art::Handle<sumdata::POTSummary> potSummaryHandlenumiETORTGT;
-	if (sr.getByLabel("beamdata","numiETORTGT",potSummaryHandlenumiETORTGT)){
-		std::cout<<"B2: "<< potSummaryHandlenumiETORTGT->totpot<<std::endl;
-	}
-	*/
-	
-	
+	  art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR875;
+	  if (sr.getByLabel("beamdata","bnbETOR875",potSummaryHandlebnbETOR875)){
+	  std::cout<<"B1: "<<potSummaryHandlebnbETOR875->totpot<<std::endl;
+	  }
+
+	  art::Handle<sumdata::POTSummary> potSummaryHandlenumiETORTGT;
+	  if (sr.getByLabel("beamdata","numiETORTGT",potSummaryHandlenumiETORTGT)){
+	  std::cout<<"B2: "<< potSummaryHandlenumiETORTGT->totpot<<std::endl;
+	  }
+	  */
+
+
 }
 
 
-void LEEPhotonAnalysis::fillwpandora(art::Event const & e,
-		ParticleAssociations & pas) {
+void LEEPhotonAnalysis::fillwpandora(art::Event const & e, ParticleAssociations & pas) {
 
-	art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp =
-		e.getValidHandle<std::vector<recob::PFParticle>>(fpfp_producer);
+	art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp =e.getValidHandle<std::vector<recob::PFParticle>>(fpfp_producer);
 
 	art::FindManyP<recob::Vertex> PFPToVertex(ev_pfp, e, fpfp_producer);
 	art::FindManyP<recob::Shower> PFPToShower(ev_pfp, e, fpfp_producer);
@@ -308,10 +309,9 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
 	++fnumber_of_events;
 
-	art::ValidHandle<std::vector<recob::Track>> const & ev_t =
-		e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
-	art::ValidHandle<std::vector<recob::Shower>> const & ev_s =
-		e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
+	//right get a list of all tracks and showers from the named producers (here mostly pandoraNu)
+	art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
+	art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
 
 	if(fverbose)
 		std::cout << "Event: " << e.id().event() << std::endl
@@ -321,7 +321,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 	fvbt.fsubrun_number = e.id().subRun();
 	fvbt.fevent_number = e.id().event();
 
-	/////////////////
+	///////////////// Runs the vertex builder
 
 	VertexBuilder vb;
 	vb.SetVerbose(fverbose);
@@ -335,6 +335,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
 	ParticleAssociations pas;
 	pas.SetVerbose(fverbose);
+
 	if(fpfp_producer == "") {
 		if(fverbose) std::cout << "Run vertex builder\n";
 		pas.GetDetectorObjects().AddShowers(ev_s);
@@ -350,7 +351,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
 	/////////////////
 
-	if(fverbose) std::cout << "Fill tree variables\n";
+	if(fverbose){ std::cout << "Fill tree variables\n";}
 	fftv.Fill(e, pas);
 
 	if(fspec_event != UINT_MAX && e.id().event() == fspec_event) {

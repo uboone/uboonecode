@@ -35,6 +35,7 @@ physics:
       mcordata: "data"
       pot: "beamdata"
       pot_producer: "beamdata"
+      trigger_product: "daq"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
       opflash_producer: "simpleFlashBeam"

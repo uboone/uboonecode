@@ -34,6 +34,7 @@ physics:
       module_type: "LEEPhotonAnalysis"
       mcordata: "mc"
       pot_producer: "generator"
+      trigger_product: "swtrigger"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
       opflash_producer: "simpleFlashBeam"

@@ -40,6 +40,7 @@ class FillTreeVariables {
   std::string fmcordata;  
   bool fmcrecomatching;
   std::string ftrack_producer;
+  std::string fswtrigger_product;
   std::string fshower_producer;
   std::string fopflash_producer;
 
@@ -331,7 +332,9 @@ public:
 		    bool const mcrecomatching,
 		    std::string const & track_producer,
 		    std::string const & shower_producer,
-		    std::string const & opflash_producer);
+		    std::string const & opflash_producer,
+		    std::string const & trigger_product
+);
   void SetUpTreeBranches();
   bool SinglePhotonFilter(art::Event const & e,
 			  size_t & mctruth_index);
