@@ -41,7 +41,8 @@ art_make( BASENAME_ONLY
 		   ${ROOT_BASIC_LIB_LIST}
 
           MODULE_LIBRARIES 	  		   
-                   larsim_MCCheater_BackTracker_service
+                   larsim_MCCheater_ParticleInventoryService_service
+                   larsim_MCCheater_BackTrackerService_service
 		   larpandora_LArPandoraInterface
 
 		   uboonecode_uboone_BasicTool_GeoAlgo
