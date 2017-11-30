@@ -24,7 +24,7 @@
 #include "lardataobj/RecoBase/Track.h"
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardata/Utilities/AssociationUtil.h"
 
@@ -148,7 +148,7 @@ void CosmicFlashTaggerAna::analyze(art::Event const & e)
   _ccnc   = -1;
   _pdg    = -1;
 
-  art::ServiceHandle<cheat::BackTracker> bt;
+  art::ServiceHandle<cheat::ParticleInventoryService> pi_serv;
 
   // *******************
   // Pandora MCParticle to PFParticle matching
@@ -219,7 +219,7 @@ void CosmicFlashTaggerAna::analyze(art::Event const & e)
      art::Ptr<simb::MCParticle>  mc_par = iter1->first;   // The MCParticle 
      art::Ptr<recob::PFParticle> pf_par = iter1->second;  // The matched PFParticle
 
-     const art::Ptr<simb::MCTruth> mc_truth = bt->TrackIDToMCTruth(mc_par->TrackId());
+     const art::Ptr<simb::MCTruth> mc_truth = pi_serv->TrackIdToMCTruth_P(mc_par->TrackId());
      if (mc_truth->Origin() == NEUTRINO_ORIGIN) {
        if (_debug) {
          std::cout << "Neutrino related track found." << std::endl;
