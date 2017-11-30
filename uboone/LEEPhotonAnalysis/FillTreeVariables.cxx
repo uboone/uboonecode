@@ -710,10 +710,10 @@ void FillTreeVariables::ResetEvent() {
 
 void FillTreeVariables::ResetVertex() {
 
+	//should be XX reco_nu vars
 	reco_nuvertx = -1;
 	reco_nuverty = -120;
 	reco_nuvertz = -1;
-
 	reco_nu_vtx_dist_to_closest_tpc_wall = -1;
 	reco_nu_vtx_fid_contained = -1;
 
@@ -722,6 +722,7 @@ void FillTreeVariables::ResetVertex() {
 
 	reco_true_nuvert_dist = -1;
 
+	// Should be 21 "longest" vars 
 	longest_asso_track_length =-1; 
 	longest_asso_track_matched_to_mcshower = -1;
 	longest_asso_track_matched_to_mctrack = -1;
@@ -744,6 +745,7 @@ void FillTreeVariables::ResetVertex() {
 	longest_asso_track_true_thetayz = -2;
 	longest_asso_track_true_energy = -1;
 
+	//
 	shower_matching_ratio = -3;
 	shower_matched_to_mcshower = -1;
 	shower_matched_to_mctrack = -1;
