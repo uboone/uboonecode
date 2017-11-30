@@ -22,7 +22,7 @@
 #include <memory>
 
 #include "nusimdata/SimulationBase/MCTruth.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 #include "lardataobj/RecoBase/PFParticle.h"
@@ -160,8 +160,8 @@ void TPCObjectCreator::produce(art::Event & e)
     art::fill_ptr_vector(mclist, mctruthListHandle);
 
   // 
-  art::ServiceHandle<cheat::BackTracker> bt;
-  const sim::ParticleList& g4plist = bt->ParticleList();
+  art::ServiceHandle<cheat::ParticleInventoryService> pi_serv;
+  const sim::ParticleList& g4plist = pi_serv->ParticleList();
 
   for (unsigned int n = 0; n < pfParticleList.size(); ++n) {
 
@@ -213,7 +213,7 @@ void TPCObjectCreator::produce(art::Event & e)
   
     if( ! (pPart->Process() == pri) ) continue; // Has to be a primary
 
-    const art::Ptr<simb::MCTruth> & mc_truth = bt->ParticleToMCTruth(pPart);   
+    const art::Ptr<simb::MCTruth> & mc_truth = pi_serv->ParticleToMCTruth_P(pPart);   
     if( ! (mc_truth->Origin() == isGENIE) ) continue; // Has to come from GENIE interaction
 
     if ( ! (pPart->PdgCode() == isMuonPlus) ) continue; // Has to be a muon
