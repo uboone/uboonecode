@@ -23,8 +23,8 @@ add_subdirectory(OpticalDetectorSim)
 add_subdirectory(OpticalDetectorAna)
 add_subdirectory(SpaceCharge)
 add_subdirectory(SpaceChargeServices)
-add_subdirectory(TPCNeutrinoIDFilter)
 #add_subdirectory(DataScanner)
+add_subdirectory(TPCNeutrinoIDFilter)
 add_subdirectory(LiteMaker)
 #add_subdirectory(LArCVImageMaker)
 add_subdirectory(MuCS)
@@ -43,6 +43,8 @@ add_subdirectory(MicroBooNEPandora)
 add_subdirectory(MicroBooNEWireCell)
 add_subdirectory(FakeNEWS)
 add_subdirectory(DQMTools)
+
+add_subdirectory(BurstNoiseMetrics)
 
 # Respect the order specified in lar_build, which is:
 #
