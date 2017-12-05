@@ -73,6 +73,8 @@ private:
 
   int fWin_start;
   int fWin_end;
+  int fIntWinFFTsum;
+  int fIntWinNF;
 
 };
 
@@ -86,15 +88,17 @@ BurstNoiseMetrics::BurstNoiseMetrics(fhicl::ParameterSet const & p)
 
 // Call appropriate produces<>() functions here.
 
- produces< double >("CBmetric"); //"insCBmetric"); //Cathode Burst Metric
- produces< int >("PMBmetric"); //"insPMBmetric"); //Purity Monitor Burst Metric
+ produces< double >("CBmetric" ); //Cathode Burst Metric
+ produces< int >   ("PMBmetric"); //Purity Monitor Burst Metric
 
 //  produces< std::vector< bnms::MET > >();
 
-  fFlashLabel        = p.get<std::string>("FlashLabel"    );
-  fRawDigitLabel     = p.get<std::string>("RawDigitLabel"    );
-  fWin_start         = p.get<int>        ("Win_start"        );
-  fWin_end           = p.get<int>        ("Win_end"          );
+  fFlashLabel        = p.get<std::string>("FlashLabel"          );
+  fRawDigitLabel     = p.get<std::string>("RawDigitLabel"       );
+  fWin_start         = p.get<int>        ("Win_start"           );
+  fWin_end           = p.get<int>        ("Win_end"             );
+  fIntWinFFTsum      = p.get<int>	 ("IntWinFFTsum"        );
+  fIntWinNF	     = p.get<int>        ("IntWinNF"            );
 }
 
 
@@ -103,16 +107,14 @@ void BurstNoiseMetrics::produce(art::Event & e)
 {
 
 //Initial parameters. Some have to be parametrized in the .fcl file 
-  int numbins = 4800;
-  double integral10;
+  int numbins = fWin_end - fWin_start;
+  double fftsum;
   int sum;
-  int nf500;
+  int nf;
   std::vector<double> U_UberADCvals;
   double ADCval;
   int chanNum;
   double U_median;
-  int int_win_fftsum = 10;
-  int int_win_nf = 500;  
  
   std::unique_ptr< double > fs2;
   std::unique_ptr< int > nf5;
@@ -120,9 +122,9 @@ void BurstNoiseMetrics::produce(art::Event & e)
 
 //////////////////////////////////HISTOGRAMS////////////////////////////////////
 /////////////////Setup histograms used for calculations/////////////////////////
-//
+
 ///////////////Histogram storing the event flashes//////////////////////////////
-  TH1F *h_time = new TH1F("h_time","Histogram;Counts;Time", numbins, -1600, 3200);
+  TH1F *h_time = new TH1F("h_time","Histogram;Counts;Time", numbins, fWin_start, fWin_end);
 
 ///////////////Histogram storing the U plane Uberwaveform/////////////////////// 
   TH1F *U_uberwf = new TH1F("U_uberwf", "Event UberWF for U plane;Time Tick; ADC Value",9594, -0.5, 9593.5);
@@ -147,77 +149,49 @@ void BurstNoiseMetrics::produce(art::Event & e)
     h_time -> Fill(flash.Time());      
   }
   std::vector<int> vec_getmax;
-  for (int k = int_win_nf - 1; k < numbins; k++ ){
-     sum = h_time -> Integral(k - int_win_nf - 1, k);
+  for (int k = fIntWinNF - 1; k < numbins; k++ ){
+     sum = h_time -> Integral(k - fIntWinNF - 1, k);
      vec_getmax.insert(vec_getmax.end(), sum);
   }
-  nf500 = *std::max_element(vec_getmax.begin(), vec_getmax.end());
-  
-  
+  nf = *std::max_element(vec_getmax.begin(), vec_getmax.end());
 ///////////////////////////////FFTSUM2 Calculations///////////////////////////
-////////////////////////////////UberWaveform Calculations/////////////////////
+/////////////////////////////////////////////////
   int tot_tt = allrawdigits_vec.at(1).Samples();
-//  double UChanADCval[tot_tt];
   double *UChanADCval = new double[tot_tt];
   U_median = 0.;
   U_UberADCvals.clear();
-  for(int k = 0; k < tot_tt; k++){
+  for(int k = 0; k < tot_tt; k++){	//UberWaveform Calculations
     for (size_t i_ar = 0, size_allrawdigits = rawdigit_handle->size(); i_ar != size_allrawdigits; ++i_ar){
         ADCval = allrawdigits_vec.at(i_ar).ADC(k);
         chanNum = allrawdigits_vec.at(i_ar).Channel();
-        if(ADCval == 0){
-           ADCval = 1.;
-        }
         if(chanNum < 2400){   
           UChanADCval[k] += ADCval;
-	  
         }    
     } 
     U_UberADCvals.insert(U_UberADCvals.end(), UChanADCval[k]);              
   }
   U_median = median_func(U_UberADCvals);
-  for(unsigned k = 0; k < U_UberADCvals.size(); k++){
-    U_uberwf -> SetBinContent(k+1,(UChanADCval[k] - U_median)/pow(10.,3.));
+  for(unsigned j = 0; j < U_UberADCvals.size(); j++){
+    U_uberwf -> SetBinContent(j+1,(UChanADCval[j] - U_median)/pow(10.,3.));
   }
 /////////////////////////////////UWF Calculations////////////////////////////////////////////
   FFT_U_uberwf = U_uberwf -> FFT(FFT_U_uberwf, "MAG");
-  integral10 = FFT_U_uberwf -> Integral(0, int_win_fftsum); 
+  fftsum = FFT_U_uberwf -> Integral(0, fIntWinFFTsum); 
 
-
-
- 
-//  fs2 = FFT_U_uberwf -> Integral(0, int_win_fftsum);  
-//  fs2 -> emplace_back(integral10);
-//  nf5 -> emplace_back(nf500); 
-
-//   metrics.push_back(integral10);
-//   metrics.push_back(nf500);
-
-//   bnms::MET metric(nf500, integral10);
-
-
-//   v_BNM -> emplace_back(metric);
-
-//  auto fs2 = std::unique_ptr< double > (integral10);
-//  auto nf5 = std::unique_ptr< int > (nf500);
-
-
-//  std::unique_ptr< double > fs2(integral10);
-//  std::unique_ptr< int >    nf5(nf500);
- 
   delete h_time; 
   delete U_uberwf;
   delete FFT_U_uberwf;
 
-  nf5 = std::unique_ptr< int >(new int (nf500));
-  fs2 = std::unique_ptr< double >(new double (integral10));
+  nf5 = std::unique_ptr< int >(new int (nf));
+  fs2 = std::unique_ptr< double >(new double (fftsum));
    
-  e.put(std::move(nf5),"PMBmetric");
-  e.put(std::move(fs2),"CBmetric");
+  e.put(std::move(nf5),"PMBmetric"  );
+  e.put(std::move(fs2),"CBmetric"   );
 
   // Implementation of required member function here.
 }
 
+///////////////////////////Functions////////////////////////////
 int BurstNoiseMetrics::median_func(std::vector<double> Chans){
   size_t size = Chans.size();
   int median;

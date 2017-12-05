@@ -7,6 +7,8 @@ FlashLabel        : "opflashCosmic"
 RawDigitLabel     : "daq"
 Win_start         : -1600
 Win_end           : 3200 
+IntWinFFTsum      : 10
+IntWinNF          : 500
 
 }
 
