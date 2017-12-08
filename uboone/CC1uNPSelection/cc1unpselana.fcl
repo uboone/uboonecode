@@ -1,0 +1,25 @@
+BEGIN_PROLOG
+
+microboone_cc1unpselana:
+{ 
+ module_type:              "CC1uNPSelAna"
+ TrackModuleLabel:         "pandoraNu"
+ VertexModuleLabel:        "pandoraNu"
+ #VertexModuleLabel:        "vertex3d"
+ #VertexModuleLabel:        [ "vertex3d" ]
+ PandoraNuVertexModuleLabel: "pandoraNu"
+ TrackMCSFitLabel:         "pandoraNuMCSMu"
+
+ #CosmicTaggerAssocLabel:   "trackkalmanhit"
+ #TrkVtxFilterLabels:       "NuMuCCInclusive"
+ #TrkVtxFilterLabels:       "CC1uNPSelAna" 
+ HitsModuleLabel:           "gaushit"
+ OpFlashModuleLabel:        "simpleFlashBeam" 
+ #RawDigitModuleLabel:      "daq"
+ CalorimetryModuleLabel:    "pandoraNucalo"
+ ShowerModuleLabel:         "showerrecopandora"
+ G4ModuleLabel:             "largeant"
+
+}
+
+END_PROLOG

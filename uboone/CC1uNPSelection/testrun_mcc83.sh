@@ -1,0 +1,1 @@
+lar -c run_cc1unpselana.fcl -s /pnfs/uboone/mc/uboone/reconstructed/prod_v06_26_05/prodgenie_bnb_nu_cosmic_uboone_reco/reco/prodgenie_bnb_nu_cosmic_uboone_0_20170310T053056_gen2_5867a710-697f-4aa3-a471-8449d0927c8c_20171026T123616_reco1_20171026T135101_reco2.root

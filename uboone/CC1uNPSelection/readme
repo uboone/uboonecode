@@ -1,0 +1,7 @@
+1> set a txt file to save the number of events for each cut or save the topology to the tree????? what do I want
+2> fix the flash max cut
+3> get the true track PDG Code of muon and proton candidate
+4> check the dQdx cut for each or redo it by myself
+5> add the calculation of the visible energy Q2 and the momentum of the initial state neutrons.(assume the target are neutrons.
+CC1uNPSelAna_module.cc_bk1204-2    > working
+
