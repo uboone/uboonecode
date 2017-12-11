@@ -29,9 +29,9 @@
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
 
+#include "RecoMCMatching.h"
 #include "ParticleAssociations.h"
 #include "EnergyHelper.h"
-#include "RecoTrueHelper.h"
 
 #include "PandoraInterfaceHelper.h"
 
@@ -53,6 +53,7 @@ class FillTreeVariables {
 
   bool fverbose;
 
+  RecoMCMatching frmcm;
   lee::EnergyHelper energyHelper;
   PandoraInterfaceHelper pandoraHelper;
 
@@ -138,6 +139,7 @@ class FillTreeVariables {
   int reco_asso_tracks;
   int reco_asso_showers;
 
+  double longest_asso_track_matching_ratio;
   int longest_asso_track_matched_to_mcshower;
   int longest_asso_track_matched_to_mctrack;
   int longest_asso_track_matched_to_mcparticle;
@@ -378,21 +380,18 @@ public:
 				size_t const most_energetic_associated_shower_index,
 				size_t const delta_rad_mct_index,
 				size_t const delta_mcshower_index,
-				size_t const delta_mctrack_index,
-				lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles);
+				size_t const delta_mctrack_index);
   void FillTrackRecoMCMatching(art::Event const & e,
 			       size_t const longest_asso_track_index,
 			       size_t const delta_rad_mct_index,
 			       size_t const delta_mcshower_index,
-			       size_t const delta_mctrack_index,
-			       lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles);
+			       size_t const delta_mctrack_index);
   void FillVertexTree(art::Event const & e,
 		      ParticleAssociations const & pas,
 		      size_t const pn,
 		      size_t const delta_rad_mct_index,
 		      size_t const delta_mcshower_index,
-		      size_t const delta_mctrack_index,
-		      lar_pandora::MCParticlesToPFParticles const & matchedMCToPFParticles);
+		      size_t const delta_mctrack_index);
   void Fill(art::Event const & e,
 	    ParticleAssociations const & pas);
 
