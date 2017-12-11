@@ -33,6 +33,7 @@
 #include "EnergyHelper.h"
 #include "RecoTrueHelper.h"
 
+#include "PandoraInterfaceHelper.h"
 
 class FillTreeVariables {
 
@@ -53,6 +54,7 @@ class FillTreeVariables {
   bool fverbose;
 
   lee::EnergyHelper energyHelper;
+  PandoraInterfaceHelper pandoraHelper;
 
   TTree * fevent_tree;
   TTree * fvertex_tree;
