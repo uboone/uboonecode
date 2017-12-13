@@ -9,6 +9,7 @@
 #include "larsim/MCCheater/BackTracker.h"
 
 #include "FilterSignal.h"
+#include "RecoMCMatching.h"
 
 
 FillTreeVariables::FillTreeVariables() :

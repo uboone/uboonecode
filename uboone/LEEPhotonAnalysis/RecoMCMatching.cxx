@@ -1,6 +1,4 @@
 
-
-
 #include "RecoMCMatching.h"
 
 #include "art/Framework/Services/Optional/TFileService.h"

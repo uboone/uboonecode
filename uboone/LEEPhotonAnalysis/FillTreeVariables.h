@@ -33,7 +33,6 @@
 #include "ParticleAssociations.h"
 #include "EnergyHelper.h"
 
-#include "PandoraInterfaceHelper.h"
 
 class FillTreeVariables {
 
@@ -55,7 +54,6 @@ class FillTreeVariables {
 
   RecoMCMatching frmcm;
   lee::EnergyHelper energyHelper;
-  PandoraInterfaceHelper pandoraHelper;
 
   TTree * fevent_tree;
   TTree * fvertex_tree;

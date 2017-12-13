@@ -1,6 +1,3 @@
-
-
-
 #ifndef RECOMCMATCHING_H
 #define RECOMCMATCHING_H
 
@@ -67,10 +64,7 @@ class RecoMCMatching {
  public:
 
 
-
   RecoMCMatching();
-
-  
 
   void Configure(std::string const & match_type,
 		 std::string const & simch_producer,

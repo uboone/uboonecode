@@ -57,6 +57,7 @@
 #include "ParticleAssociations.h"
 #include "VertexBuilder.h"
 #include "FillTreeVariables.h"
+#include "RecoMCMatching.h"
 
 class LEEPhotonAnalysis : public art::EDAnalyzer {
 
