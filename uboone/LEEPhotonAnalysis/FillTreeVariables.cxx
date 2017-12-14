@@ -4,6 +4,9 @@
 
 #include "FillTreeVariables.h"
 
+#include "uboone/AnalysisTree/MCTruth/AssociationsTruth_tool.h"
+#include "uboone/AnalysisTree/MCTruth/BackTrackerTruth_tool.h"
+
 #include "uboone/EventWeight/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 
@@ -1720,8 +1723,11 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
     e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-  
-  art::ServiceHandle<cheat::BackTracker> bt;
+ 
+  std::unique_ptr<truth::IMCTruthMatching> bt = std::unique_ptr<truth::IMCTruth<atching>(new truth::AssociationsTruth(""));
+
+ 
+  //art::ServiceHandle<cheat::BackTracker> bt;
   size_t mct_index = SIZE_MAX;
 
   shower_matched_to_mcshower = 0;
