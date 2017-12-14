@@ -10,6 +10,8 @@
 #include "uboone/EventWeight/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 
+#include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
+
 #include "FilterSignal.h"
 #include "RecoMCMatching.h"
 
@@ -1631,18 +1633,20 @@ double FillTreeVariables::ShowerZDistToClosestFlash(art::Event const & e,
 
 
 
-void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> const & mcp_trkid_to_index,
+void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
+					      std::unordered_map<int, size_t> const & sp_map,
+					      std::unordered_map<int, size_t> const & mcp_map,
 					      art::FindManyP<recob::Hit> const & hits_per_object,
 					      art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
 					      std::vector<RecoMCMatch> & object_matches) {
 
-  for(size_t i_t = 0; i_t < hits_per_object.size(); ++i_t) {
+  for(size_t i_o = 0; i_o < hits_per_object.size(); ++i_o) {
 
-    std::vector<art::Ptr<recob::Hit>> obj_hits_ptrs = hits_per_object.at(i_t);
+    std::vector<art::Ptr<recob::Hit>> obj_hits_ptrs = hits_per_object.at(i_o);
     std::vector<simb::MCParticle const *> particle_vec;
     std::vector<anab::BackTrackerHitMatchingData const *> match_vec;
 
-    std::unordered_map<int, double> trkide;
+    std::unordered_map<int, double> trkide_map;
     double total = 0;
 
     for(size_t i_h = 0; i_h < obj_hits_ptrs.size(); ++i_h) {
@@ -1652,22 +1656,38 @@ void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> co
       particles_per_hit.get(obj_hits_ptrs.at(i_h).key(), particle_vec, match_vec);
 
       for(size_t i_p = 0; i_p < particle_vec.size(); ++i_p) {
-	trkide[mcp_trkid_to_index.find(particle_vec.at(i_p)->TrackId())->second] += match_vec[i_p]->numElectrons;
+	trkide_map[particle_vec.at(i_p)->TrackId()] += match_vec[i_p]->numElectrons;
 	total += match_vec[i_p]->numElectrons;
       }
 
     }
 
-    size_t index = SIZE_MAX;
+    int trackid = -1;
     double max = 0;
-    for(auto const & p : trkide) {
+    for(auto const & p : trkide_map) {
       if(p.second > max) {
-	index = p.first;
+	trackid = p.first;
 	max = p.second;
       }
     }
-    object_matches.push_back({3, index, max / total});
-    
+
+    auto const tp_it = tp_map.find(trackid);
+    if(tp_it != tp_map.end()) {
+      object_matches.push_back({1, tp_it->second, max/total});
+      continue;
+    }
+    auto const sp_it = sp_map.find(trackid);
+    if(sp_it != sp_map.end()) {
+      object_matches.push_back({2, sp_it->second, max/total});
+      continue;
+    }
+    auto const mcp_it = mcp_map.find(trackid);
+    if(mcp_it != mcp_map.end()) {
+      object_matches.push_back({3, mcp_it->second, max/total});
+      continue;
+    }    
+    object_matches.push_back({0, SIZE_MAX, 0});
+
   }
 
 }
@@ -1676,13 +1696,12 @@ void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> co
 
 void FillTreeVariables::MatchWAssociations(art::Event const & e) {
 
+  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
+  art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
   art::ValidHandle<std::vector<recob::Hit>> const & ev_h  = e.getValidHandle<std::vector<recob::Hit>>(fhit_producer);
   art::ValidHandle<std::vector<recob::Track>> const & ev_t  = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
   art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
   art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp  = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
-
-  std::unordered_map<int, size_t> mcp_trkid_to_index;
-  for(size_t i = 0; i < ev_mcp->size(); ++i) mcp_trkid_to_index[ev_mcp->at(i).TrackId()] = i;
 
   track_matches.clear();
   track_matches.reserve(ev_t->size());
@@ -1693,17 +1712,60 @@ void FillTreeVariables::MatchWAssociations(art::Event const & e) {
   art::FindManyP<recob::Hit> hits_per_shower(ev_s, e, fshower_producer);
   art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> particles_per_hit(ev_h, e, frmcmassociation_producer);
 
-  FillAssociationVector(mcp_trkid_to_index,
+  std::unordered_map<int, size_t> tp_map;
+  for(size_t mc_index = 0; mc_index < ev_mctrack->size(); ++mc_index)
+    tp_map[ev_mctrack->at(mc_index).TrackID()] = mc_index;
+  
+  std::unordered_map<int, size_t> sp_map;
+  for(size_t mc_index = 0; mc_index < ev_mcshower->size(); ++mc_index){
+    sim::MCShower const & mcshower = ev_mcshower->at(mc_index);
+    for(auto const & id : mcshower.DaughterTrackID()) {
+      if(tp_map.find(id) != tp_map.end()) continue;
+      sp_map[id] = mc_index;
+    }
+  }
+
+  std::unordered_map<int, size_t> mcp_map;
+  for(size_t i = 0; i < ev_mcp->size(); ++i) {
+    int const trackid = ev_mcp->at(i).TrackId(); 
+    if(tp_map.find(trackid) != tp_map.end() || sp_map.find(trackid) != sp_map.end()) continue;
+    mcp_map[ev_mcp->at(i).TrackId()] = i;
+  }
+  
+  FillAssociationVector(tp_map,
+			sp_map,
+			mcp_map,
 			hits_per_track,
 			particles_per_hit,
 			track_matches);
-  FillAssociationVector(mcp_trkid_to_index,
+
+  FillAssociationVector(tp_map,
+			sp_map,
+			mcp_map,
 			hits_per_shower,
 			particles_per_hit,
 			shower_matches);
 
 }
 
+
+art::Ptr<simb::MCTruth> FillTreeVariables::TrackIDToMCTruth(art::Event const & e, int geant_track_id) {
+
+  lar_pandora::MCTruthToMCParticles truthToParticles;
+  lar_pandora::MCParticlesToMCTruth particlesToTruth;
+
+  lar_pandora::LArPandoraHelper::CollectMCParticles(e, "largeant", truthToParticles, particlesToTruth);
+
+  for (auto iter : particlesToTruth) {
+    if (iter.first->TrackId() == geant_track_id) {
+      return iter.second;
+    }
+  }
+
+  std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nERROR: no mctruth found\n";
+  exit(1);
+
+}
 
 
 void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
@@ -1723,12 +1785,8 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
     e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
- 
-  std::unique_ptr<truth::IMCTruthMatching> bt = std::unique_ptr<truth::IMCTruth<atching>(new truth::AssociationsTruth(""));
-
- 
-  //art::ServiceHandle<cheat::BackTracker> bt;
-  size_t mct_index = SIZE_MAX;
+  
+size_t mct_index = SIZE_MAX;
 
   shower_matched_to_mcshower = 0;
   shower_matched_to_mctrack = 0;
@@ -1736,7 +1794,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   if(shower_match.mc_type == 2) {
     shower_matched_to_mcshower = 1;
     sim::MCShower const & mcs = ev_mcs->at(shower_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mcs.TrackID());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcs.TrackID());
     mct_index = mct.key();
     shower_true_pdg = mcs.PdgCode();
     shower_true_parent_pdg = mcs.MotherPdgCode();
@@ -1764,7 +1822,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   else if(shower_match.mc_type == 1) {
     shower_matched_to_mctrack = 1;
     sim::MCTrack const & mctr = ev_mctr->at(shower_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mctr.TrackID());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mctr.TrackID());
     mct_index = mct.key();
     shower_true_pdg = mctr.PdgCode();
     shower_true_parent_pdg = mctr.MotherPdgCode();
@@ -1785,7 +1843,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   else if(shower_match.mc_type == 3) {
     shower_matched_to_mcparticle = 1;
     simb::MCParticle const & mcp = ev_mcp->at(shower_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mcp.TrackId());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcp.TrackId());
     mct_index = mct.key();
     shower_true_pdg = mcp.PdgCode();
     shower_true_origin = mct->Origin();      
@@ -1832,7 +1890,6 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
   
-  art::ServiceHandle<cheat::BackTracker> bt;
   size_t mct_index = SIZE_MAX;
 
   longest_asso_track_matched_to_mcshower = 0;
@@ -1841,7 +1898,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
   if(longest_asso_track_match.mc_type == 2) {
     longest_asso_track_matched_to_mcshower = 1;
     sim::MCShower const & mcs = ev_mcs->at(longest_asso_track_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mcs.TrackID());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcs.TrackID());
     mct_index = mct.key();
     longest_asso_track_true_pdg = mcs.PdgCode();
     longest_asso_track_true_parent_pdg = mcs.MotherPdgCode();
@@ -1862,7 +1919,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
   else if(longest_asso_track_match.mc_type == 1) {
     longest_asso_track_matched_to_mctrack = 1;
     sim::MCTrack const & mctr = ev_mctr->at(longest_asso_track_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mctr.TrackID());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mctr.TrackID());
     mct_index = mct.key();
     longest_asso_track_true_pdg = mctr.PdgCode();
     longest_asso_track_true_parent_pdg = mctr.MotherPdgCode();
@@ -1883,7 +1940,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
   else if(longest_asso_track_match.mc_type == 3) {
     longest_asso_track_matched_to_mcparticle = 1;
     simb::MCParticle const & mcp = ev_mcp->at(longest_asso_track_match.mc_index);
-    art::Ptr<simb::MCTruth> const mct = bt->TrackIDToMCTruth(mcp.TrackId());
+    art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcp.TrackId());
     mct_index = mct.key();
     longest_asso_track_true_pdg = mcp.PdgCode();
     longest_asso_track_true_origin = mct->Origin();      
