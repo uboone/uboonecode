@@ -377,11 +377,14 @@ public:
 		size_t const closest_associated_shower_index);
   double ShowerZDistToClosestFlash(art::Event const & e,
 				   int const most_energetic_shower_index);
-  void FillAssociationVector(std::unordered_map<int, size_t> const & mcp_trkid_to_index,
+  void FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
+			     std::unordered_map<int, size_t> const & sp_map,
+			     std::unordered_map<int, size_t> const & mcp_map,
 			     art::FindManyP<recob::Hit> const & hits_per_object,
 			     art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
 			     std::vector<RecoMCMatch> & object_matches);
   void MatchWAssociations(art::Event const & e);
+  art::Ptr<simb::MCTruth> TrackIDToMCTruth(art::Event const & e, int geant_track_id);
   void FillShowerRecoMCMatching(art::Event const & e,
 				size_t const most_energetic_associated_shower_index,
 				size_t const delta_rad_mct_index,
