@@ -30,6 +30,9 @@
 #include "lardataobj/RecoBase/Hit.h"
 
 #include "RecoMCMatching.h"
+#include "canvas/Persistency/Common/FindMany.h"
+#include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
+
 #include "ParticleAssociations.h"
 #include "EnergyHelper.h"
 
@@ -41,6 +44,8 @@ class FillTreeVariables {
   std::string ftrack_producer;
   std::string fswtrigger_product;
   std::string fshower_producer;
+  std::string fhit_producer;
+  std::string frmcmassociation_producer;
   std::string fopflash_producer;
 
   geoalgo::AABox ftpc_volume;
@@ -53,6 +58,9 @@ class FillTreeVariables {
   bool fverbose;
 
   RecoMCMatching frmcm;
+  std::vector<RecoMCMatch> track_matches;
+  std::vector<RecoMCMatch> shower_matches;
+
   lee::EnergyHelper energyHelper;
 
   TTree * fevent_tree;
@@ -333,9 +341,10 @@ public:
 		    bool const mcrecomatching,
 		    std::string const & track_producer,
 		    std::string const & shower_producer,
+		    std::string const & hit_producer,
+		    std::string const & rmcmassociations_producer,
 		    std::string const & opflash_producer,
-		    std::string const & trigger_product
-);
+		    std::string const & trigger_product);
   void SetUpTreeBranches();
   bool SinglePhotonFilter(art::Event const & e,
 			  size_t & mctruth_index);
@@ -356,12 +365,6 @@ public:
 				      size_t & delta_mcshower_index,
 				      size_t & delta_proton_index,
 				      size_t & delta_mctrack_index);
-  void GetDeltaTrackIDs(art::Event const & e,
-			size_t const delta_rad_mct_index,
-			size_t & deltarad_external_photon_index,
-			size_t & deltarad_external_proton_index,
-			size_t & deltarad_photon_mcshower_index,
-			size_t & deltarad_proton_mctrack_index);
   double DistToClosestTPCWall(geoalgo::Point_t const & pos);
   double GetShowerHelperEnergy(art::Event const & e,
 			       size_t const shower_index);
@@ -374,6 +377,11 @@ public:
 		size_t const closest_associated_shower_index);
   double ShowerZDistToClosestFlash(art::Event const & e,
 				   int const most_energetic_shower_index);
+  void FillAssociationVector(std::unordered_map<int, size_t> const & mcp_trkid_to_index,
+			     art::FindManyP<recob::Hit> const & hits_per_object,
+			     art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
+			     std::vector<RecoMCMatch> & object_matches);
+  void MatchWAssociations(art::Event const & e);
   void FillShowerRecoMCMatching(art::Event const & e,
 				size_t const most_energetic_associated_shower_index,
 				size_t const delta_rad_mct_index,

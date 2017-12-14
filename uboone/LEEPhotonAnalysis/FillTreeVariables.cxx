@@ -6,7 +6,6 @@
 
 #include "uboone/EventWeight/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
-#include "larsim/MCCheater/BackTracker.h"
 
 #include "FilterSignal.h"
 #include "RecoMCMatching.h"
@@ -37,20 +36,26 @@ void FillTreeVariables::SetProducers(std::string const & mcordata,
 				     bool const mcrecomatching,
 				     std::string const & track_producer,
 				     std::string const & shower_producer,
+				     std::string const & hit_producer,
+				     std::string const & rmcmassociation_producer,
 				     std::string const & opflash_producer,
 				     std::string const & trigger_product) {
 
   fmcordata = mcordata;
   fmcrecomatching = mcrecomatching;
   if(fmcrecomatching) {
+    /*
     frmcm.Configure("",
 		    "largeant",
 		    track_producer,
 		    track_producer,
 		    shower_producer);
+    */
   }
   ftrack_producer = track_producer;
   fshower_producer = shower_producer;
+  fhit_producer = hit_producer;
+  frmcmassociation_producer = rmcmassociation_producer;
   fopflash_producer = opflash_producer;  
   fswtrigger_product = trigger_product;
 
@@ -1416,38 +1421,6 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
 
 
 
-void FillTreeVariables::GetDeltaTrackIDs(art::Event const & e,
-					 size_t const delta_rad_mct_index,
-					 size_t & deltarad_external_photon_index,
-					 size_t & deltarad_external_proton_index,
-					 size_t & deltarad_photon_mcshower_index,
-					 size_t & deltarad_proton_mctrack_index) {
-
-  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
-    e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
-  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp =
-    e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
-
-  simb::MCTruth const & mct = ev_mctruth->at(delta_rad_mct_index);
-  std::cout << "\nMCTruth\n";
-  for(int i = 0; i < mct.NParticles(); ++i) {
-    simb::MCParticle const & mcp = mct.GetParticle(i);
-    if(mcp.StatusCode() != 1) continue;
-    std::cout << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.Px() << " " << mcp.Py() << " " << mcp.Pz() << " " << mcp.StatusCode() << "\n";
-  }
-
-  art::ServiceHandle<cheat::BackTracker> bt;
-
-  std::cout << "\nMCParticle\n";
-  for(simb::MCParticle const & mcp : *ev_mcp) {
-    if(bt->TrackIDToMCTruth(mcp.TrackId()).key() != delta_rad_mct_index || mcp.Mother() != 0) continue;
-    std::cout << mcp.TrackId() << " " << mcp.PdgCode() << " " << mcp.Px() << " " << mcp.Py() << " " << mcp.Pz() << "\n";
-  }
-
-}
-
-
-
 double FillTreeVariables::DistToClosestTPCWall(geoalgo::Point_t const & pos) {
 
   double dist = fabs(pos.at(0));
@@ -1655,13 +1628,89 @@ double FillTreeVariables::ShowerZDistToClosestFlash(art::Event const & e,
 
 
 
+void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> const & mcp_trkid_to_index,
+					      art::FindManyP<recob::Hit> const & hits_per_object,
+					      art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
+					      std::vector<RecoMCMatch> & object_matches) {
+
+  for(size_t i_t = 0; i_t < hits_per_object.size(); ++i_t) {
+
+    std::vector<art::Ptr<recob::Hit>> obj_hits_ptrs = hits_per_object.at(i_t);
+    std::vector<simb::MCParticle const *> particle_vec;
+    std::vector<anab::BackTrackerHitMatchingData const *> match_vec;
+
+    std::unordered_map<int, double> trkide;
+    double total = 0;
+
+    for(size_t i_h = 0; i_h < obj_hits_ptrs.size(); ++i_h) {
+
+      particle_vec.clear(); 
+      match_vec.clear();
+      particles_per_hit.get(obj_hits_ptrs.at(i_h).key(), particle_vec, match_vec);
+
+      for(size_t i_p = 0; i_p < particle_vec.size(); ++i_p) {
+	trkide[mcp_trkid_to_index.find(particle_vec.at(i_p)->TrackId())->second] += match_vec[i_p]->numElectrons;
+	total += match_vec[i_p]->numElectrons;
+      }
+
+    }
+
+    size_t index = SIZE_MAX;
+    double max = 0;
+    for(auto const & p : trkide) {
+      if(p.second > max) {
+	index = p.first;
+	max = p.second;
+      }
+    }
+    object_matches.push_back({3, index, max / total});
+    
+  }
+
+}
+
+
+
+void FillTreeVariables::MatchWAssociations(art::Event const & e) {
+
+  art::ValidHandle<std::vector<recob::Hit>> const & ev_h  = e.getValidHandle<std::vector<recob::Hit>>(fhit_producer);
+  art::ValidHandle<std::vector<recob::Track>> const & ev_t  = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
+  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp  = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+
+  std::unordered_map<int, size_t> mcp_trkid_to_index;
+  for(size_t i = 0; i < ev_mcp->size(); ++i) mcp_trkid_to_index[ev_mcp->at(i).TrackId()] = i;
+
+  track_matches.clear();
+  track_matches.reserve(ev_t->size());
+  shower_matches.clear();
+  shower_matches.reserve(ev_s->size());  
+
+  art::FindManyP<recob::Hit> hits_per_track(ev_t, e, ftrack_producer);
+  art::FindManyP<recob::Hit> hits_per_shower(ev_s, e, fshower_producer);
+  art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> particles_per_hit(ev_h, e, frmcmassociation_producer);
+
+  FillAssociationVector(mcp_trkid_to_index,
+			hits_per_track,
+			particles_per_hit,
+			track_matches);
+  FillAssociationVector(mcp_trkid_to_index,
+			hits_per_shower,
+			particles_per_hit,
+			shower_matches);
+
+}
+
+
+
 void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
 						 size_t const most_energetic_associated_shower_index,
 						 size_t const delta_rad_mct_index,
 						 size_t const delta_mcshower_index,
 						 size_t const delta_mctrack_index) {
 
-  RecoMCMatch const & shower_match = frmcm.GetShowerMatches().at(most_energetic_associated_shower_index);
+  //RecoMCMatch const & shower_match = frmcm.GetShowerMatches().at(most_energetic_associated_shower_index);
+  RecoMCMatch const & shower_match = shower_matches.at(most_energetic_associated_shower_index);
 
   shower_matching_ratio = shower_match.ratio;
 
@@ -1765,7 +1814,8 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
 						size_t const delta_mcshower_index,
 						size_t const delta_mctrack_index) {
 
-  RecoMCMatch const & longest_asso_track_match = frmcm.GetTrackMatches().at(longest_asso_track_index);
+  //RecoMCMatch const & longest_asso_track_match = frmcm.GetTrackMatches().at(longest_asso_track_index);
+  RecoMCMatch const & longest_asso_track_match = track_matches.at(longest_asso_track_index);
 
   longest_asso_track_matching_ratio = longest_asso_track_match.ratio;
 
@@ -2079,7 +2129,8 @@ void FillTreeVariables::Fill(art::Event const & e,
     FillWeights(e);
 
     if(ev_mct->front().GetNeutrino().Nu().Mother() == -1) FillTruth(e, delta_rad_mct_index);
-    if(fmcrecomatching) frmcm.MatchAll(e);
+    //if(fmcrecomatching) frmcm.MatchAll(e);
+    if(fmcrecomatching) MatchWAssociations(e);
 
     mctracknumber = ev_mctr->size();
     mcshowernumber = ev_mcs->size();
@@ -2097,14 +2148,6 @@ void FillTreeVariables::Fill(art::Event const & e,
 				     delta_mcshower_index,
 				     delta_proton_index,
 				     delta_mctrack_index);
-      /*
-	GetDeltaTrackIDs(e,
-	delta_rad_mct_index,
-	delta_photon_index,
-	delta_mcshower_index,
-	delta_proton_index,
-	delta_mctrack_index);
-      */
     }
 
   }
