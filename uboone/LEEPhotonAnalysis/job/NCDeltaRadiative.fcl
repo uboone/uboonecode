@@ -75,7 +75,7 @@ outputs:
    fileName:    "%ifb_%tc_ncdeltaradfiltered.root"
 #   sam_ignore:  true
    dataTier:    "reconstructed-2d"
-   SelectEvents: { SelectEvents: [ truth ] }
+   SelectEvents: [ truth ]
    compressionLevel: 1
  }
 }
