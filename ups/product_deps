@@ -36,7 +36,7 @@ product          version
 #genie 		ncdelta_2_12_2alt
 swtrigger       v02_02_03
 larlite         v06_26_01_01
-larcv           v06_26_01_01
+larcv2          v06_26_01
 genie_xsec      v2_12_0
 larsoft         v06_26_01_09
 ubutil          v06_26_01_10
@@ -50,7 +50,7 @@ end_product_list
 # We now define allowed qualifiers and the corresponding qualifiers for the depdencies.
 # Make a table by adding columns before "notes". 
 # e10  - with gcc 4.9.3 and -std=c++1y
-qualifier	larlite	    larcv	swtrigger	genie_xsec	larsoft		ubutil		uboonedata	uboonedaq_datatypes notes
+qualifier	larlite	    larcv2	swtrigger	genie_xsec	larsoft		ubutil		uboonedata	uboonedaq_datatypes notes
 e10:debug	e10:debug   e10:debug	e10:debug	DefaultPlusMECWithNC	e10:debug	e10:debug	-nq-		e10:debug
 e10:opt		e10:opt     e10:opt	e10:opt		DefaultPlusMECWithNC	e10:opt		e10:opt		-nq-        	e10:opt
 e10:prof	e10:prof    e10:prof	e10:prof	DefaultPlusMECWithNC	e10:prof	e10:prof	-nq-        	e10:prof
