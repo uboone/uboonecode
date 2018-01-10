@@ -4,8 +4,6 @@
 
 #include "FillTreeVariables.h"
 
-#include "uboone/AnalysisTree/MCTruth/AssociationsTruth_tool.h"
-#include "uboone/AnalysisTree/MCTruth/BackTrackerTruth_tool.h"
 
 #include "uboone/EventWeight/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
