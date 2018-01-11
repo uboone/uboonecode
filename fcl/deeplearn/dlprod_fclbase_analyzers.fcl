@@ -8,7 +8,7 @@
 BEGIN_PROLOG
 
 SuperaWholeView: {
-  module_type:     "LArSoftSuperaSriver"
+  module_type:     "LArSoftSuperaDriver"
   supera_params:   "supera_segment.fcl"
   out_filename:    "larcv.root"
   unique_filename: false
