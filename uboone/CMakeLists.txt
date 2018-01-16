@@ -44,6 +44,7 @@ add_subdirectory(MicroBooNEPandora)
 
 add_subdirectory(DQMTools)
 
+add_subdirectory(DecisionTreeID)
 
 add_subdirectory(LEEPhotonAnalysis)
 

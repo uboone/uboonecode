@@ -1,0 +1,29 @@
+
+BEGIN_PROLOG
+#
+# Module configuration
+#
+DecisionTreeID: {
+
+ module_type:      "DecisionTreeID"
+ TrackModuleLabel: "pandoraNu"
+
+ ModelFile:        "multiclass_pandoraNu_mcc86.model"
+
+ # this should be the same for training and predicting!
+ FeaturesConfig:
+ {
+    NEndHits:         3
+    BeamWindowStartT: 3.2
+    BeamWindowEndT:   4.8
+
+    PIDAssocLabel:        "pandoraNupid"
+    CaloAssocLabel:       "pandoraNucalo"
+    CosmicTagAssocLabel:  "pandoraNutag"
+    ContainTagAssocLabel: "pandoraNuContTag"
+    HitAssocLabel:        "pandoraNu"
+    FlashModuleLabel:     "simpleFlashBeam"
+ }
+
+}
+END_PROLOG
