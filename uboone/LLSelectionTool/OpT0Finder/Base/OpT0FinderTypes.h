@@ -77,6 +77,16 @@ namespace flashana {
     {}
   };
 
+        /// Struct to represent a spacepoint with associated hit charge
+  struct Hit3D_t {
+    double x;
+    double y;
+    double z;
+    double q;
+    int plane;
+  };
+  
+
   /// Collection of charge deposition 3D point (cluster)
   class QCluster_t : public std::vector<QPoint_t>{
   public:
@@ -98,6 +108,10 @@ namespace flashana {
       res += rhs;
       return res;
     }
+
+
+  
+  
 
   };
   /// Collection of 3D point clusters (one use case is TPC object representation for track(s) and shower(s))

@@ -42,6 +42,9 @@ add_subdirectory(DataOverlay)
 add_subdirectory(PatternFilter)
 add_subdirectory(MicroBooNEPandora)
 
+add_subdirectory(DecisionTreeID)
+add_subdirectory(UBXSec)
+
 add_subdirectory(DQMTools)
 
 
