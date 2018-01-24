@@ -174,6 +174,8 @@ class FillTreeVariables {
   double longest_asso_track_thetayx;
   double longest_asso_track_thetaxz;
   double longest_asso_track_thetayz;
+  double longest_asso_track_phi;
+  double longest_asso_track_theta;
 
   double shower_matching_ratio;
   int shower_matched_to_mcshower;

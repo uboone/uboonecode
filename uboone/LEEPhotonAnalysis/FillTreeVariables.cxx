@@ -172,6 +172,8 @@ void FillTreeVariables::SetUpTreeBranches() {
   fvertex_tree->Branch("longest_asso_track_thetayx", &longest_asso_track_thetayx, "longest_asso_track_thetayx/D");
   fvertex_tree->Branch("longest_asso_track_thetaxz", &longest_asso_track_thetaxz, "longest_asso_track_thetaxz/D");
   fvertex_tree->Branch("longest_asso_track_thetayz", &longest_asso_track_thetayz, "longest_asso_track_thetayz/D");
+  fvertex_tree->Branch("longest_asso_track_phi", &longest_asso_track_phi, "longest_asso_track_phi/D");
+  fvertex_tree->Branch("longest_asso_track_theta", &longest_asso_track_theta, "longest_asso_track_theta/D");
 
   fvertex_tree->Branch("closest_asso_shower_dist_to_flashzcenter", &closest_asso_shower_dist_to_flashzcenter, "closest_asso_shower_dist_to_flashzcenter/D");
 
@@ -760,6 +762,8 @@ void FillTreeVariables::ResetVertex() {
   longest_asso_track_true_thetaxz = -2;
   longest_asso_track_true_thetayz = -2;
   longest_asso_track_true_energy = -1;
+  longest_asso_track_theta = -99;
+  longest_asso_track_phi = -99;
 
   //
   shower_matching_ratio = -3;
@@ -2066,6 +2070,9 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     longest_asso_track_thetayx = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirx);
     longest_asso_track_thetaxz = atan(longest_asso_track_reco_dirx/longest_asso_track_reco_dirz);
     longest_asso_track_thetayz = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirz);
+    longest_asso_track_theta = t.Theta();
+    longest_asso_track_phi = t.Phi();
+
   }
 
   if(fverbose) std::cout << "Get shortest shower to vertex distance\n";
@@ -2106,7 +2113,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     most_energetic_shower_reco_thetayz = atan(shower_dir.at(1)/shower_dir.at(2)); 
     //most_energetic_shower_reco_width0 = sh.Width()[0];
     //most_energetic_shower_reco_width1 = sh.Width()[1];
-    //most_energetic_shower_reco_opening_angle = sh.OpeningAngle();
+   // most_energetic_shower_reco_opening_angle = sh.OpeningAngle();
     most_energetic_shower_reco_length = sh.Length();
     most_energetic_shower_reco_dirx = shower_dir.at(0);
     most_energetic_shower_reco_diry = shower_dir.at(1);

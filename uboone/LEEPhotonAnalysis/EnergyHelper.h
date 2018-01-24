@@ -9,7 +9,7 @@
 #define ENERGYHELPER_H
 
 #include "HelperBase.h"
-
+#include <vector>
 #include "GeometryHelper.h"
 
 #include "lardataobj/AnalysisBase/Calorimetry.h"
@@ -41,6 +41,11 @@ public:
   double trackEnergy(const art::Ptr<recob::Track> &track, const art::Event &evt,
                      std::string _pfp_producer = "pandoraNu");
 
+
+  std::vector<double> trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer = "pandoranu");
+
+
+
   /**
    * @brief      Measure the energy of a shower
    *
@@ -60,6 +65,9 @@ public:
    * @param[in]  evt     The art::event
    * @param      energy  The energy
    */
+ 
+
+
   void measureEnergy(size_t ipf, const art::Event &evt, double &energy,
                      std::string _pfp_producer = "pandoraNu");
 
