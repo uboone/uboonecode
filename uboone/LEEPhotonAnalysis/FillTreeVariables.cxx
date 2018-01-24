@@ -5,7 +5,10 @@
 #include "FillTreeVariables.h"
 
 #include "uboone/EventWeight/MCEventWeight.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
+#include "lardataobj/MCBase/MCTrack.h"
+#include "lardataobj/MCBase/MCShower.h"
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
@@ -13,7 +16,7 @@
 
 
 FillTreeVariables::FillTreeVariables() :
-  fmcrecomatching(false),
+  frmcm(nullptr),
   ftpc_volume(0,
 	      -lar::providerFrom<geo::Geometry>()->DetHalfHeight(),
 	      0,
@@ -34,33 +37,25 @@ FillTreeVariables::FillTreeVariables() :
 
 
 void FillTreeVariables::SetProducers(std::string const & mcordata,
-				     bool const mcrecomatching,
 				     std::string const & track_producer,
 				     std::string const & shower_producer,
 				     std::string const & hit_producer,
-				     std::string const & rmcmassociation_producer,
 				     std::string const & opflash_producer,
-				     std::string const & trigger_product) {
+				     std::string const & trigger_product,
+				     std::string const & rmcmassociation_producer,
+				     RecoMCMatching const * rmcm) {
 
   fmcordata = mcordata;
-  fmcrecomatching = mcrecomatching;
-  if(fmcrecomatching) {
-    /*
-    frmcm.Configure("",
-		    "largeant",
-		    track_producer,
-		    track_producer,
-		    shower_producer);
-    */
-  }
   ftrack_producer = track_producer;
   fshower_producer = shower_producer;
   fhit_producer = hit_producer;
   frmcmassociation_producer = rmcmassociation_producer;
   fopflash_producer = opflash_producer;  
   fswtrigger_product = trigger_product;
+  frmcm = rmcm;
 
 }
+
 
 
 void FillTreeVariables::SetUpTreeBranches() {
@@ -966,57 +961,6 @@ bool FillTreeVariables::DeltaRadFilter(art::Event const & e,
 }
 
 
-bool FillTreeVariables::OldDeltaRadFilter(art::Event const & e,
-					  size_t & mctruth_index) {
-
-  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct =
-    e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
-
-  size_t delta_counter = 0;
-
-  for(size_t i = 0; i < ev_mct->size(); ++i) {
-
-    simb::MCTruth const & mct = ev_mct->at(i);
-
-    if(!mct.GetNeutrino().CCNC()) continue;
-
-    size_t exiting_photon_counter = 0;
-    int parent_id = -1;
-
-    for(int j = mct.NParticles() - 1; j >= 0; --j) {
-
-      simb::MCParticle const & mcp = mct.GetParticle(j);
-
-      if(mcp.PdgCode() == 22) {
-
-	if(mcp.StatusCode() == 1) {
-	  parent_id = mcp.Mother();
-	  if(++exiting_photon_counter > 1) break;
-	}
-
-	else if(mcp.TrackId() == parent_id) {
-	  parent_id = mcp.Mother();
-	}
-
-      }
-
-      else if((abs(mcp.PdgCode()) == 2214 || abs(mcp.PdgCode()) == 2114) &&
-	      mcp.TrackId() == parent_id) {
-	mctruth_index = i;
-	++delta_counter;
-	break;
-      }
-
-    }
-
-  }      
-
-  if(delta_counter > 0) return true;
-
-  return false;
-
-}
-
 
 bool FillTreeVariables::PassedSWTrigger(art::Event const & e) const {
 
@@ -1195,10 +1139,8 @@ void FillTreeVariables::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
 
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
     e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
-
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-
   art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower =
     e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
 
@@ -1629,131 +1571,18 @@ double FillTreeVariables::ShowerZDistToClosestFlash(art::Event const & e,
 
 
 
-void FillTreeVariables::FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
-					      std::unordered_map<int, size_t> const & sp_map,
-					      std::unordered_map<int, size_t> const & mcp_map,
-					      art::FindManyP<recob::Hit> const & hits_per_object,
-					      art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
-					      std::vector<RecoMCMatch> & object_matches) {
-
-  for(size_t i_o = 0; i_o < hits_per_object.size(); ++i_o) {
-
-    std::vector<art::Ptr<recob::Hit>> obj_hits_ptrs = hits_per_object.at(i_o);
-    std::vector<simb::MCParticle const *> particle_vec;
-    std::vector<anab::BackTrackerHitMatchingData const *> match_vec;
-
-    std::unordered_map<int, double> trkide_map;
-    double total = 0;
-
-    for(size_t i_h = 0; i_h < obj_hits_ptrs.size(); ++i_h) {
-
-      particle_vec.clear(); 
-      match_vec.clear();
-      particles_per_hit.get(obj_hits_ptrs.at(i_h).key(), particle_vec, match_vec);
-
-      for(size_t i_p = 0; i_p < particle_vec.size(); ++i_p) {
-	trkide_map[particle_vec.at(i_p)->TrackId()] += match_vec[i_p]->numElectrons;
-	total += match_vec[i_p]->numElectrons;
-      }
-
-    }
-
-    int trackid = -1;
-    double max = 0;
-    for(auto const & p : trkide_map) {
-      if(p.second > max) {
-	trackid = p.first;
-	max = p.second;
-      }
-    }
-
-    auto const tp_it = tp_map.find(trackid);
-    if(tp_it != tp_map.end()) {
-      object_matches.push_back({1, tp_it->second, max/total});
-      continue;
-    }
-    auto const sp_it = sp_map.find(trackid);
-    if(sp_it != sp_map.end()) {
-      object_matches.push_back({2, sp_it->second, max/total});
-      continue;
-    }
-    auto const mcp_it = mcp_map.find(trackid);
-    if(mcp_it != mcp_map.end()) {
-      object_matches.push_back({3, mcp_it->second, max/total});
-      continue;
-    }    
-    object_matches.push_back({0, SIZE_MAX, 0});
-
-  }
-
-}
 
 
 
-void FillTreeVariables::MatchWAssociations(art::Event const & e) {
-
-  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
-  art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-  art::ValidHandle<std::vector<recob::Hit>> const & ev_h  = e.getValidHandle<std::vector<recob::Hit>>(fhit_producer);
-  art::ValidHandle<std::vector<recob::Track>> const & ev_t  = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
-  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
-  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp  = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
-
-  track_matches.clear();
-  track_matches.reserve(ev_t->size());
-  shower_matches.clear();
-  shower_matches.reserve(ev_s->size());  
-
-  art::FindManyP<recob::Hit> hits_per_track(ev_t, e, ftrack_producer);
-  art::FindManyP<recob::Hit> hits_per_shower(ev_s, e, fshower_producer);
-  art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> particles_per_hit(ev_h, e, frmcmassociation_producer);
-
-  std::unordered_map<int, size_t> tp_map;
-  for(size_t mc_index = 0; mc_index < ev_mctrack->size(); ++mc_index)
-    tp_map[ev_mctrack->at(mc_index).TrackID()] = mc_index;
-  
-  std::unordered_map<int, size_t> sp_map;
-  for(size_t mc_index = 0; mc_index < ev_mcshower->size(); ++mc_index){
-    sim::MCShower const & mcshower = ev_mcshower->at(mc_index);
-    for(auto const & id : mcshower.DaughterTrackID()) {
-      if(tp_map.find(id) != tp_map.end()) continue;
-      sp_map[id] = mc_index;
-    }
-  }
-
-  std::unordered_map<int, size_t> mcp_map;
-  for(size_t i = 0; i < ev_mcp->size(); ++i) {
-    int const trackid = ev_mcp->at(i).TrackId(); 
-    if(tp_map.find(trackid) != tp_map.end() || sp_map.find(trackid) != sp_map.end()) continue;
-    mcp_map[ev_mcp->at(i).TrackId()] = i;
-  }
-  
-  FillAssociationVector(tp_map,
-			sp_map,
-			mcp_map,
-			hits_per_track,
-			particles_per_hit,
-			track_matches);
-
-  FillAssociationVector(tp_map,
-			sp_map,
-			mcp_map,
-			hits_per_shower,
-			particles_per_hit,
-			shower_matches);
-
-}
-
-
-art::Ptr<simb::MCTruth> FillTreeVariables::TrackIDToMCTruth(art::Event const & e, int geant_track_id) {
+art::Ptr<simb::MCTruth> FillTreeVariables::TrackIDToMCTruth(art::Event const & e, int const geant_track_id) {
 
   lar_pandora::MCTruthToMCParticles truthToParticles;
   lar_pandora::MCParticlesToMCTruth particlesToTruth;
 
   lar_pandora::LArPandoraHelper::CollectMCParticles(e, "largeant", truthToParticles, particlesToTruth);
 
-  for (auto iter : particlesToTruth) {
-    if (iter.first->TrackId() == geant_track_id) {
+  for(auto iter : particlesToTruth) {
+    if(iter.first->TrackId() == geant_track_id) {
       return iter.second;
     }
   }
@@ -1770,8 +1599,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
 						 size_t const delta_mcshower_index,
 						 size_t const delta_mctrack_index) {
 
-  //RecoMCMatch const & shower_match = frmcm.GetShowerMatches().at(most_energetic_associated_shower_index);
-  RecoMCMatch const & shower_match = shower_matches.at(most_energetic_associated_shower_index);
+  RecoMCMatch const & shower_match = frmcm->GetShowerMatches().at(most_energetic_associated_shower_index);
 
   shower_matching_ratio = shower_match.ratio;
 
@@ -1787,7 +1615,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   shower_matched_to_mcshower = 0;
   shower_matched_to_mctrack = 0;
   shower_matched_to_mcparticle = 0;
-  if(shower_match.mc_type == 2) {
+  if(shower_match.mc_type == 1) {
     shower_matched_to_mcshower = 1;
     sim::MCShower const & mcs = ev_mcs->at(shower_match.mc_index);
     art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcs.TrackID());
@@ -1815,7 +1643,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
     shower_true_thetayz = atan(shower_dir.at(1)/shower_dir.at(2));
     shower_true_energy = mcs.Start().E() * 1e-3;
   }
-  else if(shower_match.mc_type == 1) {
+  else if(shower_match.mc_type == 2) {
     shower_matched_to_mctrack = 1;
     sim::MCTrack const & mctr = ev_mctr->at(shower_match.mc_index);
     art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mctr.TrackID());
@@ -1874,8 +1702,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
 						size_t const delta_mcshower_index,
 						size_t const delta_mctrack_index) {
 
-  //RecoMCMatch const & longest_asso_track_match = frmcm.GetTrackMatches().at(longest_asso_track_index);
-  RecoMCMatch const & longest_asso_track_match = track_matches.at(longest_asso_track_index);
+  RecoMCMatch const & longest_asso_track_match = frmcm->GetTrackMatches().at(longest_asso_track_index);
 
   longest_asso_track_matching_ratio = longest_asso_track_match.ratio;
 
@@ -1891,7 +1718,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
   longest_asso_track_matched_to_mcshower = 0;
   longest_asso_track_matched_to_mctrack = 0;
   longest_asso_track_matched_to_mcparticle = 0;
-  if(longest_asso_track_match.mc_type == 2) {
+  if(longest_asso_track_match.mc_type == 1) {
     longest_asso_track_matched_to_mcshower = 1;
     sim::MCShower const & mcs = ev_mcs->at(longest_asso_track_match.mc_index);
     art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mcs.TrackID());
@@ -1912,7 +1739,7 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
     longest_asso_track_true_thetayz = atan(longest_asso_track_dir.at(1)/longest_asso_track_dir.at(2));
     longest_asso_track_true_energy = mcs.Start().E() * 1e-3;
   }
-  else if(longest_asso_track_match.mc_type == 1) {
+  else if(longest_asso_track_match.mc_type == 2) {
     longest_asso_track_matched_to_mctrack = 1;
     sim::MCTrack const & mctr = ev_mctr->at(longest_asso_track_match.mc_index);
     art::Ptr<simb::MCTruth> const mct = TrackIDToMCTruth(e, mctr.TrackID());
@@ -2144,7 +1971,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 
     reco_true_nuvert_dist = reco_vertex.Dist(ev_mct->at(delta_rad_mct_index).GetNeutrino().Nu().Position(0));
 
-    if(most_energetic_associated_shower_index != SIZE_MAX && fmcrecomatching) {
+    if(most_energetic_associated_shower_index != SIZE_MAX && frmcm) {
       FillShowerRecoMCMatching(e,
 			       most_energetic_associated_shower_index,
 			       delta_rad_mct_index,
@@ -2152,7 +1979,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
 			       delta_mctrack_index);
     }
 
-    if(longest_asso_track_index != SIZE_MAX && fmcrecomatching) {
+    if(longest_asso_track_index != SIZE_MAX && frmcm) {
       FillTrackRecoMCMatching(e,
 			      longest_asso_track_index,
 			      delta_rad_mct_index,
@@ -2181,15 +2008,13 @@ void FillTreeVariables::Fill(art::Event const & e,
 
   if(fmcordata == "mc") {
 
-    art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct =      e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
-    art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =      e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-    art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcs =      e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
+    art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
+    art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
+    art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcs = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
 
     FillWeights(e);
 
     if(ev_mct->front().GetNeutrino().Nu().Mother() == -1) FillTruth(e, delta_rad_mct_index);
-    //if(fmcrecomatching) frmcm.MatchAll(e);
-    if(fmcrecomatching) MatchWAssociations(e);
 
     mctracknumber = ev_mctr->size();
     mcshowernumber = ev_mcs->size();
@@ -2211,9 +2036,9 @@ void FillTreeVariables::Fill(art::Event const & e,
 
   }
 
-  art::ValidHandle<std::vector<recob::Track>> const & ev_t =   e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
-  art::ValidHandle<std::vector<recob::Shower>> const & ev_s =   e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
-  art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf =    e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producer);
+  art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
+  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
+  art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producer);
 
   run_number = e.id().run();
   subrun_number = e.id().subRun();
