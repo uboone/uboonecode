@@ -98,7 +98,7 @@
 #include "TTimeStamp.h"
 
 
-
+constexpr int kmaxg4par= 90000;
 
 constexpr int kNplanes       = 3;     //number of wire planes
 constexpr int kMaxHits       = 40000; //maximum number of hits;
@@ -640,7 +640,8 @@ public:
     double GetRecoQ2RecoFormula();/// reconstructed Q^2 using reconstructed kinematics *** hacer                                                            
     double GetRecoQ3RecoFormula();/// reconstructed |Q_3| using reconstructed kinematics *** hacer                                                          
     */
-
+    // Clear all fields if this object (not the tracker algorithm data)
+    void ClearLocalData();
   
 
     // Override the response to input and output fils so we can get the
@@ -653,7 +654,7 @@ public:
     // The analysis routine, called once per event. 
     void analyze (const art::Event& evt); 
     TTree*    fMC_Truth;
-
+    TTree*    fMC_Geant;
 
     TTree*   fMC_allsel;
     TTree*   fMC_flashwin;
@@ -709,8 +710,18 @@ private:
     float _fmparEndx;
     float _fmparEndy;
     float _fmparEndz;
-
-    Int_t nGEANTparticles;
+    //arrays declared for the efficiency calculation
+    
+    int fhg4parpdg[kmaxg4par];
+    int fhg4parstatus[kmaxg4par];
+    float fhg4parpx[kmaxg4par];
+    float fhg4parpy[kmaxg4par];
+    float fhg4parpz[kmaxg4par];
+    float fhg4partheta[kmaxg4par];
+    float fhg4parphi[kmaxg4par];
+    float fhg4parp[kmaxg4par];
+    //===================================================
+    int nGEANTparticles;
     std::vector<int> _fg4parpdg;
     std::vector<int> _fg4parstatus; //status code of secondary particles assigned by geant
     std::vector<float> _fg4EngS; //energy of particles at started in GeV;
@@ -974,6 +985,18 @@ void  CC1uNPSelAna::beginJob()
     fMC_Truth->Branch("_fTruenuvrtxx_SCE",&_fTruenuvrtxx_SCE,"_fTruenuvrtxx_SCE/F");
     fMC_Truth->Branch("_fTruenuvrtxy_SCE",&_fTruenuvrtxy_SCE,"_fTruenuvrtxy_SCE/F");
     fMC_Truth->Branch("_fTruenuvrtxz_SCE",&_fTruenuvrtxz_SCE,"_fTruenuvrtxz_SCE/F");
+    //-------------------------------------------------------------------------------
+    fMC_Geant=tfs->make<TTree>("fMC_Geant", "MC Holder"); 
+    fMC_Geant->Branch("nGEANTparticles", &nGEANTparticles , "nGEANTparticles/I");
+    fMC_Geant->Branch("fhg4parpdg", &fhg4parpdg, "fhg4parpdg[nGEANTparticles]/I");
+    fMC_Geant->Branch("fhg4parstatus", &fhg4parstatus, "fhg4parstatus[nGEANTparticles]/I");
+    fMC_Geant->Branch("fhg4parphi", &fhg4parphi, "fhg4parphi[nGEANTparticles]/F");
+    fMC_Geant->Branch("fhg4partheta", &fhg4partheta, "fhg4partheta[nGEANTparticles]/F");
+    fMC_Geant->Branch("fhg4parpx", &fhg4parpx, "fhg4parpx[nGEANTparticles]/F");
+    fMC_Geant->Branch("fhg4parpy", &fhg4parpy, "fhg4parpy[nGEANTparticles]/F");
+    fMC_Geant->Branch("fhg4parpz", &fhg4parpz, "fhg4parpz[nGEANTparticles]/F");
+    fMC_Geant->Branch("fhg4parp",  &fhg4parp,  "fhg4parp[nGEANTparticles]/F");
+    fMC_Geant->Branch("truthtop", &truthtop, "truthtop/I");
      
     //========================================================================================= 
 
@@ -1255,16 +1278,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -1774,6 +1797,18 @@ double CC1uNPSelAna::GetTrackDirection(art::Ptr<recob::Track> InputTrackPtr, TVe
  return trackTheta;
  //return trackPos, trackEnd, trackTheta;/// *** revisit and add phi!!!                                                                                    
 }
+
+void CC1uNPSelAna::ClearLocalData(){
+  std::fill(fhg4parpdg, fhg4parpdg + sizeof(fhg4parpdg)/sizeof(fhg4parpdg[0]), -99999.);
+  std::fill(fhg4parstatus, fhg4parstatus + sizeof(fhg4parstatus)/sizeof(fhg4parstatus[0]), -99999.);
+  std::fill(fhg4parp, fhg4parp + sizeof(fhg4parp)/sizeof(fhg4parp[0]), -99999.);
+  std::fill(fhg4parpx, fhg4parpx + sizeof(fhg4parpx)/sizeof(fhg4parpx[0]), -99999.);
+  std::fill(fhg4parpy, fhg4parpy + sizeof(fhg4parpy)/sizeof(fhg4parpy[0]), -99999.);
+  std::fill(fhg4parpz, fhg4parpz + sizeof(fhg4parpz)/sizeof(fhg4parpz[0]), -99999.);
+  std::fill(fhg4partheta, fhg4partheta + sizeof(fhg4partheta)/sizeof(fhg4partheta[0]), -99999.);
+  std::fill(fhg4parphi, fhg4parphi + sizeof(fhg4parphi)/sizeof(fhg4parphi[0]), -99999.);
+}
+
 /*
 double CC1uNPSelAna::GetTruthNuEnergy(std::vector<art::Ptr<simb::MCTruth> > mclist){/// *** need to be check                                              
   double enu_truth = mclist[0]->GetNeutrino().Nu().E();/// only for the first neutrino                                                                    
@@ -2030,15 +2065,13 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     //auto const* SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
 
 
-    if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz)) {OOFVflag=true;}
-
-
     std::cout<<"start looping over all the geant particles and get the topology"<<std::endl;
  
     std::string pri("primary");
 
 
     nGeantParticles=mcparticleListHandle->size();
+    nGEANTparticles=nGeantParticles;
     std::cout<<"total number of geant particle is "<<nGeantParticles<<std::endl;
     for(size_t g4pt=0; g4pt<mcparticleListHandle->size(); g4pt++){
       if(mcparticleListHandle.isValid() && mcparticleListHandle->size()>0){
@@ -2116,12 +2149,36 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       _fg4NumberDaughters.push_back(pPart.NumberDaughters());
       //_fg4MCTruthIndex_new.push_back(mc_truth_new.key());
       //------------------------------------------------------------------------
-      //std::cout<<"mc_truth origin is "<<mc_truth->Origin()<<std::endl;
-      //std::cout<<"mc_truth new origin is "<<mc_truth_new->Origin()<<std::endl;
-
+      /*
+      fhg4parpdg[g4pt]=pPart.PdgCode();
+      fhg4parstatus[g4pt]=pPart.StatusCode();
+      fhg4parpx[g4pt]=pPart.Px();
+      fhg4parpy[g4pt]=pPart.Py();
+      fhg4parpz[g4pt]=pPart.Pz();
+      fhg4partheta[g4pt]=pPart.Momentum().Theta();
+      fhg4parphi[g4pt]=pPart.Momentum().Phi();
+      fhg4parp[g4pt]=pPart.Momentum().Vect().Mag();
+      */
+      
+      
+      //=========================================================================== 
       if( pPart.StatusCode()==1 && pPart.Mother()==0 && mc_truth->Origin()== simb::kBeamNeutrino)  
       //primary tells you if the particle is from Michel electron or decay of other particle
-      {
+      { 
+        
+
+        fhg4parpdg[g4pt]=pPart.PdgCode();
+        fhg4parstatus[g4pt]=pPart.StatusCode();
+        fhg4parpx[g4pt]=pPart.Px();
+        fhg4parpy[g4pt]=pPart.Py();
+        fhg4parpz[g4pt]=pPart.Pz();
+        fhg4partheta[g4pt]=pPart.Momentum().Theta();
+        fhg4parphi[g4pt]=pPart.Momentum().Phi();
+        fhg4parp[g4pt]=pPart.Momentum().Vect().Mag();
+ 
+
+
+
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==13) {
           nmuons=nmuons+1;
           //of all the muons select the primary muon from neutrino interaction
@@ -2145,18 +2202,19 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     
     }//end of is the g4 handle is valid and the size is greater than 0;
    }//end of loop over all the geant 4 particles
-
+   //redefine the OOFV here
+   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
 
 
    //check the cosmic flag before include the Topology function
-   if(nmuons==0 && nelectrons==0 && npions==0 && npi0==0 && nprotons==0 && OOFVflag==true) {cosmicflag=true;} 
+   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) && (nmuons==0 && nelectrons==0 && npions==0 && npi0==0 && nprotons==0)) {cosmicflag=true;} 
 
    Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons, cosmicflag, OOFVflag);
    truthtop=TopFlag;
    //std::cout<<"Topology flag is: "<<TopFlag <<" OOFVflag= "<<OOFVflag <<std::endl;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
+   fMC_Geant->Fill();
    }//end of if MC
 
 
@@ -2994,6 +3052,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
      //-------------------------------------------------------
     } //end of if flashtag is true
     } //end of if there is only one neutrino event
+    ClearLocalData();
    //-----------------------------------------------------------------------------------------------
     return;
 }

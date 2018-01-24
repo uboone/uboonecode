@@ -37,9 +37,9 @@
       <!-- <inputlist>/pnfs/uboone/persistent/users/arafique/file.txt</inputlist> -->
       <inputdef>prodgenie_bnb_nu_cosmic_uboone_mcc8.6_reco2</inputdef>
       <fcl>run_cc1unpselana.fcl</fcl>
-      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-new/out</outdir>
-      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-new/log</logdir>
-      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-new/work</workdir>
+      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-thi/out</outdir>
+      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-thi/log</logdir>
+      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-thi/work</workdir>
       
       <numjobs>1000</numjobs>
       <maxfilesperjob>10</maxfilesperjob> 
