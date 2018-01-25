@@ -583,6 +583,12 @@ namespace microboone {
       PlaneData_t<Float_t> trkpidchimu;   // particle PID chisq for muon
       PlaneData_t<Float_t> trkpidpida;    // particle PIDA
       TrackData_t<Short_t> trkpidbestplane; // this is defined as the plane with most hits   
+
+      TrackData_t<Float_t> trkpiddtp;      // decision tree PID for proton
+      TrackData_t<Float_t> trkpiddtmu;     // decision tree PID for muon
+      TrackData_t<Float_t> trkpiddtpi;     // decision tree PID for pion
+      TrackData_t<Float_t> trkpiddtem;     // decision tree PID for e and gamma
+      TrackData_t<Float_t> trkpiddtc;      // decision tree PID for cosmics
 	
 	  TrackData_t<Short_t> trkhasPFParticle; // whether this belongs to a PFParticle 
 	  TrackData_t<Short_t> trkPFParticleID;  // if hasPFParticle, its ID
@@ -1688,6 +1694,7 @@ namespace microboone {
     std::vector<std::string> fShowerModuleLabel;
     std::vector<std::string> fCalorimetryModuleLabel;
     std::vector<std::string> fParticleIDModuleLabel;
+    std::vector<std::string> fDTParticleIDModuleLabel;
     std::vector<std::string> fT0FinderLabel;   
     std::vector<std::string> fT0RecoAnodeCathodePiercingLabel; 
     std::vector<std::string> fFlashT0FinderLabel;
@@ -2112,6 +2119,12 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::Resize(size_t nTracks)
   trkpidchimu.resize(MaxTracks);
   trkpidpida.resize(MaxTracks);
   trkpidbestplane.resize(MaxTracks);
+
+  trkpiddtp.resize(MaxTracks);
+  trkpiddtmu.resize(MaxTracks);
+  trkpiddtpi.resize(MaxTracks);
+  trkpiddtem.resize(MaxTracks);
+  trkpiddtc.resize(MaxTracks);
   
   trkke.resize(MaxTracks);
   trkrange.resize(MaxTracks);
@@ -2190,7 +2203,12 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::Clear() {
   FillWith(trksvtxid    , -1);
   FillWith(trkevtxid    , -1);
   FillWith(trkpidbestplane, -1); 
-  
+  FillWith(trkpiddtp    , -99999.); 
+  FillWith(trkpiddtmu   , -99999.); 
+  FillWith(trkpiddtpi   , -99999.); 
+  FillWith(trkpiddtem   , -99999.); 
+  FillWith(trkpiddtc    , -99999.); 
+ 
   FillWith(trkhasPFParticle, -1);
   FillWith(trkPFParticleID , -1);
  
@@ -2452,6 +2470,21 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::SetAddresses(
 
   BranchName = "trkpidbestplane_" + TrackLabel;
   CreateBranch(BranchName, trkpidbestplane, BranchName + NTracksIndexStr + "/S");
+  
+  BranchName = "trkpiddtp_" + TrackLabel;
+  CreateBranch(BranchName, trkpiddtp, BranchName + NTracksIndexStr + "/F");
+  
+  BranchName = "trkpiddtmu_" + TrackLabel;
+  CreateBranch(BranchName, trkpiddtmu, BranchName + NTracksIndexStr + "/F");
+  
+  BranchName = "trkpiddtpi_" + TrackLabel;
+  CreateBranch(BranchName, trkpiddtpi, BranchName + NTracksIndexStr + "/F");
+  
+  BranchName = "trkpiddtem_" + TrackLabel;
+  CreateBranch(BranchName, trkpiddtem, BranchName + NTracksIndexStr + "/F");
+  
+  BranchName = "trkpiddtc_" + TrackLabel;
+  CreateBranch(BranchName, trkpiddtc, BranchName + NTracksIndexStr + "/F");
   
   BranchName = "trkhasPFParticle_" + TrackLabel;
   CreateBranch(BranchName, trkhasPFParticle, BranchName + NTracksIndexStr + "/S");
@@ -4101,6 +4134,7 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   fShowerModuleLabel        (pset.get< std::vector<std::string> >("ShowerModuleLabel")),
   fCalorimetryModuleLabel   (pset.get< std::vector<std::string> >("CalorimetryModuleLabel")),
   fParticleIDModuleLabel    (pset.get< std::vector<std::string> >("ParticleIDModuleLabel")   ),
+  fDTParticleIDModuleLabel  (pset.get< std::vector<std::string> >("DTParticleIDModuleLabel")   ),
   fT0RecoAnodeCathodePiercingLabel (pset.get< std::vector<std::string> >("T0RecoAnodeCathodePiercingLabel") ),
   fFlashT0FinderLabel       (pset.get< std::vector<std::string> >("FlashT0FinderLabel")   ),
   fMCT0FinderLabel          (pset.get< std::vector<std::string> >("MCT0FinderLabel")   ),
@@ -4169,6 +4203,11 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
     throw art::Exception(art::errors::Configuration)
       << "fTrackModuleLabel.size() = "<<fTrackModuleLabel.size()<<" does not match "
       << "fParticleIDModuleLabel.size() = "<<fParticleIDModuleLabel.size();
+  }
+  if (fTrackModuleLabel.size() != fDTParticleIDModuleLabel.size()){
+    throw art::Exception(art::errors::Configuration)
+      << "fTrackModuleLabel.size() = "<<fTrackModuleLabel.size()<<" does not match "
+      << "fDTParticleIDModuleLabel.size() = "<<fDTParticleIDModuleLabel.size();
   }
   
   if (fTrackModuleLabel.size() != fT0RecoAnodeCathodePiercingLabel.size()){
@@ -5504,6 +5543,29 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	  }
 	} // fmpid.isValid()
 	
+  // find decision tree particle ID info
+  art::FindMany<anab::CosmicTag> fmdtpid(trackListHandle[iTracker], evt, fDTParticleIDModuleLabel[iTracker]);
+  if(fmdtpid.isValid()) {
+    std::vector<const anab::CosmicTag*> dtpids = fmdtpid.at(iTrk);
+    for(size_t idtpid = 0; idtpid < dtpids.size(); ++idtpid){
+      if(dtpids[idtpid]->CosmicType() == anab::CosmicTagID_t::kGeometry_YY){
+        TrackerData.trkpiddtp[iTrk] = dtpids[idtpid]->CosmicScore();
+      }
+      else if(dtpids[idtpid]->CosmicType() == anab::CosmicTagID_t::kGeometry_YZ){
+        TrackerData.trkpiddtmu[iTrk] = dtpids[idtpid]->CosmicScore();
+      }
+      else if(dtpids[idtpid]->CosmicType() == anab::CosmicTagID_t::kGeometry_ZZ){
+        TrackerData.trkpiddtpi[iTrk] = dtpids[idtpid]->CosmicScore();
+      }
+      else if(dtpids[idtpid]->CosmicType() == anab::CosmicTagID_t::kGeometry_XX){
+        TrackerData.trkpiddtem[iTrk] = dtpids[idtpid]->CosmicScore();
+      }
+      else if(dtpids[idtpid]->CosmicType() == anab::CosmicTagID_t::kGeometry_XY){
+        TrackerData.trkpiddtc[iTrk] = dtpids[idtpid]->CosmicScore();
+      }
+    }
+  }
+
 	art::FindMany<anab::Calorimetry> fmcal(trackListHandle[iTracker], evt, fCalorimetryModuleLabel[iTracker]);
 	if (fmcal.isValid()){
 	  std::vector<const anab::Calorimetry*> calos = fmcal.at(iTrk);

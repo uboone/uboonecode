@@ -1,3 +1,4 @@
+#include "mctruthmatching_uboone.fcl"
 
 BEGIN_PROLOG
 #
@@ -10,7 +11,7 @@ DecisionTreeIDAna: {
 
  # get and save the class label for each track
  # (usually only works with MC)
- GetClassLabel: false
+ GetClassLabel: true
 
  # get and save the decision tree prediction
  # (only works after prediction has run)
@@ -34,6 +35,8 @@ DecisionTreeIDAna: {
     ContainTagAssocLabel:  "pandoraNuContTag"
     HitAssocLabel:         "pandoraNu"
     FlashModuleLabel:      "simpleFlashBeam"
+
+    MCTruthMatching:     @local::AssociationsTruthTool
  }
 
 }

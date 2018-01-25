@@ -11,7 +11,6 @@
 #include "canvas/Persistency/Common/FindManyP.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Framework/Principal/Handle.h"
-#include "larsim/MCCheater/BackTracker.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 
 #include <iostream>
@@ -60,6 +59,7 @@ namespace dtfeatures{
     std::string _hitassoclabel;
     std::string _flashmodulelabel;
 
+    fhicl::ParameterSet _truthparams;
   };
 }
 

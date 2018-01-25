@@ -39,14 +39,14 @@ physics:
 
  producers:
  {
-   pandoranudecisiontreeid: @local::DecisionTreeID
+   pandoraNudecisiontreeid: @local::DecisionTreeID
  }
 
  analyzers:
  {
  }
 
- reco: [ pandoranudecisiontreeid ]
+ reco: [ pandoraNudecisiontreeid ]
 
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]

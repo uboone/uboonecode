@@ -2,7 +2,6 @@
 art_make(BASENAME_ONLY
          LIBRARY_NAME uboonecode_uboone_DecisionTreeIDAlgorithms 
          LIB_LIBRARIES 	  		   
-           larsim_MCCheater_BackTracker_service
 	  	     larcore_Geometry
 		       larcore_Geometry_Geometry_service
 		       lardataobj_RecoBase
@@ -11,6 +10,8 @@ art_make(BASENAME_ONLY
 			     larreco_RecoAlg
 			     larpandora_LArPandoraInterface
            larsim_Simulation lardataobj_Simulation 
+           uboone_AnalysisTree_MCTruth_MCTruthBase
+           uboone_AnalysisTree_MCTruth
            nusimdata_SimulationBase
 		       art_Persistency_Common canvas_Persistency_Common
 		       art_Persistency_Provenance canvas_Persistency_Provenance
@@ -33,7 +34,6 @@ art_make(BASENAME_ONLY
 		       ${ROOT_BASIC_LIB_LIST}
  
          MODULE_LIBRARIES 	  		   
-           larsim_MCCheater_BackTracker_service
 	  	     larcore_Geometry
 		       larcore_Geometry_Geometry_service
 		       lardataobj_RecoBase
@@ -42,6 +42,8 @@ art_make(BASENAME_ONLY
 			     larreco_RecoAlg
 			     larpandora_LArPandoraInterface
            larsim_Simulation lardataobj_Simulation 
+           uboone_AnalysisTree_MCTruth_MCTruthBase
+           uboone_AnalysisTree_MCTruth
            nusimdata_SimulationBase
 		       art_Persistency_Common canvas_Persistency_Common
 		       art_Persistency_Provenance canvas_Persistency_Provenance

@@ -1,6 +1,4 @@
 #include "services_microboone.fcl"
-#include "largeantmodules_microboone.fcl"
-#include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
 #include "decisiontreeidana.fcl"
@@ -16,9 +14,8 @@ services:
   MemoryTracker:           @local::microboone_memory_tracker
   RandomNumberGenerator:   {} #ART native random number generator
   message:                 @local::microboone_message_services_prod_debug
-  #FileCatalogMetadata:     @local::art_file_catalog_mc
-  @table::microboone_simulation_services
-  BackTracker:             @local::microboone_backtracker
+  FileCatalogMetadata:     @local::art_file_catalog_mc
+  @table::microboone_services_reco
 }
 
 services.TimeTracker.printSummary: false

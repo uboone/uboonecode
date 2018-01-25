@@ -7,7 +7,6 @@ link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} ${XGBOOS
 art_make(BASENAME_ONLY
          LIBRARY_NAME uboonecode_uboone_DecisionTreeID 
          LIB_LIBRARIES 	  		   
-           larsim_MCCheater_BackTracker_service
 	  	     larcore_Geometry
 		       larcore_Geometry_Geometry_service
 		       lardataobj_RecoBase
@@ -17,7 +16,9 @@ art_make(BASENAME_ONLY
 			     larpandora_LArPandoraInterface
            larsim_Simulation lardataobj_Simulation 
            nusimdata_SimulationBase
-
+		       art_Persistency_Common canvas_Persistency_Common
+		       art_Persistency_Provenance canvas_Persistency_Provenance
+		       art_Utilities canvas_Utilities
 		       ${UBOONECODE_LIB}
 		       ${LARDATA_LIB}
 		       ${ART_FRAMEWORK_CORE}
@@ -37,7 +38,6 @@ art_make(BASENAME_ONLY
  
          MODULE_LIBRARIES 	  		   
            uboonecode_uboone_DecisionTreeIDAlgorithms
-           larsim_MCCheater_BackTracker_service
 	  	     larcore_Geometry
 		       larcore_Geometry_Geometry_service
 		       lardataobj_RecoBase

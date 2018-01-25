@@ -14,7 +14,6 @@
 #include "art/Framework/Services/Optional/TFileDirectory.h"
 #include "canvas/Persistency/Common/FindManyP.h"
 
-
 #include "lardataobj/RecoBase/Track.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/OpFlash.h"
@@ -22,14 +21,12 @@
 #include "lardataobj/AnalysisBase/Calorimetry.h"
 #include "lardataobj/AnalysisBase/ParticleID.h"
 #include "lardata/Utilities/AssociationUtil.h"
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/OpDetGeo.h"
-#include "uboone/Geometry/UBOpReadoutMap.h"
 
-#include "larsim/MCCheater/BackTracker.h"
+#include "uboone/AnalysisTree/MCTruth/AssociationsTruth_tool.h"
+#include "uboone/AnalysisTree/MCTruth/BackTrackerTruth_tool.h"
+#include "uboone/AnalysisTree/MCTruth/IMCTruthMatching.h"
+
+//#include "larsim/MCCheater/BackTracker.h"
 
 #include "TMath.h"
 
@@ -59,6 +56,8 @@ namespace dtfeatures {
     _containtagassoclabel = p.get<std::string>("ContainTagAssocLabel");
     _hitassoclabel        = p.get<std::string>("HitAssocLabel");
     _flashmodulelabel     = p.get<std::string>("FlashModuleLabel");
+
+    _truthparams          = p.get<fhicl::ParameterSet>("MCTruthMatching");
   }
 
   std::vector<std::vector<float>> TrackFeatures::CreateFeatures(art::Event const& e, 
@@ -287,7 +286,9 @@ namespace dtfeatures {
         return tmplabelvec;
       }
 
-      art::ServiceHandle<cheat::BackTracker> bt;
+      std::unique_ptr<truth::IMCTruthMatching> bt;
+      bt = std::unique_ptr<truth::IMCTruthMatching>(new truth::AssociationsTruth(_truthparams));
+      bt->Rebuild(e);
 
       // loop over tracks and assign class label
       for(size_t trkIdx = 0; trkIdx < trackVecHandle->size(); trkIdx++)

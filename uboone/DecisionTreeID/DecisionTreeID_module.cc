@@ -25,12 +25,6 @@
 #include "lardataobj/AnalysisBase/Calorimetry.h"
 #include "lardataobj/AnalysisBase/ParticleID.h"
 #include "lardata/Utilities/AssociationUtil.h"
-#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
-#include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/OpDetGeo.h"
-#include "uboone/Geometry/UBOpReadoutMap.h"
 
 #include "TString.h"
 #include "TTree.h"

@@ -20,6 +20,7 @@ microboone_analysistree:
  MCTrackModuleLabel:      "mcreco" 
  CalorimetryModuleLabel:   [ "calo" ]
  ParticleIDModuleLabel:    [ "pid" ]
+ DTParticleIDModuleLabel:    [ "decisiontreeid" ]
  T0RecoAnodeCathodePiercingLabel:  [ "t0reco" ]
  FlashT0FinderLabel:       ["t0"]
  MCT0FinderLabel:          ["mct0"]
