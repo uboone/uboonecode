@@ -132,7 +132,7 @@ namespace lee {
 
 
 	/********************************		Track dEdx	     ****************************************/
-	std::vector<double> EnergyHelper::trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer) {
+	std::pair<std::vector<double>,std::vector<double>> EnergyHelper::trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer) {
 		
 		auto const &track_handle = evt.getValidHandle<std::vector<recob::Track>>(_pfp_producer);
 	
@@ -142,17 +142,19 @@ namespace lee {
 		//We dont care about all the associations, only the one with this particular track
 		//This is a vector of art::Ptr's anab::Calorimetry
 		const std::vector<art::Ptr<anab::Calorimetry>> calos = calo_track_ass.at(track->ID());
+		std::pair<std::vector<double>,std::vector<double>> ans;
+
 
 		double E = 0;
 		double Eapprox = 0;
 
 		//What is this, a vector of every hit/calos thing?
-		std::cout<<"trackdEdx: calos.size() "<<calos.size()<<std::endl;
+		//std::cout<<"trackdEdx: calos.size() "<<calos.size()<<std::endl;
 		for (size_t ical = 0; ical < calos.size(); ++ical) {
 
 
 			
-			std::cout<<"trackdEdx:  "<<ical<<" Plane:\t"<<calos[ical]->PlaneID().Plane<<" Range:\t"<<calos[ical]->Range()<<" KinEn:\t"<<calos[ical]->KineticEnergy()<<" trkLen:\t"<<track->Length()<<std::endl;
+			//std::cout<<"trackdEdx:  "<<ical<<" Plane:\t"<<calos[ical]->PlaneID().Plane<<" Range:\t"<<calos[ical]->Range()<<" KinEn:\t"<<calos[ical]->KineticEnergy()<<" trkLen:\t"<<track->Length()<<std::endl;
 			
 			if (E != 0)
 				continue;
@@ -168,21 +170,25 @@ namespace lee {
 				continue;
 			if (planenum != 2)
 				continue; // Use informartion from collection plane only
+		
+	
+			//define the length of the start and end of a track	
+//			double start_length = 10;
+//			double end_length = 10;
+
+			int maxTrkHits = calos[ical]->dEdx().size();
 
 
-			// Understand if the calo module flipped the track
-			// double dqdx_start = (calos[ical]->dQdx())[0] + (calos[ical]->dQdx())[1] +
-			// (calos[ical]->dQdx())[2];
-			// double dqdx_end   = (calos[ical]->dQdx())[calos[ical]->dQdx().size()-1] +
-			// (calos[ical]->dQdx())[calos[ical]->dQdx().size()-2] +
-			// (calos[ical]->dQdx())[calos[ical]->dQdx().size()-3];
-			// bool caloFlippedTrack = dqdx_start < dqdx_end;
 
 			double mean = 0;
 			double dedx = 0;
 			double prevresrange = 0;
 
-			std::cout<<"trackdEdx: "<<ical<<" ResRange.size()\t"<<calos[ical]->ResidualRange().size()<<" calos[ical]->dEdx().size()\t "<<calos[ical]->dEdx().size()<<" calos[ical]->dQdx().size()\t"<<calos[ical]->dQdx().size()<<std::endl;
+			//std::cout<<"trackdEdx: "<<ical<<" ResRange.size()\t"<<calos[ical]->ResidualRange().size()<<" calos[ical]->dEdx().size()\t "<<calos[ical]->dEdx().size()<<" calos[ical]->dQdx().size()\t"<<calos[ical]->dQdx().size()<<std::endl;
+
+			
+		
+
 
 			if (calos[ical]->ResidualRange().size() > 0) {
 				if (calos[ical]->ResidualRange()[0] > track->Length() / 2) {
@@ -192,7 +198,14 @@ namespace lee {
 
 			double currentresrange = 0;
 
-			for (size_t iTrkHit = 0; iTrkHit < calos[ical]->dEdx().size(); ++iTrkHit) {
+			ans.first = calos[ical]->ResidualRange();
+			ans.second = calos[ical]->dEdx();
+
+
+			for (size_t iTrkHit = 0; iTrkHit < (size_t)maxTrkHits; ++iTrkHit) {
+			//	std::cout<<"trackdEdx: "<<ical<<" "<<calos[ical]->dEdx()[iTrkHit]<<" "<<calos[ical]->ResidualRange()[iTrkHit]<<std::endl;
+
+
 				dedx = calos[ical]->dEdx()[iTrkHit];
 				currentresrange = calos[ical]->ResidualRange()[iTrkHit];
 				if (dedx > 0 && dedx < 10) {
@@ -206,8 +219,8 @@ namespace lee {
 			// Energy approximation is " <<
 			// mean/calos[ical]->dEdx().size()*track->Length()<< "MeV"<<std::endl;
 			Eapprox = mean / calos[ical]->dEdx().size()* track->Length();
+			if(Eapprox < -999) std::cout<<std::endl;
 		}
-		std::vector<double> ans = {Eapprox/1000.0};
 		return ans;
 
 	}

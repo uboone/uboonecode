@@ -42,7 +42,7 @@ public:
                      std::string _pfp_producer = "pandoraNu");
 
 
-  std::vector<double> trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer = "pandoranu");
+  std::pair<std::vector<double>,std::vector<double>> trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer = "pandoranu");
 
 
 

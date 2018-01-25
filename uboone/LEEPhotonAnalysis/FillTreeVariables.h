@@ -31,7 +31,6 @@
 
 #include "RecoMCMatching.h"
 #include "canvas/Persistency/Common/FindMany.h"
-#include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
 
 #include "ParticleAssociations.h"
 #include "EnergyHelper.h"
@@ -40,13 +39,13 @@
 class FillTreeVariables {
 
   std::string fmcordata;  
-  bool fmcrecomatching;
   std::string ftrack_producer;
   std::string fswtrigger_product;
   std::string fshower_producer;
   std::string fhit_producer;
   std::string frmcmassociation_producer;
   std::string fopflash_producer;
+  RecoMCMatching const * frmcm;
 
   geoalgo::AABox ftpc_volume;
   double foffset;
@@ -56,10 +55,6 @@ class FillTreeVariables {
   int const fwire_plane;
 
   bool fverbose;
-
-  RecoMCMatching frmcm;
-  std::vector<RecoMCMatch> track_matches;
-  std::vector<RecoMCMatch> shower_matches;
 
   lee::EnergyHelper energyHelper;
 
@@ -176,6 +171,9 @@ class FillTreeVariables {
   double longest_asso_track_thetayz;
   double longest_asso_track_phi;
   double longest_asso_track_theta;
+
+  std::vector<double> longest_asso_track_calo_dEdx;
+  std::vector<double> longest_asso_track_calo_resrange;
 
   double shower_matching_ratio;
   int shower_matched_to_mcshower;
@@ -340,20 +338,18 @@ public:
 
   void SetVerbose(bool const verbose = true) {fverbose = verbose;}
   void SetProducers(std::string const & mcordata,
-		    bool const mcrecomatching,
 		    std::string const & track_producer,
 		    std::string const & shower_producer,
 		    std::string const & hit_producer,
-		    std::string const & rmcmassociations_producer,
 		    std::string const & opflash_producer,
-		    std::string const & trigger_product);
+		    std::string const & trigger_product,
+		    std::string const & rmcmassociations_producer,
+		    RecoMCMatching const * rmcm);
   void SetUpTreeBranches();
   bool SinglePhotonFilter(art::Event const & e,
 			  size_t & mctruth_index);
   bool DeltaRadFilter(art::Event const & e,
 		      size_t & mctruth_index);
-  bool OldDeltaRadFilter(art::Event const & e,
-			 size_t & mctruth_index);
   void FillTruth(art::Event const & e,
 		 size_t & delta_rad_mct_index);
   bool PassedSWTrigger(art::Event const & e) const;
@@ -372,6 +368,10 @@ public:
 			       size_t const shower_index);
   double GetTrackHelperEnergy(art::Event const & e,
 			      size_t const track_index);
+
+  std::pair<std::vector<double>,std::vector<double>> GetTrackCaloInfo(art::Event const & e,    size_t const track_index);
+
+
   int GetBestShowerPlane(art::Event const & e,
 			 size_t const shower_index);
   void FilldEdx(art::Event const & e,
@@ -379,14 +379,7 @@ public:
 		size_t const closest_associated_shower_index);
   double ShowerZDistToClosestFlash(art::Event const & e,
 				   int const most_energetic_shower_index);
-  void FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
-			     std::unordered_map<int, size_t> const & sp_map,
-			     std::unordered_map<int, size_t> const & mcp_map,
-			     art::FindManyP<recob::Hit> const & hits_per_object,
-			     art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> const & particles_per_hit,
-			     std::vector<RecoMCMatch> & object_matches);
-  void MatchWAssociations(art::Event const & e);
-  art::Ptr<simb::MCTruth> TrackIDToMCTruth(art::Event const & e, int geant_track_id);
+  art::Ptr<simb::MCTruth> TrackIDToMCTruth(art::Event const & e, int const geant_track_id);
   void FillShowerRecoMCMatching(art::Event const & e,
 				size_t const most_energetic_associated_shower_index,
 				size_t const delta_rad_mct_index,
