@@ -793,7 +793,10 @@ private:
     int fEvent;
     int fRun;
     int fSubRun;
-    int truthtop;
+    int truthtop; // true topology
+    int truthtop_200thresh; // true topology assuming a 200MeV/c proton threshold
+    int truthtop_300thresh; // true topology assuming a 300MeV/c proton threshold
+    int truthtop_400thresh; // true topology assuming a 400MeV/c proton threshold
     float fLlep;
     float fLhad;
     float fPlep;
@@ -997,6 +1000,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_Geant->Branch("fhg4parpz", &fhg4parpz, "fhg4parpz[nGEANTparticles]/F");
     fMC_Geant->Branch("fhg4parp",  &fhg4parp,  "fhg4parp[nGEANTparticles]/F");
     fMC_Geant->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_Geant->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_Geant->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_Geant->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
      
     //========================================================================================= 
 
@@ -1015,6 +1021,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashwin->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_flashwin->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_flashwin->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_flashwin->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_flashwin->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_flashwin->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
 
 
@@ -1026,6 +1035,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_flashtag->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_flashtag->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_flashtag->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_flashtag->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_flashtag->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
 
 
@@ -1044,6 +1056,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_vtxinFV->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_vtxinFV->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_vtxinFV->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_vtxinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_vtxinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
 
     //===================================================================================
@@ -1058,6 +1073,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_ntrks->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_ntrks->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_ntrks->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_ntrks->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_ntrks->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
     //===================================================================================
     fMC_noshwr=tfs->make<TTree>("fMC_noshwr","Data Holder");    
@@ -1071,6 +1089,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_noshwr->Branch("vershwrdist",  &vershwrdist,  "vershwrdist/F"); 
     fMC_noshwr->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_noshwr->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_noshwr->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_noshwr->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
     //===============================================================================
     fMC_trkfls=tfs->make<TTree>("fMC_trkfls","Data Holder");    
@@ -1086,6 +1107,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_trkfls->Branch("flstrkdist" ,  &flstrkdist,   "flstrkdist/F");
     fMC_trkfls->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_trkfls->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_trkfls->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_trkfls->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
     //===============================================================
     fMC_mupinFV=tfs->make<TTree>("fMC_mupinFV","Data Holder");    
@@ -1131,6 +1155,9 @@ void  CC1uNPSelAna::beginJob()
 
 
     fMC_mupinFV->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_mupinFV->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_mupinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_mupinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
 
     //=================================================================
@@ -1182,6 +1209,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Nhits_muoncand", &Nhits_muoncand, "Nhits_muoncand/I");
     fMC_TrunMean->Branch("Nhits_protoncand", &Nhits_protoncand, "Nhits_protoncand/I");
     fMC_TrunMean->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_TrunMean->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_TrunMean->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_TrunMean->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
 
     fMC_TrunMean->Branch("trackcand_parPDG", &trackcand_parPDG, "trackcand_parPDG/I");
@@ -2059,6 +2089,9 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     Int_t npions=0;
     Int_t npi0=0;
     Int_t nprotons=0;
+    Int_t nprotons_200thresh=0;
+    Int_t nprotons_300thresh=0;
+    Int_t nprotons_400thresh=0;
     Int_t nelectrons=0;
     Bool_t cosmicflag=false; //cosmic event
     Bool_t OOFVflag=false; //nu event outside FV
@@ -2191,12 +2224,10 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==211) {npions=npions+1;}
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==111) {npi0=npi0+1;}
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==11) {nelectrons=nelectrons+1;}
-        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212) {nprotons=nprotons+1;
-          //std::cout<<"Mother of the proton is "<<pPart.Mother()<<std::endl;
-          //std::cout<<"TrackId of the proton is "<<pPart.TrackId()<<std::endl;
-
-
-        }
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212) {nprotons=nprotons+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.2 ) {nprotons_200thresh=nprotons_200thresh+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.3 ) {nprotons_300thresh=nprotons_300thresh+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.4 ) {nprotons_400thresh=nprotons_400thresh+1;}
       }
       //std::cout<<"libo test 1 "<<std::endl;
     
@@ -2210,7 +2241,13 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
    if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) && (nmuons==0 && nelectrons==0 && npions==0 && npi0==0 && nprotons==0)) {cosmicflag=true;} 
 
    Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons, cosmicflag, OOFVflag);
+   Int_t TopFlag200=Topology(nmuons, nelectrons, npions, npi0, nprotons_200thresh, cosmicflag, OOFVflag);
+   Int_t TopFlag300=Topology(nmuons, nelectrons, npions, npi0, nprotons_300thresh, cosmicflag, OOFVflag);
+   Int_t TopFlag400=Topology(nmuons, nelectrons, npions, npi0, nprotons_400thresh, cosmicflag, OOFVflag);
    truthtop=TopFlag;
+   truthtop_200thresh=TopFlag200;
+   truthtop_300thresh=TopFlag300;
+   truthtop_400thresh=TopFlag400;
    //std::cout<<"Topology flag is: "<<TopFlag <<" OOFVflag= "<<OOFVflag <<std::endl;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
