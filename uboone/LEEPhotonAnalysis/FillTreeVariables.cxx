@@ -763,13 +763,12 @@ void FillTreeVariables::ResetVertex() {
   longest_asso_track_from_ncdeltarad_interaction = -1;
   longest_asso_track_matched_to_ncdeltarad_photon = -1;
   longest_asso_track_matched_to_ncdeltarad_proton = -1;
-  longest_asso_track_true_thetayx = -2;
-  longest_asso_track_true_thetaxz = -2;
-  longest_asso_track_true_thetayz = -2;
+  longest_asso_track_true_thetayx = -100;
+  longest_asso_track_true_thetaxz = -100;
+  longest_asso_track_true_thetayz = -100;
   longest_asso_track_true_energy = -1;
-  longest_asso_track_theta = -99;
-  longest_asso_track_phi = -99;
-
+  longest_asso_track_theta = -100;
+  longest_asso_track_phi = -100;
 
   longest_asso_track_calo_dEdx.clear();
   longest_asso_track_calo_resrange.clear();
@@ -796,13 +795,13 @@ void FillTreeVariables::ResetVertex() {
   shower_true_distx = -1;
   shower_true_disty = -120;
   shower_true_distz = -1;
-  shower_true_thetayx = -2;
-  shower_true_thetaxz = -2;
-  shower_true_thetayz = -2;
+  shower_true_thetayx = -100;
+  shower_true_thetaxz = -100;
+  shower_true_thetayz = -100;
   shower_true_energy = -1;
-  shower_detprofile_thetayx = -2;
-  shower_detprofile_thetaxz = -2;
-  shower_detprofile_thetayz = -2;
+  shower_detprofile_thetayx = -100;
+  shower_detprofile_thetaxz = -100;
+  shower_detprofile_thetayz = -100;
   shower_detprofile_energy = -1;
 
   closest_asso_shower_dist_to_flashzcenter = -1;
@@ -814,12 +813,12 @@ void FillTreeVariables::ResetVertex() {
   most_energetic_shower_reco_distx = -1;
   most_energetic_shower_reco_disty = -120;
   most_energetic_shower_reco_distz = -1;
-  most_energetic_shower_reco_thetayx = -2;
-  most_energetic_shower_reco_thetaxz = -2;
-  most_energetic_shower_reco_thetayz = -2;
+  most_energetic_shower_reco_thetayx = -100;
+  most_energetic_shower_reco_thetaxz = -100;
+  most_energetic_shower_reco_thetayz = -100;
   most_energetic_shower_reco_width0 = -1;
   most_energetic_shower_reco_width1 = -1;
-  most_energetic_shower_reco_opening_angle = -4;
+  most_energetic_shower_reco_opening_angle = -100;
   most_energetic_shower_reco_length = -1;
   most_energetic_shower_reco_dirx = -2;
   most_energetic_shower_reco_diry = -2;
