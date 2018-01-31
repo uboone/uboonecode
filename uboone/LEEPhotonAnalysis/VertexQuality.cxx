@@ -23,14 +23,21 @@ VertexQuality::VertexQuality(std::string const & track_producer,
 	      0,
 	      2*lar::providerFrom<geo::Geometry>()->DetHalfWidth(),
 	      lar::providerFrom<geo::Geometry>()->DetHalfHeight(),
-	      lar::providerFrom<geo::Geometry>()->DetLength()) {
+	      lar::providerFrom<geo::Geometry>()->DetLength()),
+  fvertex_tree(nullptr),
+  fvertex_tree_event(nullptr) {
 
   art::ServiceHandle< art::TFileService > tfs;
+
   fvertex_tree = tfs->make<TTree>("vertex_quality_tree", "");  
 
   fvertex_tree->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
 
   fvertex_tree->Branch("dist", &fdist, "dist/D");
+  fvertex_tree->Branch("distx", &fdistx, "distx/D");
+  fvertex_tree->Branch("disty", &fdisty, "disty/D");
+  fvertex_tree->Branch("distz", &fdistz, "distz/D");
+
   fvertex_tree->Branch("true_track_total", &ftrue_track_total, "true_track_total/I");
   fvertex_tree->Branch("true_shower_total", &ftrue_shower_total, "true_shower_total/I");
   fvertex_tree->Branch("reco_track_total", &freco_track_total, "reco_track_total/I");
@@ -45,6 +52,32 @@ VertexQuality::VertexQuality(std::string const & track_producer,
   fvertex_tree->Branch("shower_matching_ratio_v", &fshower_matching_ratio_v);
   fvertex_tree->Branch("shower_true_pdg_v", &fshower_true_pdg_v);
   fvertex_tree->Branch("shower_true_origin_v", &fshower_true_origin_v);
+
+  fvertex_tree_event = tfs->make<TTree>("vertex_quality_tree_closest", "");  
+
+  fvertex_tree_event->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
+
+  fvertex_tree_event->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
+
+  fvertex_tree_event->Branch("dist", &fdist, "dist/D");
+  fvertex_tree_event->Branch("distx", &fdistx, "distx/D");
+  fvertex_tree_event->Branch("disty", &fdisty, "disty/D");
+  fvertex_tree_event->Branch("distz", &fdistz, "distz/D");
+
+  fvertex_tree_event->Branch("true_track_total", &ftrue_track_total, "true_track_total/I");
+  fvertex_tree_event->Branch("true_shower_total", &ftrue_shower_total, "true_shower_total/I");
+  fvertex_tree_event->Branch("reco_track_total", &freco_track_total, "reco_track_total/I");
+  fvertex_tree_event->Branch("reco_shower_total", &freco_shower_total, "reco_shower_total/I");
+  fvertex_tree_event->Branch("correct_track_total", &fcorrect_track_total, "correct_track_total/I");
+  fvertex_tree_event->Branch("correct_shower_total", &fcorrect_shower_total, "correct_shower_total/I");
+
+  fvertex_tree_event->Branch("track_matching_ratio_v", &ftrack_matching_ratio_v);
+  fvertex_tree_event->Branch("track_true_pdg_v", &ftrack_true_pdg_v);
+  fvertex_tree_event->Branch("track_true_origin_v", &ftrack_true_origin_v);
+
+  fvertex_tree_event->Branch("shower_matching_ratio_v", &fshower_matching_ratio_v);
+  fvertex_tree_event->Branch("shower_true_pdg_v", &fshower_true_pdg_v);
+  fvertex_tree_event->Branch("shower_true_origin_v", &fshower_true_origin_v);
 
 }
 
@@ -229,11 +262,16 @@ void VertexQuality::GetTrueRecoObjects(art::Event const & e,
 
 void VertexQuality::Reset() {
 
+  fdist = -10000;
+  fdistx = -10000;
+  fdisty = -10000;
+  fdistz = -10000;
+
   freco_track_total = 0;
-  fcorrect_track_total = 0;
   freco_shower_total = 0;
+  fcorrect_track_total = 0;
   fcorrect_shower_total = 0;
-  
+
   ftrack_matching_ratio_v.clear();
   ftrack_true_pdg_v.clear();
   ftrack_true_origin_v.clear();
@@ -241,45 +279,44 @@ void VertexQuality::Reset() {
   fshower_matching_ratio_v.clear();
   fshower_true_pdg_v.clear();
   fshower_true_origin_v.clear();
-
+  
 }
- 
 
 
-void VertexQuality::RunDist(art::Event const & e,
-			    ParticleAssociations const & pas) {
 
-  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
-  art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
-  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcparticle = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
-  geoalgo::Point_t const true_nu_vtx = ev_mctruth->front().GetNeutrino().Nu().Position(0);
+void VertexQuality::FillTree(art::Event const & e,
+			     TTree * tree,
+			     ParticleAssociations const & pas,
+			     size_t const closest_index,
+			     geoalgo::Point_t const & true_nu_vtx,
+			     std::vector<size_t> const & track_v,
+			     std::vector<size_t> const & shower_v) {
 
-  ftpc_volume_contained = 0;
-  if(ftpc_volume.Contain(true_nu_vtx)) ftpc_volume_contained = 1;
+  Reset();
 
-  std::vector<RecoMCMatch> const & shower_matches = frmcm->GetShowerMatches();
-  std::vector<RecoMCMatch> const & track_matches = frmcm->GetTrackMatches(); 
+  if(closest_index != SIZE_MAX) {
 
-  std::vector<size_t> track_v;
-  std::vector<size_t> shower_v;
-  GetTrueRecoObjects(e, track_v, shower_v);
-  ftrue_track_total = track_v.size(); 
-  ftrue_shower_total = shower_v.size(); 
+    art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
+    art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
+    art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcparticle = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
 
-  DetectorObjects const & deto_v = pas.GetDetectorObjects();
-  std::vector<ParticleAssociation> const & pa_v = pas.GetAssociations();
+    std::vector<RecoMCMatch> const & shower_matches = frmcm->GetShowerMatches();
+    std::vector<RecoMCMatch> const & track_matches = frmcm->GetTrackMatches(); 
 
-  for(size_t const pa_index : pas.GetSelectedAssociations()) {
+    DetectorObjects const & deto_v = pas.GetDetectorObjects();
+    ParticleAssociation const & pa = pas.GetAssociations().at(closest_index);
+    geoalgo::Point_t const & reco_vertex = pa.GetRecoVertex();
 
-    Reset();
-
-    ParticleAssociation const & pa = pa_v.at(pa_index);
-    fdist = true_nu_vtx.Dist(pa.GetRecoVertex());
+    fdist = true_nu_vtx.Dist(reco_vertex);
+    fdistx = true_nu_vtx.at(0) - reco_vertex.at(0);
+    fdisty = true_nu_vtx.at(1) - reco_vertex.at(1);
+    fdistz = true_nu_vtx.at(2) - reco_vertex.at(2);
 
     for(size_t const object_index : pa.GetObjectIndices()) {
+
       DetectorObject const & deto = deto_v.GetDetectorObject(object_index);
       size_t const original_index = deto.foriginal_index;
+
       if(deto.freco_type == deto_v.ftrack_reco_type) {
 	RecoMCMatch const & rmcm = track_matches.at(original_index);
 	ftrack_matching_ratio_v.push_back(rmcm.ratio);
@@ -303,6 +340,7 @@ void VertexQuality::RunDist(art::Event const & e,
 	  ++fcorrect_track_total;
 	}
       }
+
       if(deto.freco_type == deto_v.fshower_reco_type) {
 	RecoMCMatch const & rmcm = shower_matches.at(original_index);
 	fshower_matching_ratio_v.push_back(rmcm.ratio);
@@ -325,121 +363,50 @@ void VertexQuality::RunDist(art::Event const & e,
 	if(std::find(shower_v.begin(), shower_v.end(), original_index) != shower_v.end()) {
 	  ++fcorrect_shower_total;
 	}
-      }
 
+      }
+  
     }
 
-    fvertex_tree->Fill();
-
   }
+
+  tree->Fill();
 
 }
+ 
 
 
+void VertexQuality::RunDist(art::Event const & e,
+			    ParticleAssociations const & pas) {
 
-void VertexQuality::Run(art::Event const & e,
-			ParticleAssociations const & pas) {
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
+  geoalgo::Point_t const true_nu_vtx = ev_mctruth->front().GetNeutrino().Nu().Position(0);
 
-  std::vector<int> mcparticle_v;
-  GetTrueObjects(e, mcparticle_v);
-  double const true_total = GetTrueTotal(mcparticle_v);
+  ftpc_volume_contained = 0;
+  if(ftpc_volume.Contain(true_nu_vtx)) ftpc_volume_contained = 1;
 
-  std::vector<RecoMCMatch> const & shower_matches = frmcm->GetShowerMatches();
-  std::vector<RecoMCMatch> const & track_matches = frmcm->GetTrackMatches();
+  std::vector<size_t> track_v;
+  std::vector<size_t> shower_v;
+  GetTrueRecoObjects(e, track_v, shower_v);
+  ftrue_track_total = track_v.size(); 
+  ftrue_shower_total = shower_v.size(); 
 
-  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcparticle = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
-  art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
-
-  if(true_total == 0 && track_matches.size() != 0 && shower_matches.size() != 0) {
-
-    art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
-
-    std::cout << "true_total: " << true_total << " ev_mctruth->size() " << ev_mctruth->size() << " shower_matches.size(): " << shower_matches.size() << " track_matches.size(): " << track_matches.size() << "\ntrue_nu_vtx: " <<   geoalgo::Point_t(ev_mctruth->front().GetNeutrino().Nu().Position(0)) << "\n";
-
-    std::cout << "\n";
-    for(RecoMCMatch const & rmcm : shower_matches) {
-      std::cout << "reco shower: " << rmcm.ratio << " origin: ";
-      if(rmcm.mc_type == 1) {
-	std::cout << ev_mcshower->at(rmcm.mc_index).Origin() << " start: " << geoalgo::Point_t(ev_mcshower->at(rmcm.mc_index).Start().Position());
-      }
-      else if(rmcm.mc_type == 2) {
-	std::cout << ev_mctrack->at(rmcm.mc_index).Origin() << " start: " << geoalgo::Point_t(ev_mctrack->at(rmcm.mc_index).Start().Position());
-      }
-      else if(rmcm.mc_type == 3) {
-	std::cout << TrackIDToMCTruth(e, ev_mcparticle->at(rmcm.mc_index).TrackId())->Origin();
-      }
-      else {
-	std::cout << "wah";
-      }
-      std::cout << "\n";
-    }
-
-    std::cout << "\n";
-    for(RecoMCMatch const & rmcm : track_matches) {
-      std::cout << "reco track: " << rmcm.ratio << " origin: ";
-      if(rmcm.mc_type == 1) {
-	std::cout << ev_mcshower->at(rmcm.mc_index).Origin();
-      }
-      else if(rmcm.mc_type == 2) {
-	std::cout << ev_mctrack->at(rmcm.mc_index).Origin();
-      }
-      else if(rmcm.mc_type == 3) {
-	std::cout << TrackIDToMCTruth(e, ev_mcparticle->at(rmcm.mc_index).TrackId())->Origin();
-      }
-      else {
-	std::cout << "wah";
-      }
-      std::cout << "\n";
-    }
-  
-    std::cout << "\n";
-    for(sim::MCTrack const & mctr : *ev_mctrack) {
-      if(mctr.Origin() == 1) {
-	std::cout << "MCTrack Origin: " << mctr.Origin() << " " << mctr.Start().E() << " " << mctr.size() << " " << geoalgo::Point_t(mctr.Start().Position()) << "\n";
-      }
-    }
-    
-    for(sim::MCShower const & mcs : *ev_mcshower) {
-      if(mcs.Origin() == 1) {
-	std::cout << "MCShower Origin: " << mcs.Origin() << " " << mcs.Start().E() << " " << mcs.DetProfile().E() << " " << geoalgo::Point_t(mcs.Start().Position()) << "\n";
-      }
-    }
-    
-    std::cout << "\n";
-    
-  }
-
-  /*
-
-  DetectorObjects const & deto_v = pas.GetDetectorObjects();
   std::vector<ParticleAssociation> const & pa_v = pas.GetAssociations();
 
+  double smallest_dist = DBL_MAX;
+  size_t closest_index = SIZE_MAX;
   for(size_t const pa_index : pas.GetSelectedAssociations()) {
-
-    double true_total = 0;
-    double reco_total = 0;
-
-    for(size_t const object_index : pa_v.at(pa_index).GetObjectIndices()) {
-      DetectorObject const & deto = deto_v.GetDetectorObject(object_index);
-      if(deto.freco_type == deto_v.fshower_reco_type) {
-	RecoMCMatch const & shower_match = shower_matches.at(deto.foriginal_index);
-	std::unordered_map<int, double> const & trkide_map = shower_match.trkide_map;
-	for(int const trkid : mcparticle_v) 
-      }
-      else if(deto.freco_type == deto_v.ftrack_reco_type) {
-	RecoMCMatch const & track_match = track_matches.at(deto.foriginal_index);
-	std::cout << deto.freco_type << " " << track_match.mc_type << "\n";
-      }
-      else {
-	std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nERROR: Unrecognized detector object type\n";
-	exit(1);
-      }
+    FillTree(e, fvertex_tree, pas, pa_index, true_nu_vtx, track_v, shower_v);
+    double const dist = true_nu_vtx.Dist(pa_v.at(pa_index).GetRecoVertex());
+    if(dist < smallest_dist) {
+      smallest_dist = dist;
+      closest_index = pa_index;
     }
-
   }
 
-  */
+  if(closest_index != SIZE_MAX) freco_vertex_present = 1;
+  else freco_vertex_present = 0;
+  FillTree(e, fvertex_tree_event, pas, closest_index, true_nu_vtx, track_v, shower_v);
 
 }
 

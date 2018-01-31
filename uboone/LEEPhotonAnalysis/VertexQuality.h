@@ -25,10 +25,15 @@ class VertexQuality {
   geoalgo::AABox ftpc_volume;
 
   TTree * fvertex_tree;
+  TTree * fvertex_tree_event;
 
   int ftpc_volume_contained;
 
   double fdist;
+  double fdistx;
+  double fdisty;
+  double fdistz;
+
   int ftrue_track_total;
   int ftrue_shower_total;
   int freco_track_total;
@@ -36,6 +41,8 @@ class VertexQuality {
   int fcorrect_track_total;
   int fcorrect_shower_total;
   
+  int freco_vertex_present;
+
   std::vector<double> ftrack_matching_ratio_v;
   std::vector<int> ftrack_true_pdg_v;
   std::vector<int> ftrack_true_origin_v;
@@ -64,10 +71,15 @@ class VertexQuality {
   double GetTrueTotal(std::vector<int> const & mcparticle_v);
 
   void Reset();
+  void FillTree(art::Event const & e,
+		TTree * tree, 
+		ParticleAssociations const & pas,
+		size_t const closest_index,
+		geoalgo::Point_t const & true_nu_vtx,
+		std::vector<size_t> const & track_v,
+		std::vector<size_t> const & shower_v);
   void RunDist(art::Event const & e,
 	       ParticleAssociations const & pas);
-  void Run(art::Event const & e,
-	   ParticleAssociations const & pas);
 
 };
 
