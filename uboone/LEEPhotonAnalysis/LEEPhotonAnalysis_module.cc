@@ -47,9 +47,14 @@
 #include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
 #include "../LLBasicTool/GeoAlgo/GeoAABox.h"
 
+
+#include "DetectorObjects.h"
+#include "ParticleAssociations.h"
+
 #include "VertexBuilder.h"
 #include "VertexQuality.h"
 #include "FillTreeVariables.h"
+#include "RecoMCMatching.h"
 
 #include "RecoMCMatching.h"
 #include "canvas/Persistency/Common/FindMany.h"

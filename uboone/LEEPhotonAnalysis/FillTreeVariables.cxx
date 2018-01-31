@@ -4,6 +4,7 @@
 
 #include "FillTreeVariables.h"
 
+
 #include "uboone/EventWeight/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
@@ -13,6 +14,7 @@
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
 #include "FilterSignal.h"
+#include "RecoMCMatching.h"
 
 
 FillTreeVariables::FillTreeVariables() :
@@ -165,6 +167,13 @@ void FillTreeVariables::SetUpTreeBranches() {
   fvertex_tree->Branch("longest_asso_track_thetayx", &longest_asso_track_thetayx, "longest_asso_track_thetayx/D");
   fvertex_tree->Branch("longest_asso_track_thetaxz", &longest_asso_track_thetaxz, "longest_asso_track_thetaxz/D");
   fvertex_tree->Branch("longest_asso_track_thetayz", &longest_asso_track_thetayz, "longest_asso_track_thetayz/D");
+  fvertex_tree->Branch("longest_asso_track_phi", &longest_asso_track_phi, "longest_asso_track_phi/D");
+  fvertex_tree->Branch("longest_asso_track_theta", &longest_asso_track_theta, "longest_asso_track_theta/D");
+
+  fvertex_tree->Branch("longest_asso_track_calo_dEdx","std::vector< double >",&longest_asso_track_calo_dEdx);
+  fvertex_tree->Branch("longest_asso_track_calo_resrange","std::vector< double >",&longest_asso_track_calo_resrange);
+
+
 
   fvertex_tree->Branch("closest_asso_shower_dist_to_flashzcenter", &closest_asso_shower_dist_to_flashzcenter, "closest_asso_shower_dist_to_flashzcenter/D");
 
@@ -282,6 +291,11 @@ void FillTreeVariables::SetUpTreeBranches() {
     fvertex_tree->Branch("longest_asso_track_true_parent_pdg", &longest_asso_track_true_parent_pdg, "longest_asso_track_true_parent_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_ancestor_pdg", &longest_asso_track_true_ancestor_pdg, "longest_asso_track_true_ancestor_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_origin", &longest_asso_track_true_origin, "longest_asso_track_true_origin/I");
+
+
+
+
+
 
     fvertex_tree->Branch("shower_matching_ratio", &shower_matching_ratio, "shower_matching_ratio/D");
     fvertex_tree->Branch("shower_matched_to_mcshower", &shower_matched_to_mcshower, "shower_matched_to_mcshower/I");
@@ -730,7 +744,7 @@ void FillTreeVariables::ResetVertex() {
 
   reco_true_nuvert_dist = -1;
 
-  // Should be 21 "longest" vars 
+  // Should be 21+xx "longest" vars 
   longest_asso_track_matching_ratio = -3;
   longest_asso_track_length =-1; 
   longest_asso_track_matched_to_mcshower = -1;
@@ -753,6 +767,12 @@ void FillTreeVariables::ResetVertex() {
   longest_asso_track_true_thetaxz = -2;
   longest_asso_track_true_thetayz = -2;
   longest_asso_track_true_energy = -1;
+  longest_asso_track_theta = -99;
+  longest_asso_track_phi = -99;
+
+
+  longest_asso_track_calo_dEdx.clear();
+  longest_asso_track_calo_resrange.clear();
 
   //
   shower_matching_ratio = -3;
@@ -1410,6 +1430,38 @@ double FillTreeVariables::GetShowerHelperEnergy(art::Event const & e,
 }
 
 
+std::pair<std::vector<double>,std::vector<double>> FillTreeVariables::GetTrackCaloInfo(art::Event const & e,
+					       size_t const track_index) {
+
+  art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp =
+    e.getValidHandle<std::vector<recob::PFParticle>>(ftrack_producer);    
+  art::FindManyP<recob::Track> PFPToTrack(ev_pfp, e, ftrack_producer);  
+
+  art::Ptr<recob::Track> const * track_ptr = nullptr;
+
+  for(size_t i = 0; i < ev_pfp->size(); ++i) {
+    std::vector<art::Ptr<recob::Track>> const & tracks = PFPToTrack.at(i);
+    for(art::Ptr<recob::Track> const & track : tracks) {
+      if(track.key() == track_index) {
+	track_ptr = &track;
+	break;
+      }
+      if(track_ptr) break;
+    }
+  }
+
+  if(!track_ptr) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: no track pointer found\n";
+		std::pair<std::vector<double>,std::vector<double>> fail({-999},{-999});
+    return fail;
+  }
+
+  return energyHelper.trackdEdx(*track_ptr, e, ftrack_producer);
+
+}
+
+
 double FillTreeVariables::GetTrackHelperEnergy(art::Event const & e,
 					       size_t const track_index) {
 
@@ -1610,7 +1662,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
   
-  size_t mct_index = SIZE_MAX;
+size_t mct_index = SIZE_MAX;
 
   shower_matched_to_mcshower = 0;
   shower_matched_to_mctrack = 0;
@@ -1891,6 +1943,14 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     longest_asso_track_thetayx = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirx);
     longest_asso_track_thetaxz = atan(longest_asso_track_reco_dirx/longest_asso_track_reco_dirz);
     longest_asso_track_thetayz = atan(longest_asso_track_reco_diry/longest_asso_track_reco_dirz);
+    longest_asso_track_theta = t.Theta();
+    longest_asso_track_phi = t.Phi();
+
+    auto calo_info = GetTrackCaloInfo(e,longest_asso_track_index);
+    longest_asso_track_calo_dEdx = calo_info.second;
+    longest_asso_track_calo_resrange = calo_info.first;
+	
+
   }
 
   if(fverbose) std::cout << "Get shortest shower to vertex distance\n";
@@ -1931,7 +1991,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     most_energetic_shower_reco_thetayz = atan(shower_dir.at(1)/shower_dir.at(2)); 
     //most_energetic_shower_reco_width0 = sh.Width()[0];
     //most_energetic_shower_reco_width1 = sh.Width()[1];
-    //most_energetic_shower_reco_opening_angle = sh.OpeningAngle();
+   // most_energetic_shower_reco_opening_angle = sh.OpeningAngle();
     most_energetic_shower_reco_length = sh.Length();
     most_energetic_shower_reco_dirx = shower_dir.at(0);
     most_energetic_shower_reco_diry = shower_dir.at(1);

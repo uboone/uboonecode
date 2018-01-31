@@ -1,6 +1,3 @@
-
-
-
 #ifndef RECOMCMATCHING_H
 #define RECOMCMATCHING_H
 
@@ -75,7 +72,6 @@ class RecoMCMatching {
   int fsimch_tdc;
 
  public:
-
   int const fmc_type_shower;
   int const fmc_type_track;
   int const fmc_type_particle;
