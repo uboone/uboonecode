@@ -1,0 +1,131 @@
+////////////////////////////////////////////////////////////////////////
+// Class:       ErezCCQEAnalyzer
+// Plugin Type: analyzer (art v2_05_00)
+// File:        ErezCCQEAnalyzer_module.cc
+//
+// Generated at Wed Jul 12 16:10:16 2017 by Erez Cohen using cetskelgen
+// from cetlib version v1_21_00.
+////////////////////////////////////////////////////////////////////////
+
+
+#include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Principal/Run.h"
+#include "art/Framework/Principal/SubRun.h"
+#include "art/Framework/Services/Optional/TFileService.h"
+#include "canvas/Utilities/InputTag.h"
+#include "fhiclcpp/ParameterSet.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
+
+// LArSoft includes
+#include "larcore/Geometry/Geometry.h"
+#include "lardataobj/RecoBase/Track.h"
+#include "lardataobj/RecoBase/Hit.h"
+#include "lardataobj/RecoBase/Cluster.h"
+#include "lardataobj/RecoBase/Vertex.h"
+#include "lardataobj/RecoBase/SpacePoint.h"
+#include "lardataobj/RecoBase/TrackHitMeta.h"
+#include "lardataobj/RecoBase/Shower.h"
+#include "lardataobj/RecoBase/OpFlash.h"
+#include "lardata/ArtDataHelper/TrackUtils.h" // lar::util::TrackPitchInView()
+#include "lardataobj/AnalysisBase/Calorimetry.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/Utilities/AssociationUtil.h"
+#include "larsim/MCCheater/BackTracker.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "larreco/RecoAlg/PMAlg/Utilities.h"
+#include "larreco/RecoAlg/TrackMomentumCalculator.h"
+#include "larreco/Calorimetry/CalorimetryAlg.h"
+#include "larcoreobj/SummaryData/POTSummary.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
+
+
+// ROOT includes
+#include "TTree.h"
+#include "TTimeStamp.h"
+
+// C/C++ libraries
+#include <memory>
+#include <utility>
+
+
+// my pandoraNu track...
+#include "PandoraNuTrack/PandoraNuTrack.h"
+
+
+namespace ub {
+    class ErezCCQEAnalyzer;
+}
+
+
+class ub::ErezCCQEAnalyzer : public art::EDAnalyzer {
+public:
+    explicit ErezCCQEAnalyzer(fhicl::ParameterSet const & p);
+    // The compiler-generated destructor is fine for non-base
+    // classes without bare pointers or other resource use.
+    
+    // Plugins should not be copied or assigned.
+    ErezCCQEAnalyzer(ErezCCQEAnalyzer const &) = delete;
+    ErezCCQEAnalyzer(ErezCCQEAnalyzer &&) = delete;
+    ErezCCQEAnalyzer & operator = (ErezCCQEAnalyzer const &) = delete;
+    ErezCCQEAnalyzer & operator = (ErezCCQEAnalyzer &&) = delete;
+    
+    // Required functions.
+    void analyze(art::Event const & e) override;
+    
+    // Selected optional functions.
+    void beginJob() override;
+//    void ResetVars();
+    
+private:
+    
+    // Declare member data here.
+    void ResetVars();
+    
+    // Declare member data here.
+    TTree *fTree;
+    Int_t run;
+    
+};
+
+
+ub::ErezCCQEAnalyzer::ErezCCQEAnalyzer(fhicl::ParameterSet const & p)
+:
+EDAnalyzer(p)  // ,
+// More initializers here.
+{}
+
+void ub::ErezCCQEAnalyzer::analyze(art::Event const & evt)
+{
+    // Implementation of required member function here.
+    ResetVars();
+    art::ServiceHandle<geo::Geometry> geom;
+    //    auto const *detprop = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    //    art::ServiceHandle<cheat::BackTracker> bt;
+    //    const sim::ParticleList& plist = bt->ParticleList();
+    
+    run = evt.run();
+    fTree -> Fill();
+
+}
+
+void ub::ErezCCQEAnalyzer::beginJob()
+{
+    // Implementation of optional member function here.
+    // Implementation of optional member function here.
+    art::ServiceHandle<art::TFileService> tfs;
+    fTree = tfs->make<TTree>("my_tree","analysis tree");
+    fTree->Branch("run",&run,"run/I");
+
+}
+
+// - -- - -- - - --- -- - - --- -- - -- - --
+void ub::ErezCCQEAnalyzer::ResetVars(){
+    run = -9999;
+}
+
+
+
+DEFINE_ART_MODULE(ub::ErezCCQEAnalyzer)

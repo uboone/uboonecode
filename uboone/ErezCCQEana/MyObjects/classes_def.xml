@@ -1,0 +1,14 @@
+<lcgdict>
+  <class name="PandoraNuTrack"/>
+  <class name="std::vector<PandoraNuTrack>"/>
+  <class name="hit"/>
+  <class name="std::vector<hit>"/>
+  <class name="box"/>
+  <class name="std::vector<box>"/>
+  <class name="GENIEinteraction"/>
+  <class name="std::vector<GENIEinteraction>"/>
+  <class name="pairVertex"/>
+  <class name="std::vector<pairVertex>"/>
+  <class name="flash"/>
+  <class name="std::vector<flash>"/>
+</lcgdict>
