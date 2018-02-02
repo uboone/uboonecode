@@ -38,7 +38,7 @@ physics:
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
       hit_producer: "pandoraCosmicHitRemoval"
-      rmcmassociation_producer: "pandoraCosmicHitRemoval"
+      rmcmassociation_producer: "crHitRemovalTruthMatch"
       opflash_producer: "simpleFlashBeam"
       fill_vertex_builder_tree: "true"
       mcrecomatching: "true"
