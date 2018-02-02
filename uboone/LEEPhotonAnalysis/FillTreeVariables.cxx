@@ -154,6 +154,9 @@ void FillTreeVariables::SetUpTreeBranches() {
 
   fvertex_tree->Branch("reco_nu_vtx_dist_to_closest_tpc_wall", &reco_nu_vtx_dist_to_closest_tpc_wall, "reco_nu_vtx_dist_to_closest_tpc_wall/D");
   fvertex_tree->Branch("reco_true_nuvert_dist", &reco_true_nuvert_dist, "reco_true_nuvert_dist/D");    
+  fvertex_tree->Branch("reco_true_nuvert_distx", &reco_true_nuvert_distx, "reco_true_nuvert_distx/D");    
+  fvertex_tree->Branch("reco_true_nuvert_disty", &reco_true_nuvert_disty, "reco_true_nuvert_disty/D");    
+  fvertex_tree->Branch("reco_true_nuvert_distz", &reco_true_nuvert_distz, "reco_true_nuvert_distz/D");    
 
   fvertex_tree->Branch("reco_nu_vtx_fid_contained", &reco_nu_vtx_fid_contained, "reco_nu_vtx_fid_contained/I");
 
@@ -743,6 +746,9 @@ void FillTreeVariables::ResetVertex() {
   reco_asso_showers = -1;
 
   reco_true_nuvert_dist = -1;
+  reco_true_nuvert_distx = -10000;
+  reco_true_nuvert_disty = -10000;
+  reco_true_nuvert_distz = -10000;
 
   // Should be 21+xx "longest" vars 
   longest_asso_track_matching_ratio = -3;
@@ -2031,8 +2037,12 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
   if(fmcordata == "mc") {
 
     art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");      
-
-    reco_true_nuvert_dist = reco_vertex.Dist(ev_mct->at(delta_rad_mct_index).GetNeutrino().Nu().Position(0));
+    if(delta_rad_mct_index != SIZE_MAX) {
+      reco_true_nuvert_dist = reco_vertex.Dist(ev_mct->at(delta_rad_mct_index).GetNeutrino().Nu().Position(0));
+      reco_true_nuvert_distx = reco_nuvertx - true_nuvertx;
+      reco_true_nuvert_disty = reco_nuverty - true_nuverty;
+      reco_true_nuvert_distz = reco_nuvertz - true_nuvertz;
+    }
 
     if(most_energetic_associated_shower_index != SIZE_MAX && frmcm) {
       FillShowerRecoMCMatching(e,

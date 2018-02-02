@@ -133,6 +133,9 @@ class FillTreeVariables {
   double reco_nuvertz;
 
   double reco_true_nuvert_dist;
+  double reco_true_nuvert_distx;
+  double reco_true_nuvert_disty;
+  double reco_true_nuvert_distz;
 
   double reco_nu_vtx_dist_to_closest_tpc_wall;
   int reco_nu_vtx_fid_contained;
