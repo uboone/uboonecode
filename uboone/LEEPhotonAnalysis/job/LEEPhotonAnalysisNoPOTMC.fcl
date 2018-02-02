@@ -23,7 +23,6 @@ source:
   firstRun: 1
   firstEvent: 1
 
-
 }
 
 physics:
@@ -34,23 +33,32 @@ physics:
     {
       module_type: "LEEPhotonAnalysis"
       mcordata: "mc"
-      pfp_producer: ""
+      pot_producer: ""
+      trigger_product: "swtrigger"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
+      hit_producer: "pandoraCosmicHitRemoval"
+      rmcmassociation_producer: "crHitRemovalTruthMatch"
       opflash_producer: "simpleFlashBeam"
       fill_vertex_builder_tree: "true"
+      mcrecomatching: "true"
+      get_pot: "false"
       start_prox: "4"
       shower_prox: "20"
       cpoa_vert_prox: "13"
       cpoa_trackend_prox: "10"
-      get_pot: "false"
-      verbose: "false"
-      #spec_event: "413067"
+      #verbose: "true"
     }
   }
   analysis: [LEEPhoton]
   end_paths: [analysis]
 }
 
+
+services.DetectorPropertiesService.NumberTimeSamples:        6400
+services.DetectorPropertiesService.ReadOutWindowSize:        6400
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+services.DetectorClocksService.TrigModuleName:               "daq"
 
 services.DetectorClocksService.InheritClockConfig: false

@@ -1438,6 +1438,7 @@ std::pair<std::vector<double>,std::vector<double>> FillTreeVariables::GetTrackCa
 
   art::Ptr<recob::Track> const * track_ptr = nullptr;
 
+
   for(size_t i = 0; i < ev_pfp->size(); ++i) {
     std::vector<art::Ptr<recob::Track>> const & tracks = PFPToTrack.at(i);
     for(art::Ptr<recob::Track> const & track : tracks) {
@@ -1455,6 +1456,8 @@ std::pair<std::vector<double>,std::vector<double>> FillTreeVariables::GetTrackCa
 		std::pair<std::vector<double>,std::vector<double>> fail({-999},{-999});
     return fail;
   }
+
+  if(fverbose) std::cout << "GetTrackCaloInfo || about to return energyHelper. \n";
 
   return energyHelper.trackdEdx(*track_ptr, e, ftrack_producer);
 
@@ -1945,7 +1948,8 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
     longest_asso_track_theta = t.Theta();
     longest_asso_track_phi = t.Phi();
 
-    auto calo_info = GetTrackCaloInfo(e,longest_asso_track_index);
+    if(fverbose) std::cout << "Get Track Calo Info:\n";
+    std::pair<std::vector<double>,std::vector<double>> calo_info = GetTrackCaloInfo(e,longest_asso_track_index);
     longest_asso_track_calo_dEdx = calo_info.second;
     longest_asso_track_calo_resrange = calo_info.first;
 	
