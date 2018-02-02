@@ -8,7 +8,7 @@ DecisionTreeID: {
  module_type:      "DecisionTreeID"
  TrackModuleLabel: "pandoraNu"
 
- ModelFile:        "multiclass_pandora_mcc8.model"
+ ModelFile:        "multiclass_pandoraNu_mcc86.model"
  # this should be the same for training and predicting!
  FeaturesConfig:
  {
