@@ -58,6 +58,7 @@ class VertexBuilder {
 
   VertexBuilderTree * fvbt;
 
+  bool fconecheck;
   bool fverbose;
 
   void CheckSetVariables();
@@ -67,9 +68,15 @@ class VertexBuilder {
 	     geoalgo::Point_t const & sv);
 
   void AssociateTracks(ParticleAssociations & pas);
+  double FindClosestApproach(geoalgo::HalfLine_t const & shr1,
+			     geoalgo::HalfLine_t const & shr2,
+			     geoalgo::Point_t & PtShr1,
+			     geoalgo::Point_t & PtShr2) const;
   double FindClosestApproach(const geoalgo::HalfLine_t & shr1,
 			     const geoalgo::HalfLine_t & shr2,
 			     geoalgo::Point_t & vtx) const;
+  bool ConeCheck(geoalgo::Cone_t const & cone,
+		 geoalgo::Point_t const & x) const;
   void AssociateShowers(ParticleAssociations & pas);
   void AddLoneTracks(ParticleAssociations & pas);
   void AddLoneShowers(ParticleAssociations & pas);
@@ -79,6 +86,9 @@ class VertexBuilder {
 
   VertexBuilder();
 
+  void SetConeCheck(bool const conecheck = true) {
+    fconecheck = conecheck;
+  }
   void SetVerbose(bool const verbose = true) {
     fverbose = verbose;
   }

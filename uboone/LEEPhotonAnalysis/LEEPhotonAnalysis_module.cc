@@ -70,6 +70,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 
   std::string fmcordata;
   bool fmcrecomatching;
+  bool frun_vertex_quality;
   std::string fpot_producer;
   std::string fpfp_producer;
   std::string ftrack_producer;
@@ -119,6 +120,7 @@ LEEPhotonAnalysis::LEEPhotonAnalysis(fhicl::ParameterSet const & p) :
   fcpoa_trackend_prox(-1),
   fverbose(false),
   fmcrecomatching(false),
+  frun_vertex_quality(false),
   fPOTtree(nullptr),
   fnumber_of_events(0),
   fpot(0),
@@ -145,6 +147,7 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
     exit(1);
   }
   p.get_if_present<bool>("mcrecomatching", fmcrecomatching);
+  p.get_if_present<bool>("run_vertex_quality", frun_vertex_quality);
   p.get_if_present<std::string>("pot_producer", fpot_producer);
   if(fpot_producer != ""){
     fPOTtree->Branch("pot", &fpot, "pot/D");
@@ -180,6 +183,7 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
   fcpoa_trackend_prox = p.get<double>("cpoa_trackend_prox");
 
   p.get_if_present<bool>("verbose", fverbose);
+  frmcm.SetVerbose(fverbose);
   fftv.SetVerbose(fverbose);
 
   p.get_if_present<unsigned int>("spec_event", fspec_event);
@@ -374,7 +378,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   if(fmcrecomatching) {
     frmcm.MatchWAssociations(e);
-    fvq.RunDist(e, pas);
+    if(frun_vertex_quality) fvq.RunDist(e, pas);
   }
   
   /////////////////

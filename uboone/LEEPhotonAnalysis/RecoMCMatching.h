@@ -35,6 +35,9 @@ struct RecoMCMatch {
   double ratio;
 
   std::unordered_map<int, double> trkide_map;
+  std::unordered_map<size_t, double> mctrack_map;
+  std::unordered_map<size_t, double> mcshower_map;
+  std::unordered_map<size_t, double> mcparticle_map;
 
   RecoMCMatch(){}
   RecoMCMatch(int const imc_type, size_t const imc_index, double const imax, double const itotal, double const iratio);
@@ -53,6 +56,8 @@ class RecoMCMatching {
   std::string frmcmassociation_producer;
 
   bool fconsider_mcparticles;
+
+  bool fverbose;
 
   SimchInfo simchi;
 
@@ -78,7 +83,9 @@ class RecoMCMatching {
 
   RecoMCMatching();
 
-  
+  void SetVerbose(bool const verbose = true) {
+    fverbose = verbose;
+  }
 
   void ConfigureSimch(std::string const & match_type,
 		      std::string const & simch_producer,
@@ -97,12 +104,14 @@ class RecoMCMatching {
   void Configure(std::string const & hit_producer,
 		 std::string const & track_producer,
 		 std::string const & shower_producer,
-		 std::string const & rmcmassociation_producer) {
+		 std::string const & rmcmassociation_producer,
+		 bool const verbose = true) {
     
     fhit_producer = hit_producer;
     ftrack_producer = track_producer;
     fshower_producer = shower_producer;
     frmcmassociation_producer = rmcmassociation_producer;
+    fverbose = verbose;
 
   }
 
@@ -126,11 +135,19 @@ class RecoMCMatching {
 		 double const max,
 		 double const total,
 		 bool const last);
-  void MatchAll(art::Event const & e);
   void CoutMatches(art::Event const & e);
+  void MatchAll(art::Event const & e);
 
   //New association method
+  void FillMap(std::unordered_map<size_t, double> & mc_map,
+	       size_t const index,
+	       double const quantity);
   void MatchWAssociations(art::Event const & e);
+  void CoutMatches(art::Event const & e,
+		   std::unordered_map<int, size_t> const & tp_map,
+		   std::unordered_map<int, size_t> const & sp_map,
+		   std::unordered_map<int, size_t> const & mcp_map,
+		   std::vector<RecoMCMatch> const & object_matches);
   void FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
 			     std::unordered_map<int, size_t> const & sp_map,
 			     std::unordered_map<int, size_t> const & mcp_map,

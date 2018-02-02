@@ -14,7 +14,8 @@ VertexBuilder::VertexBuilder() :
   fcpoa_trackend_prox(-1),
   fdetos(nullptr),
   fvbt(nullptr),
-  fverbose(true) {}
+  fconecheck(false),
+  fverbose(false) {}
 
 
 void VertexBuilder::CheckSetVariables() {
@@ -46,7 +47,7 @@ void VertexBuilder::Erase(std::multimap<size_t, geoalgo::Point_t const *> & pn,
 			  std::multimap<size_t, geoalgo::Point_t const *>::iterator const best_it,
 			  geoalgo::Point_t const & sv) {
 
-  size_t const index = best_it->first;    
+  size_t const index = best_it->first;
   pn.erase(best_it);  
 
   if(fdetos->GetRecoType(index) == fdetos->ftrack_reco_type) {
@@ -237,24 +238,53 @@ void VertexBuilder::AssociateTracks(ParticleAssociations & pas) {
 }
 
 
-double VertexBuilder::FindClosestApproach(const geoalgo::HalfLine_t & shr1,
-					  const geoalgo::HalfLine_t & shr2,
-					  geoalgo::Point_t & vtx) const {
+double VertexBuilder::FindClosestApproach(geoalgo::HalfLine_t const & shr1,
+					  geoalgo::HalfLine_t const & shr2,
+					  geoalgo::Point_t & PtShr1,
+					  geoalgo::Point_t & PtShr2) const {
+
   // Find mininum impact parameter between a two showers
   // flip their directions and look backwards
 
   // Create a half-line pointing backwards from the shower
-  geoalgo::HalfLine_t shr1Bkwd(shr1.Start(), shr1.Dir() * (-1));
-  geoalgo::HalfLine_t shr2Bkwd(shr2.Start(), shr2.Dir() * (-1));
+  geoalgo::HalfLine_t const shr1Bkwd(shr1.Start(), shr1.Dir() * (-1));
+  geoalgo::HalfLine_t const shr2Bkwd(shr2.Start(), shr2.Dir() * (-1));
 
-  // coordinates for closest points on the two objects
+  return sqrt(falgo.SqDist(shr1Bkwd, shr2Bkwd, PtShr1, PtShr2));
+
+}
+
+
+double VertexBuilder::FindClosestApproach(geoalgo::HalfLine_t const & shr1,
+					  geoalgo::HalfLine_t const & shr2,
+					  geoalgo::Point_t & vtx) const {
+
   geoalgo::Point_t PtShr1(3);
   geoalgo::Point_t PtShr2(3);
-  double IP = falgo.SqDist(shr1Bkwd, shr2Bkwd, PtShr1, PtShr2);
-  // build candidate vertex
-  vtx = (PtShr1 + PtShr2) / 2.;
+  double const ip = FindClosestApproach(shr1, shr2, PtShr1, PtShr2);
+  vtx = (PtShr1 + PtShr2) / 2;
 
-  return sqrt(IP);
+  return ip;
+
+}
+
+
+
+bool VertexBuilder::ConeCheck(geoalgo::Cone_t const & cone,
+			      geoalgo::Point_t const & x) const {
+
+  geoalgo::Vector_t const sx = cone.Start() - x;
+  geoalgo::Vector_t const sb = cone.Start() - cone.Dir() * cone.Length();
+  
+  double const sxm = sx.Length();
+  double const sbm = sb.Length();
+
+  double const dot = sx.Dot(sb)/sxm/sbm;
+
+  if(!(dot > cos(cone.Angle()/2))) return false;
+  
+  return dot < sbm * sbm;
+
 }
 
 
@@ -266,8 +296,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
     shower_map.emplace(i, &pas.GetDetectorObjects().GetShower(i));
   }
 
-  std::vector<ParticleAssociation> const & associations =
-    pas.GetAssociations();
+  std::vector<ParticleAssociation> const & associations = pas.GetAssociations();
 
   while(shower_map.size()) {
 
@@ -277,7 +306,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
     size_t best_shower_id = SIZE_MAX;
     size_t best_other_id = SIZE_MAX;
     size_t index = SIZE_MAX;
-    Double_t best_dist = fshower_prox;
+    double best_dist = fshower_prox;
     geoalgo::Point_t best_vert(2000, 2000, 2000);    
     geoalgo::Point_t temp_vert(2000, 2000, 2000);
 
@@ -286,8 +315,10 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
       if(fverbose)
 	std::cout << "\t\tshower_map primary floop, id: " << c.first << std::endl;
 
-      geoalgo::Point_t const & c_start = c.second->fcone.Start();
-      geoalgo::Vector_t const & c_dir = c.second->fcone.Dir();
+      geoalgo::Cone_t const & c_cone = c.second->fcone;
+      geoalgo::Point_t const & c_start = c_cone.Start();
+      geoalgo::Vector_t const & c_dir = c_cone.Dir();
+      geoalgo::HalfLine const bp(c_start, c_dir*-1);
 
       for(auto const & c2 : shower_map) {
 
@@ -300,15 +331,16 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 	  continue;
 	}
 
-	double dist = FindClosestApproach(c2.second->fcone, c.second->fcone, temp_vert);
+	geoalgo::Point_t PtShr1(3);
+	geoalgo::Point_t PtShr2(3);
+	double const dist = FindClosestApproach(c2.second->fcone, c_cone, PtShr2, PtShr1);
+	temp_vert = (PtShr1 + PtShr2) / 2;
 
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best-dist: "
 		    << best_dist << " ?\n";
 
-	double temp_dist = best_dist;
-
-	if(dist < temp_dist) {
+	if(dist < best_dist) {
 
 	  if(fverbose) std::cout << "\t\t\t\tyes\n";
 
@@ -333,12 +365,10 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 
 	geoalgo::Point_t dont_care;
 
-	Double_t dist =
-	  sqrt(falgo.SqDist(t.ftrajectory, 
-			    geoalgo::HalfLine(c_start,
-					      c_dir*-1),
-			    temp_vert,
-			    dont_care));
+	double const dist = sqrt(falgo.SqDist(t.ftrajectory, 
+					      bp,
+					      temp_vert,
+					      dont_care));
 
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best_dist: "
@@ -368,11 +398,8 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 
 	ParticleAssociation const & pa = associations.at(i);
 
-	double dist =
-	  sqrt(falgo.SqDist(pa.GetRecoVertex(),
-			    geoalgo::HalfLine(c_start,
-					      c_dir*-1)));
-
+	double const dist = sqrt(falgo.SqDist(pa.GetRecoVertex(), bp))
+	  ;
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best-dist: "
 		    << best_dist << " ?\n";
@@ -692,8 +719,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 			  << associations.at(index).GetRecoVertex().Dist(*point)
 			  << " < fstart_prox: " << fstart_prox << " ?\n";
 
-	      if(associations.at(index).GetRecoVertex().
-		 Dist(*point) < fstart_prox) {
+	      if(associations.at(index).GetRecoVertex().Dist(*point) < fstart_prox) {
 		if(fverbose) std::cout << "\t\t\t\t\t\t\tyes\n";
 		pas.AddShower(index, best_shower_id, best_vert);
 	      }

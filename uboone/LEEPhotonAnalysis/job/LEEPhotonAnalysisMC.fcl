@@ -42,6 +42,7 @@ physics:
       opflash_producer: "simpleFlashBeam"
       fill_vertex_builder_tree: "true"
       mcrecomatching: "true"
+      run_vertex_quality: "true"
       start_prox: "4"
       shower_prox: "20"
       cpoa_vert_prox: "13"

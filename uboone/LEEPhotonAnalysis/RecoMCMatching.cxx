@@ -20,11 +20,12 @@ RecoMCMatch::RecoMCMatch(int const imc_type, size_t const imc_index, double cons
 
 RecoMCMatching::RecoMCMatching() :
   fconsider_mcparticles(false),
+  fverbose(false),
   fhit_tree(nullptr),
   fsimch_tree(nullptr),
   fmc_type_shower(1),
   fmc_type_track(2),
-  fmc_type_particle(3) {}
+  fmc_type_particle(3){}
 
 
 
@@ -336,6 +337,18 @@ void RecoMCMatching::CoutMatches(art::Event const & e) {
 
 
 
+void RecoMCMatching::FillMap(std::unordered_map<size_t, double> & mc_map,
+			     size_t const index,
+			     double const quantity) {
+
+  auto const mcq_it = mc_map.find(index);
+  if(mcq_it == mc_map.end()) mc_map.emplace(index, quantity);
+  else mc_map[index] += quantity;
+  
+}
+
+
+
 void RecoMCMatching::FillAssociationVector(std::unordered_map<int, size_t> const & tp_map,
 					   std::unordered_map<int, size_t> const & sp_map,
 					   std::unordered_map<int, size_t> const & mcp_map,
@@ -351,6 +364,9 @@ void RecoMCMatching::FillAssociationVector(std::unordered_map<int, size_t> const
 
     RecoMCMatch rmcm;
     std::unordered_map<int, double> & trkide_map = rmcm.trkide_map;
+    std::unordered_map<size_t, double> & mctrack_map = rmcm.mctrack_map;
+    std::unordered_map<size_t, double> & mcshower_map = rmcm.mcshower_map;
+    std::unordered_map<size_t, double> & mcparticle_map = rmcm.mcparticle_map;
     double total = 0;
 
     for(size_t i_h = 0; i_h < obj_hits_ptrs.size(); ++i_h) {
@@ -375,16 +391,19 @@ void RecoMCMatching::FillAssociationVector(std::unordered_map<int, size_t> const
       }
       auto const tp_it = tp_map.find(trackid);
       if(tp_it != tp_map.end()) {
+	FillMap(mctrack_map, tp_it->second, p.second);
 	fmctrack_charge.at(tp_it->second) += p.second;
 	continue;
       }
       auto const sp_it = sp_map.find(trackid);
       if(sp_it != sp_map.end()) {
+	FillMap(mcshower_map, sp_it->second, p.second);
 	fmcshower_charge.at(sp_it->second) += p.second;
 	continue;
       }
       auto const mcp_it = mcp_map.find(trackid);
       if(mcp_it != mcp_map.end()) {
+	FillMap(mcparticle_map, mcp_it->second, p.second);
 	fmcparticle_charge.at(mcp_it->second) += p.second;
 	continue;
       }
@@ -425,11 +444,48 @@ void RecoMCMatching::FillAssociationVector(std::unordered_map<int, size_t> const
 
 
 
+void RecoMCMatching::CoutMatches(art::Event const & e,
+				 std::unordered_map<int, size_t> const & tp_map,
+				 std::unordered_map<int, size_t> const & sp_map,
+				 std::unordered_map<int, size_t> const & mcp_map,
+				 std::vector<RecoMCMatch> const & object_matches) {
+
+  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
+  art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcparticle = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+
+  for(size_t i = 0; i < object_matches.size(); ++i) {
+
+    std::cout << "Index: " << i << "\n";
+
+    RecoMCMatch const & rmcm = object_matches.at(i);
+    
+    for(auto const & p : rmcm.mctrack_map) {
+      sim::MCTrack const & mctr = ev_mctrack->at(p.first);
+      std::cout << "\tMCTrack - TrackID: " << mctr.TrackID() << " PDG: " << mctr.PdgCode() << " Contribution: " << p.second << "\n";
+    }
+
+    for(auto const & p : rmcm.mcshower_map) {
+      sim::MCShower const & mcs = ev_mcshower->at(p.first);
+      std::cout << "\tMCShower - TrackID: " << mcs.TrackID() << " PDG: " << mcs.PdgCode() << " Contribution: " << p.second << "\n";
+    }
+    
+    for(auto const & p : rmcm.mcparticle_map) {
+      simb::MCParticle const & mcp = ev_mcparticle->at(p.first);
+      std::cout << "\tMCParticle - TrackId: " << mcp.TrackId() << " PDG: " << mcp.PdgCode() << " Contribution: " << p.second << "\n";
+    }
+
+  }
+
+}
+
+
+
 void RecoMCMatching::MatchWAssociations(art::Event const & e) {
 
   art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
-  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp  = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
   art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producer);
   art::ValidHandle<std::vector<recob::Track>> const & ev_t  = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
   art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
@@ -453,10 +509,14 @@ void RecoMCMatching::MatchWAssociations(art::Event const & e) {
   std::unordered_map<int, size_t> sp_map;
   for(size_t mc_index = 0; mc_index < ev_mcshower->size(); ++mc_index){
     sim::MCShower const & mcshower = ev_mcshower->at(mc_index);
-    if(tp_map.find(mcshower.TrackID()) != tp_map.end()) continue;
+    if(tp_map.find(mcshower.TrackID()) != tp_map.end()) {
+      std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+		<< "ERROR: MCShower trackid found in MCTrack\n";
+      exit(1);
+    }
     sp_map[mcshower.TrackID()] = mc_index;
     for(auto const & id : mcshower.DaughterTrackID()) {
-      if(tp_map.find(id) != tp_map.end()) continue;
+      if(sp_map.find(id) != sp_map.end()) continue;
       sp_map[id] = mc_index;
     }
   }
@@ -467,7 +527,7 @@ void RecoMCMatching::MatchWAssociations(art::Event const & e) {
     if(tp_map.find(trackid) != tp_map.end() || sp_map.find(trackid) != sp_map.end()) continue;
     mcp_map[ev_mcp->at(mc_index).TrackId()] = mc_index;
   }
-  
+
   FillAssociationVector(tp_map,
 			sp_map,
 			mcp_map,
@@ -481,5 +541,33 @@ void RecoMCMatching::MatchWAssociations(art::Event const & e) {
 			hits_per_shower,
 			particles_per_hit,
 			fshower_matches);
+
+  if(fverbose) {
+
+    std::cout << "Number of reco tracks: " << ev_t->size() << "\n"
+	      << "Number of reco showers: " << ev_s->size() << "\n"
+	      << "Number of MCTracks: " << ev_mctrack->size() << "\n"
+	      << "Number of MCShowers: " << ev_mcshower->size() << "\n"
+	      << "Number of MCParticle: " << ev_mcp->size() << "\n";
+    
+    std::cout << "\nReco Tracks:\n";
+    
+    CoutMatches(e,
+		tp_map,
+		sp_map,
+		mcp_map,
+		ftrack_matches);
+
+    std::cout << "\nReco Showers:\n";
+
+    CoutMatches(e,
+		tp_map,
+		sp_map,
+		mcp_map,
+		fshower_matches);
+
+    std::cout << "\n";
+
+  }
 
 }
