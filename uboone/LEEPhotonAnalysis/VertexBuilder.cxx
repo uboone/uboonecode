@@ -269,6 +269,19 @@ double VertexBuilder::FindClosestApproach(geoalgo::HalfLine_t const & shr1,
 }
 
 
+/*
+double VertexBuilder::FindShowerAssociationScore(geoalgo::HalfLine_t const & shr1,
+						 geoalgo::HalfLine_t const & shr2,
+						 geoalgo::Point_t & vtx) const {
+
+  double const ip = FindClosestApproach(shr1, shr2, vtx);
+  
+
+  return ;
+
+}
+*/
+
 
 bool VertexBuilder::ConeCheck(geoalgo::Cone_t const & cone,
 			      geoalgo::Point_t const & x) const {
@@ -331,10 +344,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 	  continue;
 	}
 
-	geoalgo::Point_t PtShr1(3);
-	geoalgo::Point_t PtShr2(3);
-	double const dist = FindClosestApproach(c2.second->fcone, c_cone, PtShr2, PtShr1);
-	temp_vert = (PtShr1 + PtShr2) / 2;
+	double dist = FindClosestApproach(c2.second->fcone, c_cone, temp_vert);
 
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best-dist: "
