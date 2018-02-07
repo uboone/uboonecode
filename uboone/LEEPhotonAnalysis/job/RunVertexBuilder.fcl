@@ -1,0 +1,73 @@
+#include "services_microboone.fcl"
+#include "messageservice.fcl"
+#include "time_memory_tracker_microboone.fcl"
+
+process_name : RunVertexBuilder
+
+services:
+{
+
+  TFileService:	{fileName: "RunVertexBuilder.root"}
+  TimeTracker:	@local::microboone_time_tracker
+  MemoryTracker: @local::microboone_memory_tracker
+  @table::microboone_simulation_services
+
+
+}#end services
+
+source:
+{
+
+  module_type: RootInput
+  maxEvents: -1
+  firstRun: 1
+  firstEvent: 1
+
+}
+
+physics:
+{
+  analyzers:
+  {
+    RunVB:
+    {
+      module_type: "RunVertexBuilder"
+      track_producer: "pandoraNu"
+      shower_producer: "pandoraNu"
+
+      #start_prox: "4"
+      start_prox_min: "1"
+      start_prox_max: "4"	
+      start_prox_inc: "3"
+
+      #shower_prox: "20"
+      shower_prox_min: "5"
+      shower_prox_max: "20"
+      shower_prox_inc: "3"
+
+      max_bp_dist: "50"
+
+      cpoa_vert_prox: "13"
+
+      #cpoa_trackend_prox: "10"
+      cpoa_trackend_prox_min: "1"
+      cpoa_trackend_prox_max: "10"
+      cpoa_trackend_prox_inc: "9"
+
+      hit_producer: "pandoraCosmicHitRemoval"
+      rmcmassociation_producer: "crHitRemovalTruthMatch"
+      #verbose: "true"
+    }
+  }
+  analysis: [RunVB]
+  end_paths: [analysis]
+}
+
+
+services.DetectorPropertiesService.NumberTimeSamples:        6400
+services.DetectorPropertiesService.ReadOutWindowSize:        6400
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+services.DetectorClocksService.TrigModuleName:               "daq"
+
+services.DetectorClocksService.InheritClockConfig: false

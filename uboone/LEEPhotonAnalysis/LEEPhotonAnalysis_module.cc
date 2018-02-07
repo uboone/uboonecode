@@ -64,6 +64,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 
   double fstart_prox;
   double fshower_prox;
+  double fmax_bp_dist;
   double fcpoa_vert_prox; 
   double fcpoa_trackend_prox;
   bool fverbose;
@@ -179,6 +180,7 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 
   fstart_prox = p.get<double>("start_prox");
   fshower_prox = p.get<double>("shower_prox");
+  fmax_bp_dist = p.get<double>("max_bp_dist");
   fcpoa_vert_prox = p.get<double>("cpoa_vert_prox");
   fcpoa_trackend_prox = p.get<double>("cpoa_trackend_prox");
 
@@ -353,6 +355,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   vb.SetMaximumTrackEndProximity(fstart_prox);
   vb.SetMaximumShowerIP(fshower_prox);
+  vb.SetMaximumBackwardsProjectionDist(fmax_bp_dist);
   vb.CPOAToVert(fcpoa_vert_prox);
   vb.SetMaximumTrackEndProx(fcpoa_trackend_prox);
 

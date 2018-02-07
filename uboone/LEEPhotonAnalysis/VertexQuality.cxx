@@ -30,6 +30,12 @@ VertexQuality::VertexQuality(std::string const & track_producer,
   art::ServiceHandle< art::TFileService > tfs;
 
   fvertex_tree = tfs->make<TTree>("vertex_quality_tree", "");  
+  
+  fvertex_tree->Branch("start_prox", &fstart_prox, "start_prox/D");
+  fvertex_tree->Branch("shower_prox", &fshower_prox, "shower_prox/D");
+  fvertex_tree->Branch("max_bp_dist", &fmax_bp_dist, "max_bp_dist/D");  
+  fvertex_tree->Branch("cpoa_vert_prox", &fcpoa_vert_prox, "cpoa_vert_prox/D");
+  fvertex_tree->Branch("cpoa_trackend_prox", &fcpoa_trackend_prox, "cpoa_trackend_prox/D");
 
   fvertex_tree->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
 
@@ -55,8 +61,13 @@ VertexQuality::VertexQuality(std::string const & track_producer,
 
   fvertex_tree_event = tfs->make<TTree>("vertex_quality_tree_closest", "");  
 
-  fvertex_tree_event->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
+  fvertex_tree_event->Branch("start_prox", &fstart_prox, "start_prox/D");
+  fvertex_tree_event->Branch("shower_prox", &fshower_prox, "shower_prox/D");
+  fvertex_tree_event->Branch("max_bp_dist", &fmax_bp_dist, "max_bp_dist/D");  
+  fvertex_tree_event->Branch("cpoa_vert_prox", &fcpoa_vert_prox, "cpoa_vert_prox/D");
+  fvertex_tree_event->Branch("cpoa_trackend_prox", &fcpoa_trackend_prox, "cpoa_trackend_prox/D");
 
+  fvertex_tree_event->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
   fvertex_tree_event->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
 
   fvertex_tree_event->Branch("dist", &fdist, "dist/D");
@@ -377,7 +388,8 @@ void VertexQuality::FillTree(art::Event const & e,
 
 
 void VertexQuality::RunDist(art::Event const & e,
-			    ParticleAssociations const & pas) {
+			    ParticleAssociations const & pas,
+			    bool const track_only) {
 
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
   geoalgo::Point_t const true_nu_vtx = ev_mctruth->front().GetNeutrino().Nu().Position(0);
@@ -395,7 +407,10 @@ void VertexQuality::RunDist(art::Event const & e,
 
   double smallest_dist = DBL_MAX;
   size_t closest_index = SIZE_MAX;
-  for(size_t const pa_index : pas.GetSelectedAssociations()) {
+  std::vector<size_t> const * asso_v;
+  if(track_only) asso_v = &pas.GetAssociationIndices();
+  else asso_v = &pas.GetSelectedAssociations();
+  for(size_t const pa_index : *asso_v) {
     FillTree(e, fvertex_tree, pas, pa_index, true_nu_vtx, track_v, shower_v);
     double const dist = true_nu_vtx.Dist(pa_v.at(pa_index).GetRecoVertex());
     if(dist < smallest_dist) {

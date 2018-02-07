@@ -391,19 +391,19 @@ void RecoMCMatching::FillAssociationVector(std::unordered_map<int, size_t> const
       }
       auto const tp_it = tp_map.find(trackid);
       if(tp_it != tp_map.end()) {
-	FillMap(mctrack_map, tp_it->second, p.second);
+	if(fverbose) FillMap(mctrack_map, tp_it->second, p.second);
 	fmctrack_charge.at(tp_it->second) += p.second;
 	continue;
       }
       auto const sp_it = sp_map.find(trackid);
       if(sp_it != sp_map.end()) {
-	FillMap(mcshower_map, sp_it->second, p.second);
+	if(fverbose) FillMap(mcshower_map, sp_it->second, p.second);
 	fmcshower_charge.at(sp_it->second) += p.second;
 	continue;
       }
       auto const mcp_it = mcp_map.find(trackid);
       if(mcp_it != mcp_map.end()) {
-	FillMap(mcparticle_map, mcp_it->second, p.second);
+	if(fverbose) FillMap(mcparticle_map, mcp_it->second, p.second);
 	fmcparticle_charge.at(mcp_it->second) += p.second;
 	continue;
       }

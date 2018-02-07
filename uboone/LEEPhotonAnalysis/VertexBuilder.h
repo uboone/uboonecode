@@ -47,10 +47,9 @@ class VertexBuilder {
 
   geoalgo::GeoAlgo const falgo;
 
-  size_t fobject_id;
-
   double fstart_prox;
   double fshower_prox;
+  double fmax_bp_dist;
   double fcpoa_vert_prox; 
   double fcpoa_trackend_prox;
 
@@ -58,7 +57,7 @@ class VertexBuilder {
 
   VertexBuilderTree * fvbt;
 
-  bool fconecheck;
+  bool fshower_score;
   bool fverbose;
 
   void CheckSetVariables();
@@ -67,7 +66,6 @@ class VertexBuilder {
 	     std::multimap<size_t, geoalgo::Point_t const *>::iterator const best_it,
 	     geoalgo::Point_t const & sv);
 
-  void AssociateTracks(ParticleAssociations & pas);
   double FindClosestApproach(geoalgo::HalfLine_t const & shr1,
 			     geoalgo::HalfLine_t const & shr2,
 			     geoalgo::Point_t & PtShr1,
@@ -75,6 +73,15 @@ class VertexBuilder {
   double FindClosestApproach(const geoalgo::HalfLine_t & shr1,
 			     const geoalgo::HalfLine_t & shr2,
 			     geoalgo::Point_t & vtx) const;
+  double FindClosestApproach(geoalgo::Trajectory const & traj,
+			     geoalgo::HalfLine_t const & shr,
+			     geoalgo::Point_t & vtx) const;
+  double FindClosestApproach(geoalgo::Point_t const & pav,
+			     geoalgo::HalfLine_t const & shr,
+			     geoalgo::Point_t & vtx) const;
+  double GetShowerAssociationScore(geoalgo::HalfLine_t const & shr1,
+				   geoalgo::HalfLine_t const & shr2,
+				   geoalgo::Point_t & vtx) const;
   bool ConeCheck(geoalgo::Cone_t const & cone,
 		 geoalgo::Point_t const & x) const;
   void AssociateShowers(ParticleAssociations & pas);
@@ -86,8 +93,14 @@ class VertexBuilder {
 
   VertexBuilder();
 
-  void SetConeCheck(bool const conecheck = true) {
-    fconecheck = conecheck;
+  void AssociateTracks(ParticleAssociations & pas);
+
+  void SetDetectorObjects(DetectorObjects const * detos) {
+    fdetos = detos;
+  }
+  
+  void SetShowerScore(bool const shower_score = true) {
+    fshower_score = shower_score;
   }
   void SetVerbose(bool const verbose = true) {
     fverbose = verbose;
@@ -101,6 +114,10 @@ class VertexBuilder {
     fshower_prox = shower_prox;
   }
 
+  void SetMaximumBackwardsProjectionDist(double const max_bp_dist) {
+    fmax_bp_dist = max_bp_dist;
+  }
+
   void CPOAToVert(double const cpoa_vert_prox) {
     fcpoa_vert_prox = cpoa_vert_prox;
   }
@@ -110,9 +127,6 @@ class VertexBuilder {
   }
 
   void SetVBT(VertexBuilderTree * vbt) {fvbt = vbt;}
-
-  void AddTracks(art::ValidHandle<std::vector<recob::Track>> const & ev_t);
-  void AddShowers(art::ValidHandle<std::vector<recob::Shower>> const & ev_s);
 
   void Run(ParticleAssociations & pas);
 

@@ -105,7 +105,7 @@ class RecoMCMatching {
 		 std::string const & track_producer,
 		 std::string const & shower_producer,
 		 std::string const & rmcmassociation_producer,
-		 bool const verbose = true) {
+		 bool const verbose = false) {
     
     fhit_producer = hit_producer;
     ftrack_producer = track_producer;
