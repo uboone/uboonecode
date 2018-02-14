@@ -14,9 +14,10 @@ physics.ana: [ superaMCOnly3D ]
 physics.sim: [ rns,
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
-               @sequence::dlprod_simtpc,
-               @sequence::dlprod_pmtreco,
-               @sequence::dlprod_tpcreco ]
+               swtrigger]
+#               @sequence::dlprod_simtpc,
+#               @sequence::dlprod_pmtreco,
+#               @sequence::dlprod_tpcreco ]
 
 physics.end_paths:     [ ana ]
 physics.trigger_paths: [ sim ]
@@ -28,6 +29,7 @@ physics.trigger_paths: [ sim ]
 #physics.analyzers.wire.SelectEvents:    [ sim ]
 #physics.analyzers.reco2d.SelectEvents:  [ sim ]
 #physics.analyzers.superaFocusedView.SelectEvents: [ sim ]
+#physics.analyzers.superaMCOnly3D.SelectEvents: [ sim ]
 
 physics.producers.generator: @local::microboone_singlep
 physics.producers.generator.PDG: [ 11 ]            # eminus

@@ -7,6 +7,7 @@ source: @local::source_gen
 #physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
 #physics.ana: [ mcinfo, opreco, reco2d, superaMCFocused ]
 physics.ana: [ superaMCOnly3D ]
+#physics.ana: [ superaBasicMC ]
 physics.sim: [ rns, 
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
