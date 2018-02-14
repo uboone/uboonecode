@@ -5,42 +5,6 @@
 
 #include "ParticleAssociations.h"
 
-#include "art/Framework/Services/Optional/TFileService.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "art/Framework/Services/Optional/TFileDirectory.h"
-
-#include "TTree.h"
-
-
-struct VertexBuilderTree {
-
-  TTree * ftree;
-  int frun_number;
-  int fsubrun_number;
-  int fevent_number;
-  int ftrack_number;
-  int fshower_number;
-  int fassociation_track_number;
-  int fassociation_shower_number;
-  int fassociation_final_number;
-
-VertexBuilderTree() :
-  ftree(nullptr){}
-
-  void Setup() {
-    art::ServiceHandle< art::TFileService > tfs;
-    ftree = tfs->make<TTree>("VertexBuilder", "");
-    ftree->Branch("run_number", &frun_number, "run_number/I");
-    ftree->Branch("subrun_number", &fsubrun_number, "subrun_number/I");
-    ftree->Branch("event_number", &fevent_number, "event_number/I");  
-    ftree->Branch("track_number", &ftrack_number, "track_number/I");
-    ftree->Branch("shower_number", &fshower_number, "shower_number/I");
-    ftree->Branch("association_track_number", &fassociation_track_number, "association_track_number/I");
-    ftree->Branch("association_shower_number", &fassociation_shower_number, "association_shower_number/I");
-    ftree->Branch("association_final_number", &fassociation_final_number, "association_final_number/I");
-  }
-
-};
 
 
 class VertexBuilder {
@@ -54,8 +18,6 @@ class VertexBuilder {
   double fcpoa_trackend_prox;
 
   DetectorObjects const * fdetos;
-
-  VertexBuilderTree * fvbt;
 
   bool fshower_score;
   bool fverbose;
@@ -87,7 +49,6 @@ class VertexBuilder {
   void AssociateShowers(ParticleAssociations & pas);
   void AddLoneTracks(ParticleAssociations & pas);
   void AddLoneShowers(ParticleAssociations & pas);
-  void FillVBT(ParticleAssociations & pas);
 
  public:
 
@@ -125,8 +86,6 @@ class VertexBuilder {
   void SetMaximumTrackEndProx(double const cpoa_trackend_prox) {
     fcpoa_trackend_prox = cpoa_trackend_prox;
   }
-
-  void SetVBT(VertexBuilderTree * vbt) {fvbt = vbt;}
 
   void Run(ParticleAssociations & pas);
 

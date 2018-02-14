@@ -45,6 +45,7 @@ physics:
       run_vertex_quality: "true"
       start_prox: "4"
       shower_prox: "20"
+      max_bp_dist: "50"
       cpoa_vert_prox: "13"
       cpoa_trackend_prox: "10"
       #verbose: "true"

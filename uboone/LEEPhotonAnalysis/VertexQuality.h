@@ -5,6 +5,7 @@
 
 #include "ParticleAssociations.h"
 #include "RecoMCMatching.h"
+#include "FilterSignal.h"
 
 #include "art/Framework/Principal/Event.h"
 
@@ -21,11 +22,13 @@ class VertexQuality {
   std::string fshower_producer;
   
   RecoMCMatching const * frmcm;
+  FilterSignal ffs;
 
   geoalgo::AABox ftpc_volume;
 
   TTree * fvertex_tree;
   TTree * fvertex_tree_event;
+  TTree * fvertex_tree_event_signal;
 
   double fstart_prox;
   double fshower_prox;
@@ -34,6 +37,8 @@ class VertexQuality {
   double fcpoa_trackend_prox;
 
   int freco_vertex_present;
+  int fis_nc_delta_rad;
+  int fnc_delta_rad_split_shower;
   int ftpc_volume_contained;
 
   double fdist;
@@ -58,8 +63,6 @@ class VertexQuality {
 
  public:
 
-  art::Ptr<simb::MCTruth> TrackIDToMCTruth(art::Event const & e, int const geant_track_id);
-
   VertexQuality(std::string const & track_producer,
 		std::string const & shower_producer,
 		RecoMCMatching const & rmcm);
@@ -78,11 +81,19 @@ class VertexQuality {
 
   }
 
+  void SetupVertexQualityTree();
+  void SetupVertexQualityTreeClosest();
+  void SetupVertexQualityTreeSignal();
+
+  art::Ptr<simb::MCTruth> TrackIDToMCTruth(art::Event const & e, int const geant_track_id);
+
   void GetTrueObjects(art::Event const & e,
+		      size_t const mct_index,
 		      std::vector<size_t> & mctrack_v,
 		      std::vector<size_t> & mcshower_v,
 		      std::vector<size_t> & mcparticle_v);
   void GetTrueRecoObjects(art::Event const & e,
+			  size_t const mct_index,
 			  std::vector<size_t> & track_v,
 			  std::vector<size_t> & shower_v);
   void GetTrueObjects(art::Event const & e,
@@ -93,13 +104,17 @@ class VertexQuality {
   void FillTree(art::Event const & e,
 		TTree * tree, 
 		ParticleAssociations const & pas,
-		size_t const closest_index,
+		size_t const pa_index,
 		geoalgo::Point_t const & true_nu_vtx,
 		std::vector<size_t> const & track_v,
 		std::vector<size_t> const & shower_v);
   void RunDist(art::Event const & e,
 	       ParticleAssociations const & pas,
 	       bool const track_only = false);
+  size_t GetNCDeltadRadPhoton(art::Event const & e, size_t const nc_delta_rad_mct_index, size_t const exiting_photon_index, int & mc_type);
+  void RunSig(art::Event const & e,
+	      ParticleAssociations const & pas,
+	      bool const track_only = false);
 
 };
 

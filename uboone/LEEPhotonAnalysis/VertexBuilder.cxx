@@ -13,7 +13,6 @@ VertexBuilder::VertexBuilder() :
   fcpoa_vert_prox(-1),
   fcpoa_trackend_prox(-1),
   fdetos(nullptr),
-  fvbt(nullptr),
   fshower_score(false),
   fverbose(false) {}
 
@@ -909,14 +908,6 @@ void VertexBuilder::AddLoneShowers(ParticleAssociations & pas) {
 }
 
 
-void VertexBuilder::FillVBT(ParticleAssociations & pas) {
-
-  fvbt->ftrack_number = fdetos->GetTrackIndices().size();
-  fvbt->fshower_number = fdetos->GetShowerIndices().size();
-  fvbt->ftree->Fill();
-
-}
-
 
 void VertexBuilder::Run(ParticleAssociations & pas) {
 
@@ -926,10 +917,8 @@ void VertexBuilder::Run(ParticleAssociations & pas) {
 
   if(fverbose) std::cout << "Associate tracks\n";
   AssociateTracks(pas);
-  if(fvbt) fvbt->fassociation_track_number = pas.GetAssociations().size();
   if(fverbose) std::cout << "Associate showers\n";
   AssociateShowers(pas);
-  if(fvbt) fvbt->fassociation_shower_number = pas.GetAssociations().size();
 
   if(fverbose) std::cout << "Add lone tracks\n";
   AddLoneTracks(pas);
@@ -937,12 +926,6 @@ void VertexBuilder::Run(ParticleAssociations & pas) {
   AddLoneShowers(pas);
   if(fverbose) std::cout << "Get shower associations\n";
   pas.GetShowerAssociations();
-  if(fvbt) fvbt->fassociation_final_number = pas.GetSelectedAssociations().size();
-
-  if(fvbt) {
-    if(fverbose) std::cout << "Fill VBT\n";
-    FillVBT(pas);
-  }
 
   pas.NodeCheck();
 

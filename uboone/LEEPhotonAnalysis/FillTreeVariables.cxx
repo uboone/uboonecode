@@ -13,7 +13,6 @@
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
-#include "FilterSignal.h"
 #include "RecoMCMatching.h"
 
 
@@ -1032,7 +1031,7 @@ void FillTreeVariables::FillTruth(art::Event const & e,
 
   if(SinglePhotonFilter(e, delta_rad_mct_index)) is_single_photon = 1;
   else is_single_photon = 0;
-  if(FilterSignal(e, delta_rad_mct_index)) is_delta_rad = 1;
+  if(ffs.Run(e, delta_rad_mct_index)) is_delta_rad = 1;
   else is_delta_rad = 0;
   if(is_delta_rad == 1) {
     if(delta_rad_mct_index == SIZE_MAX) {

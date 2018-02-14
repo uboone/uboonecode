@@ -89,7 +89,6 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 
   unsigned int fspec_event;
 
-  VertexBuilderTree fvbt;
   VertexQuality fvq;
   FillTreeVariables fftv;
 
@@ -175,8 +174,6 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 		    fswtrigger_product,
 		    frmcmassociation_producer,
 		    &frmcm);
-
-  if(p.get<bool>("fill_vertex_builder_tree")) fvbt.Setup(); 
 
   fstart_prox = p.get<double>("start_prox");
   fshower_prox = p.get<double>("shower_prox");
@@ -344,10 +341,6 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
     std::cout << "Event: " << e.id().event() << std::endl
 	      << "=======================================================\n";
 
-  fvbt.frun_number = e.id().run();
-  fvbt.fsubrun_number = e.id().subRun();
-  fvbt.fevent_number = e.id().event();
-
   ///////////////// Runs the vertex builder
 
   VertexBuilder vb;
@@ -358,8 +351,6 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
   vb.SetMaximumBackwardsProjectionDist(fmax_bp_dist);
   vb.CPOAToVert(fcpoa_vert_prox);
   vb.SetMaximumTrackEndProx(fcpoa_trackend_prox);
-
-  if(fvbt.ftree) vb.SetVBT(&fvbt);
 
   ParticleAssociations pas;
   pas.SetVerbose(fverbose);

@@ -32,15 +32,16 @@ physics:
     RunVB:
     {
       module_type: "RunVertexBuilder"
+      NCDeltaRadiative: "true"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
 
-      #start_prox: "4"
+      start_prox: "4"
       start_prox_min: "1"
       start_prox_max: "4"	
       start_prox_inc: "3"
 
-      #shower_prox: "20"
+      shower_prox: "20"
       shower_prox_min: "5"
       shower_prox_max: "20"
       shower_prox_inc: "3"
@@ -49,7 +50,7 @@ physics:
 
       cpoa_vert_prox: "13"
 
-      #cpoa_trackend_prox: "10"
+      cpoa_trackend_prox: "10"
       cpoa_trackend_prox_min: "1"
       cpoa_trackend_prox_max: "10"
       cpoa_trackend_prox_inc: "9"

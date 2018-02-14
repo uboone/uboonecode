@@ -32,6 +32,7 @@ class RunVertexBuilder;
 
 class RunVertexBuilder : public art::EDAnalyzer {
 
+  bool fis_nc_delta_rad;
   std::string ftrack_producer;
   std::string fshower_producer;
   bool ftrack_only;
@@ -84,6 +85,20 @@ class RunVertexBuilder : public art::EDAnalyzer {
 
   VertexQuality fvq;
 
+  TTree * fevent_tree;
+
+  int tevent;
+
+  bool ffill_parameter_tree;
+
+  TTree * fparameter_tree;
+
+  double tstart_prox;
+  double tshower_prox;
+  double tmax_bp_dist;
+  double tcpoa_vert_prox;
+  double tcpoa_trackend_prox;  
+
 public:
 
   explicit RunVertexBuilder(fhicl::ParameterSet const & p);
@@ -128,16 +143,20 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
       fshower_producer,
       frmcm) {
 
+  fis_nc_delta_rad = p.get<bool>("NCDeltaRadiative");
   ftrack_producer = p.get<std::string>("track_producer");
   fshower_producer = p.get<std::string>("shower_producer");
   p.get_if_present<bool>("track_only", ftrack_only);
   p.get_if_present<bool>("verbose", fverbose);
 
+  p.get_if_present<int>("min_index", fmin_index);
+  p.get_if_present<int>("max_index", fmax_index);
+
   p.get_if_present<double>("start_prox", fstart_prox);
   p.get_if_present<double>("start_prox_min", fstart_prox_min);
   p.get_if_present<double>("start_prox_max", fstart_prox_max);
   p.get_if_present<double>("start_prox_inc", fstart_prox_inc);
-  if(fstart_prox == -1 && (fstart_prox_min == -1 || fstart_prox_max == -1 || fstart_prox_inc == -1)) {
+  if(fstart_prox == -1 && ((fstart_prox_min == -1 || fstart_prox_max == -1 || fstart_prox_inc == -1) || fmin_index < 0 || fmax_index == -1)) {
     std::cout << "start_prox not set correctly: "
 	      << fstart_prox << " "
 	      << fstart_prox_min << " "
@@ -149,7 +168,7 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
   p.get_if_present<double>("shower_prox_min", fshower_prox_min);
   p.get_if_present<double>("shower_prox_max", fshower_prox_max);
   p.get_if_present<double>("shower_prox_inc", fshower_prox_inc);
-  if(fshower_prox == -1 && (fshower_prox_min == -1 || fshower_prox_max == -1 || fshower_prox_inc == -1)) {
+  if(fshower_prox == -1 && ((fshower_prox_min == -1 || fshower_prox_max == -1 || fshower_prox_inc == -1) || fmin_index < 0 || fmax_index == -1)) {
     std::cout << "shower_prox not set correctly: "
 	      << fshower_prox << " "
 	      << fshower_prox_min << " "
@@ -161,7 +180,7 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
   p.get_if_present<double>("max_bp_dist_min", fmax_bp_dist_min);
   p.get_if_present<double>("max_bp_dist_max", fmax_bp_dist_max);
   p.get_if_present<double>("max_bp_dist_inc", fmax_bp_dist_inc);
-  if(fmax_bp_dist == -1 && (fmax_bp_dist_min == -1 || fmax_bp_dist_max == -1 || fmax_bp_dist_inc == -1)) {
+  if(fmax_bp_dist == -1 && ((fmax_bp_dist_min == -1 || fmax_bp_dist_max == -1 || fmax_bp_dist_inc == -1) || fmin_index < 0 || fmax_index == -1)) {
     std::cout << "max_bp_dist not set correctly: "
 	      << fmax_bp_dist << " "
 	      << fmax_bp_dist_min << " "
@@ -173,7 +192,7 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
   p.get_if_present<double>("cpoa_vert_prox_min", fcpoa_vert_prox_min);
   p.get_if_present<double>("cpoa_vert_prox_max", fcpoa_vert_prox_max);
   p.get_if_present<double>("cpoa_vert_prox_inc", fcpoa_vert_prox_inc);
-  if(fcpoa_vert_prox == -1 && (fcpoa_vert_prox_min == -1 || fcpoa_vert_prox_max == -1 || fcpoa_vert_prox_inc == -1)) {
+  if(fcpoa_vert_prox == -1 && ((fcpoa_vert_prox_min == -1 || fcpoa_vert_prox_max == -1 || fcpoa_vert_prox_inc == -1) || fmin_index < 0 || fmax_index == -1)) {
     std::cout << "cpoa_vert_prox not set correctly: "
 	      << fcpoa_vert_prox << " "
 	      << fcpoa_vert_prox_min << " "
@@ -185,23 +204,12 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
   p.get_if_present<double>("cpoa_trackend_prox_min", fcpoa_trackend_prox_min);
   p.get_if_present<double>("cpoa_trackend_prox_max", fcpoa_trackend_prox_max);
   p.get_if_present<double>("cpoa_trackend_prox_inc", fcpoa_trackend_prox_inc);
-  if(fcpoa_trackend_prox == -1 && (fcpoa_trackend_prox_min == -1 || fcpoa_trackend_prox_max == -1 || fcpoa_trackend_prox_inc == -1)) {
+  if(fcpoa_trackend_prox == -1 && ((fcpoa_trackend_prox_min == -1 || fcpoa_trackend_prox_max == -1 || fcpoa_trackend_prox_inc == -1) || fmin_index < 0 || fmax_index == -1)) {
     std::cout << "cpoa_trackend_prox not set correctly: "
 	      << fcpoa_trackend_prox << " "
 	      << fcpoa_trackend_prox_min << " "
 	      << fcpoa_trackend_prox_max << " "
 	      << fcpoa_trackend_prox_inc << "\n";
-    exit(1);
-  }
-
-  p.get_if_present<int>("min_index", fmin_index);
-  if(fmin_index == -1) {
-    std::cout << "min_index not set\n";
-    exit(1);
-  }
-  p.get_if_present<int>("max_index", fmax_index);
-  if(fmax_index == -1) {
-    std::cout << "max_index not set\n";
     exit(1);
   }
 
@@ -241,11 +249,18 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
 			 fcpoa_vert_prox_inc_size,
 			 fcpoa_trackend_prox_inc_size};
 
-  GetPermutations(fparameter_set,
-		  fparameter_min,
-		  fparameter_max,
-		  fparameter_inc_size,
-		  fpermutation_v);
+  if(fmin_index != -1 && fmax_index != -1) {
+    GetPermutations(fparameter_set,
+		    fparameter_min,
+		    fparameter_max,
+		    fparameter_inc_size,
+		    fpermutation_v);
+  }
+
+  if(fmin_index > -1 && fmax_index != -1 && fpermutation_v.size() - 1 < size_t(fmax_index)) {
+    std::cout << "max_index: " << fmax_index << " is greater than permutation_v allows: " << fpermutation_v.size() - 1 << "\n";
+    exit(1);
+  }
 
   fhit_producer = p.get<std::string>("hit_producer");
   frmcmassociation_producer = p.get<std::string>("rmcmassociation_producer");
@@ -257,6 +272,18 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
 		  fshower_producer,
 		  frmcmassociation_producer);
 
+  art::ServiceHandle< art::TFileService > tfs;
+  fevent_tree = tfs->make<TTree>("event_tree", "");  
+  fevent_tree->Branch("event", &tevent, "event/I");
+
+  ffill_parameter_tree = true;
+  fparameter_tree = tfs->make<TTree>("parameter_tree", "");  
+  fparameter_tree->Branch("start_prox", &tstart_prox, "start_prox/D");
+  fparameter_tree->Branch("shower_prox", &tshower_prox, "shower_prox/D");
+  fparameter_tree->Branch("max_bp_dist", &tmax_bp_dist, "max_bp_dist/D");  
+  fparameter_tree->Branch("cpoa_vert_prox", &tcpoa_vert_prox, "cpoa_vert_prox/D");
+  fparameter_tree->Branch("cpoa_trackend_prox", &tcpoa_trackend_prox, "cpoa_trackend_prox/D");
+
 }
 
 
@@ -266,26 +293,22 @@ void RunVertexBuilder::analyze(art::Event const & e) {
   art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
   art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
 
-  for(size_t i = fmin_index; i <= size_t(fmax_index); ++i) {
+  tevent = e.id().event();
+  fevent_tree->Fill();
+
+  if(fmin_index < 0 || fmax_index == -1) {
 
     ParticleAssociations pas;
     pas.GetDetectorObjects().AddShowers(ev_s);
     pas.GetDetectorObjects().AddTracks(ev_t);
     if(fverbose) std::cout << "Run VB\n";
-
-    std::vector<double> const & parameters = fpermutation_v.at(i);
-    double const start_prox = parameters.at(0);
-    double const shower_prox = parameters.at(1);
-    double const max_bp_dist = parameters.at(2);
-    double const cpoa_vert_prox = parameters.at(3);
-    double const cpoa_trackend_prox = parameters.at(4);
-
-    fvb.SetMaximumTrackEndProximity(start_prox);
-    fvb.SetMaximumShowerIP(shower_prox);
-    fvb.SetMaximumBackwardsProjectionDist(max_bp_dist);
-    fvb.CPOAToVert(cpoa_vert_prox);
-    fvb.SetMaximumTrackEndProx(cpoa_trackend_prox);  
-  
+    
+    fvb.SetMaximumTrackEndProximity(fstart_prox);
+    fvb.SetMaximumShowerIP(fshower_prox);
+    fvb.SetMaximumBackwardsProjectionDist(fmax_bp_dist);
+    fvb.CPOAToVert(fcpoa_vert_prox);
+    fvb.SetMaximumTrackEndProx(fcpoa_trackend_prox);  
+    
     if(ftrack_only) {
       fvb.SetDetectorObjects(&pas.GetDetectorObjects());
       fvb.AssociateTracks(pas);
@@ -293,20 +316,72 @@ void RunVertexBuilder::analyze(art::Event const & e) {
     else fvb.Run(pas);
     frmcm.MatchWAssociations(e);
     if(fverbose) std::cout << "Run VQ\n";
-    fvq.SetParameters(start_prox, shower_prox, max_bp_dist, cpoa_vert_prox, cpoa_trackend_prox);
-    fvq.RunDist(e, pas, ftrack_only);
+    fvq.SetParameters(fstart_prox, fshower_prox, fmax_bp_dist, fcpoa_vert_prox, fcpoa_trackend_prox);
+    if(fis_nc_delta_rad) fvq.RunSig(e, pas, ftrack_only);
+    else fvq.RunDist(e, pas, ftrack_only);
 
-    if(fverbose) std::cout << "Done\n";
+    tstart_prox = fstart_prox;
+    tshower_prox = fshower_prox;
+    tmax_bp_dist = fmax_bp_dist;
+    tcpoa_vert_prox = fcpoa_vert_prox;
+    tcpoa_trackend_prox = fcpoa_trackend_prox;
+    fparameter_tree->Fill();
+    
+  }
 
-    fvq.SetParameters(start_prox, shower_prox, max_bp_dist, cpoa_vert_prox, cpoa_trackend_prox);
+  else {
 
-    if(fverbose) {
-      std::cout << "cpoa_trackend_prox: " << cpoa_trackend_prox << "\n"
-		<< "cpoa_vert_prox: " << cpoa_vert_prox << "\n"
-		<< "max_bp_dist: " << max_bp_dist << "\n"
-		<< "shower_prox: " << shower_prox << "\n"
-		<< "start_prox: " << start_prox << "\n";
+    for(size_t i = fmin_index; i <= size_t(fmax_index); ++i) {
+
+      ParticleAssociations pas;
+      pas.GetDetectorObjects().AddShowers(ev_s);
+      pas.GetDetectorObjects().AddTracks(ev_t);
+      if(fverbose) std::cout << "Run VB\n";
+
+      std::vector<double> const & parameters = fpermutation_v.at(i);
+      double const start_prox = parameters.at(0);
+      double const shower_prox = parameters.at(1);
+      double const max_bp_dist = parameters.at(2);
+      double const cpoa_vert_prox = parameters.at(3);
+      double const cpoa_trackend_prox = parameters.at(4);
+
+      fvb.SetMaximumTrackEndProximity(start_prox);
+      fvb.SetMaximumShowerIP(shower_prox);
+      fvb.SetMaximumBackwardsProjectionDist(max_bp_dist);
+      fvb.CPOAToVert(cpoa_vert_prox);
+      fvb.SetMaximumTrackEndProx(cpoa_trackend_prox);  
+  
+      if(ftrack_only) {
+	fvb.SetDetectorObjects(&pas.GetDetectorObjects());
+	fvb.AssociateTracks(pas);
+      }
+      else fvb.Run(pas);
+      frmcm.MatchWAssociations(e);
+      if(fverbose) std::cout << "Run VQ\n";
+      fvq.SetParameters(start_prox, shower_prox, max_bp_dist, cpoa_vert_prox, cpoa_trackend_prox);
+      if(fis_nc_delta_rad) fvq.RunSig(e, pas, ftrack_only);
+      else fvq.RunDist(e, pas, ftrack_only);
+
+      if(ffill_parameter_tree) {
+	tstart_prox = start_prox;
+	tshower_prox = shower_prox;
+	tmax_bp_dist = max_bp_dist;
+	tcpoa_vert_prox = cpoa_vert_prox;
+	tcpoa_trackend_prox = cpoa_trackend_prox;
+	fparameter_tree->Fill();   
+      }
+
+      if(fverbose) {
+	std::cout << "cpoa_trackend_prox: " << cpoa_trackend_prox << "\n"
+		  << "cpoa_vert_prox: " << cpoa_vert_prox << "\n"
+		  << "max_bp_dist: " << max_bp_dist << "\n"
+		  << "shower_prox: " << shower_prox << "\n"
+		  << "start_prox: " << start_prox << "\n";
+      }
+
     }
+
+    ffill_parameter_tree = false;
 
   }
 

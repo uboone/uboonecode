@@ -33,6 +33,7 @@
 #include "canvas/Persistency/Common/FindMany.h"
 
 #include "ParticleAssociations.h"
+#include "FilterSignal.h"
 #include "EnergyHelper.h"
 
 
@@ -56,6 +57,7 @@ class FillTreeVariables {
 
   bool fverbose;
 
+  FilterSignal ffs;
   lee::EnergyHelper energyHelper;
 
   TTree * fevent_tree;
