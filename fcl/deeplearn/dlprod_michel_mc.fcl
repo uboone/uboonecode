@@ -43,4 +43,5 @@ physics.analyzers.opreco.SelectEvents:  [ sim ]
 physics.analyzers.reco2d.SelectEvents:  [ sim ]
 physics.analyzers.superaMichelMC.SelectEvents:  [ sim ]
 
+#physics.filters.rsefilter.CSVName: "michel_constraint_mcc7.fcl"
 physics.filters.rsefilter.CSVName: "michel_constraint_mcc7.txt"

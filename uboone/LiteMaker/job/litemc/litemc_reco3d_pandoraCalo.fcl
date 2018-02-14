@@ -1,7 +1,6 @@
 #include "litemaker_base.fcl"
 
 BEGIN_PROLOG
-
 litemc_reco3d_pandoraCalo: @local::litemaker_base
 
 litemc_reco3d_pandoraCalo.out_filename: "larlite_reco3d_pandoraCalo.root"
@@ -36,5 +35,5 @@ litemc_reco3d_pandoraCalo.AssociationLookUpMap:
   partid:     []
 }
 
-
 END_PROLOG
+

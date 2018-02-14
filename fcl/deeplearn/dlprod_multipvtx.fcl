@@ -4,14 +4,16 @@ process_name: MultiPartVertex
 
 source: @local::source_gen
 
-physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
+#physics.ana: [ mcinfo, opreco, reco2d, superaMCFocused ]
+physics.ana: [ superaMCOnly3D ]
 physics.sim: [ rns, 
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
-               swtrigger,
-               @sequence::dlprod_simtpc,
-               @sequence::dlprod_pmtreco,
-               @sequence::dlprod_tpcreco ]
+               swtrigger]
+               #@sequence::dlprod_simtpc,
+               #@sequence::dlprod_pmtreco,
+               #@sequence::dlprod_tpcreco ]
 
 #physics.trigger_paths: [ sim ]
 #physics.stream:        [out1]
@@ -28,7 +30,8 @@ physics.analyzers.opdigit.SelectEvents: [ sim ]
 physics.analyzers.opreco.SelectEvents:  [ sim ]
 physics.analyzers.wire.SelectEvents:    [ sim ]
 physics.analyzers.reco2d.SelectEvents:  [ sim ]
-physics.analyzers.superaFocusedViewPlus.SelectEvents: [ sim ]
+#physics.analyzers.superaFocusedViewPlus.SelectEvents: [ sim ]
+physics.analyzers.superaMCFocused.SelectEvents: [ sim ]
 
 physics.producers.generator: @local::MultiPartVertex
 physics.producers.generator.DebugMode    : 0
@@ -37,8 +40,8 @@ physics.producers.generator.G4TimeJitter : 800
 physics.producers.generator.XRange       : [30]
 physics.producers.generator.YRange       : [30]
 physics.producers.generator.ZRange       : [30]
-physics.producers.generator.MultiMax     : 4
-physics.producers.generator.MultiMin     : 1
+physics.producers.generator.MultiMax     : 5
+physics.producers.generator.MultiMin     : 2
 physics.producers.generator.ParticleParameter.PDGCode      : [    [11,13],        [22], [211,-211],      [2212]]
 physics.producers.generator.ParticleParameter.MinMulti     : [          1,           0,          0,           0]
 physics.producers.generator.ParticleParameter.MaxMulti     : [          3,           2,          2,           3]

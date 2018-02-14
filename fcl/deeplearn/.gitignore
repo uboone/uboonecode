@@ -1,4 +1,5 @@
 *.root.json
 *.root
 *.log
+*.txt
 

@@ -18,6 +18,7 @@ physics.end_paths:     [ ana ]
 
 physics.producers.wcNoiseFilter.DoNoiseFiltering: true
 physics.producers.wcNoiseFilter.NumTicksToDropFront: 2400
+#physics.filters.rsefilter.CSVName: "ccpi0_constraint.fcl"
 physics.filters.rsefilter.CSVName: "ccpi0_constraint.txt"
 
 physics.analyzers.mcinfo.stream:      "mcinfo"
