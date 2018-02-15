@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<!-- Production Project -->
+
+<!DOCTYPE project [
+<!ENTITY release      "v06_26_01_10" >
+<!ENTITY file_type    "data"      >
+<!ENTITY run_type     "physics"   >
+<!ENTITY name         "cc1unpfilter">
+<!ENTITY prod_version "v6"        >
+<!ENTITY tardir       "/uboone/app/users/jiangl/uboonecodev06_26_01_10_new">
+]>
+
+<job>
+
+  <project name="&name;">
+    
+    <!-- Project size -->
+    <numevents>200000</numevents>
+    
+    <!-- Operating System -->
+    <os>SL6</os>
+    
+    <!-- Batch resources -->
+    <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+    
+    <!-- Larsoft information -->
+    <larsoft>
+      <tag>&release;</tag>
+      <qual>e10:prof</qual>
+      <local>&tardir;/local_dir.tar</local>
+    </larsoft>
+    
+    <!-- Project stages -->
+    
+    <stage name="CC1uNPSelection_MC">
+      <!-- <inputlist>/pnfs/uboone/persistent/users/arafique/file.txt</inputlist> -->
+      <inputdef>prodgenie_bnb_nu_cosmic_uboone_mcc8.6_reco2</inputdef>
+      <fcl>run_cc1unpselana.fcl</fcl>
+      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-sev/out</outdir>
+      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-sev/log</logdir>
+      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6-sev/work</workdir>
+      
+      <numjobs>1000</numjobs>
+      <maxfilesperjob>10</maxfilesperjob> 
+      <memory>4000</memory>
+      <datatier>reco</datatier>
+      <!--    <defname>&name;_&prod_version;</defname> -->
+    </stage>
+    
+    <!-- file type -->
+    <!--  <filetype>&file_type;</filetype> -->
+    
+    <!-- run type -->
+    <!--  <runtype>&run_type;</runtype> --> 
+    
+  </project>
+  
+</job>

@@ -46,7 +46,7 @@ add_subdirectory(DQMTools)
 
 
 add_subdirectory(LEEPhotonAnalysis)
-
+add_subdirectory(CC1uNPSelection)
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
