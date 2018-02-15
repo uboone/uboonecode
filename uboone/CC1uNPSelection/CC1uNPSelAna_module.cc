@@ -663,6 +663,7 @@ public:
     TTree*   fMC_ntrks;
     TTree*   fMC_noshwr;
     TTree*   fMC_trkfls;
+    TTree*   fMC_NoExTrk;
     TTree*   fMC_mupinFV;
     TTree*   fMC_TrunMean;
 private:
@@ -829,7 +830,9 @@ private:
 
  
     //true information of track candidate
-
+    int trackcand_origin=-999;
+    int trackcand_nuset=-999;     
+ 
     int trackcand_parPDG=-999;
     int trackcand_parStatusCode=-999;
     float trackcand_parTheta=-999.0;                  
@@ -856,7 +859,10 @@ private:
     float trackmomprotoncandidate=-999.0;
     std::vector<float> trackdedxprotoncandidate;
     std::vector<float> trackresrgprotoncandidate;
-    
+
+    int trackpcand_origin=-999;
+    int trackpcand_nuset=-999;     
+     
     int trackpcand_parPDG=-999;
     int trackpcand_parStatusCode=-999;
     float trackpcand_parTheta=-999.0;                  
@@ -975,6 +981,9 @@ void  CC1uNPSelAna::beginJob()
     //-----------------------------------------------------------
     //fill the ntuples here
     fMC_Truth=tfs->make<TTree>("fMC_Truth", "MC Holder"); 
+    fMC_Truth->Branch("fRun",&fRun,"fRun/I");
+    fMC_Truth->Branch("fSubRun",&fSubRun,"fSubRun/I");
+    fMC_Truth->Branch("fEvent",&fEvent,"fEvent/I");
     fMC_Truth->Branch("_fTrueccnc",&_fTrueccnc,"_fTrueccnc/I");
     fMC_Truth->Branch("_fTruemode",&_fTruemode,"_fTruemode/I");
     fMC_Truth->Branch("_fTrueinttype",&_fTrueinttype,"_fTrueinttype/I");
@@ -990,6 +999,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_Truth->Branch("_fTruenuvrtxz_SCE",&_fTruenuvrtxz_SCE,"_fTruenuvrtxz_SCE/F");
     //-------------------------------------------------------------------------------
     fMC_Geant=tfs->make<TTree>("fMC_Geant", "MC Holder"); 
+    fMC_Geant->Branch("fRun",&fRun,"fRun/I");
+    fMC_Geant->Branch("fSubRun",&fSubRun,"fSubRun/I");
+    fMC_Geant->Branch("fEvent",&fEvent,"fEvent/I");
     fMC_Geant->Branch("nGEANTparticles", &nGEANTparticles , "nGEANTparticles/I");
     fMC_Geant->Branch("fhg4parpdg", &fhg4parpdg, "fhg4parpdg[nGEANTparticles]/I");
     fMC_Geant->Branch("fhg4parstatus", &fhg4parstatus, "fhg4parstatus[nGEANTparticles]/I");
@@ -1072,6 +1084,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("fvtxz", &fvtxz, "fvtxz/F");
     fMC_ntrks->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_ntrks->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
+    fMC_ntrks->Branch("vershwrdist",  &vershwrdist,  "vershwrdist/F");
     fMC_ntrks->Branch("truthtop", &truthtop, "truthtop/I");
     fMC_ntrks->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_ntrks->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
@@ -1110,6 +1123,26 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_trkfls->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_trkfls->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+
+    //================================================================= 
+    fMC_NoExTrk=tfs->make<TTree>("fMC_NoExTrk","Data Holder");    
+    fMC_NoExTrk->Branch("fRun",&fRun,"fRun/I");
+    fMC_NoExTrk->Branch("fSubRun",&fSubRun,"fSubRun/I");
+    fMC_NoExTrk->Branch("fEvent",&fEvent,"fEvent/I");
+
+    fMC_NoExTrk->Branch("fvtxx", &fvtxx, "fvtxx/F");         
+    fMC_NoExTrk->Branch("fvtxy", &fvtxy, "fvtxy/F");
+    fMC_NoExTrk->Branch("fvtxz", &fvtxz, "fvtxz/F");
+
+    fMC_NoExTrk->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
+    fMC_NoExTrk->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
+    fMC_NoExTrk->Branch("flstrkdist" ,  &flstrkdist,   "flstrkdist/F");
+    fMC_NoExTrk->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_NoExTrk->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_NoExTrk->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_NoExTrk->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+
+
 
     //===============================================================
     fMC_mupinFV=tfs->make<TTree>("fMC_mupinFV","Data Holder");    
@@ -1213,7 +1246,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_TrunMean->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
-
+    fMC_TrunMean->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
+    fMC_TrunMean->Branch("trackcand_nuset", &trackcand_nuset, "trackcand_nuset/I");
+ 
     fMC_TrunMean->Branch("trackcand_parPDG", &trackcand_parPDG, "trackcand_parPDG/I");
     fMC_TrunMean->Branch("trackcand_parStatusCode",&trackcand_parStatusCode, "trackcand_parStatusCode/I");
     fMC_TrunMean->Branch("trackcand_parTheta",&trackcand_parTheta, "trackcand_parTheta/F");                  
@@ -1230,6 +1265,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("trackcand_parCosPhi",&trackcand_parCosPhi, "trackcand_parCosPhi/F");
     fMC_TrunMean->Branch("trackcand_parSinPhi",&trackcand_parSinPhi, "trackcand_parSinPhi/F");
 
+    fMC_TrunMean->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
+    fMC_TrunMean->Branch("trackpcand_nuset", &trackpcand_nuset, "trackpcand_nuset/I");
+ 
     fMC_TrunMean->Branch("trackpcand_parPDG", &trackpcand_parPDG, "trackpcand_parPDG/I");
     fMC_TrunMean->Branch("trackpcand_parStatusCode",&trackpcand_parStatusCode, "trackpcand_parStatusCode/I");
     fMC_TrunMean->Branch("trackpcand_parTheta",&trackpcand_parTheta, "trackpcand_parTheta/F");                  
@@ -1308,13 +1346,13 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
-    //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
+    fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
+    fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
     //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
@@ -1496,9 +1534,9 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
     int l = std::round(length);
     double dqds_cut = _svm_x.at(l);
 
-    std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << std::endl;
-
-    if (dqds <= dqds_cut)
+    std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
+ 
+    if (dqds*243 <= dqds_cut)
       return true;
   
 
@@ -2126,7 +2164,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       if (pPart.E()<fG4minE ) continue;       
 
 
-      //Bool_t isPrimary = pPart.Process() == pri;  
+      Bool_t isPrimary = pPart.Process() == pri;  
       _fg4processname.push_back(pPart.Process());
 
 
@@ -2195,7 +2233,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       
       
       //=========================================================================== 
-      if( pPart.StatusCode()==1 && pPart.Mother()==0 && mc_truth->Origin()== simb::kBeamNeutrino)  
+      if( isPrimary && mctruth->NeutrinoSet() && pPart.StatusCode()==1 && pPart.Mother()==0 && mc_truth->Origin()== simb::kBeamNeutrino)  
       //primary tells you if the particle is from Michel electron or decay of other particle
       { 
         
@@ -2225,9 +2263,9 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==111) {npi0=npi0+1;}
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==11) {nelectrons=nelectrons+1;}
         if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212) {nprotons=nprotons+1;}
-        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.2 ) {nprotons_200thresh=nprotons_200thresh+1;}
-        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.3 ) {nprotons_300thresh=nprotons_300thresh+1;}
-        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.P() > 0.4 ) {nprotons_400thresh=nprotons_400thresh+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.Momentum().Vect().Mag() > 0.2 ) {nprotons_200thresh=nprotons_200thresh+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.Momentum().Vect().Mag() > 0.3 ) {nprotons_300thresh=nprotons_300thresh+1;}
+        if(_fTrueccnc==0 && abs(pPart.PdgCode())==2212 && pPart.Momentum().Vect().Mag() > 0.4 ) {nprotons_400thresh=nprotons_400thresh+1;}
       }
       //std::cout<<"libo test 1 "<<std::endl;
     
@@ -2244,6 +2282,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
    Int_t TopFlag200=Topology(nmuons, nelectrons, npions, npi0, nprotons_200thresh, cosmicflag, OOFVflag);
    Int_t TopFlag300=Topology(nmuons, nelectrons, npions, npi0, nprotons_300thresh, cosmicflag, OOFVflag);
    Int_t TopFlag400=Topology(nmuons, nelectrons, npions, npi0, nprotons_400thresh, cosmicflag, OOFVflag);
+
+
    truthtop=TopFlag;
    truthtop_200thresh=TopFlag200;
    truthtop_300thresh=TopFlag300;
@@ -2856,6 +2896,13 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                double tmpEcompletm=0;
                const simb::MCParticle *mparticle;
                truthMatcher(hitlist, hits, mparticle, tmpEfracm, tmpEcompletm );
+
+               const art::Ptr<simb::MCTruth> MCtruth = fMCTruthMatching->ParticleToMCTruth(mparticle);
+               //std:string pri("primary");
+               trackcand_origin=MCtruth->Origin();
+               trackcand_nuset=MCtruth->NeutrinoSet(); 
+ 
+
                if(mparticle){
                   trackcand_parPDG=mparticle->PdgCode();
                   trackcand_parStatusCode=mparticle->StatusCode(); 
@@ -2902,6 +2949,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
                 fNRecoPTrks=0;
                 fNRecoTrks=0;
+                int ntrkstovtx=0;
                 trackidpcand.clear();
                 trackstartxpcand.clear();
                 trackstartypcand.clear();
@@ -2930,6 +2978,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                     // Check for if track is longer
                     //make sure the proton candidate is also within 5cm from the vertex
                     //check the number rof track here       
+                    ntrkstovtx=ntrkstovtx+1;
                     if(TrackID ==TrackCandidate)   continue;           
                     if(inFV(trackPos.X(), trackPos.Y(), trackPos.Z())&& inFV(trackEnd.X(), trackEnd.Y(), trackEnd.Z())){
                       trackidpcand.push_back(TrackID);
@@ -2987,22 +3036,27 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 bool ProtonTag=true;
                 fNRecoTrks=trackidpcand.size()+1;
                 fNRecoPTrks=trackidpcand.size();
+                
                 for(int pcand=0; pcand<fNRecoPTrks; pcand++){
                        //std::cout<<"event number= "<<fEvent<<" total number of protons are "<<trackidpcand.size()<<" "<<tracklengthpcand[pcand]<<" "<<tracktrunmeanpcand[pcand]<<std::endl;
-                       if((tracktrunmeanpcand[pcand]<300 &&tracklengthpcand[pcand]<(-16*tracktrunmeanpcand[pcand]+5000)) ||
+                       /*if((tracktrunmeanpcand[pcand]<300 &&tracklengthpcand[pcand]<(-16*tracktrunmeanpcand[pcand]+5000)) ||
                           (tracktrunmeanpcand[pcand]>300 &&tracklengthpcand[pcand]<(20000*exp(-0.015*tracktrunmeanpcand[pcand])))) {
                             ProtonTag=false;              
                        }
-                       /*
-                       std::cout<<"pcand= "<<pcand<<" dqdx of pcand is "<<tracktrunmeanpcand[pcand]<<" trklen of pcand is "<<tracklengthpcand[pcand]<<std::endl;
+                       */
+                       
+                       //std::cout<<"pcand= "<<pcand<<" dqdx of pcand is "<<tracktrunmeanpcand[pcand]<<" trklen of pcand is "<<tracklengthpcand[pcand]<<std::endl;
                        if(MIPConsistency(tracktrunmeanpcand[pcand], tracklengthpcand[pcand])){
                              ProtonTag=false;
                        }
-                       */
+                       
                 } 
                 /*
   
                 */
+                if(ntrkstovtx==fNRecoTrks){
+                   fMC_NoExTrk->Fill();
+              
                 if(TrackProtonCandidate>-1 && TrackCandidate>-1){
                      fMC_mupinFV->Fill();
                      //get the truncated dQdx of proton candidate
@@ -3033,6 +3087,12 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                      double tmpEcompletm=0;
                      const simb::MCParticle *mparticle;
                      truthMatcher(hitlist, hits, mparticle, tmpEfracm, tmpEcompletm );
+
+                     //check if this particle is from neutrino interaction
+                     const art::Ptr<simb::MCTruth> MCtruth = fMCTruthMatching->ParticleToMCTruth(mparticle);
+                     trackpcand_origin=MCtruth->Origin();
+                     trackpcand_nuset=MCtruth->NeutrinoSet(); 
+ 
                      if(mparticle){
                          trackpcand_parPDG=mparticle->PdgCode();
                          trackpcand_parStatusCode=mparticle->StatusCode(); 
@@ -3050,7 +3110,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                          trackpcand_parCosPhi=TMath::Cos(mparticle->Momentum().Phi());
                          trackpcand_parSinPhi=TMath::Cos(mparticle->Momentum().Phi());
                      }
-                     }          
+                     } //end of ifMC          
                       //std::cout<<"Event number= "<<fEvent<<" true PDG id of the track proton candidate is "<<trackpcand_parPDG<<std::endl;
 
 
@@ -3075,14 +3135,15 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
 
                      } //end of if trun mean not equal to -9999 
                      //-------------------------------------------------------------------------
-                }    
+                } //end of if TrackCandidate and TrackProtonCandidate 
+                }  //end of if there is no extra tracks around vertex candidate    
                 //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
             //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-            }
-            }
-            }
-            }
-            }
+            } //end of trkfls cut
+            } //end of no shwr cut 
+            } //end of require Ntrk_sig=2
+            } //end of vertex contained
+            } //end of NumTrksVertex2>0
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        
         } //end of if the vertex is valid
