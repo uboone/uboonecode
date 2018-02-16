@@ -3011,7 +3011,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       trackendzpcand.push_back(trackEnd.Z());
 
                       //trackmompcand.push_back(track->VertexMomentum());
-                      trackmompcand.push_back(trkm.GetTrackMomentum(TrackLength, 2212);
+                      trackmompcand.push_back(trkm.GetTrackMomentum(TrackLength, 2212));
                       trackthetapcand.push_back(trackTheta);
                       tracklengthpcand.push_back(TrackLength);
                       trackphipcand.push_back(trackPhi);
