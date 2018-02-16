@@ -2986,6 +2986,19 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
 		for (auto const& TrackID : VertexTrackCollection2.find(VertexCandidate)->second)
                 {
                     art::Ptr<recob::Track> track(trackVecHandle,TrackID);
+
+                    art::FindMany<anab::ParticleID> fmpid(trackVecHandle, event, "pandoraNuPID");
+                    double PIDA(-1);
+                    if(fmpid.isValid()) {
+                      std::vector<const anab::ParticleID*> pids = fmpid.at(TrackID);
+                      for (size_t ipid = 0; ipid < pids.size(); ++ipid){
+                        if (!pids[ipid]->PlaneID().isValid) continue;
+                        int planenum = pids[ipid]->PlaneID().Plane;
+                        if (planenum != 2){continue;}
+                        PIDA = pids[ipid]->PIDA();
+                      }
+                    }
+
 		    
 		    // Calculate track range (trackstart - trackend)
 		    double TrackRange = GetTrackRange(track);
