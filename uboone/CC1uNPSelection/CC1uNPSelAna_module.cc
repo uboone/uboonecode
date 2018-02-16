@@ -681,6 +681,9 @@ private:
     int   _fTruenupdg;
     float _fTrueenu;
     float _fTrueq2truth;
+    float _fTrueWtruth;
+    float _fTrueXtruth;
+    float _fTrueYtruth;
     float _fTruenuvrtxx;
     float _fTruenuvrtxy;
     float _fTruenuvrtxz;
@@ -991,6 +994,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_Truth->Branch("_fTruenupdg",&_fTruenupdg,"_fTruenupdg/I");
     fMC_Truth->Branch("_fTrueenu",&_fTrueenu,"_fTrueenu/F");
     fMC_Truth->Branch("_fTrueq2truth",&_fTrueq2truth,"_fTrueq2truth/F");
+    fMC_Truth->Branch("_fTrueWtruth",&_fTrueWtruth,"_fTrueWtruth/F");
+    fMC_Truth->Branch("_fTrueXtruth",&_fTrueXtruth,"_fTrueXtruth/F");
+    fMC_Truth->Branch("_fTrueYtruth",&_fTrueYtruth,"_fTrueYtruth/F");
     fMC_Truth->Branch("_fTruenuvrtxx",&_fTruenuvrtxx,"_fTruenuvrtxx/F");
     fMC_Truth->Branch("_fTruenuvrtxy",&_fTruenuvrtxy,"_fTruenuvrtxy/F");
     fMC_Truth->Branch("_fTruenuvrtxz",&_fTruenuvrtxz,"_fTruenuvrtxz/F");
@@ -1211,7 +1217,10 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("_fTruenupdg",&_fTruenupdg,"_fTruenupdg/I");
     fMC_TrunMean->Branch("_fTrueenu",&_fTrueenu,"_fTrueenu/F");
     fMC_TrunMean->Branch("_fTrueq2truth",&_fTrueq2truth,"_fTrueq2truth/F");
- 
+    fMC_TrunMean->Branch("_fTrueWtruth",&_fTrueWtruth,"_fTrueWtruth/F");
+    fMC_TrunMean->Branch("_fTrueXtruth",&_fTrueXtruth,"_fTrueXtruth/F");
+    fMC_TrunMean->Branch("_fTrueYtruth",&_fTrueYtruth,"_fTrueYtruth/F");
+  
 
 
 
@@ -2086,6 +2095,12 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     _fTruenupdg=mctruth->GetNeutrino().Nu().PdgCode();
     _fTrueenu=mctruth->GetNeutrino().Nu().E(); //true neutrino energy
     _fTrueq2truth=mctruth->GetNeutrino().QSqr(); //true Q2
+    _fTrueWtruth =mctruth->GetNeutrino().W();
+    _fTrueXtruth =mctruth->GetNeutrino().X();
+    _fTrueYtruth =mctruth->GetNeutrino().Y();
+
+
+
     _fTruenuvrtxx=mctruth->GetNeutrino().Nu().Vx(); //true vertex x
     _fTruenuvrtxy=mctruth->GetNeutrino().Nu().Vy(); //true vertex y
     _fTruenuvrtxz=mctruth->GetNeutrino().Nu().Vz(); //true vertex z
