@@ -3016,6 +3016,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                         PIDA = pids[ipid]->PIDA();
                       }
                     }
+                    std::cout << PIDA << std::endl;
 
 		    
 		    // Calculate track range (trackstart - trackend)
