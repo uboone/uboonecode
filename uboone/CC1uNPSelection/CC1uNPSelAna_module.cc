@@ -898,7 +898,7 @@ private:
     std::vector<float> trackendypcand;    
     std::vector<float> trackendzpcand;
 
-    std::vector<float> trackmompcand;
+    std::vector<float> *trackmompcand = new std::vector<float>;
     std::vector<float> trackthetapcand;
     std::vector<float> tracklengthpcand;
     std::vector<float> trackphipcand;
@@ -1316,6 +1316,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Q2cal", &Q2cal, "Q2cal/F");
     fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
      
+    //example of vector branch adding
+    fMC_TrunMean->Branch("all_proton_momenta","std::vector",&trackmompcand);
+
 
     //-----------------------------------------------------------
 }
@@ -2993,7 +2996,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 trackendxpcand.clear();
                 trackendypcand.clear();
                 trackendzpcand.clear();
-                trackmompcand.clear();
+                trackmompcand->clear();
                 trackthetapcand.clear();
                 tracklengthpcand.clear();
                 trackphipcand.clear();
@@ -3039,7 +3042,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       trackendzpcand.push_back(trackEnd.Z());
 
                       //trackmompcand.push_back(track->VertexMomentum());
-                      trackmompcand.push_back(trkm.GetTrackMomentum(TrackLength, 2212));
+                      trackmompcand->push_back(trkm.GetTrackMomentum(TrackLength, 2212));
                       trackthetapcand.push_back(trackTheta);
                       tracklengthpcand.push_back(TrackLength);
                       trackphipcand.push_back(trackPhi);
@@ -3103,11 +3106,11 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                        if(MIPConsistency(tracktrunmeanpcand[pcand], tracklengthpcand[pcand])){
                              ProtonTag=false;
                        }
-                       Evis=fPlep+trackmompcand[pcand];
-                       Eptot=Eptot+sqrt(trackmompcand[pcand]*trackmompcand[pcand]+protonmass*protonmass);
-                       Pxptot=Pxptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
-                       Pyptot=Pyptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
-                       Pzptot=Pzptot+trackmompcand[pcand]*TMath::Cos(trackthetapcand[pcand]);
+                       Evis=fPlep+trackmompcand->at(pcand);
+                       Eptot=Eptot+sqrt(trackmompcand->at(pcand)*trackmompcand->at(pcand)+protonmass*protonmass);
+                       Pxptot=Pxptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
+                       Pyptot=Pyptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
+                       Pzptot=Pzptot+trackmompcand->at(pcand)*TMath::Cos(trackthetapcand[pcand]);
 
                 }
                 
