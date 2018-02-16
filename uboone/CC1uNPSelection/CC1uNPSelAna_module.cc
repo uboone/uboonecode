@@ -123,7 +123,8 @@ constexpr int kMaxSysts = 1000;
 constexpr int kMaxWeights = 1000;
 
 constexpr double pi = 3.1415;
-
+constexpr float muonmass= 0.105658;
+constexpr float protonmass=0.938;
 /// total_extent\<T\>::value has the total number of elements of an array
 template <typename T>
 struct total_extent {
@@ -879,12 +880,12 @@ private:
     float trackpcand_parCosPhi=-999.0;
     float trackpcand_parSinPhi=-999.0;
     
+    //=========================================
+    float Evis=-999.0;
+    float Q2cal=-999.0;
+    float Wcal=-999.0;
 
-
-
-
-
-
+    //=============================================================
     //declare the vectors for all the proton candidates
     std::vector<int> trackidpcand;
     std::vector<float> trackstartxpcand;
@@ -1025,7 +1026,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_allsel->Branch("fEvent",&fEvent,"fEvent/I");
     fMC_allsel->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_allsel->Branch("truthtop", &truthtop, "truthtop/I");
+    fMC_allsel->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
+    fMC_allsel->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
+    fMC_allsel->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
 
+    //============================================================================================
+ 
     fMC_flashwin=tfs->make<TTree>("fMC_flashwin","Data Holder");    
     fMC_flashwin->Branch("fRun",&fRun,"fRun/I");
     fMC_flashwin->Branch("fSubRun",&fSubRun,"fSubRun/I");
@@ -1198,6 +1204,19 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("fRun",&fRun,"fRun/I");
     fMC_TrunMean->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_TrunMean->Branch("fEvent",&fEvent,"fEvent/I");
+    //--------------------------------------------------
+    fMC_TrunMean->Branch("_fTrueccnc",&_fTrueccnc,"_fTrueccnc/I");
+    fMC_TrunMean->Branch("_fTruemode",&_fTruemode,"_fTruemode/I");
+    fMC_TrunMean->Branch("_fTrueinttype",&_fTrueinttype,"_fTrueinttype/I");
+    fMC_TrunMean->Branch("_fTruenupdg",&_fTruenupdg,"_fTruenupdg/I");
+    fMC_TrunMean->Branch("_fTrueenu",&_fTrueenu,"_fTrueenu/F");
+    fMC_TrunMean->Branch("_fTrueq2truth",&_fTrueq2truth,"_fTrueq2truth/F");
+ 
+
+
+
+
+    //---------------------------------------------------------
 
     fMC_TrunMean->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_TrunMean->Branch("fvtxy", &fvtxy, "fvtxy/F");
@@ -1284,8 +1303,10 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("trackpcand_parCosPhi",&trackpcand_parCosPhi, "trackpcand_parCosPhi/F");
     fMC_TrunMean->Branch("trackpcand_parSinPhi",&trackpcand_parSinPhi, "trackpcand_parSinPhi/F");
 
- 
-
+    fMC_TrunMean->Branch("Evis", &Evis, "Evis/F");
+    fMC_TrunMean->Branch("Q2cal", &Q2cal, "Q2cal/F");
+    fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
+     
 
     //-----------------------------------------------------------
 }
@@ -1346,13 +1367,13 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
-    fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
+    //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
+    //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
     //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
@@ -1536,7 +1557,7 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
 
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
-    if (dqds*243 <= dqds_cut)
+    if (dqds*198 <= dqds_cut)
       return true;
   
 
@@ -2056,7 +2077,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     if (mctruth->NeutrinoSet()) nGeniePrimaries = mctruth->NParticles();
     std::cout<<"<<<<total number of GENIE particle is :"<<nGeniePrimaries<<std::endl;
     //get the MC truth here 
-    if(mctruth->NeutrinoSet()&& mctruth->Origin()==1) 
+    if(mctruth->NeutrinoSet()&& mctruth->Origin()==simb::kBeamNeutrino) 
     {
     _fTrueccnc=mctruth->GetNeutrino().CCNC();  //0->CC, 1->NC
     _fTruemode=mctruth->GetNeutrino().Mode();   //0=Quasi-elastic or Elastic, 1=Resonant (RES), 2=DIS, 3=Coherent productio
@@ -2989,7 +3010,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       trackendypcand.push_back(trackEnd.Y());    
                       trackendzpcand.push_back(trackEnd.Z());
 
-                      trackmompcand.push_back(track->VertexMomentum());
+                      //trackmompcand.push_back(track->VertexMomentum());
+                      trackmompcand.push_back(trkm.GetTrackMomentum(TrackLength, 2212);
                       trackthetapcand.push_back(trackTheta);
                       tracklengthpcand.push_back(TrackLength);
                       trackphipcand.push_back(trackPhi);
@@ -3036,7 +3058,11 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 bool ProtonTag=true;
                 fNRecoTrks=trackidpcand.size()+1;
                 fNRecoPTrks=trackidpcand.size();
-                
+                Evis=0.0;
+                float Eptot=0.0;
+                float Pxptot=0.0;
+                float Pyptot=0.0;
+                float Pzptot=0.0;  
                 for(int pcand=0; pcand<fNRecoPTrks; pcand++){
                        //std::cout<<"event number= "<<fEvent<<" total number of protons are "<<trackidpcand.size()<<" "<<tracklengthpcand[pcand]<<" "<<tracktrunmeanpcand[pcand]<<std::endl;
                        /*if((tracktrunmeanpcand[pcand]<300 &&tracklengthpcand[pcand]<(-16*tracktrunmeanpcand[pcand]+5000)) ||
@@ -3049,11 +3075,22 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                        if(MIPConsistency(tracktrunmeanpcand[pcand], tracklengthpcand[pcand])){
                              ProtonTag=false;
                        }
-                       
-                } 
-                /*
-  
-                */
+                       Evis=fPlep+trackmompcand[pcand];
+                       Eptot=Eptot+sqrt(trackmompcand[pcand]*trackmompcand[pcand]+protonmass*protonmass);
+                       Pxptot=Pxptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
+                       Pyptot=Pyptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
+                       Pzptot=Pzptot+trackmompcand[pcand]*TMath::Cos(trackthetapcand[pcand]);
+
+                }
+                
+
+                //calculate Q2 and W from here
+                
+                float Emuoncand=TMath::Sqrt(muonmass*muonmass+fPlep*fPlep);
+                Q2cal=TMath::Sqrt((Evis-Emuoncand)*(Evis-Emuoncand)-fPlep*fPlep); 
+                Wcal=TMath::Sqrt(Eptot*Eptot-Pxptot*Pxptot-Pyptot*Pyptot-Pzptot*Pzptot);                
+                    
+
                 if(ntrkstovtx==fNRecoTrks){
                    fMC_NoExTrk->Fill();
               
