@@ -2834,6 +2834,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                     art::Ptr<recob::Track> track(trackVecHandle,TrackID);
                     //recob::MCSFitResult const & mcsfitresult = MCSFitHandle.at(TrackID);
 		    momentum = mcsfitlist[TrackID]->bestMomentum();
+            bool mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
                     /*
                     * mcsfitlist[TrackID]->
                     *
