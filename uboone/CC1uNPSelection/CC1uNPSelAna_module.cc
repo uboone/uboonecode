@@ -802,6 +802,14 @@ private:
     int truthtop_200thresh; // true topology assuming a 200MeV/c proton threshold
     int truthtop_300thresh; // true topology assuming a 300MeV/c proton threshold
     int truthtop_400thresh; // true topology assuming a 400MeV/c proton threshold
+
+    double trueMuonTrueMomentum;
+    double trueMuonTrueTheta;
+    double trueMuonTruePhi;
+    std::vector<double> *trueProtonsTrueMomentum;
+    std::vector<double> *trueProtonsTrueTheta;
+    std::vector<double> *trueProtonsTruePhi;
+
     float fLlep;
     float fLhad;
     float fPlep;
@@ -898,11 +906,11 @@ private:
     std::vector<float> trackendypcand;    
     std::vector<float> trackendzpcand;
 
-    std::vector<float> *trackmompcand = new std::vector<float>;
-    std::vector<float> trackthetapcand;
-    std::vector<float> tracklengthpcand;
-    std::vector<float> trackphipcand;
-    std::vector<float> tracktrunmeanpcand;
+    std::vector<double> *trackmompcand;// = new std::vector<double>;
+    std::vector<double> *trackthetapcand;// = new std::vector<double>;
+    std::vector<double> *tracklengthpcand;// = new std::vector<double>;
+    std::vector<double> *trackphipcand;// = new std::vector<double>;;
+    std::vector<double> *tracktrunmeanpcand;// = new std::vector<double>;;
 
     //----------------------------------------
     int fNRecoTrks=-999;  //total number of tracks including muon, proton and others
@@ -968,7 +976,13 @@ private:
 //-----------------------------------------------------------------------
 // Destructor
  CC1uNPSelAna::~ CC1uNPSelAna()
-{}
+{
+  delete trackmompcand;
+  delete trackphipcand;
+  delete trackthetapcand;
+  delete tracklengthpcand;
+  delete tracktrunmeanpcand;
+}
    
 //-----------------------------------------------------------------------
 void  CC1uNPSelAna::beginJob()
@@ -1221,8 +1235,13 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("_fTrueXtruth",&_fTrueXtruth,"_fTrueXtruth/F");
     fMC_TrunMean->Branch("_fTrueYtruth",&_fTrueYtruth,"_fTrueYtruth/F");
   
+    fMC_TrunMean->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_TrunMean->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_TrunMean->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
-
+    fMC_TrunMean->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_TrunMean->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_TrunMean->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
 
 
     //---------------------------------------------------------
@@ -1317,7 +1336,11 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
      
     //example of vector branch adding
-    fMC_TrunMean->Branch("all_proton_momenta","std::vector",&trackmompcand);
+    fMC_TrunMean->Branch("protoncandidate_momentum","std::vector<double>",&trackmompcand);
+    fMC_TrunMean->Branch("protoncandidate_length","std::vector<double>",&tracklengthpcand);
+    fMC_TrunMean->Branch("protoncandidate_theta","std::vector<double>",&trackthetapcand);
+    fMC_TrunMean->Branch("protoncandidate_phi","std::vector<double>",&trackphipcand);
+    fMC_TrunMean->Branch("protoncandidate_trunmeandqdx","std::vector<double>",&tracktrunmeanpcand);
 
 
     //-----------------------------------------------------------
@@ -1411,6 +1434,12 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     }
 
 
+    trackmompcand = new std::vector<double>;
+    trackmompcand = new std::vector<double>;
+    trackphipcand = new std::vector<double>;
+    trackthetapcand = new std::vector<double>;
+    tracklengthpcand = new std::vector<double>;
+    tracktrunmeanpcand = new std::vector<double>;
 
 
 
@@ -2102,6 +2131,22 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     _fTrueXtruth =mctruth->GetNeutrino().X();
     _fTrueYtruth =mctruth->GetNeutrino().Y();
 
+    trueMuonTrueMomentum = mctruth->GetNeutrino().Lepton().P();
+    trueMuonTrueTheta = mctruth->GetNeutrino().Lepton().Momentum().Theta();
+    trueMuonTruePhi = mctruth->GetNeutrino().Lepton().Momentum().Phi();
+    
+    trueProtonsTrueMomentum->clear();
+    trueProtonsTrueTheta->clear();
+    trueProtonsTruePhi->clear();
+    for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
+      simb::MCParticle part = mctruth->GetParticle(igeniepart);
+      if (part.PdgCode()==2212 && part.StatusCode()==1){
+        trueProtonsTrueMomentum->push_back(part.P());
+        trueProtonsTrueTheta->push_back(part.Momentum().Theta());
+        trueProtonsTruePhi->push_back(part.Momentum().Phi());
+      }
+    }
+    /// Also here we should get things like the true struck neutron momentum - I think we need a GTruth object for this
 
 
     _fTruenuvrtxx=mctruth->GetNeutrino().Nu().Vx(); //true vertex x
@@ -2835,6 +2880,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                     //recob::MCSFitResult const & mcsfitresult = MCSFitHandle.at(TrackID);
 		    momentum = mcsfitlist[TrackID]->bestMomentum();
             bool mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
+            if (!mcs_isBestFwd){std::cout << "muon candidate MCS fits better backwards" << std::endl;}
                     /*
                     * mcsfitlist[TrackID]->
                     *
@@ -2998,10 +3044,10 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 trackendypcand.clear();
                 trackendzpcand.clear();
                 trackmompcand->clear();
-                trackthetapcand.clear();
-                tracklengthpcand.clear();
-                trackphipcand.clear();
-                tracktrunmeanpcand.clear();
+                trackthetapcand->clear();
+                tracklengthpcand->clear();
+                trackphipcand->clear();
+                tracktrunmeanpcand->clear();
 		for (auto const& TrackID : VertexTrackCollection2.find(VertexCandidate)->second)
                 {
                     art::Ptr<recob::Track> track(trackVecHandle,TrackID);
@@ -3045,16 +3091,16 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
 
                       //trackmompcand.push_back(track->VertexMomentum());
                       trackmompcand->push_back(trkm.GetTrackMomentum(TrackLength, 2212));
-                      trackthetapcand.push_back(trackTheta);
-                      tracklengthpcand.push_back(TrackLength);
-                      trackphipcand.push_back(trackPhi);
+                      trackthetapcand->push_back(trackTheta);
+                      tracklengthpcand->push_back(TrackLength);
+                      trackphipcand->push_back(trackPhi);
                       //get the truncated mean dqdx of all the proton candidates-------------
                       art::FindManyP<recob::Hit> fmh(trackVecHandle, event, fTrackModuleLabel);
                       std::vector<art::Ptr<recob::Hit>> hits =fmh.at(track.key());
                       
                       art::FindManyP<anab::Calorimetry> calos_from_track(trackVecHandle, event, fCalorimetryModuleLabel) ;        
                       std:: vector<art::Ptr<anab::Calorimetry>> calos=calos_from_track.at(track.key());
-                      tracktrunmeanpcand.push_back(GetDqDxTruncatedMean(calos));
+                      tracktrunmeanpcand->push_back(GetDqDxTruncatedMean(calos));
                       //---------------------------------------------------------------------- 
                     }
 
@@ -3105,14 +3151,14 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                        */
                        
                        //std::cout<<"pcand= "<<pcand<<" dqdx of pcand is "<<tracktrunmeanpcand[pcand]<<" trklen of pcand is "<<tracklengthpcand[pcand]<<std::endl;
-                       if(MIPConsistency(tracktrunmeanpcand[pcand], tracklengthpcand[pcand])){
+                       if(MIPConsistency(tracktrunmeanpcand->at(pcand), tracklengthpcand->at(pcand))){
                              ProtonTag=false;
                        }
                        Evis=fPlep+trackmompcand->at(pcand);
                        Eptot=Eptot+sqrt(trackmompcand->at(pcand)*trackmompcand->at(pcand)+protonmass*protonmass);
-                       Pxptot=Pxptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
-                       Pyptot=Pyptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
-                       Pzptot=Pzptot+trackmompcand->at(pcand)*TMath::Cos(trackthetapcand[pcand]);
+                       Pxptot=Pxptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand->at(pcand))*TMath::Cos(trackphipcand->at(pcand));
+                       Pyptot=Pyptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand->at(pcand))*TMath::Sin(trackphipcand->at(pcand));
+                       Pzptot=Pzptot+trackmompcand->at(pcand)*TMath::Cos(trackthetapcand->at(pcand));
 
                 }
                 
