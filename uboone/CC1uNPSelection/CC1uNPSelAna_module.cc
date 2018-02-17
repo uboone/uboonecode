@@ -97,7 +97,7 @@
 #include "TTree.h"
 #include "TTimeStamp.h"
 
-
+constexpr int kmaxgeniepar=90000;
 constexpr int kmaxg4par= 90000;
 
 constexpr int kNplanes       = 3;     //number of wire planes
@@ -692,31 +692,22 @@ private:
     float _fTruenuvrtxz_SCE;
     int Nevt_truth; 
     //------------------------------------------------------
-    int   _fmparpdg;
-    int   _fmparStatusCode;
-    float _fmparTheta;
-    float _fmparCosTheta;	
-    float _fmparSinTheta;
-    float _fmparPhi;
-    float _fmparCosPhi;
-    float _fmparSinPhi;    
-    float _fmparE;
-    float _fmparMass;
-    float _fmparKE;
-    int   _fmctrue_origin;
-    float _fmparEndE;
-    float _fmparPx;
-    float _fmparPy;
-    float _fmparPz;
-    float _fmparP;
-    float _fmparStartx;
-    float _fmparStarty;
-    float _fmparStartz;
-    float _fmparEndx;
-    float _fmparEndy;
-    float _fmparEndz;
+    /*
+    */
     //arrays declared for the efficiency calculation
-    
+    int fgeniepdg[kmaxgeniepar];
+    float fgenieeng[kmaxgeniepar];
+    float fgeniepx[kmaxgeniepar];
+    float fgeniepy[kmaxgeniepar];
+    float fgeniepz[kmaxgeniepar];
+    float fgeniep[kmaxgeniepar];
+    int fgeniestatus[kmaxgeniepar];
+    float fgeniemass[kmaxgeniepar];
+    int fgeniemother[kmaxgeniepar];
+    int fgeniend[kmaxgeniepar];
+    int fgenietrackid[kmaxgeniepar];
+
+    //-----------------------------------------------------    
     int fhg4parpdg[kmaxg4par];
     int fhg4parstatus[kmaxg4par];
     float fhg4parpx[kmaxg4par];
@@ -829,6 +820,7 @@ private:
     float trackstartzcandidate=-999.0;
     float trackmomcandidate=-999.0;
     float trackmomcandidate_mcs=-999.0;
+    int trackcandidatemcs_isBestFwd=-999.0;
     std::vector<float> trackdedxcandidate;
     std::vector<float> trackresrgcandidate;
 
@@ -898,7 +890,8 @@ private:
     std::vector<float> trackendypcand;    
     std::vector<float> trackendzpcand;
 
-    std::vector<float> *trackmompcand = new std::vector<float>;
+    //std::vector<float> *trackmompcand = new std::vector<float>;
+    std::vector<float> trackmompcand;
     std::vector<float> trackthetapcand;
     std::vector<float> tracklengthpcand;
     std::vector<float> trackphipcand;
@@ -1259,6 +1252,7 @@ void  CC1uNPSelAna::beginJob()
 
     fMC_TrunMean->Branch("trackmomcandidate", &trackmomcandidate, "trackmomcandidate/F");
     fMC_TrunMean->Branch("trackmomcandidate_mcs", &trackmomcandidate_mcs, "trackmomcandidate_mcs/F");
+    fMC_TrunMean->Branch("trackcandidatemcs_isBestFwd", &trackcandidatemcs_isBestFwd, "trackcandidatemcs_isBestFwd/I");
     fMC_TrunMean->Branch("trackmomprotoncandidate", &trackmomprotoncandidate, "trackmomprotoncandidate/F");
  
 
@@ -1317,7 +1311,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
      
     //example of vector branch adding
-    fMC_TrunMean->Branch("all_proton_momenta","std::vector",&trackmompcand);
+    //fMC_TrunMean->Branch("all_proton_momenta","std::vector",&trackmompcand);
 
 
     //-----------------------------------------------------------
@@ -2112,14 +2106,25 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     _fTruenuvrtxy_SCE=  mctruth->GetNeutrino().Nu().Vy() + SCE->GetPosOffsets(mctruth->GetNeutrino().Nu().Vx(),mctruth->GetNeutrino().Nu().Vy(),mctruth->GetNeutrino().Nu().Vz())[1];
     _fTruenuvrtxz_SCE = mctruth->GetNeutrino().Nu().Vz() + SCE->GetPosOffsets(mctruth->GetNeutrino().Nu().Vx(),mctruth->GetNeutrino().Nu().Vy(),mctruth->GetNeutrino().Nu().Vz())[2];
 
+
+
+
+
     //std::cout<<"the true neutrino vertex position is : "<<_fTruenuvrtxx<<" "<<_fTruenuvrtxy<<" "<<_fTruenuvrtxz<<std::endl;
     //std::cout<<"test space charge effect correction x " <<SCE->GetPosOffsets(mctruth->GetNeutrino().Nu().Vx(),mctruth->GetNeutrino().Nu().Vy(),mctruth->GetNeutrino().Nu().Vz())[0]<<std::endl;
     //std::cout<<"test space charge effect correction y " <<SCE->GetPosOffsets(mctruth->GetNeutrino().Nu().Vx(),mctruth->GetNeutrino().Nu().Vy(),mctruth->GetNeutrino().Nu().Vz())[1]<<std::endl;
     //std::cout<<"test space charge effect correction z " <<SCE->GetPosOffsets(mctruth->GetNeutrino().Nu().Vx(),mctruth->GetNeutrino().Nu().Vy(),mctruth->GetNeutrino().Nu().Vz())[2]<<std::endl;
-   
-    
+
+    //loop over all the particles and stroe the particle information in GENIE stage   
+      
+ 
+
+
+
+
+
     //loop over all the particles from GENIE Stage and try to connect to GEANT4------------------
-    //Need to do the space charge effect correction 
+    //Need to do the space charge effect correction? 
 
 
 
@@ -2834,7 +2839,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                     art::Ptr<recob::Track> track(trackVecHandle,TrackID);
                     //recob::MCSFitResult const & mcsfitresult = MCSFitHandle.at(TrackID);
 		    momentum = mcsfitlist[TrackID]->bestMomentum();
-            bool mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
+                    //mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
                     /*
                     * mcsfitlist[TrackID]->
                     *
@@ -2965,6 +2970,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             }
             //std::cout<<"Event number= "<<fEvent<<" true PDG id of the track candidate is "<<trackcand_parPDG<<std::endl;
             if (trackFlashFlag==true){
+              trackcandidatemcs_isBestFwd=mcsfitlist[TrackCandidate]->isBestFwd();
               fMC_trkfls->Fill();
             }//end of if trackFlagFlag is true
             }//end of if noshowerFlag
@@ -2997,7 +3003,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 trackendxpcand.clear();
                 trackendypcand.clear();
                 trackendzpcand.clear();
-                trackmompcand->clear();
+                trackmompcand.clear();
+                //trackmompcand->clear();
                 trackthetapcand.clear();
                 tracklengthpcand.clear();
                 trackphipcand.clear();
@@ -3044,7 +3051,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       trackendzpcand.push_back(trackEnd.Z());
 
                       //trackmompcand.push_back(track->VertexMomentum());
-                      trackmompcand->push_back(trkm.GetTrackMomentum(TrackLength, 2212));
+                      //trackmompcand->push_back(trkm.GetTrackMomentum(TrackLength, 2212));
+                      trackmompcand.push_back(trkm.GetTrackMomentum(TrackLength, 2212));
                       trackthetapcand.push_back(trackTheta);
                       tracklengthpcand.push_back(TrackLength);
                       trackphipcand.push_back(trackPhi);
@@ -3108,11 +3116,18 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                        if(MIPConsistency(tracktrunmeanpcand[pcand], tracklengthpcand[pcand])){
                              ProtonTag=false;
                        }
-                       Evis=fPlep+trackmompcand->at(pcand);
-                       Eptot=Eptot+sqrt(trackmompcand->at(pcand)*trackmompcand->at(pcand)+protonmass*protonmass);
-                       Pxptot=Pxptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
-                       Pyptot=Pyptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
-                       Pzptot=Pzptot+trackmompcand->at(pcand)*TMath::Cos(trackthetapcand[pcand]);
+                       Evis=fPlep+trackmompcand[pcand];
+                       Eptot=Eptot+sqrt(trackmompcand[pcand]*trackmompcand[pcand]+protonmass*protonmass);
+                       Pxptot=Pxptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
+                       Pyptot=Pyptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
+                       Pzptot=Pzptot+trackmompcand[pcand]*TMath::Cos(trackthetapcand[pcand]);
+
+                       //Evis=fPlep+*trackmompcand->at(pcand);
+                       //Eptot=Eptot+sqrt(*trackmompcand->at(pcand)*(*trackmompcand->at(pcand))+protonmass*protonmass);
+                       //Pxptot=Pxptot+*trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Cos(trackphipcand[pcand]);
+                       //Pyptot=Pyptot+*trackmompcand->at(pcand)*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
+                       //Pzptot=Pzptot+*trackmompcand->at(pcand)*TMath::Cos(trackthetapcand[pcand]);
+
 
                 }
                 
