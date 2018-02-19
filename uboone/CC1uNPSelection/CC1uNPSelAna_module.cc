@@ -36,6 +36,7 @@
 #include "lardataobj/MCBase/MCTrack.h"
 #include "lardataobj/MCBase/MCStep.h"
 #include "nusimdata/SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/GTruth.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/Simulation/AuxDetSimChannel.h"
 #include "lardataobj/AnalysisBase/Calorimetry.h"
@@ -896,6 +897,8 @@ private:
     float Q2cal=-999.0;
     float Wcal=-999.0;
 
+    TLorentzVector *fHitNucP4;
+
     //=============================================================
     //declare the vectors for all the proton candidates
     std::vector<int> trackidpcand;
@@ -982,6 +985,7 @@ private:
   delete trackthetapcand;
   delete tracklengthpcand;
   delete tracktrunmeanpcand;
+  delete fHitNucP4;
 }
    
 //-----------------------------------------------------------------------
@@ -1334,6 +1338,8 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Evis", &Evis, "Evis/F");
     fMC_TrunMean->Branch("Q2cal", &Q2cal, "Q2cal/F");
     fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
+
+    fMC_TrunMean->Branch("fHitNucP4","TLorentzVector",&fHitNucP4);
      
     //example of vector branch adding
     fMC_TrunMean->Branch("protoncandidate_momentum","std::vector<double>",&trackmompcand);
@@ -1440,7 +1446,8 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     trackthetapcand = new std::vector<double>;
     tracklengthpcand = new std::vector<double>;
     tracktrunmeanpcand = new std::vector<double>;
-
+    
+    fHitNucP4 = new TLorentzVector(-999,-999,-999,-999);
 
 
     //--------------------------------------------------------------------------------
@@ -2147,7 +2154,14 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       }
     }
     /// Also here we should get things like the true struck neutron momentum - I think we need a GTruth object for this
-
+    art::ValidHandle< std::vector<simb::GTruth> > gtruth = event.getValidHandle< std::vector<simb::GTruth> >("generator");
+    if (gtruth->size() <1){
+      std::cout << "WARNING NO GTRUTH OBJECT" << std::endl;
+    }
+    else{
+      TLorentzVector v_tmp = gtruth->at(0).fHitNucP4;
+      fHitNucP4->SetXYZT(v_tmp.X(), v_tmp.X(), v_tmp.Y(), v_tmp.E());
+    }
 
     _fTruenuvrtxx=mctruth->GetNeutrino().Nu().Vx(); //true vertex x
     _fTruenuvrtxy=mctruth->GetNeutrino().Nu().Vy(); //true vertex y
