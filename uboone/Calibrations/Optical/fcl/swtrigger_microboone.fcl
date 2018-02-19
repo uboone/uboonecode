@@ -210,7 +210,7 @@ microboone_swtrigger_mc_bnb:
       TriggerThresPHMAX : 100
       TriggerWindowSize : 120
       TriggerWindowStart : 190
-      Verbosity : 0
+      Verbosity : 3
     }
     BNB_HSN_c0_FEMBeamTriggerAlgo:{
       Discr0deadtime : 6
