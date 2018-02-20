@@ -77,6 +77,7 @@ class RecoMCMatching {
   int fsimch_tdc;
 
  public:
+
   int const fmc_type_shower;
   int const fmc_type_track;
   int const fmc_type_particle;
@@ -115,6 +116,32 @@ class RecoMCMatching {
 
   }
 
+  void ConfigureTrack(std::string const & hit_producer,
+		      std::string const & track_producer,
+		      std::string const & rmcmassociation_producer,
+		      bool const verbose = false) {
+    
+    fhit_producer = hit_producer;
+    ftrack_producer = track_producer;
+    frmcmassociation_producer = rmcmassociation_producer;
+    fverbose = verbose;
+
+  }
+
+  void ConfigureShower(std::string const & hit_producer,
+		       std::string const & shower_producer,
+		       std::string const & rmcmassociation_producer,
+		       bool const verbose = false) {
+    
+    fhit_producer = hit_producer;
+    fshower_producer = shower_producer;
+    frmcmassociation_producer = rmcmassociation_producer;
+    fverbose = verbose;
+
+  }
+
+  void Reset(art::Event const & e);
+
   void ConsiderMCParticles(bool const consider_mcparticles = true) {fconsider_mcparticles = consider_mcparticles;}
 
   void FillHitTree(art::Event const & e);
@@ -143,6 +170,8 @@ class RecoMCMatching {
 	       size_t const index,
 	       double const quantity);
   void MatchWAssociations(art::Event const & e);
+  void MatchTracksWAssociations(art::Event const & e);
+  void MatchShowersWAssociations(art::Event const & e);
   void CoutMatches(art::Event const & e,
 		   std::unordered_map<int, size_t> const & tp_map,
 		   std::unordered_map<int, size_t> const & sp_map,

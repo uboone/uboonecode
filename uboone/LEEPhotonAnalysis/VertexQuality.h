@@ -15,6 +15,8 @@
 
 #include "TTree.h"
 
+#include "../LLBasicTool/GeoAlgo/GeoAABox.h"
+
 
 class VertexQuality {
 

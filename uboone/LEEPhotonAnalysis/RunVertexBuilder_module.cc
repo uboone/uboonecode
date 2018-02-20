@@ -107,6 +107,12 @@ public:
   RunVertexBuilder & operator = (RunVertexBuilder const &) = delete;
   RunVertexBuilder & operator = (RunVertexBuilder &&) = delete;
 
+  void AddTracks(DetectorObjects & detos,
+		 art::ValidHandle<std::vector<recob::Track>> const & ev_t,
+		 bool const track_original_indices = false);
+  void AddShowers(DetectorObjects & detos,
+		 art::ValidHandle<std::vector<recob::Shower>> const & ev_t,
+		 bool const track_original_indices = false);
   void analyze(art::Event const & e) override;
 
 };
@@ -288,6 +294,40 @@ RunVertexBuilder::RunVertexBuilder(fhicl::ParameterSet const & p) :
 
 
 
+void RunVertexBuilder::AddTracks(DetectorObjects & detos,
+				 art::ValidHandle<std::vector<recob::Track>> const & ev_t,
+				 bool const track_original_indices) {
+
+  for(size_t i = 0; i < ev_t->size(); ++i) {
+
+    recob::Track const & t = ev_t->at(i);
+
+    geoalgo::Trajectory traj;
+    traj.reserve(t.NumberTrajectoryPoints());
+    for(size_t i = 0; i < t.NumberTrajectoryPoints(); ++i)
+      traj.push_back(t.LocationAtPoint(i)); 
+
+    detos.AddTrack(i, traj, track_original_indices);
+
+  }
+
+}
+
+
+
+void RunVertexBuilder::AddShowers(DetectorObjects & detos,
+				  art::ValidHandle<std::vector<recob::Shower>> const & ev_s,
+				  bool const track_original_indices) {
+
+  for(size_t i = 0; i < ev_s->size(); ++i) {
+    recob::Shower const & s = ev_s->at(i);
+    detos.AddShower(i, geoalgo::Cone_t(s.ShowerStart(), s.Direction(), s.Length(), 0), track_original_indices);
+  }
+
+}  
+
+
+
 void RunVertexBuilder::analyze(art::Event const & e) {
 
   art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producer);
@@ -299,8 +339,8 @@ void RunVertexBuilder::analyze(art::Event const & e) {
   if(fmin_index < 0 || fmax_index == -1) {
 
     ParticleAssociations pas;
-    pas.GetDetectorObjects().AddShowers(ev_s);
-    pas.GetDetectorObjects().AddTracks(ev_t);
+    AddShowers(pas.GetDetectorObjects(), ev_s);
+    AddTracks(pas.GetDetectorObjects(), ev_t);
     if(fverbose) std::cout << "Run VB\n";
     
     fvb.SetMaximumTrackEndProximity(fstart_prox);
@@ -334,8 +374,8 @@ void RunVertexBuilder::analyze(art::Event const & e) {
     for(size_t i = fmin_index; i <= size_t(fmax_index); ++i) {
 
       ParticleAssociations pas;
-      pas.GetDetectorObjects().AddShowers(ev_s);
-      pas.GetDetectorObjects().AddTracks(ev_t);
+      AddShowers(pas.GetDetectorObjects(), ev_s);
+      AddTracks(pas.GetDetectorObjects(), ev_t);
       if(fverbose) std::cout << "Run VB\n";
 
       std::vector<double> const & parameters = fpermutation_v.at(i);

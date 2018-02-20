@@ -5,6 +5,7 @@
 
 #include "ParticleAssociations.h"
 
+#include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
 
 
 class VertexBuilder {

@@ -29,6 +29,9 @@
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
 
+#include "../LLBasicTool/GeoAlgo/GeoAABox.h"
+#include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
+
 #include "RecoMCMatching.h"
 #include "canvas/Persistency/Common/FindMany.h"
 
@@ -248,7 +251,7 @@ class FillTreeVariables {
 
   int pass_all_cuts;
 
-  std::map<std::string, std::vector<double *>> weight_branch_map; 
+  std::map<std::string, std::vector<double *>> weight_branch_map;
 
   double fweight_genie_ncelaxial_p1sigma;
   double fweight_genie_ncelaxial_m1sigma;

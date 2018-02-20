@@ -11,28 +11,18 @@ DetectorObjects::DetectorObjects() :
   fshower_reco_type(1){}
 
 
-void DetectorObjects::AddTracks(art::ValidHandle<std::vector<recob::Track>> const & ev_t,
-				bool const track_original_indices) {
-  for(size_t i = 0; i < ev_t->size(); ++i) {
-    recob::Track const & t = ev_t->at(i);
-    fobject_m.emplace(fobject_id, new Track(fobject_id, i, ftrack_reco_type, t)); 
-    ftrack_index_v.push_back(fobject_id);
-    if(track_original_indices) foriginal_track_index_m.emplace(i, fobject_id);
-    ++fobject_id;
-  }
-}
+void DetectorObjects::Clear() {
 
-  
-void DetectorObjects::AddShowers(art::ValidHandle<std::vector<recob::Shower>> const & ev_s,
-				 bool const track_original_indices) {
-  for(size_t i = 0; i < ev_s->size(); ++i) {
-    recob::Shower const & s = ev_s->at(i);
-    fobject_m.emplace(fobject_id, new Shower(fobject_id, i, fshower_reco_type, s));
-    fshower_index_v.push_back(fobject_id);
-    if(track_original_indices) foriginal_shower_index_m.emplace(i, fobject_id);
-    ++fobject_id;
-  }
-}  
+  for(std::pair<size_t, DetectorObject *> const & p : fobject_m) delete p.second;
+  fobject_m.clear();
+  ftrack_index_v.clear();
+  fshower_index_v.clear();
+  fobject_id = 0;
+
+  foriginal_track_index_m.clear();
+  foriginal_shower_index_m.clear();
+
+}
 
 
 void DetectorObjects::SetAssociated(size_t const i) {
@@ -59,6 +49,26 @@ int DetectorObjects::GetRecoType(size_t const i) const {
   }
 
   return om_it->second->freco_type;
+
+}
+
+
+void DetectorObjects::AddTrack(size_t const reco_index, geoalgo::Trajectory const & traj, bool const track_original_indices) {
+
+  fobject_m.emplace(fobject_id, new Track(fobject_id, reco_index, ftrack_reco_type, traj)); 
+  ftrack_index_v.push_back(fobject_id);
+  if(track_original_indices) foriginal_track_index_m.emplace(reco_index, fobject_id);
+  ++fobject_id;
+
+}
+
+
+void DetectorObjects::AddShower(size_t const reco_index, geoalgo::Cone_t const & cone, bool const track_original_indices) {
+
+  fobject_m.emplace(fobject_id, new Shower(fobject_id, reco_index, fshower_reco_type, cone));
+  fshower_index_v.push_back(fobject_id);
+  if(track_original_indices) foriginal_shower_index_m.emplace(reco_index, fobject_id);
+  ++fobject_id;
 
 }
 

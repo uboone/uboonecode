@@ -5,17 +5,8 @@
 
 #include <map>
 
-#include "lardataobj/RecoBase/Shower.h"
-#include "lardataobj/RecoBase/Track.h"
-
-#include "art/Framework/Principal/Handle.h"
-
-#include "../LLBasicTool/GeoAlgo/GeoVector.h"
-#include "../LLBasicTool/GeoAlgo/GeoSphere.h"
 #include "../LLBasicTool/GeoAlgo/GeoTrajectory.h"
 #include "../LLBasicTool/GeoAlgo/GeoCone.h"
-#include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
-#include "../LLBasicTool/GeoAlgo/GeoAABox.h"
 
 
 struct DetectorObject {
@@ -38,28 +29,22 @@ struct DetectorObject {
 
 struct Track : public DetectorObject {
   
-  geoalgo::Trajectory ftrajectory;
+  geoalgo::Trajectory const ftrajectory;
   
-  Track(size_t const id, size_t const original_index, int const reco_type, recob::Track const & t) :
-    DetectorObject(id, original_index, reco_type) {
-    for(size_t i = 0; i < t.NumberTrajectoryPoints(); ++i)
-      ftrajectory.push_back(t.LocationAtPoint(i)); 
-  }
+ Track(size_t const id, size_t const original_index, int const reco_type, geoalgo::Trajectory const & traj) :
+  DetectorObject(id, original_index, reco_type),
+    ftrajectory(traj) {}
   
 };
 
 
 struct Shower : public DetectorObject {
   
-  geoalgo::Cone fcone;
+  geoalgo::Cone const fcone;
   
-  Shower(size_t const id, size_t const original_index, int const reco_type, recob::Shower const & s) :
-    DetectorObject(id, original_index, reco_type) {
-    fcone = geoalgo::Cone(s.ShowerStart(),
-			  s.Direction(),
-			  s.Length(),
-			  0);
-  }
+ Shower(size_t const id, size_t const original_index, int const reco_type, geoalgo::Cone_t const & cone) :
+  DetectorObject(id, original_index, reco_type),
+    fcone(cone) {}
   
 };
 
@@ -85,8 +70,10 @@ public:
     for(std::pair<size_t, DetectorObject *> const & p : fobject_m) delete p.second;
   }
 
-  void AddTracks(art::ValidHandle<std::vector<recob::Track>> const & ev_t, bool const track_original_indices = false);
-  void AddShowers(art::ValidHandle<std::vector<recob::Shower>> const & ev_s, bool const track_original_indices = false);
+  void Clear();
+
+  void AddTrack(size_t const reco_index, geoalgo::Trajectory const & traj, bool const track_original_indices = false);
+  void AddShower(size_t const reco_index, geoalgo::Cone_t const & cone, bool const track_original_indices = false);
 
   void SetAssociated(size_t const i);
   
