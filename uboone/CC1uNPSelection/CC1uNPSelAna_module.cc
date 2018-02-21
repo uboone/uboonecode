@@ -619,7 +619,7 @@ public:
 
     double Recolength(const recob::Track& track);
     
-    int Topology(int nmuons, int nelectrons, int npions, int npi0, int nprotons, bool cosmicflag, bool OOFVflag);
+    int Topology(int nmuons, int nelectrons, int npions, int npi0, int nprotons);
     //int Reaction(int mode);/// *** need to be finish                                                                                                        
     double GetDistTracktoVtx(art::Ptr<recob::Track> InputTrackPtr, TVector3 InputvertexPos);
 
@@ -804,6 +804,7 @@ private:
     int truthtop_200thresh; // true topology assuming a 200MeV/c proton threshold
     int truthtop_300thresh; // true topology assuming a 300MeV/c proton threshold
     int truthtop_400thresh; // true topology assuming a 400MeV/c proton threshold
+    bool OOFVflag;
 
     double trueMuonTrueMomentum;
     double trueMuonTrueTheta;
@@ -1041,6 +1042,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_Truth->Branch("_fTruenuvrtxx_SCE",&_fTruenuvrtxx_SCE,"_fTruenuvrtxx_SCE/F");
     fMC_Truth->Branch("_fTruenuvrtxy_SCE",&_fTruenuvrtxy_SCE,"_fTruenuvrtxy_SCE/F");
     fMC_Truth->Branch("_fTruenuvrtxz_SCE",&_fTruenuvrtxz_SCE,"_fTruenuvrtxz_SCE/F");
+    fMC_Truth->Branch("fHitNucP4","TLorentzVector",&fHitNucP4);
     //-------------------------------------------------------------------------------
     fMC_Geant=tfs->make<TTree>("fMC_Geant", "MC Holder"); 
     fMC_Geant->Branch("fRun",&fRun,"fRun/I");
@@ -1059,6 +1061,13 @@ void  CC1uNPSelAna::beginJob()
     fMC_Geant->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_Geant->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_Geant->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_Geant->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_Geant->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_Geant->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_Geant->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_Geant->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_Geant->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_Geant->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
      
     //========================================================================================= 
 
@@ -1072,6 +1081,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_allsel->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_allsel->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_allsel->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_allsel->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
     //============================================================================================
  
@@ -1085,6 +1095,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashwin->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_flashwin->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashwin->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_flashwin->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
 
 
@@ -1099,6 +1110,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_flashtag->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashtag->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_flashtag->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
 
 
@@ -1120,6 +1132,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_vtxinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_vtxinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_vtxinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
 
     //===================================================================================
@@ -1138,6 +1151,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_ntrks->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_ntrks->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_ntrks->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
     //===================================================================================
     fMC_noshwr=tfs->make<TTree>("fMC_noshwr","Data Holder");    
@@ -1154,6 +1168,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_noshwr->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_noshwr->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_noshwr->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
     //===============================================================================
     fMC_trkfls=tfs->make<TTree>("fMC_trkfls","Data Holder");    
@@ -1172,6 +1187,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_trkfls->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_trkfls->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_trkfls->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
     //================================================================= 
     fMC_NoExTrk=tfs->make<TTree>("fMC_NoExTrk","Data Holder");    
@@ -1190,6 +1206,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_NoExTrk->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_NoExTrk->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_NoExTrk ->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
 
 
@@ -1242,6 +1259,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_mupinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_mupinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_mupinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
 
     //=================================================================
@@ -1318,6 +1336,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
     fMC_TrunMean->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_TrunMean->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
+    fMC_TrunMean->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
 
     fMC_TrunMean->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_TrunMean->Branch("trackcand_nuset", &trackcand_nuset, "trackcand_nuset/I");
@@ -1901,7 +1920,7 @@ double CC1uNPSelAna::Recolength(const recob::Track& track)
 
 
 
-int CC1uNPSelAna::Topology(int nmuons, int nelectrons, int npions, int npi0, int nprotons, bool cosmicflag, bool OOFVflag)
+int CC1uNPSelAna::Topology(int nmuons, int nelectrons, int npions, int npi0, int nprotons)
 {
   //// This function return the true topology of the event, numu & anti-numu                                                        
   ////1. CC0Pion0Proton                                                                                                             
@@ -1919,16 +1938,16 @@ int CC1uNPSelAna::Topology(int nmuons, int nelectrons, int npions, int npi0, int
   /// e.g. numu CC inclusive= Topology >0 && Topology < 7 
   
   
-  if (nmuons >0 && (nelectrons + npions + npi0 + cosmicflag + OOFVflag) == 0 && nprotons ==0 ) return 1;
-  if (nmuons >0 && (nelectrons + npions + npi0 + cosmicflag + OOFVflag) == 0 && nprotons ==1 ) return 2;
-  if (nmuons >0 && (nelectrons + npions + npi0 + cosmicflag + OOFVflag) == 0 && nprotons ==2 ) return 3;
-  if (nmuons >0 && (nelectrons + npions + npi0 + cosmicflag + OOFVflag) == 0 && nprotons >2 ) return 4;
-  if (nmuons >0 && (nelectrons + cosmicflag + OOFVflag) == 0 && (npions + npi0) == 1 ) return 5;
-  if (nmuons >0 && (nelectrons + cosmicflag + OOFVflag) == 0 && (npions + npi0) > 1 ) return 6;
-  if (nmuons == 0 && (cosmicflag + OOFVflag) == 0 && nelectrons > 0 ) return 7;
-  if (nmuons==0 && (cosmicflag+ OOFVflag==0) && nelectrons ==0) return 8;
-  if (OOFVflag) return 9;
-  if (cosmicflag) return 10;  //check with colton how to select cosmic event
+  if (nmuons >0 && (nelectrons + npions + npi0 ) == 0 && nprotons ==0 ) return 1;
+  if (nmuons >0 && (nelectrons + npions + npi0 ) == 0 && nprotons ==1 ) return 2;
+  if (nmuons >0 && (nelectrons + npions + npi0 ) == 0 && nprotons ==2 ) return 3;
+  if (nmuons >0 && (nelectrons + npions + npi0 ) == 0 && nprotons >2 ) return 4;
+  if (nmuons >0 && (nelectrons ) == 0 && (npions + npi0) == 1 ) return 5;
+  if (nmuons >0 && (nelectrons ) == 0 && (npions + npi0) > 1 ) return 6;
+  if (nmuons == 0 && nelectrons > 0 ) return 7;
+  if (nmuons==0  && nelectrons ==0) return 8;
+//  if (OOFVflag) return 9;
+//  if (cosmicflag) return 10;  //check with colton how to select cosmic event
 
   else return 11;
 
@@ -2199,7 +2218,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
       if (part.PdgCode()==2212 && part.StatusCode()==1){
-        trueProtonsTrueMomentum->push_back(part.P());
+        GeantonsTrueMomentum->push_back(part.P());
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());
       }
@@ -2280,8 +2299,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     Int_t nprotons_300thresh=0;
     Int_t nprotons_400thresh=0;
     Int_t nelectrons=0;
-    Bool_t cosmicflag=false; //cosmic event
-    Bool_t OOFVflag=false; //nu event outside FV
+    OOFVflag=false; //nu event outside FV
     //auto const* SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
 
     fhg4parpdg->clear();
@@ -2428,16 +2446,13 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     }//end of is the g4 handle is valid and the size is greater than 0;
    }//end of loop over all the geant 4 particles
    //redefine the OOFV here
-   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
+   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) {OOFVflag=true;} // && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
 
 
-   //check the cosmic flag before include the Topology function
-   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) && (nmuons==0 && nelectrons==0 && npions==0 && npi0==0 && nprotons==0)) {cosmicflag=true;} 
-
-   Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons, cosmicflag, OOFVflag);
-   Int_t TopFlag200=Topology(nmuons, nelectrons, npions, npi0, nprotons_200thresh, cosmicflag, OOFVflag);
-   Int_t TopFlag300=Topology(nmuons, nelectrons, npions, npi0, nprotons_300thresh, cosmicflag, OOFVflag);
-   Int_t TopFlag400=Topology(nmuons, nelectrons, npions, npi0, nprotons_400thresh, cosmicflag, OOFVflag);
+   Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons);
+   Int_t TopFlag200=Topology(nmuons, nelectrons, npions, npi0, nprotons_200thresh);
+   Int_t TopFlag300=Topology(nmuons, nelectrons, npions, npi0, nprotons_300thresh);
+   Int_t TopFlag400=Topology(nmuons, nelectrons, npions, npi0, nprotons_400thresh);
 
 
    truthtop=TopFlag;

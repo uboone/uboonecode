@@ -528,7 +528,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
 
-   if(*truthtop==2 || *truthtop==3 || *truthtop==4){
+   if((*truthtop==2 || *truthtop==3 || *truthtop==4) && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[0]->Fill(*ftrklenmuoncand);
       trklen_proton[0]->Fill(*ftrklenprotoncand);
       costheta_muon[0]->Fill(TMath::Cos(*fThetaLep));
@@ -598,7 +598,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
    }
    
-   if(*truthtop==1){
+   if(*truthtop==1 && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[1]->Fill(*ftrklenmuoncand);
       trklen_proton[1]->Fill(*ftrklenprotoncand);
       costheta_muon[1]->Fill(TMath::Cos(*fThetaLep));
@@ -665,7 +665,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
      }
-   if(*truthtop==5){
+   if(*truthtop==5 && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[2]->Fill(*ftrklenmuoncand);
       trklen_proton[2]->Fill(*ftrklenprotoncand);
       costheta_muon[2]->Fill(TMath::Cos(*fThetaLep));
@@ -733,7 +733,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
       }
-   if(*truthtop==6){
+   if(*truthtop==6 && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[3]->Fill(*ftrklenmuoncand);
       trklen_proton[3]->Fill(*ftrklenprotoncand);
       costheta_muon[3]->Fill(TMath::Cos(*fThetaLep));
@@ -800,7 +800,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
       }
-   if(*truthtop==7){
+   if(*truthtop==7 && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[4]->Fill(*ftrklenmuoncand);
       trklen_proton[4]->Fill(*ftrklenprotoncand);
       costheta_muon[4]->Fill(TMath::Cos(*fThetaLep));
@@ -867,7 +867,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
       }
-   if(*truthtop==8){
+   if(*truthtop==8 && (*OOFVflag==0) && (*trackcand_origin==1 && *trackpcand_origin==1)){
       trklen_muon[5]->Fill(*ftrklenmuoncand);
       trklen_proton[5]->Fill(*ftrklenprotoncand);
       costheta_muon[5]->Fill(TMath::Cos(*fThetaLep));
@@ -934,7 +934,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
       }
-   if(*truthtop==9){
+   if(*OOFVflag==true){
       trklen_muon[6]->Fill(*ftrklenmuoncand);
       trklen_proton[6]->Fill(*ftrklenprotoncand);
       costheta_muon[6]->Fill(TMath::Cos(*fThetaLep));
@@ -1002,7 +1002,7 @@ Bool_t hanalysis::Process(Long64_t entry)
 
 
       }
-   if(*truthtop==10){
+   if(*trackcand_origin==0 && *trackpcand_origin==0){
       trklen_muon[7]->Fill(*ftrklenmuoncand);
       trklen_proton[7]->Fill(*ftrklenprotoncand);
       costheta_muon[7]->Fill(TMath::Cos(*fThetaLep));
@@ -1067,6 +1067,76 @@ Bool_t hanalysis::Process(Long64_t entry)
       fEvis_all[7]->Fill(*Evis);
       fQ2cal_all[7]->Fill(*Q2cal);
 
+
+      }
+      if ((trackcand_origin==1 && trackpcand_origin==0) || (trackcand_origin==0 && trackpcand_origin==1)){
+      trklen_muon[8]->Fill(*ftrklenmuoncand);
+      trklen_proton[8]->Fill(*ftrklenprotoncand);
+      costheta_muon[8]->Fill(TMath::Cos(*fThetaLep));
+      costheta_proton[8]->Fill(TMath::Cos(*fThetaHad));
+      costhetatrue_muon[8]->Fill(*trackcand_parCosTheta);
+      costhetatrue_proton[8]->Fill(*trackpcand_parCosTheta);
+
+      costhetareso_muon[8]->Fill((TMath::Cos(*fThetaLep)-*trackcand_parCosTheta)/ *trackcand_parCosTheta);
+      costhetareso_proton[8]->Fill((TMath::Cos(*fThetaHad)-*trackpcand_parCosTheta)/ *trackpcand_parCosTheta);
+
+      cosphireso_muon[8]->Fill((TMath::Cos(*fPhiLep)-*trackcand_parCosPhi)/ *trackcand_parCosPhi);
+      cosphireso_proton[8]->Fill((TMath::Cos(*fPhiHad)-*trackpcand_parCosPhi)/ *trackpcand_parCosPhi);
+
+
+      trunmean_muon[8]->Fill(*TrunMean_cand*243.0/198.0);
+      trunmean_proton[8]->Fill(*TrunMean_pcand*243.0/198.0);
+      phi_muon[8]->Fill(*fPhiLep);
+      phi_proton[8]->Fill(*fPhiHad);
+      ntrks_proton[8]->Fill(*fNRecoPTrks);
+      trkmom_muon[8]->Fill(*trackmomcandidate_mcs);
+      fPmuon[8]->Fill(*fPlep);
+      fPproton[8]->Fill(*fPhad);
+      fPresomuon[8]->Fill((*fPlep- sqrt(*trackcand_parE * *trackcand_parE- *trackcand_parMass * *trackcand_parMass))/sqrt(*trackcand_parE * *trackcand_parE- *trackcand_parMass * *trackcand_parMass));
+      fPresoproton[8]->Fill((*fPhad- sqrt(*trackpcand_parE * *trackpcand_parE- *trackpcand_parMass * *trackpcand_parMass))/sqrt(*trackpcand_parE * *trackpcand_parE- *trackpcand_parMass * *trackpcand_parMass));
+      h_thetamups[8]->Fill(TMath::Abs(*fThetaLep-*fThetaHad));
+      h_phimups[8]->Fill(TMath::Abs(*fPhiLep-*fPhiHad));
+
+      Nhitsmuon[8]->Fill(*Nhits_muoncand);
+      Nhitsproton[8]->Fill(*Nhits_protoncand);
+
+      fvertexx[8]->Fill(*fvtxx);
+      fvertexy[8]->Fill(*fvtxy);
+      fvertexz[8]->Fill(*fvtxz);;
+
+      fmucandstartx[8]->Fill(*trackstartxcandidate);
+      fmucandstarty[8]->Fill(*trackstartycandidate);
+      fmucandstartz[8]->Fill(*trackstartzcandidate);
+      fmucandendx[8]->Fill(*trackendxcandidate);
+      fmucandendy[8]->Fill(*trackendycandidate);
+      fmucandendz[8]->Fill(*trackendzcandidate);
+      
+
+   for(int allp=0; allp< protoncandidate_id.GetSize(); ++allp){
+      fpcandstartx[8]->Fill(protoncandidate_startx[allp]);
+      fpcandstarty[8]->Fill(protoncandidate_starty[allp]);
+      fpcandstartz[8]->Fill(protoncandidate_startz[allp]);
+      fpcandendx[8]->Fill(protoncandidate_endx[allp]);
+      fpcandendy[8]->Fill(protoncandidate_endy[allp]);
+      fpcandendz[8]->Fill(protoncandidate_endz[allp]);
+   }
+   if(protoncandidate_id.GetSize()==2){ 
+      h_thetapps[8]->Fill(TMath::Abs(protoncandidate_theta[0]-protoncandidate_theta[1]));
+      h_phipps[8]->Fill(TMath::Abs(protoncandidate_phi[0]-protoncandidate_phi[1]));
+   }
+ 
+      /*fpcandstartx;
+      fpcandstarty;
+      fpcandstartz;
+      fpcandendx;
+      fpcandendy;
+      fpcandendz;
+      */
+      fEvis_all[8]->Fill(*Evis);
+      fQ2cal_all[8]->Fill(*Q2cal);
+
+
+      }
 
       }
    
