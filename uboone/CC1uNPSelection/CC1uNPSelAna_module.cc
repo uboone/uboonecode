@@ -36,6 +36,7 @@
 #include "lardataobj/MCBase/MCTrack.h"
 #include "lardataobj/MCBase/MCStep.h"
 #include "nusimdata/SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/GTruth.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "lardataobj/Simulation/AuxDetSimChannel.h"
 #include "lardataobj/AnalysisBase/Calorimetry.h"
@@ -897,6 +898,8 @@ private:
     float Q2cal=-999.0;
     float Wcal=-999.0;
 
+    TLorentzVector *fHitNucP4;
+
     //=============================================================
     //declare the vectors for all the proton candidates
     std::vector<int> *trackidpcand;
@@ -999,7 +1002,9 @@ private:
   delete trackthetapcand;
   delete tracklengthpcand;
   delete tracktrunmeanpcand;
+
   delete trackpidapcand;
+  delete fHitNucP4;
 }
    
 //-----------------------------------------------------------------------
@@ -1355,6 +1360,8 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("Evis", &Evis, "Evis/F");
     fMC_TrunMean->Branch("Q2cal", &Q2cal, "Q2cal/F");
     fMC_TrunMean->Branch("Wcal", &Wcal, "Wcal/F");
+
+    fMC_TrunMean->Branch("fHitNucP4","TLorentzVector",&fHitNucP4);
      
     //example of vector branch adding
     fMC_TrunMean->Branch("protoncandidate_id", "std::vector<int>", &trackidpcand);
@@ -1431,16 +1438,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -1487,7 +1494,10 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     trackthetapcand = new std::vector<double>;
     tracklengthpcand = new std::vector<double>;
     tracktrunmeanpcand = new std::vector<double>;
+
     trackpidapcand= new std::vector<double>;
+    
+    fHitNucP4 = new TLorentzVector(-999,-999,-999,-999);
 
 
     //--------------------------------------------------------------------------------
@@ -1645,7 +1655,7 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
 
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
-    if (dqds*243 <= dqds_cut)
+    if (dqds*198 <= dqds_cut)
       return true;
   
 
@@ -2195,7 +2205,14 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       }
     }
     /// Also here we should get things like the true struck neutron momentum - I think we need a GTruth object for this
-
+    art::ValidHandle< std::vector<simb::GTruth> > gtruth = event.getValidHandle< std::vector<simb::GTruth> >("generator");
+    if (gtruth->size() <1){
+      std::cout << "WARNING NO GTRUTH OBJECT" << std::endl;
+    }
+    else{
+      TLorentzVector v_tmp = gtruth->at(0).fHitNucP4;
+      fHitNucP4->SetXYZT(v_tmp.X(), v_tmp.X(), v_tmp.Y(), v_tmp.E());
+    }
 
     _fTruenuvrtxx=mctruth->GetNeutrino().Nu().Vx(); //true vertex x
     _fTruenuvrtxy=mctruth->GetNeutrino().Nu().Vy(); //true vertex y
