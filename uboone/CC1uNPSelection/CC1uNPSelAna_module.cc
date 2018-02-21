@@ -1188,6 +1188,8 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_trkfls->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_trkfls->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_trkfls->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
+    fMC_trkfls->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
 
     //================================================================= 
     fMC_NoExTrk=tfs->make<TTree>("fMC_NoExTrk","Data Holder");    
@@ -1207,6 +1209,8 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_NoExTrk->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_NoExTrk ->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_NoExTrk->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
+    fMC_NoExTrk->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
 
 
 
@@ -1260,6 +1264,8 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_mupinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_mupinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_mupinFV->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
+    fMC_mupinFV->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
 
 
     //=================================================================
