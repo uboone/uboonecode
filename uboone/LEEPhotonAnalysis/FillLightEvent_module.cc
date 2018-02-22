@@ -76,14 +76,28 @@ public:
 
   void ResetEvent();
 
+  bool PassedSWTrigger(art::Event const & e, std::string const & swtrigger_product) const;
+  void FillSWTriggerVectors(art::Event const & e);
+  void FillRecoOpFlashVectors(art::Event const & e, int const producer_index, size_t const opflash_index_offset);
+  void FillRecoOpFlashVectors(art::Event const & e);
   void FillRecoHitVectors(art::Event const & e);
-  void FillRecoHitVectors(art::Event const & e, int const producer_index);
+  void FillRecoHitVectors(art::Event const & e, int const producer_index, size_t const hit_index_offset);
+  std::pair<std::vector<double>,std::vector<double>> GetTrackCaloInfo(art::Event const & e,
+								      std::string const & track_producer,
+								      size_t const track_index,
+								      double & energy);
   void FillRecoTrackVectors(art::Event const & e);
-  void FillRecoTrackVectors(art::Event const & e, int const producer_index);
+  void FillRecoTrackVectors(art::Event const & e, int const producer_index, size_t const track_index_offset, size_t const hit_index_offset);
+  std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> GetShowerHelperEnergy(art::Event const & e,
+											       std::string const & shower_producer,
+											       size_t const shower_index);
+  void FillRecoShowerVectors(art::Event const & e);
+  void FillRecoShowerVectors(art::Event const & e, int const producer_index, size_t const shower_index_offset, size_t const hit_index_offset);
 
   void FillWeights(art::Event const & e);
 
   void FillGenieParticleVectors(simb::MCTruth const & mct);
+  void FillMCParticleVectors(art::Event const & e);
   void FillMCTrackVectors(art::Event const & e);
   void FillMCShowerVectors(art::Event const & e);
   void FillTruth(art::Event const & e,
@@ -100,19 +114,28 @@ public:
 
 private:
 
+  bool flighter;
   bool fmc;
   std::string fpot_producer;
 
-  std::vector<std::string> fhit_producers;
-  std::vector<std::string> frmcm_hit_producers;
-  std::vector<std::string> ftrack_producers;
-  std::vector<std::string> fshower_producers;
-
   std::string fswtrigger_product;
-  std::string fopflash_producer;
+  std::vector<std::string> fopflash_producers;
+  std::vector<std::vector<unsigned int>> fopflash_producer_indices;
+  size_t fopflashp_size;
+
+  std::vector<std::string> fhit_producers;
+  std::vector<std::vector<unsigned int>> fhit_producer_indices;
+  size_t fhitp_size;
+  std::vector<std::string> ftrack_producers;
+  std::vector<std::vector<unsigned int>> ftrack_producer_indices;
+  size_t ftrackp_size;
+  std::vector<std::string> fshower_producers;
+  std::vector<std::vector<unsigned int>> fshower_producer_indices;
+  size_t fshowerp_size;
 
   std::vector<std::string> frmcmassociation_producers;
   size_t frmcm_size;
+  RecoMCMatching * frmcm_first;
 
   geoalgo::AABox ftpc_volume;
   double foffset;
@@ -133,12 +156,43 @@ private:
   int fnumber_of_events;
   double fpot;
 
+  TTree * producer_index_tree;
+
   TTree * fevent_tree;
 
   //All
   int frun_number;
   int fsubrun_number;
   int fevent_number;
+
+  //Software Trigger
+  //std::vector<int> fswtrigger_producer_index;
+  std::vector<std::string> fswtrigger_getListOfAlgorithms;
+  std::vector<bool> fswtrigger_passedAlgo;
+  std::vector<bool> fswtrigger_passedPrescaleAlgo;
+  std::vector<bool> fswtrigger_vetoAlgo;
+  int fswtrigger_passedAlgos;
+  int fswtrigger_vetoAlgos;
+  int fswtrigger_passedPrescaleAlgos;
+  int fswtrigger_passed_swtrigger;
+
+  //Reco Flash
+  std::vector<double> freco_opflash_producer_index;
+  std::vector<double> freco_opflash_Time;
+  std::vector<double> freco_opflash_TimeWidth;
+  std::vector<double> freco_opflash_AbsTime;
+  std::vector<unsigned int> freco_opflash_Frame;
+  //std::vector<std::vector<double>> freco_opflash_PEs;
+  std::vector<double> freco_opflash_YCenter;
+  std::vector<double> freco_opflash_YWidth;
+  std::vector<double> freco_opflash_ZCenter;
+  std::vector<double> freco_opflash_ZWidth;
+  std::vector<bool> freco_opflash_InBeamFrame;
+  std::vector<int> freco_opflash_OnBeamFrame;
+  std::vector<std::vector<double>> freco_opflash_WireCenters;
+  std::vector<std::vector<double>> freco_opflash_WireWidths;
+  std::vector<double> freco_opflash_TotalPE;
+  std::vector<double> freco_opflash_FastToTotal;
 
   //Reco Hit
   std::vector<int> freco_hit_producer_index;
@@ -162,6 +216,17 @@ private:
   std::vector<unsigned int> freco_hit_WireID_TPCID;
   std::vector<unsigned int> freco_hit_WireID_PlaneID;
   std::vector<unsigned int> freco_hit_WireID_WireID;
+  //Reco - MC matching
+  std::vector<std::vector<int>> freco_hit_mc_type;
+  std::vector<std::vector<unsigned int>> freco_hit_mc_index;
+  /*
+  std::vector<std::vector<float>> freco_hit_true_ideFraction;
+  std::vector<std::vector<int>> freco_hit_true_isMaxIDE;
+  std::vector<std::vector<float>> freco_hit_true_ideNFraction;
+  std::vector<std::vector<int>> freco_hit_true_isMaxIDEN;
+  */
+  std::vector<std::vector<float>> freco_hit_true_numElectrons;
+  std::vector<std::vector<float>> freco_hit_true_energy;
 
   //Reco Track
   std::vector<int> freco_track_producer_index;
@@ -188,17 +253,50 @@ private:
   std::vector<std::vector<double>> freco_track_Phi;
   std::vector<std::vector<double>> freco_track_ZenithAngle;
   std::vector<std::vector<double>> freco_track_AzimuthAngle;
+  std::vector<std::vector<unsigned int>> freco_track_to_reco_hit;
+  std::vector<std::vector<double>> freco_track_EnergyHelper_resrange;
+  std::vector<std::vector<double>> freco_track_EnergyHelper_dedx;
+  std::vector<double> freco_track_EnergyHelper_energy;
   //Reco - MC matching
   std::vector<std::vector<int>> freco_track_mc_type;
   std::vector<std::vector<unsigned int>> freco_track_mc_index;
   std::vector<std::vector<double>> freco_track_charge_contribution;
   std::vector<double> freco_track_charge_total;
 
-  //Flash
-  int fpassed_swtrigger;
-  double ftotalpe_sum;  
-  double ftotalpe_ibg_sum;
-  double ftotalpe_bbg_sum;
+  //Reco Shower
+  std::vector<int> freco_shower_producer_index;
+  std::vector<double> freco_shower_Direction_x;
+  std::vector<double> freco_shower_Direction_y;
+  std::vector<double> freco_shower_Direction_z;
+  std::vector<double> freco_shower_DirectionErr_x;
+  std::vector<double> freco_shower_DirectionErr_y;
+  std::vector<double> freco_shower_DirectionErr_z;
+  std::vector<double> freco_shower_ShowerStart_x;
+  std::vector<double> freco_shower_ShowerStart_y;
+  std::vector<double> freco_shower_ShowerStart_z;
+  std::vector<double> freco_shower_ShowerStartErr_x;
+  std::vector<double> freco_shower_ShowerStartErr_y;
+  std::vector<double> freco_shower_ShowerStartErr_z;
+  std::vector<std::vector<double>> freco_shower_Energy;
+  std::vector<std::vector<double>> freco_shower_EnergyErr;
+  std::vector<std::vector<double>> freco_shower_MIPEnergy;
+  std::vector<std::vector<double>> freco_shower_MIPEnergyErr;
+  std::vector<int> freco_shower_best_plane;
+  std::vector<double> freco_shower_Length;
+  std::vector<double> freco_shower_OpenAngle;
+  std::vector<std::vector<double>> freco_shower_dEdx;
+  std::vector<std::vector<double>> freco_shower_dEdxErr;
+  std::vector<bool> freco_shower_has_open_angle;
+  std::vector<bool> freco_shower_has_length;
+  std::vector<std::vector<unsigned int>> freco_shower_to_reco_hit;
+  std::vector<double> freco_shower_EnergyHelper_energy_legacy;
+  std::vector<std::vector<double>> freco_shower_EnergyHelper_energy;
+  std::vector<std::vector<double>> freco_shower_EnergyHelper_dedx;
+  //Reco - MC matching
+  std::vector<std::vector<int>> freco_shower_mc_type;
+  std::vector<std::vector<unsigned int>> freco_shower_mc_index;
+  std::vector<std::vector<double>> freco_shower_charge_contribution;
+  std::vector<double> freco_shower_charge_total;
 
   //Truth
   int fnu_pdg;
@@ -230,6 +328,22 @@ private:
   std::vector<double> fgenie_particle_Py;
   std::vector<double> fgenie_particle_Pz;
   std::vector<double> fgenie_particle_E;
+
+  //MCParticle
+  std::vector<int> fmcparticle_TrackId;
+  std::vector<int> fmcparticle_StatusCode;
+  std::vector<int> fmcparticle_PdgCode;
+  std::vector<int> fmcparticle_Mother;  
+  /* 
+  std::vector<double> fmcparticle_X;
+  std::vector<double> fmcparticle_Y;
+  std::vector<double> fmcparticle_Z;
+  std::vector<double> fmcparticle_T;
+  std::vector<double> fmcparticle_Px;
+  std::vector<double> fmcparticle_Py;
+  std::vector<double> fmcparticle_Pz;
+  std::vector<double> fmcparticle_E;
+  */
 
   //MCTrack
   std::vector<int> fmctrack_Origin;
@@ -434,35 +548,38 @@ void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
 
   p.get_if_present<std::string>("pot_producer", fpot_producer);
 
+  fswtrigger_product = p.get<std::string>("trigger_product");
+  fopflash_producers = p.get<std::vector<std::string>>("opflash_producers");
+
+  fhit_producers = p.get<std::vector<std::string>>("hit_producers");
   ftrack_producers = p.get<std::vector<std::string>>("track_producers");
   fshower_producers = p.get<std::vector<std::string>>("shower_producers");
 
-  fopflash_producer = p.get<std::string>("opflash_producer");
-  fswtrigger_product = p.get<std::string>("trigger_product");
-
-  p.get_if_present<std::vector<std::string>>("hit_producers", fhit_producers);
-  p.get_if_present<std::vector<std::string>>("rmcm_hit_producers", frmcm_hit_producers);
   p.get_if_present<std::vector<std::string>>("rmcmassociation_producers", frmcmassociation_producers);
 
-  //Split rmcm into track and shower sections for some reason, need to seperate hit producer and hit producer for rmcm association
-
+  fopflashp_size = fopflash_producers.size();
+  fhitp_size = fhit_producers.size();
+  ftrackp_size = ftrack_producers.size();
+  fshowerp_size = fshower_producers.size();
   frmcm_size = frmcmassociation_producers.size();
   if(!frmcmassociation_producers.empty()) {
-    if(frmcm_size != frmcm_hit_producers.size() ||
-       frmcm_size != ftrack_producers.size() ||
-       frmcm_size != fshower_producers.size()) {
+    if(frmcm_size != fhitp_size ||
+       frmcm_size != ftrackp_size ||
+       frmcm_size != fshowerp_size) {
       std::cout << "Must have same number of producers\n";
       exit(1);
     }
     frmcm.reserve(frmcm_size);
     for(size_t i = 0; i < frmcm_size; ++i) {
       RecoMCMatching rmcm;
-      rmcm.Configure(frmcm_hit_producers.at(i),
+      rmcm.Configure(fhit_producers.at(i),
 		     ftrack_producers.at(i),
 		     fshower_producers.at(i),
 		     frmcmassociation_producers.at(i));
       frmcm.push_back(rmcm);
     }
+    if(frmcm_size) frmcm_first = &frmcm.front();
+    else frmcm_first = nullptr;
     fmc_type_shower = frmcm.front().fmc_type_shower;
     fmc_type_track = frmcm.front().fmc_type_track;
     fmc_type_particle = frmcm.front().fmc_type_particle;
@@ -475,10 +592,22 @@ void FillLightEvent::SetupTrees() {
   
   art::ServiceHandle< art::TFileService > tfs;
 
+  //Change producer tree to be per event and contain a map of producer - object indices
+
   TTree * producer_tree = tfs->make<TTree>("producer_tree", "");
+  producer_tree->Branch("swtrigger_product", &fswtrigger_product);
+  producer_tree->Branch("opflash_producers", &fopflash_producers);
+  producer_tree->Branch("hit_producers", &fhit_producers);
   producer_tree->Branch("track_producers", &ftrack_producers);
   producer_tree->Branch("shower_producers", &fshower_producers);
+  producer_tree->Branch("rmcmassociation_producers", &frmcmassociation_producers);
   producer_tree->Fill();
+
+  producer_index_tree = tfs->make<TTree>("producer_index_tree", "");
+  producer_tree->Branch("opflash_producer_indices", &fopflash_producer_indices);
+  producer_tree->Branch("hit_producer_indices", &fhit_producer_indices);
+  producer_tree->Branch("track_producer_indices", &ftrack_producer_indices);
+  producer_tree->Branch("shower_producer_indices", &fshower_producer_indices);
 
   if(fpot_producer != "") {
     fpot_tree = tfs->make<TTree>("pot_tree", "");
@@ -491,6 +620,33 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("run_number", &frun_number, "run_number/I");
   fevent_tree->Branch("subrun_number", &fsubrun_number, "subrun_number/I"); 
   fevent_tree->Branch("event_number", &fevent_number, "event_number/I");
+
+  //fevent_tree->Branch("swtrigger_producer_index", &fswtrigger_producer_index);
+  fevent_tree->Branch("swtrigger_getListOfAlgorithms", &fswtrigger_getListOfAlgorithms);
+  fevent_tree->Branch("swtrigger_passedAlgo", &fswtrigger_passedAlgo);
+  fevent_tree->Branch("swtrigger_passedPrescaleAlgo", &fswtrigger_passedPrescaleAlgo);
+  fevent_tree->Branch("swtrigger_vetoAlgo", &fswtrigger_vetoAlgo);
+  fevent_tree->Branch("swtrigger_passedAlgos", &fswtrigger_passedAlgos, "swtrigger_passedAlgos/I");
+  fevent_tree->Branch("swtrigger_vetoAlgos", &fswtrigger_vetoAlgos, "swtrigger_vetoAlgos/I");
+  fevent_tree->Branch("swtrigger_passedPrescaleAlgos", &fswtrigger_passedPrescaleAlgos, "swtrigger_passedPrescaleAlgos/I");
+  fevent_tree->Branch("swtrigger_passed_swtrigger", &fswtrigger_passed_swtrigger, "swtrigger_passed_swtrigger/I");
+
+  fevent_tree->Branch("reco_opflash_producer_index", &freco_opflash_producer_index);
+  fevent_tree->Branch("reco_opflash_Time", &freco_opflash_Time);
+  fevent_tree->Branch("reco_opflash_TimeWidth", &freco_opflash_TimeWidth);
+  fevent_tree->Branch("reco_opflash_AbsTime", &freco_opflash_AbsTime);
+  fevent_tree->Branch("reco_opflash_Frame", &freco_opflash_Frame);
+  //fevent_tree->Branch("reco_opflash_PEs", &freco_opflash_PEs);
+  fevent_tree->Branch("reco_opflash_YCenter", &freco_opflash_YCenter);
+  fevent_tree->Branch("reco_opflash_YWidth", &freco_opflash_YWidth);
+  fevent_tree->Branch("reco_opflash_ZCenter", &freco_opflash_ZCenter);
+  fevent_tree->Branch("reco_opflash_ZWidth", &freco_opflash_ZWidth);
+  fevent_tree->Branch("reco_opflash_InBeamFrame", &freco_opflash_InBeamFrame);
+  fevent_tree->Branch("reco_opflash_OnBeamFrame", &freco_opflash_OnBeamFrame);
+  fevent_tree->Branch("reco_opflash_WireCenters", &freco_opflash_WireCenters);
+  fevent_tree->Branch("reco_opflash_WireWidths", &freco_opflash_WireWidths);
+  fevent_tree->Branch("reco_opflash_TotalPE", &freco_opflash_TotalPE);
+  fevent_tree->Branch("reco_opflash_FastToTotal", &freco_opflash_FastToTotal);
 
   fevent_tree->Branch("reco_hit_producer_index", &freco_hit_producer_index);
   fevent_tree->Branch("reco_hit_StartTick", &freco_hit_StartTick);
@@ -513,6 +669,18 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_hit_WireID_TPCID", &freco_hit_WireID_TPCID);
   fevent_tree->Branch("reco_hit_WireID_PlaneID", &freco_hit_WireID_PlaneID);
   fevent_tree->Branch("reco_hit_WireID_WireID", &freco_hit_WireID_WireID);
+  if(frmcm_first) {
+    fevent_tree->Branch("reco_hit_mc_type", &freco_hit_mc_type);
+    fevent_tree->Branch("reco_hit_mc_index", &freco_hit_mc_index);
+    /*
+    fevent_tree->Branch("reco_hit_true_ideFraction", &freco_hit_true_ideFraction);
+    fevent_tree->Branch("reco_hit_true_isMaxIDE", &freco_hit_true_isMaxIDE);
+    fevent_tree->Branch("reco_hit_true_ideNFraction", &freco_hit_true_ideNFraction);
+    fevent_tree->Branch("reco_hit_true_isMaxIDEN", &freco_hit_true_isMaxIDEN);
+    */
+    fevent_tree->Branch("reco_hit_true_numElectrons", &freco_hit_true_numElectrons);
+    fevent_tree->Branch("reco_hit_true_energy", &freco_hit_true_energy);
+  }
 
   fevent_tree->Branch("reco_track_producer_index", &freco_track_producer_index);
   fevent_tree->Branch("reco_track_NumberTrajectoryPoints", &freco_track_NumberTrajectoryPoints);
@@ -538,15 +706,51 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_track_Phi", &freco_track_Phi);
   fevent_tree->Branch("reco_track_ZenithAngle", &freco_track_ZenithAngle);
   fevent_tree->Branch("reco_track_AzimuthAngle", &freco_track_AzimuthAngle);
-  fevent_tree->Branch("reco_track_mc_type", &freco_track_mc_type);
-  fevent_tree->Branch("reco_track_mc_index", &freco_track_mc_index);
-  fevent_tree->Branch("reco_track_charge_contribution", &freco_track_charge_contribution);
-  fevent_tree->Branch("reco_track_charge_total", &freco_track_charge_total);
+  fevent_tree->Branch("reco_track_to_reco_hit", &freco_track_to_reco_hit);
+  fevent_tree->Branch("reco_track_EnergyHelper_resrange", &freco_track_EnergyHelper_resrange);
+  fevent_tree->Branch("reco_track_EnergyHelper_dedx", &freco_track_EnergyHelper_dedx);
+  fevent_tree->Branch("reco_track_EnergyHelper_energy", &freco_track_EnergyHelper_energy);
+  if(frmcm_first) {
+    fevent_tree->Branch("reco_track_mc_type", &freco_track_mc_type);
+    fevent_tree->Branch("reco_track_mc_index", &freco_track_mc_index);
+    fevent_tree->Branch("reco_track_charge_contribution", &freco_track_charge_contribution);
+    fevent_tree->Branch("reco_track_charge_total", &freco_track_charge_total);
+  }
 
-  fevent_tree->Branch("passed_swtrigger", &fpassed_swtrigger, "passed_swtrigger/I");
-  fevent_tree->Branch("totalpe_sum", &ftotalpe_sum, "totalpe_sum/D");
-  fevent_tree->Branch("totalpe_ibg_sum", &ftotalpe_ibg_sum, "totalpe_ibg_sum/D");
-  fevent_tree->Branch("totalpe_bbg_sum", &ftotalpe_bbg_sum, "totalpe_bbg_sum/D");
+  fevent_tree->Branch("reco_shower_producer_index", &freco_shower_producer_index);
+  fevent_tree->Branch("reco_shower_Direction_x", &freco_shower_Direction_x);
+  fevent_tree->Branch("reco_shower_Direction_y", &freco_shower_Direction_y);
+  fevent_tree->Branch("reco_shower_Direction_z", &freco_shower_Direction_z);
+  fevent_tree->Branch("reco_shower_DirectionErr_x", &freco_shower_DirectionErr_x);
+  fevent_tree->Branch("reco_shower_DirectionErr_y", &freco_shower_DirectionErr_y);
+  fevent_tree->Branch("reco_shower_DirectionErr_z", &freco_shower_DirectionErr_z);
+  fevent_tree->Branch("reco_shower_ShowerStart_x", &freco_shower_ShowerStart_x);
+  fevent_tree->Branch("reco_shower_ShowerStart_y", &freco_shower_ShowerStart_y);
+  fevent_tree->Branch("reco_shower_ShowerStart_z", &freco_shower_ShowerStart_z);
+  fevent_tree->Branch("reco_shower_ShowerStartErr_x", &freco_shower_ShowerStartErr_x);
+  fevent_tree->Branch("reco_shower_ShowerStartErr_y", &freco_shower_ShowerStartErr_y);
+  fevent_tree->Branch("reco_shower_ShowerStartErr_z", &freco_shower_ShowerStartErr_z);
+  fevent_tree->Branch("reco_shower_Energy", &freco_shower_Energy);
+  fevent_tree->Branch("reco_shower_EnergyErr", &freco_shower_EnergyErr);
+  fevent_tree->Branch("reco_shower_MIPEnergy", &freco_shower_MIPEnergy);
+  fevent_tree->Branch("reco_shower_MIPEnergyErr", &freco_shower_MIPEnergyErr);
+  fevent_tree->Branch("reco_shower_best_plane", &freco_shower_best_plane);
+  fevent_tree->Branch("reco_shower_Length", &freco_shower_Length);
+  fevent_tree->Branch("reco_shower_OpenAngle", &freco_shower_OpenAngle);
+  fevent_tree->Branch("reco_shower_dEdx", &freco_shower_dEdx);
+  fevent_tree->Branch("reco_shower_dEdxErr", &freco_shower_dEdxErr);
+  fevent_tree->Branch("reco_shower_has_open_angle", &freco_shower_has_open_angle);
+  fevent_tree->Branch("reco_shower_has_length", &freco_shower_has_length);
+  fevent_tree->Branch("reco_shower_to_reco_hit", &freco_shower_to_reco_hit);
+  fevent_tree->Branch("reco_shower_EnergyHelper_energy_legacy", &freco_shower_EnergyHelper_energy_legacy);
+  fevent_tree->Branch("reco_shower_EnergyHelper_energy", &freco_shower_EnergyHelper_energy);
+  fevent_tree->Branch("reco_shower_EnergyHelper_dedx", &freco_shower_EnergyHelper_dedx);
+  if(frmcm_first) { 
+    fevent_tree->Branch("reco_shower_mc_type", &freco_shower_mc_type);
+    fevent_tree->Branch("reco_shower_mc_index", &freco_shower_mc_index);
+    fevent_tree->Branch("reco_shower_charge_contribution", &freco_shower_charge_contribution);
+    fevent_tree->Branch("reco_shower_charge_total", &freco_shower_charge_total);
+  }
 
   if(fmc) {
 
@@ -579,6 +783,20 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("genie_particle_Pz", &fgenie_particle_Pz);
     fevent_tree->Branch("genie_particle_E", &fgenie_particle_E);
 
+    fevent_tree->Branch("mcparticle_TrackId", &fmcparticle_TrackId);
+    fevent_tree->Branch("mcparticle_StatusCode", &fmcparticle_StatusCode);
+    fevent_tree->Branch("mcparticle_PdgCode", &fmcparticle_PdgCode);
+    fevent_tree->Branch("mcparticle_Mother", &fmcparticle_Mother);
+    /*
+    fevent_tree->Branch("mcparticle_X", &fmcparticle_X);
+    fevent_tree->Branch("mcparticle_Y", &fmcparticle_Y);
+    fevent_tree->Branch("mcparticle_Z", &fmcparticle_Z);
+    fevent_tree->Branch("mcparticle_Px", &fmcparticle_Px);
+    fevent_tree->Branch("mcparticle_Py", &fmcparticle_Py);
+    fevent_tree->Branch("mcparticle_Pz", &fmcparticle_Pz);
+    fevent_tree->Branch("mcparticle_E", &fmcparticle_E);
+    */
+
     fevent_tree->Branch("mctrack_Origin", &fmctrack_Origin);
     fevent_tree->Branch("mctrack_PdgCode", &fmctrack_PdgCode);
     fevent_tree->Branch("mctrack_TrackID", &fmctrack_TrackID);
@@ -599,7 +817,7 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("mctrack_AncestorTrackID", &fmctrack_AncestorTrackID);
     fevent_tree->Branch("mctrack_AncestorPdgCode", &fmctrack_AncestorPdgCode);
     fevent_tree->Branch("mctrack_AncestorProcess", &fmctrack_AncestorProcess);
-    fevent_tree->Branch("mctrack_contributed_charge", &fmctrack_contributed_charge);
+    if(frmcm_first) fevent_tree->Branch("mctrack_contributed_charge", &fmctrack_contributed_charge);
 
     fevent_tree->Branch("mcshower_Origin", &fmcshower_Origin);
     fevent_tree->Branch("mcshower_PdgCode", &fmcshower_PdgCode);
@@ -641,7 +859,7 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("mcshower_StartDir_X", &fmcshower_StartDir_X);
     fevent_tree->Branch("mcshower_StartDir_Y", &fmcshower_StartDir_Y);
     fevent_tree->Branch("mcshower_StartDir_Z", &fmcshower_StartDir_Z);
-    fevent_tree->Branch("mcshower_contributed_charge", &fmcshower_contributed_charge);
+    if(frmcm_first) fevent_tree->Branch("mcshower_contributed_charge", &fmcshower_contributed_charge);
 
     fevent_tree->Branch("is_delta_rad", &fis_delta_rad, "is_delta_rad/I");
     fevent_tree->Branch("delta_true_pdg", &fdelta_true_pdg, "delta_true_pdg/I");
@@ -866,9 +1084,41 @@ void FillLightEvent::beginSubRun(art::SubRun const & sr) {
 
 void FillLightEvent::ResetEvent() {
 
+  fopflash_producer_indices.resize(fopflashp_size, std::vector<unsigned int>());
+  fhit_producer_indices.resize(fhitp_size, std::vector<unsigned int>());
+  ftrack_producer_indices.resize(ftrackp_size, std::vector<unsigned int>());
+  fshower_producer_indices.resize(fshowerp_size, std::vector<unsigned int>());
+
   frun_number = -1;
   fsubrun_number = -1;
   fevent_number = -1;
+
+  //fswtrigger_producer_index.clear();
+  fswtrigger_getListOfAlgorithms.clear();
+  fswtrigger_passedAlgo.clear();
+  fswtrigger_passedPrescaleAlgo.clear();
+  fswtrigger_vetoAlgo.clear();
+  fswtrigger_passedAlgos = -1;
+  fswtrigger_vetoAlgos = -1;
+  fswtrigger_passedPrescaleAlgos = -1;
+  fswtrigger_passed_swtrigger = -1;
+
+  freco_opflash_producer_index.clear();
+  freco_opflash_Time.clear();
+  freco_opflash_TimeWidth.clear();
+  freco_opflash_AbsTime.clear();
+  freco_opflash_Frame.clear();
+  //freco_opflash_PEs.clear();
+  freco_opflash_YCenter.clear();
+  freco_opflash_YWidth.clear();
+  freco_opflash_ZCenter.clear();
+  freco_opflash_ZWidth.clear();
+  freco_opflash_InBeamFrame.clear();
+  freco_opflash_OnBeamFrame.clear();
+  freco_opflash_WireCenters.clear();
+  freco_opflash_WireWidths.clear();
+  freco_opflash_TotalPE.clear();
+  freco_opflash_FastToTotal.clear();
 
   freco_hit_producer_index.clear();
   freco_hit_StartTick.clear();
@@ -891,6 +1141,18 @@ void FillLightEvent::ResetEvent() {
   freco_hit_WireID_TPCID.clear();
   freco_hit_WireID_PlaneID.clear();
   freco_hit_WireID_WireID.clear();
+  if(frmcm_first) {
+    freco_hit_mc_type.clear();
+    freco_hit_mc_index.clear();
+    /*
+    freco_hit_true_ideFraction.clear();
+    freco_hit_true_isMaxIDE.clear();
+    freco_hit_true_ideNFraction.clear();
+    freco_hit_true_isMaxIDEN.clear();
+    */
+    freco_hit_true_numElectrons.clear();
+    freco_hit_true_energy.clear();
+  }
 
   freco_track_producer_index.clear();
   freco_track_NumberTrajectoryPoints.clear();
@@ -916,244 +1178,430 @@ void FillLightEvent::ResetEvent() {
   freco_track_Phi.clear();
   freco_track_ZenithAngle.clear();
   freco_track_AzimuthAngle.clear();
-  freco_track_mc_type.clear();
-  freco_track_mc_index.clear();
-  freco_track_charge_contribution.clear();
-  freco_track_charge_total.clear();
+  freco_track_to_reco_hit.clear();
+  freco_track_EnergyHelper_resrange.clear();
+  freco_track_EnergyHelper_dedx.clear();
+  freco_track_EnergyHelper_energy.clear();
+  if(frmcm_first) {
+    freco_track_mc_type.clear();
+    freco_track_mc_index.clear();
+    freco_track_charge_contribution.clear();
+    freco_track_charge_total.clear();
+  }    
 
-  fpassed_swtrigger = -1;
-  ftotalpe_sum = -1;
-  ftotalpe_ibg_sum = -1;
-  ftotalpe_bbg_sum = -1;
+  freco_shower_producer_index.clear();
+  freco_shower_Direction_x.clear();
+  freco_shower_Direction_y.clear();
+  freco_shower_Direction_z.clear();
+  freco_shower_DirectionErr_x.clear();
+  freco_shower_DirectionErr_y.clear();
+  freco_shower_DirectionErr_z.clear();
+  freco_shower_ShowerStart_x.clear();
+  freco_shower_ShowerStart_y.clear();
+  freco_shower_ShowerStart_z.clear();
+  freco_shower_ShowerStartErr_x.clear();
+  freco_shower_ShowerStartErr_y.clear();
+  freco_shower_ShowerStartErr_z.clear();
+  freco_shower_Energy.clear();
+  freco_shower_EnergyErr.clear();
+  freco_shower_MIPEnergy.clear();
+  freco_shower_MIPEnergyErr.clear();
+  freco_shower_best_plane.clear();
+  freco_shower_Length.clear();
+  freco_shower_OpenAngle.clear();
+  freco_shower_dEdx.clear();
+  freco_shower_dEdxErr.clear();
+  freco_shower_has_open_angle.clear();
+  freco_shower_has_length.clear();
+  freco_shower_to_reco_hit.clear();
+  freco_shower_EnergyHelper_energy_legacy.clear();
+  freco_shower_EnergyHelper_energy.clear();
+  freco_shower_EnergyHelper_dedx.clear();
+  if(frmcm_first) {
+    freco_shower_mc_type.clear();
+    freco_shower_mc_index.clear();
+    freco_shower_charge_contribution.clear();
+    freco_shower_charge_total.clear();
+  }
 
-  fnu_pdg = 0;
-  fnu_energy = -1;
-  flep_pdg = -1;
-  flep_energy = 0;
-  fccnc = -1;
-  fmode = -1;
-  finteraction_type = -1;
+  if(fmc) {
 
-  ftrue_nuvertx = -10000;
-  ftrue_nuverty = -10000;
-  ftrue_nuvertz = -10000;
+    fnu_pdg = 0;
+    fnu_energy = -1;
+    flep_pdg = -1;
+    flep_energy = 0;
+    fccnc = -1;
+    fmode = -1;
+    finteraction_type = -1;
 
-  ftrue_nu_E = -1;
+    ftrue_nuvertx = -10000;
+    ftrue_nuverty = -10000;
+    ftrue_nuvertz = -10000;
 
-  ftrue_nu_vtx_tpc_contained = -1;
-  ftrue_nu_vtx_fid_contained = -1;
+    ftrue_nu_E = -1;
 
-  fgenie_particle_TrackId.clear();
-  fgenie_particle_StatusCode.clear();
-  fgenie_particle_PdgCode.clear();
-  fgenie_particle_Mother.clear();
-  fgenie_particle_X.clear();
-  fgenie_particle_Y.clear();
-  fgenie_particle_Z.clear();
-  fgenie_particle_T.clear();
-  fgenie_particle_Px.clear();
-  fgenie_particle_Py.clear();
-  fgenie_particle_Pz.clear();
-  fgenie_particle_E.clear();
+    ftrue_nu_vtx_tpc_contained = -1;
+    ftrue_nu_vtx_fid_contained = -1;
 
-  fmctrack_Origin.clear();
-  fmctrack_PdgCode.clear();
-  fmctrack_TrackID.clear();
-  fmctrack_Process.clear();
-  fmctrack_X.clear();
-  fmctrack_Y.clear();
-  fmctrack_Z.clear();
-  fmctrack_T.clear();
-  fmctrack_Px.clear();
-  fmctrack_Py.clear();
-  fmctrack_Pz.clear();
-  fmctrack_E.clear();
-  fmctrack_dQdx.clear();
-  fmctrack_dEdx.clear();
-  fmctrack_MotherPdgCode.clear();
-  fmctrack_MotherTrackID.clear();
-  fmctrack_MotherProcess.clear();
-  fmctrack_AncestorPdgCode.clear();
-  fmctrack_AncestorTrackID.clear();
-  fmctrack_AncestorProcess.clear();
-  fmctrack_contributed_charge.clear();
+    fgenie_particle_TrackId.clear();
+    fgenie_particle_StatusCode.clear();
+    fgenie_particle_PdgCode.clear();
+    fgenie_particle_Mother.clear();
+    fgenie_particle_X.clear();
+    fgenie_particle_Y.clear();
+    fgenie_particle_Z.clear();
+    fgenie_particle_T.clear();
+    fgenie_particle_Px.clear();
+    fgenie_particle_Py.clear();
+    fgenie_particle_Pz.clear();
+    fgenie_particle_E.clear();
 
-  fmcshower_Origin.clear();
-  fmcshower_PdgCode.clear();
-  fmcshower_TrackID.clear();
-  fmcshower_Process.clear();
-  fmcshower_Start_X.clear();
-  fmcshower_Start_Y.clear();
-  fmcshower_Start_Z.clear();
-  fmcshower_Start_T.clear();
-  fmcshower_Start_Px.clear();
-  fmcshower_Start_Py.clear();
-  fmcshower_Start_Pz.clear();
-  fmcshower_Start_E.clear();
-  fmcshower_End_X.clear();
-  fmcshower_End_Y.clear();
-  fmcshower_End_Z.clear();
-  fmcshower_End_T.clear();
-  fmcshower_End_Px.clear();
-  fmcshower_End_Py.clear();
-  fmcshower_End_Pz.clear();
-  fmcshower_End_E.clear();
-  fmcshower_MotherPdgCode.clear();
-  fmcshower_MotherTrackID.clear();
-  fmcshower_MotherProcess.clear();
-  fmcshower_AncestorPdgCode.clear();
-  fmcshower_AncestorTrackID.clear();
-  fmcshower_AncestorProcess.clear();
-  fmcshower_DetProfile_X.clear();
-  fmcshower_DetProfile_Y.clear();
-  fmcshower_DetProfile_Z.clear();
-  fmcshower_DetProfile_T.clear();
-  fmcshower_DetProfile_Px.clear();
-  fmcshower_DetProfile_Py.clear();
-  fmcshower_DetProfile_Pz.clear();
-  fmcshower_DetProfile_E.clear();
-  fmcshower_DaughterTrackID.clear();
-  fmcshower_Charge.clear();
-  fmcshower_dQdx.clear();
-  fmcshower_StartDir_X.clear();
-  fmcshower_StartDir_Y.clear();
-  fmcshower_StartDir_Z.clear();
-  fmcshower_contributed_charge.clear();
+    fmcparticle_TrackId.clear();
+    fmcparticle_StatusCode.clear();
+    fmcparticle_PdgCode.clear();
+    fmcparticle_Mother.clear();      
 
-  fis_delta_rad = -1;
-  fdelta_true_pdg = 0;
-  fdelta_true_energy = -1;
-  fdelta_photon_index = -1;
-  fdelta_mcshower_index = -1;
-  fdelta_proton_index = -1;
-  fdelta_mctrack_index = -1;
-  fdelta_photon_energy = -1;
-  fdelta_proton_energy = -1;
-  fdelta_mcshower_true_pdg = 0;
-  fdelta_mcshower_true_energy = -1;
-  fdelta_mcshower_detprofile_energy = -1;
-  fdelta_mctrack_true_pdg = 0;
-  fdelta_mctrack_true_energy = -1;
-  fdelta_mctrack_true_length = -1;  
+    /*  
+    fmcparticle_X.clear();
+    fmcparticle_Y.clear();
+    fmcparticle_Z.clear();
+    fmcparticle_T.clear();
+    fmcparticle_Px.clear();
+    fmcparticle_Py.clear();
+    fmcparticle_Pz.clear();
+    fmcparticle_E.clear();
+    */
 
-  fweight_genie_ncelaxial_p1sigma = -1;
-  fweight_genie_ncelaxial_m1sigma = -1;
-  fweight_genie_nceleta_p1sigma = -1;
-  fweight_genie_nceleta_m1sigma = -1;
-  fweight_genie_qema_p1sigma = -1;
-  fweight_genie_qema_m1sigma = -1;
-  fweight_genie_qevec_p1sigma = -1;
-  fweight_genie_qevec_m1sigma = -1;
-  fweight_genie_ccresaxial_p1sigma = -1;
-  fweight_genie_ccresaxial_m1sigma = -1;
-  fweight_genie_ccresvector_p1sigma = -1;
-  fweight_genie_ccresvector_m1sigma = -1;
-  fweight_genie_resganged_p1sigma = -1;
-  fweight_genie_resganged_m1sigma = -1;
-  fweight_genie_ncresaxial_p1sigma = -1;
-  fweight_genie_ncresaxial_m1sigma = -1;
-  fweight_genie_ncresvector_p1sigma = -1;
-  fweight_genie_ncresvector_m1sigma = -1;
-  fweight_genie_cohma_p1sigma = -1;
-  fweight_genie_cohma_m1sigma = -1;
+    fmctrack_Origin.clear();
+    fmctrack_PdgCode.clear();
+    fmctrack_TrackID.clear();
+    fmctrack_Process.clear();
+    fmctrack_X.clear();
+    fmctrack_Y.clear();
+    fmctrack_Z.clear();
+    fmctrack_T.clear();
+    fmctrack_Px.clear();
+    fmctrack_Py.clear();
+    fmctrack_Pz.clear();
+    fmctrack_E.clear();
+    fmctrack_dQdx.clear();
+    fmctrack_dEdx.clear();
+    fmctrack_MotherPdgCode.clear();
+    fmctrack_MotherTrackID.clear();
+    fmctrack_MotherProcess.clear();
+    fmctrack_AncestorPdgCode.clear();
+    fmctrack_AncestorTrackID.clear();
+    fmctrack_AncestorProcess.clear();
+    fmctrack_contributed_charge.clear();
 
-  fweight_genie_cohr0_p1sigma = -1;
-  fweight_genie_cohr0_m1sigma = -1;
-  fweight_genie_nonresrvp1pi_p1sigma = -1;
-  fweight_genie_nonresrvp1pi_m1sigma = -1;
-  fweight_genie_nonresrvbarp1pi_p1sigma = -1;
-  fweight_genie_nonresrvbarp1pi_m1sigma = -1;
-  fweight_genie_nonresrvp2pi_p1sigma = -1;
-  fweight_genie_nonresrvp2pi_m1sigma = -1;
-  fweight_genie_nonresrvbarp2pi_p1sigma = -1;
-  fweight_genie_nonresrvbarp2pi_m1sigma = -1;
-  fweight_genie_resdecaygamma_p1sigma = -1;
-  fweight_genie_resdecaygamma_m1sigma = -1;
-  fweight_genie_resdecayeta_p1sigma = -1;
-  fweight_genie_resdecayeta_m1sigma = -1;
-  fweight_genie_resdecaytheta_p1sigma = -1;
-  fweight_genie_resdecaytheta_m1sigma = -1;
-  fweight_genie_nc_p1sigma = -1;
-  fweight_genie_nc_m1sigma = -1;
-  fweight_genie_disath_p1sigma = -1;
-  fweight_genie_disath_m1sigma = -1;
-  fweight_genie_disbth_p1sigma = -1;
-  fweight_genie_disbth_m1sigma = -1;
-  fweight_genie_discv1u_p1sigma = -1;
-  fweight_genie_discv1u_m1sigma = -1;
-  fweight_genie_discv2u_p1sigma = -1;
-  fweight_genie_discv2u_m1sigma = -1;
-  fweight_genie_disnucl_p1sigma = -1;
-  fweight_genie_disnucl_m1sigma = -1;
-  fweight_genie_agkyxf_p1sigma = -1;
-  fweight_genie_agkyxf_m1sigma = -1;
-  fweight_genie_agkypt_p1sigma = -1;
-  fweight_genie_agkypt_m1sigma = -1;
-  fweight_genie_formzone_p1sigma = -1;
-  fweight_genie_formzone_m1sigma = -1;
-  fweight_genie_fermigasmodelkf_p1sigma = -1;
-  fweight_genie_fermigasmodelkf_m1sigma = -1;
-  fweight_genie_fermigasmodelsf_p1sigma = -1;
-  fweight_genie_fermigasmodelsf_m1sigma = -1;
-  fweight_genie_intranukenmfp_p1sigma = -1;
-  fweight_genie_intranukenmfp_m1sigma = -1;
-  fweight_genie_intranukencex_p1sigma = -1;
-  fweight_genie_intranukencex_m1sigma = -1;
-  fweight_genie_intranukenel_p1sigma = -1;
-  fweight_genie_intranukenel_m1sigma = -1;
-  fweight_genie_intranukeninel_p1sigma = -1;
-  fweight_genie_intranukeninel_m1sigma = -1;
-  fweight_genie_intranukenabs_p1sigma = -1;
-  fweight_genie_intranukenabs_m1sigma = -1;
-  fweight_genie_intranukenpi_p1sigma = -1;
-  fweight_genie_intranukenpi_m1sigma = -1;
-  fweight_genie_intranukepimfp_p1sigma = -1;
-  fweight_genie_intranukepimfp_m1sigma = -1;
-  fweight_genie_intranukepicex_p1sigma = -1;
-  fweight_genie_intranukepicex_m1sigma = -1;
-  fweight_genie_intranukepiel_p1sigma = -1;
-  fweight_genie_intranukepiel_m1sigma = -1;
-  fweight_genie_intranukepiinel_p1sigma = -1;
-  fweight_genie_intranukepiinel_m1sigma = -1;
-  fweight_genie_intranukepiabs_p1sigma = -1;
-  fweight_genie_intranukepiabs_m1sigma = -1;
-  fweight_genie_intranukepipi_p1sigma = -1;
-  fweight_genie_intranukepipi_m1sigma = -1;
+    fmcshower_Origin.clear();
+    fmcshower_PdgCode.clear();
+    fmcshower_TrackID.clear();
+    fmcshower_Process.clear();
+    fmcshower_Start_X.clear();
+    fmcshower_Start_Y.clear();
+    fmcshower_Start_Z.clear();
+    fmcshower_Start_T.clear();
+    fmcshower_Start_Px.clear();
+    fmcshower_Start_Py.clear();
+    fmcshower_Start_Pz.clear();
+    fmcshower_Start_E.clear();
+    fmcshower_End_X.clear();
+    fmcshower_End_Y.clear();
+    fmcshower_End_Z.clear();
+    fmcshower_End_T.clear();
+    fmcshower_End_Px.clear();
+    fmcshower_End_Py.clear();
+    fmcshower_End_Pz.clear();
+    fmcshower_End_E.clear();
+    fmcshower_MotherPdgCode.clear();
+    fmcshower_MotherTrackID.clear();
+    fmcshower_MotherProcess.clear();
+    fmcshower_AncestorPdgCode.clear();
+    fmcshower_AncestorTrackID.clear();
+    fmcshower_AncestorProcess.clear();
+    fmcshower_DetProfile_X.clear();
+    fmcshower_DetProfile_Y.clear();
+    fmcshower_DetProfile_Z.clear();
+    fmcshower_DetProfile_T.clear();
+    fmcshower_DetProfile_Px.clear();
+    fmcshower_DetProfile_Py.clear();
+    fmcshower_DetProfile_Pz.clear();
+    fmcshower_DetProfile_E.clear();
+    fmcshower_DaughterTrackID.clear();
+    fmcshower_Charge.clear();
+    fmcshower_dQdx.clear();
+    fmcshower_StartDir_X.clear();
+    fmcshower_StartDir_Y.clear();
+    fmcshower_StartDir_Z.clear();
+    fmcshower_contributed_charge.clear();
+
+    fis_delta_rad = -1;
+    fdelta_true_pdg = 0;
+    fdelta_true_energy = -1;
+    fdelta_photon_index = -1;
+    fdelta_mcshower_index = -1;
+    fdelta_proton_index = -1;
+    fdelta_mctrack_index = -1;
+    fdelta_photon_energy = -1;
+    fdelta_proton_energy = -1;
+    fdelta_mcshower_true_pdg = 0;
+    fdelta_mcshower_true_energy = -1;
+    fdelta_mcshower_detprofile_energy = -1;
+    fdelta_mctrack_true_pdg = 0;
+    fdelta_mctrack_true_energy = -1;
+    fdelta_mctrack_true_length = -1;  
+
+    fweight_genie_ncelaxial_p1sigma = -1;
+    fweight_genie_ncelaxial_m1sigma = -1;
+    fweight_genie_nceleta_p1sigma = -1;
+    fweight_genie_nceleta_m1sigma = -1;
+    fweight_genie_qema_p1sigma = -1;
+    fweight_genie_qema_m1sigma = -1;
+    fweight_genie_qevec_p1sigma = -1;
+    fweight_genie_qevec_m1sigma = -1;
+    fweight_genie_ccresaxial_p1sigma = -1;
+    fweight_genie_ccresaxial_m1sigma = -1;
+    fweight_genie_ccresvector_p1sigma = -1;
+    fweight_genie_ccresvector_m1sigma = -1;
+    fweight_genie_resganged_p1sigma = -1;
+    fweight_genie_resganged_m1sigma = -1;
+    fweight_genie_ncresaxial_p1sigma = -1;
+    fweight_genie_ncresaxial_m1sigma = -1;
+    fweight_genie_ncresvector_p1sigma = -1;
+    fweight_genie_ncresvector_m1sigma = -1;
+    fweight_genie_cohma_p1sigma = -1;
+    fweight_genie_cohma_m1sigma = -1;
+
+    fweight_genie_cohr0_p1sigma = -1;
+    fweight_genie_cohr0_m1sigma = -1;
+    fweight_genie_nonresrvp1pi_p1sigma = -1;
+    fweight_genie_nonresrvp1pi_m1sigma = -1;
+    fweight_genie_nonresrvbarp1pi_p1sigma = -1;
+    fweight_genie_nonresrvbarp1pi_m1sigma = -1;
+    fweight_genie_nonresrvp2pi_p1sigma = -1;
+    fweight_genie_nonresrvp2pi_m1sigma = -1;
+    fweight_genie_nonresrvbarp2pi_p1sigma = -1;
+    fweight_genie_nonresrvbarp2pi_m1sigma = -1;
+    fweight_genie_resdecaygamma_p1sigma = -1;
+    fweight_genie_resdecaygamma_m1sigma = -1;
+    fweight_genie_resdecayeta_p1sigma = -1;
+    fweight_genie_resdecayeta_m1sigma = -1;
+    fweight_genie_resdecaytheta_p1sigma = -1;
+    fweight_genie_resdecaytheta_m1sigma = -1;
+    fweight_genie_nc_p1sigma = -1;
+    fweight_genie_nc_m1sigma = -1;
+    fweight_genie_disath_p1sigma = -1;
+    fweight_genie_disath_m1sigma = -1;
+    fweight_genie_disbth_p1sigma = -1;
+    fweight_genie_disbth_m1sigma = -1;
+    fweight_genie_discv1u_p1sigma = -1;
+    fweight_genie_discv1u_m1sigma = -1;
+    fweight_genie_discv2u_p1sigma = -1;
+    fweight_genie_discv2u_m1sigma = -1;
+    fweight_genie_disnucl_p1sigma = -1;
+    fweight_genie_disnucl_m1sigma = -1;
+    fweight_genie_agkyxf_p1sigma = -1;
+    fweight_genie_agkyxf_m1sigma = -1;
+    fweight_genie_agkypt_p1sigma = -1;
+    fweight_genie_agkypt_m1sigma = -1;
+    fweight_genie_formzone_p1sigma = -1;
+    fweight_genie_formzone_m1sigma = -1;
+    fweight_genie_fermigasmodelkf_p1sigma = -1;
+    fweight_genie_fermigasmodelkf_m1sigma = -1;
+    fweight_genie_fermigasmodelsf_p1sigma = -1;
+    fweight_genie_fermigasmodelsf_m1sigma = -1;
+    fweight_genie_intranukenmfp_p1sigma = -1;
+    fweight_genie_intranukenmfp_m1sigma = -1;
+    fweight_genie_intranukencex_p1sigma = -1;
+    fweight_genie_intranukencex_m1sigma = -1;
+    fweight_genie_intranukenel_p1sigma = -1;
+    fweight_genie_intranukenel_m1sigma = -1;
+    fweight_genie_intranukeninel_p1sigma = -1;
+    fweight_genie_intranukeninel_m1sigma = -1;
+    fweight_genie_intranukenabs_p1sigma = -1;
+    fweight_genie_intranukenabs_m1sigma = -1;
+    fweight_genie_intranukenpi_p1sigma = -1;
+    fweight_genie_intranukenpi_m1sigma = -1;
+    fweight_genie_intranukepimfp_p1sigma = -1;
+    fweight_genie_intranukepimfp_m1sigma = -1;
+    fweight_genie_intranukepicex_p1sigma = -1;
+    fweight_genie_intranukepicex_m1sigma = -1;
+    fweight_genie_intranukepiel_p1sigma = -1;
+    fweight_genie_intranukepiel_m1sigma = -1;
+    fweight_genie_intranukepiinel_p1sigma = -1;
+    fweight_genie_intranukepiinel_m1sigma = -1;
+    fweight_genie_intranukepiabs_p1sigma = -1;
+    fweight_genie_intranukepiabs_m1sigma = -1;
+    fweight_genie_intranukepipi_p1sigma = -1;
+    fweight_genie_intranukepipi_m1sigma = -1;
+
+  }
 
 }
 
 
-void FillLightEvent::FillWeights(art::Event const & e) {
+bool FillLightEvent::PassedSWTrigger(art::Event const & e, std::string const & swtrigger_product) const {
+  
+  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt = e.getValidHandle<::raw::ubdaqSoftwareTriggerData>(swtrigger_product);
+  //art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("daq");
+  //art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt =    e.getValidHandle<::raw::ubdaqSoftwareTriggerData>("swtrigger");
 
-  art::ValidHandle<std::vector<evwgh::MCEventWeight>> const & ev_evw =
-    e.getValidHandle<std::vector<evwgh::MCEventWeight>>("eventweight");
+  std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
 
-  std::map<std::string, std::vector<double>> const & weight_map = ev_evw->front().fWeight;
+  std::string const int_str = "BNB_FEMBeamTriggerAlgo";
+  std::string const ext_str = "EXT_BNBwin_FEMBeamTriggerAlgo";
 
-  if(ev_evw->size() > 1) {
-    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
-	      << "WARNING: eventweight has more than one entry\n";
+  auto const int_it = std::find(algo_v.begin(), algo_v.end(), int_str);
+  auto const ext_it = std::find(algo_v.begin(), algo_v.end(), ext_str);
+
+  if(int_it != algo_v.end() && ext_it != algo_v.end()) {
+    std::cout << "function: " << __PRETTY_FUNCTION__ << " line: " << __LINE__ << std::endl
+	      << "Found both swtriggers\n";
+    return false;
+  }
+  else if(int_it == algo_v.end() && ext_it == algo_v.end()) {
+    std::cout << "function: " << __PRETTY_FUNCTION__ << " line: " << __LINE__ << std::endl
+	      << "Found neither swtrigger\n";
+    return false;
+  }
+  else if(int_it != algo_v.end()) {
+    return swt->passedAlgo(int_str);
+  }      
+  else if(ext_it != algo_v.end()) {
+    return swt->passedAlgo(ext_str);
   }
 
-  for(auto const & p : weight_map) {
-    auto const wbm_it = fweight_branch_map.find(p.first);
-    if(wbm_it == fweight_branch_map.end()) {
-      std::cout << "Could not find weight: " << p.first << "\n";
-      continue;
-    }
-    *wbm_it->second.at(0) = p.second.at(0);
-    *wbm_it->second.at(1) = p.second.at(1);
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  return false;
+
+}
+
+
+void FillLightEvent::FillSWTriggerVectors(art::Event const & e) {
+
+  art::ValidHandle<::raw::ubdaqSoftwareTriggerData> const & swt = e.getValidHandle<::raw::ubdaqSoftwareTriggerData>(fswtrigger_product);
+  std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
+  size_t const algo_v_size = algo_v.size();
+
+  //fswtrigger_producer_index.push_back(producer_index);
+
+  fswtrigger_getListOfAlgorithms = algo_v;
+
+  fswtrigger_passedAlgo.reserve(algo_v_size);
+  fswtrigger_passedPrescaleAlgo.reserve(algo_v_size);
+  fswtrigger_vetoAlgo.reserve(algo_v_size);
+  
+  for(std::string const & algo : algo_v) {
+
+    fswtrigger_passedAlgo.push_back(swt->passedAlgo(algo));
+    fswtrigger_passedPrescaleAlgo.push_back(swt->passedPrescaleAlgo(algo));
+    fswtrigger_vetoAlgo.push_back(swt->vetoAlgo(algo));
+
+  }
+
+  fswtrigger_passedAlgos = swt->passedAlgos(algo_v);
+  fswtrigger_vetoAlgos = swt->vetoAlgos(algo_v);
+  fswtrigger_passedPrescaleAlgos = swt->passedPrescaleAlgos(algo_v);
+
+  fswtrigger_passed_swtrigger = PassedSWTrigger(e, fswtrigger_product);
+
+}
+
+
+void FillLightEvent::FillRecoOpFlashVectors(art::Event const & e, int const producer_index, size_t const opflash_index_offset) {
+
+  art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producers.at(producer_index));
+  std::vector<unsigned int> & indices = fopflash_producer_indices.at(producer_index);
+  indices.reserve(ev_opf->size());
+
+  for(size_t i = 0; i < ev_opf->size(); ++i) {
+
+    indices.push_back(i + opflash_index_offset);
+
+    recob::OpFlash const & opf = ev_opf->at(i);
+
+    freco_opflash_producer_index.push_back(producer_index);
+    freco_opflash_Time.push_back(opf.Time());
+    freco_opflash_TimeWidth.push_back(opf.TimeWidth());
+    freco_opflash_AbsTime.push_back(opf.AbsTime());
+    freco_opflash_Frame.push_back(opf.Frame());
+    //freco_opflash_PE.push_back(opf.PEs());
+    freco_opflash_YCenter.push_back(opf.YCenter());
+    freco_opflash_YWidth.push_back(opf.YWidth());
+    freco_opflash_ZCenter.push_back(opf.ZCenter());
+    freco_opflash_ZWidth.push_back(opf.ZWidth());
+    freco_opflash_InBeamFrame.push_back(opf.InBeamFrame());
+    freco_opflash_OnBeamFrame.push_back(opf.OnBeamTime());
+    freco_opflash_WireCenters.push_back(opf.WireCenters());
+    freco_opflash_WireWidths.push_back(opf.WireWidths());
+    freco_opflash_TotalPE.push_back(opf.TotalPE());
+    freco_opflash_FastToTotal.push_back(opf.FastToTotal());      
+
   }
 
 }
 
 
-void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer_index) {
+void FillLightEvent::FillRecoOpFlashVectors(art::Event const & e) {
 
-  std::cout << fhit_producers.at(producer_index) << "\n";
+  size_t size = 0;
+  for(size_t i = 0; i < fopflashp_size; ++i) {
+    art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producers.at(i));
+    size += ev_opf->size();
+  }
+
+  freco_opflash_producer_index.reserve(size);
+  freco_opflash_Time.reserve(size);
+  freco_opflash_TimeWidth.reserve(size);
+  freco_opflash_AbsTime.reserve(size);
+  freco_opflash_Frame.reserve(size);
+  //freco_opflash_PEs.reserve(size);
+  freco_opflash_YCenter.reserve(size);
+  freco_opflash_YWidth.reserve(size);
+  freco_opflash_ZCenter.reserve(size);
+  freco_opflash_ZWidth.reserve(size);
+  freco_opflash_InBeamFrame.reserve(size);
+  freco_opflash_OnBeamFrame.reserve(size);
+  freco_opflash_WireCenters.reserve(size);
+  freco_opflash_WireWidths.reserve(size);
+  freco_opflash_TotalPE.reserve(size);
+  freco_opflash_FastToTotal.reserve(size);  
+
+  size_t opflash_index_offset = 0;
+  for(size_t i = 0; i < fopflashp_size; ++i) {
+    FillRecoOpFlashVectors(e, i, opflash_index_offset);
+    art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producers.at(i));
+    opflash_index_offset += ev_opf->size();
+  }    
+
+}
+
+
+void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer_index, size_t const hit_index_offset) {
+
   art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(producer_index));  
+  std::vector<unsigned int> & indices = fhit_producer_indices.at(producer_index);
+  indices.reserve(ev_h->size());
 
-  for(recob::Hit const & h : *ev_h) {
+  std::unordered_map<int, size_t> const * tp_map = nullptr;
+  std::unordered_map<int, size_t> const * sp_map = nullptr;
+  std::unordered_map<int, size_t> const * mcp_map = nullptr;
+  art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> * particles_per_hit = nullptr;
+  if(frmcm_first) {
+    tp_map = &frmcm_first->GetMCTrackMap();
+    sp_map = &frmcm_first->GetMCShowerMap();
+    mcp_map = &frmcm_first->GetMCParticleMap();
+    particles_per_hit = new art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData>(ev_h, e, frmcmassociation_producers.at(producer_index));
+  }
+  std::vector<simb::MCParticle const *> particle_vec;
+  std::vector<anab::BackTrackerHitMatchingData const *> match_vec;
+
+  for(size_t i = 0; i < ev_h->size(); ++i) {
+
+    indices.push_back(i + hit_index_offset);
+
+    recob::Hit const & h = ev_h->at(i);
 
     freco_hit_producer_index.push_back(producer_index);
     freco_hit_StartTick.push_back(h.StartTick());
@@ -1176,8 +1624,73 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer
     freco_hit_WireID_TPCID.push_back(h.WireID().TPC);
     freco_hit_WireID_PlaneID.push_back(h.WireID().Plane);
     freco_hit_WireID_WireID.push_back(h.WireID().Wire);
-    
+
+    if(frmcm_first) {
+
+      particle_vec.clear(); 
+      match_vec.clear();
+      particles_per_hit->get(i, particle_vec, match_vec);
+      size_t const particle_vec_size = particle_vec.size();
+
+      std::vector<int> & reco_hit_mc_type = freco_hit_mc_type.at(i);
+      std::vector<unsigned int> & reco_hit_mc_index = freco_hit_mc_index.at(i);
+      /*
+      std::vector<float> & reco_hit_true_ideFraction = freco_hit_true_ideFraction.at(i);
+      std::vector<int> & reco_hit_true_isMaxIDE = freco_hit_true_isMaxIDE.at(i);
+      std::vector<float> & reco_hit_true_ideNFraction = freco_hit_true_ideNFraction.at(i);
+      std::vector<int> & reco_hit_true_isMaxIDEN = freco_hit_true_isMaxIDEN.at(i);
+      */ 
+      std::vector<float> & reco_hit_true_numElectrons = freco_hit_true_numElectrons.at(i);
+      std::vector<float> & reco_hit_true_energy = freco_hit_true_energy.at(i);
+      
+      freco_hit_mc_type.reserve(particle_vec_size);
+      freco_hit_mc_index.reserve(particle_vec_size);
+      /*  
+      freco_hit_true_ideFraction.reserve(particle_vec_size);
+      freco_hit_true_isMaxIDE.reserve(particle_vec_size);
+      freco_hit_true_ideNFraction.reserve(particle_vec_size);
+      freco_hit_true_isMaxIDEN.reserve(particle_vec_size);
+      */
+      freco_hit_true_numElectrons.reserve(particle_vec_size);
+      freco_hit_true_energy.reserve(particle_vec_size);      
+
+      for(size_t i_p = 0; i_p < particle_vec_size; ++i_p) {
+	anab::BackTrackerHitMatchingData const * match = match_vec[i_p];
+	/*
+	reco_hit_true_ideFraction.push_back(match->ideFraction);
+	reco_hit_true_isMaxIDE.push_back(match->isMaxIDE);
+	reco_hit_true_ideNFraction.push_back(match->ideNFraction);
+	reco_hit_true_isMaxIDEN.push_back(match->isMaxIDEN);
+	*/
+	reco_hit_true_numElectrons.push_back(match->numElectrons);
+	reco_hit_true_energy.push_back(match->energy);      	
+	int const trackid = particle_vec[i_p]->TrackId();
+	auto const tp_it = tp_map->find(trackid);
+	if(tp_it != tp_map->end()) {
+	  reco_hit_mc_type.push_back(fmc_type_track);
+	  reco_hit_mc_index.push_back(tp_it->second);	  
+	  continue;
+	}
+	auto const sp_it = sp_map->find(trackid);
+	if(sp_it != sp_map->end()) {
+	  reco_hit_mc_type.push_back(fmc_type_shower);
+	  reco_hit_mc_index.push_back(sp_it->second);
+	  continue;
+	}
+	auto const mcp_it = mcp_map->find(trackid);
+	if(mcp_it != mcp_map->end()) {
+	  reco_hit_mc_type.push_back(fmc_type_particle);
+	  reco_hit_mc_index.push_back(mcp_it->second);
+	  continue;
+	}
+
+      }
+
+    }
+
   }
+
+  if(frmcm_first) delete particles_per_hit;
 
 }
 
@@ -1185,8 +1698,7 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer
 void FillLightEvent::FillRecoHitVectors(art::Event const & e) {
 
   size_t size = 0;
-  for(size_t i = 0; i < fhit_producers.size(); ++i) {
-    std::cout << fhit_producers.at(i) << "\n";
+  for(size_t i = 0; i < fhitp_size; ++i) {
     art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(i));
     size += ev_h->size();
   }
@@ -1212,27 +1724,85 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e) {
   freco_hit_WireID_TPCID.reserve(size);
   freco_hit_WireID_PlaneID.reserve(size);
   freco_hit_WireID_WireID.reserve(size);
+  if(frmcm_first) {
+    freco_hit_mc_type.resize(size, std::vector<int>());
+    freco_hit_mc_index.resize(size, std::vector<unsigned int>());
+    /*
+    freco_hit_true_ideFraction.resize(size, std::vector<float>());
+    freco_hit_true_isMaxIDE.resize(size, std::vector<int>());
+    freco_hit_true_ideNFraction.resize(size, std::vector<float>());
+    freco_hit_true_isMaxIDEN.resize(size, std::vector<int>());
+    */
+    freco_hit_true_numElectrons.resize(size, std::vector<float>());
+    freco_hit_true_energy.resize(size, std::vector<float>());
+  }
 
-  for(size_t i = 0; i < fhit_producers.size(); ++i) {
-    FillRecoHitVectors(e, i);
-  }  
+  size_t hit_index_offset = 0;
+  for(size_t i = 0; i < fhitp_size; ++i) {
+    FillRecoHitVectors(e, i, hit_index_offset);
+    art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(i));
+    hit_index_offset += ev_h->size();
+  }
 
 }
 
 
-void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const producer_index) {
+std::pair<std::vector<double>,std::vector<double>> FillLightEvent::GetTrackCaloInfo(art::Event const & e,
+										    std::string const & track_producer,
+										    size_t const track_index,
+										    double & energy) {
 
-  art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producers.at(producer_index));  
-  RecoMCMatching const & rmcm = frmcm.at(producer_index);
-  std::vector<RecoMCMatch> const & track_matches = rmcm.GetTrackMatches();
+  art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp = e.getValidHandle<std::vector<recob::PFParticle>>(track_producer);    
+  art::FindManyP<recob::Track> PFPToTrack(ev_pfp, e, track_producer);  
+
+  art::Ptr<recob::Track> const * track_ptr = nullptr;
+
+  for(size_t i = 0; i < ev_pfp->size(); ++i) {
+    std::vector<art::Ptr<recob::Track>> const & tracks = PFPToTrack.at(i);
+    for(art::Ptr<recob::Track> const & track : tracks) {
+      if(track.key() == track_index) {
+	track_ptr = &track;
+	break;
+      }
+      if(track_ptr) break;
+    }
+  }
+
+  if(!track_ptr) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: no track pointer found\n";
+    std::pair<std::vector<double>,std::vector<double>> fail({-999},{-999});
+    return fail;
+  }
+
+  energy = energyHelper.trackEnergy(*track_ptr, e, track_producer);
+
+  return energyHelper.trackdEdx(*track_ptr, e, track_producer);
+
+}
+
+
+void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const producer_index, size_t const track_index_offset, size_t const hit_index_offset) {
+
+  std::string const & track_producer = ftrack_producers.at(producer_index);
+  art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(track_producer);  
+  std::vector<unsigned int> & indices = ftrack_producer_indices.at(producer_index);
+  indices.reserve(ev_t->size());
+  art::FindManyP<recob::Hit> hits_per_track(ev_t, e, track_producer);
+  std::vector<RecoMCMatch> const * track_matches = nullptr;
+  if(frmcm_first) {
+    RecoMCMatching const & rmcm = frmcm.at(producer_index);
+    track_matches = &rmcm.GetTrackMatches();
+  }
 
   for(size_t i = 0; i < ev_t->size(); ++i) {
 
+    indices.push_back(i + track_index_offset);
+
     recob::Track const & t = ev_t->at(i);
     size_t const traj_size = t.NumberTrajectoryPoints();
-    RecoMCMatch const & track_match = track_matches.at(i);
 
-    freco_track_producer_index.push_back(i);
+    freco_track_producer_index.push_back(producer_index);
     freco_track_NumberTrajectoryPoints.push_back(t.NumberTrajectoryPoints());
     freco_track_NPoints.push_back(t.NPoints());
     freco_track_FirstPoint.push_back(t.FirstPoint());
@@ -1290,39 +1860,57 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
 
     }
 
-    std::vector<int> & reco_track_mc_type = freco_track_mc_type.at(i);
-    std::vector<unsigned int> & reco_track_mc_index = freco_track_mc_index.at(i);
-    std::vector<double> & reco_track_charge_contribution = freco_track_charge_contribution.at(i);    
-
-    size_t const matching_map_size = track_match.mctrack_map.size() + track_match.mcshower_map.size() + track_match.mcparticle_map.size();
-    reco_track_mc_type.reserve(matching_map_size);
-    reco_track_mc_index.reserve(matching_map_size);
-    reco_track_charge_contribution.reserve(matching_map_size);
-
-    double charge_total = 0;
-
-    for(auto const & p : track_match.mctrack_map) {
-      reco_track_mc_type.push_back(fmc_type_track);
-      reco_track_mc_index.push_back(p.first);
-      reco_track_charge_contribution.push_back(p.second);
-      charge_total += p.second;
+    std::vector<unsigned int> & reco_track_to_reco_hit = freco_track_to_reco_hit.at(i);
+    reco_track_to_reco_hit.reserve(hits_per_track.size());
+    for(art::Ptr<recob::Hit> const & hit_ptr : hits_per_track.at(i)) {
+      reco_track_to_reco_hit.push_back(hit_ptr.key() + hit_index_offset);
     }
 
-    for(auto const & p : track_match.mcshower_map) {
-      reco_track_mc_type.push_back(fmc_type_shower);
-      reco_track_mc_index.push_back(p.first);
-      reco_track_charge_contribution.push_back(p.second);
-      charge_total += p.second;
+    double track_energy = -1;
+    std::pair<std::vector<double>, std::vector<double>> const calo_pair = GetTrackCaloInfo(e, track_producer, i, track_energy);
+    freco_track_EnergyHelper_resrange.push_back(calo_pair.first);
+    freco_track_EnergyHelper_dedx.push_back(calo_pair.second);
+    freco_track_EnergyHelper_energy.push_back(track_energy);
+
+    if(track_matches) {
+      
+      RecoMCMatch const & track_match = track_matches->at(i);
+      
+      std::vector<int> & reco_track_mc_type = freco_track_mc_type.at(i);
+      std::vector<unsigned int> & reco_track_mc_index = freco_track_mc_index.at(i);
+      std::vector<double> & reco_track_charge_contribution = freco_track_charge_contribution.at(i);    
+      
+      size_t const matching_map_size = track_match.mctrack_map.size() + track_match.mcshower_map.size() + track_match.mcparticle_map.size();
+      reco_track_mc_type.reserve(matching_map_size);
+      reco_track_mc_index.reserve(matching_map_size);
+      reco_track_charge_contribution.reserve(matching_map_size);
+      
+      double charge_total = 0;
+      
+      for(auto const & p : track_match.mctrack_map) {
+	reco_track_mc_type.push_back(fmc_type_track);
+	reco_track_mc_index.push_back(p.first);
+	reco_track_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }
+      
+      for(auto const & p : track_match.mcshower_map) {
+	reco_track_mc_type.push_back(fmc_type_shower);
+	reco_track_mc_index.push_back(p.first);
+	reco_track_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }
+      
+      for(auto const & p : track_match.mcparticle_map) {
+	reco_track_mc_type.push_back(fmc_type_particle);
+	reco_track_mc_index.push_back(p.first);
+	reco_track_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }    
+      
+      freco_track_charge_total.push_back(charge_total);
+
     }
-
-    for(auto const & p : track_match.mcparticle_map) {
-      reco_track_mc_type.push_back(fmc_type_particle);
-      reco_track_mc_index.push_back(p.first);
-      reco_track_charge_contribution.push_back(p.second);
-      charge_total += p.second;
-    }    
-
-    freco_track_charge_total.push_back(charge_total);
 
   }
   
@@ -1332,7 +1920,7 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
 void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
 
   size_t size = 0;
-  for(size_t i = 0; i < ftrack_producers.size(); ++i) {
+  for(size_t i = 0; i < ftrackp_size; ++i) {
     art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producers.at(i));
     size += ev_t->size();
   }
@@ -1361,13 +1949,253 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
   freco_track_Phi.resize(size, std::vector<double>());
   freco_track_ZenithAngle.resize(size, std::vector<double>());
   freco_track_AzimuthAngle.resize(size, std::vector<double>());
-  freco_track_mc_type.resize(size, std::vector<int>());
-  freco_track_mc_index.resize(size, std::vector<unsigned int>());
-  freco_track_charge_contribution.resize(size, std::vector<double>());
-  freco_track_charge_total.reserve(size);
+  freco_track_to_reco_hit.resize(size, std::vector<unsigned int>());
+  freco_track_EnergyHelper_resrange.reserve(size);
+  freco_track_EnergyHelper_dedx.reserve(size);
+  freco_track_EnergyHelper_energy.reserve(size);
+  if(frmcm_first) {
+    freco_track_mc_type.resize(size, std::vector<int>());
+    freco_track_mc_index.resize(size, std::vector<unsigned int>());
+    freco_track_charge_contribution.resize(size, std::vector<double>());
+    freco_track_charge_total.reserve(size);
+  }
 
-  for(size_t i = 0; i < ftrack_producers.size(); ++i) {
-    FillRecoTrackVectors(e, i);
+  size_t track_index_offset = 0;
+  size_t hit_index_offset = 0;
+  for(size_t i = 0; i < ftrackp_size; ++i) {
+    FillRecoTrackVectors(e, i, track_index_offset, hit_index_offset);
+    art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producers.at(i));
+    track_index_offset += ev_t->size();
+    art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(i));
+    hit_index_offset += ev_h->size();
+  }
+
+}
+
+
+std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLightEvent::GetShowerHelperEnergy(art::Event const & e,
+													     std::string const & shower_producer,
+													     size_t const shower_index) {
+  
+  art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp = e.getValidHandle<std::vector<recob::PFParticle>>(shower_producer);
+  art::FindManyP<recob::Shower> PFPToShower(ev_pfp, e, shower_producer);  
+
+  art::Ptr<recob::Shower> const * shower_ptr = nullptr;
+
+  for(size_t i = 0; i < ev_pfp->size(); ++i) {
+    std::vector<art::Ptr<recob::Shower>> const & showers = PFPToShower.at(i);
+    for(art::Ptr<recob::Shower> const & shower : showers) {
+      if(shower.key() == shower_index) {
+	shower_ptr = &shower;
+	break;
+      }
+      if(shower_ptr) break;
+    }
+  }
+
+  if(!shower_ptr) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: no shower pointer found\n";
+    return std::make_pair(std::make_pair(std::vector<double>(), SIZE_MAX), std::vector<double>());
+  }
+
+  std::pair<std::vector<double>, size_t> const energy_pair = energyHelper.showerEnergyV(*shower_ptr, e, shower_producer);
+
+  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(shower_producer);
+  art::FindManyP<recob::PFParticle> ShowerToPFP(ev_s, e, shower_producer);
+  std::vector<art::Ptr<recob::PFParticle>> shower_pfp = ShowerToPFP.at(shower_index);
+  if(shower_pfp.size() != 1) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: shower_pfp.size() != 1: " << shower_pfp.size() << "\n";
+  }
+  std::vector<double> dqdx_v(3, -1);
+  std::vector<double> dqdx_hits_v(3, -1);
+  std::vector<double> reco_shower_dedx_vector(3, -1);
+  energyHelper.dQdx(shower_pfp.front().key(), e, dqdx_v, dqdx_hits_v, 4, 2, shower_producer);
+  energyHelper.dEdxFromdQdx(reco_shower_dedx_vector, dqdx_v);
+
+  return std::make_pair(energy_pair, reco_shower_dedx_vector);
+
+}
+
+
+void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const producer_index, size_t const shower_index_offset, size_t const hit_index_offset) {
+
+  std::string const & shower_producer = fshower_producers.at(producer_index);
+  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(shower_producer);  
+  std::vector<unsigned int> & indices = fshower_producer_indices.at(producer_index);
+  indices.reserve(ev_s->size());
+  art::FindManyP<recob::Hit> hits_per_shower(ev_s, e, shower_producer);
+  std::vector<RecoMCMatch> const * shower_matches = nullptr;
+  if(frmcm_first) {
+    RecoMCMatching const & rmcm = frmcm.at(producer_index);
+    shower_matches = &rmcm.GetShowerMatches();
+  }
+  
+  for(size_t i = 0; i < ev_s->size(); ++i) {
+
+    indices.push_back(i + shower_index_offset);
+
+    recob::Shower const & s = ev_s->at(i);
+
+    freco_shower_producer_index.push_back(producer_index);
+    freco_shower_Direction_x.push_back(s.Direction().X());
+    freco_shower_Direction_y.push_back(s.Direction().Y());
+    freco_shower_Direction_z.push_back(s.Direction().Z());
+    freco_shower_DirectionErr_x.push_back(s.DirectionErr().X());
+    freco_shower_DirectionErr_y.push_back(s.DirectionErr().Y());
+    freco_shower_DirectionErr_z.push_back(s.DirectionErr().Z());
+    freco_shower_ShowerStart_x.push_back(s.ShowerStart().X());
+    freco_shower_ShowerStart_y.push_back(s.ShowerStart().Y());
+    freco_shower_ShowerStart_z.push_back(s.ShowerStart().Z());
+    freco_shower_ShowerStartErr_x.push_back(s.ShowerStartErr().X());
+    freco_shower_ShowerStartErr_y.push_back(s.ShowerStartErr().Y());
+    freco_shower_ShowerStartErr_z.push_back(s.ShowerStartErr().Z());
+    freco_shower_Energy.push_back(s.Energy());
+    freco_shower_EnergyErr.push_back(s.EnergyErr());
+    freco_shower_MIPEnergy.push_back(s.MIPEnergy());
+    freco_shower_MIPEnergyErr.push_back(s.MIPEnergyErr());
+    freco_shower_best_plane.push_back(s.best_plane());
+    freco_shower_Length.push_back(s.Length());
+    freco_shower_OpenAngle.push_back(s.OpenAngle());
+    freco_shower_dEdx.push_back(s.dEdx());
+    freco_shower_dEdxErr.push_back(s.dEdxErr());
+    freco_shower_has_open_angle.push_back(s.OpenAngle());
+    freco_shower_has_length.push_back(s.has_length());
+
+    std::vector<unsigned int> & reco_shower_to_reco_hit = freco_shower_to_reco_hit.at(i);
+    reco_shower_to_reco_hit.reserve(hits_per_shower.size());
+    for(art::Ptr<recob::Hit> const & hit_ptr : hits_per_shower.at(i)) {
+      reco_shower_to_reco_hit.push_back(hit_ptr.key() + hit_index_offset);
+    }
+
+    std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> const energy_pair = GetShowerHelperEnergy(e, shower_producer, i);
+
+    freco_shower_EnergyHelper_energy_legacy.push_back(energy_pair.first.first.at(energy_pair.first.second));
+    freco_shower_EnergyHelper_energy.push_back(energy_pair.first.first);
+    freco_shower_EnergyHelper_dedx.push_back(energy_pair.second);
+
+    if(shower_matches) {
+      
+      RecoMCMatch const & shower_match = shower_matches->at(i);
+      
+      std::vector<int> & reco_shower_mc_type = freco_shower_mc_type.at(i);
+      std::vector<unsigned int> & reco_shower_mc_index = freco_shower_mc_index.at(i);
+      std::vector<double> & reco_shower_charge_contribution = freco_shower_charge_contribution.at(i);    
+      
+      size_t const matching_map_size = shower_match.mctrack_map.size() + shower_match.mcshower_map.size() + shower_match.mcparticle_map.size();
+      reco_shower_mc_type.reserve(matching_map_size);
+      reco_shower_mc_index.reserve(matching_map_size);
+      reco_shower_charge_contribution.reserve(matching_map_size);
+      
+      double charge_total = 0;
+      
+      for(auto const & p : shower_match.mctrack_map) {
+	reco_shower_mc_type.push_back(fmc_type_track);
+	reco_shower_mc_index.push_back(p.first);
+	reco_shower_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }
+      
+      for(auto const & p : shower_match.mcshower_map) {
+	reco_shower_mc_type.push_back(fmc_type_shower);
+	reco_shower_mc_index.push_back(p.first);
+	reco_shower_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }
+      
+      for(auto const & p : shower_match.mcparticle_map) {
+	reco_shower_mc_type.push_back(fmc_type_particle);
+	reco_shower_mc_index.push_back(p.first);
+	reco_shower_charge_contribution.push_back(p.second);
+	charge_total += p.second;
+      }    
+      
+      freco_shower_charge_total.push_back(charge_total);
+
+    }
+
+  }  
+  
+}
+
+
+void FillLightEvent::FillRecoShowerVectors(art::Event const & e) {
+
+  size_t size = 0;
+  for(size_t i = 0; i < fshowerp_size; ++i) {
+    art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producers.at(i));
+    size += ev_s->size();
+  }
+
+  freco_shower_producer_index.reserve(size);
+  freco_shower_Direction_x.reserve(size);
+  freco_shower_Direction_y.reserve(size);
+  freco_shower_Direction_z.reserve(size);
+  freco_shower_DirectionErr_x.reserve(size);
+  freco_shower_DirectionErr_y.reserve(size);
+  freco_shower_DirectionErr_z.reserve(size);
+  freco_shower_ShowerStart_x.reserve(size);
+  freco_shower_ShowerStart_y.reserve(size);
+  freco_shower_ShowerStart_z.reserve(size);
+  freco_shower_ShowerStartErr_x.reserve(size);
+  freco_shower_ShowerStartErr_y.reserve(size);
+  freco_shower_ShowerStartErr_z.reserve(size);
+  freco_shower_Energy.reserve(size);
+  freco_shower_EnergyErr.reserve(size);
+  freco_shower_MIPEnergy.reserve(size);
+  freco_shower_MIPEnergyErr.reserve(size);
+  freco_shower_best_plane.reserve(size);
+  freco_shower_Length.reserve(size);
+  freco_shower_OpenAngle.reserve(size);
+  freco_shower_dEdx.reserve(size);
+  freco_shower_dEdxErr.reserve(size);
+  freco_shower_has_open_angle.reserve(size);
+  freco_shower_has_length.reserve(size);
+  freco_shower_to_reco_hit.resize(size, std::vector<unsigned int>());
+  freco_shower_EnergyHelper_energy_legacy.reserve(size);
+  freco_shower_EnergyHelper_energy.reserve(size);
+  freco_shower_EnergyHelper_dedx.reserve(size);
+  if(frmcm_first) {
+    freco_shower_mc_type.resize(size, std::vector<int>());
+    freco_shower_mc_index.resize(size, std::vector<unsigned int>());
+    freco_shower_charge_contribution.resize(size, std::vector<double>());
+    freco_shower_charge_total.reserve(size);
+  }
+
+  size_t shower_index_offset = 0;
+  size_t hit_index_offset = 0;
+  for(size_t i = 0; i < fshowerp_size; ++i) {
+    FillRecoShowerVectors(e, i, shower_index_offset, hit_index_offset);
+    art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producers.at(i));
+    shower_index_offset += ev_s->size();
+    art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(i));
+    hit_index_offset += ev_h->size();
+  }
+
+}
+
+
+void FillLightEvent::FillWeights(art::Event const & e) {
+
+  art::ValidHandle<std::vector<evwgh::MCEventWeight>> const & ev_evw =
+    e.getValidHandle<std::vector<evwgh::MCEventWeight>>("eventweight");
+
+  std::map<std::string, std::vector<double>> const & weight_map = ev_evw->front().fWeight;
+
+  if(ev_evw->size() > 1) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: eventweight has more than one entry\n";
+  }
+
+  for(auto const & p : weight_map) {
+    auto const wbm_it = fweight_branch_map.find(p.first);
+    if(wbm_it == fweight_branch_map.end()) {
+      std::cout << "Could not find weight: " << p.first << "\n";
+      continue;
+    }
+    *wbm_it->second.at(0) = p.second.at(0);
+    *wbm_it->second.at(1) = p.second.at(1);
   }
 
 }
@@ -1406,6 +2234,47 @@ void FillLightEvent::FillGenieParticleVectors(simb::MCTruth const & mct) {
   }
   
 }
+
+
+void FillLightEvent::FillMCParticleVectors(art::Event const & e) {
+
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcp = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+  size_t const size = ev_mcp->size();
+
+  fmcparticle_TrackId.reserve(size);
+  fmcparticle_StatusCode.reserve(size);
+  fmcparticle_PdgCode.reserve(size);
+  fmcparticle_Mother.reserve(size);  
+  /*
+  fmcparticle_X.reserve(size);
+  fmcparticle_Y.reserve(size);
+  fmcparticle_Z.reserve(size);
+  fmcparticle_T.reserve(size);
+  fmcparticle_Px.reserve(size);
+  fmcparticle_Py.reserve(size);
+  fmcparticle_Pz.reserve(size);
+  fmcparticle_E.reserve(size);
+  */
+
+  for(simb::MCParticle const & mcp : *ev_mcp) {
+    fmcparticle_TrackId.push_back(mcp.TrackId());
+    fmcparticle_StatusCode.push_back(mcp.StatusCode());
+    fmcparticle_PdgCode.push_back(mcp.PdgCode());
+    fmcparticle_Mother.push_back(mcp.Mother());
+    /*
+    simb::MCTrajectory const & mctraj = mcp.Trajectory();
+    fmcparticle_X.push_back(mctraj.Position(0).X());
+    fmcparticle_Y.push_back(mctraj.Position(0).Y());
+    fmcparticle_Z.push_back(mctraj.Position(0).Z());
+    fmcparticle_T.push_back(mctraj.Position(0).T());
+    fmcparticle_Px.push_back(mctraj.Momentum(0).Px());
+    fmcparticle_Py.push_back(mctraj.Momentum(0).Py());
+    fmcparticle_Pz.push_back(mctraj.Momentum(0).Pz());
+    fmcparticle_E.push_back(mctraj.Momentum(0).Pz());
+    */
+  }
+
+}
   
   
 void FillLightEvent::FillMCTrackVectors(art::Event const & e) {
@@ -1433,7 +2302,7 @@ void FillLightEvent::FillMCTrackVectors(art::Event const & e) {
   fmctrack_AncestorPdgCode.reserve(size);
   fmctrack_AncestorTrackID.reserve(size);
   fmctrack_AncestorProcess.reserve(size);
-  fmctrack_contributed_charge.resize(size, std::vector<double>());  
+  if(frmcm_first) fmctrack_contributed_charge.resize(size, std::vector<double>());  
 
   for(size_t i = 0; i < size; ++i) {
 
@@ -1483,12 +2352,16 @@ void FillLightEvent::FillMCTrackVectors(art::Event const & e) {
     fmctrack_AncestorTrackID.push_back(mctr.AncestorTrackID());
     fmctrack_AncestorProcess.push_back(mctr.AncestorProcess());
 
-    std::vector<double> & mctrack_contributed_charge = fmctrack_contributed_charge.at(i);
-    mctrack_contributed_charge.reserve(ftrack_producers.size());
+    if(frmcm_first) {
 
-    for(size_t j = 0; j < frmcm_size; ++j) {
-      RecoMCMatching const & rmcm = frmcm.at(j);
-      mctrack_contributed_charge.push_back(rmcm.GetMCTrackCharge().at(i));
+      std::vector<double> & mctrack_contributed_charge = fmctrack_contributed_charge.at(i);
+      mctrack_contributed_charge.reserve(frmcm_size);
+      
+      for(size_t j = 0; j < frmcm_size; ++j) {
+	RecoMCMatching const & rmcm = frmcm.at(j);
+	mctrack_contributed_charge.push_back(rmcm.GetMCTrackCharge().at(i));
+      }
+
     }
     
   }
@@ -1541,7 +2414,7 @@ void FillLightEvent::FillMCShowerVectors(art::Event const & e) {
   fmcshower_StartDir_X.reserve(size);
   fmcshower_StartDir_Y.reserve(size);
   fmcshower_StartDir_Z.reserve(size);
-  fmcshower_contributed_charge.resize(size, std::vector<double>());
+  if(frmcm_first) fmcshower_contributed_charge.resize(size, std::vector<double>());
 
   for(size_t i = 0; i < ev_mcs->size(); ++i) {
 
@@ -1591,12 +2464,16 @@ void FillLightEvent::FillMCShowerVectors(art::Event const & e) {
     fmcshower_StartDir_Y.push_back(mcs.StartDir().Y());
     fmcshower_StartDir_Z.push_back(mcs.StartDir().Z());
 
-    std::vector<double> & mcshower_contributed_charge = fmcshower_contributed_charge.at(i);
-    mcshower_contributed_charge.reserve(fshower_producers.size());
+    if(frmcm_first) {
 
-    for(size_t j = 0; j < frmcm_size; ++j) {
-      RecoMCMatching const & rmcm = frmcm.at(j);
-      mcshower_contributed_charge.push_back(rmcm.GetMCShowerCharge().at(i));
+      std::vector<double> & mcshower_contributed_charge = fmcshower_contributed_charge.at(i);
+      mcshower_contributed_charge.reserve(fshowerp_size);
+      
+      for(size_t j = 0; j < frmcm_size; ++j) {
+	RecoMCMatching const & rmcm = frmcm.at(j);
+	mcshower_contributed_charge.push_back(rmcm.GetMCShowerCharge().at(i));
+      }
+      
     }
 
   }
@@ -1625,11 +2502,6 @@ void FillLightEvent::FillTruth(art::Event const & e,
   if(fis_delta_rad == 0) delta_rad_mct_index = 0;
 
   simb::MCTruth const & mct = ev_mct->at(delta_rad_mct_index);
-
-  FillGenieParticleVectors(mct);
-  FillMCTrackVectors(e);
-  FillMCShowerVectors(e);
-
   simb::MCNeutrino const & mcn = mct.GetNeutrino();
 
   fnu_pdg = mcn.Nu().PdgCode();
@@ -1901,16 +2773,19 @@ void FillLightEvent::analyze(art::Event const & e) {
   fsubrun_number = e.id().subRun();
   fevent_number = e.id().event();
 
-  std::cout << "1\n";
-
   for(RecoMCMatching & rmcm : frmcm) rmcm.MatchWAssociations(e);
 
-  std::cout << "2\n";
-
+  if(fverbose) std::cout << "swtrigger\n";
+  FillSWTriggerVectors(e);
+  if(fverbose) std::cout << "opflash\n";
+  FillRecoOpFlashVectors(e);
+  if(fverbose) std::cout << "hit\n";
   FillRecoHitVectors(e);
-  std::cout << "3\n";
+  if(fverbose) std::cout << "track\n";
   FillRecoTrackVectors(e);
-  std::cout << "4\n";
+  if(fverbose) std::cout << "shower\n";
+  FillRecoShowerVectors(e);
+  if(fverbose) std::cout << "reco done\n";
 
   if(fmc) {
 
@@ -1921,6 +2796,11 @@ void FillLightEvent::analyze(art::Event const & e) {
     size_t delta_rad_mct_index = SIZE_MAX;
 
     if(ev_mct->front().GetNeutrino().Nu().Mother() == -1) FillTruth(e, delta_rad_mct_index);
+
+    FillGenieParticleVectors(ev_mct->at(delta_rad_mct_index));
+    FillMCParticleVectors(e);
+    FillMCTrackVectors(e);
+    FillMCShowerVectors(e);
 
     size_t delta_photon_index = SIZE_MAX;
     size_t delta_mcshower_index = SIZE_MAX;

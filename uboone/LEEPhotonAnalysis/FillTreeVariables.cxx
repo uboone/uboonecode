@@ -1570,7 +1570,6 @@ void FillTreeVariables::FilldEdx(art::Event const & e,
       closest_shower_dedx_best_plane = closest_shower_dedx_vector.at(GetBestShowerPlane(e, closest_associated_shower_index));
   }
 
-
 }
 
 

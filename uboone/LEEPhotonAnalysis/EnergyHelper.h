@@ -57,6 +57,9 @@ public:
   double showerEnergy(const art::Ptr<recob::Shower> &shower,
                       const art::Event &evt,
                       std::string _pfp_producer = "pandoraNu");
+  std::pair<std::vector<double>, size_t> showerEnergyV(const art::Ptr<recob::Shower> &shower,
+						       const art::Event &evt,
+						       std::string _pfp_producer);
 
   /**
    * @brief      Measure the energy of a pfparticle neutrino candidate

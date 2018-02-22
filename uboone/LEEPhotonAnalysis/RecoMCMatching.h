@@ -68,6 +68,10 @@ class RecoMCMatching {
   std::vector<double> fmctrack_charge;
   std::vector<double> fmcparticle_charge;
 
+  std::unordered_map<int, size_t> tp_map;
+  std::unordered_map<int, size_t> sp_map;
+  std::unordered_map<int, size_t> mcp_map;
+
   TTree * fhit_tree;
   int fhit_from_reco_track;
   double fhit_time;
@@ -169,9 +173,8 @@ class RecoMCMatching {
   void FillMap(std::unordered_map<size_t, double> & mc_map,
 	       size_t const index,
 	       double const quantity);
+  void FillMCMaps(art::Event const & e);
   void MatchWAssociations(art::Event const & e);
-  void MatchTracksWAssociations(art::Event const & e);
-  void MatchShowersWAssociations(art::Event const & e);
   void CoutMatches(art::Event const & e,
 		   std::unordered_map<int, size_t> const & tp_map,
 		   std::unordered_map<int, size_t> const & sp_map,
@@ -202,6 +205,16 @@ class RecoMCMatching {
   std::vector<double> const & GetMCParticleCharge() const {
     return fmcparticle_charge;
   }  
+  std::unordered_map<int, size_t> const & GetMCTrackMap() const {
+    return tp_map;
+  }
+  std::unordered_map<int, size_t> const & GetMCShowerMap() const {
+    return sp_map;
+  }
+  std::unordered_map<int, size_t> const & GetMCParticleMap() const {
+    return mcp_map;
+  }
+
 
 };
 

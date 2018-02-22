@@ -36,25 +36,14 @@ physics:
       mc: "true"
       pot_producer: "generator"
 
-      hit_producers: ["pandoraCosmicHitRemoval"]
-
-      #track_producers: ["pandoraNu", "pandoraCosmic"]
-      #shower_producers: ["pandoraNu", "pandoraCosmic"]
-
-      #track_producers: ["pandoraNu"]
-      #shower_producers: ["pandoraNu"]
-
-      track_producers: ["pandoraCosmic"]
-      shower_producers: ["pandoraCosmic"]
-
-      opflash_producer: "simpleFlashBeam"
       trigger_product: "swtrigger"
+      opflash_producers: ["simpleFlashBeam"]
 
-      #rmcm_hit_producers: ["pandoraCosmicHitRemoval", "pandoraCosmicHitRemoval"]
-      #rmcmassociation_producers: ["crHitRemovalTruthMatch", "crHitRemovalTruthMatch"]
+      hit_producers: ["pandoraCosmicHitRemoval", "gaushit"]
+      track_producers: ["pandoraNu", "pandoraCosmic"]
+      shower_producers: ["pandoraNu", "pandoraCosmic"]
 
-      rmcm_hit_producers: ["pandoraCosmicHitRemoval"]
-      rmcmassociation_producers: ["crHitRemovalTruthMatch"]
+      rmcmassociation_producers: ["crHitRemovalTruthMatch", "gaushitTruthMatch"]
     }
   }
   analysis: [FillLightEvent]
