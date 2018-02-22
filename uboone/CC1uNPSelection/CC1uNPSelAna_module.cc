@@ -2224,7 +2224,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
       if (part.PdgCode()==2212 && part.StatusCode()==1){
-        GeantonsTrueMomentum->push_back(part.P());
+        trueProtonsTrueMomentum->push_back(part.P());
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());
       }
@@ -2452,7 +2452,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     }//end of is the g4 handle is valid and the size is greater than 0;
    }//end of loop over all the geant 4 particles
    //redefine the OOFV here
-   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) {OOFVflag=true;} // && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
+   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz)) {OOFVflag=true;} // && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
 
 
    Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons);
