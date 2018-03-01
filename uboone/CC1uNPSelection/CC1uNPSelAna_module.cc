@@ -840,6 +840,7 @@ private:
     float trackstartzcandidate=-999.0;
     float trackmomcandidate=-999.0;
     float trackmomcandidate_mcs=-999.0;
+    bool mcs_isBestFwd = false;
     std::vector<float> trackdedxcandidate;
     std::vector<float> trackresrgcandidate;
 
@@ -1082,6 +1083,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_allsel->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_allsel->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_allsel->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_allsel->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_allsel->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_allsel->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_allsel->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_allsel->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_allsel->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
     //============================================================================================
  
@@ -1096,6 +1103,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashwin->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashwin->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_flashwin->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_flashwin->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_flashwin->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_flashwin->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_flashwin->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_flashwin->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_flashwin->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
 
 
@@ -1111,6 +1124,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashtag->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_flashtag->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_flashtag->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_flashtag->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_flashtag->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_flashtag->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_flashtag->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_flashtag->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
 
 
@@ -1133,6 +1152,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_vtxinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_vtxinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_vtxinFV->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_vtxinFV->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_vtxinFV->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_vtxinFV->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_vtxinFV->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_vtxinFV->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
 
     //===================================================================================
@@ -1152,6 +1177,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_ntrks->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_ntrks->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_ntrks->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_ntrks->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_ntrks->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_ntrks->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_ntrks->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_ntrks->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
     //===================================================================================
     fMC_noshwr=tfs->make<TTree>("fMC_noshwr","Data Holder");    
@@ -1169,6 +1200,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_noshwr->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_noshwr->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_noshwr->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_noshwr->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_noshwr->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_noshwr->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_noshwr->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_noshwr->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
     //===============================================================================
     fMC_trkfls=tfs->make<TTree>("fMC_trkfls","Data Holder");    
@@ -1190,6 +1227,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
     fMC_trkfls->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_trkfls->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
+    fMC_trkfls->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_trkfls->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_trkfls->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_trkfls->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_trkfls->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_trkfls->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
     //================================================================= 
     fMC_NoExTrk=tfs->make<TTree>("fMC_NoExTrk","Data Holder");    
@@ -1211,6 +1254,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk ->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
     fMC_NoExTrk->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_NoExTrk->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
+    fMC_NoExTrk->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_NoExTrk->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_NoExTrk->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_NoExTrk->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_NoExTrk->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_NoExTrk->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
 
 
@@ -1266,6 +1315,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
     fMC_mupinFV->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_mupinFV->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
+    fMC_mupinFV->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
+    fMC_mupinFV->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
+    fMC_mupinFV->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
+    fMC_mupinFV->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
+    fMC_mupinFV->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
+    fMC_mupinFV->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
 
 
     //=================================================================
@@ -1329,6 +1384,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("trackmomcandidate", &trackmomcandidate, "trackmomcandidate/F");
     fMC_TrunMean->Branch("trackmomcandidate_mcs", &trackmomcandidate_mcs, "trackmomcandidate_mcs/F");
     fMC_TrunMean->Branch("trackmomprotoncandidate", &trackmomprotoncandidate, "trackmomprotoncandidate/F");
+    fMC_TrunMean->Branch("mcs_isBestFwd_muoncand", &mcs_isBestFwd, "mcs_isBestFwd_muoncand/O");
 
 
     fMC_TrunMean->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
@@ -2972,7 +3028,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                     art::Ptr<recob::Track> track(trackVecHandle,TrackID);
                     //recob::MCSFitResult const & mcsfitresult = MCSFitHandle.at(TrackID);
 		    momentum = mcsfitlist[TrackID]->bestMomentum();
-            bool mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
+            mcs_isBestFwd = mcsfitlist[TrackID]->isBestFwd();
             if (!mcs_isBestFwd){std::cout << "muon candidate MCS fits better backwards" << std::endl;}
                     /*
                     * mcsfitlist[TrackID]->
