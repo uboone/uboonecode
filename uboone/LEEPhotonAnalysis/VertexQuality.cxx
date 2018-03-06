@@ -168,7 +168,6 @@ art::Ptr<simb::MCTruth> VertexQuality::TrackIDToMCTruth(art::Event const & e, in
 }
 
 
-
 void VertexQuality::GetTrueObjects(art::Event const & e,
 				   size_t const mct_index,
 				   std::vector<size_t> & mctrack_v,

@@ -32,6 +32,7 @@ physics:
     LEEPhoton:
     {
       module_type: "LEEPhotonAnalysis"
+      #spec_event: "251"
       mcordata: "mc"
       pot_producer: "generator"
       trigger_product: "swtrigger"

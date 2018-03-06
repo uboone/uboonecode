@@ -73,6 +73,7 @@ public:
   void SetupTrees();
 
   void beginSubRun(art::SubRun const & sr);
+  void endJob();
 
   void ResetEvent();
 
@@ -93,44 +94,42 @@ public:
 											       size_t const shower_index);
   void FillRecoShowerVectors(art::Event const & e);
   void FillRecoShowerVectors(art::Event const & e, int const producer_index, size_t const shower_index_offset, size_t const hit_index_offset);
+  void FillPandora(art::Event const & e);
 
   void FillWeights(art::Event const & e);
 
-  void FillGenieParticleVectors(simb::MCTruth const & mct);
+  void FillGenieParticleVectors(art::Event const & e);
+  void FillGenieParticleVectors(art::Event const & e,
+				size_t const mct_index);
   void FillMCParticleVectors(art::Event const & e);
   void FillMCTrackVectors(art::Event const & e);
   void FillMCShowerVectors(art::Event const & e);
-  void FillTruth(art::Event const & e,
-		 size_t & delta_rad_mct_index);
+  void FillTruth(art::Event const & e);
 
   void GetDeltaMCShowerMCTrackIndices(art::Event const & e,
-				      size_t const delta_rad_mct_index,
-				      size_t & delta_photon_index,
-				      size_t & delta_mcshower_index,
-				      size_t & delta_proton_index,
-				      size_t & delta_mctrack_index);
+				      size_t const delta_rad_mct_index);
   
   void analyze(art::Event const & e) override;
 
 private:
 
-  bool flighter;
+  bool fheavy;
   bool fmc;
   std::string fpot_producer;
 
   std::string fswtrigger_product;
   std::vector<std::string> fopflash_producers;
-  std::vector<std::vector<unsigned int>> fopflash_producer_indices;
+  std::vector<int> fopflash_producer_indices;
   size_t fopflashp_size;
 
   std::vector<std::string> fhit_producers;
-  std::vector<std::vector<unsigned int>> fhit_producer_indices;
+  std::vector<int> fhit_producer_indices;
   size_t fhitp_size;
   std::vector<std::string> ftrack_producers;
-  std::vector<std::vector<unsigned int>> ftrack_producer_indices;
+  std::vector<int> ftrack_producer_indices;
   size_t ftrackp_size;
   std::vector<std::string> fshower_producers;
-  std::vector<std::vector<unsigned int>> fshower_producer_indices;
+  std::vector<int> fshower_producer_indices;
   size_t fshowerp_size;
 
   std::vector<std::string> frmcmassociation_producers;
@@ -156,8 +155,6 @@ private:
   int fnumber_of_events;
   double fpot;
 
-  TTree * producer_index_tree;
-
   TTree * fevent_tree;
 
   //All
@@ -181,7 +178,7 @@ private:
   std::vector<double> freco_opflash_Time;
   std::vector<double> freco_opflash_TimeWidth;
   std::vector<double> freco_opflash_AbsTime;
-  std::vector<unsigned int> freco_opflash_Frame;
+  std::vector<int> freco_opflash_Frame;
   //std::vector<std::vector<double>> freco_opflash_PEs;
   std::vector<double> freco_opflash_YCenter;
   std::vector<double> freco_opflash_YWidth;
@@ -210,15 +207,15 @@ private:
   std::vector<int> freco_hit_LocalIndex;
   std::vector<float> freco_hit_GoodnessOfFit;
   std::vector<int> freco_hit_DegreesOfFreedom;
-  std::vector<unsigned int> freco_hit_View;
-  std::vector<unsigned int> freco_hit_SignalType;
-  std::vector<unsigned int> freco_hit_WireID_CryostatID;
-  std::vector<unsigned int> freco_hit_WireID_TPCID;
-  std::vector<unsigned int> freco_hit_WireID_PlaneID;
-  std::vector<unsigned int> freco_hit_WireID_WireID;
+  std::vector<int> freco_hit_View;
+  std::vector<int> freco_hit_SignalType;
+  std::vector<int> freco_hit_WireID_CryostatID;
+  std::vector<int> freco_hit_WireID_TPCID;
+  std::vector<int> freco_hit_WireID_PlaneID;
+  std::vector<int> freco_hit_WireID_WireID;
   //Reco - MC matching
   std::vector<std::vector<int>> freco_hit_mc_type;
-  std::vector<std::vector<unsigned int>> freco_hit_mc_index;
+  std::vector<std::vector<int>> freco_hit_mc_index;
   /*
   std::vector<std::vector<float>> freco_hit_true_ideFraction;
   std::vector<std::vector<int>> freco_hit_true_isMaxIDE;
@@ -249,17 +246,29 @@ private:
   std::vector<float> freco_track_Chi2PerNdof;
   std::vector<int> freco_track_Ndof;
   std::vector<int> freco_track_ParticleId;
+  std::vector<double> freco_track_Theta;
+  std::vector<double> freco_track_Phi;
+  std::vector<double> freco_track_ZenithAngle;
+  std::vector<double> freco_track_AzimuthAngle;
+  /*
   std::vector<std::vector<double>> freco_track_Theta;
   std::vector<std::vector<double>> freco_track_Phi;
   std::vector<std::vector<double>> freco_track_ZenithAngle;
   std::vector<std::vector<double>> freco_track_AzimuthAngle;
-  std::vector<std::vector<unsigned int>> freco_track_to_reco_hit;
+  */
+  std::vector<double> freco_track_VertexDirection_X;
+  std::vector<double> freco_track_VertexDirection_Y;
+  std::vector<double> freco_track_VertexDirection_Z;
+  std::vector<std::vector<int>> freco_track_to_reco_hit;
   std::vector<std::vector<double>> freco_track_EnergyHelper_resrange;
   std::vector<std::vector<double>> freco_track_EnergyHelper_dedx;
   std::vector<double> freco_track_EnergyHelper_energy;
   //Reco - MC matching
+  std::vector<int> freco_track_largest_mc_type;
+  std::vector<int> freco_track_largest_mc_index;
+  std::vector<double> freco_track_largest_ratio;
   std::vector<std::vector<int>> freco_track_mc_type;
-  std::vector<std::vector<unsigned int>> freco_track_mc_index;
+  std::vector<std::vector<int>> freco_track_mc_index;
   std::vector<std::vector<double>> freco_track_charge_contribution;
   std::vector<double> freco_track_charge_total;
 
@@ -288,46 +297,57 @@ private:
   std::vector<std::vector<double>> freco_shower_dEdxErr;
   std::vector<bool> freco_shower_has_open_angle;
   std::vector<bool> freco_shower_has_length;
-  std::vector<std::vector<unsigned int>> freco_shower_to_reco_hit;
+  std::vector<std::vector<int>> freco_shower_to_reco_hit;
   std::vector<double> freco_shower_EnergyHelper_energy_legacy;
   std::vector<std::vector<double>> freco_shower_EnergyHelper_energy;
   std::vector<std::vector<double>> freco_shower_EnergyHelper_dedx;
   //Reco - MC matching
+  std::vector<int> freco_shower_largest_mc_type;
+  std::vector<int> freco_shower_largest_mc_index;
+  std::vector<double> freco_shower_largest_ratio;
   std::vector<std::vector<int>> freco_shower_mc_type;
-  std::vector<std::vector<unsigned int>> freco_shower_mc_index;
+  std::vector<std::vector<int>> freco_shower_mc_index;
   std::vector<std::vector<double>> freco_shower_charge_contribution;
   std::vector<double> freco_shower_charge_total;
 
+  //Pandora
+  std::vector<int> fpfp_pdg;
+  std::vector<double> fpfp_vertex_X;
+  std::vector<double> fpfp_vertex_Y;
+  std::vector<double> fpfp_vertex_Z;
+  std::vector<int> fpfp_original_index;
+  std::vector<std::vector<int>> fpfp_children;
+
   //Truth
-  int fnu_pdg;
-  double fnu_energy;
-  int flep_pdg;
-  double flep_energy;
-  int fccnc;
-  int fmode;
-  int finteraction_type;
+  std::vector<int> fnu_pdg;
+  std::vector<double> fnu_energy;
+  std::vector<int> flep_pdg;
+  std::vector<double> flep_energy;
+  std::vector<int> fccnc;
+  std::vector<int> fmode;
+  std::vector<int> finteraction_type;
 
-  double ftrue_nu_E;
-  double ftrue_nuvertx;
-  double ftrue_nuverty;
-  double ftrue_nuvertz;
+  std::vector<double> ftrue_nu_E;
+  std::vector<double> ftrue_nuvertx;
+  std::vector<double> ftrue_nuverty;
+  std::vector<double> ftrue_nuvertz;
 
-  int ftrue_nu_vtx_tpc_contained;
-  int ftrue_nu_vtx_fid_contained;
+  std::vector<int> ftrue_nu_vtx_tpc_contained;
+  std::vector<int> ftrue_nu_vtx_fid_contained;
 
   //GENIE MCParticle
-  std::vector<int> fgenie_particle_TrackId;
-  std::vector<int> fgenie_particle_StatusCode;
-  std::vector<int> fgenie_particle_PdgCode;
-  std::vector<int> fgenie_particle_Mother;
-  std::vector<double> fgenie_particle_X;
-  std::vector<double> fgenie_particle_Y;
-  std::vector<double> fgenie_particle_Z;
-  std::vector<double> fgenie_particle_T;
-  std::vector<double> fgenie_particle_Px;
-  std::vector<double> fgenie_particle_Py;
-  std::vector<double> fgenie_particle_Pz;
-  std::vector<double> fgenie_particle_E;
+  std::vector<std::vector<int>> fgenie_particle_TrackId;
+  std::vector<std::vector<int>> fgenie_particle_StatusCode;
+  std::vector<std::vector<int>> fgenie_particle_PdgCode;
+  std::vector<std::vector<int>> fgenie_particle_Mother;
+  std::vector<std::vector<double>> fgenie_particle_X;
+  std::vector<std::vector<double>> fgenie_particle_Y;
+  std::vector<std::vector<double>> fgenie_particle_Z;
+  std::vector<std::vector<double>> fgenie_particle_T;
+  std::vector<std::vector<double>> fgenie_particle_Px;
+  std::vector<std::vector<double>> fgenie_particle_Py;
+  std::vector<std::vector<double>> fgenie_particle_Pz;
+  std::vector<std::vector<double>> fgenie_particle_E;
 
   //MCParticle
   std::vector<int> fmcparticle_TrackId;
@@ -350,6 +370,22 @@ private:
   std::vector<int> fmctrack_PdgCode;
   std::vector<int> fmctrack_TrackID;
   std::vector<std::string> fmctrack_Process;
+  std::vector<double> fmctrack_Start_X;
+  std::vector<double> fmctrack_Start_Y;
+  std::vector<double> fmctrack_Start_Z;
+  std::vector<double> fmctrack_Start_T;
+  std::vector<double> fmctrack_Start_Px;
+  std::vector<double> fmctrack_Start_Py;
+  std::vector<double> fmctrack_Start_Pz;
+  std::vector<double> fmctrack_Start_E;
+  std::vector<double> fmctrack_End_X;
+  std::vector<double> fmctrack_End_Y;
+  std::vector<double> fmctrack_End_Z;
+  std::vector<double> fmctrack_End_T;
+  std::vector<double> fmctrack_End_Px;
+  std::vector<double> fmctrack_End_Py;
+  std::vector<double> fmctrack_End_Pz;
+  std::vector<double> fmctrack_End_E;
   std::vector<std::vector<double>> fmctrack_X;
   std::vector<std::vector<double>> fmctrack_Y;
   std::vector<std::vector<double>> fmctrack_Z;
@@ -403,7 +439,7 @@ private:
   std::vector<double> fmcshower_DetProfile_Py;
   std::vector<double> fmcshower_DetProfile_Pz;
   std::vector<double> fmcshower_DetProfile_E;
-  std::vector<std::vector<unsigned int>> fmcshower_DaughterTrackID;
+  std::vector<std::vector<int>> fmcshower_DaughterTrackID;
   std::vector<std::vector<double>> fmcshower_Charge;
   std::vector<std::vector<double>> fmcshower_dQdx;
   std::vector<double> fmcshower_StartDir_X;
@@ -412,21 +448,13 @@ private:
   std::vector<std::vector<double>> fmcshower_contributed_charge;
 
   //Delta radiative
-  int fis_delta_rad;
-  int fdelta_true_pdg;
-  double fdelta_true_energy;
-  int fdelta_photon_index;
-  int fdelta_mcshower_index;
-  int fdelta_proton_index;
-  int fdelta_mctrack_index;
-  double fdelta_photon_energy;
-  double fdelta_proton_energy;
-  int fdelta_mcshower_true_pdg;
-  double fdelta_mcshower_true_energy;
-  double fdelta_mcshower_detprofile_energy;
-  int fdelta_mctrack_true_pdg;
-  double fdelta_mctrack_true_energy;
-  double fdelta_mctrack_true_length;
+  int fdelta_mct_index;
+  std::vector<int> fis_delta_rad;
+  std::vector<int> fdelta_index;
+  std::vector<int> fdelta_photon_index;
+  std::vector<int> fdelta_mcshower_index;
+  std::vector<int> fdelta_proton_index;
+  std::vector<int> fdelta_mctrack_index;
 
   std::map<std::string, std::vector<double *>> fweight_branch_map;
   
@@ -518,6 +546,7 @@ private:
 
 FillLightEvent::FillLightEvent(fhicl::ParameterSet const & p) :
   EDAnalyzer(p),
+  fheavy(false),
   ftpc_volume(0,
 	      -lar::providerFrom<geo::Geometry>()->DetHalfHeight(),
 	      0,
@@ -533,7 +562,8 @@ FillLightEvent::FillLightEvent(fhicl::ParameterSet const & p) :
 		   -foffset+lar::providerFrom<geo::Geometry>()->DetLength()),
   fverbose(false),
   fpot_tree(nullptr),
-  fevent_tree(nullptr) 
+  fnumber_of_events(0),
+  fevent_tree(nullptr)
 {
 
   Reconfigure(p);
@@ -544,6 +574,7 @@ FillLightEvent::FillLightEvent(fhicl::ParameterSet const & p) :
 
 void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
 
+  p.get_if_present<bool>("heavy", fheavy);
   fmc = p.get<bool>("mc");
 
   p.get_if_present<std::string>("pot_producer", fpot_producer);
@@ -594,20 +625,34 @@ void FillLightEvent::SetupTrees() {
 
   //Change producer tree to be per event and contain a map of producer - object indices
 
-  TTree * producer_tree = tfs->make<TTree>("producer_tree", "");
-  producer_tree->Branch("swtrigger_product", &fswtrigger_product);
-  producer_tree->Branch("opflash_producers", &fopflash_producers);
-  producer_tree->Branch("hit_producers", &fhit_producers);
-  producer_tree->Branch("track_producers", &ftrack_producers);
-  producer_tree->Branch("shower_producers", &fshower_producers);
-  producer_tree->Branch("rmcmassociation_producers", &frmcmassociation_producers);
-  producer_tree->Fill();
-
-  producer_index_tree = tfs->make<TTree>("producer_index_tree", "");
-  producer_tree->Branch("opflash_producer_indices", &fopflash_producer_indices);
-  producer_tree->Branch("hit_producer_indices", &fhit_producer_indices);
-  producer_tree->Branch("track_producer_indices", &ftrack_producer_indices);
-  producer_tree->Branch("shower_producer_indices", &fshower_producer_indices);
+  TTree * meta_tree = tfs->make<TTree>("meta_tree", "");
+  int fis_heavy;
+  if(fheavy) fis_heavy = 1;
+  else fis_heavy = 0;
+  meta_tree->Branch("is_heavy", &fis_heavy, "is_heavy/I");
+  int fis_mc;
+  if(fmc) fis_mc = 1;
+  else fis_mc = 0;
+  meta_tree->Branch("is_mc", &fis_mc, "is_mc/I");
+  meta_tree->Branch("swtrigger_product", &fswtrigger_product);
+  meta_tree->Branch("opflash_producers", &fopflash_producers);
+  meta_tree->Branch("hit_producers", &fhit_producers);
+  meta_tree->Branch("track_producers", &ftrack_producers);
+  meta_tree->Branch("shower_producers", &fshower_producers);
+  meta_tree->Branch("rmcmassociation_producers", &frmcmassociation_producers);
+  double DetHalfHeight = lar::providerFrom<geo::Geometry>()->DetHalfHeight();
+  double DetHalfWidth = lar::providerFrom<geo::Geometry>()->DetHalfWidth();
+  double DetLength = lar::providerFrom<geo::Geometry>()->DetLength();
+  meta_tree->Branch("DetHalfHeight", &DetHalfHeight);
+  meta_tree->Branch("DetHalfWidth", &DetHalfWidth);
+  meta_tree->Branch("DetLength", &DetLength);
+  int mc_type_shower = frmcm_first->fmc_type_shower;
+  int mc_type_track = frmcm_first->fmc_type_track;
+  int mc_type_particle = frmcm_first->fmc_type_particle;
+  meta_tree->Branch("mc_type_shower", &mc_type_shower);
+  meta_tree->Branch("mc_type_track", &mc_type_track);
+  meta_tree->Branch("mc_type_particle", &mc_type_particle);
+  meta_tree->Fill();
 
   if(fpot_producer != "") {
     fpot_tree = tfs->make<TTree>("pot_tree", "");
@@ -616,6 +661,11 @@ void FillLightEvent::SetupTrees() {
   }
 
   fevent_tree = tfs->make<TTree>("event_tree", "");
+
+  fevent_tree->Branch("opflash_producer_indices", &fopflash_producer_indices);
+  fevent_tree->Branch("hit_producer_indices", &fhit_producer_indices);
+  fevent_tree->Branch("track_producer_indices", &ftrack_producer_indices);
+  fevent_tree->Branch("shower_producer_indices", &fshower_producer_indices);
   
   fevent_tree->Branch("run_number", &frun_number, "run_number/I");
   fevent_tree->Branch("subrun_number", &fsubrun_number, "subrun_number/I"); 
@@ -633,10 +683,12 @@ void FillLightEvent::SetupTrees() {
 
   fevent_tree->Branch("reco_opflash_producer_index", &freco_opflash_producer_index);
   fevent_tree->Branch("reco_opflash_Time", &freco_opflash_Time);
-  fevent_tree->Branch("reco_opflash_TimeWidth", &freco_opflash_TimeWidth);
-  fevent_tree->Branch("reco_opflash_AbsTime", &freco_opflash_AbsTime);
-  fevent_tree->Branch("reco_opflash_Frame", &freco_opflash_Frame);
-  //fevent_tree->Branch("reco_opflash_PEs", &freco_opflash_PEs);
+  if(fheavy) {
+    fevent_tree->Branch("reco_opflash_TimeWidth", &freco_opflash_TimeWidth);
+    fevent_tree->Branch("reco_opflash_AbsTime", &freco_opflash_AbsTime);
+    fevent_tree->Branch("reco_opflash_Frame", &freco_opflash_Frame);
+    //fevent_tree->Branch("reco_opflash_PEs", &freco_opflash_PEs);
+  }
   fevent_tree->Branch("reco_opflash_YCenter", &freco_opflash_YCenter);
   fevent_tree->Branch("reco_opflash_YWidth", &freco_opflash_YWidth);
   fevent_tree->Branch("reco_opflash_ZCenter", &freco_opflash_ZCenter);
@@ -646,23 +698,27 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_opflash_WireCenters", &freco_opflash_WireCenters);
   fevent_tree->Branch("reco_opflash_WireWidths", &freco_opflash_WireWidths);
   fevent_tree->Branch("reco_opflash_TotalPE", &freco_opflash_TotalPE);
-  fevent_tree->Branch("reco_opflash_FastToTotal", &freco_opflash_FastToTotal);
+  if(fheavy) fevent_tree->Branch("reco_opflash_FastToTotal", &freco_opflash_FastToTotal);
 
   fevent_tree->Branch("reco_hit_producer_index", &freco_hit_producer_index);
   fevent_tree->Branch("reco_hit_StartTick", &freco_hit_StartTick);
   fevent_tree->Branch("reco_hit_EndTick", &freco_hit_EndTick);
   fevent_tree->Branch("reco_hit_PeakTime", &freco_hit_PeakTime);
-  fevent_tree->Branch("reco_hit_SigmaPeakTime", &freco_hit_SigmaPeakTime);
-  fevent_tree->Branch("reco_hit_RMS", &freco_hit_RMS);
-  fevent_tree->Branch("reco_hit_PeakAmplitude", &freco_hit_PeakAmplitude);
-  fevent_tree->Branch("reco_hit_SigmaPeakAmplitude", &freco_hit_SigmaPeakAmplitude);
+  if(fheavy) {
+    fevent_tree->Branch("reco_hit_SigmaPeakTime", &freco_hit_SigmaPeakTime);
+    fevent_tree->Branch("reco_hit_RMS", &freco_hit_RMS);
+    fevent_tree->Branch("reco_hit_PeakAmplitude", &freco_hit_PeakAmplitude);
+    fevent_tree->Branch("reco_hit_SigmaPeakAmplitude", &freco_hit_SigmaPeakAmplitude);
+  }
   fevent_tree->Branch("reco_hit_SummedADC", &freco_hit_SummedADC);
   fevent_tree->Branch("reco_hit_Integral", &freco_hit_Integral);
-  fevent_tree->Branch("reco_hit_SigmaIntegral", &freco_hit_SigmaIntegral);
-  fevent_tree->Branch("reco_hit_Multiplicity", &freco_hit_Multiplicity);
-  fevent_tree->Branch("reco_hit_LocalIndex", &freco_hit_LocalIndex);
-  fevent_tree->Branch("reco_hit_GoodnessOfFit", &freco_hit_GoodnessOfFit);
-  fevent_tree->Branch("reco_hit_DegreesOfFreedom", &freco_hit_DegreesOfFreedom);
+  if(fheavy) {  
+    fevent_tree->Branch("reco_hit_SigmaIntegral", &freco_hit_SigmaIntegral);
+    fevent_tree->Branch("reco_hit_Multiplicity", &freco_hit_Multiplicity);
+    fevent_tree->Branch("reco_hit_LocalIndex", &freco_hit_LocalIndex);
+    fevent_tree->Branch("reco_hit_GoodnessOfFit", &freco_hit_GoodnessOfFit);
+    fevent_tree->Branch("reco_hit_DegreesOfFreedom", &freco_hit_DegreesOfFreedom);
+  }
   fevent_tree->Branch("reco_hit_View", &freco_hit_View);
   fevent_tree->Branch("reco_hit_SignalType", &freco_hit_SignalType);
   fevent_tree->Branch("reco_hit_WireID_CryostatID", &freco_hit_WireID_CryostatID);
@@ -679,41 +735,52 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("reco_hit_true_isMaxIDEN", &freco_hit_true_isMaxIDEN);
     */
     fevent_tree->Branch("reco_hit_true_numElectrons", &freco_hit_true_numElectrons);
-    fevent_tree->Branch("reco_hit_true_energy", &freco_hit_true_energy);
+    if(fheavy) fevent_tree->Branch("reco_hit_true_energy", &freco_hit_true_energy);
   }
-
   fevent_tree->Branch("reco_track_producer_index", &freco_track_producer_index);
-  fevent_tree->Branch("reco_track_NumberTrajectoryPoints", &freco_track_NumberTrajectoryPoints);
-  fevent_tree->Branch("reco_track_NPoints", &freco_track_NPoints);
-  fevent_tree->Branch("reco_track_FirstPoint", &freco_track_FirstPoint);
-  fevent_tree->Branch("reco_track_LastPoint", &freco_track_LastPoint);
-  fevent_tree->Branch("reco_track_FirstValidPoint", &freco_track_FirstValidPoint);
-  fevent_tree->Branch("reco_track_LastValidPoint", &freco_track_LastValidPoint);
-  fevent_tree->Branch("reco_track_CountValidPoints", &freco_track_CountValidPoints);
+  if(fheavy) {
+    fevent_tree->Branch("reco_track_NumberTrajectoryPoints", &freco_track_NumberTrajectoryPoints);
+    fevent_tree->Branch("reco_track_NPoints", &freco_track_NPoints);
+    fevent_tree->Branch("reco_track_FirstPoint", &freco_track_FirstPoint);
+    fevent_tree->Branch("reco_track_LastPoint", &freco_track_LastPoint);
+    fevent_tree->Branch("reco_track_FirstValidPoint", &freco_track_FirstValidPoint);
+    fevent_tree->Branch("reco_track_LastValidPoint", &freco_track_LastValidPoint);
+    fevent_tree->Branch("reco_track_CountValidPoints", &freco_track_CountValidPoints);
+  }
   fevent_tree->Branch("reco_track_X", &freco_track_X);
   fevent_tree->Branch("reco_track_Y", &freco_track_Y);
   fevent_tree->Branch("reco_track_Z", &freco_track_Z);
-  fevent_tree->Branch("reco_track_Px", &freco_track_Px);
-  fevent_tree->Branch("reco_track_Py", &freco_track_Py);
-  fevent_tree->Branch("reco_track_Pz", &freco_track_Pz);
-  fevent_tree->Branch("reco_track_HasMomentum", &freco_track_HasMomentum);
-  fevent_tree->Branch("reco_track_Length", &freco_track_Length);
-  fevent_tree->Branch("reco_track_Chi2", &freco_track_Chi2);
-  fevent_tree->Branch("reco_track_Chi2PerNdof", &freco_track_Chi2PerNdof);
-  fevent_tree->Branch("reco_track_Ndof", &freco_track_Ndof);
-  fevent_tree->Branch("reco_track_ParticleId", &freco_track_ParticleId);
+  if(fheavy) {
+    fevent_tree->Branch("reco_track_Px", &freco_track_Px);
+    fevent_tree->Branch("reco_track_Py", &freco_track_Py);
+    fevent_tree->Branch("reco_track_Pz", &freco_track_Pz);
+    fevent_tree->Branch("reco_track_HasMomentum", &freco_track_HasMomentum);
+    fevent_tree->Branch("reco_track_Length", &freco_track_Length);
+    fevent_tree->Branch("reco_track_Chi2", &freco_track_Chi2);
+    fevent_tree->Branch("reco_track_Chi2PerNdof", &freco_track_Chi2PerNdof);
+    fevent_tree->Branch("reco_track_Ndof", &freco_track_Ndof);
+    fevent_tree->Branch("reco_track_ParticleId", &freco_track_ParticleId);
+  }
   fevent_tree->Branch("reco_track_Theta", &freco_track_Theta);
   fevent_tree->Branch("reco_track_Phi", &freco_track_Phi);
   fevent_tree->Branch("reco_track_ZenithAngle", &freco_track_ZenithAngle);
   fevent_tree->Branch("reco_track_AzimuthAngle", &freco_track_AzimuthAngle);
+  fevent_tree->Branch("reco_track_VertexDirection_X", &freco_track_VertexDirection_X);
+  fevent_tree->Branch("reco_track_VertexDirection_Y", &freco_track_VertexDirection_Y);
+  fevent_tree->Branch("reco_track_VertexDirection_Z", &freco_track_VertexDirection_Z);
   fevent_tree->Branch("reco_track_to_reco_hit", &freco_track_to_reco_hit);
   fevent_tree->Branch("reco_track_EnergyHelper_resrange", &freco_track_EnergyHelper_resrange);
   fevent_tree->Branch("reco_track_EnergyHelper_dedx", &freco_track_EnergyHelper_dedx);
   fevent_tree->Branch("reco_track_EnergyHelper_energy", &freco_track_EnergyHelper_energy);
   if(frmcm_first) {
-    fevent_tree->Branch("reco_track_mc_type", &freco_track_mc_type);
-    fevent_tree->Branch("reco_track_mc_index", &freco_track_mc_index);
-    fevent_tree->Branch("reco_track_charge_contribution", &freco_track_charge_contribution);
+    fevent_tree->Branch("reco_track_largest_mc_type", &freco_track_largest_mc_type);
+    fevent_tree->Branch("reco_track_largest_mc_index", &freco_track_largest_mc_index);
+    fevent_tree->Branch("reco_track_largest_ratio", &freco_track_largest_ratio);
+    if(fheavy) {
+      fevent_tree->Branch("reco_track_mc_type", &freco_track_mc_type);
+      fevent_tree->Branch("reco_track_mc_index", &freco_track_mc_index);
+      fevent_tree->Branch("reco_track_charge_contribution", &freco_track_charge_contribution);
+    }
     fevent_tree->Branch("reco_track_charge_total", &freco_track_charge_total);
   }
 
@@ -721,55 +788,73 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_shower_Direction_x", &freco_shower_Direction_x);
   fevent_tree->Branch("reco_shower_Direction_y", &freco_shower_Direction_y);
   fevent_tree->Branch("reco_shower_Direction_z", &freco_shower_Direction_z);
-  fevent_tree->Branch("reco_shower_DirectionErr_x", &freco_shower_DirectionErr_x);
-  fevent_tree->Branch("reco_shower_DirectionErr_y", &freco_shower_DirectionErr_y);
-  fevent_tree->Branch("reco_shower_DirectionErr_z", &freco_shower_DirectionErr_z);
+  if(fheavy) {
+    fevent_tree->Branch("reco_shower_DirectionErr_x", &freco_shower_DirectionErr_x);
+    fevent_tree->Branch("reco_shower_DirectionErr_y", &freco_shower_DirectionErr_y);
+    fevent_tree->Branch("reco_shower_DirectionErr_z", &freco_shower_DirectionErr_z);
+  }
   fevent_tree->Branch("reco_shower_ShowerStart_x", &freco_shower_ShowerStart_x);
   fevent_tree->Branch("reco_shower_ShowerStart_y", &freco_shower_ShowerStart_y);
   fevent_tree->Branch("reco_shower_ShowerStart_z", &freco_shower_ShowerStart_z);
-  fevent_tree->Branch("reco_shower_ShowerStartErr_x", &freco_shower_ShowerStartErr_x);
-  fevent_tree->Branch("reco_shower_ShowerStartErr_y", &freco_shower_ShowerStartErr_y);
-  fevent_tree->Branch("reco_shower_ShowerStartErr_z", &freco_shower_ShowerStartErr_z);
-  fevent_tree->Branch("reco_shower_Energy", &freco_shower_Energy);
-  fevent_tree->Branch("reco_shower_EnergyErr", &freco_shower_EnergyErr);
-  fevent_tree->Branch("reco_shower_MIPEnergy", &freco_shower_MIPEnergy);
-  fevent_tree->Branch("reco_shower_MIPEnergyErr", &freco_shower_MIPEnergyErr);
+  if(fheavy) {
+    fevent_tree->Branch("reco_shower_ShowerStartErr_x", &freco_shower_ShowerStartErr_x);
+    fevent_tree->Branch("reco_shower_ShowerStartErr_y", &freco_shower_ShowerStartErr_y);
+    fevent_tree->Branch("reco_shower_ShowerStartErr_z", &freco_shower_ShowerStartErr_z);
+    fevent_tree->Branch("reco_shower_Energy", &freco_shower_Energy);
+    fevent_tree->Branch("reco_shower_EnergyErr", &freco_shower_EnergyErr);
+    fevent_tree->Branch("reco_shower_MIPEnergy", &freco_shower_MIPEnergy);
+    fevent_tree->Branch("reco_shower_MIPEnergyErr", &freco_shower_MIPEnergyErr);
+  }
   fevent_tree->Branch("reco_shower_best_plane", &freco_shower_best_plane);
   fevent_tree->Branch("reco_shower_Length", &freco_shower_Length);
   fevent_tree->Branch("reco_shower_OpenAngle", &freco_shower_OpenAngle);
-  fevent_tree->Branch("reco_shower_dEdx", &freco_shower_dEdx);
-  fevent_tree->Branch("reco_shower_dEdxErr", &freco_shower_dEdxErr);
-  fevent_tree->Branch("reco_shower_has_open_angle", &freco_shower_has_open_angle);
-  fevent_tree->Branch("reco_shower_has_length", &freco_shower_has_length);
+  if(fheavy) {
+    fevent_tree->Branch("reco_shower_dEdx", &freco_shower_dEdx);
+    fevent_tree->Branch("reco_shower_dEdxErr", &freco_shower_dEdxErr);
+    fevent_tree->Branch("reco_shower_has_open_angle", &freco_shower_has_open_angle);
+    fevent_tree->Branch("reco_shower_has_length", &freco_shower_has_length);
+  }
   fevent_tree->Branch("reco_shower_to_reco_hit", &freco_shower_to_reco_hit);
   fevent_tree->Branch("reco_shower_EnergyHelper_energy_legacy", &freco_shower_EnergyHelper_energy_legacy);
   fevent_tree->Branch("reco_shower_EnergyHelper_energy", &freco_shower_EnergyHelper_energy);
   fevent_tree->Branch("reco_shower_EnergyHelper_dedx", &freco_shower_EnergyHelper_dedx);
   if(frmcm_first) { 
-    fevent_tree->Branch("reco_shower_mc_type", &freco_shower_mc_type);
-    fevent_tree->Branch("reco_shower_mc_index", &freco_shower_mc_index);
-    fevent_tree->Branch("reco_shower_charge_contribution", &freco_shower_charge_contribution);
+    fevent_tree->Branch("reco_shower_largest_mc_type", &freco_shower_largest_mc_type);
+    fevent_tree->Branch("reco_shower_largest_mc_index", &freco_shower_largest_mc_index);
+    fevent_tree->Branch("reco_shower_largest_ratio", &freco_shower_largest_ratio);
+    if(fheavy) {
+      fevent_tree->Branch("reco_shower_mc_type", &freco_shower_mc_type);
+      fevent_tree->Branch("reco_shower_mc_index", &freco_shower_mc_index);
+      fevent_tree->Branch("reco_shower_charge_contribution", &freco_shower_charge_contribution);
+    }
     fevent_tree->Branch("reco_shower_charge_total", &freco_shower_charge_total);
   }
 
+  fevent_tree->Branch("pfp_pdg", &fpfp_pdg);
+  fevent_tree->Branch("pfp_vertex_X", &fpfp_vertex_X);
+  fevent_tree->Branch("pfp_vertex_Y", &fpfp_vertex_Y);
+  fevent_tree->Branch("pfp_vertex_Z", &fpfp_vertex_Z);
+  fevent_tree->Branch("pfp_original_index", &fpfp_original_index);
+  fevent_tree->Branch("pfp_children", &fpfp_children);  
+
   if(fmc) {
 
-    fevent_tree->Branch("nu_pdg", &fnu_pdg, "nu_pdg/I");
-    fevent_tree->Branch("nu_energy", &fnu_energy, "nu_energy/D");
-    fevent_tree->Branch("lep_pdg", &flep_pdg, "lep_pdg/I");
-    fevent_tree->Branch("lep_energy", &flep_energy, "lep_energy/D");
-    fevent_tree->Branch("ccnc", &fccnc, "ccnc/I");
-    fevent_tree->Branch("mode", &fmode, "mode/I");
-    fevent_tree->Branch("interaction_type", &finteraction_type, "interaction_type/I");
+    fevent_tree->Branch("nu_pdg", &fnu_pdg);
+    fevent_tree->Branch("nu_energy", &fnu_energy);
+    fevent_tree->Branch("lep_pdg", &flep_pdg);
+    fevent_tree->Branch("lep_energy", &flep_energy);
+    fevent_tree->Branch("ccnc", &fccnc);
+    fevent_tree->Branch("mode", &fmode);
+    fevent_tree->Branch("interaction_type", &finteraction_type);
 
-    fevent_tree->Branch("true_nu_E", &ftrue_nu_E, "true_nu_E/D");
+    fevent_tree->Branch("true_nu_E", &ftrue_nu_E);
 
-    fevent_tree->Branch("true_nuvertx", &ftrue_nuvertx, "true_nuvertx/D");
-    fevent_tree->Branch("true_nuverty", &ftrue_nuverty, "true_nuverty/D");
-    fevent_tree->Branch("true_nuvertz", &ftrue_nuvertz, "true_nuvertz/D");
+    fevent_tree->Branch("true_nuvertx", &ftrue_nuvertx);
+    fevent_tree->Branch("true_nuverty", &ftrue_nuverty);
+    fevent_tree->Branch("true_nuvertz", &ftrue_nuvertz);
 
-    fevent_tree->Branch("true_nu_vtx_tpc_contained", &ftrue_nu_vtx_tpc_contained, "true_nu_vtx_tpc_contained/I"); 
-    fevent_tree->Branch("true_nu_vtx_fid_contained", &ftrue_nu_vtx_fid_contained, "true_nu_vtx_fid_contained/I"); 
+    fevent_tree->Branch("true_nu_vtx_tpc_contained", &ftrue_nu_vtx_tpc_contained); 
+    fevent_tree->Branch("true_nu_vtx_fid_contained", &ftrue_nu_vtx_fid_contained); 
 
     fevent_tree->Branch("genie_particle_TrackId", &fgenie_particle_TrackId);
     fevent_tree->Branch("genie_particle_StatusCode", &fgenie_particle_StatusCode);
@@ -801,16 +886,34 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("mctrack_PdgCode", &fmctrack_PdgCode);
     fevent_tree->Branch("mctrack_TrackID", &fmctrack_TrackID);
     fevent_tree->Branch("mctrack_Process", &fmctrack_Process);
+    fevent_tree->Branch("mctrack_Start_X", &fmctrack_Start_X);
+    fevent_tree->Branch("mctrack_Start_Y", &fmctrack_Start_Y);
+    fevent_tree->Branch("mctrack_Start_Z", &fmctrack_Start_Z);
+    fevent_tree->Branch("mctrack_Start_T", &fmctrack_Start_T);
+    fevent_tree->Branch("mctrack_Start_Px", &fmctrack_Start_Px);
+    fevent_tree->Branch("mctrack_Start_Py", &fmctrack_Start_Py);
+    fevent_tree->Branch("mctrack_Start_Pz", &fmctrack_Start_Pz);
+    fevent_tree->Branch("mctrack_Start_E", &fmctrack_Start_E);
+    fevent_tree->Branch("mctrack_End_X", &fmctrack_End_X);
+    fevent_tree->Branch("mctrack_End_Y", &fmctrack_End_Y);
+    fevent_tree->Branch("mctrack_End_Z", &fmctrack_End_Z);
+    fevent_tree->Branch("mctrack_End_T", &fmctrack_End_T);
+    fevent_tree->Branch("mctrack_End_Px", &fmctrack_End_Px);
+    fevent_tree->Branch("mctrack_End_Py", &fmctrack_End_Py);
+    fevent_tree->Branch("mctrack_End_Pz", &fmctrack_End_Pz);
+    fevent_tree->Branch("mctrack_End_E", &fmctrack_End_E);
     fevent_tree->Branch("mctrack_X", &fmctrack_X);
     fevent_tree->Branch("mctrack_Y", &fmctrack_Y);
     fevent_tree->Branch("mctrack_Z", &fmctrack_Z);
     fevent_tree->Branch("mctrack_T", &fmctrack_T);
-    fevent_tree->Branch("mctrack_Px", &fmctrack_Px);
-    fevent_tree->Branch("mctrack_Py", &fmctrack_Py);
-    fevent_tree->Branch("mctrack_Pz", &fmctrack_Pz);
-    fevent_tree->Branch("mctrack_E", &fmctrack_E);
-    fevent_tree->Branch("mctrack_dQdx", &fmctrack_dQdx);
-    fevent_tree->Branch("mctrack_dEdx", &fmctrack_dEdx);
+    if(fheavy) {
+      fevent_tree->Branch("mctrack_Px", &fmctrack_Px);
+      fevent_tree->Branch("mctrack_Py", &fmctrack_Py);
+      fevent_tree->Branch("mctrack_Pz", &fmctrack_Pz);
+      fevent_tree->Branch("mctrack_E", &fmctrack_E);
+      fevent_tree->Branch("mctrack_dQdx", &fmctrack_dQdx);
+      fevent_tree->Branch("mctrack_dEdx", &fmctrack_dEdx);
+    }
     fevent_tree->Branch("mctrack_MotherTrackID", &fmctrack_MotherTrackID);
     fevent_tree->Branch("mctrack_MotherPdgCode", &fmctrack_MotherPdgCode);
     fevent_tree->Branch("mctrack_MotherProcess", &fmctrack_MotherProcess);
@@ -854,192 +957,190 @@ void FillLightEvent::SetupTrees() {
     fevent_tree->Branch("mcshower_DetProfile_Pz", &fmcshower_DetProfile_Pz);
     fevent_tree->Branch("mcshower_DetProfile_E", &fmcshower_DetProfile_E);
     fevent_tree->Branch("mcshower_DaughterTrackID", &fmcshower_DaughterTrackID);
-    fevent_tree->Branch("mcshower_Charge", &fmcshower_Charge);
-    fevent_tree->Branch("mcshower_dQdx", &fmcshower_dQdx);
+    if(fheavy) {
+      fevent_tree->Branch("mcshower_Charge", &fmcshower_Charge);
+      fevent_tree->Branch("mcshower_dQdx", &fmcshower_dQdx);
+    }
     fevent_tree->Branch("mcshower_StartDir_X", &fmcshower_StartDir_X);
     fevent_tree->Branch("mcshower_StartDir_Y", &fmcshower_StartDir_Y);
     fevent_tree->Branch("mcshower_StartDir_Z", &fmcshower_StartDir_Z);
     if(frmcm_first) fevent_tree->Branch("mcshower_contributed_charge", &fmcshower_contributed_charge);
 
-    fevent_tree->Branch("is_delta_rad", &fis_delta_rad, "is_delta_rad/I");
-    fevent_tree->Branch("delta_true_pdg", &fdelta_true_pdg, "delta_true_pdg/I");
-    fevent_tree->Branch("delta_true_energy", &fdelta_true_energy, "delta_true_energy/D");
-    fevent_tree->Branch("delta_photon_index", &fdelta_photon_index, "delta_photon_index");
-    fevent_tree->Branch("delta_mcshower_index", &fdelta_mcshower_index, "delta_mcshower_index");
-    fevent_tree->Branch("delta_proton_index", &fdelta_proton_index, "delta_proton_index");
-    fevent_tree->Branch("delta_mctrack_index", &fdelta_mctrack_index, "delta_mctrack_index");
-    fevent_tree->Branch("delta_photon_energy", &fdelta_photon_energy, "delta_photon_energy/D");
-    fevent_tree->Branch("delta_proton_energy", &fdelta_proton_energy, "delta_proton_energy/D");
-    fevent_tree->Branch("delta_mcshower_true_pdg", &fdelta_mcshower_true_pdg, "delta_mcshower_true_pdg/I");
-    fevent_tree->Branch("delta_mcshower_true_energy", &fdelta_mcshower_true_energy, "delta_mcshower_true_energy/D");
-    fevent_tree->Branch("delta_mcshower_detprofile_energy", &fdelta_mcshower_detprofile_energy, "delta_mcshower_detprofile_energy/D");
-    fevent_tree->Branch("delta_mctrack_true_pdg", &fdelta_mctrack_true_pdg, "delta_mctrack_true_pdg/I");
-    fevent_tree->Branch("delta_mctrack_true_energy", &fdelta_mctrack_true_energy, "delta_mctrack_true_energy/D");
-    fevent_tree->Branch("delta_mctrack_true_length", &fdelta_mctrack_true_length, "delta_mctrack_true_length/D");
+    fevent_tree->Branch("delta_mct_index", &fdelta_mct_index);
+    fevent_tree->Branch("is_delta_rad", &fis_delta_rad);
+    fevent_tree->Branch("delta_index", &fdelta_index);
+    fevent_tree->Branch("delta_photon_index", &fdelta_photon_index);
+    fevent_tree->Branch("delta_mcshower_index", &fdelta_mcshower_index);
+    fevent_tree->Branch("delta_proton_index", &fdelta_proton_index);
+    fevent_tree->Branch("delta_mctrack_index", &fdelta_mctrack_index);
 
-    fevent_tree->Branch("fweight_genie_ncelaxial_p1sigma", &fweight_genie_ncelaxial_p1sigma, "fweight_genie_ncelaxial_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_ncelaxial_m1sigma", &fweight_genie_ncelaxial_m1sigma, "fweight_genie_ncelaxial_m1sigma/D");
-    fweight_branch_map.emplace("genie_NCELaxial_Genie", std::vector<double *>{&fweight_genie_ncelaxial_p1sigma, &fweight_genie_ncelaxial_m1sigma});
+    if(fheavy) {
 
-    fevent_tree->Branch("fweight_genie_nceleta_p1sigma", &fweight_genie_nceleta_p1sigma, "fweight_genie_nceleta_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nceleta_m1sigma", &fweight_genie_nceleta_m1sigma, "fweight_genie_nceleta_m1sigma/D");
-    fweight_branch_map.emplace("genie_NCELeta_Genie", std::vector<double *>{&fweight_genie_nceleta_p1sigma, &fweight_genie_nceleta_m1sigma});
+      fevent_tree->Branch("fweight_genie_ncelaxial_p1sigma", &fweight_genie_ncelaxial_p1sigma, "fweight_genie_ncelaxial_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_ncelaxial_m1sigma", &fweight_genie_ncelaxial_m1sigma, "fweight_genie_ncelaxial_m1sigma/D");
+      fweight_branch_map.emplace("genie_NCELaxial_Genie", std::vector<double *>{&fweight_genie_ncelaxial_p1sigma, &fweight_genie_ncelaxial_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_qema_p1sigma", &fweight_genie_qema_p1sigma, "fweight_genie_qema_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_qema_m1sigma", &fweight_genie_qema_m1sigma, "fweight_genie_qema_m1sigma/D");
-    fweight_branch_map.emplace("genie_QEMA_Genie", std::vector<double *>{&fweight_genie_qema_p1sigma, &fweight_genie_qema_m1sigma});
+      fevent_tree->Branch("fweight_genie_nceleta_p1sigma", &fweight_genie_nceleta_p1sigma, "fweight_genie_nceleta_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nceleta_m1sigma", &fweight_genie_nceleta_m1sigma, "fweight_genie_nceleta_m1sigma/D");
+      fweight_branch_map.emplace("genie_NCELeta_Genie", std::vector<double *>{&fweight_genie_nceleta_p1sigma, &fweight_genie_nceleta_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_qevec_p1sigma", &fweight_genie_qevec_p1sigma, "fweight_genie_qevec_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_qevec_m1sigma", &fweight_genie_qevec_m1sigma, "fweight_genie_qevec_m1sigma/D");
-    fweight_branch_map.emplace("genie_QEVec_Genie", std::vector<double *>{&fweight_genie_qevec_p1sigma, &fweight_genie_qevec_m1sigma});
+      fevent_tree->Branch("fweight_genie_qema_p1sigma", &fweight_genie_qema_p1sigma, "fweight_genie_qema_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_qema_m1sigma", &fweight_genie_qema_m1sigma, "fweight_genie_qema_m1sigma/D");
+      fweight_branch_map.emplace("genie_QEMA_Genie", std::vector<double *>{&fweight_genie_qema_p1sigma, &fweight_genie_qema_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_ccresaxial_p1sigma", &fweight_genie_ccresaxial_p1sigma, "fweight_genie_ccresaxial_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_ccresaxial_m1sigma", &fweight_genie_ccresaxial_m1sigma, "fweight_genie_ccresaxial_m1sigma/D");
-    fweight_branch_map.emplace("genie_CCResAxial_Genie", std::vector<double *>{&fweight_genie_ccresaxial_p1sigma, &fweight_genie_ccresaxial_m1sigma});
+      fevent_tree->Branch("fweight_genie_qevec_p1sigma", &fweight_genie_qevec_p1sigma, "fweight_genie_qevec_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_qevec_m1sigma", &fweight_genie_qevec_m1sigma, "fweight_genie_qevec_m1sigma/D");
+      fweight_branch_map.emplace("genie_QEVec_Genie", std::vector<double *>{&fweight_genie_qevec_p1sigma, &fweight_genie_qevec_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_ccresvector_p1sigma", &fweight_genie_ccresvector_p1sigma, "fweight_genie_ccresvector_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_ccresvector_m1sigma", &fweight_genie_ccresvector_m1sigma, "fweight_genie_ccresvector_m1sigma/D");
-    fweight_branch_map.emplace("genie_CCResVector_Genie", std::vector<double *>{&fweight_genie_ccresvector_p1sigma, &fweight_genie_ccresvector_m1sigma});
+      fevent_tree->Branch("fweight_genie_ccresaxial_p1sigma", &fweight_genie_ccresaxial_p1sigma, "fweight_genie_ccresaxial_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_ccresaxial_m1sigma", &fweight_genie_ccresaxial_m1sigma, "fweight_genie_ccresaxial_m1sigma/D");
+      fweight_branch_map.emplace("genie_CCResAxial_Genie", std::vector<double *>{&fweight_genie_ccresaxial_p1sigma, &fweight_genie_ccresaxial_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_resganged_p1sigma", &fweight_genie_resganged_p1sigma, "fweight_genie_resganged_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_resganged_m1sigma", &fweight_genie_resganged_m1sigma, "fweight_genie_resganged_m1sigma/D");
-    fweight_branch_map.emplace("genie_ResGanged_Genie", std::vector<double *>{&fweight_genie_resganged_p1sigma, &fweight_genie_resganged_m1sigma});
+      fevent_tree->Branch("fweight_genie_ccresvector_p1sigma", &fweight_genie_ccresvector_p1sigma, "fweight_genie_ccresvector_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_ccresvector_m1sigma", &fweight_genie_ccresvector_m1sigma, "fweight_genie_ccresvector_m1sigma/D");
+      fweight_branch_map.emplace("genie_CCResVector_Genie", std::vector<double *>{&fweight_genie_ccresvector_p1sigma, &fweight_genie_ccresvector_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_ncresaxial_p1sigma", &fweight_genie_ncresaxial_p1sigma, "fweight_genie_ncresaxial_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_ncresaxial_m1sigma", &fweight_genie_ncresaxial_m1sigma, "fweight_genie_ncresaxial_m1sigma/D");
-    fweight_branch_map.emplace("genie_NCResAxial_Genie", std::vector<double *>{&fweight_genie_ncresaxial_p1sigma, &fweight_genie_ncresaxial_m1sigma});
+      fevent_tree->Branch("fweight_genie_resganged_p1sigma", &fweight_genie_resganged_p1sigma, "fweight_genie_resganged_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_resganged_m1sigma", &fweight_genie_resganged_m1sigma, "fweight_genie_resganged_m1sigma/D");
+      fweight_branch_map.emplace("genie_ResGanged_Genie", std::vector<double *>{&fweight_genie_resganged_p1sigma, &fweight_genie_resganged_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_ncresvector_p1sigma", &fweight_genie_ncresvector_p1sigma, "fweight_genie_ncresvector_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_ncresvector_m1sigma", &fweight_genie_ncresvector_m1sigma, "fweight_genie_ncresvector_m1sigma/D");
-    fweight_branch_map.emplace("genie_NCResVector_Genie", std::vector<double *>{&fweight_genie_ncresvector_p1sigma, &fweight_genie_ncresvector_m1sigma});
+      fevent_tree->Branch("fweight_genie_ncresaxial_p1sigma", &fweight_genie_ncresaxial_p1sigma, "fweight_genie_ncresaxial_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_ncresaxial_m1sigma", &fweight_genie_ncresaxial_m1sigma, "fweight_genie_ncresaxial_m1sigma/D");
+      fweight_branch_map.emplace("genie_NCResAxial_Genie", std::vector<double *>{&fweight_genie_ncresaxial_p1sigma, &fweight_genie_ncresaxial_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_cohma_p1sigma", &fweight_genie_cohma_p1sigma, "fweight_genie_cohma_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_cohma_m1sigma", &fweight_genie_cohma_m1sigma, "fweight_genie_cohma_m1sigma/D");
-    fweight_branch_map.emplace("genie_CohMA_Genie", std::vector<double *>{&fweight_genie_cohma_p1sigma, &fweight_genie_cohma_m1sigma});
+      fevent_tree->Branch("fweight_genie_ncresvector_p1sigma", &fweight_genie_ncresvector_p1sigma, "fweight_genie_ncresvector_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_ncresvector_m1sigma", &fweight_genie_ncresvector_m1sigma, "fweight_genie_ncresvector_m1sigma/D");
+      fweight_branch_map.emplace("genie_NCResVector_Genie", std::vector<double *>{&fweight_genie_ncresvector_p1sigma, &fweight_genie_ncresvector_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_cohr0_p1sigma", &fweight_genie_cohr0_p1sigma, "fweight_genie_cohr0_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_cohr0_m1sigma", &fweight_genie_cohr0_m1sigma, "fweight_genie_cohr0_m1sigma/D");
-    fweight_branch_map.emplace("genie_CohR0_Genie", std::vector<double *>{&fweight_genie_cohr0_p1sigma, &fweight_genie_cohr0_m1sigma});
+      fevent_tree->Branch("fweight_genie_cohma_p1sigma", &fweight_genie_cohma_p1sigma, "fweight_genie_cohma_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_cohma_m1sigma", &fweight_genie_cohma_m1sigma, "fweight_genie_cohma_m1sigma/D");
+      fweight_branch_map.emplace("genie_CohMA_Genie", std::vector<double *>{&fweight_genie_cohma_p1sigma, &fweight_genie_cohma_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_nonresrvp1pi_p1sigma", &fweight_genie_nonresrvp1pi_p1sigma, "fweight_genie_nonresrvp1pi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nonresrvp1pi_m1sigma", &fweight_genie_nonresrvp1pi_m1sigma, "fweight_genie_nonresrvp1pi_m1sigma/D");
-    fweight_branch_map.emplace("genie_NonResRvp1pi_Genie", std::vector<double *>{&fweight_genie_nonresrvp1pi_p1sigma, &fweight_genie_nonresrvp1pi_m1sigma});
+      fevent_tree->Branch("fweight_genie_cohr0_p1sigma", &fweight_genie_cohr0_p1sigma, "fweight_genie_cohr0_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_cohr0_m1sigma", &fweight_genie_cohr0_m1sigma, "fweight_genie_cohr0_m1sigma/D");
+      fweight_branch_map.emplace("genie_CohR0_Genie", std::vector<double *>{&fweight_genie_cohr0_p1sigma, &fweight_genie_cohr0_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_nonresrvbarp1pi_p1sigma", &fweight_genie_nonresrvbarp1pi_p1sigma, "fweight_genie_nonresrvbarp1pi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nonresrvbarp1pi_m1sigma", &fweight_genie_nonresrvbarp1pi_m1sigma, "fweight_genie_nonresrvbarp1pi_m1sigma/D");
-    fweight_branch_map.emplace("genie_NonResRvbarp1pi_Genie", std::vector<double *>{&fweight_genie_nonresrvbarp1pi_p1sigma, &fweight_genie_nonresrvbarp1pi_m1sigma});
+      fevent_tree->Branch("fweight_genie_nonresrvp1pi_p1sigma", &fweight_genie_nonresrvp1pi_p1sigma, "fweight_genie_nonresrvp1pi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nonresrvp1pi_m1sigma", &fweight_genie_nonresrvp1pi_m1sigma, "fweight_genie_nonresrvp1pi_m1sigma/D");
+      fweight_branch_map.emplace("genie_NonResRvp1pi_Genie", std::vector<double *>{&fweight_genie_nonresrvp1pi_p1sigma, &fweight_genie_nonresrvp1pi_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_nonresrvp2pi_p1sigma", &fweight_genie_nonresrvp2pi_p1sigma, "fweight_genie_nonresrvp2pi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nonresrvp2pi_m1sigma", &fweight_genie_nonresrvp2pi_m1sigma, "fweight_genie_nonresrvp2pi_m1sigma/D");
-    fweight_branch_map.emplace("genie_NonResRvp2pi_Genie", std::vector<double *>{&fweight_genie_nonresrvp2pi_p1sigma, &fweight_genie_nonresrvp2pi_m1sigma});
+      fevent_tree->Branch("fweight_genie_nonresrvbarp1pi_p1sigma", &fweight_genie_nonresrvbarp1pi_p1sigma, "fweight_genie_nonresrvbarp1pi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nonresrvbarp1pi_m1sigma", &fweight_genie_nonresrvbarp1pi_m1sigma, "fweight_genie_nonresrvbarp1pi_m1sigma/D");
+      fweight_branch_map.emplace("genie_NonResRvbarp1pi_Genie", std::vector<double *>{&fweight_genie_nonresrvbarp1pi_p1sigma, &fweight_genie_nonresrvbarp1pi_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_nonresrvbarp2pi_p1sigma", &fweight_genie_nonresrvbarp2pi_p1sigma, "fweight_genie_nonresrvbarp2pi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nonresrvbarp2pi_m1sigma", &fweight_genie_nonresrvbarp2pi_m1sigma, "fweight_genie_nonresrvbarp2pi_m1sigma/D");
-    fweight_branch_map.emplace("genie_NonResRvbarp2pi_Genie", std::vector<double *>{&fweight_genie_nonresrvbarp2pi_p1sigma, &fweight_genie_nonresrvbarp2pi_m1sigma});
+      fevent_tree->Branch("fweight_genie_nonresrvp2pi_p1sigma", &fweight_genie_nonresrvp2pi_p1sigma, "fweight_genie_nonresrvp2pi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nonresrvp2pi_m1sigma", &fweight_genie_nonresrvp2pi_m1sigma, "fweight_genie_nonresrvp2pi_m1sigma/D");
+      fweight_branch_map.emplace("genie_NonResRvp2pi_Genie", std::vector<double *>{&fweight_genie_nonresrvp2pi_p1sigma, &fweight_genie_nonresrvp2pi_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_resdecaygamma_p1sigma", &fweight_genie_resdecaygamma_p1sigma, "fweight_genie_resdecaygamma_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_resdecaygamma_m1sigma", &fweight_genie_resdecaygamma_m1sigma, "fweight_genie_resdecaygamma_m1sigma/D");
-    fweight_branch_map.emplace("genie_ResDecayGamma_Genie", std::vector<double *>{&fweight_genie_resdecaygamma_p1sigma, &fweight_genie_resdecaygamma_m1sigma});
+      fevent_tree->Branch("fweight_genie_nonresrvbarp2pi_p1sigma", &fweight_genie_nonresrvbarp2pi_p1sigma, "fweight_genie_nonresrvbarp2pi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nonresrvbarp2pi_m1sigma", &fweight_genie_nonresrvbarp2pi_m1sigma, "fweight_genie_nonresrvbarp2pi_m1sigma/D");
+      fweight_branch_map.emplace("genie_NonResRvbarp2pi_Genie", std::vector<double *>{&fweight_genie_nonresrvbarp2pi_p1sigma, &fweight_genie_nonresrvbarp2pi_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_resdecayeta_p1sigma", &fweight_genie_resdecayeta_p1sigma, "fweight_genie_resdecayeta_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_resdecayeta_m1sigma", &fweight_genie_resdecayeta_m1sigma, "fweight_genie_resdecayeta_m1sigma/D");
-    fweight_branch_map.emplace("genie_ResDecayEta_Genie", std::vector<double *>{&fweight_genie_resdecayeta_p1sigma, &fweight_genie_resdecayeta_m1sigma});
+      fevent_tree->Branch("fweight_genie_resdecaygamma_p1sigma", &fweight_genie_resdecaygamma_p1sigma, "fweight_genie_resdecaygamma_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_resdecaygamma_m1sigma", &fweight_genie_resdecaygamma_m1sigma, "fweight_genie_resdecaygamma_m1sigma/D");
+      fweight_branch_map.emplace("genie_ResDecayGamma_Genie", std::vector<double *>{&fweight_genie_resdecaygamma_p1sigma, &fweight_genie_resdecaygamma_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_resdecaytheta_p1sigma", &fweight_genie_resdecaytheta_p1sigma, "fweight_genie_resdecaytheta_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_resdecaytheta_m1sigma", &fweight_genie_resdecaytheta_m1sigma, "fweight_genie_resdecaytheta_m1sigma/D");
-    fweight_branch_map.emplace("genie_ResDecayTheta_Genie", std::vector<double *>{&fweight_genie_resdecaytheta_p1sigma, &fweight_genie_resdecaytheta_m1sigma});
+      fevent_tree->Branch("fweight_genie_resdecayeta_p1sigma", &fweight_genie_resdecayeta_p1sigma, "fweight_genie_resdecayeta_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_resdecayeta_m1sigma", &fweight_genie_resdecayeta_m1sigma, "fweight_genie_resdecayeta_m1sigma/D");
+      fweight_branch_map.emplace("genie_ResDecayEta_Genie", std::vector<double *>{&fweight_genie_resdecayeta_p1sigma, &fweight_genie_resdecayeta_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_nc_p1sigma", &fweight_genie_nc_p1sigma, "fweight_genie_nc_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_nc_m1sigma", &fweight_genie_nc_m1sigma, "fweight_genie_nc_m1sigma/D");
-    fweight_branch_map.emplace("genie_NC_Genie", std::vector<double *>{&fweight_genie_nc_p1sigma, &fweight_genie_nc_m1sigma});
+      fevent_tree->Branch("fweight_genie_resdecaytheta_p1sigma", &fweight_genie_resdecaytheta_p1sigma, "fweight_genie_resdecaytheta_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_resdecaytheta_m1sigma", &fweight_genie_resdecaytheta_m1sigma, "fweight_genie_resdecaytheta_m1sigma/D");
+      fweight_branch_map.emplace("genie_ResDecayTheta_Genie", std::vector<double *>{&fweight_genie_resdecaytheta_p1sigma, &fweight_genie_resdecaytheta_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_disath_p1sigma", &fweight_genie_disath_p1sigma, "fweight_genie_disath_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_disath_m1sigma", &fweight_genie_disath_m1sigma, "fweight_genie_disath_m1sigma/D");
-    fweight_branch_map.emplace("genie_DISAth_Genie", std::vector<double *>{&fweight_genie_disath_p1sigma, &fweight_genie_disath_m1sigma});
+      fevent_tree->Branch("fweight_genie_nc_p1sigma", &fweight_genie_nc_p1sigma, "fweight_genie_nc_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_nc_m1sigma", &fweight_genie_nc_m1sigma, "fweight_genie_nc_m1sigma/D");
+      fweight_branch_map.emplace("genie_NC_Genie", std::vector<double *>{&fweight_genie_nc_p1sigma, &fweight_genie_nc_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_disbth_p1sigma", &fweight_genie_disbth_p1sigma, "fweight_genie_disbth_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_disbth_m1sigma", &fweight_genie_disbth_m1sigma, "fweight_genie_disbth_m1sigma/D");
-    fweight_branch_map.emplace("genie_DISBth_Genie", std::vector<double *>{&fweight_genie_disbth_p1sigma, &fweight_genie_disbth_m1sigma});
+      fevent_tree->Branch("fweight_genie_disath_p1sigma", &fweight_genie_disath_p1sigma, "fweight_genie_disath_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_disath_m1sigma", &fweight_genie_disath_m1sigma, "fweight_genie_disath_m1sigma/D");
+      fweight_branch_map.emplace("genie_DISAth_Genie", std::vector<double *>{&fweight_genie_disath_p1sigma, &fweight_genie_disath_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_discv1u_p1sigma", &fweight_genie_discv1u_p1sigma, "fweight_genie_discv1u_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_discv1u_m1sigma", &fweight_genie_discv1u_m1sigma, "fweight_genie_discv1u_m1sigma/D");
-    fweight_branch_map.emplace("genie_DISCv1u_Genie", std::vector<double *>{&fweight_genie_discv1u_p1sigma, &fweight_genie_discv1u_m1sigma});
+      fevent_tree->Branch("fweight_genie_disbth_p1sigma", &fweight_genie_disbth_p1sigma, "fweight_genie_disbth_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_disbth_m1sigma", &fweight_genie_disbth_m1sigma, "fweight_genie_disbth_m1sigma/D");
+      fweight_branch_map.emplace("genie_DISBth_Genie", std::vector<double *>{&fweight_genie_disbth_p1sigma, &fweight_genie_disbth_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_discv2u_p1sigma", &fweight_genie_discv2u_p1sigma, "fweight_genie_discv2u_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_discv2u_m1sigma", &fweight_genie_discv2u_m1sigma, "fweight_genie_discv2u_m1sigma/D");
-    fweight_branch_map.emplace("genie_DISCv2u_Genie", std::vector<double *>{&fweight_genie_discv2u_p1sigma, &fweight_genie_discv2u_m1sigma});
+      fevent_tree->Branch("fweight_genie_discv1u_p1sigma", &fweight_genie_discv1u_p1sigma, "fweight_genie_discv1u_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_discv1u_m1sigma", &fweight_genie_discv1u_m1sigma, "fweight_genie_discv1u_m1sigma/D");
+      fweight_branch_map.emplace("genie_DISCv1u_Genie", std::vector<double *>{&fweight_genie_discv1u_p1sigma, &fweight_genie_discv1u_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_disnucl_p1sigma", &fweight_genie_disnucl_p1sigma, "fweight_genie_disnucl_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_disnucl_m1sigma", &fweight_genie_disnucl_m1sigma, "fweight_genie_disnucl_m1sigma/D");
-    fweight_branch_map.emplace("genie_DISnucl_Genie", std::vector<double *>{&fweight_genie_disnucl_p1sigma, &fweight_genie_disnucl_m1sigma});
+      fevent_tree->Branch("fweight_genie_discv2u_p1sigma", &fweight_genie_discv2u_p1sigma, "fweight_genie_discv2u_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_discv2u_m1sigma", &fweight_genie_discv2u_m1sigma, "fweight_genie_discv2u_m1sigma/D");
+      fweight_branch_map.emplace("genie_DISCv2u_Genie", std::vector<double *>{&fweight_genie_discv2u_p1sigma, &fweight_genie_discv2u_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_agkyxf_p1sigma", &fweight_genie_agkyxf_p1sigma, "fweight_genie_agkyxf_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_agkyxf_m1sigma", &fweight_genie_agkyxf_m1sigma, "fweight_genie_agkyxf_m1sigma/D");
-    fweight_branch_map.emplace("genie_AGKYxF_Genie", std::vector<double *>{&fweight_genie_agkyxf_p1sigma, &fweight_genie_agkyxf_m1sigma});
+      fevent_tree->Branch("fweight_genie_disnucl_p1sigma", &fweight_genie_disnucl_p1sigma, "fweight_genie_disnucl_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_disnucl_m1sigma", &fweight_genie_disnucl_m1sigma, "fweight_genie_disnucl_m1sigma/D");
+      fweight_branch_map.emplace("genie_DISnucl_Genie", std::vector<double *>{&fweight_genie_disnucl_p1sigma, &fweight_genie_disnucl_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_agkypt_p1sigma", &fweight_genie_agkypt_p1sigma, "fweight_genie_agkypt_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_agkypt_m1sigma", &fweight_genie_agkypt_m1sigma, "fweight_genie_agkypt_m1sigma/D");
-    fweight_branch_map.emplace("genie_AGKYpT_Genie", std::vector<double *>{&fweight_genie_agkypt_p1sigma, &fweight_genie_agkypt_m1sigma});
+      fevent_tree->Branch("fweight_genie_agkyxf_p1sigma", &fweight_genie_agkyxf_p1sigma, "fweight_genie_agkyxf_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_agkyxf_m1sigma", &fweight_genie_agkyxf_m1sigma, "fweight_genie_agkyxf_m1sigma/D");
+      fweight_branch_map.emplace("genie_AGKYxF_Genie", std::vector<double *>{&fweight_genie_agkyxf_p1sigma, &fweight_genie_agkyxf_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_formzone_p1sigma", &fweight_genie_formzone_p1sigma, "fweight_genie_formzone_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_formzone_m1sigma", &fweight_genie_formzone_m1sigma, "fweight_genie_formzone_m1sigma/D");
-    fweight_branch_map.emplace("genie_FormZone_Genie", std::vector<double *>{&fweight_genie_formzone_p1sigma, &fweight_genie_formzone_m1sigma});
+      fevent_tree->Branch("fweight_genie_agkypt_p1sigma", &fweight_genie_agkypt_p1sigma, "fweight_genie_agkypt_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_agkypt_m1sigma", &fweight_genie_agkypt_m1sigma, "fweight_genie_agkypt_m1sigma/D");
+      fweight_branch_map.emplace("genie_AGKYpT_Genie", std::vector<double *>{&fweight_genie_agkypt_p1sigma, &fweight_genie_agkypt_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_fermigasmodelkf_p1sigma", &fweight_genie_fermigasmodelkf_p1sigma, "fweight_genie_fermigasmodelkf_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_fermigasmodelkf_m1sigma", &fweight_genie_fermigasmodelkf_m1sigma, "fweight_genie_fermigasmodelkf_m1sigma/D");
-    fweight_branch_map.emplace("genie_FermiGasModelKf_Genie", std::vector<double *>{&fweight_genie_fermigasmodelkf_p1sigma, &fweight_genie_fermigasmodelkf_m1sigma});
+      fevent_tree->Branch("fweight_genie_formzone_p1sigma", &fweight_genie_formzone_p1sigma, "fweight_genie_formzone_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_formzone_m1sigma", &fweight_genie_formzone_m1sigma, "fweight_genie_formzone_m1sigma/D");
+      fweight_branch_map.emplace("genie_FormZone_Genie", std::vector<double *>{&fweight_genie_formzone_p1sigma, &fweight_genie_formzone_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_fermigasmodelsf_p1sigma", &fweight_genie_fermigasmodelsf_p1sigma, "fweight_genie_fermigasmodelsf_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_fermigasmodelsf_m1sigma", &fweight_genie_fermigasmodelsf_m1sigma, "fweight_genie_fermigasmodelsf_m1sigma/D");
-    fweight_branch_map.emplace("genie_FermiGasModelSf_Genie", std::vector<double *>{&fweight_genie_fermigasmodelsf_p1sigma, &fweight_genie_fermigasmodelsf_m1sigma});
+      fevent_tree->Branch("fweight_genie_fermigasmodelkf_p1sigma", &fweight_genie_fermigasmodelkf_p1sigma, "fweight_genie_fermigasmodelkf_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_fermigasmodelkf_m1sigma", &fweight_genie_fermigasmodelkf_m1sigma, "fweight_genie_fermigasmodelkf_m1sigma/D");
+      fweight_branch_map.emplace("genie_FermiGasModelKf_Genie", std::vector<double *>{&fweight_genie_fermigasmodelkf_p1sigma, &fweight_genie_fermigasmodelkf_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukenmfp_p1sigma", &fweight_genie_intranukenmfp_p1sigma, "fweight_genie_intranukenmfp_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukenmfp_m1sigma", &fweight_genie_intranukenmfp_m1sigma, "fweight_genie_intranukenmfp_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNmfp_Genie", std::vector<double *>{&fweight_genie_intranukenmfp_p1sigma, &fweight_genie_intranukenmfp_m1sigma});
+      fevent_tree->Branch("fweight_genie_fermigasmodelsf_p1sigma", &fweight_genie_fermigasmodelsf_p1sigma, "fweight_genie_fermigasmodelsf_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_fermigasmodelsf_m1sigma", &fweight_genie_fermigasmodelsf_m1sigma, "fweight_genie_fermigasmodelsf_m1sigma/D");
+      fweight_branch_map.emplace("genie_FermiGasModelSf_Genie", std::vector<double *>{&fweight_genie_fermigasmodelsf_p1sigma, &fweight_genie_fermigasmodelsf_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukencex_p1sigma", &fweight_genie_intranukencex_p1sigma, "fweight_genie_intranukencex_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukencex_m1sigma", &fweight_genie_intranukencex_m1sigma, "fweight_genie_intranukencex_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNcex_Genie", std::vector<double *>{&fweight_genie_intranukencex_p1sigma, &fweight_genie_intranukencex_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukenmfp_p1sigma", &fweight_genie_intranukenmfp_p1sigma, "fweight_genie_intranukenmfp_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukenmfp_m1sigma", &fweight_genie_intranukenmfp_m1sigma, "fweight_genie_intranukenmfp_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNmfp_Genie", std::vector<double *>{&fweight_genie_intranukenmfp_p1sigma, &fweight_genie_intranukenmfp_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukenel_p1sigma", &fweight_genie_intranukenel_p1sigma, "fweight_genie_intranukenel_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukenel_m1sigma", &fweight_genie_intranukenel_m1sigma, "fweight_genie_intranukenel_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNel_Genie", std::vector<double *>{&fweight_genie_intranukenel_p1sigma, &fweight_genie_intranukenel_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukencex_p1sigma", &fweight_genie_intranukencex_p1sigma, "fweight_genie_intranukencex_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukencex_m1sigma", &fweight_genie_intranukencex_m1sigma, "fweight_genie_intranukencex_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNcex_Genie", std::vector<double *>{&fweight_genie_intranukencex_p1sigma, &fweight_genie_intranukencex_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukeninel_p1sigma", &fweight_genie_intranukeninel_p1sigma, "fweight_genie_intranukeninel_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukeninel_m1sigma", &fweight_genie_intranukeninel_m1sigma, "fweight_genie_intranukeninel_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNinel_Genie", std::vector<double *>{&fweight_genie_intranukeninel_p1sigma, &fweight_genie_intranukeninel_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukenel_p1sigma", &fweight_genie_intranukenel_p1sigma, "fweight_genie_intranukenel_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukenel_m1sigma", &fweight_genie_intranukenel_m1sigma, "fweight_genie_intranukenel_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNel_Genie", std::vector<double *>{&fweight_genie_intranukenel_p1sigma, &fweight_genie_intranukenel_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukenabs_p1sigma", &fweight_genie_intranukenabs_p1sigma, "fweight_genie_intranukenabs_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukenabs_m1sigma", &fweight_genie_intranukenabs_m1sigma, "fweight_genie_intranukenabs_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNabs_Genie", std::vector<double *>{&fweight_genie_intranukenabs_p1sigma, &fweight_genie_intranukenabs_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukeninel_p1sigma", &fweight_genie_intranukeninel_p1sigma, "fweight_genie_intranukeninel_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukeninel_m1sigma", &fweight_genie_intranukeninel_m1sigma, "fweight_genie_intranukeninel_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNinel_Genie", std::vector<double *>{&fweight_genie_intranukeninel_p1sigma, &fweight_genie_intranukeninel_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukenpi_p1sigma", &fweight_genie_intranukenpi_p1sigma, "fweight_genie_intranukenpi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukenpi_m1sigma", &fweight_genie_intranukenpi_m1sigma, "fweight_genie_intranukenpi_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukeNpi_Genie", std::vector<double *>{&fweight_genie_intranukenpi_p1sigma, &fweight_genie_intranukenpi_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukenabs_p1sigma", &fweight_genie_intranukenabs_p1sigma, "fweight_genie_intranukenabs_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukenabs_m1sigma", &fweight_genie_intranukenabs_m1sigma, "fweight_genie_intranukenabs_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNabs_Genie", std::vector<double *>{&fweight_genie_intranukenabs_p1sigma, &fweight_genie_intranukenabs_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepimfp_p1sigma", &fweight_genie_intranukepimfp_p1sigma, "fweight_genie_intranukepimfp_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepimfp_m1sigma", &fweight_genie_intranukepimfp_m1sigma, "fweight_genie_intranukepimfp_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePImfp_Genie", std::vector<double *>{&fweight_genie_intranukepimfp_p1sigma, &fweight_genie_intranukepimfp_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukenpi_p1sigma", &fweight_genie_intranukenpi_p1sigma, "fweight_genie_intranukenpi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukenpi_m1sigma", &fweight_genie_intranukenpi_m1sigma, "fweight_genie_intranukenpi_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukeNpi_Genie", std::vector<double *>{&fweight_genie_intranukenpi_p1sigma, &fweight_genie_intranukenpi_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepicex_p1sigma", &fweight_genie_intranukepicex_p1sigma, "fweight_genie_intranukepicex_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepicex_m1sigma", &fweight_genie_intranukepicex_m1sigma, "fweight_genie_intranukepicex_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePIcex_Genie", std::vector<double *>{&fweight_genie_intranukepicex_p1sigma, &fweight_genie_intranukepicex_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukepimfp_p1sigma", &fweight_genie_intranukepimfp_p1sigma, "fweight_genie_intranukepimfp_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepimfp_m1sigma", &fweight_genie_intranukepimfp_m1sigma, "fweight_genie_intranukepimfp_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePImfp_Genie", std::vector<double *>{&fweight_genie_intranukepimfp_p1sigma, &fweight_genie_intranukepimfp_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepiel_p1sigma", &fweight_genie_intranukepiel_p1sigma, "fweight_genie_intranukepiel_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepiel_m1sigma", &fweight_genie_intranukepiel_m1sigma, "fweight_genie_intranukepiel_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePIel_Genie", std::vector<double *>{&fweight_genie_intranukepiel_p1sigma, &fweight_genie_intranukepiel_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukepicex_p1sigma", &fweight_genie_intranukepicex_p1sigma, "fweight_genie_intranukepicex_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepicex_m1sigma", &fweight_genie_intranukepicex_m1sigma, "fweight_genie_intranukepicex_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePIcex_Genie", std::vector<double *>{&fweight_genie_intranukepicex_p1sigma, &fweight_genie_intranukepicex_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepiinel_p1sigma", &fweight_genie_intranukepiinel_p1sigma, "fweight_genie_intranukepiinel_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepiinel_m1sigma", &fweight_genie_intranukepiinel_m1sigma, "fweight_genie_intranukepiinel_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePIinel_Genie", std::vector<double *>{&fweight_genie_intranukepiinel_p1sigma, &fweight_genie_intranukepiinel_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukepiel_p1sigma", &fweight_genie_intranukepiel_p1sigma, "fweight_genie_intranukepiel_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepiel_m1sigma", &fweight_genie_intranukepiel_m1sigma, "fweight_genie_intranukepiel_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePIel_Genie", std::vector<double *>{&fweight_genie_intranukepiel_p1sigma, &fweight_genie_intranukepiel_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepiabs_p1sigma", &fweight_genie_intranukepiabs_p1sigma, "fweight_genie_intranukepiabs_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepiabs_m1sigma", &fweight_genie_intranukepiabs_m1sigma, "fweight_genie_intranukepiabs_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePIabs_Genie", std::vector<double *>{&fweight_genie_intranukepiabs_p1sigma, &fweight_genie_intranukepiabs_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukepiinel_p1sigma", &fweight_genie_intranukepiinel_p1sigma, "fweight_genie_intranukepiinel_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepiinel_m1sigma", &fweight_genie_intranukepiinel_m1sigma, "fweight_genie_intranukepiinel_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePIinel_Genie", std::vector<double *>{&fweight_genie_intranukepiinel_p1sigma, &fweight_genie_intranukepiinel_m1sigma});
 
-    fevent_tree->Branch("fweight_genie_intranukepipi_p1sigma", &fweight_genie_intranukepipi_p1sigma, "fweight_genie_intranukepipi_p1sigma/D");
-    fevent_tree->Branch("fweight_genie_intranukepipi_m1sigma", &fweight_genie_intranukepipi_m1sigma, "fweight_genie_intranukepipi_m1sigma/D");
-    fweight_branch_map.emplace("genie_IntraNukePIpi_Genie", std::vector<double *>{&fweight_genie_intranukepipi_p1sigma, &fweight_genie_intranukepipi_m1sigma});
+      fevent_tree->Branch("fweight_genie_intranukepiabs_p1sigma", &fweight_genie_intranukepiabs_p1sigma, "fweight_genie_intranukepiabs_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepiabs_m1sigma", &fweight_genie_intranukepiabs_m1sigma, "fweight_genie_intranukepiabs_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePIabs_Genie", std::vector<double *>{&fweight_genie_intranukepiabs_p1sigma, &fweight_genie_intranukepiabs_m1sigma});
+
+      fevent_tree->Branch("fweight_genie_intranukepipi_p1sigma", &fweight_genie_intranukepipi_p1sigma, "fweight_genie_intranukepipi_p1sigma/D");
+      fevent_tree->Branch("fweight_genie_intranukepipi_m1sigma", &fweight_genie_intranukepipi_m1sigma, "fweight_genie_intranukepipi_m1sigma/D");
+      fweight_branch_map.emplace("genie_IntraNukePIpi_Genie", std::vector<double *>{&fweight_genie_intranukepipi_p1sigma, &fweight_genie_intranukepipi_m1sigma});
+    }
+
   }    
 
 }
@@ -1084,10 +1185,15 @@ void FillLightEvent::beginSubRun(art::SubRun const & sr) {
 
 void FillLightEvent::ResetEvent() {
 
-  fopflash_producer_indices.resize(fopflashp_size, std::vector<unsigned int>());
-  fhit_producer_indices.resize(fhitp_size, std::vector<unsigned int>());
-  ftrack_producer_indices.resize(ftrackp_size, std::vector<unsigned int>());
-  fshower_producer_indices.resize(fshowerp_size, std::vector<unsigned int>());
+  fopflash_producer_indices.clear();
+  fhit_producer_indices.clear();
+  ftrack_producer_indices.clear();
+  fshower_producer_indices.clear();
+
+  fopflash_producer_indices.reserve(fopflashp_size);
+  fhit_producer_indices.reserve(fhitp_size);
+  ftrack_producer_indices.reserve(ftrackp_size);
+  fshower_producer_indices.reserve(fshowerp_size);
 
   frun_number = -1;
   fsubrun_number = -1;
@@ -1178,11 +1284,17 @@ void FillLightEvent::ResetEvent() {
   freco_track_Phi.clear();
   freco_track_ZenithAngle.clear();
   freco_track_AzimuthAngle.clear();
+  freco_track_VertexDirection_X.clear();
+  freco_track_VertexDirection_Y.clear();
+  freco_track_VertexDirection_Z.clear();
   freco_track_to_reco_hit.clear();
   freco_track_EnergyHelper_resrange.clear();
   freco_track_EnergyHelper_dedx.clear();
   freco_track_EnergyHelper_energy.clear();
   if(frmcm_first) {
+    freco_track_largest_mc_type.clear();
+    freco_track_largest_mc_index.clear();
+    freco_track_largest_ratio.clear();
     freco_track_mc_type.clear();
     freco_track_mc_index.clear();
     freco_track_charge_contribution.clear();
@@ -1218,30 +1330,40 @@ void FillLightEvent::ResetEvent() {
   freco_shower_EnergyHelper_energy.clear();
   freco_shower_EnergyHelper_dedx.clear();
   if(frmcm_first) {
+    freco_shower_largest_mc_type.clear();
+    freco_shower_largest_mc_index.clear();
+    freco_shower_largest_ratio.clear();
     freco_shower_mc_type.clear();
     freco_shower_mc_index.clear();
     freco_shower_charge_contribution.clear();
     freco_shower_charge_total.clear();
   }
 
+  fpfp_pdg.clear();
+  fpfp_vertex_X.clear();
+  fpfp_vertex_Y.clear();
+  fpfp_vertex_Z.clear();
+  fpfp_original_index.clear();
+  fpfp_children.clear();
+
   if(fmc) {
 
-    fnu_pdg = 0;
-    fnu_energy = -1;
-    flep_pdg = -1;
-    flep_energy = 0;
-    fccnc = -1;
-    fmode = -1;
-    finteraction_type = -1;
+    fnu_pdg.clear();
+    fnu_energy.clear();
+    flep_pdg.clear();
+    flep_energy.clear();
+    fccnc.clear();
+    fmode.clear();
+    finteraction_type.clear();
 
-    ftrue_nuvertx = -10000;
-    ftrue_nuverty = -10000;
-    ftrue_nuvertz = -10000;
+    ftrue_nuvertx.clear();
+    ftrue_nuverty.clear();
+    ftrue_nuvertz.clear();
 
-    ftrue_nu_E = -1;
+    ftrue_nu_E.clear();
 
-    ftrue_nu_vtx_tpc_contained = -1;
-    ftrue_nu_vtx_fid_contained = -1;
+    ftrue_nu_vtx_tpc_contained.clear();
+    ftrue_nu_vtx_fid_contained.clear();
 
     fgenie_particle_TrackId.clear();
     fgenie_particle_StatusCode.clear();
@@ -1276,6 +1398,22 @@ void FillLightEvent::ResetEvent() {
     fmctrack_PdgCode.clear();
     fmctrack_TrackID.clear();
     fmctrack_Process.clear();
+    fmctrack_Start_X.clear();
+    fmctrack_Start_Y.clear();
+    fmctrack_Start_Z.clear();
+    fmctrack_Start_T.clear();
+    fmctrack_Start_Px.clear();
+    fmctrack_Start_Py.clear();
+    fmctrack_Start_Pz.clear();
+    fmctrack_Start_E.clear();
+    fmctrack_End_X.clear();
+    fmctrack_End_Y.clear();
+    fmctrack_End_Z.clear();
+    fmctrack_End_T.clear();
+    fmctrack_End_Px.clear();
+    fmctrack_End_Py.clear();
+    fmctrack_End_Pz.clear();
+    fmctrack_End_E.clear();
     fmctrack_X.clear();
     fmctrack_Y.clear();
     fmctrack_Z.clear();
@@ -1336,21 +1474,13 @@ void FillLightEvent::ResetEvent() {
     fmcshower_StartDir_Z.clear();
     fmcshower_contributed_charge.clear();
 
-    fis_delta_rad = -1;
-    fdelta_true_pdg = 0;
-    fdelta_true_energy = -1;
-    fdelta_photon_index = -1;
-    fdelta_mcshower_index = -1;
-    fdelta_proton_index = -1;
-    fdelta_mctrack_index = -1;
-    fdelta_photon_energy = -1;
-    fdelta_proton_energy = -1;
-    fdelta_mcshower_true_pdg = 0;
-    fdelta_mcshower_true_energy = -1;
-    fdelta_mcshower_detprofile_energy = -1;
-    fdelta_mctrack_true_pdg = 0;
-    fdelta_mctrack_true_energy = -1;
-    fdelta_mctrack_true_length = -1;  
+    fdelta_mct_index = -1;
+    fis_delta_rad.clear();
+    fdelta_index.clear();
+    fdelta_photon_index.clear();
+    fdelta_mcshower_index.clear();
+    fdelta_proton_index.clear();
+    fdelta_mctrack_index.clear();
 
     fweight_genie_ncelaxial_p1sigma = -1;
     fweight_genie_ncelaxial_m1sigma = -1;
@@ -1512,14 +1642,12 @@ void FillLightEvent::FillSWTriggerVectors(art::Event const & e) {
 void FillLightEvent::FillRecoOpFlashVectors(art::Event const & e, int const producer_index, size_t const opflash_index_offset) {
 
   art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producers.at(producer_index));
-  std::vector<unsigned int> & indices = fopflash_producer_indices.at(producer_index);
-  indices.reserve(ev_opf->size());
 
   for(size_t i = 0; i < ev_opf->size(); ++i) {
 
-    indices.push_back(i + opflash_index_offset);
-
     recob::OpFlash const & opf = ev_opf->at(i);
+
+    //size_t const index = i + opflash_index_offset;
 
     freco_opflash_producer_index.push_back(producer_index);
     freco_opflash_Time.push_back(opf.Time());
@@ -1549,6 +1677,7 @@ void FillLightEvent::FillRecoOpFlashVectors(art::Event const & e) {
   for(size_t i = 0; i < fopflashp_size; ++i) {
     art::ValidHandle<std::vector<recob::OpFlash>> const & ev_opf = e.getValidHandle<std::vector<recob::OpFlash>>(fopflash_producers.at(i));
     size += ev_opf->size();
+    fopflash_producer_indices.push_back(size);
   }
 
   freco_opflash_producer_index.reserve(size);
@@ -1581,8 +1710,6 @@ void FillLightEvent::FillRecoOpFlashVectors(art::Event const & e) {
 void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer_index, size_t const hit_index_offset) {
 
   art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(producer_index));  
-  std::vector<unsigned int> & indices = fhit_producer_indices.at(producer_index);
-  indices.reserve(ev_h->size());
 
   std::unordered_map<int, size_t> const * tp_map = nullptr;
   std::unordered_map<int, size_t> const * sp_map = nullptr;
@@ -1599,9 +1726,9 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer
 
   for(size_t i = 0; i < ev_h->size(); ++i) {
 
-    indices.push_back(i + hit_index_offset);
-
     recob::Hit const & h = ev_h->at(i);
+
+    size_t const index = i + hit_index_offset;
 
     freco_hit_producer_index.push_back(producer_index);
     freco_hit_StartTick.push_back(h.StartTick());
@@ -1632,16 +1759,16 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer
       particles_per_hit->get(i, particle_vec, match_vec);
       size_t const particle_vec_size = particle_vec.size();
 
-      std::vector<int> & reco_hit_mc_type = freco_hit_mc_type.at(i);
-      std::vector<unsigned int> & reco_hit_mc_index = freco_hit_mc_index.at(i);
+      std::vector<int> & reco_hit_mc_type = freco_hit_mc_type.at(index);
+      std::vector<int> & reco_hit_mc_index = freco_hit_mc_index.at(index);
       /*
-      std::vector<float> & reco_hit_true_ideFraction = freco_hit_true_ideFraction.at(i);
-      std::vector<int> & reco_hit_true_isMaxIDE = freco_hit_true_isMaxIDE.at(i);
-      std::vector<float> & reco_hit_true_ideNFraction = freco_hit_true_ideNFraction.at(i);
-      std::vector<int> & reco_hit_true_isMaxIDEN = freco_hit_true_isMaxIDEN.at(i);
+      std::vector<float> & reco_hit_true_ideFraction = freco_hit_true_ideFraction.at(index);
+      std::vector<int> & reco_hit_true_isMaxIDE = freco_hit_true_isMaxIDE.at(index);
+      std::vector<float> & reco_hit_true_ideNFraction = freco_hit_true_ideNFraction.at(index);
+      std::vector<int> & reco_hit_true_isMaxIDEN = freco_hit_true_isMaxIDEN.at(index);
       */ 
-      std::vector<float> & reco_hit_true_numElectrons = freco_hit_true_numElectrons.at(i);
-      std::vector<float> & reco_hit_true_energy = freco_hit_true_energy.at(i);
+      std::vector<float> & reco_hit_true_numElectrons = freco_hit_true_numElectrons.at(index);
+      std::vector<float> & reco_hit_true_energy = freco_hit_true_energy.at(index);
       
       freco_hit_mc_type.reserve(particle_vec_size);
       freco_hit_mc_index.reserve(particle_vec_size);
@@ -1701,6 +1828,7 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e) {
   for(size_t i = 0; i < fhitp_size; ++i) {
     art::ValidHandle<std::vector<recob::Hit>> const & ev_h = e.getValidHandle<std::vector<recob::Hit>>(fhit_producers.at(i));
     size += ev_h->size();
+    fhit_producer_indices.push_back(size);
   }
 
   freco_hit_producer_index.reserve(size);
@@ -1726,7 +1854,7 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e) {
   freco_hit_WireID_WireID.reserve(size);
   if(frmcm_first) {
     freco_hit_mc_type.resize(size, std::vector<int>());
-    freco_hit_mc_index.resize(size, std::vector<unsigned int>());
+    freco_hit_mc_index.resize(size, std::vector<int>());
     /*
     freco_hit_true_ideFraction.resize(size, std::vector<float>());
     freco_hit_true_isMaxIDE.resize(size, std::vector<int>());
@@ -1786,8 +1914,6 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
 
   std::string const & track_producer = ftrack_producers.at(producer_index);
   art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(track_producer);  
-  std::vector<unsigned int> & indices = ftrack_producer_indices.at(producer_index);
-  indices.reserve(ev_t->size());
   art::FindManyP<recob::Hit> hits_per_track(ev_t, e, track_producer);
   std::vector<RecoMCMatch> const * track_matches = nullptr;
   if(frmcm_first) {
@@ -1797,10 +1923,10 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
 
   for(size_t i = 0; i < ev_t->size(); ++i) {
 
-    indices.push_back(i + track_index_offset);
-
     recob::Track const & t = ev_t->at(i);
     size_t const traj_size = t.NumberTrajectoryPoints();
+
+    size_t const index = i + track_index_offset;
 
     freco_track_producer_index.push_back(producer_index);
     freco_track_NumberTrajectoryPoints.push_back(t.NumberTrajectoryPoints());
@@ -1816,17 +1942,13 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
     freco_track_Ndof.push_back(t.Ndof());
     freco_track_ParticleId.push_back(t.ParticleId());
 
-    std::vector<double> & reco_track_X_traj = freco_track_X.at(i);
-    std::vector<double> & reco_track_Y_traj = freco_track_Y.at(i);
-    std::vector<double> & reco_track_Z_traj = freco_track_Z.at(i);
-    std::vector<double> & reco_track_Px_traj = freco_track_Px.at(i);
-    std::vector<double> & reco_track_Py_traj = freco_track_Py.at(i);
-    std::vector<double> & reco_track_Pz_traj = freco_track_Pz.at(i);
-    std::vector<double> & reco_track_Length_traj = freco_track_Length.at(i);
-    std::vector<double> & reco_track_Theta_traj = freco_track_Theta.at(i);
-    std::vector<double> & reco_track_Phi_traj = freco_track_Phi.at(i);
-    std::vector<double> & reco_track_ZenithAngle_traj = freco_track_ZenithAngle.at(i);
-    std::vector<double> & reco_track_AzimuthAngle_traj = freco_track_AzimuthAngle.at(i);    
+    std::vector<double> & reco_track_X_traj = freco_track_X.at(index);
+    std::vector<double> & reco_track_Y_traj = freco_track_Y.at(index);
+    std::vector<double> & reco_track_Z_traj = freco_track_Z.at(index);
+    std::vector<double> & reco_track_Px_traj = freco_track_Px.at(index);
+    std::vector<double> & reco_track_Py_traj = freco_track_Py.at(index);
+    std::vector<double> & reco_track_Pz_traj = freco_track_Pz.at(index);
+    std::vector<double> & reco_track_Length_traj = freco_track_Length.at(index);
 
     reco_track_X_traj.reserve(traj_size);
     reco_track_Y_traj.reserve(traj_size);
@@ -1835,10 +1957,6 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
     reco_track_Py_traj.reserve(traj_size);
     reco_track_Pz_traj.reserve(traj_size);
     reco_track_Length_traj.reserve(traj_size);
-    reco_track_Theta_traj.reserve(traj_size);
-    reco_track_Phi_traj.reserve(traj_size);
-    reco_track_ZenithAngle_traj.reserve(traj_size);
-    reco_track_AzimuthAngle_traj.reserve(traj_size);
     
     for(size_t j = 0; j < traj_size; ++j) {
 
@@ -1853,14 +1971,18 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
       reco_track_Py_traj.push_back(mom.Y());
       reco_track_Pz_traj.push_back(mom.Z());
       reco_track_Length_traj.push_back(t.Length(j));
-      reco_track_Theta_traj.push_back(t.Theta(j));
-      reco_track_Phi_traj.push_back(t.Phi(j));
-      reco_track_ZenithAngle_traj.push_back(t.ZenithAngle(j));
-      reco_track_AzimuthAngle_traj.push_back(t.AzimuthAngle(j));
 
     }
 
-    std::vector<unsigned int> & reco_track_to_reco_hit = freco_track_to_reco_hit.at(i);
+    freco_track_Theta.push_back(t.Theta());
+    freco_track_Phi.push_back(t.Phi());
+    freco_track_ZenithAngle.push_back(t.ZenithAngle());
+    freco_track_AzimuthAngle.push_back(t.AzimuthAngle());
+    freco_track_VertexDirection_X.push_back(t.VertexDirection().X());
+    freco_track_VertexDirection_Y.push_back(t.VertexDirection().Y());
+    freco_track_VertexDirection_Z.push_back(t.VertexDirection().Z());
+
+    std::vector<int> & reco_track_to_reco_hit = freco_track_to_reco_hit.at(index);
     reco_track_to_reco_hit.reserve(hits_per_track.size());
     for(art::Ptr<recob::Hit> const & hit_ptr : hits_per_track.at(i)) {
       reco_track_to_reco_hit.push_back(hit_ptr.key() + hit_index_offset);
@@ -1876,9 +1998,13 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
       
       RecoMCMatch const & track_match = track_matches->at(i);
       
-      std::vector<int> & reco_track_mc_type = freco_track_mc_type.at(i);
-      std::vector<unsigned int> & reco_track_mc_index = freco_track_mc_index.at(i);
-      std::vector<double> & reco_track_charge_contribution = freco_track_charge_contribution.at(i);    
+      freco_track_largest_mc_type.push_back(track_match.mc_type);
+      freco_track_largest_mc_index.push_back(track_match.mc_index);
+      freco_track_largest_ratio.push_back(track_match.ratio);
+      
+      std::vector<int> & reco_track_mc_type = freco_track_mc_type.at(index);
+      std::vector<int> & reco_track_mc_index = freco_track_mc_index.at(index);
+      std::vector<double> & reco_track_charge_contribution = freco_track_charge_contribution.at(index);    
       
       size_t const matching_map_size = track_match.mctrack_map.size() + track_match.mcshower_map.size() + track_match.mcparticle_map.size();
       reco_track_mc_type.reserve(matching_map_size);
@@ -1923,6 +2049,7 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
   for(size_t i = 0; i < ftrackp_size; ++i) {
     art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producers.at(i));
     size += ev_t->size();
+    ftrack_producer_indices.push_back(size);
   }
 
   freco_track_producer_index.reserve(size);
@@ -1945,17 +2072,23 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
   freco_track_Chi2PerNdof.reserve(size);
   freco_track_Ndof.reserve(size);
   freco_track_ParticleId.reserve(size);
-  freco_track_Theta.resize(size, std::vector<double>());
-  freco_track_Phi.resize(size, std::vector<double>());
-  freco_track_ZenithAngle.resize(size, std::vector<double>());
-  freco_track_AzimuthAngle.resize(size, std::vector<double>());
-  freco_track_to_reco_hit.resize(size, std::vector<unsigned int>());
+  freco_track_Theta.reserve(size);
+  freco_track_Phi.reserve(size);
+  freco_track_ZenithAngle.reserve(size);
+  freco_track_AzimuthAngle.reserve(size);
+  freco_track_VertexDirection_X.reserve(size);
+  freco_track_VertexDirection_Y.reserve(size);
+  freco_track_VertexDirection_Z.reserve(size);
+  freco_track_to_reco_hit.resize(size, std::vector<int>());
   freco_track_EnergyHelper_resrange.reserve(size);
   freco_track_EnergyHelper_dedx.reserve(size);
   freco_track_EnergyHelper_energy.reserve(size);
   if(frmcm_first) {
+    freco_track_largest_mc_type.reserve(size);
+    freco_track_largest_mc_index.reserve(size);
+    freco_track_largest_ratio.reserve(size);
     freco_track_mc_type.resize(size, std::vector<int>());
-    freco_track_mc_index.resize(size, std::vector<unsigned int>());
+    freco_track_mc_index.resize(size, std::vector<int>());
     freco_track_charge_contribution.resize(size, std::vector<double>());
     freco_track_charge_total.reserve(size);
   }
@@ -2023,8 +2156,6 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const produ
 
   std::string const & shower_producer = fshower_producers.at(producer_index);
   art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(shower_producer);  
-  std::vector<unsigned int> & indices = fshower_producer_indices.at(producer_index);
-  indices.reserve(ev_s->size());
   art::FindManyP<recob::Hit> hits_per_shower(ev_s, e, shower_producer);
   std::vector<RecoMCMatch> const * shower_matches = nullptr;
   if(frmcm_first) {
@@ -2034,9 +2165,9 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const produ
   
   for(size_t i = 0; i < ev_s->size(); ++i) {
 
-    indices.push_back(i + shower_index_offset);
-
     recob::Shower const & s = ev_s->at(i);
+
+    size_t const index = i + shower_index_offset;
 
     freco_shower_producer_index.push_back(producer_index);
     freco_shower_Direction_x.push_back(s.Direction().X());
@@ -2063,7 +2194,7 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const produ
     freco_shower_has_open_angle.push_back(s.OpenAngle());
     freco_shower_has_length.push_back(s.has_length());
 
-    std::vector<unsigned int> & reco_shower_to_reco_hit = freco_shower_to_reco_hit.at(i);
+    std::vector<int> & reco_shower_to_reco_hit = freco_shower_to_reco_hit.at(index);
     reco_shower_to_reco_hit.reserve(hits_per_shower.size());
     for(art::Ptr<recob::Hit> const & hit_ptr : hits_per_shower.at(i)) {
       reco_shower_to_reco_hit.push_back(hit_ptr.key() + hit_index_offset);
@@ -2078,10 +2209,14 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const produ
     if(shower_matches) {
       
       RecoMCMatch const & shower_match = shower_matches->at(i);
+
+      freco_shower_largest_mc_type.push_back(shower_match.mc_type);
+      freco_shower_largest_mc_index.push_back(shower_match.mc_index);
+      freco_shower_largest_ratio.push_back(shower_match.ratio);
       
-      std::vector<int> & reco_shower_mc_type = freco_shower_mc_type.at(i);
-      std::vector<unsigned int> & reco_shower_mc_index = freco_shower_mc_index.at(i);
-      std::vector<double> & reco_shower_charge_contribution = freco_shower_charge_contribution.at(i);    
+      std::vector<int> & reco_shower_mc_type = freco_shower_mc_type.at(index);
+      std::vector<int> & reco_shower_mc_index = freco_shower_mc_index.at(index);
+      std::vector<double> & reco_shower_charge_contribution = freco_shower_charge_contribution.at(index);    
       
       size_t const matching_map_size = shower_match.mctrack_map.size() + shower_match.mcshower_map.size() + shower_match.mcparticle_map.size();
       reco_shower_mc_type.reserve(matching_map_size);
@@ -2126,6 +2261,7 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e) {
   for(size_t i = 0; i < fshowerp_size; ++i) {
     art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producers.at(i));
     size += ev_s->size();
+    fshower_producer_indices.push_back(size);
   }
 
   freco_shower_producer_index.reserve(size);
@@ -2152,13 +2288,16 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e) {
   freco_shower_dEdxErr.reserve(size);
   freco_shower_has_open_angle.reserve(size);
   freco_shower_has_length.reserve(size);
-  freco_shower_to_reco_hit.resize(size, std::vector<unsigned int>());
+  freco_shower_to_reco_hit.resize(size, std::vector<int>());
   freco_shower_EnergyHelper_energy_legacy.reserve(size);
   freco_shower_EnergyHelper_energy.reserve(size);
   freco_shower_EnergyHelper_dedx.reserve(size);
   if(frmcm_first) {
+    freco_shower_largest_mc_type.reserve(size);
+    freco_shower_largest_mc_index.reserve(size);
+    freco_shower_largest_ratio.reserve(size);
     freco_shower_mc_type.resize(size, std::vector<int>());
-    freco_shower_mc_index.resize(size, std::vector<unsigned int>());
+    freco_shower_mc_index.resize(size, std::vector<int>());
     freco_shower_charge_contribution.resize(size, std::vector<double>());
     freco_shower_charge_total.reserve(size);
   }
@@ -2173,6 +2312,93 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e) {
     hit_index_offset += ev_h->size();
   }
 
+}
+
+
+void FillLightEvent::FillPandora(art::Event const & e) {
+
+  std::string const fpfp_producer = "pandoraNu";
+  art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp = e.getValidHandle<std::vector<recob::PFParticle>>(fpfp_producer);
+  size_t const size = ev_pfp->size();
+
+  fpfp_pdg.reserve(size);
+  fpfp_vertex_X.reserve(size);
+  fpfp_vertex_Y.reserve(size);
+  fpfp_vertex_Z.reserve(size);
+  fpfp_original_index.reserve(size);
+  fpfp_children.reserve(size);
+
+  size_t track_offset = 0;
+  for(size_t i = 0; i < ftrackp_size; ++i) {
+    if(ftrack_producers.at(i) == "pandoraNu") break;
+    art::ValidHandle<std::vector<recob::Track>> const & ev_t = e.getValidHandle<std::vector<recob::Track>>(ftrack_producers.at(i));
+    track_offset += ev_t->size();
+  }
+
+  size_t shower_offset = 0;
+  for(size_t i = 0; i < fshowerp_size; ++i) {
+    if(fshower_producers.at(i) == "pandoraNu") break;
+    art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producers.at(i));
+    shower_offset += ev_s->size();
+  }
+
+  art::FindManyP<recob::Vertex> PFPToVertex(ev_pfp, e, fpfp_producer);
+  art::FindManyP<recob::Shower> PFPToShower(ev_pfp, e, fpfp_producer);
+  art::FindManyP<recob::Track> PFPToTrack(ev_pfp, e, fpfp_producer);
+
+  for(size_t i = 0; i < size; ++i) {
+
+    recob::PFParticle const & pfp = ev_pfp->at(i);
+    int const pdg = pfp.PdgCode();
+    int original_index = -1;
+
+    std::vector<art::Ptr<recob::Vertex>> asso_vertices = PFPToVertex.at(i);
+    if(asso_vertices.size() > 1) {
+      std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nWarning: more than one vertex associated with pfp\n";
+    }
+    std::vector<double> xyz(3, -10000);
+
+    if(abs(pdg) == 12 || abs(pdg) == 14) {
+      asso_vertices.front()->XYZ(&(xyz[0]));
+    }
+    else if(abs(pdg) == 13) {
+      std::vector<art::Ptr<recob::Track>> asso_tracks = PFPToTrack.at(i);
+      if(asso_tracks.size() > 1) {
+	std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nWarning: more than one track associated with pfp\n";
+      }
+      else if(asso_tracks.size() == 0) {
+	if(fverbose) std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nWarning: no track associated with pfp\n";
+      }
+      else {
+	original_index = asso_tracks.front().key() + track_offset;
+      }
+    }
+
+    else if(abs(pdg) == 11) {
+      std::vector<art::Ptr<recob::Shower>> asso_showers = PFPToShower.at(i);
+      if(asso_showers.size() > 1) {
+	std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nWarning: more than one shower associated with pfp\n";
+      }
+      else if(asso_showers.size() == 0) {
+	if(fverbose) std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\nWarning: no shower associated with pfp\n";
+      }
+      else {
+	original_index = asso_showers.front().key() + shower_offset;
+      }
+    }
+
+    fpfp_pdg.push_back(pdg);
+    fpfp_vertex_X.push_back(xyz[0]);
+    fpfp_vertex_Y.push_back(xyz[1]);
+    fpfp_vertex_Z.push_back(xyz[2]);
+    fpfp_original_index.push_back(original_index);
+    std::vector<int> daughters;
+    daughters.reserve(pfp.Daughters().size());
+    for(unsigned int const dtid : pfp.Daughters()) daughters.push_back(dtid);
+    fpfp_children.push_back(daughters);
+    
+  }
+  
 }
 
 
@@ -2201,38 +2427,80 @@ void FillLightEvent::FillWeights(art::Event const & e) {
 }
 
 
-void FillLightEvent::FillGenieParticleVectors(simb::MCTruth const & mct) {
+void FillLightEvent::FillGenieParticleVectors(art::Event const & e,
+					      size_t const mct_index) {
 
-  fgenie_particle_TrackId.reserve(mct.NParticles());
-  fgenie_particle_StatusCode.reserve(mct.NParticles());
-  fgenie_particle_PdgCode.reserve(mct.NParticles());
-  fgenie_particle_Mother.reserve(mct.NParticles());
-  fgenie_particle_X.reserve(mct.NParticles());
-  fgenie_particle_Y.reserve(mct.NParticles());
-  fgenie_particle_Z.reserve(mct.NParticles());
-  fgenie_particle_T.reserve(mct.NParticles());
-  fgenie_particle_Px.reserve(mct.NParticles());
-  fgenie_particle_Py.reserve(mct.NParticles());
-  fgenie_particle_Pz.reserve(mct.NParticles());
-  fgenie_particle_E.reserve(mct.NParticles());
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
+  simb::MCTruth const & mct = ev_mct->at(mct_index);
+
+  std::vector<int> & genie_particle_TrackId = fgenie_particle_TrackId.at(mct_index);
+  std::vector<int> & genie_particle_StatusCode = fgenie_particle_StatusCode.at(mct_index);
+  std::vector<int> & genie_particle_PdgCode = fgenie_particle_PdgCode.at(mct_index);
+  std::vector<int> & genie_particle_Mother = fgenie_particle_Mother.at(mct_index);
+  std::vector<double> & genie_particle_X = fgenie_particle_X.at(mct_index);
+  std::vector<double> & genie_particle_Y = fgenie_particle_Y.at(mct_index);
+  std::vector<double> & genie_particle_Z = fgenie_particle_Z.at(mct_index);
+  std::vector<double> & genie_particle_T = fgenie_particle_T.at(mct_index);
+  std::vector<double> & genie_particle_Px = fgenie_particle_Px.at(mct_index);
+  std::vector<double> & genie_particle_Py = fgenie_particle_Py.at(mct_index);
+  std::vector<double> & genie_particle_Pz = fgenie_particle_Pz.at(mct_index);
+  std::vector<double> & genie_particle_E = fgenie_particle_E.at(mct_index);
+
+  genie_particle_TrackId.reserve(mct.NParticles());
+  genie_particle_StatusCode.reserve(mct.NParticles());
+  genie_particle_PdgCode.reserve(mct.NParticles());
+  genie_particle_Mother.reserve(mct.NParticles());
+  genie_particle_X.reserve(mct.NParticles());
+  genie_particle_Y.reserve(mct.NParticles());
+  genie_particle_Z.reserve(mct.NParticles());
+  genie_particle_T.reserve(mct.NParticles());
+  genie_particle_Px.reserve(mct.NParticles());
+  genie_particle_Py.reserve(mct.NParticles());
+  genie_particle_Pz.reserve(mct.NParticles());
+  genie_particle_E.reserve(mct.NParticles());
 
   for(int i = 0; i < mct.NParticles(); ++i) {
     simb::MCParticle const & mcp = mct.GetParticle(i);
-    fgenie_particle_TrackId.push_back(mcp.TrackId());
-    fgenie_particle_StatusCode.push_back(mcp.StatusCode());
-    fgenie_particle_PdgCode.push_back(mcp.PdgCode());
-    fgenie_particle_Mother.push_back(mcp.Mother());
+    genie_particle_TrackId.push_back(mcp.TrackId());
+    genie_particle_StatusCode.push_back(mcp.StatusCode());
+    genie_particle_PdgCode.push_back(mcp.PdgCode());
+    genie_particle_Mother.push_back(mcp.Mother());
     simb::MCTrajectory const & mctraj = mcp.Trajectory();
-    fgenie_particle_X.push_back(mctraj.Position(0).X());
-    fgenie_particle_Y.push_back(mctraj.Position(0).Y());
-    fgenie_particle_Z.push_back(mctraj.Position(0).Z());
-    fgenie_particle_T.push_back(mctraj.Position(0).T());
-    fgenie_particle_Px.push_back(mctraj.Momentum(0).Px());
-    fgenie_particle_Py.push_back(mctraj.Momentum(0).Py());
-    fgenie_particle_Pz.push_back(mctraj.Momentum(0).Pz());
-    fgenie_particle_E.push_back(mctraj.Momentum(0).Pz());    
+    genie_particle_X.push_back(mctraj.Position(0).X());
+    genie_particle_Y.push_back(mctraj.Position(0).Y());
+    genie_particle_Z.push_back(mctraj.Position(0).Z());
+    genie_particle_T.push_back(mctraj.Position(0).T());
+    genie_particle_Px.push_back(mctraj.Momentum(0).Px());
+    genie_particle_Py.push_back(mctraj.Momentum(0).Py());
+    genie_particle_Pz.push_back(mctraj.Momentum(0).Pz());
+    genie_particle_E.push_back(mctraj.Momentum(0).E());    
   }
   
+}
+
+
+void FillLightEvent::FillGenieParticleVectors(art::Event const & e) {
+
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
+  size_t const size = ev_mct->size();
+
+  fgenie_particle_TrackId.resize(size, {});
+  fgenie_particle_StatusCode.resize(size, {});
+  fgenie_particle_PdgCode.resize(size, {});
+  fgenie_particle_Mother.resize(size, {});
+  fgenie_particle_X.resize(size, {});
+  fgenie_particle_Y.resize(size, {});
+  fgenie_particle_Z.resize(size, {});
+  fgenie_particle_T.resize(size, {});
+  fgenie_particle_Px.resize(size, {});
+  fgenie_particle_Py.resize(size, {});
+  fgenie_particle_Pz.resize(size, {});
+  fgenie_particle_E.resize(size, {});
+  
+  for(size_t mct_index = 0; mct_index < size; ++mct_index) {
+    FillGenieParticleVectors(e, mct_index);
+  }
+
 }
 
 
@@ -2286,6 +2554,22 @@ void FillLightEvent::FillMCTrackVectors(art::Event const & e) {
   fmctrack_PdgCode.reserve(size);
   fmctrack_TrackID.reserve(size);
   fmctrack_Process.reserve(size);
+  fmctrack_Start_X.reserve(size);
+  fmctrack_Start_Y.reserve(size);
+  fmctrack_Start_Z.reserve(size);
+  fmctrack_Start_T.reserve(size);
+  fmctrack_Start_Px.reserve(size);
+  fmctrack_Start_Py.reserve(size);
+  fmctrack_Start_Pz.reserve(size);
+  fmctrack_Start_E.reserve(size);
+  fmctrack_End_X.reserve(size);
+  fmctrack_End_Y.reserve(size);
+  fmctrack_End_Z.reserve(size);
+  fmctrack_End_T.reserve(size);
+  fmctrack_End_Px.reserve(size);
+  fmctrack_End_Py.reserve(size);
+  fmctrack_End_Pz.reserve(size);
+  fmctrack_End_E.reserve(size);
   fmctrack_X.resize(size, std::vector<double>());
   fmctrack_Y.resize(size, std::vector<double>());
   fmctrack_Z.resize(size, std::vector<double>());
@@ -2313,7 +2597,25 @@ void FillLightEvent::FillMCTrackVectors(art::Event const & e) {
     fmctrack_PdgCode.push_back(mctr.PdgCode());
     fmctrack_TrackID.push_back(mctr.TrackID());
     fmctrack_Process.push_back(mctr.Process());
-
+    sim::MCStep const & start = mctr.Start();
+    fmctrack_Start_X.push_back(start.X());
+    fmctrack_Start_Y.push_back(start.Y());
+    fmctrack_Start_Z.push_back(start.Z());
+    fmctrack_Start_T.push_back(start.T());
+    fmctrack_Start_Px.push_back(start.Px());
+    fmctrack_Start_Py.push_back(start.Py());
+    fmctrack_Start_Pz.push_back(start.Pz());
+    fmctrack_Start_E.push_back(start.E());
+    sim::MCStep const & end = mctr.End();
+    fmctrack_End_X.push_back(end.X());
+    fmctrack_End_Y.push_back(end.Y());
+    fmctrack_End_Z.push_back(end.Z());
+    fmctrack_End_T.push_back(end.T());
+    fmctrack_End_Px.push_back(end.Px());
+    fmctrack_End_Py.push_back(end.Py());
+    fmctrack_End_Pz.push_back(end.Pz());
+    fmctrack_End_E.push_back(end.E());
+    
     std::vector<double> & mctrack_X_mcstp = fmctrack_X.at(i);
     std::vector<double> & mctrack_Y_mcstp = fmctrack_Y.at(i);
     std::vector<double> & mctrack_Z_mcstp = fmctrack_Z.at(i);
@@ -2457,7 +2759,10 @@ void FillLightEvent::FillMCShowerVectors(art::Event const & e) {
     fmcshower_DetProfile_Py.push_back(detprofile.Py());
     fmcshower_DetProfile_Pz.push_back(detprofile.Pz());
     fmcshower_DetProfile_E.push_back(detprofile.E());
-    fmcshower_DaughterTrackID.push_back(mcs.DaughterTrackID());
+    std::vector<int> mcs_DaughterTrackID;
+    mcs_DaughterTrackID.reserve(mcs.DaughterTrackID().size());
+    for(unsigned const int dtid : mcs.DaughterTrackID()) mcs_DaughterTrackID.push_back(dtid);
+    fmcshower_DaughterTrackID.push_back(mcs_DaughterTrackID);
     fmcshower_Charge.push_back(mcs.Charge());
     fmcshower_dQdx.push_back(mcs.Charge());
     fmcshower_StartDir_X.push_back(mcs.StartDir().X());
@@ -2481,58 +2786,83 @@ void FillLightEvent::FillMCShowerVectors(art::Event const & e) {
 }
 
 
-void FillLightEvent::FillTruth(art::Event const & e,
-			       size_t & delta_rad_mct_index) {
+void FillLightEvent::FillTruth(art::Event const & e) {
   
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mct = e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
+  size_t const size = ev_mct->size();
+
+  fnu_pdg.reserve(size);
+  fnu_energy.reserve(size);
+  flep_pdg.reserve(size);
+  flep_energy.reserve(size);
+  fccnc.reserve(size);
+  fmode.reserve(size);
+  finteraction_type.reserve(size);
+
+  ftrue_nuvertx.reserve(size);
+  ftrue_nuverty.reserve(size);
+  ftrue_nuvertz.reserve(size);
+
+  ftrue_nu_E.reserve(size);
+
+  ftrue_nu_vtx_tpc_contained.reserve(size);
+  ftrue_nu_vtx_fid_contained.reserve(size);
   
-  if(ffs.Run(e, delta_rad_mct_index)) fis_delta_rad = 1;
-  else fis_delta_rad = 0;
-  if(fis_delta_rad == 1) {
-    if(delta_rad_mct_index == SIZE_MAX) {
-      std::cout << "delta_rad_mct_index == SIZE_MAX\n";
-      return;
+  fis_delta_rad.reserve(size);
+  fdelta_index.reserve(size);
+  fdelta_photon_index.reserve(size);
+  fdelta_mcshower_index.reserve(size);
+  fdelta_proton_index.reserve(size);
+  fdelta_mctrack_index.reserve(size);
+  
+  size_t temp;
+  for(size_t i = 0; i < ev_mct->size(); ++i) {
+
+    if(ffs.RunSingle(e, i, temp)) {
+      fdelta_mct_index = i;
+      fis_delta_rad.push_back(1);
+      GetDeltaMCShowerMCTrackIndices(e, i);
     }
-    if(delta_rad_mct_index >= ev_mct->size()) {
-      std::cout << "delta_rad_mct_index: " << delta_rad_mct_index
-		<< " >= ev_mct->size(): " << ev_mct->size() << std::endl;
-      return;
+    else {
+      fis_delta_rad.push_back(0);
+      fdelta_index.push_back(-1);
+      fdelta_photon_index.push_back(-1);
+      fdelta_mcshower_index.push_back(-1);
+      fdelta_proton_index.push_back(-1);
+      fdelta_mctrack_index.push_back(-1);      
     }
+
+    simb::MCTruth const & mct = ev_mct->at(i);
+    simb::MCNeutrino const & mcn = mct.GetNeutrino();
+
+    fnu_pdg.push_back(mcn.Nu().PdgCode());
+    fnu_energy.push_back(mcn.Nu().Trajectory().E(0));
+    flep_pdg.push_back(mcn.Lepton().PdgCode());
+    flep_energy.push_back(mcn.Lepton().Trajectory().E(0));
+    fccnc.push_back(mcn.CCNC());
+    fmode.push_back(mcn.Mode());
+    finteraction_type.push_back(mcn.InteractionType());
+
+    TLorentzVector const & true_nu_pos = mcn.Nu().Trajectory().Position(0);
+
+    ftrue_nuvertx.push_back(true_nu_pos.X());
+    ftrue_nuverty.push_back(true_nu_pos.Y());
+    ftrue_nuvertz.push_back(true_nu_pos.Z());
+
+    ftrue_nu_E.push_back(mcn.Nu().Trajectory().E(0));
+
+    if(ftpc_volume.Contain(geoalgo::Point_t(true_nu_pos))) ftrue_nu_vtx_tpc_contained.push_back(1);
+    else ftrue_nu_vtx_tpc_contained.push_back(0);
+    if(ffiducial_volume.Contain(geoalgo::Point_t(true_nu_pos))) ftrue_nu_vtx_fid_contained.push_back(1);
+    else ftrue_nu_vtx_fid_contained.push_back(0);
+        
   }
-  if(fis_delta_rad == 0) delta_rad_mct_index = 0;
-
-  simb::MCTruth const & mct = ev_mct->at(delta_rad_mct_index);
-  simb::MCNeutrino const & mcn = mct.GetNeutrino();
-
-  fnu_pdg = mcn.Nu().PdgCode();
-  fnu_energy = mcn.Nu().Trajectory().E(0);
-  flep_pdg = mcn.Lepton().PdgCode();
-  flep_energy = mcn.Lepton().Trajectory().E(0);
-  fccnc = mcn.CCNC();
-  fmode = mcn.Mode();
-  finteraction_type = mcn.InteractionType();
-
-  TLorentzVector const & true_nu_pos = mcn.Nu().Trajectory().Position(0);
-  if(ftpc_volume.Contain(geoalgo::Point_t(true_nu_pos))) ftrue_nu_vtx_tpc_contained = 1;
-  else ftrue_nu_vtx_tpc_contained = 0;
-  if(ffiducial_volume.Contain(geoalgo::Point_t(true_nu_pos))) ftrue_nu_vtx_fid_contained = 1;
-  else ftrue_nu_vtx_fid_contained = 0;
-
-  ftrue_nuvertx = true_nu_pos.X();
-  ftrue_nuverty = true_nu_pos.Y();
-  ftrue_nuvertz = true_nu_pos.Z();
-
-  ftrue_nu_E = mcn.Nu().Trajectory().E(0);
-
+  
 }
 
 
 void FillLightEvent::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
-						    size_t const delta_rad_mct_index,
-						    size_t & delta_photon_index,
-						    size_t & delta_mcshower_index,
-						    size_t & delta_proton_index,
-						    size_t & delta_mctrack_index) {
+						    size_t const delta_rad_mct_index) {
 
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth =
     e.getValidHandle<std::vector<simb::MCTruth>>("generator");  
@@ -2542,14 +2872,17 @@ void FillLightEvent::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
     e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
 
   simb::MCTruth const & mct = ev_mctruth->at(delta_rad_mct_index);
-
+  
   int delta_index = -1;
+  int delta_photon_index = -1;
+  int delta_mcshower_index = -1;
+  int delta_proton_index = -1;
+  int delta_mctrack_index = -1;
+    
   for(int i = 0; i < mct.NParticles(); ++i) {
     simb::MCParticle const & mcp = mct.GetParticle(i);
     if(abs(mcp.PdgCode()) == 2214 || abs(mcp.PdgCode()) == 2114) {
       delta_index = i;
-      fdelta_true_pdg = mcp.PdgCode();
-      fdelta_true_energy = mcp.Trajectory().E(0);
       break;
     }
   }
@@ -2609,10 +2942,6 @@ void FillLightEvent::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
   delta_photon_index = iphoton_index;
   delta_proton_index = iproton_index;
 
-  fdelta_photon_energy = mct.GetParticle(delta_photon_index).Trajectory().E(0);
-  if(delta_proton_index != SIZE_MAX) 
-    fdelta_proton_energy = mct.GetParticle(delta_proton_index).Trajectory().E(0);
-
   double const diffd = 1e-10;
   double const diffp = 1e-10;
   double const diffE = 1e-2;
@@ -2663,13 +2992,6 @@ void FillLightEvent::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
   auto const mcs_it = mcp_mcs.find(delta_photon_index);
   if(mcs_it != mcp_mcs.end()) {
     delta_mcshower_index = mcs_it->second;
-  }
-
-  if(delta_mcshower_index != SIZE_MAX) {
-    sim::MCShower const & mcs = ev_mcshower->at(delta_mcshower_index);
-    fdelta_mcshower_true_pdg = mcs.PdgCode();
-    fdelta_mcshower_true_energy = mcs.Start().E();
-    fdelta_mcshower_detprofile_energy = mcs.DetProfile().E();
   }
 
   std::map<int, int> mcp_mctr;
@@ -2750,22 +3072,18 @@ void FillLightEvent::GetDeltaMCShowerMCTrackIndices(art::Event const & e,
     delta_mctrack_index = mctr_it->second;    
   }
 
-  if(delta_mctrack_index != SIZE_MAX) {
-    sim::MCTrack const & mctr = ev_mctrack->at(delta_mctrack_index);
-    fdelta_mctrack_true_pdg = mctr.PdgCode();
-    fdelta_mctrack_true_energy = mctr.Start().E();
-    fdelta_mctrack_true_length = geoalgo::Point_t(mctr.Start().Position()).Dist(mctr.End().Position());
-  }
+  fdelta_index.push_back(delta_index);
+  fdelta_photon_index.push_back(delta_photon_index);
+  fdelta_mcshower_index.push_back(delta_mcshower_index);
+  fdelta_proton_index.push_back(delta_proton_index);
+  fdelta_mctrack_index.push_back(delta_mctrack_index);
 
 }
 
 
 void FillLightEvent::analyze(art::Event const & e) {
 
-  /*
-
-  art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(fshower_producer);
-  */
+  ++fnumber_of_events;
 
   ResetEvent();
 
@@ -2785,6 +3103,8 @@ void FillLightEvent::analyze(art::Event const & e) {
   FillRecoTrackVectors(e);
   if(fverbose) std::cout << "shower\n";
   FillRecoShowerVectors(e);
+  if(fverbose) std::cout << "pandora\n";
+  FillPandora(e);
   if(fverbose) std::cout << "reco done\n";
 
   if(fmc) {
@@ -2793,39 +3113,26 @@ void FillLightEvent::analyze(art::Event const & e) {
 
     FillWeights(e);
 
-    size_t delta_rad_mct_index = SIZE_MAX;
+    if(ev_mct->front().GetNeutrino().Nu().Mother() == -1) FillTruth(e);
 
-    if(ev_mct->front().GetNeutrino().Nu().Mother() == -1) FillTruth(e, delta_rad_mct_index);
-
-    FillGenieParticleVectors(ev_mct->at(delta_rad_mct_index));
+    FillGenieParticleVectors(e);
     FillMCParticleVectors(e);
     FillMCTrackVectors(e);
     FillMCShowerVectors(e);
-
-    size_t delta_photon_index = SIZE_MAX;
-    size_t delta_mcshower_index = SIZE_MAX;
-    size_t delta_proton_index = SIZE_MAX;
-    size_t delta_mctrack_index = SIZE_MAX;
-
-    if(fis_delta_rad == 1) {
-      GetDeltaMCShowerMCTrackIndices(e,
-				     delta_rad_mct_index,
-				     delta_photon_index,
-				     delta_mcshower_index,
-				     delta_proton_index,
-				     delta_mctrack_index);
-    }
-
-    fdelta_photon_index = delta_photon_index;
-    fdelta_mcshower_index = delta_mcshower_index;
-    fdelta_proton_index = delta_proton_index;
-    fdelta_mctrack_index = delta_mctrack_index;
 
   }  
   
   fevent_tree->Fill();
 
 }
+
+
+void FillLightEvent::endJob() {
+
+  fpot_tree->Fill();
+
+}
+
 
 
 DEFINE_ART_MODULE(FillLightEvent)

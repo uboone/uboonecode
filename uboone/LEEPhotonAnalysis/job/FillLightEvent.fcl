@@ -33,6 +33,7 @@ physics:
     {
       module_type: "FillLightEvent"
 
+      #heavy: "true"
       mc: "true"
       pot_producer: "generator"
 

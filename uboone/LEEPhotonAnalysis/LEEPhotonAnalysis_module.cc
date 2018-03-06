@@ -409,7 +409,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   if(fmcrecomatching) {
     frmcm.MatchWAssociations(e);
-    if(frun_vertex_quality) fvq.RunDist(e, pas);
+    if(frun_vertex_quality) fvq.RunSig(e, pas);
   }
   
   /////////////////
