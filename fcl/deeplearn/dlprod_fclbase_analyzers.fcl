@@ -34,6 +34,9 @@ SuperaBasicMCFocused.supera_params: "supera_basic_mc_focused.fcl"
 SuperaMCFocused: @local::SuperaWholeView
 SuperaMCFocused.supera_params: "supera_mc_focused.fcl"
 
+SuperaMCFocused2Gen: @local::SuperaWholeView
+SuperaMCFocused2Gen.supera_params: "supera_mc_focused_2gen.fcl"
+
 SuperaMCOnly3D: @local::SuperaWholeView
 SuperaMCOnly3D.supera_params: "supera_mc_only3d.fcl"
 
@@ -53,6 +56,7 @@ dlprod_analyzers:
    superaBasicMC: @local::SuperaBasicMC
    superaBasicMCFocused: @local::SuperaBasicMCFocused
    superaMCFocused: @local::SuperaMCFocused
+   superaMCFocused2Gen: @local::SuperaMCFocused2Gen
    superaMCOnly3D: @local::SuperaMCOnly3D
    superaMCLArFlow:   @local::SuperaMCLArFlow
 }

@@ -36,7 +36,7 @@ product          version
 #genie 		ncdelta_2_12_2alt
 swtrigger       v02_02_03
 larlite         v06_26_01_02
-larcv2          v06_26_01
+larcv2          v06_26_01_10
 genie_xsec      v2_12_0
 larsoft         v06_26_01_10
 ubutil          v06_26_01_11
