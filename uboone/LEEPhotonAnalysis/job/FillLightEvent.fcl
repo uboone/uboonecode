@@ -34,7 +34,7 @@ physics:
       module_type: "FillLightEvent"
 
       #heavy: "true"
-      mc: "true"
+      #mc: "true"
       pot_producer: "generator"
 
       trigger_product: "swtrigger"
