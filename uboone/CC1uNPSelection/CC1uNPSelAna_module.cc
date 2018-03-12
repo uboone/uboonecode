@@ -604,6 +604,8 @@ public:
 
 
     virtual void produces(art::EDProducer*);
+
+    void endSubRun(art::SubRun &sr);
  
     double GetTrackRange(art::Ptr<recob::Track>  InputTrackPtr) const;  
     double GetTrackLength(art::Ptr<recob::Track>  InputTrackPtr) const;  
@@ -658,6 +660,9 @@ public:
     TTree*    fMC_Truth;
     TTree*    fMC_Geant;
 
+    TTree*    fMC_pottree;
+
+
     TTree*   fMC_allsel;
     TTree*   fMC_flashwin;
     TTree*   fMC_flashtag;
@@ -674,7 +679,18 @@ private:
     //==================================================================
     // For keeping track of the replacement backtracker
     std::unique_ptr<truth::IMCTruthMatching> fMCTruthMatching;
- 
+
+    std::string _potsum_producer; 
+    std::string _potsum_instance;
+
+    bool isMC;
+    bool isData;
+    bool _debug=true;
+    int _sr_run;
+    int _sr_subrun;
+    double _sr_begintime;
+    double _sr_endtime;
+    double _sr_pot;    
     //------------------------------------------------------
     int   _fTrueccnc;
     int   _fTruemode;
@@ -1070,8 +1086,16 @@ void  CC1uNPSelAna::beginJob()
     fMC_Geant->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
      
     //========================================================================================= 
+    fMC_pottree =tfs->make<TTree>("fMC_pottree","");
+    fMC_pottree->Branch("run",                &_sr_run,                "run/I");
+    fMC_pottree->Branch("subrun",             &_sr_subrun,             "subrun/I");
+    fMC_pottree->Branch("begintime",          &_sr_begintime,          "begintime/D");
+    fMC_pottree->Branch("endtime",            &_sr_endtime,            "endtime/D");
+    fMC_pottree->Branch("pot", &_sr_pot, "pot/D");
 
 
+
+    //================================================================================================
     fMC_allsel=tfs->make<TTree>("fMC_allsel","Data Holder");    
     fMC_allsel->Branch("fRun",&fRun,"fRun/I");
     fMC_allsel->Branch("fSubRun",&fSubRun,"fSubRun/I");
@@ -1493,6 +1517,9 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     {
         fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::BackTrackerTruth(truthParams));
     }
+
+    _potsum_producer = pset.get<std::string>("POTSummaryProducer");
+    _potsum_instance = pset.get<std::string>("POTSummaryInstance");
     /*
     */
     
@@ -1923,7 +1950,45 @@ double CC1uNPSelAna::Recolength(const recob::Track& track)
   return result;
 }
 
+void CC1uNPSelAna::endSubRun(art::SubRun& sr){
+  if (_debug) std::cout << "[CC1uNPSelAna::endSubRun] Starts" << std::endl;
 
+  // Saving run and subrun number on file so that we can run Zarko's script easily
+  //_run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
+  
+  _sr_run       = sr.run();
+  _sr_subrun    = sr.subRun();
+  _sr_begintime = sr.beginTime().value();
+  _sr_endtime   = sr.endTime().value();
+  
+  art::Handle<sumdata::POTSummary> potsum_h;
+  
+  // MC
+  if (isMC) {
+     if (_debug) std::cout << "CC1uNPSelAna::endSubRun] Getting POT for MC" << std::endl;
+     if(sr.getByLabel(_potsum_producer, potsum_h)) {
+        if (_debug) std::cout << "CC1uNPSelAna POT are valid" << std::endl;
+        _sr_pot = potsum_h->totpot;
+     }
+     else
+     _sr_pot = 0.;
+  }
+  /*
+   // Data
+   if (isData) {
+     if (_debug) std::cout << "[CC1uNPSelAna::endSubRun] Getting POT for DATA, producer " << _potsum_producer << ", instance " << _potsum_instance << std::endl;
+     if (sr.getByLabel(_potsum_producer, _potsum_instance, potsum_h)){
+        if (_debug) std::cout << "[CC1uNPSelAna::endSubRun] POT are valid" << std::endl;
+          _sr_pot = potsum_h->totpot;
+     }
+   else
+   _sr_pot = 0;
+  }
+  */
+  fMC_pottree->Fill();
+  
+  if (_debug) std::cout << "[CC1uNPSelAna::endSubRun] Ends" << std::endl;
+}
 
 
 int CC1uNPSelAna::Topology(int nmuons, int nelectrons, int npions, int npi0, int nprotons)
@@ -2170,8 +2235,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     std::cout<<"The SubRun Number is: "<<fSubRun<<std::endl;
 
 
-    bool isMC = !event.isRealData();
-
+    isMC = !event.isRealData();
+    isData= !isMC;
     //std::cout<<"is this an MC event or not?????????   "<<isMC<<std::endl;
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<     
@@ -2224,7 +2289,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
       if (part.PdgCode()==2212 && part.StatusCode()==1){
-        GeantonsTrueMomentum->push_back(part.P());
+        trueProtonsTrueMomentum->push_back(part.P());
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());
       }
@@ -2452,7 +2517,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     }//end of is the g4 handle is valid and the size is greater than 0;
    }//end of loop over all the geant 4 particles
    //redefine the OOFV here
-   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz) {OOFVflag=true;} // && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
+   if(!inFV(_fTruenuvrtxx, _fTruenuvrtxy, _fTruenuvrtxz)) {OOFVflag=true;} // && (nmuons!=0 || nelectrons!=0 || npions!=0 || npi0!=0 || nprotons!=0)) {OOFVflag=true;}
 
 
    Int_t TopFlag=Topology(nmuons, nelectrons, npions, npi0, nprotons);
@@ -2471,6 +2536,9 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
    fMC_Geant->Fill();
    }//end of if MC
 
+
+
+    
 
     // In principle we can have several producers running over various configurations of vertices and tracks.
     // The output associations we want to check are then encapsuated in the input vectors of strings
@@ -3231,7 +3299,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 bool ProtonTag=true;
                 fNRecoTrks=trackidpcand->size()+1;
                 fNRecoPTrks=trackidpcand->size();
-                Evis=0.0;
+                Evis=TMath::Sqrt(muonmass*muonmass+fPlep*fPlep);
                 float Eptot=0.0;
                 float Pxptot=0.0;
                 float Pyptot=0.0;
@@ -3254,8 +3322,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                        //Pyptot=Pyptot+trackmompcand[pcand]*TMath::Sin(trackthetapcand[pcand])*TMath::Sin(trackphipcand[pcand]);
                        //Pzptot=Pzptot+trackmompcand[pcand]*TMath::Cos(trackthetapcand[pcand]);
 
-
-                       Evis=fPlep+trackmompcand->at(pcand);
+                       //total visible energy=total muon energy + kinemtic energy of protons
+                       Evis=Evis+TMath::Sqrt(trackmompcand->at(pcand)*trackmompcand->at(pcand)+protonmass*protonmass)-protonmass;
                        Eptot=Eptot+TMath::Sqrt(trackmompcand->at(pcand)*trackmompcand->at(pcand)+protonmass*protonmass);
                        Pxptot=Pxptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand->at(pcand))*TMath::Cos(trackphipcand->at(pcand));
                        Pyptot=Pyptot+trackmompcand->at(pcand)*TMath::Sin(trackthetapcand->at(pcand))*TMath::Sin(trackphipcand->at(pcand));
