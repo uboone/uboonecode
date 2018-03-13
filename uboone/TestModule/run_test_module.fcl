@@ -1,0 +1,34 @@
+#include "services_microboone.fcl"
+#include "messageservice.fcl"
+#include "time_memory_tracker_microboone.fcl"
+
+process_name: tesmodule
+
+services:
+{
+
+  TFileService:  {fileName: "testOutput.root"}
+  TimeTracker:   @local::microboone_time_tracker
+  MemoryTracker: @local::microboone_memory_tracker
+                 @table::microboone_simulation_services
+
+} # services
+
+physics:
+{
+  analyzers:
+  {
+  testmod:
+    {
+
+    module_type:            "TestModule"
+
+    }
+  }
+
+  analysis: [ testmod ]
+  end_paths: [ analysis ]
+
+} #physics
+
+services.DetectorClocksService.InheritClockConfig: false

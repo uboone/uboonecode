@@ -37,6 +37,8 @@ add_subdirectory(LLApp)
 add_subdirectory(CosmicTagging)
 add_subdirectory(QuietEventFilter)
 add_subdirectory(DLFilters)
+add_subdirectory(FluxReader)
+add_subdirectory(TestModule)
 
 add_subdirectory(DataOverlay)
 add_subdirectory(PatternFilter)
