@@ -1,0 +1,7 @@
+#include "FillLightEvent.fcl"
+
+physics.analyzers.FillLightEvent.mc: "true"
+physics.analyzers.FillLightEvent.hit_producers: ["pandoraCosmicHitRemoval"]
+physics.analyzers.FillLightEvent.track_producers: ["pandoraNu"]
+physics.analyzers.FillLightEvent.shower_producers: ["pandoraNu"]
+physics.analyzers.FillLightEvent.rmcmassociation_producers: ["crHitRemovalTruthMatch"]

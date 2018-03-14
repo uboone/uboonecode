@@ -700,42 +700,44 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_opflash_TotalPE", &freco_opflash_TotalPE);
   if(fheavy) fevent_tree->Branch("reco_opflash_FastToTotal", &freco_opflash_FastToTotal);
 
-  fevent_tree->Branch("reco_hit_producer_index", &freco_hit_producer_index);
-  fevent_tree->Branch("reco_hit_StartTick", &freco_hit_StartTick);
-  fevent_tree->Branch("reco_hit_EndTick", &freco_hit_EndTick);
-  fevent_tree->Branch("reco_hit_PeakTime", &freco_hit_PeakTime);
   if(fheavy) {
-    fevent_tree->Branch("reco_hit_SigmaPeakTime", &freco_hit_SigmaPeakTime);
-    fevent_tree->Branch("reco_hit_RMS", &freco_hit_RMS);
-    fevent_tree->Branch("reco_hit_PeakAmplitude", &freco_hit_PeakAmplitude);
-    fevent_tree->Branch("reco_hit_SigmaPeakAmplitude", &freco_hit_SigmaPeakAmplitude);
-  }
-  fevent_tree->Branch("reco_hit_SummedADC", &freco_hit_SummedADC);
-  fevent_tree->Branch("reco_hit_Integral", &freco_hit_Integral);
-  if(fheavy) {  
-    fevent_tree->Branch("reco_hit_SigmaIntegral", &freco_hit_SigmaIntegral);
-    fevent_tree->Branch("reco_hit_Multiplicity", &freco_hit_Multiplicity);
-    fevent_tree->Branch("reco_hit_LocalIndex", &freco_hit_LocalIndex);
-    fevent_tree->Branch("reco_hit_GoodnessOfFit", &freco_hit_GoodnessOfFit);
-    fevent_tree->Branch("reco_hit_DegreesOfFreedom", &freco_hit_DegreesOfFreedom);
-  }
-  fevent_tree->Branch("reco_hit_View", &freco_hit_View);
-  fevent_tree->Branch("reco_hit_SignalType", &freco_hit_SignalType);
-  fevent_tree->Branch("reco_hit_WireID_CryostatID", &freco_hit_WireID_CryostatID);
-  fevent_tree->Branch("reco_hit_WireID_TPCID", &freco_hit_WireID_TPCID);
-  fevent_tree->Branch("reco_hit_WireID_PlaneID", &freco_hit_WireID_PlaneID);
-  fevent_tree->Branch("reco_hit_WireID_WireID", &freco_hit_WireID_WireID);
-  if(frmcm_first) {
-    fevent_tree->Branch("reco_hit_mc_type", &freco_hit_mc_type);
-    fevent_tree->Branch("reco_hit_mc_index", &freco_hit_mc_index);
-    /*
-    fevent_tree->Branch("reco_hit_true_ideFraction", &freco_hit_true_ideFraction);
-    fevent_tree->Branch("reco_hit_true_isMaxIDE", &freco_hit_true_isMaxIDE);
-    fevent_tree->Branch("reco_hit_true_ideNFraction", &freco_hit_true_ideNFraction);
-    fevent_tree->Branch("reco_hit_true_isMaxIDEN", &freco_hit_true_isMaxIDEN);
-    */
-    fevent_tree->Branch("reco_hit_true_numElectrons", &freco_hit_true_numElectrons);
-    if(fheavy) fevent_tree->Branch("reco_hit_true_energy", &freco_hit_true_energy);
+    fevent_tree->Branch("reco_hit_producer_index", &freco_hit_producer_index);
+    fevent_tree->Branch("reco_hit_StartTick", &freco_hit_StartTick);
+    fevent_tree->Branch("reco_hit_EndTick", &freco_hit_EndTick);
+    fevent_tree->Branch("reco_hit_PeakTime", &freco_hit_PeakTime);
+    if(fheavy) {
+      fevent_tree->Branch("reco_hit_SigmaPeakTime", &freco_hit_SigmaPeakTime);
+      fevent_tree->Branch("reco_hit_RMS", &freco_hit_RMS);
+      fevent_tree->Branch("reco_hit_PeakAmplitude", &freco_hit_PeakAmplitude);
+      fevent_tree->Branch("reco_hit_SigmaPeakAmplitude", &freco_hit_SigmaPeakAmplitude);
+    }
+    fevent_tree->Branch("reco_hit_SummedADC", &freco_hit_SummedADC);
+    fevent_tree->Branch("reco_hit_Integral", &freco_hit_Integral);
+    if(fheavy) {  
+      fevent_tree->Branch("reco_hit_SigmaIntegral", &freco_hit_SigmaIntegral);
+      fevent_tree->Branch("reco_hit_Multiplicity", &freco_hit_Multiplicity);
+      fevent_tree->Branch("reco_hit_LocalIndex", &freco_hit_LocalIndex);
+      fevent_tree->Branch("reco_hit_GoodnessOfFit", &freco_hit_GoodnessOfFit);
+      fevent_tree->Branch("reco_hit_DegreesOfFreedom", &freco_hit_DegreesOfFreedom);
+    }
+    fevent_tree->Branch("reco_hit_View", &freco_hit_View);
+    fevent_tree->Branch("reco_hit_SignalType", &freco_hit_SignalType);
+    fevent_tree->Branch("reco_hit_WireID_CryostatID", &freco_hit_WireID_CryostatID);
+    fevent_tree->Branch("reco_hit_WireID_TPCID", &freco_hit_WireID_TPCID);
+    fevent_tree->Branch("reco_hit_WireID_PlaneID", &freco_hit_WireID_PlaneID);
+    fevent_tree->Branch("reco_hit_WireID_WireID", &freco_hit_WireID_WireID);
+    if(frmcm_first) {
+      fevent_tree->Branch("reco_hit_mc_type", &freco_hit_mc_type);
+      fevent_tree->Branch("reco_hit_mc_index", &freco_hit_mc_index);
+      /*
+	fevent_tree->Branch("reco_hit_true_ideFraction", &freco_hit_true_ideFraction);
+	fevent_tree->Branch("reco_hit_true_isMaxIDE", &freco_hit_true_isMaxIDE);
+	fevent_tree->Branch("reco_hit_true_ideNFraction", &freco_hit_true_ideNFraction);
+	fevent_tree->Branch("reco_hit_true_isMaxIDEN", &freco_hit_true_isMaxIDEN);
+      */
+      fevent_tree->Branch("reco_hit_true_numElectrons", &freco_hit_true_numElectrons);
+      if(fheavy) fevent_tree->Branch("reco_hit_true_energy", &freco_hit_true_energy);
+    }
   }
   fevent_tree->Branch("reco_track_producer_index", &freco_track_producer_index);
   if(fheavy) {
