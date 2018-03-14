@@ -44,6 +44,10 @@ add_subdirectory(MicroBooNEWireCell)
 add_subdirectory(FakeNEWS)
 add_subdirectory(DQMTools)
 
+add_subdirectory(LEEPhotonAnalysis)
+
+
+
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
