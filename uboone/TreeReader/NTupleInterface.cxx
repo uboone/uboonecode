@@ -9,31 +9,31 @@ NTupleInterface::NTupleInterface() {}
 
 NTupleInterface::~NTupleInterface() {}
 
-void NTupleInterface::SetRootFile(TFile* inputFile) {
-  fFluxTree=dynamic_cast<TTree*>(inputFile->Get("testmod/flux"));
+void NTupleInterface::SetRootFile(TFile* inputFile, TString /*treeName*/, fhicl::ParameterSet& /*branchDef*/) {
+  fTree=dynamic_cast<TTree*>(inputFile->Get("testmod/flux"));
   
-  fFluxTree->SetBranchAddress("vtxx" ,&vtxx);
-  fFluxTree->SetBranchAddress("vtxy" ,&vtxy);
-  fFluxTree->SetBranchAddress("vtxz" ,&vtxz);
-  fFluxTree->SetBranchAddress("px"   ,&px);
-  fFluxTree->SetBranchAddress("py"   ,&py);
-  fFluxTree->SetBranchAddress("pz"   ,&pz);
-  fFluxTree->SetBranchAddress("E"    ,&E);
-  fFluxTree->SetBranchAddress("pdg"  ,&pdg);
-  fFluxTree->SetBranchAddress("ptype",&ptype);
-  fFluxTree->SetBranchAddress("wgt"  ,&wgt);
-  fFluxTree->SetBranchAddress("dist" ,&dist);
-  fFluxTree->SetBranchAddress("evtno"  ,&run);
-  fFluxTree->SetBranchAddress("nenergyn", &nenergyn);
+  fTree->SetBranchAddress("vtxx" ,&vtxx);
+  fTree->SetBranchAddress("vtxy" ,&vtxy);
+  fTree->SetBranchAddress("vtxz" ,&vtxz);
+  fTree->SetBranchAddress("px"   ,&px);
+  fTree->SetBranchAddress("py"   ,&py);
+  fTree->SetBranchAddress("pz"   ,&pz);
+  fTree->SetBranchAddress("E"    ,&E);
+  fTree->SetBranchAddress("pdg"  ,&pdg);
+  fTree->SetBranchAddress("ptype",&ptype);
+  fTree->SetBranchAddress("wgt"  ,&wgt);
+  fTree->SetBranchAddress("dist" ,&dist);
+  fTree->SetBranchAddress("evtno"  ,&run);
+  fTree->SetBranchAddress("nenergyn", &nenergyn);
 
-  fNEntries = fFluxTree->GetEntries();
+  fNEntries = fTree->GetEntries();
   assert(fNEntries > 0);
-  fFluxTree->GetEntry(0);
+  fTree->GetEntry(0);
   fRun = run;
 }
 
 bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
-  if (!fFluxTree->GetEntry(ientry))
+  if (!fTree->GetEntry(ientry))
     return false;
 
   fNuPos=TLorentzVector(vtxx, vtxy, vtxz, 0);

@@ -1,7 +1,7 @@
 BEGIN_PROLOG
-microboone_fluxreader:
+microboone_treereader:
 {
-	module_type:	"FluxReaderSource"
+	module_type:	"TreeReaderSource"
 	maxEvents: 0
 	skipEvents: 0
 }

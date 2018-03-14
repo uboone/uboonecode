@@ -36,9 +36,9 @@ TreeReader::TreeReader(fhicl::ParameterSet const& ps,
                        art::ProductRegistryHelper &helper,
                        art::SourceHelper const &pm)
     : fSourceHelper(pm), fCurrentSubRunID() {
-  helper.reconstitutes<std::vector<simb::MCFlux>, art::InEvent>("treereader");
-  helper.reconstitutes<std::vector<simb::MCTruth>, art::InEvent>("treereader");
-  helper.reconstitutes<sumdata::POTSummary, art::InSubRun>("treereader");
+  helper.reconstitutes<std::vector<simb::MCFlux>, art::InEvent>("flux");
+  helper.reconstitutes<std::vector<simb::MCTruth>, art::InEvent>("flux");
+  helper.reconstitutes<sumdata::POTSummary, art::InSubRun>("flux");
 
   fEventCounter = 0; 
   fEntry = ps.get<uint32_t>("skipEvents", 0);
@@ -153,8 +153,8 @@ bool TreeReader::readNext(art::RunPrincipal* const&,
     fCurrentSubRunID.run(), fCurrentSubRunID.subRun(), fEventCounter, tstamp);
 
   // Put products in the event.
-  art::put_product_in_principal(std::move(mcfluxvec), *outE, "treereader");
-  art::put_product_in_principal(std::move(mctruthvec), *outE, "treereader");
+  art::put_product_in_principal(std::move(mcfluxvec), *outE, "flux");
+  art::put_product_in_principal(std::move(mctruthvec), *outE, "flux");
 
   return true;
 }
