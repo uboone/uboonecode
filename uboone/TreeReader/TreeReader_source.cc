@@ -1,3 +1,9 @@
+/**
+ * Tree reader input source.
+ *
+ * Reconstitutes art::Event products from external TTrees.
+ */
+
 #include "art/Framework/Core/InputSourceMacros.h"
 #include "art/Framework/IO/Sources/Source.h"
 #include "uboone/TreeReader/TreeReader.h"

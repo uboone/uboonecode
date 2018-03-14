@@ -6,7 +6,9 @@ namespace uboone {
 
 GSimpleInterface::GSimpleInterface() {}
 
+
 GSimpleInterface::~GSimpleInterface() {}
+
 
 void GSimpleInterface::SetRootFile(TFile* fluxInputFile) {
   fFluxTree = dynamic_cast<TTree*>(fluxInputFile->Get("flux"));
@@ -27,9 +29,11 @@ void GSimpleInterface::SetRootFile(TFile* fluxInputFile) {
   fPOT=fGSimpleMeta->protons;
 }
 
+
 bool GSimpleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
-  if (!fFluxTree->GetEntry(ientry))
+  if (!fFluxTree->GetEntry(ientry)) {
     return false;
+  }
 
   fNuPos=TLorentzVector(fGSimpleEntry->vtxx,fGSimpleEntry->vtxy,fGSimpleEntry->vtxz,0);
   fNuMom=TLorentzVector(fGSimpleEntry->px  ,fGSimpleEntry->py  ,fGSimpleEntry->pz  ,fGSimpleEntry->E);
@@ -39,7 +43,6 @@ bool GSimpleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
   flux.fnimpwt = fGSimpleEntry->wgt;
   flux.fdk2gen = fGSimpleEntry->dist;
   flux.fnenergyn = flux.fnenergyf = fGSimpleEntry->E;
-
 
   if ( fGSimpleNuMI ) {
     flux.frun      = fGSimpleNuMI->run;

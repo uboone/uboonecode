@@ -17,6 +17,9 @@ In Ntuple input mode, the TreeReader source accepts a ROOT file, where the
 user specifies the name of the ROOT tree and a list of branch names where the
 required data is stored.
 
+An example configuration, where the names of the branches in the input TTree
+happen to match the key names, which are fixed.
+
     source: {
       fileNames: []
       module_type: TreeReader

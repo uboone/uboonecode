@@ -18,12 +18,28 @@ namespace uboone {
  */
 class TreeInterface {
 public:    
+  /** 
+   * Fill in the MCFlux object from the tree data.
+   *
+   * \param ientry Tree entry index
+   * \param mcflux MCFlux object to fill in (by reference)
+   * \returns True if successful
+   */
   virtual bool FillMCFlux(Long64_t ientry, simb::MCFlux& mcflux) = 0;
+
+  /** Get the POT from the tree. */
   virtual const float GetPOT() = 0;
+
+  /** Get the number of entries in the tree. */
   virtual const Long64_t GetEntries() = 0;
+
+  /** Get the run number (for the first entry in the tree). */
   virtual const int GetRun() = 0;
 
+  /** Get the neutrino position for the current entry. */
   virtual const TLorentzVector GetNuPosition() = 0;
+
+  /** Get the neutrino momentum for the current entry. */
   virtual const TLorentzVector GetNuMomentum() = 0;
 };
 

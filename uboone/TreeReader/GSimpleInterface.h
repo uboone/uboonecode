@@ -22,30 +22,55 @@ namespace uboone {
  */
 class GSimpleInterface : public TreeInterface {
 public:
+  /** Constructor. */
   GSimpleInterface();
+
+  /** Destructor. */
   ~GSimpleInterface();
   
-  const Long64_t       GetEntries()              { return fNEntries; }
-  const int            GetRun()                  { return fRun; }
-  const float          GetPOT()                  { return fPOT; }
-  const TLorentzVector GetNuPosition()           { return fNuPos; }
-  const TLorentzVector GetNuMomentum()           { return fNuMom; }
+  /** Get the number of entries in the tree. */
+  const Long64_t GetEntries() { return fNEntries; }
 
-  void SetRootFile(TFile* rootFileName);
+  /** Get the run number (for the first entry in the tree). */
+  const int GetRun() { return fRun; }
+
+  /** Get the POT from the tree. */
+  const float GetPOT() { return fPOT; }
+
+  /** Get the neutrino position for the current entry. */
+  const TLorentzVector GetNuPosition() { return fNuPos; }
+
+  /** Get the neutrino momentum for the current entry. */
+  const TLorentzVector GetNuMomentum() { return fNuMom; }
+
+  /**
+   * Set the ROOT file to load from.
+   *
+   * \param rootFile The input ROOT TFile object
+   */
+  void SetRootFile(TFile* rootFile);
+
+  /** 
+   * Fill in the MCFlux object from the tree data.
+   *
+   * \param ientry Tree entry index
+   * \param mcflux MCFlux object to fill in (by reference)
+   * \returns True if successful
+   */
   bool FillMCFlux(Long64_t ientry, simb::MCFlux& mcflux);
 
 private:
-  TTree*                        fFluxTree;
-  TTree*                        fMetaTree;
+  TTree* fFluxTree;  //!< Tree with flux data
+  TTree* fMetaTree;  //!< Tree with flux metadata
   genie::flux::GSimpleNtpEntry* fGSimpleEntry;
-  genie::flux::GSimpleNtpNuMI*  fGSimpleNuMI;
-  genie::flux::GSimpleNtpAux*   fGSimpleAux;
-  genie::flux::GSimpleNtpMeta*  fGSimpleMeta;
-  Long64_t                      fNEntries;
-  int                           fRun;
-  float                         fPOT;
-  TLorentzVector                fNuPos;
-  TLorentzVector                fNuMom;
+  genie::flux::GSimpleNtpNuMI* fGSimpleNuMI;
+  genie::flux::GSimpleNtpAux* fGSimpleAux;
+  genie::flux::GSimpleNtpMeta* fGSimpleMeta;
+  Long64_t fNEntries;  //!< Number of events in the input tree
+  int fRun;  //!< Run ID
+  float fPOT;  //!< POT counter
+  TLorentzVector fNuPos;  //!< Neutrino position vector
+  TLorentzVector fNuMom;  //!< Neutrino momentum vector
 };
 
 }  // namespace uboone
