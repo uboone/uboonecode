@@ -9,22 +9,23 @@ NTupleInterface::NTupleInterface() {}
 
 NTupleInterface::~NTupleInterface() {}
 
-void NTupleInterface::SetRootFile(TFile* inputFile, TString /*treeName*/, fhicl::ParameterSet& /*branchDef*/) {
-  fTree=dynamic_cast<TTree*>(inputFile->Get("testmod/flux"));
+void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::ParameterSet& branchDef) {
+  std::cout << "TREE NAME: " << treeName << std::endl;
+  fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
   
-  fTree->SetBranchAddress("vtxx" ,&vtxx);
-  fTree->SetBranchAddress("vtxy" ,&vtxy);
-  fTree->SetBranchAddress("vtxz" ,&vtxz);
-  fTree->SetBranchAddress("px"   ,&px);
-  fTree->SetBranchAddress("py"   ,&py);
-  fTree->SetBranchAddress("pz"   ,&pz);
-  fTree->SetBranchAddress("E"    ,&E);
-  fTree->SetBranchAddress("pdg"  ,&pdg);
-  fTree->SetBranchAddress("ptype",&ptype);
-  fTree->SetBranchAddress("wgt"  ,&wgt);
-  fTree->SetBranchAddress("dist" ,&dist);
-  fTree->SetBranchAddress("evtno"  ,&run);
-  fTree->SetBranchAddress("nenergyn", &nenergyn);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxx").c_str()    , &vtxx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxy").c_str()    , &vtxy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxz").c_str()    , &vtxz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("px").c_str()      , &px);
+  fTree->SetBranchAddress(branchDef.get<std::string>("py").c_str()      , &py);
+  fTree->SetBranchAddress(branchDef.get<std::string>("pz").c_str()      , &pz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("E").c_str()       , &E);
+  fTree->SetBranchAddress(branchDef.get<std::string>("pdg").c_str()     , &pdg);
+  fTree->SetBranchAddress(branchDef.get<std::string>("ptype").c_str()   , &ptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("wgt").c_str()     , &wgt);
+  fTree->SetBranchAddress(branchDef.get<std::string>("dist").c_str()    , &dist);
+  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()   , &run);
+  fTree->SetBranchAddress(branchDef.get<std::string>("nenergyn").c_str(), &nenergyn);
 
   fNEntries = fTree->GetEntries();
   assert(fNEntries > 0);

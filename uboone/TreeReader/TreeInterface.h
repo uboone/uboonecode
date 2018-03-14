@@ -2,7 +2,7 @@
 #define __uboone_TreeInterface__
 
 /**
- * Base interface for importing flux files.
+ * Base interface for importing ROOT trees.
  *
  * \author Z. Pavlovic
  */
@@ -14,7 +14,7 @@ namespace uboone {
 
 /**
  * \class TreeInterface
- * \brief Wrapper to access flux trees
+ * \brief Wrapper to access ROOT trees (pure virtual base class)
  */
 class TreeInterface {
 public:    

@@ -1,0 +1,67 @@
+#include "services_microboone.fcl"
+#include "eventweight_microboone.fcl"
+#include "seedservice_microboone.fcl"
+
+process_name: TreeReader
+
+services: {
+  #TFileService: {}
+  RandomNumberGenerator: {}
+  NuRandomService: @local::microboone_seedservice
+  TimeTracker: {}
+  FileCatalogMetadata: @local::art_file_catalog_mc
+}
+
+source: {
+  fileNames: []
+  module_type: TreeReader
+  skipEvents: 0
+  maxEvents: -1
+  inputType: "ntuple"
+  treeName: "testmod/flux"
+  branches: {
+    vtxx: "vtxx"
+    vtxy: "vtxy"
+    vtxz: "vtxz"
+    px: "px"
+    py: "py"
+    pz: "pz"
+    E: "E"
+    pdg: "pdg"
+    ptype: "ptype"
+    wgt: "wgt"
+    dist: "dist"
+    evtno: "evtno"
+    nenergyn: "nenergyn"
+  }
+}
+
+outputs: {
+ out1: {
+   module_type: RootOutput
+   fileName: "treereader.root" 
+   compressionLevel: 1
+   dataTier: "simulated"
+  }
+}
+
+physics: {
+ producers: {
+   eventweight: @local::microboone_eventweight
+   rns: { module_type: "RandomNumberSaver" }
+ }
+
+ analyzers: {}
+ ana: []
+
+ simulate: [ rns, eventweight ]
+ stream1:   [ out1 ]
+ end_paths: [ stream1 ]
+}
+
+physics.producers.eventweight.genie_module_label: flux
+
+physics.producers.eventweight.weight_functions: [
+  piplus, piminus, kplus, kzero, kminus, horncurrent, pioninexsec, nucleontotxsec, nucleonqexsec, nucleoninexsec, pionqexsec, piontotxsec, expskin
+]
+
