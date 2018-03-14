@@ -1,14 +1,14 @@
 cet_enable_asserts()
 include_directories ( $ENV{GENIE_INC}/GENIE )
 file(GLOB INTERFACEFILES *Interface* )
-simple_plugin( FluxReader
+simple_plugin( TreeReader
                "source"
-	       FluxReader
+	       TreeReader
                ${ART_FRAMEWORK_PERSISTENCY_COMMON}
                BASENAME_ONLY
              )
 
-art_make_library(LIBRARY_NAME FluxInterface 
+art_make_library(LIBRARY_NAME TreeInterface 
                  SOURCE	      ${INTERFACEFILES}
                  LIBRARIES
 		       nusimdata_SimulationBase
@@ -32,11 +32,11 @@ art_make_library(LIBRARY_NAME FluxInterface
                       ${Boost_SYSTEM_LIBRARY}
 	        ) 
 
-art_make( EXCLUDE FluxReader_source.cc ${INTERFACEFILES}
+art_make( EXCLUDE TreeReader_source.cc ${INTERFACEFILES}
 	  BASENAME_ONLY
-          LIBRARY_NAME FluxReader
+          LIBRARY_NAME TreeReader
           LIB_LIBRARIES	nusimdata_SimulationBase
-	  		FluxInterface
+	  		TreeInterface
 			larcoreobj_SummaryData
 	  		${ART_FRAMEWORK_CORE}
                         ${ART_FRAMEWORK_IO_SOURCES}
@@ -53,8 +53,8 @@ art_make( EXCLUDE FluxReader_source.cc ${INTERFACEFILES}
                         ${Boost_SYSTEM_LIBRARY}
                         ${ROOT_BASIC_LIB_LIST}
 
-          MODULE_LIBRARIES FluxReader
-	  		FluxInterface
+          MODULE_LIBRARIES TreeReader
+	  		TreeInterface
                         nusimdata_SimulationBase
 			larcoreobj_SummaryData
                         ${ART_FRAMEWORK_CORE}
@@ -87,3 +87,4 @@ install_source()
 install_fhicl()
 
 add_subdirectory(job)
+
