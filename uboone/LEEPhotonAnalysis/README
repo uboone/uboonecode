@@ -1,0 +1,8 @@
+flash module, not used in main code. just a test
+	DetectorObjects & particle associatons, used in vertexBuilder
+
+difference between NCDeltaRadiative and SignalFilter?
+	NCDeltaRadiative requires a photon child and NC
+	SignalFilter require
+
+GeometryHelper & anaHelper are required by energyhelp

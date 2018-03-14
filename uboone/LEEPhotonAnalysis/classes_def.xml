@@ -1,0 +1,6 @@
+<lcgdict>
+<class name="art::Assns<recob::Hit,recob::PFParticle,void>"/>
+<class name="art::Assns<recob::PFParticle,recob::Hit,void>"/>
+<class name="art::Wrapper<art::Assns<recob::Hit,recob::PFParticle,void> >"/>
+<class name="art::Wrapper<art::Assns<recob::PFParticle,recob::Hit,void> >"/>
+</lcgdict>
