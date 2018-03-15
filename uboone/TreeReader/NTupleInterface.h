@@ -156,7 +156,6 @@ private:
   double GTruth_gW;
   double GTruth_gQ2;
   double GTruth_gq2;
-  int GTruth_ProbePDG;
   double GTruth_ProbeP4x;
   double GTruth_ProbeP4y;
   double GTruth_ProbeP4z;

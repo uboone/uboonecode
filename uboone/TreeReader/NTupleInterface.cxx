@@ -22,28 +22,26 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
 
   fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
   
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxx").c_str()    , &vtxx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxy").c_str()    , &vtxy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxz").c_str()    , &vtxz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("px").c_str()      , &px);
-  fTree->SetBranchAddress(branchDef.get<std::string>("py").c_str()      , &py);
-  fTree->SetBranchAddress(branchDef.get<std::string>("pz").c_str()      , &pz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("E").c_str()       , &E);
-  fTree->SetBranchAddress(branchDef.get<std::string>("pdg").c_str()     , &pdg);
-  fTree->SetBranchAddress(branchDef.get<std::string>("ptype").c_str()   , &ptype);
-  fTree->SetBranchAddress(branchDef.get<std::string>("wgt").c_str()     , &wgt);
-  fTree->SetBranchAddress(branchDef.get<std::string>("dist").c_str()    , &dist);
-  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()   , &run);
-  fTree->SetBranchAddress(branchDef.get<std::string>("nenergyn").c_str(), &nenergyn);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpx").c_str()     , &tpx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpy").c_str()     , &tpy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpz").c_str()     , &tpz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tptype").c_str()  , &tptype);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vx").c_str()      , &vx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vy").c_str()      , &vy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vz").c_str()      , &vz);
-
-  std::cout << "[NTUPLEINTERFACE] >> Tree configured." << std::endl;
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxx").c_str()                            , &vtxx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxy").c_str()                            , &vtxy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vtxz").c_str()                            , &vtxz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("px").c_str()                              , &px);
+  fTree->SetBranchAddress(branchDef.get<std::string>("py").c_str()                              , &py);
+  fTree->SetBranchAddress(branchDef.get<std::string>("pz").c_str()                              , &pz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("E").c_str()                               , &E);
+  fTree->SetBranchAddress(branchDef.get<std::string>("pdg").c_str()                             , &pdg);
+  fTree->SetBranchAddress(branchDef.get<std::string>("ptype").c_str()                           , &ptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("wgt").c_str()                             , &wgt);
+  fTree->SetBranchAddress(branchDef.get<std::string>("dist").c_str()                            , &dist);
+  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()                           , &run);
+  fTree->SetBranchAddress(branchDef.get<std::string>("nenergyn").c_str()                        , &nenergyn);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpx").c_str()                             , &tpx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpy").c_str()                             , &tpy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpz").c_str()                             , &tpz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tptype").c_str()                          , &tptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vx").c_str()                              , &vx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vy").c_str()                              , &vy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vz").c_str()                              , &vz);
 
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_NParticles").c_str()              , &MCTruth_NParticles);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_TrackId").c_str()       , &MCTruth_particles_TrackId);
@@ -74,6 +72,47 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_X").c_str()              , &MCTruth_neutrino_X);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Y").c_str()              , &MCTruth_neutrino_Y);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Q2").c_str()             , &MCTruth_neutrino_Q2);
+
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbePDG").c_str()                 , &GTruth_ProbePDG);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsSeaQuark").c_str()               , &GTruth_IsSeaQuark);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_tgtPDG").c_str()                   , &GTruth_tgtPDG);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_weight").c_str()                   , &GTruth_weight);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_probability").c_str()              , &GTruth_probability);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Xsec").c_str()                     , &GTruth_Xsec);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_fDiffXsec").c_str()                , &GTruth_fDiffXsec);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexX").c_str()                  , &GTruth_vertexX);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexY").c_str()                  , &GTruth_vertexY);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexZ").c_str()                  , &GTruth_vertexZ);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexT").c_str()                  , &GTruth_Gscatter);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Gscatter").c_str()                 , &GTruth_Gscatter);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Gint").c_str()                     , &GTruth_Gint);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ResNum").c_str()                   , &GTruth_ResNum);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumPiPlus").c_str()                , &GTruth_NumPiPlus);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumPi0").c_str()                   , &GTruth_NumPi0);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumPiMinus").c_str()               , &GTruth_NumPiMinus);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumProton").c_str()                , &GTruth_NumProton);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumNeutron").c_str()               , &GTruth_NumNeutron);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsCharm").c_str()                  , &GTruth_IsCharm);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gX").c_str()                       , &GTruth_gX);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gY").c_str()                       , &GTruth_gY);
+  //fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gZ").c_str()                       , &GTruth_gZ);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gT").c_str()                       , &GTruth_gT);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gW").c_str()                       , &GTruth_gW);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gQ2").c_str()                      , &GTruth_gQ2);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gq2").c_str()                      , &GTruth_gq2);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbeP4x").c_str()                 , &GTruth_ProbeP4x);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbeP4y").c_str()                 , &GTruth_ProbeP4y);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbeP4z").c_str()                 , &GTruth_ProbeP4z);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbeP4E").c_str()                 , &GTruth_ProbeP4E);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_HitNucP4x").c_str()                , &GTruth_HitNucP4x);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_HitNucP4y").c_str()                , &GTruth_HitNucP4y);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_HitNucP4z").c_str()                , &GTruth_HitNucP4z);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_HitNucP4E").c_str()                , &GTruth_HitNucP4E);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4x").c_str()             , &GTruth_FShadSystP4x);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4y").c_str()             , &GTruth_FShadSystP4y);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4z").c_str()             , &GTruth_FShadSystP4z);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4E").c_str()             , &GTruth_FShadSystP4E);
+
 
   fNEntries = fTree->GetEntries();
   assert(fNEntries > 0);
@@ -176,7 +215,7 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
   gtruth.fProbePDG = GTruth_ProbePDG;
   gtruth.fIsSeaQuark = GTruth_IsSeaQuark;
   gtruth.ftgtPDG = GTruth_tgtPDG;
-  gtruth.gweight = GTruth_weight;
+  gtruth.fweight = GTruth_weight;
   gtruth.fprobability = GTruth_probability;
   gtruth.fXsec = GTruth_Xsec;
   gtruth.fDiffXsec = GTruth_fDiffXsec;
@@ -196,12 +235,11 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
   gtruth.fIsCharm = GTruth_IsCharm;
   gtruth.fgX = GTruth_gX;
   gtruth.fgY = GTruth_gY;
-  gtruth.fgZ = GTruth_gZ;
+  //gtruth.fgZ = GTruth_gZ; // variable doesn't exist... 
   gtruth.fgT = GTruth_gT;
   gtruth.fgW = GTruth_gW;
   gtruth.fgQ2 = GTruth_gQ2;
   gtruth.fgq2 = GTruth_gq2;
-  gtruth.fProbePDG = GTruth_ProbePDG;
   gtruth.fProbeP4 = TLorentzVector(
     GTruth_ProbeP4x,
     GTruth_ProbeP4y,
