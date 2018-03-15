@@ -1,0 +1,27 @@
+#include "flashmatchalg.fcl"
+
+BEGIN_PROLOG
+#
+# Module configuration
+#
+NeutrinoFlashMatch: {
+  module_type:              "NeutrinoFlashMatch"
+  PFParticleModule:         "pandoraNu::UBXSec"
+  TrackModule:              "pandoraNu::UBXSec"
+  TPCObjectModule:          "TPCObjectMaker"
+  NeutrinoMCFlashModule:    "NeutrinoMCFlash"
+  DebugMode:                false
+  BeamOpFlashProducer:      "simpleFlashBeam"
+  FlashVetoTimeStart:       3.2
+  FlashVetoTimeEnd:         4.8
+  UseShowersAsTracks:       true
+
+  FlashMatchConfig: @local::flashmatch_config
+}
+
+NeutrinoFlashMatch.FlashMatchConfig.FlashMatchManager.AllowReuseFlash: true
+NeutrinoFlashMatch.FlashMatchConfig.FlashMatchManager.Verbosity:       1
+NeutrinoFlashMatch.FlashMatchConfig.QLLMatch.ZPenaltyThreshold:        1000
+NeutrinoFlashMatch.FlashMatchConfig.QLLMatch.XPenaltyThreshold:        1000
+
+END_PROLOG

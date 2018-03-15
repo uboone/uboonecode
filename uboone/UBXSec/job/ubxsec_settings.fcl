@@ -1,0 +1,54 @@
+#include "muoncandidatefinder.fcl"
+
+BEGIN_PROLOG
+#
+# Module configuration
+#
+
+UBXSec: {
+  module_type:                  "UBXSec"
+  PFParticleProducer:           "pandoraNu::UBXSec"
+  HitProducer:                  "pandoraCosmicHitRemoval::UBXSec"
+  GeantModule:                  "largeant"
+  SpacePointProducer:           "pandoraNu::UBXSec"
+  NeutrinoFlashMatchProducer:   "NeutrinoFlashMatch"
+  CosmicFlashMatchProducer:     "CosmicFlashMatch"
+  OpFlashBeamProducer:          "simpleFlashBeam"
+  ACPTProducer:                 "pandoraCosmicT0Reco"
+  TPCObjectProducer:            "TPCObjectMaker"
+  POTSummaryProducer:           "generator"
+  POTSummaryInstance:           ""
+  ParticleIDProducer:           "pandoraNupid::UBXSec"
+  MCGhostProducer:              "RecoTrueMatcher"
+  GeoCosmicTaggerProducer:      "pandoraNuGeoCosmicTag"
+  CandidateConsistencyProducer: "CandidateConsistency"
+  MCSFitResultMuProducer:       "pandoraNuMCSMu"
+  MCSFitResultPiProducer:       "pandoraNuMCSPi"
+  CalorimetryProducer:          "pandoraNucalo"
+  EventWeightProducer:          "eventweight"
+  GenieEventWeightProducer:     "genieeventweight::UBXSec"
+
+  UseGENIEInfo:                 true
+  MinimumHitRequirement:        3
+  MinimumDistanceToDeadRegion:  5.
+
+  GeoCosmicScoreCut:            0.6
+  ToleranceTrackMultiplicity:   5.
+
+  MinTrackLength:               0.1
+
+  PECalib:                      @local::SPECalib
+
+  FiducialVolumeSettings:       @local::UBXSecFiducialVolumeSettings
+
+  MuonCandidateFinderSettings:  @local::MuonCandidateFinder_mc
+
+  NuMuCCSelectionSettings:      @local::NuMuCCSelectionSettings
+}
+
+UBXSec_mc: @local::UBXSec
+
+UBXSec_data: @local::UBXSec
+UBXSec_data.MuonCandidateFinderSettings: @local::MuonCandidateFinder_data
+
+END_PROLOG
