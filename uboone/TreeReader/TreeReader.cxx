@@ -36,14 +36,25 @@ TreeReader::TreeReader(fhicl::ParameterSet const& ps,
                        art::ProductRegistryHelper &helper,
                        art::SourceHelper const &pm)
     : fSourceHelper(pm), fCurrentSubRunID() {
-  helper.reconstitutes<std::vector<simb::MCFlux>, art::InEvent>("flux");
-  helper.reconstitutes<std::vector<simb::MCTruth>, art::InEvent>("flux");
-  helper.reconstitutes<sumdata::POTSummary, art::InSubRun>("flux");
-
   fEventCounter = 0; 
   fEntry = ps.get<uint32_t>("skipEvents", 0);
   fMaxEvents = ps.get<int>("maxEvents", -1);
   fInputType = ps.get<std::string>("inputType");
+
+  if (fInputType == "gsimple") {
+    helper.reconstitutes<std::vector<simb::MCFlux>, art::InEvent>("flux");
+    helper.reconstitutes<std::vector<simb::MCTruth>, art::InEvent>("flux");
+    helper.reconstitutes<sumdata::POTSummary, art::InSubRun>("flux");
+  }
+  else if (fInputType == "ntuple") {
+    helper.reconstitutes<std::vector<simb::MCFlux>, art::InEvent>("flux");
+    helper.reconstitutes<std::vector<simb::MCTruth>, art::InEvent>("flux");
+    helper.reconstitutes<std::vector<simb::GTruth>, art::InEvent>("flux");
+  }
+  else {
+    throw cet::exception(__PRETTY_FUNCTION__)
+      << "Ntuple format " << fInputType << " not supported" << std::endl;
+  }
 
   // For ntuples
   fTreeName = ps.get<std::string>("treeName", "");
