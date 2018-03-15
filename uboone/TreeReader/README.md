@@ -28,20 +28,27 @@ happen to match the key names, which are fixed.
       inputType: "ntuple"
       treeName: "NAME OF TREE"
       branches: {
-        vtxx: "vtxx"
-        vtxy: "vtxy"
+        vtxx: "vtxx"           # neutrino position at the window (fgenx in MCFlux)
+        vtxy: "vtxy" 
         vtxz: "vtxz"
-        px: "px"
+        px: "px"               # neutrino momentum (taken from Neutrino MCParticle)
         py: "py"
         pz: "pz"
-        E: "E"
-        pdg: "pdg"
-        ptype: "ptype"
-        wgt: "wgt"
+        E: "E"                 # neutrino energy
+        pdg: "pdg"             # neutrino pdg
+        ptype: "ptype"         # parent pdg
+        wgt: "wgt"             # weight (always set to 1 for files generated with gSimple)
         dist: "dist"
-        evtno: "evtno"
-        nenergyn: "nenergyn"
-      }
+        evtno: "evtno"         # POT
+        nenergyn: "nenergyn"   # neutrino energy for a neutrino forced at the center of the near detector
+        tpx: "tpx"             # parent momentum exiting the target
+        tpy: "tpy"
+        tpz: "tpz"
+        vx: "vx"               # exit point at the target
+        vy: "vy"
+        vz: "vz"
+        tptype: "tptype"       # parent particle ID exiting the target
+        }
     }
 
 Note that the tree can be inside a `TDirectory`, e.g. `dir/treename`.

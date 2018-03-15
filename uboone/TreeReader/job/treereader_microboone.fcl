@@ -1,0 +1,10 @@
+BEGIN_PROLOG
+
+microboone_treereader: {
+  module_type: "TreeReaderSource"
+  maxEvents: 0
+  skipEvents: 0
+}
+
+END_PROLOG
+
