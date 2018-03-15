@@ -10,6 +10,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "nusimdata/SimulationBase/MCFlux.h"
 #include "TreeInterface.h"
+#include "TFile.h"
 
 class TTree;
 
@@ -68,6 +69,7 @@ public:
 
 private:
   TTree* fTree;  //!< Input TTree
+  float fPOT;
   double vtxx, vtxy, vtxz;  //!< Neutrino vertex
   double px, py, pz, E;  //!< Neutrino momentum
   int pdg;  //!< Neutrino PDG code
@@ -80,6 +82,17 @@ private:
   int fRun;  //!< Run ID
   TLorentzVector fNuPos;  //!< Neutrino vertex vector
   TLorentzVector fNuMom;  //!< Neutrino momentum vector
+
+  double tpx;
+  double tpy;
+  double tpz;
+  double vx;
+  double vy;
+  double vz;
+  double tptype;
+
+
+
 };
 
 }  // namespace uboone

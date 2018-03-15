@@ -33,6 +33,14 @@ source: {
     dist: "dist"
     evtno: "evtno"
     nenergyn: "nenergyn"
+    tpx: "tpx"
+    tpy: "tpy"
+    tpz: "tpz"
+    vx: "vx"
+    vy: "vy"
+    vz: "vz"
+    tptype: "tptype"
+
   }
 }
 
