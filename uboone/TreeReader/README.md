@@ -85,6 +85,47 @@ Note that the tree can be inside a `TDirectory`, e.g. `dir/treename`.
     double MCTruth_particles_poly[kMaxParticles];
     double MCTruth_particles_polz[kMaxParticles];
 
+    int GTruth_ProbePDG;
+    bool GTruth_IsSeaQuark;
+    int GTruth_tgtPDG;
+    double GTruth_weight;
+    double GTruth_probability;
+    double GTruth_Xsec;
+    double GTruth_fDiffXsec;
+    double GTruth_vertexX,
+    double GTruth_vertexY,
+    double GTruth_vertexZ,
+    double GTruth_vertexT;
+    int GTruth_Gscatter;
+    int GTruth_Gint;
+    int GTruth_ResNum;
+    int GTruth_NumPiPlus;
+    int GTruth_NumPi0;
+    int GTruth_NumPiMinus;
+    int GTruth_NumProton;
+    int GTruth_NumNeutron;
+    bool GTruth_IsCharm;
+    double GTruth_gX;
+    double GTruth_gY;
+    double GTruth_gZ;
+    double GTruth_gT;
+    double GTruth_gW;
+    double GTruth_gQ2;
+    double GTruth_gq2;
+    int GTruth_ProbePDG;
+    double GTruth_ProbeP4x,
+    double GTruth_ProbeP4y,
+    double GTruth_ProbeP4z,
+    double GTruth_ProbeP4E;
+    double GTruth_HitNucP4x,
+    double GTruth_HitNucP4y,
+    double GTruth_HitNucP4z,
+    double GTruth_HitNucP4E;
+    double GTruth_FShadSystP4x,
+    double GTruth_FShadSystP4y,
+    double GTruth_FShadSystP4z,
+    double GTruth_FShadSystP4E;
+
 Authors
 -------
 This module is based on the FluxReader by Zarko Pavlovic. It was generalized

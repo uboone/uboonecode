@@ -8,6 +8,8 @@
  */
 
 #include "nusimdata/SimulationBase/MCFlux.h"
+#include "nusimdata/SimulationBase/MCTruth.h"
+#include "nusimdata/SimulationBase/GTruth.h"
 #include "TLorentzVector.h"
 
 namespace uboone {
