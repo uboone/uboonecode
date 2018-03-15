@@ -7,14 +7,13 @@
 
 
 VertexBuilder::VertexBuilder() :
-  fobject_id(0),
   fstart_prox(-1),
   fshower_prox(-1),
+  fmax_bp_dist(-1),
   fcpoa_vert_prox(-1),
   fcpoa_trackend_prox(-1),
   fdetos(nullptr),
-  fvbt(nullptr),
-  fconecheck(false),
+  fshower_score(false),
   fverbose(false) {}
 
 
@@ -27,6 +26,11 @@ void VertexBuilder::CheckSetVariables() {
 
   if(fshower_prox == -1) {
     std::cout << "fshower_prox not set\n";
+    exit(1);
+  } 
+
+  if(fmax_bp_dist == -1) {
+    std::cout << "fmax_bp_dist not set\n";
     exit(1);
   } 
 
@@ -262,12 +266,55 @@ double VertexBuilder::FindClosestApproach(geoalgo::HalfLine_t const & shr1,
   geoalgo::Point_t PtShr1(3);
   geoalgo::Point_t PtShr2(3);
   double const ip = FindClosestApproach(shr1, shr2, PtShr1, PtShr2);
+  if(shr1.Start().Dist(PtShr1) > fmax_bp_dist) return DBL_MAX;
   vtx = (PtShr1 + PtShr2) / 2;
 
   return ip;
 
 }
 
+
+double VertexBuilder::FindClosestApproach(geoalgo::Trajectory const & traj,
+					  geoalgo::HalfLine_t const & shr,
+					  geoalgo::Point_t & vtx) const {
+
+  geoalgo::Point_t PtShr(3);
+  double const ip = sqrt(falgo.SqDist(traj,
+				      shr,
+				      vtx,
+				      PtShr));
+  if(shr.Start().Dist(PtShr) > fmax_bp_dist) return DBL_MAX;
+
+  return ip;
+
+}
+
+
+
+double VertexBuilder::FindClosestApproach(geoalgo::Point_t const & pav,
+					  geoalgo::HalfLine_t const & shr,
+					  geoalgo::Point_t & vtx) const {
+
+  double const ip = sqrt(falgo.SqDist(pav, shr));
+  vtx = falgo.ClosestPt(pav, shr);
+  if(shr.Start().Dist(vtx) > fmax_bp_dist) return DBL_MAX;
+
+  return ip;
+
+}
+
+double VertexBuilder::GetShowerAssociationScore(geoalgo::HalfLine_t const & shr1,
+						geoalgo::HalfLine_t const & shr2,
+						geoalgo::Point_t & vtx) const {
+
+  geoalgo::Point_t PtShr1(3);
+  geoalgo::Point_t PtShr2(3);
+  double const ip = FindClosestApproach(shr1, shr2, PtShr1, PtShr2);
+  vtx = (PtShr1 + PtShr2) / 2;
+
+  return ip / shr1.Start().Dist(PtShr1);
+
+}
 
 
 bool VertexBuilder::ConeCheck(geoalgo::Cone_t const & cone,
@@ -331,10 +378,9 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 	  continue;
 	}
 
-	geoalgo::Point_t PtShr1(3);
-	geoalgo::Point_t PtShr2(3);
-	double const dist = FindClosestApproach(c2.second->fcone, c_cone, PtShr2, PtShr1);
-	temp_vert = (PtShr1 + PtShr2) / 2;
+	double dist;
+	if(fshower_score) dist = GetShowerAssociationScore(c2.second->fcone, c_cone, temp_vert);
+	else dist = FindClosestApproach(c2.second->fcone, c_cone, temp_vert);
 
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best-dist: "
@@ -361,14 +407,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 	if(fverbose)
 	  std::cout << "\t\t\ttrack secondary floop, id: " << i << std::endl;
 
-	Track const & t = fdetos->GetTrack(i);
-
-	geoalgo::Point_t dont_care;
-
-	double const dist = sqrt(falgo.SqDist(t.ftrajectory, 
-					      bp,
-					      temp_vert,
-					      dont_care));
+	double const dist = FindClosestApproach(fdetos->GetTrack(i).ftrajectory, bp, temp_vert);
 
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best_dist: "
@@ -396,10 +435,9 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 	  std::cout << "\t\t\tassociation secondary floop, index: "
 		    << i << std::endl;
 
-	ParticleAssociation const & pa = associations.at(i);
+	geoalgo::Point_t const & pav = associations.at(i).GetRecoVertex();
+	double const dist = FindClosestApproach(pav, bp, temp_vert);
 
-	double const dist = sqrt(falgo.SqDist(pa.GetRecoVertex(), bp))
-	  ;
 	if(fverbose)
 	  std::cout << "\t\t\tdist: " << dist << " < best-dist: "
 		    << best_dist << " ?\n";
@@ -410,7 +448,7 @@ void VertexBuilder::AssociateShowers(ParticleAssociations & pas) {
 
 	  best_shower_id = c.first;
 	  best_other_id = SIZE_MAX;
-	  best_vert = falgo.ClosestPt(pa.GetRecoVertex(), c.second->fcone);
+	  best_vert = temp_vert;
 	  best_dist = dist;
 	  index = i;
 
@@ -870,14 +908,6 @@ void VertexBuilder::AddLoneShowers(ParticleAssociations & pas) {
 }
 
 
-void VertexBuilder::FillVBT(ParticleAssociations & pas) {
-
-  fvbt->ftrack_number = fdetos->GetTrackIndices().size();
-  fvbt->fshower_number = fdetos->GetShowerIndices().size();
-  fvbt->ftree->Fill();
-
-}
-
 
 void VertexBuilder::Run(ParticleAssociations & pas) {
 
@@ -887,10 +917,8 @@ void VertexBuilder::Run(ParticleAssociations & pas) {
 
   if(fverbose) std::cout << "Associate tracks\n";
   AssociateTracks(pas);
-  if(fvbt) fvbt->fassociation_track_number = pas.GetAssociations().size();
   if(fverbose) std::cout << "Associate showers\n";
   AssociateShowers(pas);
-  if(fvbt) fvbt->fassociation_shower_number = pas.GetAssociations().size();
 
   if(fverbose) std::cout << "Add lone tracks\n";
   AddLoneTracks(pas);
@@ -898,12 +926,6 @@ void VertexBuilder::Run(ParticleAssociations & pas) {
   AddLoneShowers(pas);
   if(fverbose) std::cout << "Get shower associations\n";
   pas.GetShowerAssociations();
-  if(fvbt) fvbt->fassociation_final_number = pas.GetSelectedAssociations().size();
-
-  if(fvbt) {
-    if(fverbose) std::cout << "Fill VBT\n";
-    FillVBT(pas);
-  }
 
   pas.NodeCheck();
 

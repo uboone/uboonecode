@@ -1,0 +1,3 @@
+#include "FillLightEventMC.fcl"
+
+physics.analyzers.FillLightEvent.pot_producer: ""

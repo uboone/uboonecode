@@ -2,12 +2,12 @@
 #include "messageservice.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
-process_name : LEEPhotonAnalysisProcess
+process_name : RunVertexBuilder
 
 services:
 {
 
-  TFileService:	{fileName: "LEEPhotonAnalysisMC.root"}
+  TFileService:	{fileName: "RunVertexBuilder.root"}
   TimeTracker:	@local::microboone_time_tracker
   MemoryTracker: @local::microboone_memory_tracker
   @table::microboone_simulation_services
@@ -29,30 +29,38 @@ physics:
 {
   analyzers:
   {
-    LEEPhoton:
+    RunVB:
     {
-      module_type: "LEEPhotonAnalysis"
-      #spec_event: "251"
-      mcordata: "mc"
-      pot_producer: "generator"
-      trigger_product: "swtrigger"
+      module_type: "RunVertexBuilder"
+      NCDeltaRadiative: "true"
       track_producer: "pandoraNu"
       shower_producer: "pandoraNu"
+
+      start_prox: "4"
+      start_prox_min: "1"
+      start_prox_max: "4"	
+      start_prox_inc: "3"
+
+      shower_prox: "20"
+      shower_prox_min: "5"
+      shower_prox_max: "20"
+      shower_prox_inc: "3"
+
+      max_bp_dist: "50"
+
+      cpoa_vert_prox: "13"
+
+      cpoa_trackend_prox: "10"
+      cpoa_trackend_prox_min: "1"
+      cpoa_trackend_prox_max: "10"
+      cpoa_trackend_prox_inc: "9"
+
       hit_producer: "pandoraCosmicHitRemoval"
       rmcmassociation_producer: "crHitRemovalTruthMatch"
-      opflash_producer: "simpleFlashBeam"
-      fill_vertex_builder_tree: "true"
-      mcrecomatching: "true"
-      run_vertex_quality: "true"
-      start_prox: "4"
-      shower_prox: "20"
-      max_bp_dist: "50"
-      cpoa_vert_prox: "13"
-      cpoa_trackend_prox: "10"
       #verbose: "true"
     }
   }
-  analysis: [LEEPhoton]
+  analysis: [RunVB]
   end_paths: [analysis]
 }
 

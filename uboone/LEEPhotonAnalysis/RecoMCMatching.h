@@ -68,6 +68,10 @@ class RecoMCMatching {
   std::vector<double> fmctrack_charge;
   std::vector<double> fmcparticle_charge;
 
+  std::unordered_map<int, size_t> tp_map;
+  std::unordered_map<int, size_t> sp_map;
+  std::unordered_map<int, size_t> mcp_map;
+
   TTree * fhit_tree;
   int fhit_from_reco_track;
   double fhit_time;
@@ -77,6 +81,7 @@ class RecoMCMatching {
   int fsimch_tdc;
 
  public:
+
   int const fmc_type_shower;
   int const fmc_type_track;
   int const fmc_type_particle;
@@ -105,7 +110,7 @@ class RecoMCMatching {
 		 std::string const & track_producer,
 		 std::string const & shower_producer,
 		 std::string const & rmcmassociation_producer,
-		 bool const verbose = true) {
+		 bool const verbose = false) {
     
     fhit_producer = hit_producer;
     ftrack_producer = track_producer;
@@ -114,6 +119,32 @@ class RecoMCMatching {
     fverbose = verbose;
 
   }
+
+  void ConfigureTrack(std::string const & hit_producer,
+		      std::string const & track_producer,
+		      std::string const & rmcmassociation_producer,
+		      bool const verbose = false) {
+    
+    fhit_producer = hit_producer;
+    ftrack_producer = track_producer;
+    frmcmassociation_producer = rmcmassociation_producer;
+    fverbose = verbose;
+
+  }
+
+  void ConfigureShower(std::string const & hit_producer,
+		       std::string const & shower_producer,
+		       std::string const & rmcmassociation_producer,
+		       bool const verbose = false) {
+    
+    fhit_producer = hit_producer;
+    fshower_producer = shower_producer;
+    frmcmassociation_producer = rmcmassociation_producer;
+    fverbose = verbose;
+
+  }
+
+  void Reset(art::Event const & e);
 
   void ConsiderMCParticles(bool const consider_mcparticles = true) {fconsider_mcparticles = consider_mcparticles;}
 
@@ -142,6 +173,7 @@ class RecoMCMatching {
   void FillMap(std::unordered_map<size_t, double> & mc_map,
 	       size_t const index,
 	       double const quantity);
+  void FillMCMaps(art::Event const & e);
   void MatchWAssociations(art::Event const & e);
   void CoutMatches(art::Event const & e,
 		   std::unordered_map<int, size_t> const & tp_map,
@@ -173,6 +205,16 @@ class RecoMCMatching {
   std::vector<double> const & GetMCParticleCharge() const {
     return fmcparticle_charge;
   }  
+  std::unordered_map<int, size_t> const & GetMCTrackMap() const {
+    return tp_map;
+  }
+  std::unordered_map<int, size_t> const & GetMCShowerMap() const {
+    return sp_map;
+  }
+  std::unordered_map<int, size_t> const & GetMCParticleMap() const {
+    return mcp_map;
+  }
+
 
 };
 

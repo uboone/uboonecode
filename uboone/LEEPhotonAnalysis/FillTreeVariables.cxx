@@ -13,7 +13,6 @@
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
-#include "FilterSignal.h"
 #include "RecoMCMatching.h"
 
 
@@ -153,10 +152,6 @@ void FillTreeVariables::SetUpTreeBranches() {
   fvertex_tree->Branch("reco_nuvertz", &reco_nuvertz, "reco_nuvertz/D");
 
   fvertex_tree->Branch("reco_nu_vtx_dist_to_closest_tpc_wall", &reco_nu_vtx_dist_to_closest_tpc_wall, "reco_nu_vtx_dist_to_closest_tpc_wall/D");
-  fvertex_tree->Branch("reco_true_nuvert_dist", &reco_true_nuvert_dist, "reco_true_nuvert_dist/D");    
-  fvertex_tree->Branch("reco_true_nuvert_distx", &reco_true_nuvert_distx, "reco_true_nuvert_distx/D");    
-  fvertex_tree->Branch("reco_true_nuvert_disty", &reco_true_nuvert_disty, "reco_true_nuvert_disty/D");    
-  fvertex_tree->Branch("reco_true_nuvert_distz", &reco_true_nuvert_distz, "reco_true_nuvert_distz/D");    
 
   fvertex_tree->Branch("reco_nu_vtx_fid_contained", &reco_nu_vtx_fid_contained, "reco_nu_vtx_fid_contained/I");
 
@@ -175,8 +170,6 @@ void FillTreeVariables::SetUpTreeBranches() {
 
   fvertex_tree->Branch("longest_asso_track_calo_dEdx","std::vector< double >",&longest_asso_track_calo_dEdx);
   fvertex_tree->Branch("longest_asso_track_calo_resrange","std::vector< double >",&longest_asso_track_calo_resrange);
-
-
 
   fvertex_tree->Branch("closest_asso_shower_dist_to_flashzcenter", &closest_asso_shower_dist_to_flashzcenter, "closest_asso_shower_dist_to_flashzcenter/D");
 
@@ -262,6 +255,11 @@ void FillTreeVariables::SetUpTreeBranches() {
 
     fvertex_tree->Branch("true_nu_E", &true_nu_E, "true_nu_E/D");
 
+    fvertex_tree->Branch("reco_true_nuvert_dist", &reco_true_nuvert_dist, "reco_true_nuvert_dist/D");    
+    fvertex_tree->Branch("reco_true_nuvert_distx", &reco_true_nuvert_distx, "reco_true_nuvert_distx/D");    
+    fvertex_tree->Branch("reco_true_nuvert_disty", &reco_true_nuvert_disty, "reco_true_nuvert_disty/D");    
+    fvertex_tree->Branch("reco_true_nuvert_distz", &reco_true_nuvert_distz, "reco_true_nuvert_distz/D");    
+
     fvertex_tree->Branch("true_nu_vtx_tpc_contained", &true_nu_vtx_tpc_contained, "true_nu_vtx_tpc_contained/I"); 
     fvertex_tree->Branch("true_nu_vtx_fid_contained", &true_nu_vtx_fid_contained, "true_nu_vtx_fid_contained/I"); 
 
@@ -294,11 +292,6 @@ void FillTreeVariables::SetUpTreeBranches() {
     fvertex_tree->Branch("longest_asso_track_true_parent_pdg", &longest_asso_track_true_parent_pdg, "longest_asso_track_true_parent_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_ancestor_pdg", &longest_asso_track_true_ancestor_pdg, "longest_asso_track_true_ancestor_pdg/I");
     fvertex_tree->Branch("longest_asso_track_true_origin", &longest_asso_track_true_origin, "longest_asso_track_true_origin/I");
-
-
-
-
-
 
     fvertex_tree->Branch("shower_matching_ratio", &shower_matching_ratio, "shower_matching_ratio/D");
     fvertex_tree->Branch("shower_matched_to_mcshower", &shower_matched_to_mcshower, "shower_matched_to_mcshower/I");
@@ -1032,7 +1025,7 @@ void FillTreeVariables::FillTruth(art::Event const & e,
 
   if(SinglePhotonFilter(e, delta_rad_mct_index)) is_single_photon = 1;
   else is_single_photon = 0;
-  if(FilterSignal(e, delta_rad_mct_index)) is_delta_rad = 1;
+  if(ffs.Run(e, delta_rad_mct_index)) is_delta_rad = 1;
   else is_delta_rad = 0;
   if(is_delta_rad == 1) {
     if(delta_rad_mct_index == SIZE_MAX) {
@@ -1574,7 +1567,6 @@ void FillTreeVariables::FilldEdx(art::Event const & e,
       closest_shower_dedx_best_plane = closest_shower_dedx_vector.at(GetBestShowerPlane(e, closest_associated_shower_index));
   }
 
-
 }
 
 
@@ -1670,7 +1662,7 @@ void FillTreeVariables::FillShowerRecoMCMatching(art::Event const & e,
   art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctr =
     e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
   
-size_t mct_index = SIZE_MAX;
+  size_t mct_index = SIZE_MAX;
 
   shower_matched_to_mcshower = 0;
   shower_matched_to_mctrack = 0;
@@ -1702,6 +1694,7 @@ size_t mct_index = SIZE_MAX;
     shower_true_thetaxz = atan(shower_dir.at(0)/shower_dir.at(2));
     shower_true_thetayz = atan(shower_dir.at(1)/shower_dir.at(2));
     shower_true_energy = mcs.Start().E() * 1e-3;
+    shower_detprofile_energy = mcs.DetProfile().E() * 1e-3;
   }
   else if(shower_match.mc_type == 2) {
     shower_matched_to_mctrack = 1;
@@ -1747,9 +1740,9 @@ size_t mct_index = SIZE_MAX;
     shower_from_ncdeltarad_interaction = 0;
     if(is_delta_rad == 1 && mct_index == delta_rad_mct_index) shower_from_ncdeltarad_interaction = 1;
     shower_matched_to_ncdeltarad_photon = 0;
-    if(is_delta_rad == 1 && shower_match.mc_type == 2 && shower_match.mc_index == delta_mcshower_index) shower_matched_to_ncdeltarad_photon = 1;
+    if(is_delta_rad == 1 && shower_match.mc_type == frmcm->fmc_type_shower && shower_match.mc_index == delta_mcshower_index) shower_matched_to_ncdeltarad_photon = 1;
     shower_matched_to_ncdeltarad_proton = 0;
-    if(is_delta_rad == 1 && shower_match.mc_type == 1 && shower_match.mc_index == delta_mctrack_index) shower_matched_to_ncdeltarad_proton = 1;
+    if(is_delta_rad == 1 && shower_match.mc_type == frmcm->fmc_type_track && shower_match.mc_index == delta_mctrack_index) shower_matched_to_ncdeltarad_proton = 1;
   }
 
 }
@@ -1843,9 +1836,9 @@ void FillTreeVariables::FillTrackRecoMCMatching(art::Event const & e,
     longest_asso_track_from_ncdeltarad_interaction = 0;
     if(is_delta_rad == 1 && mct_index == delta_rad_mct_index) longest_asso_track_from_ncdeltarad_interaction = 1;
     longest_asso_track_matched_to_ncdeltarad_photon = 0;
-    if(is_delta_rad == 1 && longest_asso_track_match.mc_type == 2 && longest_asso_track_match.mc_index == delta_mcshower_index) longest_asso_track_matched_to_ncdeltarad_photon = 1;
+    if(is_delta_rad == 1 && longest_asso_track_match.mc_type == frmcm->fmc_type_shower && longest_asso_track_match.mc_index == delta_mcshower_index) longest_asso_track_matched_to_ncdeltarad_photon = 1;
     longest_asso_track_matched_to_ncdeltarad_proton = 0;
-    if(is_delta_rad == 1 && longest_asso_track_match.mc_type == 1 && longest_asso_track_match.mc_index == delta_mctrack_index) longest_asso_track_matched_to_ncdeltarad_proton = 1;
+    if(is_delta_rad == 1 && longest_asso_track_match.mc_type == frmcm->fmc_type_track && longest_asso_track_match.mc_index == delta_mctrack_index) longest_asso_track_matched_to_ncdeltarad_proton = 1;
   }
   
 }
@@ -1925,7 +1918,7 @@ void FillTreeVariables::FillVertexTree(art::Event const & e,
       ++reco_asso_tracks;
       recob::Track const & t = ev_t->at(original_index);
       track_length = geoalgo::Point_t(t.Vertex()).Dist(t.End());
-			
+
       if(fverbose) std::cout << "\t\tTRK: reco_asso_tracks: " <<reco_asso_tracks<<" track_length: "<<track_length<<" longest: "<<longest_asso_track_length<<std::endl;
       if(track_length > longest_asso_track_length) {
 

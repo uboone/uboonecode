@@ -27,6 +27,12 @@ class SignalFilter;
 
 
 class SignalFilter : public art::EDFilter {
+
+  FilterSignal ffs;
+
+  unsigned int counter;
+  unsigned int counterold;
+
 public:
   explicit SignalFilter(fhicl::ParameterSet const & p);
   // The compiler-generated destructor is fine for non-base
@@ -38,21 +44,18 @@ public:
   SignalFilter & operator = (SignalFilter const &) = delete;
   SignalFilter & operator = (SignalFilter &&) = delete;
 
+  void endJob();  
+
   // Required functions.
   bool filter(art::Event & e) override;
-
-private:
-
   void cout_particles(art::Event & e);
-
-  // Declare member data here.
 
 };
 
 
-SignalFilter::SignalFilter(fhicl::ParameterSet const & p) {
-
-}
+SignalFilter::SignalFilter(fhicl::ParameterSet const & p) :
+  counter(0),
+  counterold(0){}
 
 
 void SignalFilter::cout_particles(art::Event & e) {
@@ -75,11 +78,24 @@ void SignalFilter::cout_particles(art::Event & e) {
 bool SignalFilter::filter(art::Event & e) {
 
   size_t temp;
-  if(FilterSignal(e, temp)) cout_particles(e);
+  
+  //if(ffs.Run(e, temp)) cout_particles(e);
 
-  return FilterSignal(e, temp);
+  if(ffs.Run(e, temp)) ++counter;
+  if(ffs.RunOld(e, temp)) ++counterold;
+
+  return ffs.Run(e, temp);
   
 }
+
+
+
+void SignalFilter::endJob() {
+
+  std::cout << counter << " " << counterold << "\n";
+
+}
+
 
 
 DEFINE_ART_MODULE(SignalFilter)

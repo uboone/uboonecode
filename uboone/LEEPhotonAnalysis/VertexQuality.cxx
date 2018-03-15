@@ -10,6 +10,7 @@
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
+#include "FilterSignal.h"
 
 
 VertexQuality::VertexQuality(std::string const & track_producer,
@@ -25,11 +26,22 @@ VertexQuality::VertexQuality(std::string const & track_producer,
 	      lar::providerFrom<geo::Geometry>()->DetHalfHeight(),
 	      lar::providerFrom<geo::Geometry>()->DetLength()),
   fvertex_tree(nullptr),
-  fvertex_tree_event(nullptr) {
+  fvertex_tree_event(nullptr),
+  fvertex_tree_event_signal(nullptr) {}
+
+
+
+void VertexQuality::SetupVertexQualityTree() {
 
   art::ServiceHandle< art::TFileService > tfs;
 
   fvertex_tree = tfs->make<TTree>("vertex_quality_tree", "");  
+  
+  fvertex_tree->Branch("start_prox", &fstart_prox, "start_prox/D");
+  fvertex_tree->Branch("shower_prox", &fshower_prox, "shower_prox/D");
+  fvertex_tree->Branch("max_bp_dist", &fmax_bp_dist, "max_bp_dist/D");  
+  fvertex_tree->Branch("cpoa_vert_prox", &fcpoa_vert_prox, "cpoa_vert_prox/D");
+  fvertex_tree->Branch("cpoa_trackend_prox", &fcpoa_trackend_prox, "cpoa_trackend_prox/D");
 
   fvertex_tree->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
 
@@ -53,10 +65,23 @@ VertexQuality::VertexQuality(std::string const & track_producer,
   fvertex_tree->Branch("shower_true_pdg_v", &fshower_true_pdg_v);
   fvertex_tree->Branch("shower_true_origin_v", &fshower_true_origin_v);
 
+}
+
+
+
+void VertexQuality::SetupVertexQualityTreeClosest() {
+
+  art::ServiceHandle< art::TFileService > tfs;
+
   fvertex_tree_event = tfs->make<TTree>("vertex_quality_tree_closest", "");  
 
-  fvertex_tree_event->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
+  fvertex_tree_event->Branch("start_prox", &fstart_prox, "start_prox/D");
+  fvertex_tree_event->Branch("shower_prox", &fshower_prox, "shower_prox/D");
+  fvertex_tree_event->Branch("max_bp_dist", &fmax_bp_dist, "max_bp_dist/D");  
+  fvertex_tree_event->Branch("cpoa_vert_prox", &fcpoa_vert_prox, "cpoa_vert_prox/D");
+  fvertex_tree_event->Branch("cpoa_trackend_prox", &fcpoa_trackend_prox, "cpoa_trackend_prox/D");
 
+  fvertex_tree_event->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
   fvertex_tree_event->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
 
   fvertex_tree_event->Branch("dist", &fdist, "dist/D");
@@ -83,6 +108,47 @@ VertexQuality::VertexQuality(std::string const & track_producer,
 
 
 
+void VertexQuality::SetupVertexQualityTreeSignal() {
+
+  art::ServiceHandle< art::TFileService > tfs;
+
+  fvertex_tree_event_signal = tfs->make<TTree>("vertex_quality_tree_signal", "");  
+
+  fvertex_tree_event_signal->Branch("start_prox", &fstart_prox, "start_prox/D");
+  fvertex_tree_event_signal->Branch("shower_prox", &fshower_prox, "shower_prox/D");
+  fvertex_tree_event_signal->Branch("max_bp_dist", &fmax_bp_dist, "max_bp_dist/D");  
+  fvertex_tree_event_signal->Branch("cpoa_vert_prox", &fcpoa_vert_prox, "cpoa_vert_prox/D");
+  fvertex_tree_event_signal->Branch("cpoa_trackend_prox", &fcpoa_trackend_prox, "cpoa_trackend_prox/D");
+
+  fvertex_tree_event_signal->Branch("reco_vertex_present", &freco_vertex_present, "reco_vertex_present/I");
+  fvertex_tree_event_signal->Branch("is_nc_delta_rad", &fis_nc_delta_rad, "is_nc_delta_rad/I");
+  fvertex_tree_event_signal->Branch("nc_delta_rad_split_shower", &fnc_delta_rad_split_shower, "nc_delta_rad_split_shower/I");
+  fvertex_tree_event_signal->Branch("tpc_volume_contained", &ftpc_volume_contained, "tpc_volume_contained/I");
+
+  fvertex_tree_event_signal->Branch("dist", &fdist, "dist/D");
+  fvertex_tree_event_signal->Branch("distx", &fdistx, "distx/D");
+  fvertex_tree_event_signal->Branch("disty", &fdisty, "disty/D");
+  fvertex_tree_event_signal->Branch("distz", &fdistz, "distz/D");
+
+  fvertex_tree_event_signal->Branch("true_track_total", &ftrue_track_total, "true_track_total/I");
+  fvertex_tree_event_signal->Branch("true_shower_total", &ftrue_shower_total, "true_shower_total/I");
+  fvertex_tree_event_signal->Branch("reco_track_total", &freco_track_total, "reco_track_total/I");
+  fvertex_tree_event_signal->Branch("reco_shower_total", &freco_shower_total, "reco_shower_total/I");
+  fvertex_tree_event_signal->Branch("correct_track_total", &fcorrect_track_total, "correct_track_total/I");
+  fvertex_tree_event_signal->Branch("correct_shower_total", &fcorrect_shower_total, "correct_shower_total/I");
+
+  fvertex_tree_event_signal->Branch("track_matching_ratio_v", &ftrack_matching_ratio_v);
+  fvertex_tree_event_signal->Branch("track_true_pdg_v", &ftrack_true_pdg_v);
+  fvertex_tree_event_signal->Branch("track_true_origin_v", &ftrack_true_origin_v);
+
+  fvertex_tree_event_signal->Branch("shower_matching_ratio_v", &fshower_matching_ratio_v);
+  fvertex_tree_event_signal->Branch("shower_true_pdg_v", &fshower_true_pdg_v);
+  fvertex_tree_event_signal->Branch("shower_true_origin_v", &fshower_true_origin_v);
+
+}
+
+
+
 art::Ptr<simb::MCTruth> VertexQuality::TrackIDToMCTruth(art::Event const & e, int const geant_track_id) {
 
   lar_pandora::MCTruthToMCParticles truthToParticles;
@@ -102,8 +168,8 @@ art::Ptr<simb::MCTruth> VertexQuality::TrackIDToMCTruth(art::Event const & e, in
 }
 
 
-
 void VertexQuality::GetTrueObjects(art::Event const & e,
+				   size_t const mct_index,
 				   std::vector<size_t> & mctrack_v,
 				   std::vector<size_t> & mcshower_v,
 				   std::vector<size_t> & mcparticle_v) {
@@ -115,7 +181,7 @@ void VertexQuality::GetTrueObjects(art::Event const & e,
   
   double const threshold = 1;
 
-  geoalgo::Point_t const true_nu_vtx = ev_mctruth->front().GetNeutrino().Nu().Position(0);
+  geoalgo::Point_t const true_nu_vtx = ev_mctruth->at(mct_index).GetNeutrino().Nu().Position(0);
   std::vector<int> used_trackid_v;
 
   for(size_t i = 0; i < ev_mctrack->size(); ++i) {
@@ -213,13 +279,14 @@ double VertexQuality::GetTrueTotal(std::vector<int> const & mcparticle_v) {
 
 
 void VertexQuality::GetTrueRecoObjects(art::Event const & e,
+				       size_t const mct_index,
 				       std::vector<size_t> & track_v,
 				       std::vector<size_t> & shower_v) {
 
   std::vector<size_t> mctrack_v;
   std::vector<size_t> mcshower_v;
   std::vector<size_t> mcparticle_v;
-  GetTrueObjects(e, mctrack_v, mcshower_v, mcparticle_v);
+  GetTrueObjects(e, mct_index, mctrack_v, mcshower_v, mcparticle_v);
 
   std::vector<RecoMCMatch> const & shower_matches = frmcm->GetShowerMatches();
   std::vector<RecoMCMatch> const & track_matches = frmcm->GetTrackMatches(); 
@@ -287,14 +354,14 @@ void VertexQuality::Reset() {
 void VertexQuality::FillTree(art::Event const & e,
 			     TTree * tree,
 			     ParticleAssociations const & pas,
-			     size_t const closest_index,
+			     size_t const pa_index,
 			     geoalgo::Point_t const & true_nu_vtx,
 			     std::vector<size_t> const & track_v,
 			     std::vector<size_t> const & shower_v) {
 
   Reset();
 
-  if(closest_index != SIZE_MAX) {
+  if(pa_index != SIZE_MAX) {
 
     art::ValidHandle<std::vector<sim::MCTrack>> const & ev_mctrack = e.getValidHandle<std::vector<sim::MCTrack>>("mcreco");
     art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
@@ -304,7 +371,7 @@ void VertexQuality::FillTree(art::Event const & e,
     std::vector<RecoMCMatch> const & track_matches = frmcm->GetTrackMatches(); 
 
     DetectorObjects const & deto_v = pas.GetDetectorObjects();
-    ParticleAssociation const & pa = pas.GetAssociations().at(closest_index);
+    ParticleAssociation const & pa = pas.GetAssociations().at(pa_index);
     geoalgo::Point_t const & reco_vertex = pa.GetRecoVertex();
 
     fdist = true_nu_vtx.Dist(reco_vertex);
@@ -377,7 +444,10 @@ void VertexQuality::FillTree(art::Event const & e,
 
 
 void VertexQuality::RunDist(art::Event const & e,
-			    ParticleAssociations const & pas) {
+			    ParticleAssociations const & pas,
+			    bool const track_only) {
+
+  if(!fvertex_tree_event) SetupVertexQualityTreeClosest();
 
   art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
   geoalgo::Point_t const true_nu_vtx = ev_mctruth->front().GetNeutrino().Nu().Position(0);
@@ -387,7 +457,7 @@ void VertexQuality::RunDist(art::Event const & e,
 
   std::vector<size_t> track_v;
   std::vector<size_t> shower_v;
-  GetTrueRecoObjects(e, track_v, shower_v);
+  GetTrueRecoObjects(e, 0, track_v, shower_v);
   ftrue_track_total = track_v.size(); 
   ftrue_shower_total = shower_v.size(); 
 
@@ -395,8 +465,12 @@ void VertexQuality::RunDist(art::Event const & e,
 
   double smallest_dist = DBL_MAX;
   size_t closest_index = SIZE_MAX;
-  for(size_t const pa_index : pas.GetSelectedAssociations()) {
-    FillTree(e, fvertex_tree, pas, pa_index, true_nu_vtx, track_v, shower_v);
+  std::vector<size_t> const * asso_v;
+  if(track_only) asso_v = &pas.GetAssociationIndices();
+  else asso_v = &pas.GetSelectedAssociations();
+
+  for(size_t const pa_index : *asso_v) {
+    //FillTree(e, fvertex_tree, pas, pa_index, true_nu_vtx, track_v, shower_v);
     double const dist = true_nu_vtx.Dist(pa_v.at(pa_index).GetRecoVertex());
     if(dist < smallest_dist) {
       smallest_dist = dist;
@@ -408,6 +482,123 @@ void VertexQuality::RunDist(art::Event const & e,
   else freco_vertex_present = 0;
   FillTree(e, fvertex_tree_event, pas, closest_index, true_nu_vtx, track_v, shower_v);
 
+}
+
+
+
+size_t VertexQuality::GetNCDeltadRadPhoton(art::Event const & e, size_t const nc_delta_rad_mct_index, size_t const exiting_photon_index, int & mc_type) {
+
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
+  art::ValidHandle<std::vector<sim::MCShower>> const & ev_mcshower = e.getValidHandle<std::vector<sim::MCShower>>("mcreco");
+  art::ValidHandle<std::vector<simb::MCParticle>> const & ev_mcparticle = e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+
+  simb::MCParticle const & mcp = ev_mctruth->at(nc_delta_rad_mct_index).GetParticle(exiting_photon_index);
+  int const mcp_pdg = mcp.PdgCode();
+  geoalgo::Point_t const photon_start(mcp.Trajectory().Position(0));
+  geoalgo::Point_t const photon_mom(mcp.Trajectory().Momentum(0));
+
+  size_t mc_index = SIZE_MAX;
+
+  double const diffd = 1e-10;
+  double const diffp = 1e-10;
+
+  double distd = diffd;
+  double distp = diffp;
+
+  for(size_t i = 0; i < ev_mcshower->size(); ++i) {
+    sim::MCShower const & mcs = ev_mcshower->at(i);
+    if(mcs.PdgCode() != mcp_pdg) continue; 
+    double const dd = photon_start.Dist(mcs.Start().Position());
+    double const dp = photon_mom.Dist(geoalgo::Point_t(mcs.Start().Momentum())*1e-3);
+    if(dd < distd && dp < distp) {
+      mc_index = i;
+      mc_type = frmcm->fmc_type_shower;
+      distd = dd;
+      distp = dp;
+    }
+  }
+
+  if(mc_index != SIZE_MAX) return mc_index;
+
+  for(size_t i = 0; i < ev_mcparticle->size(); ++i) {
+    simb::MCParticle const & mcp = ev_mcparticle->at(i);
+    if(mcp.PdgCode() != mcp_pdg) continue; 
+    double const dd = photon_start.Dist(mcp.Trajectory().Position(0));
+    double const dp = photon_mom.Dist(mcp.Trajectory().Momentum(0));
+    if(dd < distd && dp < distp) {
+      mc_index = i;
+      mc_type = frmcm->fmc_type_particle;
+      distd = dd;
+      distp = dp;
+    }
+  }  
+ 
+  return mc_index;
+
+}
+
+
+
+void VertexQuality::RunSig(art::Event const & e,
+			   ParticleAssociations const & pas,
+			   bool const track_only) {
+
+  if(!fvertex_tree_event_signal) SetupVertexQualityTreeSignal();
+
+  art::ValidHandle<std::vector<simb::MCTruth>> const & ev_mctruth = e.getValidHandle<std::vector<simb::MCTruth>>("generator");
+  DetectorObjects const & detos = pas.GetDetectorObjects();   
+
+  for(size_t mct_index = 0; mct_index < ev_mctruth->size(); ++mct_index) {
+
+    simb::MCTruth const & mct = ev_mctruth->at(mct_index);
+    size_t exiting_photon_index = SIZE_MAX;
+    ftpc_volume_contained = 0;
+    
+    if(!ffs.RunSingle(e, mct_index, exiting_photon_index)) continue;
+
+    int mc_type = 0;
+    size_t const mc_index = GetNCDeltadRadPhoton(e, mct_index, exiting_photon_index, mc_type);
+
+    std::vector<size_t> shower_indices;
+    std::vector<RecoMCMatch> const & shower_matches = frmcm->GetShowerMatches();
+    for(size_t i = 0; i < shower_matches.size(); ++i) {
+      RecoMCMatch const & rmcm = shower_matches.at(i);
+      if(rmcm.mc_index != mc_index || rmcm.mc_type != mc_type) continue;
+      shower_indices.push_back(i);
+    }
+    fnc_delta_rad_split_shower = 0;
+    if(shower_indices.empty()) continue;
+    if(shower_indices.size() > 1) fnc_delta_rad_split_shower = 1;
+
+    geoalgo::Point_t const true_nu_vtx = mct.GetNeutrino().Nu().Position(0);
+    if(ftpc_volume.Contain(true_nu_vtx)) ftpc_volume_contained = 1;
+
+    std::vector<size_t> track_v;
+    std::vector<size_t> shower_v;
+    GetTrueRecoObjects(e, mct_index, track_v, shower_v);
+    ftrue_track_total = track_v.size(); 
+    ftrue_shower_total = shower_v.size(); 
+   
+    std::vector<ParticleAssociation> const & pa_v = pas.GetAssociations();
+    for(size_t const i : pas.GetSelectedAssociations()) {
+      ParticleAssociation const & pa = pa_v.at(i);
+      bool signal_vertex = false;
+      for(size_t const n : pa.GetObjectIndices()) {
+	if(detos.GetRecoType(n) != detos.fshower_reco_type) continue;
+	size_t const original_index = detos.GetDetectorObject(n).foriginal_index;      
+	auto const si_it = std::find(shower_indices.begin(), shower_indices.end(), original_index);
+	if(si_it == shower_indices.end()) continue;
+	signal_vertex = true;
+	break;
+      }
+      fis_nc_delta_rad = 0;
+      if(!signal_vertex) continue;
+      fis_nc_delta_rad = 1;
+      FillTree(e, fvertex_tree_event_signal, pas, i, true_nu_vtx, track_v, shower_v);
+    }
+    
+  }  
+  
 }
 
 

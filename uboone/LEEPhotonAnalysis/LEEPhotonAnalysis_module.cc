@@ -64,6 +64,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 
   double fstart_prox;
   double fshower_prox;
+  double fmax_bp_dist;
   double fcpoa_vert_prox; 
   double fcpoa_trackend_prox;
   bool fverbose;
@@ -88,7 +89,6 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
 
   unsigned int fspec_event;
 
-  VertexBuilderTree fvbt;
   VertexQuality fvq;
   FillTreeVariables fftv;
 
@@ -106,6 +106,12 @@ public:
   void beginSubRun(art::SubRun const & sr);
   void fillwpandora(art::Event const & e,
 		    ParticleAssociations & pas);
+  void AddTracks(DetectorObjects & detos,
+		 art::ValidHandle<std::vector<recob::Track>> const & ev_t,
+		 bool const track_original_indices = false);
+  void AddShowers(DetectorObjects & detos,
+		  art::ValidHandle<std::vector<recob::Shower>> const & ev_s,
+		  bool const track_original_indices = false);
   void analyze(art::Event const & e) override;
   void endJob();  
 
@@ -175,10 +181,9 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 		    frmcmassociation_producer,
 		    &frmcm);
 
-  if(p.get<bool>("fill_vertex_builder_tree")) fvbt.Setup(); 
-
   fstart_prox = p.get<double>("start_prox");
   fshower_prox = p.get<double>("shower_prox");
+  fmax_bp_dist = p.get<double>("max_bp_dist");
   fcpoa_vert_prox = p.get<double>("cpoa_vert_prox");
   fcpoa_trackend_prox = p.get<double>("cpoa_trackend_prox");
 
@@ -325,6 +330,37 @@ void LEEPhotonAnalysis::fillwpandora(art::Event const & e, ParticleAssociations 
 }
 
 
+void LEEPhotonAnalysis::AddTracks(DetectorObjects & detos,
+				  art::ValidHandle<std::vector<recob::Track>> const & ev_t,
+				  bool const track_original_indices) {
+
+  for(size_t i = 0; i < ev_t->size(); ++i) {
+
+    recob::Track const & t = ev_t->at(i);
+
+    geoalgo::Trajectory traj;
+    traj.reserve(t.NumberTrajectoryPoints());
+    for(size_t i = 0; i < t.NumberTrajectoryPoints(); ++i)
+      traj.push_back(t.LocationAtPoint(i)); 
+
+    detos.AddTrack(i, traj, track_original_indices);
+
+  }
+
+}
+
+
+void LEEPhotonAnalysis::AddShowers(DetectorObjects & detos,
+				   art::ValidHandle<std::vector<recob::Shower>> const & ev_s,
+				   bool const track_original_indices) {
+
+  for(size_t i = 0; i < ev_s->size(); ++i) {
+    recob::Shower const & s = ev_s->at(i);
+    detos.AddShower(i, geoalgo::Cone_t(s.ShowerStart(), s.Direction(), s.Length(), 0), track_original_indices);
+  }
+
+}  
+
 
 void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
@@ -342,10 +378,6 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
     std::cout << "Event: " << e.id().event() << std::endl
 	      << "=======================================================\n";
 
-  fvbt.frun_number = e.id().run();
-  fvbt.fsubrun_number = e.id().subRun();
-  fvbt.fevent_number = e.id().event();
-
   ///////////////// Runs the vertex builder
 
   VertexBuilder vb;
@@ -353,24 +385,23 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   vb.SetMaximumTrackEndProximity(fstart_prox);
   vb.SetMaximumShowerIP(fshower_prox);
+  vb.SetMaximumBackwardsProjectionDist(fmax_bp_dist);
   vb.CPOAToVert(fcpoa_vert_prox);
   vb.SetMaximumTrackEndProx(fcpoa_trackend_prox);
-
-  if(fvbt.ftree) vb.SetVBT(&fvbt);
 
   ParticleAssociations pas;
   pas.SetVerbose(fverbose);
 
   if(fpfp_producer == "") {
     if(fverbose) std::cout << "Run vertex builder\n";
-    pas.GetDetectorObjects().AddShowers(ev_s);
-    pas.GetDetectorObjects().AddTracks(ev_t);
+    AddShowers(pas.GetDetectorObjects(), ev_s);
+    AddTracks(pas.GetDetectorObjects(), ev_t);
     vb.Run(pas);
   }
   else {
     if(fverbose) std::cout << "Run pandora\n";
-    pas.GetDetectorObjects().AddShowers(ev_s, true);
-    pas.GetDetectorObjects().AddTracks(ev_t, true);
+    AddShowers(pas.GetDetectorObjects(), ev_s, true);
+    AddTracks(pas.GetDetectorObjects(), ev_t, true);
     fillwpandora(e, pas);
   }
 
@@ -378,7 +409,7 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   if(fmcrecomatching) {
     frmcm.MatchWAssociations(e);
-    if(frun_vertex_quality) fvq.RunDist(e, pas);
+    if(frun_vertex_quality) fvq.RunSig(e, pas);
   }
   
   /////////////////

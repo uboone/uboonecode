@@ -1,0 +1,3 @@
+#include "FillLightEvent.fcl"
+
+physics.analyzers.FillLightEvent.mc: "true"
