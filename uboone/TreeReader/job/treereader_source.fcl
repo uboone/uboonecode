@@ -19,6 +19,7 @@ source: {
   maxEvents: -1
   inputType: "ntuple"
   treeName: "testmod/flux"
+  dataProductName: "TreeReader"
   branches: {
     vtxx: "vtxx"
     vtxy: "vtxy"

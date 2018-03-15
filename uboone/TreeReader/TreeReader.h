@@ -51,6 +51,7 @@ private:
   float               fPOT;
 
   std::string         fTreeName;
+  std::string         fDataProductName;
   fhicl::ParameterSet fBranchDef;
 
   TreeInterface*      fInterface;
