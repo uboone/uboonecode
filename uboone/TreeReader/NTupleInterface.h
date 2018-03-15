@@ -10,6 +10,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "nusimdata/SimulationBase/MCFlux.h"
 #include "TreeInterface.h"
+#include "TFile.h"
 
 class TTree;
 
@@ -71,16 +72,25 @@ public:
 private:
   TTree* fTree;  //!< Input TTree
 
+  int tptype;
+  int ptype;  //!< Parent PDG
+  int run;  //!< Run ID
+  int pdg;  //!< Neutrino PDG code
+  int fRun;  //!< Run ID
+  float fPOT;
   double vtxx, vtxy, vtxz;  //!< Neutrino vertex
   double px, py, pz, E;  //!< Neutrino momentum
-  int pdg;  //!< Neutrino PDG code
   double wgt;  //!< Neutrino weight (i.e. from upstream flux simulation)
   double dist;  //!< ???
-  int ptype;  //!< Parent PDG?
-  int run;  //!< Run ID
-  double nenergyn;  //!< ???
+  double nenergyn;  //!< neutrino energy if forced to interact in center of near TPC
+  double tpx;
+  double tpy;
+  double tpz;
+  double vx;
+  double vy;
+  double vz;
+
   Long64_t fNEntries;  //!< Number of entries in the tree
-  int fRun;  //!< Run ID
   TLorentzVector fNuPos;  //!< Neutrino vertex vector
   TLorentzVector fNuMom;  //!< Neutrino momentum vector
 

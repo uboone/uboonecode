@@ -12,7 +12,8 @@ NTupleInterface::~NTupleInterface() {}
 
 
 void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::ParameterSet& branchDef) {
-  std::cout << "TREE NAME: " << treeName << std::endl;
+  std::cout << "[NTUPLEINTERFACE] TREE NAME: " << treeName << std::endl;
+
   fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
   
   fTree->SetBranchAddress(branchDef.get<std::string>("vtxx").c_str()    , &vtxx);
@@ -28,6 +29,15 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("dist").c_str()    , &dist);
   fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()   , &run);
   fTree->SetBranchAddress(branchDef.get<std::string>("nenergyn").c_str(), &nenergyn);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpx").c_str()     , &tpx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpy").c_str()     , &tpy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tpz").c_str()     , &tpz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("tptype").c_str()  , &tptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vx").c_str()      , &vx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vy").c_str()      , &vy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("vz").c_str()      , &vz);
+
+  std::cout << "[NTUPLEINTERFACE] >> Tree configured." << std::endl;
 
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_NParticles"              , &MCTruth_NParticles);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_TrackId"       , &MCTruth_particles_TrackId);
@@ -74,11 +84,18 @@ bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
   fNuPos = TLorentzVector(vtxx, vtxy, vtxz, 0);
   fNuMom = TLorentzVector(px, py, pz, E);
 
-  flux.fptype = ptype;
-  flux.fntype  = pdg;
-  flux.fnimpwt = wgt;
-  flux.fdk2gen = dist;
-  flux.fnenergyn = nenergyn;
+  flux.fptype     = ptype;
+  flux.fntype     = pdg;
+  flux.fnimpwt    = wgt;
+  flux.fdk2gen    = dist;
+  flux.fnenergyn  = nenergyn;
+  flux.ftpx       = tpx;
+  flux.ftpy       = tpy;
+  flux.ftpz       = tpz;
+  flux.fvx        = vx;
+  flux.fvy        = vy;
+  flux.fvz        = vz;
+  flux.ftptype    = tptype;
 
   return true;
 }
