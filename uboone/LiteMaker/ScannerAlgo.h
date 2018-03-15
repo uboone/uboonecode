@@ -37,6 +37,7 @@
 #include "lardataobj/RecoBase/EndPoint2D.h"
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/PCAxis.h"
+#include "uboone/EventWeight/MCEventWeight.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
 #include "lardataobj/AnalysisBase/ParticleID.h"
 #include "lardataobj/AnalysisBase/Calorimetry.h"
@@ -210,6 +211,8 @@ namespace larlite {
     std::vector< std::vector< std::map< art::Ptr<::recob::PFParticle>, std::pair<size_t,size_t> > > > fPtrIndex_pfpart;
     std::vector< std::vector< std::map< art::Ptr<::recob::PCAxis>,     std::pair<size_t,size_t> > > > fPtrIndex_pcaxis;
     std::vector< std::vector< std::map< art::Ptr<::anab::FlashMatch>,  std::pair<size_t,size_t> > > > fPtrIndex_fmatch;
+    std::vector< std::vector< std::map< art::Ptr<::evwgh::MCEventWeight>, std::pair<size_t,size_t> > > > fPtrIndex_eventweight;
+
   };
 }
 

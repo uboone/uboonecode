@@ -1,8 +1,10 @@
 #include "standard_g4_uboone.fcl"
 
-outputs.out1.fileName: "%ifb_%tc_g4_spacecharge.root"
+process_name: G4ExtraLight
 
-source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*"]
+outputs.out1.fileName: "detsyst_%tc_g4_ExtraLight.root"
+
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*", "drop sumdata::RunData_*_*_*"]
 
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true
@@ -18,3 +20,11 @@ services.SpaceCharge.EnableSimEfieldSCE: true
 #
 
 services.PhotonVisibilityService.LibraryFile: "PhotonPropagation/LibraryData/uboone_photon_library_v6_70kV_EnhancedExtraTPCVis.root" 
+
+
+services.DetectorPropertiesService.NumberTimeSamples: 9600
+services.DetectorPropertiesService.ReadOutWindowSize: 9600
+services.DetectorClocksService.InheritClockConfig:    false
+services.DetectorClocksService.TriggerOffsetTPC:      -1600
+
+services.LArG4Parameters.MCC80Compat: true

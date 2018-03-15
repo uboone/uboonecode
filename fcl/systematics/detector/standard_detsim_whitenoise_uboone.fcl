@@ -2,8 +2,13 @@
 
 process_name: DetsimWhiteNoise
 
-source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*" ]
+outputs.out1.fileName: "%ifb_%tc_detsim_whitenoise.root"
+
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*", "drop sumdata::RunData_*_*_*" ]
 
 physics.producers.daq.GenNoise: 1
 
-
+services.DetectorPropertiesService.NumberTimeSamples: 9600
+services.DetectorPropertiesService.ReadOutWindowSize: 9600
+services.DetectorClocksService.InheritClockConfig:    false
+services.DetectorClocksService.TriggerOffsetTPC:      -1600

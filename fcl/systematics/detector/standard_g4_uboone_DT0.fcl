@@ -2,6 +2,15 @@
 
 process_name: G4DT0
 
-source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*"]
+outputs.out1.fileName: "detsyst_%tc_g4_dt0.root"
+
+source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*","drop *_*_*_G4*", "drop sumdata::RunData_*_*_*"]
 
 services.LArG4Parameters.TransverseDiffusion:0.0
+
+services.DetectorPropertiesService.NumberTimeSamples: 9600
+services.DetectorPropertiesService.ReadOutWindowSize: 9600
+services.DetectorClocksService.InheritClockConfig:    false
+services.DetectorClocksService.TriggerOffsetTPC:      -1600
+
+services.LArG4Parameters.MCC80Compat: true

@@ -1,12 +1,45 @@
+#include "mchitmodules.fcl"
+##include "eventweight_microboone_BNBcorrectionOnly.fcl"
+##include "services_microboone.fcl"
+## include "reco_uboone_mcc8.fcl"
+#include "mctrutht0matching.fcl"
 #include "reco_uboone_data_mcc8_driver_common.fcl"
 
 process_name: McRecoStage2
 
+services.DetectorClocksService.InheritClockConfig:  false
+
 services.TFileService.fileName: "reco_stage_2_hist.root"
-physics.reco: [ @sequence::microboone_reco_data_stage2 ]
+
+physics.producers.gaushitTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.gaushitTruthMatch.HitModuleLabel: "gaushit"
+physics.producers.gaushitTruthMatch.OverrideRealData: true
+physics.producers.gaushitTruthMatch.HitParticleAssociations:                        @local::DirectHitParticleAssnsTool
+physics.producers.gaushitTruthMatch.HitParticleAssociations.HitModuleLabel:         "gaushit"
+physics.producers.gaushitTruthMatch.HitParticleAssociations.MCParticleModuleLabel:  "largeant"
+
+physics.producers.crHitRemovalTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.crHitRemovalTruthMatch.OverrideRealData: true
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations:                   @local::IndirectHitParticleAssnsTool
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations.HitPartAssnsLabel: "gaushitTruthMatch"
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations.HitModuleLabel:    "pandoraCosmicHitRemoval"
+
+physics.producers.trajclusterTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.trajclusterTruthMatch.OverrideRealData: true
+physics.producers.trajclusterTruthMatch.HitParticleAssociations:                    @local::IndirectHitParticleAssnsTool
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
+physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
+physics.producers.trajcluster.DoRawDigitAssns: false
+
+physics.reco: [ @sequence::microboone_reco_data_pandoraCosmic,crHitRemovalTruthMatch,@sequence::microboone_reco_data_pandoraNu,@sequence::microboone_reco_data_ccpath,trajclusterTruthMatch ]
 physics.trigger_paths: [ reco ]
 outputs.out1.fileName: "%ifb_%tc_reco2.root"
 outputs.out1.dataTier: "reconstructed"
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_Mc*RecoStage2" ]
+outputs.out1.outputCommands: [ "keep *_*_*_*",
+                               "drop sim::SimChannels_*_*_*",
+                               "drop raw::RawDigits_*_*_*",
+                               "drop optdata::ChannelDataGroup_*_*_*" ]
 
 services.FileCatalogMetadata.fileType: "mc"

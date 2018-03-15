@@ -10,15 +10,15 @@ litemc_opreco.DataLookUpMap:
 {
   trigger:    ["triggersim"]
   swtrigger:    ["swtrigger"]
-  opdigit:    ["saturation"]
-  ophit: ["ophitBeam","ophitCosmic"]
-  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+  #opdigit:    ["saturation"]
+  #ophit: ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic"]
 }
 
 litemc_opreco.AssociationLookUpMap:
 {
-  ophit: ["ophitBeam","ophitCosmic"]
-  opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+  #ophit: ["ophitBeam","ophitCosmic"]
+  opflash: ["simpleFlashBeam","simpleFlashCosmic"]
 }
-litemc_opreco.AssLabelToSave: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic"]
+#litemc_opreco.AssLabelToSave: ["simpleFlashBeam","simpleFlashCosmic"]
 END_PROLOG

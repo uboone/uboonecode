@@ -19,7 +19,7 @@ litemc_mcinfo.DataLookUpMap:
 }
 
 litemc_mcinfo.AssociationLookUpMap: {
-  mcpart:  ["largeant"]
+  #mcpart:  ["largeant"]
   mctruth: ["generator","corsika"]
 }
 

@@ -7,6 +7,9 @@
 #include <stdexcept>
 #include <algorithm>
 
+#include <TFile.h>
+#include <TList.h>
+#include <TH1D.h>
 
 void mix::OpDetWaveformMixer::DeclareData(std::vector<raw::OpDetWaveform> const& dataVector,
 					  std::vector<raw::OpDetWaveform> & outputVector){
@@ -16,11 +19,10 @@ void mix::OpDetWaveformMixer::DeclareData(std::vector<raw::OpDetWaveform> const&
 
   for(auto const& od : dataVector){
 
-
     outputVector.emplace_back(od);
 
     if(od.size() < fMinSampleSize) continue;
-    
+     
     //we're going to keep the longest one ... JUST handling beam gate stuff for now
     auto my_channel = fChannelIndexMap.find(od.ChannelNumber());
     if( my_channel != fChannelIndexMap.end() && outputVector[my_channel->second].size() > od.size())
@@ -65,11 +67,16 @@ void mix::OpDetWaveformMixer::Mix(std::vector<raw::OpDetWaveform> const& mcVecto
 								  od.begin()+outputVector[i_output].size());
 	fRDAdderAlg.AddRawDigits(mc_trimmed,outputVector[i_output]);
       }
-      //if the samples is shorter, pad it out with the pedestal
+      //if the data sample is larger, we make a new vector of the right size,trimmed down appropriatly
+      //to avoid extra ADC tick in tje overlay sample
       else if(od.size() < outputVector[i_output].size()){
-	std::vector<short> mc_trimmed(outputVector[i_output].size(),0.0);
-	std::copy(od.begin(),od.end(),mc_trimmed.begin());
-	fRDAdderAlg.AddRawDigits(mc_trimmed,outputVector[i_output]);
+        std::vector<short> outputVector_copy(outputVector[i_output].size(),0.0);
+        std::copy(outputVector[i_output].begin(),outputVector[i_output].end(),outputVector_copy.begin());
+        outputVector[i_output].clear();
+        for ( unsigned int i = 0; i <od.size() ; i++) {
+              outputVector[i_output].push_back(outputVector_copy[i]);
+        }
+	fRDAdderAlg.AddRawDigits(od,outputVector[i_output]);
       }
     }
     //Sizes are the same? Easy!
@@ -77,7 +84,7 @@ void mix::OpDetWaveformMixer::Mix(std::vector<raw::OpDetWaveform> const& mcVecto
       fRDAdderAlg.AddRawDigits(od,outputVector[i_output]);
     }
   }
-
+  
 }
 
 #endif
