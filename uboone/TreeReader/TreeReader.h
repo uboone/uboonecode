@@ -20,12 +20,12 @@ namespace uboone {
 
 class TreeReader {
 public:
-  // Required constructor
+  /** Constructor for an InputSource. */
   TreeReader(fhicl::ParameterSet const &pset,
              art::ProductRegistryHelper &helper,
              art::SourceHelper const &pm);
   
-  // Required by FileReaderSource:
+  /** Required by FileReaderSource. */
   void closeCurrentFile();
 
   void readFile(std::string const &name,

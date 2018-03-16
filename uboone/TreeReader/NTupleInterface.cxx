@@ -21,28 +21,34 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   std::cout << "[NTUPLEINTERFACE] TREE NAME: " << treeName << std::endl;
 
   fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
-  
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxx").c_str()                            , &vtxx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxy").c_str()                            , &vtxy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vtxz").c_str()                            , &vtxz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("px").c_str()                              , &px);
-  fTree->SetBranchAddress(branchDef.get<std::string>("py").c_str()                              , &py);
-  fTree->SetBranchAddress(branchDef.get<std::string>("pz").c_str()                              , &pz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("E").c_str()                               , &E);
-  fTree->SetBranchAddress(branchDef.get<std::string>("pdg").c_str()                             , &pdg);
-  fTree->SetBranchAddress(branchDef.get<std::string>("ptype").c_str()                           , &ptype);
-  fTree->SetBranchAddress(branchDef.get<std::string>("wgt").c_str()                             , &wgt);
-  fTree->SetBranchAddress(branchDef.get<std::string>("dist").c_str()                            , &dist);
-  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()                           , &run);
-  fTree->SetBranchAddress(branchDef.get<std::string>("nenergyn").c_str()                        , &nenergyn);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpx").c_str()                             , &tpx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpy").c_str()                             , &tpy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tpz").c_str()                             , &tpz);
-  fTree->SetBranchAddress(branchDef.get<std::string>("tptype").c_str()                          , &tptype);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vx").c_str()                              , &vx);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vy").c_str()                              , &vy);
-  fTree->SetBranchAddress(branchDef.get<std::string>("vz").c_str()                              , &vz);
 
+  // Metadata
+  fTree->SetBranchAddress(branchDef.get<std::string>("run").c_str()                             , &run);
+  fTree->SetBranchAddress(branchDef.get<std::string>("subrun").c_str()                          , &subrun);
+  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()                           , &evtno);
+
+  // MCFlux
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosX").c_str()                   , &MCFlux_NuPosX);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosY").c_str()                   , &MCFlux_NuPosY);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosZ").c_str()                   , &MCFlux_NuPosZ);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuMomX").c_str()                   , &MCFlux_NuMomX);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuMomY").c_str()                   , &MCFlux_NuMomY);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuMomZ").c_str()                   , &MCFlux_NuMomZ);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuMomE").c_str()                   , &MCFlux_NuMomE);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_ntype").c_str()                    , &MCFlux_ntype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_ptype").c_str()                    , &MCFlux_ptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_nimpwt").c_str()                   , &MCFlux_nimpwt);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_dk2gen").c_str()                   , &MCFlux_dk2gen);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_nenergyn").c_str()                 , &MCFlux_nenergyn);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_tpx").c_str()                      , &MCFlux_tpx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_tpy").c_str()                      , &MCFlux_tpy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_tpz").c_str()                      , &MCFlux_tpz);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_tptype").c_str()                   , &MCFlux_tptype);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_vx").c_str()                       , &MCFlux_vx);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_vy").c_str()                       , &MCFlux_vy);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_vz").c_str()                       , &MCFlux_vz);
+
+  // MCTruth
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_NParticles").c_str()              , &MCTruth_NParticles);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_TrackId").c_str()       , &MCTruth_particles_TrackId);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_PdgCode").c_str()       , &MCTruth_particles_PdgCode);
@@ -73,6 +79,7 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Y").c_str()              , &MCTruth_neutrino_Y);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Q2").c_str()             , &MCTruth_neutrino_Q2);
 
+  // GTruth
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbePDG").c_str()                 , &GTruth_ProbePDG);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsSeaQuark").c_str()               , &GTruth_IsSeaQuark);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_tgtPDG").c_str()                   , &GTruth_tgtPDG);
@@ -95,7 +102,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsCharm").c_str()                  , &GTruth_IsCharm);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gX").c_str()                       , &GTruth_gX);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gY").c_str()                       , &GTruth_gY);
-  //fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gZ").c_str()                       , &GTruth_gZ);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gT").c_str()                       , &GTruth_gT);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gW").c_str()                       , &GTruth_gW);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gQ2").c_str()                      , &GTruth_gQ2);
@@ -113,7 +119,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4z").c_str()             , &GTruth_FShadSystP4z);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4E").c_str()             , &GTruth_FShadSystP4E);
 
-
   fNEntries = fTree->GetEntries();
   assert(fNEntries > 0);
   fTree->GetEntry(0);
@@ -126,21 +131,30 @@ bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
     return false;
   }
 
-  fNuPos = TLorentzVector(vtxx, vtxy, vtxz, 0);
-  fNuMom = TLorentzVector(px, py, pz, E);
+  fNuPos = TLorentzVector(
+    MCFlux_NuPosX,
+    MCFlux_NuPosY,
+    MCFlux_NuPosZ,
+    0);
 
-  flux.fptype     = ptype;
-  flux.fntype     = pdg;
-  flux.fnimpwt    = wgt;
-  flux.fdk2gen    = dist;
-  flux.fnenergyn  = nenergyn;
-  flux.ftpx       = tpx;
-  flux.ftpy       = tpy;
-  flux.ftpz       = tpz;
-  flux.fvx        = vx;
-  flux.fvy        = vy;
-  flux.fvz        = vz;
-  flux.ftptype    = tptype;
+  fNuMom = TLorentzVector(
+    MCFlux_NuMomX,
+    MCFlux_NuMomY,
+    MCFlux_NuMomZ,
+    MCFlux_NuMomE);
+
+  flux.fptype     = MCFlux_ptype;
+  flux.fntype     = MCFlux_ntype;
+  flux.fnimpwt    = MCFlux_nimpwt;
+  flux.fdk2gen    = MCFlux_dk2gen;
+  flux.fnenergyn  = MCFlux_nenergyn;
+  flux.ftpx       = MCFlux_tpx;
+  flux.ftpy       = MCFlux_tpy;
+  flux.ftpz       = MCFlux_tpz;
+  flux.fvx        = MCFlux_vx;
+  flux.fvy        = MCFlux_vy;
+  flux.fvz        = MCFlux_vz;
+  flux.ftptype    = MCFlux_tptype;
 
   return true;
 }
@@ -235,7 +249,6 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
   gtruth.fIsCharm = GTruth_IsCharm;
   gtruth.fgX = GTruth_gX;
   gtruth.fgY = GTruth_gY;
-  //gtruth.fgZ = GTruth_gZ; // variable doesn't exist... 
   gtruth.fgT = GTruth_gT;
   gtruth.fgW = GTruth_gW;
   gtruth.fgQ2 = GTruth_gQ2;

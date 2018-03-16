@@ -60,7 +60,7 @@ public:
                    TString treeName,
                    fhicl::ParameterSet& branchDef);
 
-  /** 
+  /**
    * Fill in the MCFlux object from the tree data.
    *
    * \param ientry Tree entry index
@@ -68,36 +68,61 @@ public:
    * \returns True if successful
    */
   bool FillMCFlux(Long64_t ientry, simb::MCFlux& mcflux);
+
+  /**
+   * Fill in the MCTruth object from the tree data.
+   *
+   * \param ientry Tree entry index
+   * \param mctruth MCTruth object to fill in (by reference)
+   * \returns True if successful
+   */
   bool FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth);
+
+  /**
+   * Fill in the GTruth object from the tree data.
+   *
+   * \param ientry Tree entry index
+   * \param gtruth GTruth object to fill in (by reference)
+   * \returns True if successful
+   */
   bool FillGTruth(Long64_t ientry, simb::GTruth& gtruth);
 
 private:
-  static const unsigned kMaxParticles = 50;
+  static const unsigned kMaxParticles = 50;  //!< Max. MCParticles in MCTruth
 
   TTree* fTree;  //!< Input TTree
 
-  int tptype;
-  int ptype;  //!< Parent PDG
-  int run;  //!< Run ID
-  int pdg;  //!< Neutrino PDG code
-  int fRun;  //!< Run ID
-  float fPOT;
-  double vtxx, vtxy, vtxz;  //!< Neutrino vertex
-  double px, py, pz, E;  //!< Neutrino momentum
-  double wgt;  //!< Neutrino weight (i.e. from upstream flux simulation)
-  double dist;  //!< ???
-  double nenergyn;  //!< neutrino energy if forced to interact in center of near TPC
-  double tpx;
-  double tpy;
-  double tpz;
-  double vx;
-  double vy;
-  double vz;
+  // Metadata
+  int run;
+  int subrun;
+  int evtno;
+  Long64_t fNEntries;
 
-  Long64_t fNEntries;  //!< Number of entries in the tree
+  // MCFlux
+  double MCFlux_NuPosX;
+  double MCFlux_NuPosY;
+  double MCFlux_NuPosZ;
+  double MCFlux_NuMomX;
+  double MCFlux_NuMomY;
+  double MCFlux_NuMomZ;
+  double MCFlux_NuMomE;
+  int MCFlux_ntype;
+  int MCFlux_ptype;
+  double MCFlux_nimpwt;
+  double MCFlux_dk2gen;
+  double MCFlux_nenergyn;
+  double MCFlux_tpx;
+  double MCFlux_tpy;
+  double MCFlux_tpz;
+  int MCFlux_tptype;
+  double MCFlux_vx;
+  double MCFlux_vy;
+  double MCFlux_vz;
+
   TLorentzVector fNuPos;  //!< Neutrino vertex vector
   TLorentzVector fNuMom;  //!< Neutrino momentum vector
 
+  // MCTruth
   int MCTruth_neutrino_CCNC;
   int MCTruth_neutrino_mode;
   int MCTruth_neutrino_interactionType;
@@ -129,6 +154,7 @@ private:
   double MCTruth_particles_poly[kMaxParticles];
   double MCTruth_particles_polz[kMaxParticles];
 
+  // GTruth
   int GTruth_ProbePDG;
   bool GTruth_IsSeaQuark;
   int GTruth_tgtPDG;
