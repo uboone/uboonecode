@@ -241,19 +241,19 @@ namespace ubana {
     }
 
     // Vertex Check   
-    if(_ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) > _vtxcheck_angle_cut_up) {
-      reason = "fail_vertex_check_up";
-      failure_map["vertex_check_up"] = false;
-    } else {
-      failure_map["vertex_check_up"] = true;
-    }
-    if(_ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) < _vtxcheck_angle_cut_down 
-       && _ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) != -9999) {
-      reason = "fail_vertex_check_down";
-      failure_map["vertex_check_down"] = false;
-    } else {
-      failure_map["vertex_check_down"] = true;
-    }
+    //if(_ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) > _vtxcheck_angle_cut_up) {
+    //  reason = "fail_vertex_check_up";
+    //  failure_map["vertex_check_up"] = false;
+    //} else {
+    //  failure_map["vertex_check_up"] = true;
+    //}
+    //if(_ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) < _vtxcheck_angle_cut_down 
+    //   && _ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) != -9999) {
+    //  reason = "fail_vertex_check_down";
+    //  failure_map["vertex_check_down"] = false;
+    //} else {
+    //  failure_map["vertex_check_down"] = true;
+    //}
 
     // N Track
     if(_ubxsec_event->slc_ntrack.at(scl_ll_max) < _ntrack_cut) {
@@ -264,20 +264,20 @@ namespace ubana {
     }
 
     // Track Quality
-    if(!_ubxsec_event->slc_passed_min_track_quality.at(scl_ll_max)) {
-      reason = "fail_track quality";
-      failure_map["track_quality"] = false;
-    } else {
-      failure_map["track_quality"] = true;
-    }
+    //if(!_ubxsec_event->slc_passed_min_track_quality.at(scl_ll_max)) {
+    //  reason = "fail_track quality";
+    //  failure_map["track_quality"] = false;
+    //} else {
+    //  failure_map["track_quality"] = true;
+    //}
     
     // Vertex Quality
-    if(!_ubxsec_event->slc_passed_min_vertex_quality.at(scl_ll_max)) {
-      reason = "fail_vertex_quality";
-      failure_map["vertex_quality"] = false;
-    } else {
-      failure_map["vertex_quality"] = true;
-    }
+    //if(!_ubxsec_event->slc_passed_min_vertex_quality.at(scl_ll_max)) {
+    //  reason = "fail_vertex_quality";
+    //  failure_map["vertex_quality"] = false;
+    //} else {
+    //  failure_map["vertex_quality"] = true;
+    //}
 
     // MCS-Length Quality Cut
     if(_ubxsec_event->slc_muoncandidate_contained.at(scl_ll_max) 
