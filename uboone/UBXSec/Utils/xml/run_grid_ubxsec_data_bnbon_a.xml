@@ -3,14 +3,14 @@
 <!-- Production Project -->
 
 <!DOCTYPE project [
-<!ENTITY release "v06_26_01_10">
+<!ENTITY release "v06_26_01_12">
 <!ENTITY releasetag "e10:prof">
-<!ENTITY name "ubxsec_data_bnbon_a">
+<!ENTITY name "ubxsec_data_bnbon_a_mcc8.7_test1">
 <!ENTITY tag "ubxsec">
 <!ENTITY file_type "data">
 <!ENTITY run_type "physics">
 <!ENTITY PNFSpath "/pnfs/uboone/persistent/users/mdeltutt/">
-<!ENTITY ubxsec_version "mcc8.6_stopmu_test29">
+<!ENTITY ubxsec_version "mcc8.7_test1">
 ]>
 
 
@@ -33,7 +33,7 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>&releasetag;</qual>
-    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.6_stopmu_test29.tgz</local>
+    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.7_test1.tgz</local>
   </larsoft>
 
   <!-- Project stages -->
