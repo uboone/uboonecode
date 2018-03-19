@@ -9,7 +9,7 @@
 <!ENTITY tag "ubxsec">
 <!ENTITY file_type "data">
 <!ENTITY run_type "physics">
-<!ENTITY PNFSpath "/pnfs/uboone/persistent/users/mdeltutt/">
+<!ENTITY PNFSpath "/pnfs/uboone/resilient/users/mdeltutt/">
 <!ENTITY ubxsec_version "mcc8.7_test1">
 ]>
 
@@ -44,7 +44,8 @@
     <defname>&name;_&tag;_ana</defname>
     <maxfilesperjob>12</maxfilesperjob>
     <outdir>/pnfs/uboone/scratch/users/mdeltutt/&release;/ubxsec_&ubxsec_version;_data_extbnb_b</outdir>
-    <workdir>&PNFSpath;grid_workdir_ubxsec_data_extbnb_b</workdir>
+    <workdir>&PNFSpath;grid_workdir/grid_workdir_ubxsec_&ubxsec_version;_data_extbnb_b</workdir>
+    <bookdir>/uboone/data/grid_bookdir/ubxsec_&ubxsec_version;_data_extbnb_b</bookdir>
     <numjobs>943</numjobs>
     <datatier>ubana</datatier>
     <memory>3500</memory>
