@@ -229,17 +229,6 @@ namespace ubana {
       failure_map["flash_match_deltaz_down"] = true;
     }
 
-    // FV
-    bool in_fv = _ubxsec_event->slc_nuvtx_fv.at(scl_ll_max) == 1
-                 && (_ubxsec_event->slc_nuvtx_z.at(scl_ll_max) < 675 
-                     || _ubxsec_event->slc_nuvtx_z.at(scl_ll_max) > 775);
-    if(!in_fv) {
-      reason = "fail_fiducial_volume";
-      failure_map["fiducial_volume"] = false;
-    } else {
-      failure_map["fiducial_volume"] = true;
-    }
-
     // Vertex Check   
     //if(_ubxsec_event->slc_vtxcheck_angle.at(scl_ll_max) > _vtxcheck_angle_cut_up) {
     //  reason = "fail_vertex_check_up";
@@ -295,6 +284,17 @@ namespace ubana {
       failure_map["mip_consistency"] = false;
     } else {
       failure_map["mip_consistency"] = true;
+    }
+
+    // FV
+    bool in_fv = _ubxsec_event->slc_nuvtx_fv.at(scl_ll_max) == 1
+                 && (_ubxsec_event->slc_nuvtx_z.at(scl_ll_max) < 675 
+                     || _ubxsec_event->slc_nuvtx_z.at(scl_ll_max) > 775);
+    if(!in_fv) {
+      reason = "fail_fiducial_volume";
+      failure_map["fiducial_volume"] = false;
+    } else {
+      failure_map["fiducial_volume"] = true;
     }
 
     // Hit Residuals STD Cut
