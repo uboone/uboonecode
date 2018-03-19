@@ -37,6 +37,9 @@ UBXSec: {
 
   MinTrackLength:               0.1
 
+  MakeOpHitCSV:                 false
+  MakePIDACSV:                  false
+
   PECalib:                      @local::SPECalib
 
   FiducialVolumeSettings:       @local::UBXSecFiducialVolumeSettings
