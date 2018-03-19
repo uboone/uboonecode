@@ -193,6 +193,8 @@ private:
   double _geo_cosmic_score_cut;         ///< Cut on the score of the pandoraNu geo cosmic tagger
   double _tolerance_track_multiplicity; ///< Tolerance to consider a track coming from the nu reco vertex
   double _min_track_len;                ///< Min track length for momentum calculation
+  bool _make_ophit_csv;                 ///< If true makea a csv file with ophit info
+  bool _make_pida_csv;                  ///< If true makea a csv file with pida/tracklength info
 
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
@@ -297,6 +299,9 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _tolerance_track_multiplicity   = p.get<double>("ToleranceTrackMultiplicity", 5.);
 
   _min_track_len                  = p.get<double>("MinTrackLength", 0.1);
+
+  _make_ophit_csv                 = p.get<bool>("MakeOpHitCSV", false);
+  _make_pida_csv                  = p.get<bool>("MakePIDACSV", false);
 
   _pecalib.Configure(p.get<fhicl::ParameterSet>("PECalib"));
 
@@ -417,11 +422,11 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _sr_tree->Branch("endtime",            &_sr_endtime,            "endtime/D");
   _sr_tree->Branch("pot",                &_sr_pot,                "pot/D");
 
-  _csvfile.open ("pida_trklen.csv", std::ofstream::out | std::ofstream::trunc);
-  _csvfile << "pida,trklen,y" << std::endl;
+  if(_make_pida_csv) _csvfile.open ("pida_trklen.csv", std::ofstream::out | std::ofstream::trunc);
+  if(_make_pida_csv) _csvfile << "pida,trklen,y" << std::endl;
 
-  _csvfile2.open("ophit.csv", std::ofstream::out | std::ofstream::trunc);
-  _csvfile2 << "ophit,opdet,time,pe" << std::endl;
+  if(_make_ophit_csv) _csvfile2.open("ophit.csv", std::ofstream::out | std::ofstream::trunc);
+  if(_make_ophit_csv) _csvfile2 << "ophit,opdet,time,pe" << std::endl;
 
   _run_subrun_list_file.open ("run_subrub_list.txt", std::ofstream::out | std::ofstream::trunc);
 
@@ -1202,7 +1207,7 @@ void UBXSec::produce(art::Event & e) {
       //std::cout << "OpHit::  OpDet: " << opdet
       //          << ", PeakTime: " << ophit.PeakTime()
       //          << ", PE: " << _pecalib.BeamPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
-      _csvfile2 << oh << "," << opdet << "," << ophit.PeakTime() << "," << _pecalib.BeamPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
+      if(_make_ophit_csv) _csvfile2 << oh << "," << opdet << "," << ophit.PeakTime() << "," << _pecalib.BeamPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
       if (ophit.OpChannel() != this_opch) continue;
       if (ophit.PeakTime() > _beam_spill_start && ophit.PeakTime() < _beam_spill_end) {
         n_intime_ophits ++;
@@ -1637,11 +1642,11 @@ void UBXSec::produce(art::Event & e) {
             if (pdg == 13) {
               _h_pida_muon->Fill(pid->PIDA());
               _h_pida_len_muon->Fill(pid->PIDA(), track->Length());
-              if( pid->PIDA() > 0 && pid->PIDA() < 50. ) _csvfile << pid->PIDA() << "," << track->Length() << "," << "1" << std::endl;
+              if( pid->PIDA() > 0 && pid->PIDA() < 50. && _make_pida_csv) _csvfile << pid->PIDA() << "," << track->Length() << "," << "1" << std::endl;
             } else if (pdg == 2212) {
               _h_pida_proton->Fill(pid->PIDA());
               _h_pida_len_proton->Fill(pid->PIDA(), track->Length());
-              if( pid->PIDA() > 0 && pid->PIDA() < 50. ) _csvfile << pid->PIDA() << "," << track->Length() << "," << "0" << std::endl;
+              if( pid->PIDA() > 0 && pid->PIDA() < 50. && _make_pida_csv) _csvfile << pid->PIDA() << "," << track->Length() << "," << "0" << std::endl;
             } else if (pdg == 211) {
               _h_pida_pion->Fill(pid->PIDA());
               _h_pida_len_pion->Fill(pid->PIDA(), track->Length());
