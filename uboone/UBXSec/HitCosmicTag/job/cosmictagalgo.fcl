@@ -19,6 +19,8 @@ CosmicTagManager: {
   CustomAlgo:                    ["StopMuMichel", 
                                   "StopMuBragg", 
                                   "CosmicSimpleMIP"]
+
+  MakeCSV: false
 }
 
 #

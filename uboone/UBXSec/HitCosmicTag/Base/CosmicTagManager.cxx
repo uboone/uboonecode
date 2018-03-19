@@ -29,8 +29,8 @@ namespace cosmictag {
   {
     _configured = false;
 
-    _csvfile.open ("stopping_muon_tagger_helper.csv", std::ofstream::out | std::ofstream::trunc);
-    _csvfile << "n,i,dqdx,dqdx_slider,linearity" << std::endl;
+    if(_make_csv) _csvfile.open ("stopping_muon_tagger_helper.csv", std::ofstream::out | std::ofstream::trunc);
+    if(_make_csv) _csvfile << "n,i,dqdx,dqdx_slider,linearity" << std::endl;
   }
 
   const std::string& CosmicTagManager::Name() const
@@ -73,6 +73,9 @@ namespace cosmictag {
 
     for(auto const& name : custom_algo_v)
       if(!name.empty()) AddCustomAlgo(CustomAlgoFactory::get().create(name,name));
+
+
+    _make_csv = mgr_cfg.get<bool>("MakeCSV", false);
     
 
     // Checks
@@ -310,6 +313,11 @@ namespace cosmictag {
     if (_cluster._s_hit_v.size() != _cluster._linearity_v.size() 
       || _cluster._s_hit_v.size() != _cluster._dqds_slider.size()) {
       CT_CRITICAL() << "Vectors in cluster have different size!" << std::endl;
+      throw HitCosmicTagException();
+    }
+
+    if (!_make_csv) {
+      CT_CRITICAL() << "_make_csv has to be true to print on file." << std::endl;
       throw HitCosmicTagException();
     }
 
