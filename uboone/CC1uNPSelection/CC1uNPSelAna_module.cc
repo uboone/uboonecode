@@ -605,7 +605,7 @@ public:
 
     virtual void produces(art::EDProducer*);
 
-    void endSubRun(art::SubRun &sr);
+    void endSubRun(const art::SubRun &sr);
  
     double GetTrackRange(art::Ptr<recob::Track>  InputTrackPtr) const;  
     double GetTrackLength(art::Ptr<recob::Track>  InputTrackPtr) const;  
@@ -1543,16 +1543,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -1763,7 +1763,7 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
 
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
-    if (dqds*198 <= dqds_cut)
+    if (dqds*243 <= dqds_cut)
       return true;
   
 
@@ -2006,7 +2006,7 @@ double CC1uNPSelAna::Recolength(const recob::Track& track)
   return result;
 }
 
-void CC1uNPSelAna::endSubRun(art::SubRun& sr){
+void CC1uNPSelAna::endSubRun(const art::SubRun& sr){
   if (_debug) std::cout << "[CC1uNPSelAna::endSubRun] Starts" << std::endl;
 
   // Saving run and subrun number on file so that we can run Zarko's script easily
@@ -2023,8 +2023,8 @@ void CC1uNPSelAna::endSubRun(art::SubRun& sr){
   if (isMC) {
      if (_debug) std::cout << "CC1uNPSelAna::endSubRun] Getting POT for MC" << std::endl;
      if(sr.getByLabel(_potsum_producer, potsum_h)) {
-        if (_debug) std::cout << "CC1uNPSelAna POT are valid" << std::endl;
-        _sr_pot = potsum_h->totpot;
+        if (_debug) std::cout << "CC1uNPSelAna POT are valid, POT = " << potsum_h->totpot  << std::endl;
+        _sr_pot = (double)potsum_h->totpot/1.0e16;
      }
      else
      _sr_pot = 0.;
