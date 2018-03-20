@@ -3024,6 +3024,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             //get the shower location and make sure there is no shower close to the primary vertex
             //distance from primary vertex to start point of shower or the perpendicular distance
             bool noshowerFlag=true;
+            vershwrdist=10000.; // Set to a large value by default
             /* check total number of showers for each event
             int no_showers=0;
             //loop over all the showers
@@ -3053,7 +3054,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                   vershwrdist=(shwrPos-temp).Mag();
                   
                
-                  if(vershwrdist<=50)  noshowerFlag=false;
+                  if(vershwrdist<=50.0)  noshowerFlag=false;
                   }
 	    }
             fvtxx=nuvtxxtest[VertexCandidate];
