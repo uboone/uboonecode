@@ -184,6 +184,7 @@ private:
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
   std::string _genie_eventweight_multisim_producer;
+  std::string _flux_eventweight_multisim_producer;
   bool _debug = true;                   ///< Debug mode
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
   double _minimumDistDeadReg;           ///< Minimum distance the track end points can have to a dead region
@@ -288,6 +289,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
+  _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
 
   _use_genie_info                 = p.get<bool>("UseGENIEInfo", false);
   _minimumHitRequirement          = p.get<int>("MinimumHitRequirement", 3);
@@ -677,7 +679,7 @@ void UBXSec::produce(art::Event & e) {
     art::Handle<std::vector<evwgh::MCEventWeight>> genieeventweight_h;
     e.getByLabel(_genie_eventweight_pm1_producer, genieeventweight_h);
     if(!genieeventweight_h.isValid()){
-      std::cout << "[UBXSec] MCEventWeight for GENIE reweight pm1sigma, product " << _eventweight_producer << " not found..." << std::endl;
+      std::cout << "[UBXSec] MCEventWeight for GENIE reweight pm1sigma, product " << _genie_eventweight_pm1_producer << " not found..." << std::endl;
       //throw std::exception();
     } else {
       std::vector<art::Ptr<evwgh::MCEventWeight>> genieeventweight_v;
@@ -690,12 +692,12 @@ void UBXSec::produce(art::Event & e) {
         for(auto it : evtwgt_map) {
           std::string func_name = it.first;
           std::vector<double> weight_v = it.second; 
-          ubxsec_event->evtwgt_pm1_funcname.push_back(func_name);
-          ubxsec_event->evtwgt_pm1_weight.push_back(weight_v);
-          ubxsec_event->evtwgt_pm1_nweight.push_back(weight_v.size());
+          ubxsec_event->evtwgt_genie_pm1_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_genie_pm1_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_genie_pm1_nweight.push_back(weight_v.size());
           countFunc++;
         }
-        ubxsec_event->evtwgt_pm1_nfunc = countFunc;
+        ubxsec_event->evtwgt_genie_pm1_nfunc = countFunc;
       }
     }
   }
@@ -706,7 +708,7 @@ void UBXSec::produce(art::Event & e) {
     art::Handle<std::vector<evwgh::MCEventWeight>> genieeventweight_h;
     e.getByLabel(_genie_eventweight_multisim_producer, genieeventweight_h);
     if(!genieeventweight_h.isValid()){
-      std::cout << "[UBXSec] MCEventWeight for GENIE reweight multisim, product " << _eventweight_producer << " not found..." << std::endl;
+      std::cout << "[UBXSec] MCEventWeight for GENIE reweight multisim, product " << _genie_eventweight_multisim_producer << " not found..." << std::endl;
       //throw std::exception();
     } else {
       std::vector<art::Ptr<evwgh::MCEventWeight>> genieeventweight_v;
@@ -719,12 +721,41 @@ void UBXSec::produce(art::Event & e) {
         for(auto it : evtwgt_map) {
           std::string func_name = it.first;
           std::vector<double> weight_v = it.second; 
-          ubxsec_event->evtwgt_multisim_funcname.push_back(func_name);
-          ubxsec_event->evtwgt_multisim_weight.push_back(weight_v);
-          ubxsec_event->evtwgt_multisim_nweight.push_back(weight_v.size());
+          ubxsec_event->evtwgt_genie_multisim_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_genie_multisim_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_genie_multisim_nweight.push_back(weight_v.size());
           countFunc++;
         }
-        ubxsec_event->evtwgt_multisim_nfunc = countFunc;
+        ubxsec_event->evtwgt_genie_multisim_nfunc = countFunc;
+      }
+    }
+  }
+
+  // FLUX reweigthing (systematics - multisim)
+  ubxsec_event->ResetFluxEventWeightVectorsMultisim();
+  if (_is_mc) {
+    art::Handle<std::vector<evwgh::MCEventWeight>> fluxeventweight_h;
+    e.getByLabel(_flux_eventweight_multisim_producer, fluxeventweight_h);
+    if(!fluxeventweight_h.isValid()){
+      std::cout << "[UBXSec] MCEventWeight for FLUX reweight multisim, product " << _flux_eventweight_multisim_producer << " not found..." << std::endl;
+      //throw std::exception();
+    } else {
+      std::vector<art::Ptr<evwgh::MCEventWeight>> fluxeventweight_v;
+      art::fill_ptr_vector(fluxeventweight_v, fluxeventweight_h);
+      if (fluxeventweight_v.size() > 0) {
+        art::Ptr<evwgh::MCEventWeight> evt_wgt = fluxeventweight_v.at(0); // Just for the first nu interaction
+        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+        int countFunc = 0;
+        // loop over the map and save the name of the function and the vector of weights for each function
+        for(auto it : evtwgt_map) {
+          std::string func_name = it.first;
+          std::vector<double> weight_v = it.second; 
+          ubxsec_event->evtwgt_flux_multisim_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_flux_multisim_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_flux_multisim_nweight.push_back(weight_v.size());
+          countFunc++;
+        }
+        ubxsec_event->evtwgt_flux_multisim_nfunc = countFunc;
       }
     }
   }

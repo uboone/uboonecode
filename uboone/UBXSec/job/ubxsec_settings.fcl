@@ -28,6 +28,7 @@ UBXSec: {
   EventWeightProducer:          "eventweight"
   GenieEventWeightPMOneProducer: "genieeventweightpm1::UBXSec"
   GenieEventWeightMultisimProducer: "genieeventweightmultisim::UBXSec"
+  FluxEventWeightMultisimProducer: "fluxeventweightmultisim::UBXSec"
 
   UseGENIEInfo:                 true
   MinimumHitRequirement:        3
