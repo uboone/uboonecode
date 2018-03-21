@@ -213,6 +213,7 @@ class UBXSecEvent /*: public TObject*/{
   void ResizeVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
+  void ResetFluxEventWeightVectorsMultisim();
 
 };
 
