@@ -182,7 +182,8 @@ private:
   std::string _mcsfitresult_pi_producer;
   std::string _calorimetry_producer;
   std::string _eventweight_producer;
-  std::string _genie_eventweight_producer;
+  std::string _genie_eventweight_pm1_producer;
+  std::string _genie_eventweight_multisim_producer;
   bool _debug = true;                   ///< Debug mode
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
   double _minimumDistDeadReg;           ///< Minimum distance the track end points can have to a dead region
@@ -285,7 +286,8 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _mcsfitresult_pi_producer       = p.get<std::string>("MCSFitResultPiProducer");
   _calorimetry_producer           = p.get<std::string>("CalorimetryProducer");
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
-  _genie_eventweight_producer     = p.get<std::string>("GenieEventWeightProducer");
+  _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
+  _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
 
   _use_genie_info                 = p.get<bool>("UseGENIEInfo", false);
   _minimumHitRequirement          = p.get<int>("MinimumHitRequirement", 3);
@@ -669,33 +671,66 @@ void UBXSec::produce(art::Event & e) {
 
   ubxsec_event->bnb_weight = bnb_weight;
 
-  // GENIE reweigthing (systematics)
-  ubxsec_event->ResetGenieEventWeightVectors();
+  // GENIE reweigthing (systematics - pm1sigma)
+  ubxsec_event->ResetGenieEventWeightVectorsPM1();
   if (_is_mc) {
     art::Handle<std::vector<evwgh::MCEventWeight>> genieeventweight_h;
-    e.getByLabel(_genie_eventweight_producer, genieeventweight_h);
+    e.getByLabel(_genie_eventweight_pm1_producer, genieeventweight_h);
     if(!genieeventweight_h.isValid()){
-      std::cout << "[UBXSec] MCEventWeight for GENIE reweight, product " << _eventweight_producer << " not found..." << std::endl;
+      std::cout << "[UBXSec] MCEventWeight for GENIE reweight pm1sigma, product " << _eventweight_producer << " not found..." << std::endl;
       //throw std::exception();
-    }  
-    std::vector<art::Ptr<evwgh::MCEventWeight>> genieeventweight_v;
-    art::fill_ptr_vector(genieeventweight_v, genieeventweight_h);
-    if (genieeventweight_v.size() > 0) {
-      art::Ptr<evwgh::MCEventWeight> evt_wgt = genieeventweight_v.at(0); // Just for the first nu interaction
-      std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
-      int countFunc = 0;
-      // loop over the map and save the name of the function and the vector of weights for each function
-      for(auto it : evtwgt_map) {
-        std::string func_name = it.first;
-        std::vector<double> weight_v = it.second; 
-        ubxsec_event->evtwgt_funcname.push_back(func_name);
-        ubxsec_event->evtwgt_weight.push_back(weight_v);
-        ubxsec_event->evtwgt_nweight.push_back(weight_v.size());
-        countFunc++;
+    } else {
+      std::vector<art::Ptr<evwgh::MCEventWeight>> genieeventweight_v;
+      art::fill_ptr_vector(genieeventweight_v, genieeventweight_h);
+      if (genieeventweight_v.size() > 0) {
+        art::Ptr<evwgh::MCEventWeight> evt_wgt = genieeventweight_v.at(0); // Just for the first nu interaction
+        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+        int countFunc = 0;
+        // loop over the map and save the name of the function and the vector of weights for each function
+        for(auto it : evtwgt_map) {
+          std::string func_name = it.first;
+          std::vector<double> weight_v = it.second; 
+          ubxsec_event->evtwgt_pm1_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_pm1_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_pm1_nweight.push_back(weight_v.size());
+          countFunc++;
+        }
+        ubxsec_event->evtwgt_pm1_nfunc = countFunc;
       }
-      ubxsec_event->evtwgt_nfunc = countFunc;
     }
   }
+
+  // GENIE reweigthing (systematics - multisim)
+  ubxsec_event->ResetGenieEventWeightVectorsMultisim();
+  if (_is_mc) {
+    art::Handle<std::vector<evwgh::MCEventWeight>> genieeventweight_h;
+    e.getByLabel(_genie_eventweight_multisim_producer, genieeventweight_h);
+    if(!genieeventweight_h.isValid()){
+      std::cout << "[UBXSec] MCEventWeight for GENIE reweight multisim, product " << _eventweight_producer << " not found..." << std::endl;
+      //throw std::exception();
+    } else {
+      std::vector<art::Ptr<evwgh::MCEventWeight>> genieeventweight_v;
+      art::fill_ptr_vector(genieeventweight_v, genieeventweight_h);
+      if (genieeventweight_v.size() > 0) {
+        art::Ptr<evwgh::MCEventWeight> evt_wgt = genieeventweight_v.at(0); // Just for the first nu interaction
+        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+        int countFunc = 0;
+        // loop over the map and save the name of the function and the vector of weights for each function
+        for(auto it : evtwgt_map) {
+          std::string func_name = it.first;
+          std::vector<double> weight_v = it.second; 
+          ubxsec_event->evtwgt_multisim_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_multisim_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_multisim_nweight.push_back(weight_v.size());
+          countFunc++;
+        }
+        ubxsec_event->evtwgt_multisim_nfunc = countFunc;
+      }
+    }
+  }
+
+
+  
   
   // pandoraCosmic PFPs (for cosmic removal studies)
   art::Handle<std::vector<recob::PFParticle>> pfp_cosmic_h;

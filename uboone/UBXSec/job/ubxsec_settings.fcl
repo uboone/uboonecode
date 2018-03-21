@@ -26,7 +26,8 @@ UBXSec: {
   MCSFitResultPiProducer:       "pandoraNuMCSPi"
   CalorimetryProducer:          "pandoraNucalo"
   EventWeightProducer:          "eventweight"
-  GenieEventWeightProducer:     "genieeventweight::UBXSec"
+  GenieEventWeightPMOneProducer: "genieeventweightpm1::UBXSec"
+  GenieEventWeightMultisimProducer: "genieeventweightmultisim::UBXSec"
 
   UseGENIEInfo:                 true
   MinimumHitRequirement:        3

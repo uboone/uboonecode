@@ -190,10 +190,16 @@ class UBXSecEvent /*: public TObject*/{
   
   Double_t        pot; ///< Not used
 
-  Int_t evtwgt_nfunc; ///< Number of functions used for GENIE reweighting
-  vector<std::string> evtwgt_funcname; ///< Names of the functions used for GENIE reweighting
-  vector<int> evtwgt_nweight; ///< Number of weights per function name used for GENIE reweighting
-  vector<vector<double>> evtwgt_weight; ///< Weights per function name used for GENIE reweighting
+  Int_t evtwgt_pm1_nfunc; ///< Number of functions used for GENIE reweighting (pm1sigma)
+  vector<std::string> evtwgt_pm1_funcname; ///< Names of the functions used for GENIE reweighting (pm1sigma)
+  vector<int> evtwgt_pm1_nweight; ///< Number of weights per function name used for GENIE reweighting (pm1sigma)
+  vector<vector<double>> evtwgt_pm1_weight; ///< Weights per function name used for GENIE reweighting (pm1sigma)
+
+  Int_t evtwgt_multisim_nfunc; ///< Number of functions used for GENIE reweighting (multisim)
+  vector<std::string> evtwgt_multisim_funcname; ///< Names of the functions used for GENIE reweighting (multisim)
+  vector<int> evtwgt_multisim_nweight; ///< Number of weights per function name used for GENIE reweighting (multisim)
+  vector<vector<double>> evtwgt_multisim_weight; ///< Weights per function name used for GENIE reweighting (multisim)
+ 
  
   int _default_value = -9999; ///< Default value 
 
@@ -201,7 +207,8 @@ class UBXSecEvent /*: public TObject*/{
   virtual ~UBXSecEvent();
   void Init();
   void ResizeVectors(int); 
-  void ResetGenieEventWeightVectors();
+  void ResetGenieEventWeightVectorsPM1();
+  void ResetGenieEventWeightVectorsMultisim();
 
 };
 
