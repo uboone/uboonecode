@@ -27,7 +27,7 @@ public:
    * \param mcflux MCFlux object to fill in (by reference)
    * \returns True if successful
    */
-  bool FillMCFlux(Long64_t ientry, simb::MCFlux& mcflux) { return true; }
+  virtual bool FillMCFlux(Long64_t ientry, simb::MCFlux& mcflux) { return true; }
 
   /**
    * Fill in the MCTruth object from the tree data.
@@ -36,7 +36,7 @@ public:
    * \param mctruth MCTruth object to fill in (by reference)
    * \returns True if successful
    */
-  bool FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) { return true; }
+  virtual bool FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) { return true; }
 
   /**
    * Fill in the GTruth object from the tree data.
@@ -45,7 +45,7 @@ public:
    * \param gtruth GTruth object to fill in (by reference)
    * \returns True if successful
    */
-  bool FillGTruth(Long64_t ientry, simb::GTruth& gtruth) { return true; }
+  virtual bool FillGTruth(Long64_t ientry, simb::GTruth& gtruth) { return true; }
 
   /** Get the POT from the tree. */
   virtual const float GetPOT() = 0;
