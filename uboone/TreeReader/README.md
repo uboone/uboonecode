@@ -50,7 +50,7 @@ full list of fields follows here:
 
     run                              Run ID                                int
     subrun                           Subrun ID                             int
-    evtno                            Event Number                          int
+    evt                            Event Number                          int
 
     # MCFlux.
     #
@@ -66,6 +66,9 @@ full list of fields follows here:
     MCFlux_NuMomY                    MCTruth::fMCNeutrino::fNu.Py(0)       double
     MCFlux_NuMomZ                    MCTruth::fMCNeutrino::fNu.Pz(0)       double
     MCFlux_NuMomE                    MCTruth::fMCNeutrino::fNu.E(0)        double
+    MCFlux_genx                      MCFlux::genx                          double
+    MCFlux_geny                      MCFlux::geny                          double
+    MCFlux_genz                      MCFlux::genz                          double
     MCFlux_ntype                     MCFlux::ntype                         int
     MCFlux_ptype                     MCFlux::ptype                         int
     MCFlux_nimpwt                    MCFlux::nimpwt                        double
@@ -86,47 +89,46 @@ full list of fields follows here:
     # array, Daughters, contains a list of the track IDs of the daughters of
     # ith MCParticle.
     #
-    MCTruth_NParticles               MCTruth::NParticles                   int
-    MCTruth_particles_TrackId        MCTruth::fPartList[i].TrackId         int[]
-    MCTruth_particles_PdgCode        MCTruth::fPartList[i].PdgCode         int[]
-    MCTruth_particles_Mother         MCTruth::fPartList[i].Mother          int[]
-    MCTruth_particles_StatusCode     MCTruth::fPartList[i].StatusCode      int[]
-    MCTruth_particles_NDaughters     MCTruth::fPartList[i].NDaughters      int[]
-    MCTruth_particles_Daughters      MCTruth::fPartList[i].Daughters       int[][]
-    MCTruth_particles_Gvx            MCTruth::fPartList[i].Gvx             double[]
-    MCTruth_particles_Gvy            MCTruth::fPartList[i].Gvy             double[]
-    MCTruth_particles_Gvz            MCTruth::fPartList[i].Gvz             double[]
-    MCTruth_particles_Gvt            MCTruth::fPartList[i].Gvt             double[]
-    MCTruth_particles_px0            MCTruth::fPartList[i].Px(0)           double[]
-    MCTruth_particles_py0            MCTruth::fPartList[i].Py(0)           double[]
-    MCTruth_particles_pz0            MCTruth::fPartList[i].Pz(0)           double[]
-    MCTruth_particles_e0             MCTruth::fPartList[i].E(0)            double[]
-    MCTruth_particles_Rescatter      MCTruth::fPartList[i].Rescatter       int[]
-    MCTruth_particles_polx           MCTruth::fPartList[i].Polarization.fX double[]
-    MCTruth_particles_poly           MCTruth::fPartList[i].Polarization.fY double[]
-    MCTruth_particles_polz           MCTruth::fPartList[i].Polarization.fZ double[]
-    MCTruth_neutrino_CCNC            MCTruth::fMCNeutrino.CCNC             int[]
-    MCTruth_neutrino_mode            MCTruth::fMCNeutrino.Mode             int[]
-    MCTruth_neutrino_interactionType MCTruth::fMCNeutrino.InteractionType  int[]
-    MCTruth_neutrino_target          MCTruth::fMCNeutrino.Target           int[]
-    MCTruth_neutrino_nucleon         MCTruth::fMCNeutrino.HitNuc           int[]
-    MCTruth_neutrino_quark           MCTruth::fMCNeutrino.HitQuark         int[]
-    MCTruth_neutrino_W               MCTruth::fMCNeutrino.W                double[]
-    MCTruth_neutrino_X               MCTruth::fMCNeutrino.X                double[]
-    MCTruth_neutrino_Y               MCTruth::fMCNeutrino.Y                double[]
-    MCTruth_neutrino_Q2              MCTruth::fMCNeutrino.Q2               double[]
+    MCTruth_NParticles                    MCTruth::NParticles                   int
+    MCTruth_particles_TrackId             MCTruth::fPartList[i].TrackId         int[]
+    MCTruth_particles_PdgCode             MCTruth::fPartList[i].PdgCode         int[]
+    MCTruth_particles_Mother              MCTruth::fPartList[i].Mother          int[]
+    MCTruth_particles_StatusCode          MCTruth::fPartList[i].StatusCode      int[]
+    MCTruth_particles_NumberDaughters     MCTruth::fPartList[i].NumberDaughters int[]
+    MCTruth_particles_Daughters           MCTruth::fPartList[i].Daughters       int[][]
+    MCTruth_particles_Gvx                 MCTruth::fPartList[i].Gvx             double[]
+    MCTruth_particles_Gvy                 MCTruth::fPartList[i].Gvy             double[]
+    MCTruth_particles_Gvz                 MCTruth::fPartList[i].Gvz             double[]
+    MCTruth_particles_Gvt                 MCTruth::fPartList[i].Gvt             double[]
+    MCTruth_particles_px0                 MCTruth::fPartList[i].Px(0)           double[]
+    MCTruth_particles_py0                 MCTruth::fPartList[i].Py(0)           double[]
+    MCTruth_particles_pz0                 MCTruth::fPartList[i].Pz(0)           double[]
+    MCTruth_particles_e0                  MCTruth::fPartList[i].E(0)            double[]
+    MCTruth_particles_Rescatter           MCTruth::fPartList[i].Rescatter       int[]
+    MCTruth_particles_polx                MCTruth::fPartList[i].Polarization.fX double[]
+    MCTruth_particles_poly                MCTruth::fPartList[i].Polarization.fY double[]
+    MCTruth_particles_polz                MCTruth::fPartList[i].Polarization.fZ double[]
+    MCTruth_neutrino_CCNC                 MCTruth::fMCNeutrino.CCNC             int
+    MCTruth_neutrino_mode                 MCTruth::fMCNeutrino.Mode             int
+    MCTruth_neutrino_interactionType      MCTruth::fMCNeutrino.InteractionType  int
+    MCTruth_neutrino_target               MCTruth::fMCNeutrino.Target           int
+    MCTruth_neutrino_nucleon              MCTruth::fMCNeutrino.HitNuc           int
+    MCTruth_neutrino_quark                MCTruth::fMCNeutrino.HitQuark         int
+    MCTruth_neutrino_W                    MCTruth::fMCNeutrino.W                double
+    MCTruth_neutrino_X                    MCTruth::fMCNeutrino.X                double
+    MCTruth_neutrino_Y                    MCTruth::fMCNeutrino.Y                double
+    MCTruth_neutrino_QSqr                 MCTruth::fMCNeutrino.QSqr             double
 
     # GTruth.
     #
     # A copy of all fields in the simb::GTruth object.
     #
-    GTruth_ProbePDG                  GTruth::fProbePDG                     int
     GTruth_IsSeaQuark                GTruth::fIsSeaQuark                   bool
     GTruth_tgtPDG                    GTruth::ftgtPDG                       int
     GTruth_weight                    GTruth::fweight                       double
     GTruth_probability               GTruth::fprobability                  double
     GTruth_Xsec                      GTruth::fXsec                         double
-    GTruth_fDiffXsec                 GTruth::ffDiffXsec                    double
+    GTruth_DiffXsec                  GTruth::fDiffXsec                    double
     GTruth_vertexX                   GTruth::fVertex.X                     double
     GTruth_vertexY                   GTruth::fVertex.Y                     double
     GTruth_vertexZ                   GTruth::fVertex.Z                     double

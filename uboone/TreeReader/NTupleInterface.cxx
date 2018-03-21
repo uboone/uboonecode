@@ -22,12 +22,15 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
 
   fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
 
+  std::cout << "[NTUPLEINTERFACE] Tree retrieved. Setting branch addresses." << std::endl;
+
   // Metadata
   fTree->SetBranchAddress(branchDef.get<std::string>("run").c_str()                             , &run);
   fTree->SetBranchAddress(branchDef.get<std::string>("subrun").c_str()                          , &subrun);
-  fTree->SetBranchAddress(branchDef.get<std::string>("evtno").c_str()                           , &evtno);
+  fTree->SetBranchAddress(branchDef.get<std::string>("event").c_str()                           , &event);
 
   // MCFlux
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_evtno").c_str()                    , &MCFlux_evtno);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosX").c_str()                   , &MCFlux_NuPosX);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosY").c_str()                   , &MCFlux_NuPosY);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosZ").c_str()                   , &MCFlux_NuPosZ);
@@ -54,7 +57,7 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_PdgCode").c_str()       , &MCTruth_particles_PdgCode);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_Mother").c_str()        , &MCTruth_particles_Mother);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_StatusCode").c_str()    , &MCTruth_particles_StatusCode);
-  fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_NDaughters").c_str()    , &MCTruth_particles_NDaughters);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_NumberDaughters").c_str()    , &MCTruth_particles_NumberDaughters);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_Daughters").c_str()     , &MCTruth_particles_Daughters);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_Gvx").c_str()           , &MCTruth_particles_Gvx);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_particles_Gvy").c_str()           , &MCTruth_particles_Gvy);
@@ -77,7 +80,7 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_W").c_str()              , &MCTruth_neutrino_W);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_X").c_str()              , &MCTruth_neutrino_X);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Y").c_str()              , &MCTruth_neutrino_Y);
-  fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_Q2").c_str()             , &MCTruth_neutrino_Q2);
+  fTree->SetBranchAddress(branchDef.get<std::string>("MCTruth_neutrino_QSqr").c_str()             , &MCTruth_neutrino_QSqr);
 
   // GTruth
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbePDG").c_str()                 , &GTruth_ProbePDG);
@@ -86,11 +89,11 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_weight").c_str()                   , &GTruth_weight);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_probability").c_str()              , &GTruth_probability);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Xsec").c_str()                     , &GTruth_Xsec);
-  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_fDiffXsec").c_str()                , &GTruth_fDiffXsec);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_DiffXsec").c_str()                , &GTruth_DiffXsec);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexX").c_str()                  , &GTruth_vertexX);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexY").c_str()                  , &GTruth_vertexY);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexZ").c_str()                  , &GTruth_vertexZ);
-  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexT").c_str()                  , &GTruth_Gscatter);
+  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_vertexT").c_str()                  , &GTruth_vertexT);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Gscatter").c_str()                 , &GTruth_Gscatter);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_Gint").c_str()                     , &GTruth_Gint);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ResNum").c_str()                   , &GTruth_ResNum);
@@ -177,7 +180,7 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
       MCTruth_particles_StatusCode[i]);
 
     // Add daughter track IDs for this particle
-    for (int j=0; j<MCTruth_particles_NDaughters[i]; j++) {
+    for (int j=0; j<MCTruth_particles_NumberDaughters[i]; j++) {
       part.AddDaughter(MCTruth_particles_Daughters[i][j]);
     }
 
@@ -215,7 +218,7 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
                       MCTruth_neutrino_W,
                       MCTruth_neutrino_X,
                       MCTruth_neutrino_Y,
-                      MCTruth_neutrino_Q2);
+                      MCTruth_neutrino_QSqr);
 
   return true;
 }  
@@ -232,7 +235,7 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
   gtruth.fweight = GTruth_weight;
   gtruth.fprobability = GTruth_probability;
   gtruth.fXsec = GTruth_Xsec;
-  gtruth.fDiffXsec = GTruth_fDiffXsec;
+  gtruth.fDiffXsec = GTruth_DiffXsec;
   gtruth.fVertex = TLorentzVector(
     GTruth_vertexX,
     GTruth_vertexY,

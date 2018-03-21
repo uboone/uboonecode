@@ -24,6 +24,7 @@ namespace uboone {
  */
 class NTupleInterface : public TreeInterface {
 public:
+
   /** Constructor. */
   NTupleInterface();
 
@@ -91,14 +92,17 @@ private:
   static const unsigned kMaxParticles = 50;  //!< Max. MCParticles in MCTruth
 
   TTree* fTree;  //!< Input TTree
+  int fRun;
+  double fPOT;
 
   // Metadata
   int run;
   int subrun;
-  int evtno;
+  int event;
   Long64_t fNEntries;
 
   // MCFlux
+  int MCFlux_evtno; //!< POT information
   double MCFlux_NuPosX;
   double MCFlux_NuPosY;
   double MCFlux_NuPosZ;
@@ -132,15 +136,15 @@ private:
   double MCTruth_neutrino_W;
   double MCTruth_neutrino_X;
   double MCTruth_neutrino_Y;
-  double MCTruth_neutrino_Q2;
+  double MCTruth_neutrino_QSqr;
 
   int MCTruth_NParticles;
   int MCTruth_particles_TrackId[kMaxParticles];
   int MCTruth_particles_PdgCode[kMaxParticles];
   int MCTruth_particles_Mother[kMaxParticles];
   int MCTruth_particles_StatusCode[kMaxParticles];
-  int MCTruth_particles_NDaughters[kMaxParticles];
-  int MCTruth_particles_Daughters[kMaxParticles][kMaxParticles];
+  int MCTruth_particles_NumberDaughters[kMaxParticles];
+  int MCTruth_particles_Daughters[50][50];
   double MCTruth_particles_Gvx[kMaxParticles];
   double MCTruth_particles_Gvy[kMaxParticles];
   double MCTruth_particles_Gvz[kMaxParticles];
@@ -161,7 +165,7 @@ private:
   double GTruth_weight;
   double GTruth_probability;
   double GTruth_Xsec;
-  double GTruth_fDiffXsec;
+  double GTruth_DiffXsec;
   double GTruth_vertexX;
   double GTruth_vertexY;
   double GTruth_vertexZ;
