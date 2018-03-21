@@ -1148,6 +1148,12 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashtag->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_flashtag->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+
+    fMC_flashtag->Branch("fvtxx", &fvtxx, "fvtxx/F");         
+    fMC_flashtag->Branch("fvtxy", &fvtxy, "fvtxy/F");
+    fMC_flashtag->Branch("fvtxz", &fvtxz, "fvtxz/F");
+ 
+
     fMC_flashtag->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
     fMC_flashtag->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_flashtag->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
@@ -1224,6 +1230,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_noshwr->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_noshwr->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+
+    fMC_noshwr->Branch("flstrkdist" ,  &flstrkdist,   "flstrkdist/F");
+
     fMC_noshwr->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
     fMC_noshwr->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_noshwr->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
@@ -1330,6 +1339,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_mupinFV->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_mupinFV->Branch("flstrkdist" ,  &flstrkdist,   "flstrkdist/F");
+
+    fMC_mupinFV->Branch("TrunMean_cand", &TrunMean_cand, "TrunMean_cand/F");
+    fMC_mupinFV->Branch("TrunMean_pcand", &TrunMean_pcand, "TrunMean_pcand/F");
 
 
     fMC_mupinFV->Branch("truthtop", &truthtop, "truthtop/I");
@@ -1543,16 +1555,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -1763,7 +1775,9 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
 
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
-    if (dqds*243 <= dqds_cut)
+    //if (dqds*242.77 <= dqds_cut) //data
+    if (dqds*196.98 <= dqds_cut) //MC
+
       return true;
   
 
@@ -3402,7 +3416,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 if(TrackProtonCandidate>-1 && TrackCandidate>-1){
                      //trackidmuoncand=TrackCandidate;
                      //trackidprotoncand=TrackProtonCandidate;
-                     fMC_mupinFV->Fill();
+                     //fMC_mupinFV->Fill();
                      //get the truncated dQdx of proton candidate
                      art::Ptr<recob::Track>  track(trackVecHandle,TrackProtonCandidate);
 
@@ -3458,6 +3472,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       //std::cout<<"Event number= "<<fEvent<<" true PDG id of the track proton candidate is "<<trackpcand_parPDG<<std::endl;
 
 
+                     fMC_mupinFV->Fill();
 
                      //-----------------------------------------------------------------------
                      if(TrunMean_cand !=-9999 && TrunMean_pcand !=-9999){
