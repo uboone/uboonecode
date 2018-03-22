@@ -20,7 +20,7 @@ NTupleInterface::~NTupleInterface() {}
 void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::ParameterSet& branchDef) {
   std::cout << "[NTUPLEINTERFACE] TREE NAME: " << treeName << std::endl;
 
-  fTree=dynamic_cast<TTree*>(inputFile->Get(treeName));
+  fTree = dynamic_cast<TTree*>(inputFile->Get(treeName));
 
   std::cout << "[NTUPLEINTERFACE] Tree retrieved. Setting branch addresses." << std::endl;
 

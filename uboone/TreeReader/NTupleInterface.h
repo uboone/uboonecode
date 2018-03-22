@@ -144,7 +144,7 @@ private:
   int MCTruth_particles_Mother[kMaxParticles];
   int MCTruth_particles_StatusCode[kMaxParticles];
   int MCTruth_particles_NumberDaughters[kMaxParticles];
-  int MCTruth_particles_Daughters[50][50];
+  int MCTruth_particles_Daughters[kMaxParticles][100];
   double MCTruth_particles_Gvx[kMaxParticles];
   double MCTruth_particles_Gvy[kMaxParticles];
   double MCTruth_particles_Gvz[kMaxParticles];
