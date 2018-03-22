@@ -1,7 +1,12 @@
 #include "EventWeightTreeUtility.h"
 
 namespace uboone {
-  int WriteTree(const art::Event e, 
+
+  EWTreeUtil::EWTreeUtil() {}
+
+  EWTreeUtil::~EWTreeUtil() {}
+
+  int EWTreeUtil::WriteTree(const art::Event & e, 
       const art::Ptr<simb::MCFlux> mcFlux, 
       const art::Ptr<simb::MCTruth> mcTruth, 
       const art::Ptr<simb::GTruth> gTruth){
@@ -132,18 +137,19 @@ namespace uboone {
     return 0;
   }
 
-  int WriteTree(const art::Event e, 
+  int EWTreeUtil::WriteTree(const art::Event & e, 
       const art::Ptr<simb::MCFlux> mcFlux, 
       const art::Ptr<simb::MCTruth> mcTruth, 
-      const art::Ptr<simb::GTruth> gTruth
+      const art::Ptr<simb::GTruth> gTruth,
       TTree* t){
 
     tree = t;
     WriteTree(e, mcFlux, mcTruth, gTruth);
 
+    return 0;
   }
 
-  void InitialiseTree(TTree* t){
+  void EWTreeUtil::InitialiseTree(TTree* t){
 
     t->Branch("run"     , &run);
     t->Branch("subrun"  , &subrun);
@@ -248,7 +254,7 @@ namespace uboone {
 
   }
 
-  void ConfigureTree(TTree* t){
+  void EWTreeUtil::ConfigureTree(TTree* t){
     t->SetBranchAddress("run"     , &run);
     t->SetBranchAddress("subrun"  , &subrun);
     t->SetBranchAddress("event"   , &event);
@@ -280,24 +286,24 @@ namespace uboone {
 
     // MCTruth
     t->SetBranchAddress("MCTruth_NParticles", &MCTruth_NParticles);
-    t->SetBranchAddress("MCTruth_particles_TrackId", MCTruth_particles_TrackId, "MCTruth_particles_TrackId[MCTruth_NParticles]/I");
-    t->SetBranchAddress("MCTruth_particles_PdgCode", &MCTruth_particles_PdgCode, "MCTruth_particles_PdgCode[MCTruth_NParticles]/I");
-    t->SetBranchAddress("MCTruth_particles_Mother", &MCTruth_particles_Mother, "MCTruth_particles_Mother[MCTruth_NParticles]/I"); 
-    t->SetBranchAddress("MCTruth_particles_StatusCode", MCTruth_particles_StatusCode, "MCTruth_particles_StatusCode[MCTruth_NParticles]/I"); 
-    t->SetBranchAddress("MCTruth_particles_NumberDaughters", MCTruth_particles_NumberDaughters, "MCTruth_particles_NumberDaughters[MCTruth_NParticles]/I");
-    t->SetBranchAddress("MCTruth_particles_Daughters", MCTruth_particles_Daughters, "MCTruth_particles_Daughters[MCTruth_NParticles][100]/I");
-    t->SetBranchAddress("MCTruth_particles_Gvx", MCTruth_particles_Gvx, "MCTruth_particles_Gvx[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_Gvy", MCTruth_particles_Gvy, "MCTruth_particles_Gvy[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_Gvz", MCTruth_particles_Gvz, "MCTruth_particles_Gvz[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_Gvt", MCTruth_particles_Gvt, "MCTruth_particles_Gvt[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_px0", MCTruth_particles_px0, "MCTruth_particles_px0[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_py0", MCTruth_particles_py0, "MCTruth_particles_py0[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_pz0", MCTruth_particles_pz0, "MCTruth_particles_pz0[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_e0", MCTruth_particles_e0, "MCTruth_particles_e0[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_Rescatter", MCTruth_particles_Rescatter, "MCTruth_particles_Rescatter[MCTruth_NParticles]/I");
-    t->SetBranchAddress("MCTruth_particles_polx", MCTruth_particles_polx, "MCTruth_particles_polx[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_poly", MCTruth_particles_poly, "MCTruth_particles_poly[MCTruth_NParticles]/D");
-    t->SetBranchAddress("MCTruth_particles_polz", MCTruth_particles_polz, "MCTruth_particles_polz[MCTruth_NParticles]/D");
+    t->SetBranchAddress("MCTruth_particles_TrackId", MCTruth_particles_TrackId);
+    t->SetBranchAddress("MCTruth_particles_PdgCode", &MCTruth_particles_PdgCode);
+    t->SetBranchAddress("MCTruth_particles_Mother", &MCTruth_particles_Mother); 
+    t->SetBranchAddress("MCTruth_particles_StatusCode", MCTruth_particles_StatusCode); 
+    t->SetBranchAddress("MCTruth_particles_NumberDaughters", MCTruth_particles_NumberDaughters);
+    t->SetBranchAddress("MCTruth_particles_Daughters", MCTruth_particles_Daughters);
+    t->SetBranchAddress("MCTruth_particles_Gvx", MCTruth_particles_Gvx);
+    t->SetBranchAddress("MCTruth_particles_Gvy", MCTruth_particles_Gvy);
+    t->SetBranchAddress("MCTruth_particles_Gvz", MCTruth_particles_Gvz);
+    t->SetBranchAddress("MCTruth_particles_Gvt", MCTruth_particles_Gvt);
+    t->SetBranchAddress("MCTruth_particles_px0", MCTruth_particles_px0);
+    t->SetBranchAddress("MCTruth_particles_py0", MCTruth_particles_py0);
+    t->SetBranchAddress("MCTruth_particles_pz0", MCTruth_particles_pz0);
+    t->SetBranchAddress("MCTruth_particles_e0", MCTruth_particles_e0);
+    t->SetBranchAddress("MCTruth_particles_Rescatter", MCTruth_particles_Rescatter);
+    t->SetBranchAddress("MCTruth_particles_polx", MCTruth_particles_polx);
+    t->SetBranchAddress("MCTruth_particles_poly", MCTruth_particles_poly);
+    t->SetBranchAddress("MCTruth_particles_polz", MCTruth_particles_polz);
     t->SetBranchAddress("MCTruth_neutrino_CCNC", &MCTruth_neutrino_CCNC);
     t->SetBranchAddress("MCTruth_neutrino_mode", &MCTruth_neutrino_mode);
     t->SetBranchAddress("MCTruth_neutrino_interactionType", &MCTruth_neutrino_interactionType);
@@ -310,7 +316,6 @@ namespace uboone {
     t->SetBranchAddress("MCTruth_neutrino_QSqr",&MCTruth_neutrino_QSqr);
 
     //GTruth
-    //t->SetBranchAddress("GTruth_ProbePDG"   , &GTruth_ProbePDG);
     t->SetBranchAddress("GTruth_IsSeaQuark"   , &GTruth_IsSeaQuark);
     t->SetBranchAddress("GTruth_tgtPDG"       , &GTruth_tgtPDG);
     t->SetBranchAddress("GTruth_weight"       , &GTruth_weight);

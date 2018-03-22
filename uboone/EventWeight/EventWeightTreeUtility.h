@@ -24,7 +24,6 @@ namespace uboone {
    *  \class EWTreeUtil
    *  \brief Automatically builds TTree with variables for reweighting
    */
-
   class EWTreeUtil {
     public:
 
@@ -38,7 +37,7 @@ namespace uboone {
        * Take variables from mcFlux, mcTruth, gTruth
        * and dump them to new TTree for later reweighting
        */
-      int WriteTree(const art::Event e, 
+      int WriteTree(const art::Event & e, 
         const art::Ptr<simb::MCFlux> mcFlux, 
         const art::Ptr<simb::MCTruth> mcTruth, 
         const art::Ptr<simb::GTruth> gTruth);
@@ -48,10 +47,10 @@ namespace uboone {
        * and dump them to user specified TTree for later
        * reweighting
        */
-      int WriteTree(const art::Event e, 
+      int WriteTree(const art::Event & e, 
           const art::Ptr<simb::MCFlux> mcFlux, 
           const art::Ptr<simb::MCTruth> mcTruth, 
-          const art::Ptr<simb::GTruth> gTruth
+          const art::Ptr<simb::GTruth> gTruth,
           TTree* t);
 
       /**
@@ -67,6 +66,8 @@ namespace uboone {
     private:
       TTree* tree;
       bool isDebug;
+
+      static const unsigned kMaxMCParticles = 50;
 
       // Metadata
       int run;
@@ -94,7 +95,8 @@ namespace uboone {
       int MCTruth_particles_Mother[kMaxMCParticles];
       int MCTruth_particles_StatusCode[kMaxMCParticles];
       int MCTruth_particles_NumberDaughters[kMaxMCParticles];
-      int MCTruth_particles_Daughters[100][100]; // only one multi-dimensional array allowed... thanks root.
+      // only one multi-dimensional array allowed... thanks root.
+      int MCTruth_particles_Daughters[kMaxMCParticles][100]; 
       double MCTruth_particles_Gvx[kMaxMCParticles];
       double MCTruth_particles_Gvy[kMaxMCParticles];
       double MCTruth_particles_Gvz[kMaxMCParticles];
