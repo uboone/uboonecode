@@ -130,7 +130,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
 
 
 bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
-  std::cout << "[NTUPLEINTERFACE] Filling MCFlux" << std::endl;
   if (!fTree->GetEntry(ientry)) {
     return false;
   }
@@ -165,9 +164,14 @@ bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
 
 
 bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
-  std::cout << "[NTUPLEINTERFACE] Filling MCTruth" << std::endl;
   if (!fTree->GetEntry(ientry)) {
     return false;
+  }
+
+  if ((unsigned) MCTruth_NParticles > kMaxParticles) {
+    throw cet::exception(__PRETTY_FUNCTION__)
+      << "Number of MCTruth particles (" << MCTruth_NParticles << ") "
+         "exceeds kMaxParticles (" << kMaxParticles << ")" << std::endl;
   }
 
   // Add MCParticles list with neutrino first
@@ -182,6 +186,13 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
       MCTruth_particles_StatusCode[i]);
 
     // Add daughter track IDs for this particle
+    if (MCTruth_particles_NumberDaughters[i] > 100) {
+      throw cet::exception(__PRETTY_FUNCTION__)
+        << "Number of MCTruth particles ("
+        << MCTruth_particles_NumberDaughters[i] << ") "
+        << "exceeds maximum (" << 100 << ")" << std::endl;
+    }
+
     for (int j=0; j<MCTruth_particles_NumberDaughters[i]; j++) {
       part.AddDaughter(MCTruth_particles_Daughters[i][j]);
     }
@@ -227,7 +238,6 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
 
 
 bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
-  std::cout << "[NTUPLEINTERFACE] Filling GTruth" << std::endl;
   if (!fTree->GetEntry(ientry)) {
     return false;
   }
