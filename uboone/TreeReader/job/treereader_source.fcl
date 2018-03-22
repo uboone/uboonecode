@@ -27,14 +27,14 @@ source: {
     event: "event"
     MCFlux_evtno: "MCFlux_evtno"
     MCFlux_NuPosX: "MCFlux_NuPosX"
-    MCFlux_NuPosY: "MCFlux_NuPosY" 
+    MCFlux_NuPosY: "MCFlux_NuPosY"
     MCFlux_NuPosZ: "MCFlux_NuPosZ"
-    MCFlux_NuMomX: "MCFlux_NuMomX" 
-    MCFlux_NuMomY: "MCFlux_NuMomY" 
-    MCFlux_NuMomZ: "MCFlux_NuMomZ" 
+    MCFlux_NuMomX: "MCFlux_NuMomX"
+    MCFlux_NuMomY: "MCFlux_NuMomY"
+    MCFlux_NuMomZ: "MCFlux_NuMomZ"
     MCFlux_NuMomE: "MCFlux_NuMomE"
-    MCFlux_genx: "MCFlux_genx" 
-    MCFlux_geny: "MCFlux_geny" 
+    MCFlux_genx: "MCFlux_genx"
+    MCFlux_geny: "MCFlux_geny"
     MCFlux_genz: "MCFlux_genz"
     MCFlux_ntype: "MCFlux_ntype"
     MCFlux_ptype: "MCFlux_ptype"
@@ -59,13 +59,13 @@ source: {
     MCTruth_particles_Gvy: "MCTruth_particles_Gvy"
     MCTruth_particles_Gvz: "MCTruth_particles_Gvz"
     MCTruth_particles_Gvt: "MCTruth_particles_Gvt"
-    MCTruth_particles_px0: "MCTruth_particles_px0" 
+    MCTruth_particles_px0: "MCTruth_particles_px0"
     MCTruth_particles_py0: "MCTruth_particles_py0"
     MCTruth_particles_pz0: "MCTruth_particles_pz0"
-    MCTruth_particles_e0: "MCTruth_particles_e0" 
+    MCTruth_particles_e0: "MCTruth_particles_e0"
     MCTruth_particles_Rescatter: "MCTruth_particles_Rescatter"
     MCTruth_particles_polx: "MCTruth_particles_polx"
-    MCTruth_particles_poly: "MCTruth_particles_poly" 
+    MCTruth_particles_poly: "MCTruth_particles_poly"
     MCTruth_particles_polz: "MCTruth_particles_polz"
     MCTruth_neutrino_CCNC: "MCTruth_neutrino_CCNC"
     MCTruth_neutrino_mode: "MCTruth_neutrino_mode"
@@ -98,7 +98,6 @@ source: {
     GTruth_IsCharm: "GTruth_IsCharm"
     GTruth_gX: "GTruth_gX"
     GTruth_gY: "GTruth_gY"
-    #double GTruth_gZ: "GTruth_gZ"
     GTruth_gT: "GTruth_gT"
     GTruth_gW: "GTruth_gW"
     GTruth_gQ2: "GTruth_gQ2"
@@ -116,7 +115,7 @@ source: {
     GTruth_FShadSystP4y: "GTruth_FShadSystP4y"
     GTruth_FShadSystP4z: "GTruth_FShadSystP4z"
     GTruth_FShadSystP4E: "GTruth_FShadSystP4E"
-  } 
+  }
 }
 
 outputs: {
@@ -143,7 +142,7 @@ physics: {
  end_paths: [ stream1 ]
 }
 
-physics.producers.eventweight.genie_module_label: TreeReader 
+physics.producers.eventweight.genie_module_label: TreeReader
 physics.producers.genieeventweight.genie_module_label: TreeReader
 
 physics.producers.eventweight.weight_functions: [
