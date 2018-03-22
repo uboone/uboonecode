@@ -126,13 +126,16 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   assert(fNEntries > 0);
   fTree->GetEntry(0);
   fRun = run;
+
 }
 
 
 bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
   if (!fTree->GetEntry(ientry)) {
+    std::cout << "[TEST] DIDN'T PASS" << std::endl;
     return false;
   }
+  std::cout << "[TEST] DID PASS" << std::endl;
 
   fNuPos = TLorentzVector(
     MCFlux_NuPosX,
@@ -164,6 +167,7 @@ bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
 
 
 bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
+  std::cout << "[NTUPLEINTERFACE] Filling MCTruth" << std::endl; 
   if (!fTree->GetEntry(ientry)) {
     return false;
   }
@@ -225,6 +229,7 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
 
 
 bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
+  std::cout << "[NTUPLEINTERFACE] Filling GTruth" << std::endl; 
   if (!fTree->GetEntry(ientry)) {
     return false;
   }
