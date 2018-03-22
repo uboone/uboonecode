@@ -1,6 +1,7 @@
 #include "services_microboone.fcl"
 #include "eventweight_microboone.fcl"
 #include "seedservice_microboone.fcl"
+#include "run_genie_reweight_uboone.fcl"
 
 process_name: TreeReader
 
@@ -18,31 +19,104 @@ source: {
   skipEvents: 0
   maxEvents: -1
   inputType: "ntuple"
-  treeName: "testmod/flux"
+  treeName: "testmod/tree"
   dataProductName: "TreeReader"
   branches: {
-    vtxx: "vtxx"
-    vtxy: "vtxy"
-    vtxz: "vtxz"
-    px: "px"
-    py: "py"
-    pz: "pz"
-    E: "E"
-    pdg: "pdg"
-    ptype: "ptype"
-    wgt: "wgt"
-    dist: "dist"
-    evtno: "evtno"
-    nenergyn: "nenergyn"
-    tpx: "tpx"
-    tpy: "tpy"
-    tpz: "tpz"
-    vx: "vx"
-    vy: "vy"
-    vz: "vz"
-    tptype: "tptype"
-
-  }
+    run: "run"
+    subrun: "subrun"
+    event: "event"
+    MCFlux_evtno: "MCFlux_evtno"
+    MCFlux_NuPosX: "MCFlux_NuPosX"
+    MCFlux_NuPosY: "MCFlux_NuPosY" 
+    MCFlux_NuPosZ: "MCFlux_NuPosZ"
+    MCFlux_NuMomX: "MCFlux_NuMomX" 
+    MCFlux_NuMomY: "MCFlux_NuMomY" 
+    MCFlux_NuMomZ: "MCFlux_NuMomZ" 
+    MCFlux_NuMomE: "MCFlux_NuMomE"
+    MCFlux_genx: "MCFlux_genx" 
+    MCFlux_geny: "MCFlux_geny" 
+    MCFlux_genz: "MCFlux_genz"
+    MCFlux_ntype: "MCFlux_ntype"
+    MCFlux_ptype: "MCFlux_ptype"
+    MCFlux_nimpwt: "MCFlux_nimpwt"
+    MCFlux_dk2gen: "MCFlux_dk2gen"
+    MCFlux_nenergyn: "MCFlux_nenergyn"
+    MCFlux_tpx: "MCFlux_tpx"
+    MCFlux_tpy: "MCFlux_tpy"
+    MCFlux_tpz: "MCFlux_tpz"
+    MCFlux_vx: "MCFlux_vx"
+    MCFlux_vy: "MCFlux_vy"
+    MCFlux_vz: "MCFlux_vz"
+    MCFlux_tptype: "MCFlux_tptype"
+    MCTruth_NParticles: "MCTruth_NParticles"
+    MCTruth_particles_TrackId: "MCTruth_particles_TrackId"
+    MCTruth_particles_PdgCode: "MCTruth_particles_PdgCode"
+    MCTruth_particles_Mother: "MCTruth_particles_Mother"
+    MCTruth_particles_StatusCode: "MCTruth_particles_StatusCode"
+    MCTruth_particles_NumberDaughters: "MCTruth_particles_NumberDaughters"
+    MCTruth_particles_Daughters: "MCTruth_particles_Daughters"
+    MCTruth_particles_Gvx: "MCTruth_particles_Gvx"
+    MCTruth_particles_Gvy: "MCTruth_particles_Gvy"
+    MCTruth_particles_Gvz: "MCTruth_particles_Gvz"
+    MCTruth_particles_Gvt: "MCTruth_particles_Gvt"
+    MCTruth_particles_px0: "MCTruth_particles_px0" 
+    MCTruth_particles_py0: "MCTruth_particles_py0"
+    MCTruth_particles_pz0: "MCTruth_particles_pz0"
+    MCTruth_particles_e0: "MCTruth_particles_e0" 
+    MCTruth_particles_Rescatter: "MCTruth_particles_Rescatter"
+    MCTruth_particles_polx: "MCTruth_particles_polx"
+    MCTruth_particles_poly: "MCTruth_particles_poly" 
+    MCTruth_particles_polz: "MCTruth_particles_polz"
+    MCTruth_neutrino_CCNC: "MCTruth_neutrino_CCNC"
+    MCTruth_neutrino_mode: "MCTruth_neutrino_mode"
+    MCTruth_neutrino_interactionType: "MCTruth_neutrino_interactionType"
+    MCTruth_neutrino_target: "MCTruth_neutrino_target"
+    MCTruth_neutrino_nucleon: "MCTruth_neutrino_nucleon"
+    MCTruth_neutrino_quark: "MCTruth_neutrino_quark"
+    MCTruth_neutrino_W: "MCTruth_neutrino_W"
+    MCTruth_neutrino_X: "MCTruth_neutrino_X"
+    MCTruth_neutrino_Y: "MCTruth_neutrino_Y"
+    MCTruth_neutrino_QSqr: "MCTruth_neutrino_QSqr"
+    GTruth_IsSeaQuark: "GTruth_IsSeaQuark"
+    GTruth_tgtPDG: "GTruth_tgtPDG"
+    GTruth_weight: "GTruth_weight"
+    GTruth_probability: "GTruth_probability"
+    GTruth_Xsec: "GTruth_Xsec"
+    GTruth_DiffXsec: "GTruth_DiffXsec"
+    GTruth_vertexX: "GTruth_vertexX"
+    GTruth_vertexY: "GTruth_vertexY"
+    GTruth_vertexZ: "GTruth_vertexZ"
+    GTruth_vertexT: "GTruth_vertexT"
+    GTruth_Gscatter: "GTruth_Gscatter"
+    GTruth_Gint: "GTruth_Gint"
+    GTruth_ResNum: "GTruth_ResNum"
+    GTruth_NumPiPlus: "GTruth_NumPiPlus"
+    GTruth_NumPi0: "GTruth_NumPi0"
+    GTruth_NumPiMinus: "GTruth_NumPiMinus"
+    GTruth_NumProton: "GTruth_NumProton"
+    GTruth_NumNeutron: "GTruth_NumNeutron"
+    GTruth_IsCharm: "GTruth_IsCharm"
+    GTruth_gX: "GTruth_gX"
+    GTruth_gY: "GTruth_gY"
+    #double GTruth_gZ: "GTruth_gZ"
+    GTruth_gT: "GTruth_gT"
+    GTruth_gW: "GTruth_gW"
+    GTruth_gQ2: "GTruth_gQ2"
+    GTruth_gq2: "GTruth_gq2"
+    GTruth_ProbePDG: "GTruth_ProbePDG"
+    GTruth_ProbeP4x: "GTruth_ProbeP4x"
+    GTruth_ProbeP4y: "GTruth_ProbeP4y"
+    GTruth_ProbeP4z: "GTruth_ProbeP4z"
+    GTruth_ProbeP4E: "GTruth_ProbeP4E"
+    GTruth_HitNucP4x: "GTruth_HitNucP4x"
+    GTruth_HitNucP4y: "GTruth_HitNucP4y"
+    GTruth_HitNucP4z: "GTruth_HitNucP4z"
+    GTruth_HitNucP4E: "GTruth_HitNucP4E"
+    GTruth_FShadSystP4x: "GTruth_FShadSystP4x"
+    GTruth_FShadSystP4y: "GTruth_FShadSystP4y"
+    GTruth_FShadSystP4z: "GTruth_FShadSystP4z"
+    GTruth_FShadSystP4E: "GTruth_FShadSystP4E"
+  } 
 }
 
 outputs: {
@@ -57,20 +131,24 @@ outputs: {
 physics: {
  producers: {
    eventweight: @local::microboone_eventweight
+   genieeventweight: @local::genie_microboone_eventweight
    rns: { module_type: "RandomNumberSaver" }
  }
 
  analyzers: {}
  ana: []
 
- simulate: [ rns, eventweight ]
+ simulate: [ rns , eventweight, genieeventweight ]
  stream1:   [ out1 ]
  end_paths: [ stream1 ]
 }
 
-physics.producers.eventweight.genie_module_label: flux
+physics.producers.eventweight.genie_module_label: TreeReader 
+physics.producers.genieeventweight.genie_module_label: TreeReader
 
 physics.producers.eventweight.weight_functions: [
   piplus, piminus, kplus, kzero, kminus, horncurrent, pioninexsec, nucleontotxsec, nucleonqexsec, nucleoninexsec, pionqexsec, piontotxsec, expskin
 ]
 
+# only use subset of genie weight functions for speed
+physics.producers.genieeventweight.weight_functions: [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf ]
