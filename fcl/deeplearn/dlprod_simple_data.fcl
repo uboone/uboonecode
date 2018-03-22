@@ -10,5 +10,5 @@ physics.sim: [ rns ]
 physics.trigger_paths: [ sim ]
 physics.end_paths:     [ ana ]
 
-physics.analyzers.superaMichelData.SelectEvents:  []
+#physics.analyzers.superaMichelData.SelectEvents:  []
 

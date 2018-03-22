@@ -5,11 +5,11 @@ process_name: MultiPartVertex
 source: @local::source_gen
 
 #physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
-#physics.ana: [ superaMCFocused ]
+physics.ana: [ superaMCFocused ]
 #physics.ana: [ superaMCOnly3D ]
-physics.ana: [ superaMCFocused2Gen ]
+#physics.ana: [ superaMCFocused2Gen ]
 physics.sim: [ rns, 
-               rain,
+               #rain,
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
                swtrigger,
@@ -47,14 +47,14 @@ physics.producers.generator.G4TimeJitter : 800
 physics.producers.generator.XRange       : [30]
 physics.producers.generator.YRange       : [30]
 physics.producers.generator.ZRange       : [30]
-physics.producers.generator.MultiMax     : 5
+physics.producers.generator.MultiMax     : 4
 physics.producers.generator.MultiMin     : 1
-physics.producers.generator.ParticleParameter.PDGCode      : [       [11],        [22],       [13], [211,-211],      [2212]]
-physics.producers.generator.ParticleParameter.MinMulti     : [          0,           0,          0,          0,           0]
-physics.producers.generator.ParticleParameter.MaxMulti     : [          2,           2,          2,          2,           3]
-physics.producers.generator.ParticleParameter.ProbWeight   : [          1,           1,          1,          1,           1]
-physics.producers.generator.ParticleParameter.KERange      : [ [0.05,1.0],  [0.05,1.0], [0.05,3.0], [0.05,2.0],  [0.05,0.4]]
-physics.producers.generator.ParticleParameter.MomRange     : []
+physics.producers.generator.ParticleParameter.PDGCode      : [       [11],       [22],          [13],    [211,-211],     [2212]]
+physics.producers.generator.ParticleParameter.MinMulti     : [          0,          0,             0,             0,          0]
+physics.producers.generator.ParticleParameter.MaxMulti     : [          2,          2,             2,             2,          2]
+physics.producers.generator.ParticleParameter.ProbWeight   : [          3,          3,             2,             2,          2]
+physics.producers.generator.ParticleParameter.KERange      : []
+physics.producers.generator.ParticleParameter.MomRange     : [ [0.03,0.1], [0.03,0.1], [0.085,0.175], [0.095,0.195], [0.3,0.45]]
 
 physics.producers.rain.DebugMode    : 1
 physics.producers.rain.G4Time       : 3925.0

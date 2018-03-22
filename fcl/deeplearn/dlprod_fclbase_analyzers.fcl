@@ -40,6 +40,9 @@ SuperaMCFocused2Gen.supera_params: "supera_mc_focused_2gen.fcl"
 SuperaMCOnly3D: @local::SuperaWholeView
 SuperaMCOnly3D.supera_params: "supera_mc_only3d.fcl"
 
+SuperaMCOnly3D2Gen: @local::SuperaWholeView
+SuperaMCOnly3D2Gen.supera_params: "supera_mc_only3d_2gen.fcl"
+
 dlprod_analyzers:
  {
    mcinfo:  @local::litemc_mcinfo
@@ -58,6 +61,7 @@ dlprod_analyzers:
    superaMCFocused: @local::SuperaMCFocused
    superaMCFocused2Gen: @local::SuperaMCFocused2Gen
    superaMCOnly3D: @local::SuperaMCOnly3D
+   superaMCOnly3D2Gen: @local::SuperaMCOnly3D2Gen
    superaMCLArFlow:   @local::SuperaMCLArFlow
 }
 

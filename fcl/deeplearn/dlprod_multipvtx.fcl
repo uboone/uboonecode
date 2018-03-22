@@ -6,8 +6,9 @@ source: @local::source_gen
 
 #physics.ana: [ mcinfo, opreco, reco2d, superaFocusedViewPlus ]
 #physics.ana: [ mcinfo, opreco, reco2d, superaMCFocused ]
-physics.ana: [ superaMCOnly3D ]
+physics.ana: [ superaMCOnly3D2Gen ]
 physics.sim: [ rns, 
+               rain,
                @sequence::dlprod_simpart,
                @sequence::dlprod_simpmt,
                swtrigger]
@@ -49,3 +50,21 @@ physics.producers.generator.ParticleParameter.ProbWeight   : [          1,      
 physics.producers.generator.ParticleParameter.KERange      : [ [0.05,1.0],  [0.05,1.0],  [0.05,1.0], [0.05,0.4]]
 physics.producers.generator.ParticleParameter.MomRange     : []
 physics.producers.daq.GenNoise: 3
+
+physics.producers.rain.DebugMode    : 1
+physics.producers.rain.G4Time       : 3925.0
+physics.producers.rain.G4TimeJitter : 800
+physics.producers.rain.XRange       : [0]
+physics.producers.rain.YRange       : [0]
+physics.producers.rain.ZRange       : [0]
+physics.producers.rain.MultiMax     : 10
+physics.producers.rain.MultiMin     : 5
+physics.producers.rain.ParticleParameter.PDGCode      : [       [13]]
+physics.producers.rain.ParticleParameter.MinMulti     : [          5]
+physics.producers.rain.ParticleParameter.MaxMulti     : [         10]
+physics.producers.rain.ParticleParameter.ProbWeight   : [         10]
+physics.producers.rain.ParticleParameter.KERange      : [ [5.0,20.0]]
+physics.producers.rain.ParticleParameter.MomRange     : []
+
+services.SpaceCharge.EnableSimSpatialSCE: false
+services.SpaceCharge.EnableSimEfieldSCE:  false
