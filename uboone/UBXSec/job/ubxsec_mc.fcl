@@ -5,7 +5,7 @@
 #include "correct_saturation.fcl"
 
 #include "genie_eventweight_microboone_ubxsec.fcl"
-#include "eventweight_microboone_MCC8.fcl"
+#include "flux_eventweight_microboone_ubxsec.fcl"
 
 #include "tpcobjectmaker.fcl"
 #include "neutrinomcflash.fcl"
@@ -83,7 +83,7 @@ ubxsec_mc_flashmatch:
 
    genieeventweightpm1:            @local::genie_microboone_eventweight_ubxsec
    genieeventweightmultisim:       @local::genie_microboone_eventweight_ubxsec
-   fluxeventweightmultisim:        @local::microboone_eventweight
+   fluxeventweightmultisim:        @local::flux_microboone_eventweight_ubxsec
 
    UBXSec:                         @local::UBXSec_mc
 
