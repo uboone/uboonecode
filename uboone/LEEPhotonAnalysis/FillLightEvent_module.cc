@@ -593,7 +593,7 @@ void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
   ftrackp_size = ftrack_producers.size();
   fshowerp_size = fshower_producers.size();
   frmcm_size = frmcmassociation_producers.size();
-  if(!frmcmassociation_producers.empty()) {
+  if(fmc && !frmcmassociation_producers.empty()) {
     if(frmcm_size != fhitp_size ||
        frmcm_size != ftrackp_size ||
        frmcm_size != fshowerp_size) {
@@ -646,9 +646,14 @@ void FillLightEvent::SetupTrees() {
   meta_tree->Branch("DetHalfHeight", &DetHalfHeight);
   meta_tree->Branch("DetHalfWidth", &DetHalfWidth);
   meta_tree->Branch("DetLength", &DetLength);
-  int mc_type_shower = frmcm_first->fmc_type_shower;
-  int mc_type_track = frmcm_first->fmc_type_track;
-  int mc_type_particle = frmcm_first->fmc_type_particle;
+  int mc_type_shower = -1;
+  int mc_type_track = -1;
+  int mc_type_particle = -1;
+  if(fmc && !frmcmassociation_producers.empty()) {
+    mc_type_shower = frmcm_first->fmc_type_shower;
+    mc_type_track = frmcm_first->fmc_type_track;
+    mc_type_particle = frmcm_first->fmc_type_particle;
+  }
   meta_tree->Branch("mc_type_shower", &mc_type_shower);
   meta_tree->Branch("mc_type_track", &mc_type_track);
   meta_tree->Branch("mc_type_particle", &mc_type_particle);
@@ -3093,7 +3098,7 @@ void FillLightEvent::analyze(art::Event const & e) {
   fsubrun_number = e.id().subRun();
   fevent_number = e.id().event();
 
-  for(RecoMCMatching & rmcm : frmcm) rmcm.MatchWAssociations(e);
+  if(fmc) for(RecoMCMatching & rmcm : frmcm) rmcm.MatchWAssociations(e);
 
   if(fverbose) std::cout << "swtrigger\n";
   FillSWTriggerVectors(e);

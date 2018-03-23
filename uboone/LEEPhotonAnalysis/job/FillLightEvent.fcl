@@ -37,7 +37,7 @@ physics:
       #mc: "true"
       pot_producer: "generator"
 
-      trigger_product: "swtrigger"
+      #trigger_product: "swtrigger"
       opflash_producers: ["simpleFlashBeam"]
 
       hit_producers: ["pandoraCosmicHitRemoval", "gaushit"]
