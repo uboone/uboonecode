@@ -95,6 +95,9 @@ private:
   bool _debug;
   double fDriftVelocity;
 
+  bool _do_opdet_swap;                 ///< If true swaps reconstructed OpDets according to _opdet_swap_map
+  std::vector<int> _opdet_swap_map;    ///< The OpDet swap map for reco flashes
+
   TTree* _tree1;
   int _run, _subrun, _event, _matchid;
   int _n_beam_flashes, _n_pfp;
@@ -115,6 +118,8 @@ CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
   _min_trj_pts             = p.get<int>        ("MinimumNumberOfTrajectoryPoints");
   _min_track_length        = p.get<double>     ("MinimumTrackLength");
   _debug                   = p.get<bool>       ("DebugMode");
+  _do_opdet_swap           = p.get<bool>       ("DoOpDetSwap", false);
+  _opdet_swap_map          = p.get<std::vector<int> >("OpDetSwapMap");
 
   _mgr.Configure(p.get<flashana::Config_t>("FlashMatchConfig"));
   _incompChecker.Configure(p.get<fhicl::ParameterSet>("IncompCheckConfig"));
@@ -156,6 +161,10 @@ void CosmicFlashTagger::produce(art::Event & e)
     _run    = e.id().run();
     _subrun = e.id().subRun();
     _event  = e.id().event();
+  }
+
+  if (_do_opdet_swap && e.isRealData()) {
+    mf::LogWarning("CosmicFlashTagger") << "Swapping OpDets. I hope you know what you are doing." << std::endl;
   }
 
   // Instantiate the output
@@ -219,6 +228,9 @@ void CosmicFlashTagger::produce(art::Event & e)
     f.pe_err_v.resize(geo->NOpDets());
     for (unsigned int i = 0; i < f.pe_v.size(); i++) {
       unsigned int opdet = geo->OpDetFromOpChannel(i);
+      if (_do_opdet_swap && e.isRealData()) {
+        opdet = _opdet_swap_map.at(opdet);
+      }
       f.pe_v[opdet] = flash.PE(i);
       f.pe_err_v[opdet] = sqrt(flash.PE(i));
     }
