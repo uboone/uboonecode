@@ -147,6 +147,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_muoncandidate_perc_used_hits_in_cluster; ///< Number of used hits in the cluster to make the track
   vector<double>   slc_muoncandidate_maxscatteringangle; ///< Maximum scattering angle along track
 
+/*
   vector<double>   slc_othershowers_longest_length; ///< Length of longest shower not in the TPCObject
   vector<double>   slc_othershowers_longest_startx; ///< Start x of longest shower not in the TPCObject
   vector<double>   slc_othershowers_longest_starty; ///< Start y of longest shower not in the TPCObject
@@ -170,6 +171,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_othershowers_flashmatch_phi; ///< Phi of most flash matched shower not in the TPCObject
   vector<double>   slc_othershowers_flashmatch_theta; ///< CosTheta of most flash matched shower not in the TPCObject
   vector<double>   slc_othershowers_flashmatch_openangle; ///< Opening angle of most flash matched shower not in the TPCObject
+  */
 
   Int_t            nbeamfls; ///< Number of beam flashes in the event
   vector<double>   beamfls_time; ///< Time of the beam flash
@@ -193,17 +195,17 @@ class UBXSecEvent /*: public TObject*/{
   Int_t evtwgt_genie_pm1_nfunc; ///< Number of functions used for GENIE reweighting (pm1sigma)
   vector<std::string> evtwgt_genie_pm1_funcname; ///< Names of the functions used for GENIE reweighting (pm1sigma)
   vector<int> evtwgt_genie_pm1_nweight; ///< Number of weights per function name used for GENIE reweighting (pm1sigma)
-  vector<vector<double>> evtwgt_genie_pm1_weight; ///< Weights per function name used for GENIE reweighting (pm1sigma)
+  vector<vector<float>> evtwgt_genie_pm1_weight; ///< Weights per function name used for GENIE reweighting (pm1sigma)
 
   Int_t evtwgt_genie_multisim_nfunc; ///< Number of functions used for GENIE reweighting (multisim)
   vector<std::string> evtwgt_genie_multisim_funcname; ///< Names of the functions used for GENIE reweighting (multisim)
   vector<int> evtwgt_genie_multisim_nweight; ///< Number of weights per function name used for GENIE reweighting (multisim)
-  vector<vector<double>> evtwgt_genie_multisim_weight; ///< Weights per function name used for GENIE reweighting (multisim)
+  vector<vector<float>> evtwgt_genie_multisim_weight; ///< Weights per function name used for GENIE reweighting (multisim)
  
   Int_t evtwgt_flux_multisim_nfunc; ///< Number of functions used for FLUX reweighting (multisim)
   vector<std::string> evtwgt_flux_multisim_funcname; ///< Names of the functions used for FLUX reweighting (multisim)
   vector<int> evtwgt_flux_multisim_nweight; ///< Number of weights per function name used for FLUX reweighting (multisim)
-  vector<vector<double>> evtwgt_flux_multisim_weight; ///< Weights per function name used for FLUX reweighting (multisim)
+  vector<vector<float>> evtwgt_flux_multisim_weight; ///< Weights per function name used for FLUX reweighting (multisim)
  
   int _default_value = -9999; ///< Default value 
 
