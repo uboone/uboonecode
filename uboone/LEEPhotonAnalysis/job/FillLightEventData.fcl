@@ -1,0 +1,6 @@
+#include "FillLightEvent.fcl"
+
+physics.analyzers.FillLightEvent.mc: "false"
+physics.analyzers.FillLightEvent.pot_producer: "beamdata"
+physics.analyzers.FillLightEvent.trigger_product: "daq"
+
