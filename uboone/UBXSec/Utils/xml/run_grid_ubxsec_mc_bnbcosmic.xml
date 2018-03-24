@@ -5,13 +5,13 @@
 <!DOCTYPE project [
 <!ENTITY release "v06_26_01_12">
 <!ENTITY releasetag "e10:prof">
-<!ENTITY name "ubxsec_mc_bnbcosmic_mcc8.7_test2">
-<!ENTITY outdefname "ubxsec_mc_bnbcosmic_mcc87_test2">
+<!ENTITY name "ubxsec_mc_bnbcosmic_mcc8.7_test7">
+<!ENTITY outdefname "ubxsec_mc_bnbcosmic_mcc87_test7">
 <!ENTITY tag "ubxsec">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY PNFSpath "/pnfs/uboone/resilient/users/mdeltutt/">
-<!ENTITY ubxsec_version "mcc8.7_test2">
+<!ENTITY ubxsec_version "mcc8.7_test7">
 ]>
 
 
@@ -33,7 +33,7 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>&releasetag;</qual>
-    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.7_test2.tgz</local>
+    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.7_test7.tgz</local>
   </larsoft>
 
   <!-- Project stages -->
