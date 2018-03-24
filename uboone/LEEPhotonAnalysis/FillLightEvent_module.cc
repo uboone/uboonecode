@@ -115,6 +115,7 @@ private:
 
   bool fheavy;
   bool fmc;
+  bool fuse_eventweight;
   std::string fpot_producer;
 
   std::string fswtrigger_product;
@@ -547,6 +548,7 @@ private:
 FillLightEvent::FillLightEvent(fhicl::ParameterSet const & p) :
   EDAnalyzer(p),
   fheavy(false),
+  fuse_eventweight(true),
   ftpc_volume(0,
 	      -lar::providerFrom<geo::Geometry>()->DetHalfHeight(),
 	      0,
@@ -575,6 +577,7 @@ FillLightEvent::FillLightEvent(fhicl::ParameterSet const & p) :
 void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
 
   p.get_if_present<bool>("heavy", fheavy);
+  p.get_if_present<bool>("use_eventweight",fuse_eventweight);
   fmc = p.get<bool>("mc");
 
   p.get_if_present<std::string>("pot_producer", fpot_producer);
@@ -1581,6 +1584,11 @@ bool FillLightEvent::PassedSWTrigger(art::Event const & e, std::string const & s
 
   std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
 
+  std::cout<<"ALGO_V: of size: "<<algo_v.size()<<std::endl;
+  for(std::string const &a: algo_v){
+	std::cout<<a<<std::endl;	
+  }
+
   std::string const int_str = "BNB_FEMBeamTriggerAlgo";
   std::string const ext_str = "EXT_BNBwin_FEMBeamTriggerAlgo";
 
@@ -2405,6 +2413,7 @@ void FillLightEvent::FillPandora(art::Event const & e) {
 
 
 void FillLightEvent::FillWeights(art::Event const & e) {
+  if(fuse_eventweight){
 
   art::ValidHandle<std::vector<evwgh::MCEventWeight>> const & ev_evw =
     e.getValidHandle<std::vector<evwgh::MCEventWeight>>("eventweight");
@@ -2425,7 +2434,7 @@ void FillLightEvent::FillWeights(art::Event const & e) {
     *wbm_it->second.at(0) = p.second.at(0);
     *wbm_it->second.at(1) = p.second.at(1);
   }
-
+}
 }
 
 
@@ -3131,7 +3140,10 @@ void FillLightEvent::analyze(art::Event const & e) {
 
 void FillLightEvent::endJob() {
 
-  fpot_tree->Fill();
+  if(fpot_producer != "") {
+  	fpot_tree->Fill();
+  }
+
 
 }
 
