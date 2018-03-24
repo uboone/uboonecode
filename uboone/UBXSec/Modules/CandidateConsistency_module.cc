@@ -510,7 +510,7 @@ void CandidateConsistency::produce(art::Event & e)
       if (passed) {
         _ct_manager.PrintClusterStatus();
       } else {
-        std::cout << "Not passed" << std::endl;
+        if(_debug) std::cout << "[CandidateConsistency] Not passed" << std::endl;
         continue;
       }
 

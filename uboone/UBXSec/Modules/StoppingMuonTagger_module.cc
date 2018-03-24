@@ -359,7 +359,7 @@ void StoppingMuonTagger::produce(art::Event & e) {
 
         auto iter4 = pfps_to_tracks.find(p);
         if (iter4 == pfps_to_tracks.end()) {
-          std::cout << "[StoppingMuonTagger] PFParticle in TPCObject not found by pandora !?" << std::endl;
+          if (_debug) std::cout << "[StoppingMuonTagger] PFParticle in TPCObject not found by pandora !?" << std::endl;
           //throw std::exception();
           ignore_this = true;
           continue;

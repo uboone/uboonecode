@@ -460,7 +460,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 void UBXSec::produce(art::Event & e) {
 
   if(_debug) std::cout << "********** UBXSec starts" << std::endl;
-  if(_debug) std::cout << "Run: " << e.id().run() << 
+  if(_debug) std::cout << "[UBXSec] Run: " << e.id().run() << 
                           ", subRun: " << e.id().subRun() <<
                           ", event: " << e.id().event()  << std::endl;
 
@@ -496,12 +496,12 @@ void UBXSec::produce(art::Event & e) {
   ::art::ServiceHandle<geo::Geometry> geo;
 
   // Prepare the dead region finder
-  std::cout << "Recreate ch status map" << std::endl;
+  std::cout << "[UBXSec] Recreate channel status map" << std::endl;
   const lariov::ChannelStatusProvider& chanFilt = art::ServiceHandle<lariov::ChannelStatusService>()->GetProvider();
   for (unsigned int ch = 0; ch < 8256; ch++) {
     deadRegionsFinder.SetChannelStatus(ch, chanFilt.Status(ch));
   }
-  std::cout << "Now force reload BWires" << std::endl;
+  std::cout << "[UBXSec] Now force reload BWires" << std::endl;
   deadRegionsFinder.CreateBWires();
 
   // Use '_detp' to find 'efield' and 'temp'
@@ -959,8 +959,8 @@ void UBXSec::produce(art::Event & e) {
   std::vector<raw::OpDetWaveform> const& waveform_v(*waveform_h);*/
 
   auto const& detectorClocks (*lar::providerFrom< detinfo::DetectorClocksService >());
-  std::cout << "Trigger Time: " << detectorClocks.TriggerTime() << std::endl;
-  std::cout << "Tick Period:  " << detectorClocks.OpticalClock().TickPeriod() << std::endl;
+  std::cout << "[UBXSec] Trigger Time: " << detectorClocks.TriggerTime() << std::endl;
+  std::cout << "[UBXSec] Tick Period:  " << detectorClocks.OpticalClock().TickPeriod() << std::endl;
 
 
   //std::cout << "Printing waveforms" << std::endl;
