@@ -220,10 +220,6 @@ void CosmicFlashTagger::produce(art::Event & e)
     // Construct a Flash_t
     ::flashana::Flash_t f;
     f.x = f.x_err = 0;
-    f.y = flash.YCenter();
-    f.z = flash.ZCenter();
-    f.y_err = flash.YWidth();
-    f.z_err = flash.ZWidth();
     f.pe_v.resize(geo->NOpDets());
     f.pe_err_v.resize(geo->NOpDets());
     for (unsigned int i = 0; i < f.pe_v.size(); i++) {
@@ -234,6 +230,11 @@ void CosmicFlashTagger::produce(art::Event & e)
       f.pe_v[opdet] = flash.PE(i);
       f.pe_err_v[opdet] = sqrt(flash.PE(i));
     }
+    AddFlashPosition(f);
+    //f.y = YCenter;
+    //f.z = ZCenter;
+    //f.y_err = YWidth;
+    //f.z_err = ZWidth; 
     f.time = flash.Time();
     beam_flashes.resize(_n_beam_flashes);
     beam_flashes[_n_beam_flashes-1] = f;

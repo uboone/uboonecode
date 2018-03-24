@@ -147,6 +147,9 @@ private:
   /// Prints MC particles from GENIE on the screen
   void PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist);
 
+  /// Calculates flash position
+  void GetFlashLocation(std::vector<double>, double&, double&, double&, double&);
+
   FindDeadRegions deadRegionsFinder;
   //ubxsec::McPfpMatch mcpfpMatcher;
   ::ubana::FiducialVolume _fiducial_volume;
@@ -197,6 +200,9 @@ private:
   double _min_track_len;                ///< Min track length for momentum calculation
   bool _make_ophit_csv;                 ///< If true makea a csv file with ophit info
   bool _make_pida_csv;                  ///< If true makea a csv file with pida/tracklength info
+
+  bool _do_opdet_swap;                  ///< If true swaps reconstructed OpDets according to _opdet_swap_map
+  std::vector<int> _opdet_swap_map;     ///< The OpDet swap map for reco flashes
 
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
@@ -298,6 +304,9 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _beam_spill_start               = p.get<double>("BeamSpillStart", 3.2);
   _beam_spill_end                 = p.get<double>("BeamSpillEnd",   4.8);
   _total_pe_cut                   = p.get<double>("TotalPECut",     50);
+
+  _do_opdet_swap                  = p.get<bool>("DoOpDetSwap", false);
+  _opdet_swap_map                 = p.get<std::vector<int> >("OpDetSwapMap");
 
   _geo_cosmic_score_cut           = p.get<double>("GeoCosmicScoreCut", 0.6);
   _tolerance_track_multiplicity   = p.get<double>("ToleranceTrackMultiplicity", 5.);
@@ -454,6 +463,10 @@ void UBXSec::produce(art::Event & e) {
   if(_debug) std::cout << "Run: " << e.id().run() << 
                           ", subRun: " << e.id().subRun() <<
                           ", event: " << e.id().event()  << std::endl;
+
+  if (_do_opdet_swap && e.isRealData()) {
+    std::cout << "[UBXSec] WARNING!!! Swapping OpDets. I hope you know what you are doing." << std::endl;
+  } 
 
 
   // Instantiate the output
@@ -798,7 +811,7 @@ void UBXSec::produce(art::Event & e) {
     auto const& flash = (*beamflash_h)[n];
     ubxsec_event->beamfls_pe[n]   = flash.TotalPE();
     ubxsec_event->beamfls_time[n] = flash.Time();
-    ubxsec_event->beamfls_z[n]    = flash.ZCenter();
+    //ubxsec_event->beamfls_z[n]    = flash.ZCenter();
 
     ubxsec_event->beamfls_spec[n].resize(32);
     ubxsec_event->candidate_flash_time = 0.;
@@ -807,7 +820,12 @@ void UBXSec::produce(art::Event & e) {
     //if (_debug) std::cout << "[UBXSec] Reco beam flash pe: " << std::endl;
     for (unsigned int i = 0; i < 32; i++) {
       unsigned int opdet = geo->OpDetFromOpChannel(i);
+      if (_do_opdet_swap && e.isRealData()) {
+        opdet = _opdet_swap_map.at(opdet);
+      }
+ 
       ubxsec_event->beamfls_spec[n][opdet] = flash.PE(i);
+
       if (ubxsec_event->beamfls_time[n] > _beam_spill_start && ubxsec_event->beamfls_time[n] < _beam_spill_end) {
         // Find largest flash above threshold
         if (flash.TotalPE() > _total_pe_cut && flash.TotalPE() > min_pe) { 
@@ -817,8 +835,15 @@ void UBXSec::produce(art::Event & e) {
         }
         //if (_debug) std::cout << "\t PMT " << opdet << ": " << ubxsec_event->beamfls_spec[n][opdet] << std::endl;
       }
-    }
-  }
+    } // OpDet loop
+
+    double Ycenter, Zcenter, Ywidth, Zwidth;
+    GetFlashLocation(ubxsec_event->beamfls_spec[n], Ycenter, Zcenter, Ywidth, Zwidth);
+    ubxsec_event->beamfls_z[n] = Zcenter;
+
+    std::cout << "[UBXSec] Flash time: " << ubxsec_event->beamfls_time[n] << ", Old flash position: " << flash.ZCenter() << std::endl;
+    std::cout << "[UBXSec] Flash time: " << ubxsec_event->beamfls_time[n] << ", New flash position: " << Zcenter << std::endl;
+  } // flash loop
 
 
   // Check if truth nu is in FV
@@ -1978,6 +2003,9 @@ void UBXSec::endSubRun(art::SubRun& sr) {
   if (_debug) std::cout << "[UBXSec::endSubRun] Ends" << std::endl;
 }
 
+
+
+
 void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
 
   std::cout << "[UBXSec] ================= MC Information ================= [UBXSec]" << std::endl;
@@ -2023,6 +2051,48 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
   }
 
   std::cout << "[UBXSec] ================= MC Information ================= [UBXSec]" << std::endl;
+}
+
+
+//_______________________________________________________________________________________
+void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet, 
+                              double& Ycenter, 
+                              double& Zcenter, 
+                              double& Ywidth, 
+                              double& Zwidth)
+{
+
+  // Reset variables
+  Ycenter = Zcenter = 0.;
+  Ywidth  = Zwidth  = -999.;
+  double totalPE = 0.;
+  double sumy = 0., sumz = 0., sumy2 = 0., sumz2 = 0.;
+
+  for (unsigned int opdet = 0; opdet < pePerOpDet.size(); opdet++) {
+
+    // Get physical detector location for this opChannel
+    double PMTxyz[3];
+    ::art::ServiceHandle<geo::Geometry> geo;
+    geo->OpDetGeoFromOpDet(opdet).GetCenter(PMTxyz);
+
+    // Add up the position, weighting with PEs
+    sumy    += pePerOpDet[opdet]*PMTxyz[1];
+    sumy2   += pePerOpDet[opdet]*PMTxyz[1]*PMTxyz[1];
+    sumz    += pePerOpDet[opdet]*PMTxyz[2];
+    sumz2   += pePerOpDet[opdet]*PMTxyz[2]*PMTxyz[2];
+
+    totalPE += pePerOpDet[opdet];
+  }
+
+  Ycenter = sumy/totalPE;
+  Zcenter = sumz/totalPE;
+
+  // This is just sqrt(<x^2> - <x>^2)
+  if ( (sumy2*totalPE - sumy*sumy) > 0. ) 
+    Ywidth = std::sqrt(sumy2*totalPE - sumy*sumy)/totalPE;
+  
+  if ( (sumz2*totalPE - sumz*sumz) > 0. ) 
+    Zwidth = std::sqrt(sumz2*totalPE - sumz*sumz)/totalPE;
 }
 
 DEFINE_ART_MODULE(UBXSec)
