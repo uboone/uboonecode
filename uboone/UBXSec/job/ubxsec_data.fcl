@@ -34,6 +34,13 @@
 
 #include "tpcneutrinoidfilter_microboone.fcl"
 
+#include "photpropservices_microboone.fcl"
+
+#include "services_microboone.fcl"
+#include "opticaldetectorsim_microboone.fcl"
+#include "opticaldetectormodules_microboone.fcl"
+#include "time_memory_tracker_microboone.fcl"
+
 
 BEGIN_PROLOG
 #
