@@ -54,7 +54,7 @@ void recotruehelper::Configure(art::Event const & e,
 
 	if (_debug) { // yes, don't do it
 		std::cout << "[McPfpMatch] This is event " << e.id().run() << std::endl;
-		art::ServiceHandle<cheat::BackTracker> bt;
+		art::ServiceHandle<cheat::BackTrackerService> bt;
 		std::cout << "[McPfpMatch] Number of MCParticles matched to hits: " << trueParticlesToHits.size() << std::endl;
 		for (const auto & iter : trueParticlesToHits) {
 			const art::Ptr<simb::MCTruth> mc_truth = bt->TrackIDToMCTruth((iter.first)->TrackId());
