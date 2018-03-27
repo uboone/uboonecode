@@ -1,12 +1,10 @@
 #include "services_microboone.fcl"
-#include "eventweight_microboone.fcl"
+#include "eventweight_treereader.fcl"
 #include "seedservice_microboone.fcl"
-#include "run_genie_reweight_uboone.fcl"
 
 process_name: TreeReader
 
 services: {
-  #TFileService: {}
   RandomNumberGenerator: {}
   NuRandomService: @local::microboone_seedservice
   TimeTracker: {}
@@ -25,7 +23,6 @@ source: {
     run: "run"
     subrun: "subrun"
     event: "event"
-    MCFlux_evtno: "MCFlux_evtno"
     MCFlux_NuPosX: "MCFlux_NuPosX"
     MCFlux_NuPosY: "MCFlux_NuPosY"
     MCFlux_NuPosZ: "MCFlux_NuPosZ"
@@ -33,9 +30,6 @@ source: {
     MCFlux_NuMomY: "MCFlux_NuMomY"
     MCFlux_NuMomZ: "MCFlux_NuMomZ"
     MCFlux_NuMomE: "MCFlux_NuMomE"
-    MCFlux_genx: "MCFlux_genx"
-    MCFlux_geny: "MCFlux_geny"
-    MCFlux_genz: "MCFlux_genz"
     MCFlux_ntype: "MCFlux_ntype"
     MCFlux_ptype: "MCFlux_ptype"
     MCFlux_nimpwt: "MCFlux_nimpwt"
@@ -129,25 +123,17 @@ outputs: {
 
 physics: {
  producers: {
-   eventweight: @local::microboone_eventweight
-   genieeventweight: @local::genie_microboone_eventweight
+   mcweight: @local::treereader_eventweight
    rns: { module_type: "RandomNumberSaver" }
  }
 
  analyzers: {}
  ana: []
 
- simulate: [ rns , eventweight, genieeventweight ]
+ simulate: [ rns, mcweight ]
  stream1:   [ out1 ]
  end_paths: [ stream1 ]
 }
 
-physics.producers.eventweight.genie_module_label: TreeReader
-physics.producers.genieeventweight.genie_module_label: TreeReader
+physics.producers.mcweight.genie_module_label: TreeReader
 
-physics.producers.eventweight.weight_functions: [
-  piplus, piminus, kplus, kzero, kminus, horncurrent, pioninexsec, nucleontotxsec, nucleonqexsec, nucleoninexsec, pionqexsec, piontotxsec, expskin
-]
-
-# only use subset of genie weight functions for speed
-physics.producers.genieeventweight.weight_functions: [ genie_qema, genie_ncelAxial, genie_ncelEta, genie_qevec, genie_ccresAxial, genie_ccresVector, genie_ncresAxial, genie_ncresVector, genie_cohMA, genie_cohR0, genie_NonResRvp1pi, genie_NonResRvbarp1pi, genie_NonResRvp2pi, genie_NonResRvbarp2pi, genie_ResDecayGamma, genie_ResDecayEta,  genie_ResDecayTheta, genie_NC, genie_DISAth, genie_DISBth, genie_DISCv1u, genie_DISCv2u, genie_AGKYxF, genie_AGKYpT, genie_FormZone, genie_FermiGasModelKf, genie_FermiGasModelSf ]

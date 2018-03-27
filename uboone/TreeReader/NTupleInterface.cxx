@@ -30,7 +30,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("event").c_str()                           , &event);
 
   // MCFlux
-  fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_evtno").c_str()                    , &MCFlux_evtno);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosX").c_str()                   , &MCFlux_NuPosX);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosY").c_str()                   , &MCFlux_NuPosY);
   fTree->SetBranchAddress(branchDef.get<std::string>("MCFlux_NuPosZ").c_str()                   , &MCFlux_NuPosZ);

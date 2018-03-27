@@ -50,7 +50,7 @@ full list of fields follows here:
 
     run                              Run ID                                int
     subrun                           Subrun ID                             int
-    evt                            Event Number                          int
+    evt                              Event Number                          int
 
     # MCFlux.
     #
@@ -66,9 +66,6 @@ full list of fields follows here:
     MCFlux_NuMomY                    MCTruth::fMCNeutrino::fNu.Py(0)       double
     MCFlux_NuMomZ                    MCTruth::fMCNeutrino::fNu.Pz(0)       double
     MCFlux_NuMomE                    MCTruth::fMCNeutrino::fNu.E(0)        double
-    MCFlux_genx                      MCFlux::genx                          double
-    MCFlux_geny                      MCFlux::geny                          double
-    MCFlux_genz                      MCFlux::genz                          double
     MCFlux_ntype                     MCFlux::ntype                         int
     MCFlux_ptype                     MCFlux::ptype                         int
     MCFlux_nimpwt                    MCFlux::nimpwt                        double

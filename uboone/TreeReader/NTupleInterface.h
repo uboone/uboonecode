@@ -102,7 +102,6 @@ private:
   Long64_t fNEntries;
 
   // MCFlux
-  int MCFlux_evtno; //!< POT information
   double MCFlux_NuPosX;
   double MCFlux_NuPosY;
   double MCFlux_NuPosZ;
