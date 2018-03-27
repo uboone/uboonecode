@@ -36,7 +36,8 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 //#include "lardataobj/Simulation/SimChannel.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/BackTrackerService.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 #include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
 
 #include "McPfpMatch.h"
@@ -119,10 +120,11 @@ namespace ubana {
 
     if (_debug) { 
       std::cout << "[McPfpMatch] This is event " << e.id().event() << std::endl;
-      art::ServiceHandle<cheat::BackTracker> bt;
+      art::ServiceHandle<cheat::BackTrackerService> bt;
+      art::ServiceHandle<cheat::ParticleInventoryService> pi;
       std::cout << "[McPfpMatch] Number of MCParticles matched to hits: " << trueParticlesToHits.size() << std::endl;
       for (const auto & iter : trueParticlesToHits) {
-        const art::Ptr<simb::MCTruth> mc_truth = bt->TrackIDToMCTruth((iter.first)->TrackId());
+        const art::Ptr<simb::MCTruth> mc_truth = pi->TrackIdToMCTruth_P((iter.first)->TrackId());
         std::cout << "[McPfpMatch] MCParticle with pdg " << (iter.first)->PdgCode()
                   << " and origin " << (mc_truth->Origin() == 1 ? "neutrino" : "cosmic")  
                   << " has " << (iter.second).size() << " hits ass." << std::endl;

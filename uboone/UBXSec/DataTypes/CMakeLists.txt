@@ -11,7 +11,7 @@ art_make( BASENAME_ONLY
           LIBRARY_NAME     uboonecode_uboone_UBXSec_DataTypes
           LIB_LIBRARIES
                    uboonecode_uboone_BasicTool_GeoAlgo
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
                    uboone_RawData
                    lardataobj_RawData
@@ -30,16 +30,16 @@ art_make( BASENAME_ONLY
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                   art_Persistency_Common canvas_Persistency_Common
-                   art_Persistency_Provenance canvas_Persistency_Provenance
-                   art_Utilities canvas_Utilities
+                   art_Persistency_Common canvas
+                   art_Persistency_Provenance canvas
+                   art_Utilities canvas
                    ${ART_PERSISTENCY_COMMON}
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -49,7 +49,7 @@ art_make( BASENAME_ONLY
 		   larpandora_LArPandoraInterface
 
                    uboone_RawData
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase
@@ -70,7 +70,7 @@ art_make( BASENAME_ONLY
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}

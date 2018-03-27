@@ -30,7 +30,7 @@ set( hitfinder_tool_lib_list
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}
-                        ${CETLIB}
+                        cetlib cetlib_except
                         ${Boost_FILESYSTEM_LIBRARY}
                         ${Boost_SYSTEM_LIBRARY}      
                         ${CLHEP}
@@ -46,13 +46,13 @@ art_make( BASENAME_ONLY
                    uboone_UBFlashFinder
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
                    uboone_RawData
                    SignalShapingServiceMicroBooNE_service
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
-                   larsim_MCCheater_BackTracker_service
+                   larsim_MCCheater_BackTrackerService_service
                    larsim_Simulation
                    #Simulation
 		   #Utilities
@@ -76,16 +76,16 @@ art_make( BASENAME_ONLY
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                   art_Persistency_Common canvas_Persistency_Common
-                   art_Persistency_Provenance canvas_Persistency_Provenance
-                   art_Utilities canvas_Utilities
+                   art_Persistency_Common canvas
+                   art_Persistency_Provenance canvas
+                   art_Utilities canvas
                    ${ART_PERSISTENCY_COMMON}
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -97,7 +97,7 @@ art_make( BASENAME_ONLY
           MODULE_LIBRARIES
                    uboonecode_uboone_UBXSec_DataTypes
                    uboonecode_uboone_UBXSec_Algorithms
-                   larsim_MCCheater_BackTracker_service
+                   larsim_MCCheater_BackTrackerService_service
 		   larpandora_LArPandoraInterface
                    #                   larpandora_LArPandoraContent
 
@@ -110,7 +110,7 @@ art_make( BASENAME_ONLY
                    SignalShapingServiceMicroBooNE_service
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase
@@ -131,7 +131,7 @@ art_make( BASENAME_ONLY
 		   ${MF_MESSAGELOGGER}
 		   ${MF_UTILITIES}
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}

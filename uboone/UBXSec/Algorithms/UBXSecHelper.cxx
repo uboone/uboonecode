@@ -33,7 +33,7 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/BackTrackerService.h"
 
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
@@ -52,7 +52,7 @@
 //___________________________________________________________________________________________________
 void UBXSecHelper::GetTrackPurityAndEfficiency( lar_pandora::HitVector recoHits, double & trackPurity, double & trackEfficiency ) {
 
-  art::ServiceHandle<cheat::BackTracker> bt;
+  art::ServiceHandle<cheat::BackTrackerService> bt;
 
   // map from geant track id to true track deposited energy
   std::map<int,double> trkidToIDE;
@@ -60,7 +60,7 @@ void UBXSecHelper::GetTrackPurityAndEfficiency( lar_pandora::HitVector recoHits,
   for(size_t h = 0; h < recoHits.size(); h++){
 
     art::Ptr<recob::Hit> recoHit = recoHits[h];
-    std::vector<sim::TrackIDE> eveIDs = bt->HitToEveID(recoHit);
+    std::vector<sim::TrackIDE> eveIDs = bt->HitToEveTrackIDEs(recoHit);
 
     for(size_t e = 0; e < eveIDs.size(); ++e){
       //std::cout<<"[Hit "<< h<<"] hit plane: "<<recoHit->View()<<" "<<e<<" "<<eveIDs[e].trackID<<" "<<eveIDs[e].energy<<" "<<eveIDs[e].energyFrac<<"   pdg "<< (bt->TrackIDToParticle(eveIDs[e].trackID))->PdgCode()<<"   process "<<(bt->TrackIDToParticle(eveIDs[e].trackID))->Process()<<std::endl;
@@ -83,10 +83,10 @@ void UBXSecHelper::GetTrackPurityAndEfficiency( lar_pandora::HitVector recoHits,
     trackPurity = maxe/tote;
   }
 
-  std::vector<sim::IDE> vide(bt->TrackIDToSimIDE(trackid)); 
+  std::vector<const sim::IDE*> vide(bt->TrackIdToSimIDEs_Ps(trackid)); 
   double totalEnergyFromMainTrack = 0;
-  for (const sim::IDE& ide: vide) {
-    totalEnergyFromMainTrack += ide.energy;
+  for (const sim::IDE* pide: vide) {
+    totalEnergyFromMainTrack += pide->energy;
   }
 
   trackEfficiency = maxe/(totalEnergyFromMainTrack); //totalEnergyFromMainTrack includes both inductions and collection energies

@@ -655,14 +655,14 @@ void ACPTTagger::produce(art::Event & e)
       this->GetClosestDtDz(sorted_points[sorted_points.size()-1], _cathodeTime, trk_z_start, trk_z_end, _dt_d_cathode, _dz_d_cathode, false);
 
       auto const* SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
-      std::vector<double> sce_corr_c = SCE->GetPosOffsets(256.35,
+      geo::Vector_t sce_corr_c = SCE->GetPosOffsets(geo::Point_t(256.35,
                                        sorted_points[sorted_points.size()-1].Y(),
-                                       sorted_points[sorted_points.size()-1].Z());
-      if (_debug) std::cout << "[ACPTTagger] \t Eventual SCE X corretion at cathode: " << sce_corr_c.at(0) << std::endl;
-      std::vector<double> sce_corr_a = SCE->GetPosOffsets(0.,
+				       sorted_points[sorted_points.size()-1].Z()));
+      if (_debug) std::cout << "[ACPTTagger] \t Eventual SCE X corretion at cathode: " << sce_corr_c.X() << std::endl;
+      geo::Vector_t sce_corr_a = SCE->GetPosOffsets(geo::Point_t(0.,
                                        sorted_points[sorted_points.size()-1].Y(),
-                                       sorted_points[sorted_points.size()-1].Z());
-      if (_debug) std::cout << "[ACPTTagger] \t Eventual SCE X corretion at anode: " << sce_corr_a.at(0) << std::endl;
+				       sorted_points[sorted_points.size()-1].Z()));
+      if (_debug) std::cout << "[ACPTTagger] \t Eventual SCE X corretion at anode: " << sce_corr_a.X() << std::endl;
 
       bool sign = this->GetSign(sorted_points);
       

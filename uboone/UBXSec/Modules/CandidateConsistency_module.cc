@@ -92,9 +92,9 @@
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/PhotonLibHypothesis.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/CryostatGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 
 // Root include
@@ -544,9 +544,10 @@ void CandidateConsistency::produce(art::Event & e)
       std::vector<double> linearity_v = processed_cluster._linearity_v;
       bool linearity_failed = false;
       for (size_t l = 2; l < linearity_v.size()-2; l++) {
-        if (linearity_v.at(l) < _linearity_threshold)
+        if (linearity_v.at(l) < _linearity_threshold) {
           if(_debug) std::cout << "[CandidateConsistency] Linearity is below threshold: " << linearity_v.at(l) << std::endl;
           linearity_failed = true;
+	}
       }
 
       // If we have a shower, with low dqds, and whose hits

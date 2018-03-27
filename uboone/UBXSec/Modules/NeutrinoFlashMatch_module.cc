@@ -52,9 +52,9 @@
 
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/CryostatGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 
 #include "uboone/LLSelectionTool/OpT0Finder/Base/OpT0FinderTypes.h"

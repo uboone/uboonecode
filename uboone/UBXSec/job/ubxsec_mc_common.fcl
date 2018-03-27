@@ -29,7 +29,7 @@ services:
   message:                 @local::microboone_message_services_prod_debug
   FileCatalogMetadata:     @local::art_file_catalog_mc
   @table::microboone_simulation_services
-  #BackTracker:             @local::microboone_backtracker
+  #BackTrackerService:     @local::microboone_backtrackerservice
   SpaceCharge:             @local::microboone_spacecharge
 }
 

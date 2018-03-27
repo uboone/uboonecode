@@ -42,7 +42,7 @@
 #include "uboone/UBXSec/DataTypes/SelectionResult.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "larcore/Geometry/Geometry.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoTrajectory.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoAABox.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoVector.h"

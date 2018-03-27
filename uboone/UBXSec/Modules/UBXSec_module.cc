@@ -64,7 +64,7 @@
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/RawData/OpDetWaveform.h"
 #include "lardata/DetectorInfo/DetectorClocks.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 
 #include "uboone/UBXSec/DataTypes/UBXSecEvent.h"
 #include "uboone/UBXSec/DataTypes/SelectionResult.h"
@@ -1064,12 +1064,12 @@ void UBXSec::produce(art::Event & e) {
 
     // Space Charge correction
     auto const* SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
-    std::vector<double> sce_corr = SCE->GetPosOffsets(reco_nu_vtx[0],
-                                                      reco_nu_vtx[1],
-                                                      reco_nu_vtx[2]);
-    std::cout << "[UBXSec] \t SCE correction in x, y, z = " << sce_corr.at(0) 
-                                                    << ", " << sce_corr.at(1) 
-                                                    << ", " << sce_corr.at(2) << std::endl;
+    geo::Vector_t sce_corr = SCE->GetPosOffsets(geo::Point_t(reco_nu_vtx[0],
+							     reco_nu_vtx[1],
+							     reco_nu_vtx[2]));
+    std::cout << "[UBXSec] \t SCE correction in x, y, z = " << sce_corr.X() 
+	                                            << ", " << sce_corr.Y() 
+	                                            << ", " << sce_corr.Z() << std::endl;
     //reco_nu_vtx[0] += sce_corr.at(0);
     //reco_nu_vtx[1] -= sce_corr.at(1);
     //reco_nu_vtx[2] -= sce_corr.at(2);
@@ -2027,12 +2027,12 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
     std::cout << "\tVz       " << mclist[iList]->GetNeutrino().Nu().Vz() << std::endl;
 
     auto const* SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
-    std::vector<double> sce_corr = SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
-                                                      mclist[iList]->GetNeutrino().Nu().Vy(),
-                                                      mclist[iList]->GetNeutrino().Nu().Vz());
-    std::cout << "\t\t SCE correction in x, y, z = " << sce_corr.at(0) 
-                                                     << ", " << sce_corr.at(1) 
-                                                     << ", " << sce_corr.at(2) << std::endl;
+    geo::Vector_t sce_corr = SCE->GetPosOffsets(geo::Point_t(mclist[iList]->GetNeutrino().Nu().Vx(),
+							     mclist[iList]->GetNeutrino().Nu().Vy(),
+							     mclist[iList]->GetNeutrino().Nu().Vz()));
+    std::cout << "\t\t SCE correction in x, y, z = " << sce_corr.X()
+	                                     << ", " << sce_corr.Y()
+	                                     << ", " << sce_corr.Z() << std::endl;
   } else
     std::cout << "\t---No Neutrino information---" << std::endl;
 
