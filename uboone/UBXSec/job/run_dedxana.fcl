@@ -31,6 +31,7 @@ services:
   FileCatalogMetadata:     @local::art_file_catalog_mc
   @table::microboone_simulation_services
   BackTrackerService:      @local::microboone_backtrackerservice
+  ParticleInventoryService: @local::standard_particleinventoryservice
 }
 
 services.DetectorPropertiesService.NumberTimeSamples:        6400
