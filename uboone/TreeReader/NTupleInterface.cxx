@@ -11,7 +11,7 @@
 
 namespace uboone {
 
-NTupleInterface::NTupleInterface() {}
+NTupleInterface::NTupleInterface() : fVerbose(false), fDLMode(false) {}
 
 
 NTupleInterface::~NTupleInterface() {}
@@ -21,6 +21,10 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   std::cout << "[NTUPLEINTERFACE] TREE NAME: " << treeName << std::endl;
 
   fTree = dynamic_cast<TTree*>(inputFile->Get(treeName));
+  if (!fTree) {
+    throw cet::exception(__PRETTY_FUNCTION__)
+      << "Unable to load input TTree " << treeName << "." << std::endl;
+  }
 
   std::cout << "[NTUPLEINTERFACE] Tree retrieved. Setting branch addresses." << std::endl;
 
@@ -83,7 +87,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
 
   // GTruth
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_ProbePDG").c_str()                 , &GTruth_ProbePDG);
-  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsSeaQuark").c_str()               , &GTruth_IsSeaQuark);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_tgtPDG").c_str()                   , &GTruth_tgtPDG);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_weight").c_str()                   , &GTruth_weight);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_probability").c_str()              , &GTruth_probability);
@@ -101,7 +104,6 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumPiMinus").c_str()               , &GTruth_NumPiMinus);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumProton").c_str()                , &GTruth_NumProton);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_NumNeutron").c_str()               , &GTruth_NumNeutron);
-  fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsCharm").c_str()                  , &GTruth_IsCharm);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gX").c_str()                       , &GTruth_gX);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gY").c_str()                       , &GTruth_gY);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_gT").c_str()                       , &GTruth_gT);
@@ -120,6 +122,16 @@ void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::Par
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4y").c_str()             , &GTruth_FShadSystP4y);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4z").c_str()             , &GTruth_FShadSystP4z);
   fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_FShadSystP4E").c_str()             , &GTruth_FShadSystP4E);
+
+  // DL tree branches are ints
+  if (fDLMode) {
+    fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsSeaQuark").c_str(), &GTruth_IsSeaQuark_int);
+    fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsCharm").c_str()   , &GTruth_IsCharm_int);
+  }
+  else {
+    fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsSeaQuark").c_str(), &GTruth_IsSeaQuark);
+    fTree->SetBranchAddress(branchDef.get<std::string>("GTruth_IsCharm").c_str()   , &GTruth_IsCharm);
+  }
 
   fNEntries = fTree->GetEntries();
   assert(fNEntries > 0);
@@ -157,6 +169,12 @@ bool NTupleInterface::FillMCFlux(Long64_t ientry, simb::MCFlux& flux) {
   flux.fvy        = MCFlux_vy;
   flux.fvz        = MCFlux_vz;
   flux.ftptype    = MCFlux_tptype;
+
+  if (fVerbose) {
+    std::cout << "== MCFlux =============================" << std::endl;
+    std::cout << flux << std::endl;
+    std::cout << "=======================================" << std::endl;
+  }
 
   return true;
 }
@@ -232,6 +250,12 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
                       MCTruth_neutrino_Y,
                       MCTruth_neutrino_QSqr);
 
+  if (fVerbose) {
+    std::cout << "== MCTruth ============================" << std::endl;
+    std::cout << mctruth << std::endl;
+    std::cout << "=======================================" << std::endl;
+  }
+
   return true;
 }  
 
@@ -241,8 +265,6 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
     return false;
   }
 
-  gtruth.fProbePDG = GTruth_ProbePDG;
-  gtruth.fIsSeaQuark = GTruth_IsSeaQuark;
   gtruth.ftgtPDG = GTruth_tgtPDG;
   gtruth.fweight = GTruth_weight;
   gtruth.fprobability = GTruth_probability;
@@ -261,7 +283,6 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
   gtruth.fNumPiMinus = GTruth_NumPiMinus;
   gtruth.fNumProton = GTruth_NumProton;
   gtruth.fNumNeutron = GTruth_NumNeutron;
-  gtruth.fIsCharm = GTruth_IsCharm;
   gtruth.fgX = GTruth_gX;
   gtruth.fgY = GTruth_gY;
   gtruth.fgT = GTruth_gT;
@@ -283,6 +304,52 @@ bool NTupleInterface::FillGTruth(Long64_t ientry, simb::GTruth& gtruth) {
     GTruth_FShadSystP4y,
     GTruth_FShadSystP4z,
     GTruth_FShadSystP4E);
+
+  if (fDLMode) {
+    gtruth.fProbePDG = MCFlux_ntype;  // Grab nu PDG from MCFlux
+    gtruth.fIsSeaQuark = GTruth_IsSeaQuark_int;
+    gtruth.fIsCharm = GTruth_IsCharm_int;
+  }
+  else {
+    gtruth.fProbePDG = GTruth_ProbePDG;
+    gtruth.fIsSeaQuark = GTruth_IsSeaQuark;
+    gtruth.fIsCharm = GTruth_IsCharm;
+  }
+
+  if (fVerbose) {
+    std::cout << "== GTruth =============================" << std::endl;
+    std::cout << "gtruth.fProbePDG   :" << gtruth.fProbePDG    << std::endl;
+    std::cout << "gtruth.fIsSeaQuark :" << gtruth.fIsSeaQuark  << std::endl;
+    std::cout << "gtruth.ftgtPDG     :" << gtruth.ftgtPDG      << std::endl;
+    std::cout << "gtruth.fweight     :" << gtruth.fweight      << std::endl;
+    std::cout << "gtruth.fprobability:" << gtruth.fprobability << std::endl;
+    std::cout << "gtruth.fXsec       :" << gtruth.fXsec        << std::endl;
+    std::cout << "gtruth.fDiffXsec   :" << gtruth.fDiffXsec    << std::endl;
+    std::cout << "gtruth.fVertex     :";
+    gtruth.fVertex.Print();
+    std::cout << "gtruth.fGscatter   :" << gtruth.fGscatter    << std::endl;
+    std::cout << "gtruth.fGint       :" << gtruth.fGint        << std::endl;
+    std::cout << "gtruth.fResNum     :" << gtruth.fResNum      << std::endl;
+    std::cout << "gtruth.fNumPiPlus  :" << gtruth.fNumPiPlus   << std::endl;
+    std::cout << "gtruth.fNumPi0     :" << gtruth.fNumPi0      << std::endl;
+    std::cout << "gtruth.fNumPiMinus :" << gtruth.fNumPiMinus  << std::endl;
+    std::cout << "gtruth.fNumProton  :" << gtruth.fNumProton   << std::endl;
+    std::cout << "gtruth.fNumNeutron :" << gtruth.fNumNeutron  << std::endl;
+    std::cout << "gtruth.fIsCharm    :" << gtruth.fIsCharm     << std::endl;
+    std::cout << "gtruth.fgX         :" << gtruth.fgX          << std::endl;
+    std::cout << "gtruth.fgY         :" << gtruth.fgY          << std::endl;
+    std::cout << "gtruth.fgT         :" << gtruth.fgT          << std::endl;
+    std::cout << "gtruth.fgW         :" << gtruth.fgW          << std::endl;
+    std::cout << "gtruth.fgQ2        :" << gtruth.fgQ2         << std::endl;
+    std::cout << "gtruth.fgq2        :" << gtruth.fgq2         << std::endl;
+    std::cout << "gtruth.fProbeP4    :";
+    gtruth.fProbeP4.Print();
+    std::cout << "gtruth.fHitNucP4   :";
+    gtruth.fHitNucP4.Print();
+    std::cout << "gtruth.fFShadSystP4:";
+    gtruth.fFShadSystP4.Print();
+    std::cout << "=======================================" << std::endl;
+  }
 
   return true;
 }

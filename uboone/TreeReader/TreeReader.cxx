@@ -43,6 +43,8 @@ TreeReader::TreeReader(fhicl::ParameterSet const& ps,
   fMaxEvents = ps.get<int>("maxEvents", -1);
   fInputType = ps.get<std::string>("inputType");
   fDataProductName = ps.get<std::string>("dataProductName", "TreeReader");
+  fVerbose = ps.get<bool>("verbose", false);
+  fDLMode = ps.get<bool>("dlMode", false);
 
   // Define which data products this module produces
   if (fInputType == "gsimple") {
@@ -93,6 +95,8 @@ void TreeReader::readFile(std::string const &name, art::FileBlock* &fb) {
   } 
   else if (fInputType == "ntuple") {
     NTupleInterface* iface = new NTupleInterface();
+    iface->SetVerbose(fVerbose);
+    iface->SetDLMode(fDLMode);
     iface->SetRootFile(fInputFile, fTreeName, fBranchDef);
     fInterface = iface;
   }

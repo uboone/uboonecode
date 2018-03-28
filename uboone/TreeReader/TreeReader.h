@@ -43,6 +43,8 @@ private:
   art::SourceHelper   fSourceHelper;
   art::SubRunID       fCurrentSubRunID;
 
+  bool                fVerbose;
+  bool                fDLMode;
   uint32_t            fEventCounter; 
   uint32_t            fEntry;
   int                 fMaxEvents;  //fhicl parameter.  Maximum number of events.

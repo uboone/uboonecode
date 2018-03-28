@@ -46,6 +46,12 @@ public:
   /** Get the neutrino momentum for the current entry. */
   const TLorentzVector GetNuMomentum() { return fNuMom; }
 
+  /** Enable DL tree mode. */
+  void SetDLMode(bool mode) { fDLMode = mode; }
+
+  /** Enable verbose output. */
+  void SetVerbose(bool verbose) { fVerbose = verbose; }
+
   /**
    * Set up the input ROOT file.
    *
@@ -94,6 +100,8 @@ private:
   TTree* fTree;  //!< Input TTree
   int fRun;
   double fPOT;
+  bool fVerbose;
+  bool fDLMode;  //!< Enable DL tree mode
 
   // Metadata
   int run;
@@ -160,6 +168,7 @@ private:
   // GTruth
   int GTruth_ProbePDG;
   bool GTruth_IsSeaQuark;
+  int GTruth_IsSeaQuark_int;
   int GTruth_tgtPDG;
   double GTruth_weight;
   double GTruth_probability;
@@ -178,6 +187,7 @@ private:
   int GTruth_NumProton;
   int GTruth_NumNeutron;
   bool GTruth_IsCharm;
+  int GTruth_IsCharm_int;
   double GTruth_gX;
   double GTruth_gY;
   double GTruth_gZ;
