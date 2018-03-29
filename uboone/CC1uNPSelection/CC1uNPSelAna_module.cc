@@ -1357,6 +1357,15 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_mupinFV->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_mupinFV->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
+    
+    fMC_mupinFV->Branch("trackcand_parPDG", &trackcand_parPDG, "trackcand_parPDG/I");
+    fMC_mupinFV->Branch("trackpcand_parPDG", &trackpcand_parPDG, "trackpcand_parPDG/I");
+    fMC_mupinFV->Branch("protoncandidate_momentum","std::vector<double>",&trackmompcand);
+    fMC_mupinFV->Branch("protoncandidate_length","std::vector<double>",&tracklengthpcand);
+    fMC_mupinFV->Branch("protoncandidate_theta","std::vector<double>",&trackthetapcand);
+    fMC_mupinFV->Branch("protoncandidate_phi","std::vector<double>",&trackphipcand);
+    fMC_mupinFV->Branch("protoncandidate_trunmeandqdx","std::vector<double>",&tracktrunmeanpcand);
+    fMC_mupinFV->Branch("protoncandidate_pida", "std::vector<double>", &trackpidapcand);
 
 
     //=================================================================
