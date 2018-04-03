@@ -118,10 +118,10 @@ namespace lee {
 
 
   /********************************		Track Energy     ****************************************/
-  double EnergyHelper::trackEnergy(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer) {
+  double EnergyHelper::trackEnergy(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer, std::string _calo_producer) {
     auto const &track_handle = evt.getValidHandle<std::vector<recob::Track>>(_pfp_producer);
 		
-    art::FindManyP<anab::Calorimetry> calo_track_ass(track_handle, evt, "pandoraNucalo");
+    art::FindManyP<anab::Calorimetry> calo_track_ass(track_handle, evt, _calo_producer);
 
     const std::vector<art::Ptr<anab::Calorimetry>> calos = calo_track_ass.at(track->ID());
 
@@ -190,12 +190,12 @@ namespace lee {
 
 
   /********************************		Track dEdx	     ****************************************/
-  std::pair<std::vector<double>,std::vector<double>> EnergyHelper::trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer) {
+  std::pair<std::vector<double>,std::vector<double>> EnergyHelper::trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer, std::string _calo_producer) {
 		
     auto const &track_handle = evt.getValidHandle<std::vector<recob::Track>>(_pfp_producer);
 	
     //This is pointers to all the calo-track associations	
-    art::FindManyP<anab::Calorimetry> calo_track_ass(track_handle, evt, "pandoraNucalo");
+    art::FindManyP<anab::Calorimetry> calo_track_ass(track_handle, evt, _calo_producer);
 
     //We dont care about all the associations, only the one with this particular track
     //This is a vector of art::Ptr's anab::Calorimetry
@@ -441,7 +441,7 @@ namespace lee {
   }
 
   void EnergyHelper::measureEnergy(size_t ipf, const art::Event &evt,
-				   double &energy, std::string _pfp_producer) {
+				   double &energy, std::string _pfp_producer,std::string _calo_producer) {
 
     try {
 
@@ -474,8 +474,8 @@ namespace lee {
 	std::vector<art::Ptr<recob::Track>> tracks = tracks_per_pfparticle.at(ipf);
 
 	for (size_t itr = 0; itr < tracks.size(); itr++) {
-	  if (trackEnergy(tracks[itr], evt) > 0) {
-	    energy += trackEnergy(tracks[itr], evt);
+	  if (trackEnergy(tracks[itr], evt, _pfp_producer, _calo_producer) > 0) {
+	    energy += trackEnergy(tracks[itr], evt, _pfp_producer, _calo_producer);
 	  }
 	}
 
@@ -485,7 +485,7 @@ namespace lee {
 		  << "TRACK NOT AVAILABLE " << std::endl;
       }
       for (auto const &pfdaughter : pfparticles[ipf].Daughters()) {
-	measureEnergy(pfdaughter, evt, energy, _pfp_producer);
+	measureEnergy(pfdaughter, evt, energy, _pfp_producer, _calo_producer);
       }
 
     } catch (...) {

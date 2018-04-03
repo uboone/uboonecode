@@ -44,6 +44,7 @@ class FillTreeVariables {
 
   std::string fmcordata;  
   std::string ftrack_producer;
+  std::string ftrack_calo_producer;
   std::string fswtrigger_product;
   std::string fshower_producer;
   std::string fhit_producer;
@@ -347,6 +348,7 @@ public:
   void SetVerbose(bool const verbose = true) {fverbose = verbose;}
   void SetProducers(std::string const & mcordata,
 		    std::string const & track_producer,
+		    std::string const & track_calo_producer,
 		    std::string const & shower_producer,
 		    std::string const & hit_producer,
 		    std::string const & opflash_producer,

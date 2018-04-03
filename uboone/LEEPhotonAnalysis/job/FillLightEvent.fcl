@@ -42,6 +42,7 @@ physics:
 
       hit_producers: ["pandoraCosmicHitRemoval", "gaushit"]
       track_producers: ["pandoraNu", "pandoraCosmic"]
+      track_calo_producer: "pandoraNucalo"
       shower_producers: ["pandoraNu", "pandoraCosmic"]
 
       rmcmassociation_producers: ["crHitRemovalTruthMatch", "gaushitTruthMatch"]

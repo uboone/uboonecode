@@ -39,6 +39,7 @@ FillTreeVariables::FillTreeVariables() :
 
 void FillTreeVariables::SetProducers(std::string const & mcordata,
 				     std::string const & track_producer,
+				     std::string const & track_calo_producer,
 				     std::string const & shower_producer,
 				     std::string const & hit_producer,
 				     std::string const & opflash_producer,
@@ -48,6 +49,7 @@ void FillTreeVariables::SetProducers(std::string const & mcordata,
 
   fmcordata = mcordata;
   ftrack_producer = track_producer;
+  ftrack_calo_producer = track_calo_producer;
   fshower_producer = shower_producer;
   fhit_producer = hit_producer;
   frmcmassociation_producer = rmcmassociation_producer;
@@ -1458,7 +1460,7 @@ std::pair<std::vector<double>,std::vector<double>> FillTreeVariables::GetTrackCa
 
   if(fverbose) std::cout << "GetTrackCaloInfo || about to return energyHelper. \n";
 
-  return energyHelper.trackdEdx(*track_ptr, e, ftrack_producer);
+  return energyHelper.trackdEdx(*track_ptr, e, ftrack_producer, ftrack_calo_producer);
 
 }
 
@@ -1489,7 +1491,7 @@ double FillTreeVariables::GetTrackHelperEnergy(art::Event const & e,
     return -1;
   }
 
-  return energyHelper.trackEnergy(*track_ptr, e, ftrack_producer);
+  return energyHelper.trackEnergy(*track_ptr, e, ftrack_producer,ftrack_calo_producer);
 
 }
 

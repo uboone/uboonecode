@@ -3,4 +3,4 @@
 physics.analyzers.FillLightEvent.mc: "false"
 physics.analyzers.FillLightEvent.pot_producer: "beamdata"
 physics.analyzers.FillLightEvent.trigger_product: "daq"
-
+physics.analyzers.FillLightEvent.track_calo_producer: "pandoraNucali"

@@ -85,6 +85,7 @@ public:
   void FillRecoHitVectors(art::Event const & e, int const producer_index, size_t const hit_index_offset);
   std::pair<std::vector<double>,std::vector<double>> GetTrackCaloInfo(art::Event const & e,
 								      std::string const & track_producer,
+								      std::string const & track_calo_producer,
 								      size_t const track_index,
 								      double & energy);
   void FillRecoTrackVectors(art::Event const & e);
@@ -127,6 +128,7 @@ private:
   std::vector<int> fhit_producer_indices;
   size_t fhitp_size;
   std::vector<std::string> ftrack_producers;
+  std::string ftrack_calo_producer;
   std::vector<int> ftrack_producer_indices;
   size_t ftrackp_size;
   std::vector<std::string> fshower_producers;
@@ -587,6 +589,7 @@ void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
 
   fhit_producers = p.get<std::vector<std::string>>("hit_producers");
   ftrack_producers = p.get<std::vector<std::string>>("track_producers");
+  ftrack_calo_producer = p.get<std::string>("track_calo_producer");
   fshower_producers = p.get<std::vector<std::string>>("shower_producers");
 
   p.get_if_present<std::vector<std::string>>("rmcmassociation_producers", frmcmassociation_producers);
@@ -1892,6 +1895,7 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e) {
 
 std::pair<std::vector<double>,std::vector<double>> FillLightEvent::GetTrackCaloInfo(art::Event const & e,
 										    std::string const & track_producer,
+										    std::string const & track_calo_producer,
 										    size_t const track_index,
 										    double & energy) {
 
@@ -1918,9 +1922,9 @@ std::pair<std::vector<double>,std::vector<double>> FillLightEvent::GetTrackCaloI
     return fail;
   }
 
-  energy = energyHelper.trackEnergy(*track_ptr, e, track_producer);
+  energy = energyHelper.trackEnergy(*track_ptr, e, track_producer, track_calo_producer);
 
-  return energyHelper.trackdEdx(*track_ptr, e, track_producer);
+  return energyHelper.trackdEdx(*track_ptr, e, track_producer, track_calo_producer);
 
 }
 
@@ -2004,7 +2008,7 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
     }
 
     double track_energy = -1;
-    std::pair<std::vector<double>, std::vector<double>> const calo_pair = GetTrackCaloInfo(e, track_producer, i, track_energy);
+    std::pair<std::vector<double>, std::vector<double>> const calo_pair = GetTrackCaloInfo(e, track_producer, ftrack_calo_producer, i, track_energy);
     freco_track_EnergyHelper_resrange.push_back(calo_pair.first);
     freco_track_EnergyHelper_dedx.push_back(calo_pair.second);
     freco_track_EnergyHelper_energy.push_back(track_energy);

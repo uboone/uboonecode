@@ -39,10 +39,10 @@ public:
    * @return     Energy in units of [ TODO: units? ]
    */
   double trackEnergy(const art::Ptr<recob::Track> &track, const art::Event &evt,
-                     std::string _pfp_producer = "pandoraNu");
+                     std::string _pfp_producer = "pandoraNu", std::string _calo_producer="pandoraNucalo");
 
 
-  std::pair<std::vector<double>,std::vector<double>> trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer = "pandoranu");
+  std::pair<std::vector<double>,std::vector<double>> trackdEdx(const art::Ptr<recob::Track> &track, const art::Event &evt, std::string _pfp_producer = "pandoranu", std::string _calo_producer = "pandoraNucalo");
 
 
 
@@ -72,7 +72,7 @@ public:
 
 
   void measureEnergy(size_t ipf, const art::Event &evt, double &energy,
-                     std::string _pfp_producer = "pandoraNu");
+                     std::string _pfp_producer = "pandoraNu",std::string _calo_producer="pandoraNucalo");
 
   void dQdx(size_t pfp_id, const art::Event &evt,
             std::vector<double> &dqdx,

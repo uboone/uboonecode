@@ -75,6 +75,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
   std::string fpot_producer;
   std::string fpfp_producer;
   std::string ftrack_producer;
+  std::string ftrack_calo_producer;
   std::string fshower_producer;
   std::string fhit_producer;
   std::string frmcmassociation_producer;
@@ -160,6 +161,7 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
   }
   p.get_if_present<std::string>("pfp_producer", fpfp_producer);
   ftrack_producer = p.get<std::string>("track_producer");
+  ftrack_calo_producer = p.get<std::string>("track_calo_producer");
   fshower_producer = p.get<std::string>("shower_producer");
   p.get_if_present<std::string>("hit_producer", fhit_producer);
   p.get_if_present<std::string>("rmcmassociation_producer", frmcmassociation_producer);
@@ -174,6 +176,7 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
 
   fftv.SetProducers(fmcordata,
 		    ftrack_producer,
+		    ftrack_calo_producer,
 		    fshower_producer,
 		    fhit_producer,
 		    fopflash_producer,
