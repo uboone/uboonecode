@@ -180,7 +180,9 @@ namespace evwgh {
       reweightVector[weight_point] = new rwgt::NuReweight;
       
       for (unsigned int i_reweightingKnob=0;i_reweightingKnob<erwgh.size();i_reweightingKnob++) {
-	std::cout<<GetName()<<"::Setting up rwgh "<<weight_point<<"\t"<<i_reweightingKnob<<"\t"<<erwgh[i_reweightingKnob]<<std::endl; 
+	std::cout << GetName() << "::Setting up rwgh. Universe: " << weight_point 
+                               << " \t ReweightingKnob: " << i_reweightingKnob 
+                               << " \t ReweightingParameter: " << erwgh[i_reweightingKnob] << std::endl; 
 
 	switch (erwgh[i_reweightingKnob]){
 

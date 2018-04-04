@@ -25,7 +25,7 @@ source:
   module_type: RootInput
   maxEvents:  10        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*", "drop sumdata::RunData_*_*_*"]
 
 }
 
@@ -71,7 +71,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "%ifb_%tc_detsim.root"
+   fileName:    "%ifb_%tc_detsim_CV.root"
    dataTier:    "detector-simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1

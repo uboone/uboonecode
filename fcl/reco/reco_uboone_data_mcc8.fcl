@@ -32,6 +32,7 @@
 #include "microboone_dqmtpcbursts.fcl"
 #include "microboone_dqmgoodruns.fcl"
 #include "mcsfitproducer.fcl"
+#include "calibration_microboone.fcl"
 
 BEGIN_PROLOG
 
@@ -159,18 +160,26 @@ microboone_reco_data_producers:
   pandoraNutag:                   @local::microboone_cosmictracktagger
   pandoraNucalo:                  @local::microboone_calodata
   pandoraNupid:                   @local::microboone_chi2pid
+  pandoraNucali:                  @local::microboone_calibrationdedx
+  pandoraNucalipid:               @local::microboone_chi2pid
   pandoraNuKHittag:               @local::microboone_cosmictracktagger
   pandoraNuKHitcalo:              @local::microboone_calodata
   pandoraNuKHitpid:               @local::microboone_chi2pid
+  pandoraNuKHitcali:              @local::microboone_calibrationdedx
+  pandoraNuKHitcalipid:           @local::microboone_chi2pid
   pandoraNuKalmanTracktag:        @local::microboone_cosmictracktagger
   pandoraNuKalmanTrackcalo:       @local::microboone_calodata
   pandoraNuKalmanTrackpid:        @local::microboone_chi2pid
+  pandoraNuKalmanTrackcali:       @local::microboone_calibrationdedx
+  pandoraNuKalmanTrackcalipid:    @local::microboone_chi2pid
   pandoraNuKalmanShowertag:       @local::microboone_cosmictracktagger
   pandoraNuKalmanShowercalo:      @local::microboone_calodata
   pandoraNuKalmanShowerpid:       @local::microboone_chi2pid
   pandoraNuPMAtag:                @local::microboone_cosmictracktagger
   pandoraNuPMAcalo:               @local::microboone_calodata
   pandoraNuPMApid:                @local::microboone_chi2pid
+  pandoraNuPMAcali:               @local::microboone_calibrationdedx
+  pandoraNuPMAcalipid:            @local::microboone_chi2pid
   pandoraNuKHitFlashMatch:        @local::microboone_beamflashtrackmatchtagger
   pandoraNuKalmanTrackFlashMatch: @local::microboone_beamflashtrackmatchtagger
   pandoraNuKalmanShowerFlashMatch: @local::microboone_beamflashtrackmatchtagger
@@ -215,6 +224,8 @@ microboone_reco_data_producers:
   pmtracktag:                     @local::microboone_cosmictracktagger
   pmtrackcalo:                    @local::microboone_calodata
   pmtrackpid:                     @local::microboone_chi2pid
+  pmtrackcali:                    @local::microboone_calibrationdedx
+  pmtrackcalipid:                 @local::microboone_chi2pid
 
   ### Containment taggers
   pandoraCosmicContTag:           @local::microboone_containment_tag
@@ -346,7 +357,9 @@ microboone_reco_data_cctracks: [         #trackkalmanhitcc,
                                          pmtrackT0RecoLoose,
                                          pmtrackT0RecoBeam,
                                          pmtrackcalo,
-                                         pmtrackpid]
+                                         pmtrackpid,
+					 pmtrackcali,
+                                         pmtrackcalipid]
 
 microboone_reco_data_ccpath: [           @sequence::microboone_reco_data_clustercrawler,
                                          @sequence::microboone_reco_data_cctracks ]
@@ -388,12 +401,18 @@ microboone_reco_data_pandoraNu: [        pandoraNu,
 					 pandoraNuMCSMu,
                                          pandoraNucalo,
                                          pandoraNupid,
+					 pandoraNucali,
+                                         pandoraNucalipid,
                                          pandoraNuKHittag,
                                          pandoraNuKHitcalo,
                                          pandoraNuKHitpid,
+					 pandoraNuKHitcali,
+                                         pandoraNuKHitcalipid,
                                          pandoraNuKalmanTracktag,
                                          pandoraNuKalmanTrackcalo,
                                          pandoraNuKalmanTrackpid,
+					 pandoraNuKalmanTrackcali,
+                                         pandoraNuKalmanTrackcalipid,
                                          pandoraNuKalmanShowertag,
                                          pandoraNuKalmanShowercalo,
                                          pandoraNuKalmanShowerpid,
@@ -401,6 +420,8 @@ microboone_reco_data_pandoraNu: [        pandoraNu,
                                          pandoraNuPMAContTag,
                                          pandoraNuPMAcalo,
                                          pandoraNuPMApid,
+					 pandoraNuPMAcali,
+                                         pandoraNuPMAcalipid,
                                          pandoraNuKHitFlashMatch,
                                          pandoraNuKalmanTrackFlashMatch,
                                          pandoraNuKalmanShowerFlashMatch,
@@ -643,6 +664,13 @@ microboone_reco_data_producers.pandoraNucalo.SpacePointModuleLabel:             
 microboone_reco_data_producers.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo"
 microboone_reco_data_producers.pandoraNupid.TrackModuleLabel:                    "pandoraNu"
 
+microboone_reco_data_producers.pandoraNucali.TrackModuleLabel:                   "pandoraNu"
+microboone_reco_data_producers.pandoraNucali.CalorimetryModuleLabel:             "pandoraNucalo"
+
+microboone_reco_data_producers.pandoraNucalipid.TrackModuleLabel:                "pandoraNu"
+microboone_reco_data_producers.pandoraNucalipid.CalorimetryModuleLabel:          "pandoraNucali"
+microboone_reco_data_producers.pandoraNucalipid.Chi2PIDAlg.UseMedian:            true
+
 microboone_reco_data_producers.pandoraNuKHittag.TrackModuleLabel:                "pandoraNuKHit"
 
 microboone_reco_data_producers.pandoraNuKHitcalo.TrackModuleLabel:               "pandoraNuKHit"
@@ -651,6 +679,13 @@ microboone_reco_data_producers.pandoraNuKHitcalo.SpacePointModuleLabel:         
 microboone_reco_data_producers.pandoraNuKHitpid.CalorimetryModuleLabel:          "pandoraNuKHitcalo"
 microboone_reco_data_producers.pandoraNuKHitpid.TrackModuleLabel:                "pandoraNuKHit"
 
+microboone_reco_data_producers.pandoraNuKHitcali.TrackModuleLabel:               "pandoraNuKHit"
+microboone_reco_data_producers.pandoraNuKHitcali.CalorimetryModuleLabel:         "pandoraNuKHitcalo"
+
+microboone_reco_data_producers.pandoraNuKHitcalipid.TrackModuleLabel:            "pandoraNuKHit"
+microboone_reco_data_producers.pandoraNuKHitcalipid.CalorimetryModuleLabel:      "pandoraNuKHitcali"
+microboone_reco_data_producers.pandoraNuKHitcalipid.Chi2PIDAlg.UseMedian:        true
+
 microboone_reco_data_producers.pandoraNuKalmanTracktag.TrackModuleLabel:         "pandoraNuKalmanTrack"
 
 microboone_reco_data_producers.pandoraNuKalmanTrackcalo.TrackModuleLabel:        "pandoraNuKalmanTrack"
@@ -658,6 +693,13 @@ microboone_reco_data_producers.pandoraNuKalmanTrackcalo.SpacePointModuleLabel:  
 
 microboone_reco_data_producers.pandoraNuKalmanTrackpid.CalorimetryModuleLabel:   "pandoraNuKalmanTrackcalo"
 microboone_reco_data_producers.pandoraNuKalmanTrackpid.TrackModuleLabel:         "pandoraNuKalmanTrack"
+
+microboone_reco_data_producers.pandoraNuKalmanTrackcali.TrackModuleLabel:        "pandoraNuKalmanTrack"
+microboone_reco_data_producers.pandoraNuKalmanTrackcali.CalorimetryModuleLabel:  "pandoraNuKalmanTrackcalo"
+
+microboone_reco_data_producers.pandoraNuKalmanTrackcalipid.TrackModuleLabel:     "pandoraNuKalmanTrack"
+microboone_reco_data_producers.pandoraNuKalmanTrackcalipid.CalorimetryModuleLabel:"pandoraNuKalmanTrackcali"
+microboone_reco_data_producers.pandoraNuKalmanTrackcalipid.Chi2PIDAlg.UseMedian:            true
 
 microboone_reco_data_producers.pandoraNuKalmanShowertag.TrackModuleLabel:        "pandoraNuKalmanShower"
 
@@ -674,6 +716,13 @@ microboone_reco_data_producers.pandoraNuPMAcalo.SpacePointModuleLabel:          
 
 microboone_reco_data_producers.pandoraNuPMApid.CalorimetryModuleLabel:           "pandoraNuPMAcalo"
 microboone_reco_data_producers.pandoraNuPMApid.TrackModuleLabel:                 "pandoraNuPMA"
+
+microboone_reco_data_producers.pandoraNuPMAcali.TrackModuleLabel:                "pandoraNuPMA"
+microboone_reco_data_producers.pandoraNuPMAcali.CalorimetryModuleLabel:          "pandoraNuPMAcalo"
+
+microboone_reco_data_producers.pandoraNuPMAcalipid.TrackModuleLabel:             "pandoraNuPMA"
+microboone_reco_data_producers.pandoraNuPMAcalipid.CalorimetryModuleLabel:       "pandoraNuPMAcali"
+microboone_reco_data_producers.pandoraNuPMAcalipid.Chi2PIDAlg.UseMedian:            true
 
 microboone_reco_data_producers.pandoraNuKHitFlashMatch.TrackModuleLabel:         "pandoraNuKHit"
 microboone_reco_data_producers.pandoraNuKHitFlashMatch.FlashModuleLabel:         "simpleFlashBeam"
@@ -699,6 +748,11 @@ microboone_reco_data_producers.pmtrackcalo.TrackModuleLabel:                    
 microboone_reco_data_producers.pmtrackcalo.SpacePointModuleLabel:                "pmtrack"
 microboone_reco_data_producers.pmtrackpid.CalorimetryModuleLabel:                "pmtrackcalo"
 microboone_reco_data_producers.pmtrackpid.TrackModuleLabel:                      "pmtrack"
+microboone_reco_data_producers.pmtrackcali.TrackModuleLabel:                     "pmtrack"
+microboone_reco_data_producers.pmtrackcali.CalorimetryModuleLabel:               "pmtrackcalo"
+microboone_reco_data_producers.pmtrackcalipid.TrackModuleLabel:                  "pmtrack"
+microboone_reco_data_producers.pmtrackcalipid.CalorimetryModuleLabel:            "pmtrackcali"
+microboone_reco_data_producers.pmtrackcalipid.Chi2PIDAlg.UseMedian:            true
 
 #microboone_reco_data_producers.trackkalmanhitContTag.TrackModuleLabels:          ["trackkalmanhit"]
 #microboone_reco_data_producers.trackkalmanhitContTag.ApplyTags:                  [true]

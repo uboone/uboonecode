@@ -9,6 +9,7 @@
 
 // ART includes
 #include "canvas/Persistency/Common/FindManyP.h"
+#include "canvas/Persistency/Common/FindMany.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Principal/Event.h"
@@ -31,6 +32,8 @@
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
+#include "uboone/EventWeight/MCEventWeight.h"
+
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardataobj/RawData/RawDigit.h"
@@ -69,6 +72,8 @@
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+//// New Data Product
+#include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
 
 #include "DataFormat/simphotons.h"
 #include "DataFormat/chstatus.h"
@@ -126,7 +131,7 @@ private:
   
   /// Templated association scanner
   template<class T> void ScanAssociation(const art::Event& evt, const size_t name_index);
-
+ 
   void FillChStatus(const art::Event& e, const std::string& name);
 
   /// storage_manager from larlite
@@ -272,6 +277,7 @@ void LiteScanner::analyze(art::Event const & e)
 	      e.id().event());
   //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
   //ts->preProcessEvent(e);
+  //
   /*
   std::cout<<" Run: " << _mgr.run_id() << " ... "
 	   <<" SubRun: " << _mgr.subrun_id() << " ... "
@@ -281,6 +287,8 @@ void LiteScanner::analyze(art::Event const & e)
   // Loop over data type to store association ptr map
   //
   SaveAssociationSource<simb::MCTruth>(e);
+  SaveAssociationSource<simb::MCParticle>(e);
+  //  SaveAssociationSource<anab::BackTrackerHitMatchingData>(e);
   SaveAssociationSource<recob::Hit>(e);
   SaveAssociationSource<recob::Cluster>(e);
   SaveAssociationSource<recob::EndPoint2D>(e);
@@ -318,7 +326,6 @@ void LiteScanner::analyze(art::Event const & e)
 	ScanData<simb::MCFlux>(e,j); break;
       case ::larlite::data::kMCParticle:
 	ScanData<simb::MCParticle>(e,j); break;
-
       case ::larlite::data::kSimPhotons:
 	ScanSimPhotons(e,j); break;
       case ::larlite::data::kSimChannel:
@@ -341,6 +348,8 @@ void LiteScanner::analyze(art::Event const & e)
 
       case ::larlite::data::kHit:
 	ScanData<recob::Hit>(e,j); break;
+      case ::larlite::data::kMCEventWeight:
+ 	ScanData<evwgh::MCEventWeight>(e,j); break;
       case ::larlite::data::kWire:
 	ScanData<recob::Wire>(e,j); break;
       case ::larlite::data::kOpHit:
@@ -390,9 +399,8 @@ void LiteScanner::analyze(art::Event const & e)
   }
 
   auto const& ass_labels_v = fAlg.AssLabels();
-  //
+
   // Loop over data type to store association
-  //
   for(size_t i=0; fStoreAss && i<ass_labels_v.size(); ++i) {
 
     auto const& labels = ass_labels_v[i];
@@ -401,6 +409,71 @@ void LiteScanner::analyze(art::Event const & e)
     for(size_t j=0; j<labels.size(); ++j) {
 
       auto const& label = labels[j];
+      //std::cout << "This is the label I am scanning now: " << label << std::endl;
+      ////////////////////////////////////////////////////////////////////////////////////////////
+      if ( label == "gaushitTruthMatch" ){
+
+        auto lite_ass = (::larlite::event_ass*)( _mgr.get_data(::larlite::data::kAssociation,"gaushitTruthMatch"));
+
+        auto lite_hit = _mgr.get_data(::larlite::data::kHit,"gaushit");
+        auto lite_mcpart = _mgr.get_data(::larlite::data::kMCParticle,"largeant");
+
+        //std::cout<<"Now the real adventure begins... " <<std::endl ;
+        auto const& hit_handle = e.getValidHandle<std::vector<recob::Hit>>("gaushit");
+        auto const& hit_vec(*hit_handle);
+
+        auto const& mcpart_handle= e.getValidHandle<std::vector<simb::MCParticle>>("largeant");
+        auto const& mcpart_vec(*mcpart_handle);
+
+        art::FindMany<simb::MCParticle,anab::BackTrackerHitMatchingData> particles_per_hit(hit_handle,e,"gaushitTruthMatch");
+
+        std::vector<simb::MCParticle const*> particle_vec;
+        std::vector<anab::BackTrackerHitMatchingData const*> match_v;
+
+        ::larlite::AssSet_t hit_to_mcps_map ;
+        hit_to_mcps_map.resize(hit_handle->size());
+  
+        for (auto& ass_unit : hit_to_mcps_map)
+          ass_unit.reserve(100);
+       
+        //std::cout<<"Hit vec: "<<hit_vec.size()<<std::endl;
+        for(int ii = 0; ii < int(hit_vec.size()) ; ii++){
+
+          particle_vec.clear(); match_v.clear();
+          double max_energy = -1 ;
+          int best_match_id = -1 ;
+        
+          particles_per_hit.get(ii,particle_vec,match_v);
+
+          for (size_t m = 0; m < match_v.size(); m++) {
+            double this_energy = match_v[m]->energy;
+            if (this_energy > max_energy) {
+              best_match_id = m;
+              max_energy = this_energy;
+            }
+          }
+          
+          if (best_match_id > -1) {
+
+            int store_this_id = best_match_id ;
+            for(int janky = 0; janky < int(mcpart_vec.size()); janky++ ){
+              if ( mcpart_vec[janky].TrackId() == particle_vec[best_match_id]->TrackId() ){
+                store_this_id = mcpart_vec[janky].TrackId() ;
+                //store_this_id = janky ;
+              }            
+            }  
+            try {
+              hit_to_mcps_map[ii].emplace_back(store_this_id) ;
+            } catch (cet::exception &e) {
+              std::cout<<"CANT ADD!!! " <<std::endl ;
+            }
+          }
+       }
+       if (lite_ass)
+         lite_ass->set_association(lite_hit->id(), lite_mcpart->id(), hit_to_mcps_map);
+       }
+        ///////////////////////////////
+
       if(!fAssLabelToSave_s.empty() && fAssLabelToSave_s.find(label) == fAssLabelToSave_s.end())
 	continue;
       switch(lite_type) {
@@ -440,6 +513,8 @@ void LiteScanner::analyze(art::Event const & e)
       case ::larlite::data::kMCTrack:
       case ::larlite::data::kWire:
       case ::larlite::data::kHit:
+      case ::larlite::data::kMCEventWeight:
+	//ScanAssociation<recob::Hit>(e,j); break;
       case ::larlite::data::kUndefined:
       case ::larlite::data::kEvent:
       default:
@@ -638,21 +713,28 @@ template<class T> void LiteScanner::SaveAssociationSource(const art::Event& evt)
   auto lite_type = fAlg.LiteDataType<T>();
   auto const& ass_labels_v = fAlg.AssLabels();
 
+  //std::cout<<"Ass labels size: "<<ass_labels_v.size()<<", "<<lite_type<<std::endl ;
+
   for(size_t i=0; i<ass_labels_v[lite_type].size(); ++i) {
+    
 
     auto const& name = ass_labels_v[lite_type][i];
+    
+    //std::cout <<"ASS LABEL NAME !! "<< name << ", "<<lite_type<<std::endl;
 
     art::Handle<std::vector<T> > dh;
     if(name.find("::")<name.size()) {
+      //std::cout<<"Inside label setter :"<<name.substr(0,name.find("::"))<<std::endl ;
       evt.getByLabel(name.substr(0,name.find("::")),
 		     name.substr(name.find("::")+2,name.size()-name.find("::")-2),
 		     dh);
     }else{ evt.getByLabel(name,dh); }
     
-    if(!dh.isValid() || !(dh->size())) continue;
+    if(!dh.isValid() || !(dh->size())) continue; 
 
+    //std::cout<<"Now building association for "<<name<<std::endl ;
     for(size_t j=0; j<dh->size(); ++j) {
-
+      //std::cout<<"j "<<j<<std::endl ;
       const art::Ptr<T> ptr(dh,j);
 
       size_t key1, key2;
@@ -660,6 +742,7 @@ template<class T> void LiteScanner::SaveAssociationSource(const art::Event& evt)
       auto& ptr_map = fAlg.GetPtrMap<T>(key1,key2);
 
       ptr_map[ptr] = std::make_pair(j,i);
+      //std::cout<<"Pointer map now adjusted "<<std::endl ;
 
     }
 
@@ -672,14 +755,20 @@ template<class T> void LiteScanner::SaveAssociationSource(const art::Event& evt)
 //-------------------------------------------------------------------------------------------------
 template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const size_t name_index)
 { 
+  //std::cout<<"Inside ScanAssociation.... "<<name_index<<std::endl ;
   auto lite_id = fAlg.AssProductID<T>(name_index);
   art::Handle<std::vector<T> > dh;
   std::string label = lite_id.second;
+
+  //std::cout << "\nI am scanning for this assocaition : " << label << std::endl; 
+  // Done adding this block in
+  
   if(label.find("::")<label.size()) {
     evt.getByLabel(label.substr(0,label.find("::")),
 		   label.substr(label.find("::")+2,label.size()-label.find("::")-2),
 		   dh);
   }else{ evt.getByLabel(lite_id.second,dh); }
+
       
   if(!dh.isValid()) return;
 
@@ -752,6 +841,7 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
       //fAlg.ScanAssociation<T, recob::Cluster    > (evt,dh,lite_ass);
       fAlg.ScanAssociation<T, recob::Hit        > (evt,dh,lite_ass);
       break;
+    case ::larlite::data::kMCEventWeight: break;
     case ::larlite::data::kCalorimetry:
       fAlg.ScanAssociation<T, recob::Track      > (evt,dh,lite_ass);
       //fAlg.ScanAssociation<T, recob::Shower     > (evt,dh,lite_ass);

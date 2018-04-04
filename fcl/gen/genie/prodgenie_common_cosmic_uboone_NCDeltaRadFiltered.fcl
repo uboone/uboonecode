@@ -79,6 +79,7 @@ outputs:
    module_type: RootOutput
    fileName:    "prodgenie_bnb_nu_cosmic_filtered_NCDeltaRad_uboone_%tc_gen.root" #default file name, can override from command line with -o or --output
    dataTier:    "generated"
+   SelectEvents: [ simulate ]
    compressionLevel: 1
    fastCloning: false
  }
@@ -87,6 +88,10 @@ outputs:
 physics.producers.generator: @local::microboone_genie_simple
 physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
-physics.producers.generator.TopVolume: "volCryostat"
+#And this is another suggested help
+physics.producers.generator.TopVolume: "volTPC"
 physics.producers.generator.BeamName: "booster"
-#physics.producers.generator.EventGeneratorList: "DefaultPlusCCMEC"
+physics.producers.generator.EventGeneratorList: "NCRES"
+#This supposidly changes the geom scan length, NOVA suggested fix, default 1.1 set to 1.3 now
+physics.producers.generator.GeomScan:     "flux: 10000 1.3 1"
+

@@ -6,6 +6,8 @@ services.DetectorClocksService.InheritClockConfig:  false
 
 services.TFileService.fileName: "reco_stage_2_hist.root"
 
+services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcenergycalib_provider_mc
+
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
 

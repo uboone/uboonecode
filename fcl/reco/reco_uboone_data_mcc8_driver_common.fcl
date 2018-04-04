@@ -22,6 +22,8 @@ process_name: DataRecoCommon
 
 services.DatabaseUtil.ShouldConnect: false
 
+services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcenergycalib_provider_data
+
 # Adjust the window/offset for the reduced total frame size (9600 -> 6400 ticks)
 #THIS IS DONE IN reco_uboone_data_mcc8.fcl
 #services.DetectorPropertiesService.NumberTimeSamples: 6400

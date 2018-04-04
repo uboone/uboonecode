@@ -43,6 +43,7 @@
 #include "DataFormat/mucsdata.h"
 #include "DataFormat/mucsreco.h"
 #include "DataFormat/chstatus.h"
+#include "DataFormat/mceventweight.h"
 #include <TStopwatch.h>
 /*
   This file defines certain specilization of templated functions.
@@ -482,7 +483,8 @@ namespace larlite {
     for(size_t i=0; i<dh->size(); ++i ) {
       
       const art::Ptr<::sim::SimChannel> sch_ptr(dh,i);
-      
+
+      if ( sch_ptr->Channel() < 4800 ) continue;
       const auto & sch_map(sch_ptr->TDCIDEMap());
       
       larlite::simch lite_sch;
@@ -498,9 +500,9 @@ namespace larlite {
 	  lite_ide.trackID = this_ide.trackID;
 	  lite_ide.numElectrons = this_ide.numElectrons;
 	  lite_ide.energy = this_ide.energy;
-	  lite_ide.x = this_ide.x;
-	  lite_ide.y = this_ide.y;
-	  lite_ide.z = this_ide.z;
+	  //lite_ide.x = this_ide.x;
+	  //lite_ide.y = this_ide.y;
+	  //lite_ide.z = this_ide.z;
 	  
 	  lite_sch.add_ide(tdc,lite_ide);
 	}
@@ -808,11 +810,19 @@ namespace larlite {
     art::ServiceHandle<::geo::UBOpReadoutMap> ub_pmt_channel_map;
     auto const channel_set = ub_pmt_channel_map->GetReadoutChannelSet();
 
+    art::ServiceHandle<::geo::Geometry> geo; 
+
+
     for(size_t i=0; i<dh->size(); ++i) {
 
       art::Ptr<::recob::OpFlash> flash_ptr(dh,i);
-      
       std::vector<double> pe_per_opdet;
+
+      //pe_per_opdet.reserve(geo->NOpChannels());
+      //for(size_t j=0; j<geo->NOpChannels(); ++j){
+      //  pe_per_opdet.push_back(flash_ptr->PE(j));
+      //}    
+
       pe_per_opdet.reserve((*(channel_set.rbegin())));
       double pe_larsoft = flash_ptr->TotalPE();
       double pe_larlite = 0.;
@@ -1208,6 +1218,24 @@ namespace larlite {
     }
   }
 
+  template<>
+  void ScannerAlgo::ScanData(art::Handle<std::vector< ::evwgh::MCEventWeight> > const &dh,
+                             ::larlite::event_base* lite_dh)
+  {
+
+    fDataReadFlag_v[lite_dh->data_type()][lite_dh->name()] = true;
+    //auto name_index = NameIndex(lite_dh->data_type(),lite_dh->name());
+    auto lite_data = (::larlite::event_mceventweight*)lite_dh;
+    for(size_t i=0; i<dh->size(); ++i) {
+      art::Ptr<::evwgh::MCEventWeight> weight_ptr(dh,i);
+      larlite::mceventweight lite_weight(weight_ptr->fWeight);
+
+      auto w_map = lite_weight.GetWeights() ;
+
+      lite_data->push_back(lite_weight);
+    }
+  }
+
   template <>
   void ScannerAlgo::ScanData(art::Handle<std::vector< ::anab::FlashMatch> > const &dh,
 			       ::larlite::event_base* lite_dh)
@@ -1436,6 +1464,14 @@ namespace larlite {
     return fPtrIndex_pfpart[key1][key2]; 
   }
 
+  template <> std::map<art::Ptr< ::evwgh::MCEventWeight>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
+  { if(fPtrIndex_eventweight.size()<=key1) fPtrIndex_eventweight.resize(key1+1);
+    if(fPtrIndex_eventweight[key1].size()<=key2) fPtrIndex_eventweight[key1].resize(key2+1);
+    return fPtrIndex_eventweight[key1][key2];
+  }
+ 
+
+
   template <> std::map<art::Ptr< ::recob::PCAxis>,std::pair<size_t,size_t> >& ScannerAlgo::GetPtrMap(size_t key1, size_t key2)
   { if(fPtrIndex_pcaxis.size()<=key1) fPtrIndex_pcaxis.resize(key1+1);
     if(fPtrIndex_pcaxis[key1].size()<=key2) fPtrIndex_pcaxis[key1].resize(key2+1);
@@ -1530,6 +1566,9 @@ namespace larlite {
   { return ::larlite::data::kMuCSData; }
   template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::MuCS::MuCSRecoData> () const
   { return ::larlite::data::kMuCSReco; }
+  // evwgh
+  template <> const ::larlite::data::DataType_t ScannerAlgo::LiteDataType<::evwgh::MCEventWeight> () const
+  { return ::larlite::data::kMCEventWeight; }
   //
   // LocateLiteProduct implementation
   //
@@ -1538,8 +1577,10 @@ namespace larlite {
 				      std::pair<size_t,size_t> &loc)
   { 
     size_t key1, key2;
+
     ProducePtrMapKey(ptr,key1,key2);
     auto const& ptr_map = GetPtrMap<T>(key1,key2);
+
     auto id_iter = ptr_map.find(ptr);
     if(id_iter == ptr_map.end()) return false; 
     
@@ -1666,6 +1707,13 @@ namespace larlite {
 										    ::larlite::event_ass* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
 
+  template <> void ScannerAlgo::ScanAssociation <::recob::Hit,::recob::Hit>(art::Event const& e,
+										    art::Handle<std::vector<::recob::Hit> > &dh,
+										    ::larlite::event_ass* lite_dh)
+  { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
+
+
+
   template <> void ScannerAlgo::ScanAssociation <::recob::EndPoint2D,::recob::EndPoint2D>(art::Event const& e,
 											  art::Handle<std::vector<::recob::EndPoint2D> > &dh,
 											  ::larlite::event_ass* lite_dh)
@@ -1716,6 +1764,7 @@ namespace larlite {
 											::larlite::event_ass* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
 
+
   template <> void ScannerAlgo::ScanAssociation <::recob::PFParticle,::recob::PFParticle>(art::Event const& e,
 											  art::Handle<std::vector<::recob::PFParticle> > &dh,
 											  ::larlite::event_ass* lite_dh)
@@ -1725,6 +1774,12 @@ namespace larlite {
 										  art::Handle<std::vector<::recob::PCAxis> > &dh,
 										  ::larlite::event_ass* lite_dh)
   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
+
+  template <> void ScannerAlgo::ScanAssociation <::evwgh::MCEventWeight,::evwgh::MCEventWeight>(art::Event const& e,
+                                           art::Handle<std::vector<::evwgh::MCEventWeight> > &dh,
+                                           ::larlite::event_ass* lite_dh)
+   { throw cet::exception(__PRETTY_FUNCTION__) << " not implemented!"; }
+
 
 
   //

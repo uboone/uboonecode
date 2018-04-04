@@ -48,7 +48,7 @@ namespace lariov {
       if (evt.isRealData()) the_time = time_stamp.timeHigh()*1.0e9 + time_stamp.timeLow();
       else                  the_time = time_stamp.value();
 
-      std::cout<<"Using art::Event timestamp to query "<<dbname<<" database: "<<the_time<<std::endl;
+      //std::cout<<"Using art::Event timestamp to query "<<dbname<<" database: "<<the_time<<std::endl;
       return the_time;
     }
   }
