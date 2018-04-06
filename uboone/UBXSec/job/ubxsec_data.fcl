@@ -147,6 +147,7 @@ ubxsec_data_reco.pandoraCosmicTrackPFPart.TPCZBoundary:            20
 ubxsec_data_reco.pandoraCosmicTrackPFPart.Debug:                   false
 
 ubxsec_data_reco.pandoraCosmicFlashTag.DebugMode:                  false
+ubxsec_data_reco.pandoraCosmicFlashTag.DoOpDetSwap:                true
 
 ubxsec_data_reco.pandoraCosmicHitRemoval.CosmicProducerLabels:     ["pandoraCosmicTrackPFPart::UBXSec", "pandoraCosmicFlashTag::UBXSec", "pandoraCosmicACPTTagger::UBXSec", "pandoraCosmicStoppingMu::UBXSec" ]
 ubxsec_data_reco.pandoraCosmicHitRemoval.TrackProducerLabels:      ["pandoraCosmic",                    "pandoraCosmic",                 "pandoraCosmic",                   "pandoraCosmic"                   ]
