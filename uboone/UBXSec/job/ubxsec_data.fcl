@@ -127,6 +127,9 @@ ubxsec_data_producers: [ pandoraCosmicTPCObj,
 ubxsec_data_filters: [ tpcneutrinoidfilternumuccinc 
                      ]
 
+ubxsec_data_producers_anaonly: [ UBXSec
+                               ]
+
 ubxsec_data_analyzers: [ #CosmicTaggerAna 
                        ]
 

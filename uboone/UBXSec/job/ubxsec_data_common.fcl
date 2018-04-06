@@ -51,11 +51,11 @@ services.SpaceCharge.EnableSimSpatialSCE: true
  
 #services.Geometry.ForceUseFCLOnly:                           true
 
-services.TimeTracker.printSummary:                           false
+services.TimeTracker.printSummary:                           true
 services.TimeTracker.dbOutput:                               {}
 
 services.MemoryTracker.printSummaries:                       []
-services.MemoryTracker.includeMallocInfo:                    false
+services.MemoryTracker.includeMallocInfo:                    true
 services.MemoryTracker.dbOutput.filename:                    ""
 
 
