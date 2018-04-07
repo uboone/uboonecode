@@ -1,3 +1,4 @@
 #include "FillLightEvent.fcl"
 
 physics.analyzers.FillLightEvent.mc: "true"
+physics.analyzers.FillLightEvent.trigger_product: "swtrigger"
