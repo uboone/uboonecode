@@ -50,6 +50,7 @@
 
 #include "FilterSignal.h"
 #include "EnergyHelper.h"
+#include "EnergyHelperNew.h"
 
 #include "TTree.h"
 
@@ -90,9 +91,14 @@ public:
 								      double & energy);
   void FillRecoTrackVectors(art::Event const & e);
   void FillRecoTrackVectors(art::Event const & e, int const producer_index, size_t const track_index_offset, size_t const hit_index_offset);
+  std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> GetTrackHelperEnergy(art::Event const & e,
+											      std::string const & track_producer,
+											      size_t const track_index,
+											      std::vector<double> & track_energy_dedx);
   std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> GetShowerHelperEnergy(art::Event const & e,
 											       std::string const & shower_producer,
-											       size_t const shower_index);
+											       size_t const shower_index,
+											       bool const energy_helper_new = false);
   void FillRecoShowerVectors(art::Event const & e);
   void FillRecoShowerVectors(art::Event const & e, int const producer_index, size_t const shower_index_offset, size_t const hit_index_offset);
   void FillPandora(art::Event const & e);
@@ -150,7 +156,8 @@ private:
   int fmc_type_particle;
 
   FilterSignal ffs;
-  lee::EnergyHelper energyHelper;
+  lee::EnergyHelper fenergyHelper;
+  lee::EnergyHelperNew fenergyHelperNew;
 
   bool fverbose;
 
@@ -266,6 +273,11 @@ private:
   std::vector<std::vector<double>> freco_track_EnergyHelper_resrange;
   std::vector<std::vector<double>> freco_track_EnergyHelper_dedx;
   std::vector<double> freco_track_EnergyHelper_energy;
+  std::vector<double> freco_track_EnergyHelperNew_energy_legacy;
+  std::vector<std::vector<double>> freco_track_EnergyHelperNew_energy;
+  std::vector<std::vector<double>> freco_track_EnergyHelperNew_energy_from_dedx;
+  std::vector<std::vector<double>> freco_track_EnergyHelperNew_dedx;
+
   //Reco - MC matching
   std::vector<int> freco_track_largest_mc_type;
   std::vector<int> freco_track_largest_mc_index;
@@ -304,6 +316,9 @@ private:
   std::vector<double> freco_shower_EnergyHelper_energy_legacy;
   std::vector<std::vector<double>> freco_shower_EnergyHelper_energy;
   std::vector<std::vector<double>> freco_shower_EnergyHelper_dedx;
+  std::vector<double> freco_shower_EnergyHelperNew_energy_legacy;
+  std::vector<std::vector<double>> freco_shower_EnergyHelperNew_energy;
+  std::vector<std::vector<double>> freco_shower_EnergyHelperNew_dedx;
   //Reco - MC matching
   std::vector<int> freco_shower_largest_mc_type;
   std::vector<int> freco_shower_largest_mc_index;
@@ -785,15 +800,19 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_track_EnergyHelper_resrange", &freco_track_EnergyHelper_resrange);
   fevent_tree->Branch("reco_track_EnergyHelper_dedx", &freco_track_EnergyHelper_dedx);
   fevent_tree->Branch("reco_track_EnergyHelper_energy", &freco_track_EnergyHelper_energy);
+  fevent_tree->Branch("reco_track_EnergyHelperNew_energy_legacy", &freco_track_EnergyHelperNew_energy_legacy);
+  fevent_tree->Branch("reco_track_EnergyHelperNew_energy", &freco_track_EnergyHelperNew_energy);
+  fevent_tree->Branch("reco_track_EnergyHelperNew_energy_from_dedx", &freco_track_EnergyHelperNew_energy_from_dedx);
+  fevent_tree->Branch("reco_track_EnergyHelperNew_dedx", &freco_track_EnergyHelperNew_dedx);
   if(frmcm_first) {
     fevent_tree->Branch("reco_track_largest_mc_type", &freco_track_largest_mc_type);
     fevent_tree->Branch("reco_track_largest_mc_index", &freco_track_largest_mc_index);
     fevent_tree->Branch("reco_track_largest_ratio", &freco_track_largest_ratio);
-    if(fheavy) {
+    //if(fheavy) {
       fevent_tree->Branch("reco_track_mc_type", &freco_track_mc_type);
       fevent_tree->Branch("reco_track_mc_index", &freco_track_mc_index);
       fevent_tree->Branch("reco_track_charge_contribution", &freco_track_charge_contribution);
-    }
+      //}
     fevent_tree->Branch("reco_track_charge_total", &freco_track_charge_total);
   }
 
@@ -831,15 +850,18 @@ void FillLightEvent::SetupTrees() {
   fevent_tree->Branch("reco_shower_EnergyHelper_energy_legacy", &freco_shower_EnergyHelper_energy_legacy);
   fevent_tree->Branch("reco_shower_EnergyHelper_energy", &freco_shower_EnergyHelper_energy);
   fevent_tree->Branch("reco_shower_EnergyHelper_dedx", &freco_shower_EnergyHelper_dedx);
+  fevent_tree->Branch("reco_shower_EnergyHelperNew_energy_legacy", &freco_shower_EnergyHelperNew_energy_legacy);
+  fevent_tree->Branch("reco_shower_EnergyHelperNew_energy", &freco_shower_EnergyHelperNew_energy);
+  fevent_tree->Branch("reco_shower_EnergyHelperNew_dedx", &freco_shower_EnergyHelperNew_dedx);
   if(frmcm_first) { 
     fevent_tree->Branch("reco_shower_largest_mc_type", &freco_shower_largest_mc_type);
     fevent_tree->Branch("reco_shower_largest_mc_index", &freco_shower_largest_mc_index);
     fevent_tree->Branch("reco_shower_largest_ratio", &freco_shower_largest_ratio);
-    if(fheavy) {
+    //if(fheavy) {
       fevent_tree->Branch("reco_shower_mc_type", &freco_shower_mc_type);
       fevent_tree->Branch("reco_shower_mc_index", &freco_shower_mc_index);
       fevent_tree->Branch("reco_shower_charge_contribution", &freco_shower_charge_contribution);
-    }
+      //}
     fevent_tree->Branch("reco_shower_charge_total", &freco_shower_charge_total);
   }
 
@@ -1304,6 +1326,10 @@ void FillLightEvent::ResetEvent() {
   freco_track_EnergyHelper_resrange.clear();
   freco_track_EnergyHelper_dedx.clear();
   freco_track_EnergyHelper_energy.clear();
+  freco_track_EnergyHelperNew_energy_legacy.clear();
+  freco_track_EnergyHelperNew_energy.clear();
+  freco_track_EnergyHelperNew_energy_from_dedx.clear();
+  freco_track_EnergyHelperNew_dedx.clear();
   if(frmcm_first) {
     freco_track_largest_mc_type.clear();
     freco_track_largest_mc_index.clear();
@@ -1342,6 +1368,9 @@ void FillLightEvent::ResetEvent() {
   freco_shower_EnergyHelper_energy_legacy.clear();
   freco_shower_EnergyHelper_energy.clear();
   freco_shower_EnergyHelper_dedx.clear();
+  freco_shower_EnergyHelperNew_energy_legacy.clear();
+  freco_shower_EnergyHelperNew_energy.clear();
+  freco_shower_EnergyHelperNew_dedx.clear();
   if(frmcm_first) {
     freco_shower_largest_mc_type.clear();
     freco_shower_largest_mc_index.clear();
@@ -1925,6 +1954,58 @@ std::pair<std::vector<double>,std::vector<double>> FillLightEvent::GetTrackCaloI
   energy = energyHelper.trackEnergy(*track_ptr, e, track_producer, track_calo_producer);
 
   return energyHelper.trackdEdx(*track_ptr, e, track_producer, track_calo_producer);
+}
+
+
+std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLightEvent::GetTrackHelperEnergy(art::Event const & e,
+													    std::string const & track_producer,
+													    size_t const track_index,
+													    std::vector<double> & track_energy_dedx) {
+  
+  art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp = e.getValidHandle<std::vector<recob::PFParticle>>(track_producer);
+  art::FindManyP<recob::Track> PFPToTrack(ev_pfp, e, track_producer);  
+
+  art::Ptr<recob::Track> const * track_ptr = nullptr;
+
+  for(size_t i = 0; i < ev_pfp->size(); ++i) {
+    std::vector<art::Ptr<recob::Track>> const & tracks = PFPToTrack.at(i);
+    for(art::Ptr<recob::Track> const & track : tracks) {
+      if(track.key() == track_index) {
+	track_ptr = &track;
+	break;
+      }
+      if(track_ptr) break;
+    }
+  }
+
+  if(!track_ptr) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: no track pointer found\n";
+    return std::make_pair(std::make_pair(std::vector<double>(), SIZE_MAX), std::vector<double>());
+  }
+
+  art::ValidHandle<std::vector<recob::Track>> const & ev_s = e.getValidHandle<std::vector<recob::Track>>(track_producer);
+  art::FindManyP<recob::PFParticle> TrackToPFP(ev_s, e, track_producer);
+  std::vector<art::Ptr<recob::PFParticle>> track_pfp = TrackToPFP.at(track_index);
+  if(track_pfp.size() != 1) {
+    std::cout << __LINE__ << " " << __PRETTY_FUNCTION__ << "\n"
+	      << "WARNING: track_pfp.size() != 1: " << track_pfp.size() << "\n";
+  }
+  std::vector<double> dqdx_v(3, -1);
+  std::vector<double> dqdx_hits_v(3, -1);
+  std::vector<double> reco_track_dedx_vector(3, -1);
+  std::pair<std::vector<double>, size_t> energy_pair;
+
+  std::vector<int> nHits;
+  std::vector<double> pfenergy;
+  fenergyHelperNew.energyFromHits(*track_pfp.front(), nHits, pfenergy, e, track_producer);
+  track_energy_dedx = fenergyHelperNew.trackEnergy_dedx(*track_ptr, e, track_producer);
+  energy_pair = std::make_pair(pfenergy, std::distance(nHits.begin(), std::max_element(nHits.begin(), nHits.end())));
+  fenergyHelperNew.dQdx(track_pfp.front().key(), e, dqdx_v, dqdx_hits_v, 4, 1, track_producer);
+  fenergyHelperNew.dEdxFromdQdx(reco_track_dedx_vector, dqdx_v);
+  
+  return std::make_pair(energy_pair, reco_track_dedx_vector);
+>>>>>>> d23e498d20a5edad7496bed1a0655ce6bef9c630
 
 }
 
@@ -2012,6 +2093,13 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e, int const produc
     freco_track_EnergyHelper_resrange.push_back(calo_pair.first);
     freco_track_EnergyHelper_dedx.push_back(calo_pair.second);
     freco_track_EnergyHelper_energy.push_back(track_energy);
+
+    std::vector<double> track_energy_from_dedx;
+    std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> const energynew_pair = GetTrackHelperEnergy(e, track_producer, i, track_energy_from_dedx);
+    freco_track_EnergyHelperNew_energy_legacy.push_back(energynew_pair.first.first.at(energynew_pair.first.second));
+    freco_track_EnergyHelperNew_energy.push_back(energynew_pair.first.first);
+    freco_track_EnergyHelperNew_energy_from_dedx.push_back(track_energy_from_dedx);
+    freco_track_EnergyHelperNew_dedx.push_back(energynew_pair.second);    
 
     if(track_matches) {
       
@@ -2102,6 +2190,10 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
   freco_track_EnergyHelper_resrange.reserve(size);
   freco_track_EnergyHelper_dedx.reserve(size);
   freco_track_EnergyHelper_energy.reserve(size);
+  freco_track_EnergyHelperNew_energy_legacy.reserve(size);
+  freco_track_EnergyHelperNew_energy.reserve(size);
+  freco_track_EnergyHelperNew_energy_from_dedx.reserve(size);
+  freco_track_EnergyHelperNew_dedx.reserve(size);
   if(frmcm_first) {
     freco_track_largest_mc_type.reserve(size);
     freco_track_largest_mc_index.reserve(size);
@@ -2127,11 +2219,11 @@ void FillLightEvent::FillRecoTrackVectors(art::Event const & e) {
 
 std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLightEvent::GetShowerHelperEnergy(art::Event const & e,
 													     std::string const & shower_producer,
-													     size_t const shower_index) {
+													     size_t const shower_index,
+													     bool const energy_helper_new) {
   
   art::ValidHandle<std::vector<recob::PFParticle>> const & ev_pfp = e.getValidHandle<std::vector<recob::PFParticle>>(shower_producer);
   art::FindManyP<recob::Shower> PFPToShower(ev_pfp, e, shower_producer);  
-
   art::Ptr<recob::Shower> const * shower_ptr = nullptr;
 
   for(size_t i = 0; i < ev_pfp->size(); ++i) {
@@ -2151,8 +2243,6 @@ std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLight
     return std::make_pair(std::make_pair(std::vector<double>(), SIZE_MAX), std::vector<double>());
   }
 
-  std::pair<std::vector<double>, size_t> const energy_pair = energyHelper.showerEnergyV(*shower_ptr, e, shower_producer);
-
   art::ValidHandle<std::vector<recob::Shower>> const & ev_s = e.getValidHandle<std::vector<recob::Shower>>(shower_producer);
   art::FindManyP<recob::PFParticle> ShowerToPFP(ev_s, e, shower_producer);
   std::vector<art::Ptr<recob::PFParticle>> shower_pfp = ShowerToPFP.at(shower_index);
@@ -2163,8 +2253,21 @@ std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLight
   std::vector<double> dqdx_v(3, -1);
   std::vector<double> dqdx_hits_v(3, -1);
   std::vector<double> reco_shower_dedx_vector(3, -1);
-  energyHelper.dQdx(shower_pfp.front().key(), e, dqdx_v, dqdx_hits_v, 4, 2, shower_producer);
-  energyHelper.dEdxFromdQdx(reco_shower_dedx_vector, dqdx_v);
+  std::pair<std::vector<double>, size_t> energy_pair;
+  
+  if(energy_helper_new) {
+    std::vector<int> nHits;
+    std::vector<double> pfenergy;
+    fenergyHelperNew.energyFromHits(*shower_pfp.front(), nHits, pfenergy, e, shower_producer);
+    energy_pair = std::make_pair(pfenergy, std::distance(nHits.begin(), std::max_element(nHits.begin(), nHits.end())));
+    fenergyHelperNew.dQdx(shower_pfp.front().key(), e, dqdx_v, dqdx_hits_v, 4, 1, shower_producer);
+    fenergyHelperNew.dEdxFromdQdx(reco_shower_dedx_vector, dqdx_v);
+  }
+  else {
+    energy_pair = fenergyHelper.showerEnergyV(*shower_ptr, e, shower_producer);
+    fenergyHelper.dQdx(shower_pfp.front().key(), e, dqdx_v, dqdx_hits_v, 4, 2, shower_producer);
+    fenergyHelper.dEdxFromdQdx(reco_shower_dedx_vector, dqdx_v);
+  }
 
   return std::make_pair(energy_pair, reco_shower_dedx_vector);
 
@@ -2220,10 +2323,14 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e, int const produ
     }
 
     std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> const energy_pair = GetShowerHelperEnergy(e, shower_producer, i);
-
     freco_shower_EnergyHelper_energy_legacy.push_back(energy_pair.first.first.at(energy_pair.first.second));
     freco_shower_EnergyHelper_energy.push_back(energy_pair.first.first);
     freco_shower_EnergyHelper_dedx.push_back(energy_pair.second);
+
+    std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> const energynew_pair = GetShowerHelperEnergy(e, shower_producer, i, true);
+    freco_shower_EnergyHelperNew_energy_legacy.push_back(energynew_pair.first.first.at(energynew_pair.first.second));
+    freco_shower_EnergyHelperNew_energy.push_back(energynew_pair.first.first);
+    freco_shower_EnergyHelperNew_dedx.push_back(energynew_pair.second);
 
     if(shower_matches) {
       
@@ -2311,6 +2418,9 @@ void FillLightEvent::FillRecoShowerVectors(art::Event const & e) {
   freco_shower_EnergyHelper_energy_legacy.reserve(size);
   freco_shower_EnergyHelper_energy.reserve(size);
   freco_shower_EnergyHelper_dedx.reserve(size);
+  freco_shower_EnergyHelperNew_energy_legacy.reserve(size);
+  freco_shower_EnergyHelperNew_energy.reserve(size);
+  freco_shower_EnergyHelperNew_dedx.reserve(size);
   if(frmcm_first) {
     freco_shower_largest_mc_type.reserve(size);
     freco_shower_largest_mc_index.reserve(size);
@@ -2494,6 +2604,9 @@ void FillLightEvent::FillGenieParticleVectors(art::Event const & e,
     genie_particle_Py.push_back(mctraj.Momentum(0).Py());
     genie_particle_Pz.push_back(mctraj.Momentum(0).Pz());
     genie_particle_E.push_back(mctraj.Momentum(0).E());    
+
+    //std::cout << mcp.TrackId() << " " << mcp.Mother() << " " << mcp.PdgCode() << " " << mctraj.Position(0).X() << " " << mctraj.Position(0).Y() << " " << mctraj.Position(0).Z() << "\n";
+    
   }
   
 }
