@@ -50,6 +50,7 @@ physics:
 
 physics.analyzers.cc1unpselana.BeamMin: 3.65
 physics.analyzers.cc1unpselana.BeamMax: 5.25
+physics.analyzers.cc1unpselana.dQdxScale: 242.77
 
 services.DetectorClocksService.InheritClockConfig:                     false
 services.DetectorClocksService.TriggerOffsetTPC:                       -0.400e3

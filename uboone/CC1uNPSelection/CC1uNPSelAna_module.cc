@@ -1579,7 +1579,7 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
     fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
-
+    fdQdx_scale              = pset.get("dQdxScale",196.98);
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
@@ -1797,7 +1797,8 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
     //if (dqds*242.77 <= dqds_cut) //data
-    if (dqds*196.98 <= dqds_cut) //MC
+    //if (dqds*196.98 <= dqds_cut) //MC
+    if (dqds * fdQdx_scale <= dqds_cut) //Use a fcl variable to change from data to MC
 
       return true;
   
@@ -2380,7 +2381,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     trueProtonsEndMomentum->clear();
     for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
-      if (part.PdgCode()==2212 && part.StatusCode()==1){
+      if (part.PdgCode()==2212 && part.StatusCode()==1 && part.Mother()==0){
         trueProtonsTrueMomentum->push_back(part.P());
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());
@@ -3537,7 +3538,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     return;
 }
 
-DEFINE_ART_MODULE( CC1uNPSelAna)
+DEFINE_ART_MODULE(CC1uNPSelAna)
 
 } // namespace  CC1uNPSelAna
 
