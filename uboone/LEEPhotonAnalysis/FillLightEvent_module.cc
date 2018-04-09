@@ -1951,9 +1951,9 @@ std::pair<std::vector<double>,std::vector<double>> FillLightEvent::GetTrackCaloI
     return fail;
   }
 
-  energy = energyHelper.trackEnergy(*track_ptr, e, track_producer, track_calo_producer);
+  energy = fenergyHelper.trackEnergy(*track_ptr, e, track_producer, track_calo_producer);
 
-  return energyHelper.trackdEdx(*track_ptr, e, track_producer, track_calo_producer);
+  return fenergyHelper.trackdEdx(*track_ptr, e, track_producer, track_calo_producer);
 }
 
 
@@ -2005,7 +2005,6 @@ std::pair<std::pair<std::vector<double>, size_t>, std::vector<double>> FillLight
   fenergyHelperNew.dEdxFromdQdx(reco_track_dedx_vector, dqdx_v);
   
   return std::make_pair(energy_pair, reco_track_dedx_vector);
->>>>>>> d23e498d20a5edad7496bed1a0655ce6bef9c630
 
 }
 
