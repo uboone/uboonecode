@@ -1622,9 +1622,9 @@ bool FillLightEvent::PassedSWTrigger(art::Event const & e, std::string const & s
   std::vector<std::string> const & algo_v = swt->getListOfAlgorithms();
 
   std::cout<<"ALGO_V: of size: "<<algo_v.size()<<std::endl;
-  for(std::string const &a: algo_v){
-	std::cout<<a<<std::endl;	
-  }
+ // for(std::string const &a: algo_v){
+	//std::cout<<a<<std::endl;	
+ // }
 
   std::string const int_str = "BNB_FEMBeamTriggerAlgo";
   std::string const ext_str = "EXT_BNBwin_FEMBeamTriggerAlgo";
