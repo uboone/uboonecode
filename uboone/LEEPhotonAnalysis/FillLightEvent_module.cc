@@ -3262,9 +3262,8 @@ void FillLightEvent::analyze(art::Event const & e) {
 void FillLightEvent::endJob() {
 
   if(fpot_producer != "") {
-  	fpot_tree->Fill();
+    fpot_tree->Fill();
   }
-
 
 }
 
