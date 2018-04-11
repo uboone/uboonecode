@@ -1555,16 +1555,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
 
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -1775,8 +1775,8 @@ bool CC1uNPSelAna::MIPConsistency(double dqds, double length) {
 
     std::cout << "[MuonCandidateFinder] Track length is " << length << ", dqds_cut is " << dqds_cut << ", dqds value is " << dqds << std::endl;
  
-    //if (dqds*242.77 <= dqds_cut) //data
-    if (dqds*196.98 <= dqds_cut) //MC
+    if (dqds*242.77 <= dqds_cut) //data
+    //if (dqds*196.98 <= dqds_cut) //MC
 
       return true;
   
