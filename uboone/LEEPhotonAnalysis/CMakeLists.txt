@@ -17,6 +17,7 @@ art_make( BASENAME_ONLY
 			lardataobj_RecoBase
 			larcoreobj_SummaryData
 			larsim_MCCheater_BackTrackerService_service
+			larsim_MCCheater_ParticleInventoryService_service
 			larpandora_LArPandoraInterface
 			nusimdata_SimulationBase
 			${UB_DATA_TYPES}

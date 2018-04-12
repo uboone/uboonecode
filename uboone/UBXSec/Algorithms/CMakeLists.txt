@@ -53,6 +53,7 @@ art_make( BASENAME_ONLY
                    larevt_CalibrationDBI_IOVData
                    larevt_CalibrationDBI_Providers
                    larsim_MCCheater_BackTrackerService_service
+		   larsim_MCCheater_ParticleInventoryService_service
                    larsim_Simulation
                    #Simulation
 		   #Utilities
