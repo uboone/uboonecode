@@ -2259,17 +2259,14 @@ void plot_com_MCaddOffbeam_bacsep(){
 
   //=====================ZOOM in on proton length ============
   THStack *hs_prange_zoom = new THStack("hs_prange_zoom","");
-  std::cout << "allzoom[0] " << h_prange_allzoom[0]->GetNbinsX() << std::endl;
   h_prange_allzoom[0]->SetLineColor(kBlack);
   h_prange_allzoom[0]->SetLineWidth(2);
   h_prange_allzoom[0]->SetLineStyle(1);
   h_prange_allzoom[0]->GetXaxis()->SetTitle("Track Length of The Leading Proton Candidate[cm]");
   h_prange_allzoom[0]->GetYaxis()->SetTitle("No. of Tracks");
-  std::cout << "allzoom[0] " << h_prange_allzoom[0]->GetNbinsX() << std::endl;
   h_prange_allzoom[0]->SetMaximum(2.0*h_prange_allzoom[0]->GetMaximum());
   h_prange_allzoom[0]->GetXaxis()->SetRangeUser(0,10);
   h_prange_allzoom[0]->Draw();
-  std::cout << "allzoom[0] " << h_prange_allzoom[0]->GetNbinsX() << std::endl;
   
   h_prange_sigzoom[0]-> SetFillColor(2); 
   h_prange_sigzoom[0]->Scale(normfac);
@@ -2308,9 +2305,10 @@ void plot_com_MCaddOffbeam_bacsep(){
 //  hs_prange_zoom -> Draw("HIST");
 
 //  h_prange_zoom[2]->Draw("same");
-  std::cout << "allzoom[0] " << h_prange_allzoom[0]->GetNbinsX() << ", h_prange_sigzoom[0] " << h_prange_sigzoom[0]->GetNbinsX() << std::endl;
   h_prange_allzoom[0]->Draw("same");
   
+  legend->Draw("same");
+
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_prange_zoom.png");}
   else{c1->Print("figures/Tune1/BackSep/h_prange_zoom.png");}
   

@@ -400,72 +400,125 @@ void plot_com_MCaddOffbeam_sigsep(){
 
   //=============================================================== 
   TH1D                  *h_prange_allsel[3];
+  TH1D                  *h_prange_allzoom[3];
+
 
   h_prange_allsel[0]=(TH1D*)input0->Get("trklen_pcand");
+  h_prange_allzoom[0]=(TH1D*)h_prange_allsel[0]->Clone();
+  h_prange_allzoom[0]->Rebin(2);
+  h_prange_allzoom[0]->Sumw2();
   h_prange_allsel[0]->Rebin(4); 
   h_prange_allsel[0]->Sumw2();
- 
 
   h_prange_allsel[1]=(TH1D*)input1->Get("trklen_pcand");
+  h_prange_allzoom[1]=(TH1D*)h_prange_allsel[1]->Clone();
+  h_prange_allzoom[1]->Rebin(2);
+  h_prange_allzoom[1]->Sumw2();
   h_prange_allsel[1]->Rebin(4);
   h_prange_allsel[1]->Sumw2();
 
-  h_prange_allsel[2]=(TH1D*)input2->Get("trklen_pcand");
+  h_tmp = (TH1D*)input2->Get("trklen_pcand");
+  //h_prange_allsel[2]=(TH1D*)input2->Get("trklen_pcand");
+  h_prange_allsel[2]=(TH1D*)h_tmp->Clone();
+  h_prange_allzoom[2]=(TH1D*)h_prange_allsel[2]->Clone();
+  h_prange_allzoom[2]->Rebin(2);
+  h_prange_allzoom[2]->Sumw2();
   h_prange_allsel[2]->Rebin(4);
   h_prange_allsel[2]->Sumw2();
 
   TH1D               *h_prange_sig[8];
   TH1D               *h_prange_bac[8];
+  TH1D               *h_prange_sigzoom[2];
+  TH1D               *h_prange_baczoom[8];
+
   h_prange_sig[0]=(TH1D*)input2->Get("trklen_proton_0");
+  h_prange_sigzoom[0]=(TH1D*)h_prange_sig[0]->Clone();
+  h_prange_sigzoom[0]->Rebin(2);
+  h_prange_sigzoom[0]->Sumw2();
   h_prange_sig[0]->Rebin(4);
   h_prange_sig[0]->Sumw2();
 
   h_prange_sig[1]=(TH1D*)input2->Get("trklen_proton_sig_0");
+  h_prange_sigzoom[1]=(TH1D*)h_prange_sig[1]->Clone();
+  h_prange_sigzoom[1]->Rebin(2);
+  h_prange_sigzoom[1]->Sumw2();
   h_prange_sig[1]->Rebin(4);
   h_prange_sig[1]->Sumw2();
 
   h_prange_sig[2]=(TH1D*)input2->Get("trklen_proton_sig_1");
+  h_prange_sigzoom[2]=(TH1D*)h_prange_sig[2]->Clone();
+  h_prange_sigzoom[2]->Rebin(2);
+  h_prange_sigzoom[2]->Sumw2();
   h_prange_sig[2]->Rebin(4);
   h_prange_sig[2]->Sumw2();
 
   h_prange_sig[3]=(TH1D*)input2->Get("trklen_proton_sig_2");
+  h_prange_sigzoom[3]=(TH1D*)h_prange_sig[3]->Clone();
+  h_prange_sigzoom[3]->Rebin(2);
+  h_prange_sigzoom[3]->Sumw2();
   h_prange_sig[3]->Rebin(4);
   h_prange_sig[3]->Sumw2();
 
   h_prange_sig[4]=(TH1D*)input2->Get("trklen_proton_sig_3");
+  h_prange_sigzoom[4]=(TH1D*)h_prange_sig[4]->Clone();
+  h_prange_sigzoom[4]->Rebin(2);
+  h_prange_sigzoom[4]->Sumw2();
   h_prange_sig[4]->Rebin(4);
   h_prange_sig[4]->Sumw2();
 
 
   h_prange_bac[0]=(TH1D*)input2->Get("trklen_proton_1");
+  h_prange_baczoom[0]=(TH1D*)h_prange_bac[0]->Clone();
+  h_prange_baczoom[0]->Sumw2();
   h_prange_bac[0]->Rebin(4);
   h_prange_bac[0]->Sumw2();
  
   h_prange_bac[1]=(TH1D*)input2->Get("trklen_proton_2");
+  h_prange_baczoom[1]=(TH1D*)h_prange_bac[1]->Clone();
+  h_prange_baczoom[1]->Rebin(2);
+  h_prange_baczoom[1]->Sumw2();
   h_prange_bac[1]->Rebin(4);
   h_prange_bac[1]->Sumw2();
 
   h_prange_bac[2]=(TH1D*)input2->Get("trklen_proton_3");
+  h_prange_baczoom[2]=(TH1D*)h_prange_bac[2]->Clone();
+  h_prange_baczoom[2]->Rebin(2);
+  h_prange_baczoom[2]->Sumw2();
   h_prange_bac[2]->Rebin(4);
   h_prange_bac[2]->Sumw2();
  
   h_prange_bac[3]=(TH1D*)input2->Get("trklen_proton_4");
+  h_prange_baczoom[3]=(TH1D*)h_prange_bac[3]->Clone();
+  h_prange_baczoom[3]->Rebin(2);
+  h_prange_baczoom[3]->Sumw2();
   h_prange_bac[3]->Rebin(4);
   h_prange_bac[3]->Sumw2();
 
   h_prange_bac[4]=(TH1D*)input2->Get("trklen_proton_5");
+  h_prange_baczoom[4]=(TH1D*)h_prange_bac[4]->Clone();
+  h_prange_baczoom[4]->Rebin(2);
+  h_prange_baczoom[4]->Sumw2();
   h_prange_bac[4]->Rebin(4);
   h_prange_bac[4]->Sumw2();
  
   h_prange_bac[5]=(TH1D*)input2->Get("trklen_proton_6");
+  h_prange_baczoom[5]=(TH1D*)h_prange_bac[5]->Clone();
+  h_prange_baczoom[5]->Rebin(2);
+  h_prange_baczoom[5]->Sumw2();
   h_prange_bac[5]->Rebin(4);
   h_prange_bac[5]->Sumw2();
 
   h_prange_bac[6]=(TH1D*)input2->Get("trklen_proton_7");
+  h_prange_baczoom[6]=(TH1D*)h_prange_bac[6]->Clone();
+  h_prange_baczoom[6]->Rebin(2);
+  h_prange_baczoom[6]->Sumw2();
   h_prange_bac[6]->Rebin(4);
   h_prange_bac[6]->Sumw2();
 
   h_prange_bac[7]=(TH1D*)input2->Get("trklen_proton_8");
+  h_prange_baczoom[7]=(TH1D*)h_prange_bac[7]->Clone();
+  h_prange_baczoom[7]->Rebin(2);
+  h_prange_baczoom[7]->Sumw2();
   h_prange_bac[7]->Rebin(4);
   h_prange_bac[7]->Sumw2();
    //=============================================================
@@ -2725,7 +2778,6 @@ void plot_com_MCaddOffbeam_sigsep(){
   //============================================================================
 
   TH1D *h_onoff_prange=(TH1D*)h_prange_allsel[1]->Clone(Form("%s_on-off", h_prange_allsel[1]->GetName()));
-  cout<<"get all the histograms!"<<endl;
 
 
   h_prange_allsel[0]->SetLineColor(kBlack);
@@ -2820,6 +2872,81 @@ void plot_com_MCaddOffbeam_sigsep(){
    legend->Draw("same");
    if (tune==3){c1->Print("figures/Tune3/SigSep/h_prange_allsel.png");}
    else{c1->Print("figures/Tune1/SigSep/h_prange_allsel.png");}
+  
+  //=====================ZOOM in on proton length ============
+  THStack *hs_prange_zoom = new THStack("hs_prange_zoom","");
+  h_prange_allzoom[0]->SetLineColor(kBlack);
+  h_prange_allzoom[0]->SetLineWidth(2);
+  h_prange_allzoom[0]->SetLineStyle(1);
+  h_prange_allzoom[0]->GetXaxis()->SetTitle("Track Length of The Leading Proton Candidate[cm]");
+  h_prange_allzoom[0]->GetYaxis()->SetTitle("No. of Tracks");
+  h_prange_allzoom[0]->SetMaximum(2.0*h_prange_allzoom[0]->GetMaximum());
+  h_prange_allzoom[0]->GetXaxis()->SetRangeUser(0,10);
+  h_prange_allzoom[0]->Draw();
+
+
+  h_prange_sigzoom[1]-> SetFillColor(2); 
+  h_prange_sigzoom[1]->Scale(normfac);
+  h_prange_sigzoom[2]-> SetFillColor(3); 
+  h_prange_sigzoom[2]->Scale(normfac);
+  h_prange_sigzoom[3]-> SetFillColor(4); 
+  h_prange_sigzoom[3]->Scale(normfac);
+  h_prange_sigzoom[4]-> SetFillColor(5); 
+  h_prange_sigzoom[4]->Scale(normfac);
+      
+  h_prange_baczoom[0]-> SetFillColor(6);
+  h_prange_baczoom[0]-> SetLineColor(6);
+  h_prange_baczoom[0]->Scale(normfac);
+  h_prange_baczoom[1]-> SetFillColor(6);
+  h_prange_baczoom[1]-> SetLineColor(6);
+  h_prange_baczoom[1]->Scale(normfac);
+  h_prange_baczoom[2]-> SetFillColor(6);
+  h_prange_baczoom[2]-> SetLineColor(6);
+  h_prange_baczoom[2]-> Scale(normfac);
+  h_prange_baczoom[3]->SetFillColor(6);
+  h_prange_baczoom[3]-> SetLineColor(6);
+  h_prange_baczoom[3]->Scale(normfac);
+  h_prange_baczoom[4]-> SetFillColor(6);
+  h_prange_baczoom[4]-> SetLineColor(6);
+  h_prange_baczoom[4]->Scale(normfac);
+  h_prange_baczoom[5]-> SetFillColor(6);
+  h_prange_baczoom[5]-> SetLineColor(6);
+  h_prange_baczoom[5]->Scale(normfac);
+  h_prange_baczoom[6]-> SetFillColor(6);
+  h_prange_baczoom[6]-> SetLineColor(6);
+  h_prange_baczoom[6]->Scale(normfac);
+  h_prange_baczoom[7]-> SetFillColor(6);
+  h_prange_baczoom[7]-> SetLineColor(6);
+  h_prange_baczoom[7]->Scale(normfac);
+  h_prange_allzoom[1]->SetFillStyle(3005);
+  h_prange_allzoom[1]->SetFillColor(28);
+  h_prange_allzoom[1]->Scale(scale_onoffbeam);
+
+  
+  hs_prange_zoom -> Add(h_prange_sigzoom[1]);
+  hs_prange_zoom -> Add(h_prange_sigzoom[2]);
+  hs_prange_zoom -> Add(h_prange_sigzoom[3]);
+  hs_prange_zoom -> Add(h_prange_sigzoom[4]);
+
+  hs_prange_zoom -> Add(h_prange_baczoom[0]);
+  hs_prange_zoom -> Add(h_prange_baczoom[1]);
+  hs_prange_zoom -> Add(h_prange_baczoom[2]);
+  hs_prange_zoom -> Add(h_prange_baczoom[3]);
+  hs_prange_zoom -> Add(h_prange_baczoom[4]);
+  hs_prange_zoom -> Add(h_prange_baczoom[5]);
+  hs_prange_zoom -> Add(h_prange_baczoom[6]);
+  hs_prange_zoom -> Add(h_prange_baczoom[7]);
+  hs_prange_zoom -> Add(h_prange_allzoom[1]);
+  hs_prange_zoom -> Draw("HIST SAME");
+//  hs_prange_zoom -> GetXaxis()->SetRangeUser(0,10);
+//  hs_prange_zoom -> Draw("HIST");
+
+//  h_prange_zoom[2]->Draw("same");
+  h_prange_allzoom[0]->Draw("same");
+
+   legend->Draw("same");
+  if(tune==3){c1->Print("figures/Tune3/SigSep/h_prange_zoom.png");}
+  else{c1->Print("figures/Tune1/SigSep/h_prange_zoom.png");}
 
   //===================================================================
   TH1D *h_onoff_costheta=(TH1D*)h_costheta_allsel[1]->Clone(Form("%s_on-off", h_costheta_allsel[1]->GetName()));
