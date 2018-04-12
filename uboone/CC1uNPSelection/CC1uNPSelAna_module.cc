@@ -971,6 +971,7 @@ private:
     double fFlashWidth;      
     double fBeamMin;    
     double fBeamMax;      
+    double fdQdx_scale;      
     double fPEThresh;     
     double fMinTrk2VtxDist;     
     double fMinTrackLen;
