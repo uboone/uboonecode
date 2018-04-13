@@ -1,3 +1,18 @@
+void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH1D *histarray_data[]){
+  // Merge background histograms as needed
+  histarray_bac[1]->Add(histarray_bac[2]); // CC-1pi add CC-Npi
+  histarray_bac[4]->Add(histarray_bac[3]); // NC add nue
+  histarray_bac[4]->Add(histarray_bac[5]); // NC add OOFV
+  histarray_bac[4]->Add(histarray_bac[6]); // NC add Cosmic
+  histarray_bac[4]->Add(histarray_bac[7]); // NC add Mixed
+
+  // Stack histograms into stack
+  stack->Add(histarray_sig[0]); // signal
+  stack->Add(histarray_bac[0]); // 0pi0p
+  stack->Add(histarray_bac[1]); // CC-other
+  stack->Add(histarray_bac[4]); // Other
+  stack->Add(histarray_data[1]); // EXT data
+}
 
 
 void plot_com_MCaddOffbeam_bacsep(){
@@ -356,6 +371,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 
   h_prange_bac[0]=(TH1D*)input2->Get("trklen_proton_1");
   h_prange_baczoom[0]=(TH1D*)h_prange_bac[0]->Clone();
+  h_prange_baczoom[0]->Rebin(2);
   h_prange_baczoom[0]->Sumw2();
   h_prange_bac[0]->Rebin(5);
   h_prange_bac[0]->Sumw2();
@@ -788,54 +804,54 @@ void plot_com_MCaddOffbeam_bacsep(){
   TH1D                  *h_phad_allsel[3];
 
   h_phad_allsel[0]=(TH1D*)input0->Get("Phad");
-  h_phad_allsel[0]->Rebin(5); 
+  h_phad_allsel[0]->Rebin(2); 
   h_phad_allsel[0]->Sumw2();
  
 
   h_phad_allsel[1]=(TH1D*)input1->Get("Phad");
-  h_phad_allsel[1]->Rebin(5);
+  h_phad_allsel[1]->Rebin(2);
   h_phad_allsel[1]->Sumw2();
 
   h_phad_allsel[2]=(TH1D*)input2->Get("Phad");
-  h_phad_allsel[2]->Rebin(5);
+  h_phad_allsel[2]->Rebin(2);
   h_phad_allsel[2]->Sumw2();
 
   TH1D               *h_phad_sig[2];
   TH1D               *h_phad_bac[8];
   h_phad_sig[0]=(TH1D*)input2->Get("fPproton_0");
-  h_phad_sig[0]->Rebin(5);
+  h_phad_sig[0]->Rebin(2);
   h_phad_sig[0]->Sumw2();
 
   h_phad_bac[0]=(TH1D*)input2->Get("fPproton_1");
-  h_phad_bac[0]->Rebin(5);
+  h_phad_bac[0]->Rebin(2);
   h_phad_bac[0]->Sumw2();
  
   h_phad_bac[1]=(TH1D*)input2->Get("fPproton_2");
-  h_phad_bac[1]->Rebin(5);
+  h_phad_bac[1]->Rebin(2);
   h_phad_bac[1]->Sumw2();
 
   h_phad_bac[2]=(TH1D*)input2->Get("fPproton_3");
-  h_phad_bac[2]->Rebin(5);
+  h_phad_bac[2]->Rebin(2);
   h_phad_bac[2]->Sumw2();
  
   h_phad_bac[3]=(TH1D*)input2->Get("fPproton_4");
-  h_phad_bac[3]->Rebin(5);
+  h_phad_bac[3]->Rebin(2);
   h_phad_bac[3]->Sumw2();
 
   h_phad_bac[4]=(TH1D*)input2->Get("fPproton_5");
-  h_phad_bac[4]->Rebin(5);
+  h_phad_bac[4]->Rebin(2);
   h_phad_bac[4]->Sumw2();
  
   h_phad_bac[5]=(TH1D*)input2->Get("fPproton_6");
-  h_phad_bac[5]->Rebin(5);
+  h_phad_bac[5]->Rebin(2);
   h_phad_bac[5]->Sumw2();
 
   h_phad_bac[6]=(TH1D*)input2->Get("fPproton_7");
-  h_phad_bac[6]->Rebin(5);
+  h_phad_bac[6]->Rebin(2);
   h_phad_bac[6]->Sumw2();
 
   h_phad_bac[7]=(TH1D*)input2->Get("fPproton_8");
-  h_phad_bac[7]->Rebin(5);
+  h_phad_bac[7]->Rebin(2);
   h_phad_bac[7]->Sumw2();
    //=============================================================== 
   TH1D                  *h_thetamup_allsel[3];
@@ -2065,19 +2081,20 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_range_allsel[1]->Scale(scale_onoffbeam);
 
 
-   hs_range -> Add(h_range_sig[0]);
-   hs_range -> Add(h_range_bac[0]);
-   hs_range -> Add(h_range_bac[1]);
-   hs_range -> Add(h_range_bac[2]);
-   hs_range -> Add(h_range_bac[3]);
-   hs_range -> Add(h_range_bac[4]);
-   hs_range -> Add(h_range_bac[5]);
-   hs_range -> Add(h_range_bac[6]);
-   hs_range -> Add(h_range_bac[7]);
-   hs_range -> Add(h_range_allsel[1]);
+//   hs_range -> Add(h_range_sig[0]);
+//   hs_range -> Add(h_range_bac[0]);
+//   hs_range -> Add(h_range_bac[1]);
+//   hs_range -> Add(h_range_bac[2]);
+//   hs_range -> Add(h_range_bac[3]);
+//   hs_range -> Add(h_range_bac[4]);
+//   hs_range -> Add(h_range_bac[5]);
+//   hs_range -> Add(h_range_bac[6]);
+//   hs_range -> Add(h_range_bac[7]);
+//   hs_range -> Add(h_range_allsel[1]);
+   stackHists(hs_range, h_range_sig, h_range_bac, h_range_allsel);
    hs_range -> Draw("HIST,SAME");
 
-   h_range_allsel[2]->Draw("same");
+//   h_range_allsel[2]->Draw("same");
    h_range_allsel[0]->Draw("same");
    //h_onoff_range->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2086,16 +2103,20 @@ void plot_com_MCaddOffbeam_bacsep(){
   legend->AddEntry(h_range_allsel[0], "on_beam");
   legend->AddEntry(h_range_allsel[1], "off_beam");
   //legend->AddEntry(h_onoff_range, "on beam - off beam");
-  legend->AddEntry(h_range_allsel[2],"MC");
-  legend -> AddEntry(h_range_sig[0], "1uNp (CC)", "f");
-  legend -> AddEntry(h_range_bac[0], "CC0#pi0P", "f");
-  legend -> AddEntry(h_range_bac[1], "CC1#piNP", "f");
-  legend -> AddEntry(h_range_bac[2], "CCN#piNp", "f");
-  legend -> AddEntry(h_range_bac[3], "CC#nu_{e}", "f");
-  legend -> AddEntry(h_range_bac[4], "NC", "f");
-  legend -> AddEntry(h_range_bac[5], "OOFV", "f");
-  legend -> AddEntry(h_range_bac[6], "Cosmic", "f");
-  legend -> AddEntry(h_range_bac[7], "Mixed", "f");
+  //legend->AddEntry(h_range_allsel[2],"MC");
+  legend -> AddEntry(h_range_sig[0], "Signal", "f");
+  legend -> AddEntry(h_range_bac[0], "#nu_{#mu}CC0#pi0P", "f");
+
+  legend -> AddEntry(h_range_bac[1], "#nu_{#mu}CC-other", "f");
+  legend -> AddEntry(h_range_bac[4], "Other", "f");
+
+//  legend -> AddEntry(h_range_bac[1], "CC1#piNP", "f");
+//  legend -> AddEntry(h_range_bac[2], "CCN#piNp", "f");
+//  legend -> AddEntry(h_range_bac[3], "CC#nu_{e}", "f");
+//  legend -> AddEntry(h_range_bac[4], "NC", "f");
+//  legend -> AddEntry(h_range_bac[5], "OOFV", "f");
+//  legend -> AddEntry(h_range_bac[6], "Cosmic", "f");
+//  legend -> AddEntry(h_range_bac[7], "Mixed", "f");
   legend->Draw("same");
 
 
@@ -2949,7 +2970,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_phad_allsel[0]->SetLineStyle(1);
   h_phad_allsel[0]->GetXaxis()->SetTitle("Momentum of the leading proton candidates[GeV]");
   h_phad_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phad_allsel[0]->SetMaximum(600);
+  h_phad_allsel[0]->SetMaximum(2.0*h_phad_allsel[0]->GetMaximum());
   h_phad_allsel[0]->Draw();  
 
   //h_phad_allsel[1]->SetLineColor(kRed);
@@ -3008,7 +3029,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    hs_phad -> Draw("HIST,SAME");
 
    h_phad_allsel[2]->Draw("same");
-  h_phad_allsel[0]->Draw("same");  
+   h_phad_allsel[0]->Draw("same");  
    //h_onoff_phad->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
@@ -3016,6 +3037,17 @@ void plot_com_MCaddOffbeam_bacsep(){
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phad_allsel.png");}
    
+   h_phad_allsel[0]->GetXaxis()->SetRangeUser(0.2,0.5);
+   h_phad_allsel[0]->Draw();
+   hs_phad -> Draw("HIST,SAME");
+   //h_phad_allsel[2]->Draw("same");
+   h_phad_allsel[0]->Draw("same");  
+ 
+   legend->Draw("same");
+   if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_zoom.png");}
+   else{c1->Print("figures/Tune1/BackSep/h_phad_zoom.png");}
+
+
 //==============================================================
 
   TH1D *h_onoff_thetamup=(TH1D*)h_thetamup_allsel[1]->Clone(Form("%s_on-off", h_thetamup_allsel[1]->GetName()));
@@ -4801,3 +4833,5 @@ void plot_com_MCaddOffbeam_bacsep(){
 
 
 }
+
+
