@@ -1,4 +1,28 @@
-void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH1D *histarray_data[]){
+void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH1D *histarray_data[], const double &normfac, const double &scale_onoffbeam){
+  std::cout << normfac << ", " << scale_onoffbeam << std::endl;
+  histarray_data[0]->SetLineColor(kBlack);
+  histarray_data[0]->SetLineWidth(2);
+  histarray_data[0]->SetLineStyle(1);
+
+  histarray_sig[0]-> SetFillColor(2); 
+  histarray_sig[0]->Scale(normfac);
+  histarray_bac[0]-> SetFillColor(46);
+  histarray_bac[0]->Scale(normfac);
+  histarray_bac[1]-> SetFillColor(4);
+  histarray_bac[1]->Scale(normfac);
+
+  histarray_bac[2]->Scale(normfac);
+  histarray_bac[3]->Scale(normfac);
+  histarray_bac[5]->Scale(normfac);
+  histarray_bac[6]->Scale(normfac);
+  histarray_bac[7]->Scale(normfac);
+
+  histarray_bac[4]-> SetFillColor(3);
+  histarray_bac[4]->Scale(normfac);
+  histarray_data[1]->SetFillStyle(3005);
+  histarray_data[1]->SetFillColor(28);
+  histarray_data[1]->Scale(scale_onoffbeam);
+
   // Merge background histograms as needed
   histarray_bac[1]->Add(histarray_bac[2]); // CC-1pi add CC-Npi
   histarray_bac[4]->Add(histarray_bac[3]); // NC add nue
@@ -222,6 +246,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 
 
   //===============================================================
+  std::cout << "h_range" << std::endl;
   TH1D                  *h_range_allsel[3];
 
   h_range_allsel[0]=(TH1D*)input0->Get("trklen_cand");
@@ -237,6 +262,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_range_allsel[2]->Rebin(4);
   h_range_allsel[2]->Sumw2();
 
+  std::cout << "h_range_sig/bac" << std::endl;
   TH1D               *h_range_sig[2];
   TH1D               *h_range_bac[8];
   h_range_sig[0]=(TH1D*)input2->Get("trklen_muon_0");
@@ -275,6 +301,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_range_bac[7]->Rebin(4);
   h_range_bac[7]->Sumw2();
    //===============================================================
+  std::cout << "h_trkmom" << std::endl;
   TH1D                  *h_trkmom_allsel[3];
 
   h_trkmom_allsel[0]=(TH1D*)input0->Get("trkmomlep");
@@ -2031,9 +2058,9 @@ void plot_com_MCaddOffbeam_bacsep(){
 
   TCanvas *c1 = new TCanvas("c1"); 
 
-  h_range_allsel[0]->SetLineColor(kBlack);
-  h_range_allsel[0]->SetLineWidth(2);
-  h_range_allsel[0]->SetLineStyle(1);
+//  h_range_allsel[0]->SetLineColor(kBlack);
+//  h_range_allsel[0]->SetLineWidth(2);
+//  h_range_allsel[0]->SetLineStyle(1);
   h_range_allsel[0]->GetXaxis()->SetTitle("Track Length of Muon Candidate[cm]");
   h_range_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
   h_range_allsel[0]->SetMaximum(500);
@@ -2051,34 +2078,34 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_onoff_range->GetYaxis()->SetTitle("No. of Tracks");
   //h_onoff_range->DrawCopy("");
 
-  h_range_allsel[2]->SetLineColor(kRed);
-  h_range_allsel[2]->SetLineWidth(2);
-  h_range_allsel[2]->SetLineStyle(1);
-  h_range_allsel[2]->Scale(normfac);
+//  h_range_allsel[2]->SetLineColor(kRed);
+//  h_range_allsel[2]->SetLineWidth(2);
+//  h_range_allsel[2]->SetLineStyle(1);
+//  h_range_allsel[2]->Scale(normfac);
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_range = new THStack("hs_range","");
 
-  h_range_sig[0]-> SetFillColor(2); 
-  h_range_sig[0]->Scale(normfac);
-  h_range_bac[0]-> SetFillColor(46);
-  h_range_bac[0]->Scale(normfac);
-  h_range_bac[1]-> SetFillColor(4);
-  h_range_bac[1]->Scale(normfac);
-  h_range_bac[2]-> SetFillColor(8);
-  h_range_bac[2]->Scale(normfac);
-  h_range_bac[3] -> SetFillColor(5);
-  h_range_bac[3]->Scale(normfac);
-  h_range_bac[4]-> SetFillColor(3);
-  h_range_bac[4]->Scale(normfac);
-  h_range_bac[5]-> SetFillColor(6);
-  h_range_bac[5]->Scale(normfac);
-  h_range_bac[6]-> SetFillColor(7);
-  h_range_bac[6]->Scale(normfac);
-  h_range_bac[7]-> SetFillColor(9);
-  h_range_bac[7]->Scale(normfac);
-  h_range_allsel[1]->SetFillStyle(3005);
-  h_range_allsel[1]->SetFillColor(28);
-  h_range_allsel[1]->Scale(scale_onoffbeam);
+//  h_range_sig[0]-> SetFillColor(2); 
+//  h_range_sig[0]->Scale(normfac);
+//  h_range_bac[0]-> SetFillColor(46);
+//  h_range_bac[0]->Scale(normfac);
+//  h_range_bac[1]-> SetFillColor(4);
+//  h_range_bac[1]->Scale(normfac);
+//  h_range_bac[2]-> SetFillColor(8);
+//  h_range_bac[2]->Scale(normfac);
+//  h_range_bac[3] -> SetFillColor(5);
+//  h_range_bac[3]->Scale(normfac);
+//  h_range_bac[4]-> SetFillColor(3);
+//  h_range_bac[4]->Scale(normfac);
+//  h_range_bac[5]-> SetFillColor(6);
+//  h_range_bac[5]->Scale(normfac);
+//  h_range_bac[6]-> SetFillColor(7);
+//  h_range_bac[6]->Scale(normfac);
+//  h_range_bac[7]-> SetFillColor(9);
+//  h_range_bac[7]->Scale(normfac);
+//  h_range_allsel[1]->SetFillStyle(3005);
+//  h_range_allsel[1]->SetFillColor(28);
+//  h_range_allsel[1]->Scale(scale_onoffbeam);
 
 
 //   hs_range -> Add(h_range_sig[0]);
@@ -2091,33 +2118,30 @@ void plot_com_MCaddOffbeam_bacsep(){
 //   hs_range -> Add(h_range_bac[6]);
 //   hs_range -> Add(h_range_bac[7]);
 //   hs_range -> Add(h_range_allsel[1]);
-   stackHists(hs_range, h_range_sig, h_range_bac, h_range_allsel);
+   stackHists(hs_range, h_range_sig, h_range_bac, h_range_allsel, normfac, scale_onoffbeam);
    hs_range -> Draw("HIST,SAME");
 
 //   h_range_allsel[2]->Draw("same");
    h_range_allsel[0]->Draw("same");
    //h_onoff_range->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-  TLegend *legend = new TLegend(.60, .65, .90, .90);
+  TLegend *legendR = new TLegend(.60, .65, .90, .90); // right-aligned
+  TLegend *legendL = new TLegend(.10, .65, .35, .90); // left-aligned
 
-  legend->AddEntry(h_range_allsel[0], "on_beam");
-  legend->AddEntry(h_range_allsel[1], "off_beam");
-  //legend->AddEntry(h_onoff_range, "on beam - off beam");
-  //legend->AddEntry(h_range_allsel[2],"MC");
-  legend -> AddEntry(h_range_sig[0], "Signal", "f");
-  legend -> AddEntry(h_range_bac[0], "#nu_{#mu}CC0#pi0P", "f");
-
-  legend -> AddEntry(h_range_bac[1], "#nu_{#mu}CC-other", "f");
-  legend -> AddEntry(h_range_bac[4], "Other", "f");
-
-//  legend -> AddEntry(h_range_bac[1], "CC1#piNP", "f");
-//  legend -> AddEntry(h_range_bac[2], "CCN#piNp", "f");
-//  legend -> AddEntry(h_range_bac[3], "CC#nu_{e}", "f");
-//  legend -> AddEntry(h_range_bac[4], "NC", "f");
-//  legend -> AddEntry(h_range_bac[5], "OOFV", "f");
-//  legend -> AddEntry(h_range_bac[6], "Cosmic", "f");
-//  legend -> AddEntry(h_range_bac[7], "Mixed", "f");
-  legend->Draw("same");
+  legendR->AddEntry(h_range_allsel[0], "on_beam");
+  legendR->AddEntry(h_range_allsel[1], "off_beam");
+  legendR -> AddEntry(h_range_sig[0], "Signal", "f");
+  legendR -> AddEntry(h_range_bac[0], "#nu_{#mu}CC0#pi0P", "f");
+  legendR -> AddEntry(h_range_bac[1], "#nu_{#mu}CC-other", "f");
+  legendR -> AddEntry(h_range_bac[4], "Other", "f");
+  legendL->AddEntry(h_range_allsel[0], "on_beam");
+  legendL->AddEntry(h_range_allsel[1], "off_beam");
+  legendL -> AddEntry(h_range_sig[0], "Signal", "f");
+  legendL -> AddEntry(h_range_bac[0], "#nu_{#mu}CC0#pi0P", "f");
+  legendL -> AddEntry(h_range_bac[1], "#nu_{#mu}CC-other", "f");
+  legendL -> AddEntry(h_range_bac[4], "Other", "f");
+  
+  legendR->Draw("same");
 
 
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_range_allsel.png");}
@@ -2197,7 +2221,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_trkmom->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   
-  legend->Draw("same");
+  legendR->Draw("same");
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_trkmom_allsel.png");}
   else{c1->Print("figures/Tune1/BackSep/h_trkmom_allsel.png");}
 
@@ -2274,7 +2298,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   //h_onoff_prange->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-  legend->Draw("same");
+  legendR->Draw("same");
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_prange_allsel.png");}
   else{c1->Print("figures/Tune1/BackSep/h_prange_allsel.png");}
 
@@ -2328,7 +2352,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 //  h_prange_zoom[2]->Draw("same");
   h_prange_allzoom[0]->Draw("same");
   
-  legend->Draw("same");
+  legendR->Draw("same");
 
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_prange_zoom.png");}
   else{c1->Print("figures/Tune1/BackSep/h_prange_zoom.png");}
@@ -2405,7 +2429,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_costheta_allsel[0]->Draw("same");
    //h_onoff_costheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-  legend->Draw("same");
+  legendL->Draw("same");
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_costheta_allsel.png");}
   else{c1->Print("figures/Tune1/BackSep/h_costheta_allsel.png");}
 
@@ -2483,7 +2507,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_pcostheta_allsel[0]->Draw("same");
    //h_onoff_pcostheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-   legend->Draw("same");
+   legendL->Draw("same");
   if(tune==3){c1->Print("figures/Tune3/BackSep/h_pcostheta_allsel.png");}
   else{c1->Print("figures/Tune1/BackSep/h_pcostheta_allsel.png");}
 
@@ -2564,7 +2588,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_trunmean_muon->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_trunmean_muon.png");}
    else{c1->Print("figures/Tune1/BackSep/h_trunmean_muon.png");}
   //==================================================================================
@@ -2644,7 +2668,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_trunmean_proton->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_trunmean_proton.png");}
    else{c1->Print("figures/Tune1/BackSep/h_trunmean_proton.png");}
   
@@ -2724,7 +2748,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_phi->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phi_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phi_allsel.png");}
 
@@ -2804,7 +2828,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_pphi->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendL->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pphi_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pphi_allsel.png");}
  //================================================================================ 
@@ -2880,7 +2904,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_ntrksp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_ntrksp_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_ntrksp_allsel.png");}
 //===========================================================================
@@ -2956,7 +2980,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_plep->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_plep_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_plep_allsel.png");}
  //==============================================================
@@ -3033,7 +3057,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_phad->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phad_allsel.png");}
    
@@ -3043,7 +3067,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_phad_allsel[2]->Draw("same");
    h_phad_allsel[0]->Draw("same");  
  
-   legend->Draw("same");
+   legendL->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_zoom.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phad_zoom.png");}
 
@@ -3122,7 +3146,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_thetamup->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_thetamup_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_thetamup_allsel.png");}
 //==================================================================
@@ -3198,7 +3222,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_thetapp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_thetapp_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_thetapp_allsel.png");}
 
@@ -3278,7 +3302,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_phimup->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendL->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phimup_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phimup_allsel.png");}
 //================================================================
@@ -3355,7 +3379,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_phipp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendL->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_phipp_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_phipp_allsel.png");}
 
@@ -3434,7 +3458,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_Nhitsmuon->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_Nhitsmuon_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_Nhitsmuon_allsel.png");}
 
@@ -3512,7 +3536,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_Nhitsproton->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_Nhitsproton_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_Nhitsproton_allsel.png");}
    //=====================================================================
@@ -3589,7 +3613,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_vtxx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxx_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_vtxx_allsel.png");}
    //============================================================
@@ -3666,7 +3690,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_vtxy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxy_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_vtxy_allsel.png");}
    //================================================================================ 
@@ -3743,7 +3767,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_vtxz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxz_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_vtxz_allsel.png");}
    //==================================================    
@@ -3820,7 +3844,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_mustartx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustartx_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_mustartx_allsel.png");}
  
@@ -3898,7 +3922,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_mustarty->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustarty_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_mustarty_allsel.png");}
   //==================================================================== 
@@ -3975,7 +3999,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_mustartz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustartz_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_mustartz_allsel.png");}
   //================================================================= 
@@ -4052,7 +4076,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_muendx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendx_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_muendx_allsel.png");}
  
@@ -4130,7 +4154,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_muendy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendy_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_muendy_allsel.png");}
   //==================================================================== 
@@ -4207,7 +4231,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_muendz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendL->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendz_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_muendz_allsel.png");}
    //==================================================================   
@@ -4284,7 +4308,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_pstartx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstartx_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pstartx_allsel.png");}
  
@@ -4362,7 +4386,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_pstarty->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstarty_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pstarty_allsel.png");}
   //==================================================================== 
@@ -4439,7 +4463,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 //h_onoff_pstartz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstartz_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pstartz_allsel.png");}
   //================================================================= 
@@ -4516,7 +4540,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 //h_onoff_pendx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendx_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pendx_allsel.png");}
  
@@ -4594,7 +4618,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   //h_onoff_pendy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendy_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pendy_allsel.png");}
   //==================================================================== 
@@ -4671,7 +4695,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 //h_onoff_pendz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendz_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_pendz_allsel.png");}
   //==================================================
@@ -4748,7 +4772,7 @@ void plot_com_MCaddOffbeam_bacsep(){
 //h_onoff_Evis->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_Evis_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_Evis_allsel.png");}
   //============================================================
@@ -4825,7 +4849,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_Q2cal->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legend->Draw("same");
+   legendR->Draw("same");
    if(tune==3){c1->Print("figures/Tune3/BackSep/h_Q2cal_allsel.png");}
    else{c1->Print("figures/Tune1/BackSep/h_Q2cal_allsel.png");}
 
