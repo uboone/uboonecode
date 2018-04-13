@@ -455,7 +455,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   TH1D                  *h_phi_allsel[3];
 
   h_phi_allsel[0]=(TH1D*)input0->Get("philep");
-  h_phi_allsel[0]->Rebin(6); 
+  h_phi_allsel[0]->Rebin(4); 
   h_phi_allsel[0]->Sumw2();
  
 
@@ -2085,45 +2085,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_range = new THStack("hs_range","");
 
-//  h_range_sig[0]-> SetFillColor(2); 
-//  h_range_sig[0]->Scale(normfac);
-//  h_range_bac[0]-> SetFillColor(46);
-//  h_range_bac[0]->Scale(normfac);
-//  h_range_bac[1]-> SetFillColor(4);
-//  h_range_bac[1]->Scale(normfac);
-//  h_range_bac[2]-> SetFillColor(8);
-//  h_range_bac[2]->Scale(normfac);
-//  h_range_bac[3] -> SetFillColor(5);
-//  h_range_bac[3]->Scale(normfac);
-//  h_range_bac[4]-> SetFillColor(3);
-//  h_range_bac[4]->Scale(normfac);
-//  h_range_bac[5]-> SetFillColor(6);
-//  h_range_bac[5]->Scale(normfac);
-//  h_range_bac[6]-> SetFillColor(7);
-//  h_range_bac[6]->Scale(normfac);
-//  h_range_bac[7]-> SetFillColor(9);
-//  h_range_bac[7]->Scale(normfac);
-//  h_range_allsel[1]->SetFillStyle(3005);
-//  h_range_allsel[1]->SetFillColor(28);
-//  h_range_allsel[1]->Scale(scale_onoffbeam);
-
-
-//   hs_range -> Add(h_range_sig[0]);
-//   hs_range -> Add(h_range_bac[0]);
-//   hs_range -> Add(h_range_bac[1]);
-//   hs_range -> Add(h_range_bac[2]);
-//   hs_range -> Add(h_range_bac[3]);
-//   hs_range -> Add(h_range_bac[4]);
-//   hs_range -> Add(h_range_bac[5]);
-//   hs_range -> Add(h_range_bac[6]);
-//   hs_range -> Add(h_range_bac[7]);
-//   hs_range -> Add(h_range_allsel[1]);
-   stackHists(hs_range, h_range_sig, h_range_bac, h_range_allsel, normfac, scale_onoffbeam);
-   hs_range -> Draw("HIST,SAME");
+  stackHists(hs_range, h_range_sig, h_range_bac, h_range_allsel, normfac, scale_onoffbeam);
+  hs_range -> Draw("HIST,SAME");
 
 //   h_range_allsel[2]->Draw("same");
-   h_range_allsel[0]->Draw("same");
-   //h_onoff_range->Draw("E1CSAME");
+  h_range_allsel[0]->Draw("same");
+  //h_onoff_range->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   TLegend *legendR = new TLegend(.60, .65, .90, .90); // right-aligned
   TLegend *legendL = new TLegend(.10, .65, .35, .90); // left-aligned
@@ -2158,7 +2125,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_trkmom_allsel[0]->SetLineStyle(1);
   h_trkmom_allsel[0]->GetXaxis()->SetTitle("Track Momentum of Muon Candidate with MCS calculation[cm]");
   h_trkmom_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_trkmom_allsel[0]->SetMaximum(600);
+  h_trkmom_allsel[0]->SetMaximum(1.4 * h_trkmom_allsel[0]->GetMaximum());
   h_trkmom_allsel[0]->Draw();
   
   //h_trkmom_allsel[1]->SetLineColor(kRed);
@@ -2180,43 +2147,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_trkmom = new THStack("hs_trkmom","");
 
-  h_trkmom_sig[0]-> SetFillColor(2); 
-  h_trkmom_sig[0]->Scale(normfac);
-  h_trkmom_bac[0]-> SetFillColor(46);
-  h_trkmom_bac[0]->Scale(normfac);
-  h_trkmom_bac[1]-> SetFillColor(4);
-  h_trkmom_bac[1]->Scale(normfac);
-  h_trkmom_bac[2]-> SetFillColor(8);
-  h_trkmom_bac[2]->Scale(normfac);
-  h_trkmom_bac[3] -> SetFillColor(5);
-  h_trkmom_bac[3]->Scale(normfac);
-  h_trkmom_bac[4]-> SetFillColor(3);
-  h_trkmom_bac[4]->Scale(normfac);
-  h_trkmom_bac[5]-> SetFillColor(6);
-  h_trkmom_bac[5]->Scale(normfac);
-  h_trkmom_bac[6]-> SetFillColor(7);
-  h_trkmom_bac[6]->Scale(normfac);
-  h_trkmom_bac[7]-> SetFillColor(9);
-  h_trkmom_bac[7]->Scale(normfac);
-  h_trkmom_allsel[1]->SetFillStyle(3005);
-  h_trkmom_allsel[1]->SetFillColor(28);
-  h_trkmom_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_trkmom, h_trkmom_sig, h_trkmom_bac, h_trkmom_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_trkmom -> Add(h_trkmom_sig[0]);
-   hs_trkmom -> Add(h_trkmom_bac[0]);
-   hs_trkmom -> Add(h_trkmom_bac[1]);
-   hs_trkmom -> Add(h_trkmom_bac[2]);
-   hs_trkmom -> Add(h_trkmom_bac[3]);
-   hs_trkmom -> Add(h_trkmom_bac[4]);
-   hs_trkmom -> Add(h_trkmom_bac[5]);
-   hs_trkmom -> Add(h_trkmom_bac[6]);
-   hs_trkmom -> Add(h_trkmom_bac[7]);
-   hs_trkmom -> Add(h_trkmom_allsel[1]);
    hs_trkmom -> Draw("HIST,SAME");
 
-   h_trkmom_allsel[2]->Draw("same");
+//   h_trkmom_allsel[2]->Draw("same");
    h_trkmom_allsel[0]->Draw("same");
    //h_onoff_trkmom->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2236,7 +2171,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allsel[0]->SetLineStyle(1);
   h_prange_allsel[0]->GetXaxis()->SetTitle("Track Length of The Leading Proton Candidate[cm]");
   h_prange_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_prange_allsel[0]->SetMaximum(2.0*h_prange_allsel[0]->GetMaximum());
+  h_prange_allsel[0]->SetMaximum(1.4*h_prange_allsel[0]->GetMaximum());
   h_prange_allsel[0]->Draw();
   //h_prange_allsel[1]->SetLineColor(kRed);
   //h_prange_allsel[1]->SetLineWidth(2);
@@ -2256,41 +2191,9 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allsel[2]->Scale(normfac);
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_prange = new THStack("hs_prange","");
+  
+  stackHists(hs_prange, h_prange_sig, h_prange_bac, h_prange_allsel, normfac, scale_onoffbeam);
 
-  h_prange_sig[0]-> SetFillColor(2); 
-  h_prange_sig[0]->Scale(normfac);
-  h_prange_bac[0]-> SetFillColor(46);
-  h_prange_bac[0]->Scale(normfac);
-  h_prange_bac[1]-> SetFillColor(4);
-  h_prange_bac[1]->Scale(normfac);
-  h_prange_bac[2]-> SetFillColor(8);
-  h_prange_bac[2]->Scale(normfac);
-  h_prange_bac[3] -> SetFillColor(5);
-  h_prange_bac[3]->Scale(normfac);
-  h_prange_bac[4]-> SetFillColor(3);
-  h_prange_bac[4]->Scale(normfac);
-  h_prange_bac[5]-> SetFillColor(6);
-  h_prange_bac[5]->Scale(normfac);
-  h_prange_bac[6]-> SetFillColor(7);
-  h_prange_bac[6]->Scale(normfac);
-  h_prange_bac[7]-> SetFillColor(9);
-  h_prange_bac[7]->Scale(normfac);
-  h_prange_allsel[1]->SetFillStyle(3005);
-  h_prange_allsel[1]->SetFillColor(28);
-  h_prange_allsel[1]->Scale(scale_onoffbeam);
-
-
-
-  hs_prange -> Add(h_prange_sig[0]);
-  hs_prange -> Add(h_prange_bac[0]);
-  hs_prange -> Add(h_prange_bac[1]);
-  hs_prange -> Add(h_prange_bac[2]);
-  hs_prange -> Add(h_prange_bac[3]);
-  hs_prange -> Add(h_prange_bac[4]);
-  hs_prange -> Add(h_prange_bac[5]);
-  hs_prange -> Add(h_prange_bac[6]);
-  hs_prange -> Add(h_prange_bac[7]);
-  hs_prange -> Add(h_prange_allsel[1]);
   hs_prange -> Draw("HIST,SAME");
 
   //h_prange_allsel[2]->Draw("same"); // MC error bars, but done wrong
@@ -2304,6 +2207,9 @@ void plot_com_MCaddOffbeam_bacsep(){
 
   //=====================ZOOM in on proton length ============
   THStack *hs_prange_zoom = new THStack("hs_prange_zoom","");
+
+  stackHists(hs_prange_zoom, h_prange_sigzoom, h_prange_baczoom, h_prange_allzoom, normfac, scale_onoffbeam);
+
   h_prange_allzoom[0]->SetLineColor(kBlack);
   h_prange_allzoom[0]->SetLineWidth(2);
   h_prange_allzoom[0]->SetLineStyle(1);
@@ -2313,38 +2219,6 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allzoom[0]->GetXaxis()->SetRangeUser(0,10);
   h_prange_allzoom[0]->Draw();
   
-  h_prange_sigzoom[0]-> SetFillColor(2); 
-  h_prange_sigzoom[0]->Scale(normfac);
-  h_prange_baczoom[0]-> SetFillColor(46);
-  h_prange_baczoom[0]->Scale(normfac);
-  h_prange_baczoom[1]-> SetFillColor(4);
-  h_prange_baczoom[1]->Scale(normfac);
-  h_prange_baczoom[2]-> SetFillColor(8);
-  h_prange_baczoom[2]->Scale(normfac);
-  h_prange_baczoom[3] -> SetFillColor(5);
-  h_prange_baczoom[3]->Scale(normfac);
-  h_prange_baczoom[4]-> SetFillColor(3);
-  h_prange_baczoom[4]->Scale(normfac);
-  h_prange_baczoom[5]-> SetFillColor(6);
-  h_prange_baczoom[5]->Scale(normfac);
-  h_prange_baczoom[6]-> SetFillColor(7);
-  h_prange_baczoom[6]->Scale(normfac);
-  h_prange_baczoom[7]-> SetFillColor(9);
-  h_prange_baczoom[7]->Scale(normfac);
-  h_prange_allzoom[1]->SetFillStyle(3005);
-  h_prange_allzoom[1]->SetFillColor(28);
-  h_prange_allzoom[1]->Scale(scale_onoffbeam);
-
-  hs_prange_zoom -> Add(h_prange_sigzoom[0]);
-  hs_prange_zoom -> Add(h_prange_baczoom[0]);
-  hs_prange_zoom -> Add(h_prange_baczoom[1]);
-  hs_prange_zoom -> Add(h_prange_baczoom[2]);
-  hs_prange_zoom -> Add(h_prange_baczoom[3]);
-  hs_prange_zoom -> Add(h_prange_baczoom[4]);
-  hs_prange_zoom -> Add(h_prange_baczoom[5]);
-  hs_prange_zoom -> Add(h_prange_baczoom[6]);
-  hs_prange_zoom -> Add(h_prange_baczoom[7]);
-  hs_prange_zoom -> Add(h_prange_allzoom[1]);
   hs_prange_zoom -> Draw("HIST SAME");
 //  hs_prange_zoom -> GetXaxis()->SetRangeUser(0,10);
 //  hs_prange_zoom -> Draw("HIST");
@@ -2367,7 +2241,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_costheta_allsel[0]->SetLineStyle(1);
   h_costheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{#mu}");
   h_costheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_costheta_allsel[0]->SetMaximum(800);
+  h_costheta_allsel[0]->SetMaximum(2.3 * h_costheta_allsel[0]->GetMaximum());
   h_costheta_allsel[0]->Draw();
   //h_costheta_allsel[1]->SetLineColor(kRed);
   //h_costheta_allsel[1]->SetLineWidth(2);
@@ -2388,44 +2262,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_costheta_allsel[2]->Scale(normfac);
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_costheta = new THStack("hs_costheta","");
+  
+  stackHists(hs_costheta, h_costheta_sig, h_costheta_bac, h_costheta_allsel, normfac, scale_onoffbeam);
 
-  h_costheta_sig[0]-> SetFillColor(2); 
-  h_costheta_sig[0]->Scale(normfac);
-  h_costheta_bac[0]-> SetFillColor(46);
-  h_costheta_bac[0]->Scale(normfac);
-  h_costheta_bac[1]-> SetFillColor(4);
-  h_costheta_bac[1]->Scale(normfac);
-  h_costheta_bac[2]-> SetFillColor(8);
-  h_costheta_bac[2]->Scale(normfac);
-  h_costheta_bac[3] -> SetFillColor(5);
-  h_costheta_bac[3]->Scale(normfac);
-  h_costheta_bac[4]-> SetFillColor(3);
-  h_costheta_bac[4]->Scale(normfac);
-  h_costheta_bac[5]-> SetFillColor(6);
-  h_costheta_bac[5]->Scale(normfac);
-  h_costheta_bac[6]-> SetFillColor(7);
-  h_costheta_bac[6]->Scale(normfac);
-  h_costheta_bac[7]-> SetFillColor(9);
-  h_costheta_bac[7]->Scale(normfac);
-  h_costheta_allsel[1]->SetFillStyle(3005);
-  h_costheta_allsel[1]->SetFillColor(28);
-  h_costheta_allsel[1]->Scale(scale_onoffbeam);
-
-
-
-   hs_costheta -> Add(h_costheta_sig[0]);
-   hs_costheta -> Add(h_costheta_bac[0]);
-   hs_costheta -> Add(h_costheta_bac[1]);
-   hs_costheta -> Add(h_costheta_bac[2]);
-   hs_costheta -> Add(h_costheta_bac[3]);
-   hs_costheta -> Add(h_costheta_bac[4]);
-   hs_costheta -> Add(h_costheta_bac[5]);
-   hs_costheta -> Add(h_costheta_bac[6]);
-   hs_costheta -> Add(h_costheta_bac[7]);
-   hs_costheta -> Add(h_costheta_allsel[1]);
    hs_costheta -> Draw("HIST,SAME");
 
-   h_costheta_allsel[2]->Draw("same");
+   //h_costheta_allsel[2]->Draw("same");
    h_costheta_allsel[0]->Draw("same");
    //h_onoff_costheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2444,7 +2286,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_pcostheta_allsel[0]->SetLineStyle(1);
   h_pcostheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{p}");
   h_pcostheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pcostheta_allsel[0]->SetMaximum(500);
+  h_pcostheta_allsel[0]->SetMaximum(2.3*h_pcostheta_allsel[0]->GetMaximum());
    h_pcostheta_allsel[0]->Draw();
 
   //h_pcostheta_allsel[1]->SetLineColor(kRed);
@@ -2467,43 +2309,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_pcostheta = new THStack("hs_pcostheta","");
 
-  h_pcostheta_sig[0]-> SetFillColor(2); 
-  h_pcostheta_sig[0]->Scale(normfac);
-  h_pcostheta_bac[0]-> SetFillColor(46);
-  h_pcostheta_bac[0]->Scale(normfac);
-  h_pcostheta_bac[1]-> SetFillColor(4);
-  h_pcostheta_bac[1]->Scale(normfac);
-  h_pcostheta_bac[2]-> SetFillColor(8);
-  h_pcostheta_bac[2]->Scale(normfac);
-  h_pcostheta_bac[3] -> SetFillColor(5);
-  h_pcostheta_bac[3]->Scale(normfac);
-  h_pcostheta_bac[4]-> SetFillColor(3);
-  h_pcostheta_bac[4]->Scale(normfac);
-  h_pcostheta_bac[5]-> SetFillColor(6);
-  h_pcostheta_bac[5]->Scale(normfac);
-  h_pcostheta_bac[6]-> SetFillColor(7);
-  h_pcostheta_bac[6]->Scale(normfac);
-  h_pcostheta_bac[7]-> SetFillColor(9);
-  h_pcostheta_bac[7]->Scale(normfac);
-  h_pcostheta_allsel[1]->SetFillStyle(3005);
-  h_pcostheta_allsel[1]->SetFillColor(28);
-  h_pcostheta_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_pcostheta, h_pcostheta_sig, h_pcostheta_bac, h_pcostheta_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pcostheta -> Add(h_pcostheta_sig[0]);
-   hs_pcostheta -> Add(h_pcostheta_bac[0]);
-   hs_pcostheta -> Add(h_pcostheta_bac[1]);
-   hs_pcostheta -> Add(h_pcostheta_bac[2]);
-   hs_pcostheta -> Add(h_pcostheta_bac[3]);
-   hs_pcostheta -> Add(h_pcostheta_bac[4]);
-   hs_pcostheta -> Add(h_pcostheta_bac[5]);
-   hs_pcostheta -> Add(h_pcostheta_bac[6]);
-   hs_pcostheta -> Add(h_pcostheta_bac[7]);
-   hs_pcostheta -> Add(h_pcostheta_allsel[1]);
    hs_pcostheta -> Draw("HIST,SAME");
 
-   h_pcostheta_allsel[2]->Draw("same");
+   //h_pcostheta_allsel[2]->Draw("same");
    h_pcostheta_allsel[0]->Draw("same");
    //h_onoff_pcostheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2546,44 +2356,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_trunmean_muon_allsel[2]->Scale(normfac);
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_trunmean_muon = new THStack("hs_trunmean_muon","");
+  
+  stackHists(hs_trunmean_muon, h_trunmean_muon_sig, h_trunmean_muon_bac, h_trunmean_muon_allsel, normfac, scale_onoffbeam);
 
-  h_trunmean_muon_sig[0]-> SetFillColor(2); 
-  h_trunmean_muon_sig[0]->Scale(normfac);
-  h_trunmean_muon_bac[0]-> SetFillColor(46);
-  h_trunmean_muon_bac[0]->Scale(normfac);
-  h_trunmean_muon_bac[1]-> SetFillColor(4);
-  h_trunmean_muon_bac[1]->Scale(normfac);
-  h_trunmean_muon_bac[2]-> SetFillColor(8);
-  h_trunmean_muon_bac[2]->Scale(normfac);
-  h_trunmean_muon_bac[3] -> SetFillColor(5);
-  h_trunmean_muon_bac[3]->Scale(normfac);
-  h_trunmean_muon_bac[4]-> SetFillColor(3);
-  h_trunmean_muon_bac[4]->Scale(normfac);
-  h_trunmean_muon_bac[5]-> SetFillColor(6);
-  h_trunmean_muon_bac[5]->Scale(normfac);
-  h_trunmean_muon_bac[6]-> SetFillColor(7);
-  h_trunmean_muon_bac[6]->Scale(normfac);
-  h_trunmean_muon_bac[7]-> SetFillColor(9);
-  h_trunmean_muon_bac[7]->Scale(normfac);
-  h_trunmean_muon_allsel[1]->SetFillStyle(3005);
-  h_trunmean_muon_allsel[1]->SetFillColor(28);
-  h_trunmean_muon_allsel[1]->Scale(scale_onoffbeam);
-
-
-
-   hs_trunmean_muon -> Add(h_trunmean_muon_sig[0]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[0]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[1]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[2]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[3]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[4]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[5]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[6]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_bac[7]);
-   hs_trunmean_muon -> Add(h_trunmean_muon_allsel[1]);
    hs_trunmean_muon -> Draw("HIST,SAME");
 
-   h_trunmean_muon_allsel[2]->Draw("same");
+   //h_trunmean_muon_allsel[2]->Draw("same");
    h_trunmean_muon_allsel[0]->Draw("same");
    //h_onoff_trunmean_muon->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2627,43 +2405,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_trunmean_proton = new THStack("hs_trunmean_proton","");
 
-  h_trunmean_proton_sig[0]-> SetFillColor(2); 
-  h_trunmean_proton_sig[0]->Scale(normfac);
-  h_trunmean_proton_bac[0]-> SetFillColor(46);
-  h_trunmean_proton_bac[0]->Scale(normfac);
-  h_trunmean_proton_bac[1]-> SetFillColor(4);
-  h_trunmean_proton_bac[1]->Scale(normfac);
-  h_trunmean_proton_bac[2]-> SetFillColor(8);
-  h_trunmean_proton_bac[2]->Scale(normfac);
-  h_trunmean_proton_bac[3] -> SetFillColor(5);
-  h_trunmean_proton_bac[3]->Scale(normfac);
-  h_trunmean_proton_bac[4]-> SetFillColor(3);
-  h_trunmean_proton_bac[4]->Scale(normfac);
-  h_trunmean_proton_bac[5]-> SetFillColor(6);
-  h_trunmean_proton_bac[5]->Scale(normfac);
-  h_trunmean_proton_bac[6]-> SetFillColor(7);
-  h_trunmean_proton_bac[6]->Scale(normfac);
-  h_trunmean_proton_bac[7]-> SetFillColor(9);
-  h_trunmean_proton_bac[7]->Scale(normfac);
-  h_trunmean_proton_allsel[1]->SetFillStyle(3005);
-  h_trunmean_proton_allsel[1]->SetFillColor(28);
-  h_trunmean_proton_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_trunmean_proton, h_trunmean_proton_sig, h_trunmean_proton_bac, h_trunmean_proton_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_trunmean_proton -> Add(h_trunmean_proton_sig[0]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[0]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[1]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[2]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[3]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[4]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[5]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[6]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_bac[7]);
-   hs_trunmean_proton -> Add(h_trunmean_proton_allsel[1]);
    hs_trunmean_proton -> Draw("HIST,SAME");
 
-   h_trunmean_proton_allsel[2]->Draw("same");
+   //h_trunmean_proton_allsel[2]->Draw("same");
    h_trunmean_proton_allsel[0]->Draw("same");
    //h_onoff_trunmean_proton->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2683,7 +2429,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_phi_allsel[0]->SetLineStyle(1);
   h_phi_allsel[0]->GetXaxis()->SetTitle("#phi_{#mu}[Rad]");
   h_phi_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phi_allsel[0]->SetMaximum(240);
+  h_phi_allsel[0]->SetMaximum(2.0*h_phi_allsel[0]->GetMaximum());
   h_phi_allsel[0]->SetMinimum(0);
   h_phi_allsel[0]->Draw();
   
@@ -2707,43 +2453,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_phi = new THStack("hs_phi","");
 
-  h_phi_sig[0]-> SetFillColor(2); 
-  h_phi_sig[0]->Scale(normfac);
-  h_phi_bac[0]-> SetFillColor(46);
-  h_phi_bac[0]->Scale(normfac);
-  h_phi_bac[1]-> SetFillColor(4);
-  h_phi_bac[1]->Scale(normfac);
-  h_phi_bac[2]-> SetFillColor(8);
-  h_phi_bac[2]->Scale(normfac);
-  h_phi_bac[3] -> SetFillColor(5);
-  h_phi_bac[3]->Scale(normfac);
-  h_phi_bac[4]-> SetFillColor(3);
-  h_phi_bac[4]->Scale(normfac);
-  h_phi_bac[5]-> SetFillColor(6);
-  h_phi_bac[5]->Scale(normfac);
-  h_phi_bac[6]-> SetFillColor(7);
-  h_phi_bac[6]->Scale(normfac);
-  h_phi_bac[7]-> SetFillColor(9);
-  h_phi_bac[7]->Scale(normfac);
-  h_phi_allsel[1]->SetFillStyle(3005);
-  h_phi_allsel[1]->SetFillColor(28);
-  h_phi_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_phi, h_phi_sig, h_phi_bac, h_phi_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_phi -> Add(h_phi_sig[0]);
-   hs_phi -> Add(h_phi_bac[0]);
-   hs_phi -> Add(h_phi_bac[1]);
-   hs_phi -> Add(h_phi_bac[2]);
-   hs_phi -> Add(h_phi_bac[3]);
-   hs_phi -> Add(h_phi_bac[4]);
-   hs_phi -> Add(h_phi_bac[5]);
-   hs_phi -> Add(h_phi_bac[6]);
-   hs_phi -> Add(h_phi_bac[7]);
-   hs_phi -> Add(h_phi_allsel[1]);
    hs_phi -> Draw("HIST,SAME");
 
-   h_phi_allsel[2]->Draw("same");
+   //h_phi_allsel[2]->Draw("same");
    h_phi_allsel[0]->Draw("same");
    //h_onoff_phi->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2762,7 +2476,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_pphi_allsel[0]->SetLineStyle(1);
   h_pphi_allsel[0]->GetXaxis()->SetTitle("#phi_{P}[Rad]");
   h_pphi_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pphi_allsel[0]->SetMaximum(200);
+  h_pphi_allsel[0]->SetMaximum(2.0 * h_pphi_allsel[0]->GetMaximum());
   h_pphi_allsel[0]->SetMinimum(0);
   h_pphi_allsel[0]->Draw();
 
@@ -2787,43 +2501,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_pphi = new THStack("hs_pphi","");
 
-  h_pphi_sig[0]-> SetFillColor(2); 
-  h_pphi_sig[0]->Scale(normfac);
-  h_pphi_bac[0]-> SetFillColor(46);
-  h_pphi_bac[0]->Scale(normfac);
-  h_pphi_bac[1]-> SetFillColor(4);
-  h_pphi_bac[1]->Scale(normfac);
-  h_pphi_bac[2]-> SetFillColor(8);
-  h_pphi_bac[2]->Scale(normfac);
-  h_pphi_bac[3] -> SetFillColor(5);
-  h_pphi_bac[3]->Scale(normfac);
-  h_pphi_bac[4]-> SetFillColor(3);
-  h_pphi_bac[4]->Scale(normfac);
-  h_pphi_bac[5]-> SetFillColor(6);
-  h_pphi_bac[5]->Scale(normfac);
-  h_pphi_bac[6]-> SetFillColor(7);
-  h_pphi_bac[6]->Scale(normfac);
-  h_pphi_bac[7]-> SetFillColor(9);
-  h_pphi_bac[7]->Scale(normfac);
-  h_pphi_allsel[1]->SetFillStyle(3005);
-  h_pphi_allsel[1]->SetFillColor(28);
-  h_pphi_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_pphi, h_pphi_sig, h_pphi_bac, h_pphi_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pphi -> Add(h_pphi_sig[0]);
-   hs_pphi -> Add(h_pphi_bac[0]);
-   hs_pphi -> Add(h_pphi_bac[1]);
-   hs_pphi -> Add(h_pphi_bac[2]);
-   hs_pphi -> Add(h_pphi_bac[3]);
-   hs_pphi -> Add(h_pphi_bac[4]);
-   hs_pphi -> Add(h_pphi_bac[5]);
-   hs_pphi -> Add(h_pphi_bac[6]);
-   hs_pphi -> Add(h_pphi_bac[7]);
-   hs_pphi -> Add(h_pphi_allsel[1]);
    hs_pphi -> Draw("HIST,SAME");
 
-   h_pphi_allsel[2]->Draw("same");
+   //h_pphi_allsel[2]->Draw("same");
    h_pphi_allsel[0]->Draw("same");
    //h_onoff_pphi->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2863,43 +2545,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_ntrksp = new THStack("hs_ntrksp","");
 
-  h_ntrksp_sig[0]-> SetFillColor(2); 
-  h_ntrksp_sig[0]->Scale(normfac);
-  h_ntrksp_bac[0]-> SetFillColor(46);
-  h_ntrksp_bac[0]->Scale(normfac);
-  h_ntrksp_bac[1]-> SetFillColor(4);
-  h_ntrksp_bac[1]->Scale(normfac);
-  h_ntrksp_bac[2]-> SetFillColor(8);
-  h_ntrksp_bac[2]->Scale(normfac);
-  h_ntrksp_bac[3] -> SetFillColor(5);
-  h_ntrksp_bac[3]->Scale(normfac);
-  h_ntrksp_bac[4]-> SetFillColor(3);
-  h_ntrksp_bac[4]->Scale(normfac);
-  h_ntrksp_bac[5]-> SetFillColor(6);
-  h_ntrksp_bac[5]->Scale(normfac);
-  h_ntrksp_bac[6]-> SetFillColor(7);
-  h_ntrksp_bac[6]->Scale(normfac);
-  h_ntrksp_bac[7]-> SetFillColor(9);
-  h_ntrksp_bac[7]->Scale(normfac);
-  h_ntrksp_allsel[1]->SetFillStyle(3005);
-  h_ntrksp_allsel[1]->SetFillColor(28);
-  h_ntrksp_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_ntrksp, h_ntrksp_sig, h_ntrksp_bac, h_ntrksp_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_ntrksp -> Add(h_ntrksp_sig[0]);
-   hs_ntrksp -> Add(h_ntrksp_bac[0]);
-   hs_ntrksp -> Add(h_ntrksp_bac[1]);
-   hs_ntrksp -> Add(h_ntrksp_bac[2]);
-   hs_ntrksp -> Add(h_ntrksp_bac[3]);
-   hs_ntrksp -> Add(h_ntrksp_bac[4]);
-   hs_ntrksp -> Add(h_ntrksp_bac[5]);
-   hs_ntrksp -> Add(h_ntrksp_bac[6]);
-   hs_ntrksp -> Add(h_ntrksp_bac[7]);
-   hs_ntrksp -> Add(h_ntrksp_allsel[1]);
    hs_ntrksp -> Draw("HIST,SAME");
 
-   h_ntrksp_allsel[2]->Draw("same");
+   //h_ntrksp_allsel[2]->Draw("same");
    h_ntrksp_allsel[0]->Draw("same");
    //h_onoff_ntrksp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2939,43 +2589,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_plep = new THStack("hs_plep","");
 
-  h_plep_sig[0]-> SetFillColor(2); 
-  h_plep_sig[0]->Scale(normfac);
-  h_plep_bac[0]-> SetFillColor(46);
-  h_plep_bac[0]->Scale(normfac);
-  h_plep_bac[1]-> SetFillColor(4);
-  h_plep_bac[1]->Scale(normfac);
-  h_plep_bac[2]-> SetFillColor(8);
-  h_plep_bac[2]->Scale(normfac);
-  h_plep_bac[3] -> SetFillColor(5);
-  h_plep_bac[3]->Scale(normfac);
-  h_plep_bac[4]-> SetFillColor(3);
-  h_plep_bac[4]->Scale(normfac);
-  h_plep_bac[5]-> SetFillColor(6);
-  h_plep_bac[5]->Scale(normfac);
-  h_plep_bac[6]-> SetFillColor(7);
-  h_plep_bac[6]->Scale(normfac);
-  h_plep_bac[7]-> SetFillColor(9);
-  h_plep_bac[7]->Scale(normfac);
-  h_plep_allsel[1]->SetFillStyle(3005);
-  h_plep_allsel[1]->SetFillColor(28);
-  h_plep_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_plep, h_plep_sig, h_plep_bac, h_plep_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_plep -> Add(h_plep_sig[0]);
-   hs_plep -> Add(h_plep_bac[0]);
-   hs_plep -> Add(h_plep_bac[1]);
-   hs_plep -> Add(h_plep_bac[2]);
-   hs_plep -> Add(h_plep_bac[3]);
-   hs_plep -> Add(h_plep_bac[4]);
-   hs_plep -> Add(h_plep_bac[5]);
-   hs_plep -> Add(h_plep_bac[6]);
-   hs_plep -> Add(h_plep_bac[7]);
-   hs_plep -> Add(h_plep_allsel[1]);
    hs_plep -> Draw("HIST,SAME");
 
-   h_plep_allsel[2]->Draw("same");
+   //h_plep_allsel[2]->Draw("same");
    h_plep_allsel[0]->Draw("same");  
    //h_onoff_plep->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -2994,7 +2612,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_phad_allsel[0]->SetLineStyle(1);
   h_phad_allsel[0]->GetXaxis()->SetTitle("Momentum of the leading proton candidates[GeV]");
   h_phad_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phad_allsel[0]->SetMaximum(2.0*h_phad_allsel[0]->GetMaximum());
+  h_phad_allsel[0]->SetMaximum(1.4*h_phad_allsel[0]->GetMaximum());
   h_phad_allsel[0]->Draw();  
 
   //h_phad_allsel[1]->SetLineColor(kRed);
@@ -3016,43 +2634,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_phad = new THStack("hs_phad","");
 
-  h_phad_sig[0]-> SetFillColor(2); 
-  h_phad_sig[0]->Scale(normfac);
-  h_phad_bac[0]-> SetFillColor(46);
-  h_phad_bac[0]->Scale(normfac);
-  h_phad_bac[1]-> SetFillColor(4);
-  h_phad_bac[1]->Scale(normfac);
-  h_phad_bac[2]-> SetFillColor(8);
-  h_phad_bac[2]->Scale(normfac);
-  h_phad_bac[3] -> SetFillColor(5);
-  h_phad_bac[3]->Scale(normfac);
-  h_phad_bac[4]-> SetFillColor(3);
-  h_phad_bac[4]->Scale(normfac);
-  h_phad_bac[5]-> SetFillColor(6);
-  h_phad_bac[5]->Scale(normfac);
-  h_phad_bac[6]-> SetFillColor(7);
-  h_phad_bac[6]->Scale(normfac);
-  h_phad_bac[7]-> SetFillColor(9);
-  h_phad_bac[7]->Scale(normfac);
-  h_phad_allsel[1]->SetFillStyle(3005);
-  h_phad_allsel[1]->SetFillColor(28);
-  h_phad_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_phad, h_phad_sig, h_phad_bac, h_phad_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_phad -> Add(h_phad_sig[0]);
-   hs_phad -> Add(h_phad_bac[0]);
-   hs_phad -> Add(h_phad_bac[1]);
-   hs_phad -> Add(h_phad_bac[2]);
-   hs_phad -> Add(h_phad_bac[3]);
-   hs_phad -> Add(h_phad_bac[4]);
-   hs_phad -> Add(h_phad_bac[5]);
-   hs_phad -> Add(h_phad_bac[6]);
-   hs_phad -> Add(h_phad_bac[7]);
-   hs_phad -> Add(h_phad_allsel[1]);
    hs_phad -> Draw("HIST,SAME");
 
-   h_phad_allsel[2]->Draw("same");
+   //h_phad_allsel[2]->Draw("same");
    h_phad_allsel[0]->Draw("same");  
    //h_onoff_phad->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3105,43 +2691,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_thetamup = new THStack("hs_thetamup","");
 
-  h_thetamup_sig[0]-> SetFillColor(2); 
-  h_thetamup_sig[0]->Scale(normfac);
-  h_thetamup_bac[0]-> SetFillColor(46);
-  h_thetamup_bac[0]->Scale(normfac);
-  h_thetamup_bac[1]-> SetFillColor(4);
-  h_thetamup_bac[1]->Scale(normfac);
-  h_thetamup_bac[2]-> SetFillColor(8);
-  h_thetamup_bac[2]->Scale(normfac);
-  h_thetamup_bac[3] -> SetFillColor(5);
-  h_thetamup_bac[3]->Scale(normfac);
-  h_thetamup_bac[4]-> SetFillColor(3);
-  h_thetamup_bac[4]->Scale(normfac);
-  h_thetamup_bac[5]-> SetFillColor(6);
-  h_thetamup_bac[5]->Scale(normfac);
-  h_thetamup_bac[6]-> SetFillColor(7);
-  h_thetamup_bac[6]->Scale(normfac);
-  h_thetamup_bac[7]-> SetFillColor(9);
-  h_thetamup_bac[7]->Scale(normfac);
-  h_thetamup_allsel[1]->SetFillStyle(3005);
-  h_thetamup_allsel[1]->SetFillColor(28);
-  h_thetamup_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_thetamup, h_thetamup_sig, h_thetamup_bac, h_thetamup_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_thetamup -> Add(h_thetamup_sig[0]);
-   hs_thetamup -> Add(h_thetamup_bac[0]);
-   hs_thetamup -> Add(h_thetamup_bac[1]);
-   hs_thetamup -> Add(h_thetamup_bac[2]);
-   hs_thetamup -> Add(h_thetamup_bac[3]);
-   hs_thetamup -> Add(h_thetamup_bac[4]);
-   hs_thetamup -> Add(h_thetamup_bac[5]);
-   hs_thetamup -> Add(h_thetamup_bac[6]);
-   hs_thetamup -> Add(h_thetamup_bac[7]);
-   hs_thetamup -> Add(h_thetamup_allsel[1]);
    hs_thetamup -> Draw("HIST,SAME");
 
-   h_thetamup_allsel[2]->Draw("same");
+   //h_thetamup_allsel[2]->Draw("same");
    h_thetamup_allsel[0]->Draw("same");
    //h_onoff_thetamup->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3181,43 +2735,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_thetapp = new THStack("hs_thetapp","");
 
-  h_thetapp_sig[0]-> SetFillColor(2); 
-  h_thetapp_sig[0]->Scale(normfac);
-  h_thetapp_bac[0]-> SetFillColor(46);
-  h_thetapp_bac[0]->Scale(normfac);
-  h_thetapp_bac[1]-> SetFillColor(4);
-  h_thetapp_bac[1]->Scale(normfac);
-  h_thetapp_bac[2]-> SetFillColor(8);
-  h_thetapp_bac[2]->Scale(normfac);
-  h_thetapp_bac[3] -> SetFillColor(5);
-  h_thetapp_bac[3]->Scale(normfac);
-  h_thetapp_bac[4]-> SetFillColor(3);
-  h_thetapp_bac[4]->Scale(normfac);
-  h_thetapp_bac[5]-> SetFillColor(6);
-  h_thetapp_bac[5]->Scale(normfac);
-  h_thetapp_bac[6]-> SetFillColor(7);
-  h_thetapp_bac[6]->Scale(normfac);
-  h_thetapp_bac[7]-> SetFillColor(9);
-  h_thetapp_bac[7]->Scale(normfac);
-  h_thetapp_allsel[1]->SetFillStyle(3005);
-  h_thetapp_allsel[1]->SetFillColor(28);
-  h_thetapp_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_thetapp, h_thetapp_sig, h_thetapp_bac, h_thetapp_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_thetapp -> Add(h_thetapp_sig[0]);
-   hs_thetapp -> Add(h_thetapp_bac[0]);
-   hs_thetapp -> Add(h_thetapp_bac[1]);
-   hs_thetapp -> Add(h_thetapp_bac[2]);
-   hs_thetapp -> Add(h_thetapp_bac[3]);
-   hs_thetapp -> Add(h_thetapp_bac[4]);
-   hs_thetapp -> Add(h_thetapp_bac[5]);
-   hs_thetapp -> Add(h_thetapp_bac[6]);
-   hs_thetapp -> Add(h_thetapp_bac[7]);
-   hs_thetapp -> Add(h_thetapp_allsel[1]);
    hs_thetapp -> Draw("HIST,SAME");
 
-   h_thetapp_allsel[2]->Draw("same");
+   //h_thetapp_allsel[2]->Draw("same");
    h_thetapp_allsel[0]->Draw("same");
    //h_onoff_thetapp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3238,7 +2760,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_phimup_allsel[0]->SetLineStyle(1);
   h_phimup_allsel[0]->GetXaxis()->SetTitle("|#phi_{#mu}-#phi_{P}|[Rad]");
   h_phimup_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phimup_allsel[0]->SetMaximum(600);
+  h_phimup_allsel[0]->SetMaximum(1.4*h_phimup_allsel[0]->GetMaximum());
   h_phimup_allsel[0]->Draw();
 
   //h_phimup_allsel[1]->SetLineColor(kRed);
@@ -3261,43 +2783,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_phimup = new THStack("hs_phimup","");
 
-  h_phimup_sig[0]-> SetFillColor(2); 
-  h_phimup_sig[0]->Scale(normfac);
-  h_phimup_bac[0]-> SetFillColor(46);
-  h_phimup_bac[0]->Scale(normfac);
-  h_phimup_bac[1]-> SetFillColor(4);
-  h_phimup_bac[1]->Scale(normfac);
-  h_phimup_bac[2]-> SetFillColor(8);
-  h_phimup_bac[2]->Scale(normfac);
-  h_phimup_bac[3] -> SetFillColor(5);
-  h_phimup_bac[3]->Scale(normfac);
-  h_phimup_bac[4]-> SetFillColor(3);
-  h_phimup_bac[4]->Scale(normfac);
-  h_phimup_bac[5]-> SetFillColor(6);
-  h_phimup_bac[5]->Scale(normfac);
-  h_phimup_bac[6]-> SetFillColor(7);
-  h_phimup_bac[6]->Scale(normfac);
-  h_phimup_bac[7]-> SetFillColor(9);
-  h_phimup_bac[7]->Scale(normfac);
-  h_phimup_allsel[1]->SetFillStyle(3005);
-  h_phimup_allsel[1]->SetFillColor(28);
-  h_phimup_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_phimup, h_phimup_sig, h_phimup_bac, h_phimup_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_phimup -> Add(h_phimup_sig[0]);
-   hs_phimup -> Add(h_phimup_bac[0]);
-   hs_phimup -> Add(h_phimup_bac[1]);
-   hs_phimup -> Add(h_phimup_bac[2]);
-   hs_phimup -> Add(h_phimup_bac[3]);
-   hs_phimup -> Add(h_phimup_bac[4]);
-   hs_phimup -> Add(h_phimup_bac[5]);
-   hs_phimup -> Add(h_phimup_bac[6]);
-   hs_phimup -> Add(h_phimup_bac[7]);
-   hs_phimup -> Add(h_phimup_allsel[1]);
    hs_phimup -> Draw("HIST,SAME");
 
-   h_phimup_allsel[2]->Draw("same");
+   //h_phimup_allsel[2]->Draw("same");
   h_phimup_allsel[0]->Draw("same");
    //h_onoff_phimup->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3338,43 +2828,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_phipp = new THStack("hs_phipp","");
 
-  h_phipp_sig[0]-> SetFillColor(2); 
-  h_phipp_sig[0]->Scale(normfac);
-  h_phipp_bac[0]-> SetFillColor(46);
-  h_phipp_bac[0]->Scale(normfac);
-  h_phipp_bac[1]-> SetFillColor(4);
-  h_phipp_bac[1]->Scale(normfac);
-  h_phipp_bac[2]-> SetFillColor(8);
-  h_phipp_bac[2]->Scale(normfac);
-  h_phipp_bac[3] -> SetFillColor(5);
-  h_phipp_bac[3]->Scale(normfac);
-  h_phipp_bac[4]-> SetFillColor(3);
-  h_phipp_bac[4]->Scale(normfac);
-  h_phipp_bac[5]-> SetFillColor(6);
-  h_phipp_bac[5]->Scale(normfac);
-  h_phipp_bac[6]-> SetFillColor(7);
-  h_phipp_bac[6]->Scale(normfac);
-  h_phipp_bac[7]-> SetFillColor(9);
-  h_phipp_bac[7]->Scale(normfac);
-  h_phipp_allsel[1]->SetFillStyle(3005);
-  h_phipp_allsel[1]->SetFillColor(28);
-  h_phipp_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_phipp, h_phipp_sig, h_phipp_bac, h_phipp_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_phipp -> Add(h_phipp_sig[0]);
-   hs_phipp -> Add(h_phipp_bac[0]);
-   hs_phipp -> Add(h_phipp_bac[1]);
-   hs_phipp -> Add(h_phipp_bac[2]);
-   hs_phipp -> Add(h_phipp_bac[3]);
-   hs_phipp -> Add(h_phipp_bac[4]);
-   hs_phipp -> Add(h_phipp_bac[5]);
-   hs_phipp -> Add(h_phipp_bac[6]);
-   hs_phipp -> Add(h_phipp_bac[7]);
-   hs_phipp -> Add(h_phipp_allsel[1]);
    hs_phipp -> Draw("HIST,SAME");
 
-   h_phipp_allsel[2]->Draw("same");
+   //h_phipp_allsel[2]->Draw("same");
   h_phipp_allsel[0]->Draw("same");
    //h_onoff_phipp->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3395,7 +2853,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_Nhitsmuon_allsel[0]->SetLineStyle(1);
   h_Nhitsmuon_allsel[0]->GetXaxis()->SetTitle("Number of Hits of Muon Candidate");
   h_Nhitsmuon_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_Nhitsmuon_allsel[0]->SetMaximum(500);
+  h_Nhitsmuon_allsel[0]->SetMaximum(1.4* h_Nhitsmuon_allsel[0]->GetMaximum());
   h_Nhitsmuon_allsel[0]->Draw();
 
   //h_Nhitsmuon_allsel[1]->SetLineColor(kRed);
@@ -3417,43 +2875,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_Nhitsmuon = new THStack("hs_Nhitsmuon","");
 
-  h_Nhitsmuon_sig[0]-> SetFillColor(2); 
-  h_Nhitsmuon_sig[0]->Scale(normfac);
-  h_Nhitsmuon_bac[0]-> SetFillColor(46);
-  h_Nhitsmuon_bac[0]->Scale(normfac);
-  h_Nhitsmuon_bac[1]-> SetFillColor(4);
-  h_Nhitsmuon_bac[1]->Scale(normfac);
-  h_Nhitsmuon_bac[2]-> SetFillColor(8);
-  h_Nhitsmuon_bac[2]->Scale(normfac);
-  h_Nhitsmuon_bac[3] -> SetFillColor(5);
-  h_Nhitsmuon_bac[3]->Scale(normfac);
-  h_Nhitsmuon_bac[4]-> SetFillColor(3);
-  h_Nhitsmuon_bac[4]->Scale(normfac);
-  h_Nhitsmuon_bac[5]-> SetFillColor(6);
-  h_Nhitsmuon_bac[5]->Scale(normfac);
-  h_Nhitsmuon_bac[6]-> SetFillColor(7);
-  h_Nhitsmuon_bac[6]->Scale(normfac);
-  h_Nhitsmuon_bac[7]-> SetFillColor(9);
-  h_Nhitsmuon_bac[7]->Scale(normfac);
-  h_Nhitsmuon_allsel[1]->SetFillStyle(3005);
-  h_Nhitsmuon_allsel[1]->SetFillColor(28);
-  h_Nhitsmuon_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_Nhitsmuon, h_Nhitsmuon_sig, h_Nhitsmuon_bac, h_Nhitsmuon_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_sig[0]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[0]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[1]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[2]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[3]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[4]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[5]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[6]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_bac[7]);
-   hs_Nhitsmuon -> Add(h_Nhitsmuon_allsel[1]);
    hs_Nhitsmuon -> Draw("HIST,SAME");
 
-   h_Nhitsmuon_allsel[2]->Draw("same");
+   //h_Nhitsmuon_allsel[2]->Draw("same");
    h_Nhitsmuon_allsel[0]->Draw("same");
    //h_onoff_Nhitsmuon->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3473,7 +2899,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_Nhitsproton_allsel[0]->SetLineStyle(1);
   h_Nhitsproton_allsel[0]->GetXaxis()->SetTitle("Number of Hits of The Proton Candidate");
   h_Nhitsproton_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_Nhitsproton_allsel[0]->SetMaximum(600);
+  h_Nhitsproton_allsel[0]->SetMaximum(1.4 * h_Nhitsproton_allsel[0]->GetMaximum());
   h_Nhitsproton_allsel[0]->Draw();
 
   //h_Nhitsproton_allsel[1]->SetLineColor(kRed);
@@ -3495,43 +2921,11 @@ void plot_com_MCaddOffbeam_bacsep(){
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   THStack *hs_Nhitsproton = new THStack("hs_Nhitsproton","");
 
-  h_Nhitsproton_sig[0]-> SetFillColor(2); 
-  h_Nhitsproton_sig[0]->Scale(normfac);
-  h_Nhitsproton_bac[0]-> SetFillColor(46);
-  h_Nhitsproton_bac[0]->Scale(normfac);
-  h_Nhitsproton_bac[1]-> SetFillColor(4);
-  h_Nhitsproton_bac[1]->Scale(normfac);
-  h_Nhitsproton_bac[2]-> SetFillColor(8);
-  h_Nhitsproton_bac[2]->Scale(normfac);
-  h_Nhitsproton_bac[3] -> SetFillColor(5);
-  h_Nhitsproton_bac[3]->Scale(normfac);
-  h_Nhitsproton_bac[4]-> SetFillColor(3);
-  h_Nhitsproton_bac[4]->Scale(normfac);
-  h_Nhitsproton_bac[5]-> SetFillColor(6);
-  h_Nhitsproton_bac[5]->Scale(normfac);
-  h_Nhitsproton_bac[6]-> SetFillColor(7);
-  h_Nhitsproton_bac[6]->Scale(normfac);
-  h_Nhitsproton_bac[7]-> SetFillColor(9);
-  h_Nhitsproton_bac[7]->Scale(normfac);
-  h_Nhitsproton_allsel[1]->SetFillStyle(3005);
-  h_Nhitsproton_allsel[1]->SetFillColor(28);
-  h_Nhitsproton_allsel[1]->Scale(scale_onoffbeam);
+  stackHists(hs_Nhitsproton, h_Nhitsproton_sig, h_Nhitsproton_bac, h_Nhitsproton_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_Nhitsproton -> Add(h_Nhitsproton_sig[0]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[0]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[1]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[2]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[3]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[4]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[5]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[6]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_bac[7]);
-   hs_Nhitsproton -> Add(h_Nhitsproton_allsel[1]);
    hs_Nhitsproton -> Draw("HIST,SAME");
 
-   h_Nhitsproton_allsel[2]->Draw("same");
+   //h_Nhitsproton_allsel[2]->Draw("same");
    h_Nhitsproton_allsel[0]->Draw("same");
    //h_onoff_Nhitsproton->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3572,43 +2966,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_vtxx = new THStack("hs_vtxx","");
 
-   h_vtxx_sig[0]-> SetFillColor(2); 
-   h_vtxx_sig[0]->Scale(normfac);
-   h_vtxx_bac[0]-> SetFillColor(46);
-   h_vtxx_bac[0]->Scale(normfac);
-   h_vtxx_bac[1]-> SetFillColor(4);
-   h_vtxx_bac[1]->Scale(normfac);
-   h_vtxx_bac[2]-> SetFillColor(8);
-   h_vtxx_bac[2]->Scale(normfac);
-   h_vtxx_bac[3] -> SetFillColor(5);
-   h_vtxx_bac[3]->Scale(normfac);
-   h_vtxx_bac[4]-> SetFillColor(3);
-   h_vtxx_bac[4]->Scale(normfac);
-   h_vtxx_bac[5]-> SetFillColor(6);
-   h_vtxx_bac[5]->Scale(normfac);
-   h_vtxx_bac[6]-> SetFillColor(7);
-   h_vtxx_bac[6]->Scale(normfac);
-   h_vtxx_bac[7]-> SetFillColor(9);
-   h_vtxx_bac[7]->Scale(normfac);
-  h_vtxx_allsel[1]->SetFillStyle(3005);
-  h_vtxx_allsel[1]->SetFillColor(28);
-  h_vtxx_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_vtxx, h_vtxx_sig, h_vtxx_bac, h_vtxx_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_vtxx -> Add(h_vtxx_sig[0]);
-   hs_vtxx -> Add(h_vtxx_bac[0]);
-   hs_vtxx -> Add(h_vtxx_bac[1]);
-   hs_vtxx -> Add(h_vtxx_bac[2]);
-   hs_vtxx -> Add(h_vtxx_bac[3]);
-   hs_vtxx -> Add(h_vtxx_bac[4]);
-   hs_vtxx -> Add(h_vtxx_bac[5]);
-   hs_vtxx -> Add(h_vtxx_bac[6]);
-   hs_vtxx -> Add(h_vtxx_bac[7]);
-   hs_vtxx -> Add(h_vtxx_allsel[1]);
    hs_vtxx -> Draw("HIST,SAME");
 
-   h_vtxx_allsel[2]->Draw("same");
+   //h_vtxx_allsel[2]->Draw("same");
    h_vtxx_allsel[0]->Draw("same");
    //h_onoff_vtxx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3649,43 +3011,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_vtxy = new THStack("hs_vtxy","");
 
-   h_vtxy_sig[0]-> SetFillColor(2); 
-   h_vtxy_sig[0]->Scale(normfac);
-   h_vtxy_bac[0]-> SetFillColor(46);
-   h_vtxy_bac[0]->Scale(normfac);
-   h_vtxy_bac[1]-> SetFillColor(4);
-   h_vtxy_bac[1]->Scale(normfac);
-   h_vtxy_bac[2]-> SetFillColor(8);
-   h_vtxy_bac[2]->Scale(normfac);
-   h_vtxy_bac[3] -> SetFillColor(5);
-   h_vtxy_bac[3]->Scale(normfac);
-   h_vtxy_bac[4]-> SetFillColor(3);
-   h_vtxy_bac[4]->Scale(normfac);
-   h_vtxy_bac[5]-> SetFillColor(6);
-   h_vtxy_bac[5]->Scale(normfac);
-   h_vtxy_bac[6]-> SetFillColor(7);
-   h_vtxy_bac[6]->Scale(normfac);
-   h_vtxy_bac[7]-> SetFillColor(9);
-   h_vtxy_bac[7]->Scale(normfac);
-  h_vtxy_allsel[1]->SetFillStyle(3005);
-  h_vtxy_allsel[1]->SetFillColor(28);
-  h_vtxy_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_vtxy, h_vtxy_sig, h_vtxy_bac, h_vtxy_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_vtxy -> Add(h_vtxy_sig[0]);
-   hs_vtxy -> Add(h_vtxy_bac[0]);
-   hs_vtxy -> Add(h_vtxy_bac[1]);
-   hs_vtxy -> Add(h_vtxy_bac[2]);
-   hs_vtxy -> Add(h_vtxy_bac[3]);
-   hs_vtxy -> Add(h_vtxy_bac[4]);
-   hs_vtxy -> Add(h_vtxy_bac[5]);
-   hs_vtxy -> Add(h_vtxy_bac[6]);
-   hs_vtxy -> Add(h_vtxy_bac[7]);
-   hs_vtxy -> Add(h_vtxy_allsel[1]);
    hs_vtxy -> Draw("HIST,SAME");
 
-   h_vtxy_allsel[2]->Draw("same");
+   //h_vtxy_allsel[2]->Draw("same");
    h_vtxy_allsel[0]->Draw("same");
    //h_onoff_vtxy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3726,43 +3056,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_vtxz = new THStack("hs_vtxz","");
 
-   h_vtxz_sig[0]-> SetFillColor(2); 
-   h_vtxz_sig[0]->Scale(normfac);
-   h_vtxz_bac[0]-> SetFillColor(46);
-   h_vtxz_bac[0]->Scale(normfac);
-   h_vtxz_bac[1]-> SetFillColor(4);
-   h_vtxz_bac[1]->Scale(normfac);
-   h_vtxz_bac[2]-> SetFillColor(8);
-   h_vtxz_bac[2]->Scale(normfac);
-   h_vtxz_bac[3] -> SetFillColor(5);
-   h_vtxz_bac[3]->Scale(normfac);
-   h_vtxz_bac[4]-> SetFillColor(3);
-   h_vtxz_bac[4]->Scale(normfac);
-   h_vtxz_bac[5]-> SetFillColor(6);
-   h_vtxz_bac[5]->Scale(normfac);
-   h_vtxz_bac[6]-> SetFillColor(7);
-   h_vtxz_bac[6]->Scale(normfac);
-   h_vtxz_bac[7]-> SetFillColor(9);
-   h_vtxz_bac[7]->Scale(normfac);
-  h_vtxz_allsel[1]->SetFillStyle(3005);
-  h_vtxz_allsel[1]->SetFillColor(28);
-  h_vtxz_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_vtxz, h_vtxz_sig, h_vtxz_bac, h_vtxz_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_vtxz -> Add(h_vtxz_sig[0]);
-   hs_vtxz -> Add(h_vtxz_bac[0]);
-   hs_vtxz -> Add(h_vtxz_bac[1]);
-   hs_vtxz -> Add(h_vtxz_bac[2]);
-   hs_vtxz -> Add(h_vtxz_bac[3]);
-   hs_vtxz -> Add(h_vtxz_bac[4]);
-   hs_vtxz -> Add(h_vtxz_bac[5]);
-   hs_vtxz -> Add(h_vtxz_bac[6]);
-   hs_vtxz -> Add(h_vtxz_bac[7]);
-   hs_vtxz -> Add(h_vtxz_allsel[1]);
    hs_vtxz -> Draw("HIST,SAME");
 
-   h_vtxz_allsel[2]->Draw("same");
+   //h_vtxz_allsel[2]->Draw("same");
    h_vtxz_allsel[0]->Draw("same");
    //h_onoff_vtxz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3802,44 +3100,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_mustartx_allsel[2]->Scale(normfac);
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_mustartx = new THStack("hs_mustartx","");
+   
+   stackHists(hs_mustartx, h_mustartx_sig, h_mustartx_bac, h_mustartx_allsel, normfac, scale_onoffbeam);
 
-   h_mustartx_sig[0]-> SetFillColor(2); 
-   h_mustartx_sig[0]->Scale(normfac);
-   h_mustartx_bac[0]-> SetFillColor(46);
-   h_mustartx_bac[0]->Scale(normfac);
-   h_mustartx_bac[1]-> SetFillColor(4);
-   h_mustartx_bac[1]->Scale(normfac);
-   h_mustartx_bac[2]-> SetFillColor(8);
-   h_mustartx_bac[2]->Scale(normfac);
-   h_mustartx_bac[3] -> SetFillColor(5);
-   h_mustartx_bac[3]->Scale(normfac);
-   h_mustartx_bac[4]-> SetFillColor(3);
-   h_mustartx_bac[4]->Scale(normfac);
-   h_mustartx_bac[5]-> SetFillColor(6);
-   h_mustartx_bac[5]->Scale(normfac);
-   h_mustartx_bac[6]-> SetFillColor(7);
-   h_mustartx_bac[6]->Scale(normfac);
-   h_mustartx_bac[7]-> SetFillColor(9);
-   h_mustartx_bac[7]->Scale(normfac);
-  h_mustartx_allsel[1]->SetFillStyle(3005);
-  h_mustartx_allsel[1]->SetFillColor(28);
-  h_mustartx_allsel[1]->Scale(scale_onoffbeam);
-
-
-
-   hs_mustartx -> Add(h_mustartx_sig[0]);
-   hs_mustartx -> Add(h_mustartx_bac[0]);
-   hs_mustartx -> Add(h_mustartx_bac[1]);
-   hs_mustartx -> Add(h_mustartx_bac[2]);
-   hs_mustartx -> Add(h_mustartx_bac[3]);
-   hs_mustartx -> Add(h_mustartx_bac[4]);
-   hs_mustartx -> Add(h_mustartx_bac[5]);
-   hs_mustartx -> Add(h_mustartx_bac[6]);
-   hs_mustartx -> Add(h_mustartx_bac[7]);
-   hs_mustartx -> Add(h_mustartx_allsel[1]);
    hs_mustartx -> Draw("HIST,SAME");
 
-   h_mustartx_allsel[2]->Draw("same");
+   //h_mustartx_allsel[2]->Draw("same");
    h_mustartx_allsel[0]->Draw("same");
    //h_onoff_mustartx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3881,43 +3147,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_mustarty = new THStack("hs_mustarty","");
 
-   h_mustarty_sig[0]-> SetFillColor(2); 
-   h_mustarty_sig[0]->Scale(normfac);
-   h_mustarty_bac[0]-> SetFillColor(46);
-   h_mustarty_bac[0]->Scale(normfac);
-   h_mustarty_bac[1]-> SetFillColor(4);
-   h_mustarty_bac[1]->Scale(normfac);
-   h_mustarty_bac[2]-> SetFillColor(8);
-   h_mustarty_bac[2]->Scale(normfac);
-   h_mustarty_bac[3] -> SetFillColor(5);
-   h_mustarty_bac[3]->Scale(normfac);
-   h_mustarty_bac[4]-> SetFillColor(3);
-   h_mustarty_bac[4]->Scale(normfac);
-   h_mustarty_bac[5]-> SetFillColor(6);
-   h_mustarty_bac[5]->Scale(normfac);
-   h_mustarty_bac[6]-> SetFillColor(7);
-   h_mustarty_bac[6]->Scale(normfac);
-   h_mustarty_bac[7]-> SetFillColor(9);
-   h_mustarty_bac[7]->Scale(normfac);
-  h_mustarty_allsel[1]->SetFillStyle(3005);
-  h_mustarty_allsel[1]->SetFillColor(28);
-  h_mustarty_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_mustarty, h_mustarty_sig, h_mustarty_bac, h_mustarty_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_mustarty -> Add(h_mustarty_sig[0]);
-   hs_mustarty -> Add(h_mustarty_bac[0]);
-   hs_mustarty -> Add(h_mustarty_bac[1]);
-   hs_mustarty -> Add(h_mustarty_bac[2]);
-   hs_mustarty -> Add(h_mustarty_bac[3]);
-   hs_mustarty -> Add(h_mustarty_bac[4]);
-   hs_mustarty -> Add(h_mustarty_bac[5]);
-   hs_mustarty -> Add(h_mustarty_bac[6]);
-   hs_mustarty -> Add(h_mustarty_bac[7]);
-   hs_mustarty -> Add(h_mustarty_allsel[1]);
    hs_mustarty -> Draw("HIST,SAME");
 
-   h_mustarty_allsel[2]->Draw("same");
+   //h_mustarty_allsel[2]->Draw("same");
     h_mustarty_allsel[0]->Draw("same");
    //h_onoff_mustarty->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -3958,43 +3192,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_mustartz = new THStack("hs_mustartz","");
 
-   h_mustartz_sig[0]-> SetFillColor(2); 
-   h_mustartz_sig[0]->Scale(normfac);
-   h_mustartz_bac[0]-> SetFillColor(46);
-   h_mustartz_bac[0]->Scale(normfac);
-   h_mustartz_bac[1]-> SetFillColor(4);
-   h_mustartz_bac[1]->Scale(normfac);
-   h_mustartz_bac[2]-> SetFillColor(8);
-   h_mustartz_bac[2]->Scale(normfac);
-   h_mustartz_bac[3] -> SetFillColor(5);
-   h_mustartz_bac[3]->Scale(normfac);
-   h_mustartz_bac[4]-> SetFillColor(3);
-   h_mustartz_bac[4]->Scale(normfac);
-   h_mustartz_bac[5]-> SetFillColor(6);
-   h_mustartz_bac[5]->Scale(normfac);
-   h_mustartz_bac[6]-> SetFillColor(7);
-   h_mustartz_bac[6]->Scale(normfac);
-   h_mustartz_bac[7]-> SetFillColor(9);
-   h_mustartz_bac[7]->Scale(normfac);
-  h_mustartz_allsel[1]->SetFillStyle(3005);
-  h_mustartz_allsel[1]->SetFillColor(28);
-  h_mustartz_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_mustartz, h_mustartz_sig, h_mustartz_bac, h_mustartz_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_mustartz -> Add(h_mustartz_sig[0]);
-   hs_mustartz -> Add(h_mustartz_bac[0]);
-   hs_mustartz -> Add(h_mustartz_bac[1]);
-   hs_mustartz -> Add(h_mustartz_bac[2]);
-   hs_mustartz -> Add(h_mustartz_bac[3]);
-   hs_mustartz -> Add(h_mustartz_bac[4]);
-   hs_mustartz -> Add(h_mustartz_bac[5]);
-   hs_mustartz -> Add(h_mustartz_bac[6]);
-   hs_mustartz -> Add(h_mustartz_bac[7]);
-   hs_mustartz -> Add(h_mustartz_allsel[1]);
    hs_mustartz -> Draw("HIST,SAME");
 
-   h_mustartz_allsel[2]->Draw("same");
+   //h_mustartz_allsel[2]->Draw("same");
     h_mustartz_allsel[0]->Draw("same");
    //h_onoff_mustartz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4035,43 +3237,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_muendx = new THStack("hs_muendx","");
 
-   h_muendx_sig[0]-> SetFillColor(2); 
-   h_muendx_sig[0]->Scale(normfac);
-   h_muendx_bac[0]-> SetFillColor(46);
-   h_muendx_bac[0]->Scale(normfac);
-   h_muendx_bac[1]-> SetFillColor(4);
-   h_muendx_bac[1]->Scale(normfac);
-   h_muendx_bac[2]-> SetFillColor(8);
-   h_muendx_bac[2]->Scale(normfac);
-   h_muendx_bac[3] -> SetFillColor(5);
-   h_muendx_bac[3]->Scale(normfac);
-   h_muendx_bac[4]-> SetFillColor(3);
-   h_muendx_bac[4]->Scale(normfac);
-   h_muendx_bac[5]-> SetFillColor(6);
-   h_muendx_bac[5]->Scale(normfac);
-   h_muendx_bac[6]-> SetFillColor(7);
-   h_muendx_bac[6]->Scale(normfac);
-   h_muendx_bac[7]-> SetFillColor(9);
-   h_muendx_bac[7]->Scale(normfac);
-  h_muendx_allsel[1]->SetFillStyle(3005);
-  h_muendx_allsel[1]->SetFillColor(28);
-  h_muendx_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_muendx, h_muendx_sig, h_muendx_bac, h_muendx_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_muendx -> Add(h_muendx_sig[0]);
-   hs_muendx -> Add(h_muendx_bac[0]);
-   hs_muendx -> Add(h_muendx_bac[1]);
-   hs_muendx -> Add(h_muendx_bac[2]);
-   hs_muendx -> Add(h_muendx_bac[3]);
-   hs_muendx -> Add(h_muendx_bac[4]);
-   hs_muendx -> Add(h_muendx_bac[5]);
-   hs_muendx -> Add(h_muendx_bac[6]);
-   hs_muendx -> Add(h_muendx_bac[7]);
-   hs_muendx -> Add(h_muendx_allsel[1]);
    hs_muendx -> Draw("HIST,SAME");
 
-   h_muendx_allsel[2]->Draw("same");
+   //h_muendx_allsel[2]->Draw("same");
    h_muendx_allsel[0]->Draw("same");
    //h_onoff_muendx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4090,7 +3260,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_muendy_allsel[0]->SetLineStyle(1);
    h_muendy_allsel[0]->GetXaxis()->SetTitle("End Position Y of Muon Candidate[cm]");
    h_muendy_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_muendy_allsel[0]->SetMaximum(700);
+   h_muendy_allsel[0]->SetMaximum(300);
    h_muendy_allsel[0]->Draw();
 
    //h_muendy_allsel[1]->SetLineColor(kRed);
@@ -4113,43 +3283,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_muendy = new THStack("hs_muendy","");
 
-   h_muendy_sig[0]-> SetFillColor(2); 
-   h_muendy_sig[0]->Scale(normfac);
-   h_muendy_bac[0]-> SetFillColor(46);
-   h_muendy_bac[0]->Scale(normfac);
-   h_muendy_bac[1]-> SetFillColor(4);
-   h_muendy_bac[1]->Scale(normfac);
-   h_muendy_bac[2]-> SetFillColor(8);
-   h_muendy_bac[2]->Scale(normfac);
-   h_muendy_bac[3] -> SetFillColor(5);
-   h_muendy_bac[3]->Scale(normfac);
-   h_muendy_bac[4]-> SetFillColor(3);
-   h_muendy_bac[4]->Scale(normfac);
-   h_muendy_bac[5]-> SetFillColor(6);
-   h_muendy_bac[5]->Scale(normfac);
-   h_muendy_bac[6]-> SetFillColor(7);
-   h_muendy_bac[6]->Scale(normfac);
-   h_muendy_bac[7]-> SetFillColor(9);
-   h_muendy_bac[7]->Scale(normfac);
-  h_muendy_allsel[1]->SetFillStyle(3005);
-  h_muendy_allsel[1]->SetFillColor(28);
-  h_muendy_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_muendy, h_muendy_sig, h_muendy_bac, h_muendy_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_muendy -> Add(h_muendy_sig[0]);
-   hs_muendy -> Add(h_muendy_bac[0]);
-   hs_muendy -> Add(h_muendy_bac[1]);
-   hs_muendy -> Add(h_muendy_bac[2]);
-   hs_muendy -> Add(h_muendy_bac[3]);
-   hs_muendy -> Add(h_muendy_bac[4]);
-   hs_muendy -> Add(h_muendy_bac[5]);
-   hs_muendy -> Add(h_muendy_bac[6]);
-   hs_muendy -> Add(h_muendy_bac[7]);
-   hs_muendy -> Add(h_muendy_allsel[1]);
    hs_muendy -> Draw("HIST,SAME");
 
-   h_muendy_allsel[2]->Draw("same");
+   //h_muendy_allsel[2]->Draw("same");
    h_muendy_allsel[0]->Draw("same");
    //h_onoff_muendy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4167,7 +3305,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_muendz_allsel[0]->SetLineStyle(1);
    h_muendz_allsel[0]->GetXaxis()->SetTitle("End Position Z of Muon Candidate[cm]");
    h_muendz_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_muendz_allsel[0]->SetMaximum(500);
+   h_muendz_allsel[0]->SetMaximum(300);
    h_muendz_allsel[0]->Draw();
 
    //h_muendz_allsel[1]->SetLineColor(kRed);
@@ -4190,43 +3328,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_muendz = new THStack("hs_muendz","");
 
-   h_muendz_sig[0]-> SetFillColor(2); 
-   h_muendz_sig[0]->Scale(normfac);
-   h_muendz_bac[0]-> SetFillColor(46);
-   h_muendz_bac[0]->Scale(normfac);
-   h_muendz_bac[1]-> SetFillColor(4);
-   h_muendz_bac[1]->Scale(normfac);
-   h_muendz_bac[2]-> SetFillColor(8);
-   h_muendz_bac[2]->Scale(normfac);
-   h_muendz_bac[3] -> SetFillColor(5);
-   h_muendz_bac[3]->Scale(normfac);
-   h_muendz_bac[4]-> SetFillColor(3);
-   h_muendz_bac[4]->Scale(normfac);
-   h_muendz_bac[5]-> SetFillColor(6);
-   h_muendz_bac[5]->Scale(normfac);
-   h_muendz_bac[6]-> SetFillColor(7);
-   h_muendz_bac[6]->Scale(normfac);
-   h_muendz_bac[7]-> SetFillColor(9);
-   h_muendz_bac[7]->Scale(normfac);
-  h_muendz_allsel[1]->SetFillStyle(3005);
-  h_muendz_allsel[1]->SetFillColor(28);
-  h_muendz_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_muendz, h_muendz_sig, h_muendz_bac, h_muendz_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_muendz -> Add(h_muendz_sig[0]);
-   hs_muendz -> Add(h_muendz_bac[0]);
-   hs_muendz -> Add(h_muendz_bac[1]);
-   hs_muendz -> Add(h_muendz_bac[2]);
-   hs_muendz -> Add(h_muendz_bac[3]);
-   hs_muendz -> Add(h_muendz_bac[4]);
-   hs_muendz -> Add(h_muendz_bac[5]);
-   hs_muendz -> Add(h_muendz_bac[6]);
-   hs_muendz -> Add(h_muendz_bac[7]);
-   hs_muendz -> Add(h_muendz_allsel[1]);
    hs_muendz -> Draw("HIST,SAME");
 
-   h_muendz_allsel[2]->Draw("same");
+   //h_muendz_allsel[2]->Draw("same");
    h_muendz_allsel[0]->Draw("same");
    //h_onoff_muendz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4267,43 +3373,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pstartx = new THStack("hs_pstartx","");
 
-   h_pstartx_sig[0]-> SetFillColor(2); 
-   h_pstartx_sig[0]->Scale(normfac);
-   h_pstartx_bac[0]-> SetFillColor(46);
-   h_pstartx_bac[0]->Scale(normfac);
-   h_pstartx_bac[1]-> SetFillColor(4);
-   h_pstartx_bac[1]->Scale(normfac);
-   h_pstartx_bac[2]-> SetFillColor(8);
-   h_pstartx_bac[2]->Scale(normfac);
-   h_pstartx_bac[3] -> SetFillColor(5);
-   h_pstartx_bac[3]->Scale(normfac);
-   h_pstartx_bac[4]-> SetFillColor(3);
-   h_pstartx_bac[4]->Scale(normfac);
-   h_pstartx_bac[5]-> SetFillColor(6);
-   h_pstartx_bac[5]->Scale(normfac);
-   h_pstartx_bac[6]-> SetFillColor(7);
-   h_pstartx_bac[6]->Scale(normfac);
-   h_pstartx_bac[7]-> SetFillColor(9);
-   h_pstartx_bac[7]->Scale(normfac);
-  h_pstartx_allsel[1]->SetFillStyle(3005);
-  h_pstartx_allsel[1]->SetFillColor(28);
-  h_pstartx_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pstartx, h_pstartx_sig, h_pstartx_bac, h_pstartx_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pstartx -> Add(h_pstartx_sig[0]);
-   hs_pstartx -> Add(h_pstartx_bac[0]);
-   hs_pstartx -> Add(h_pstartx_bac[1]);
-   hs_pstartx -> Add(h_pstartx_bac[2]);
-   hs_pstartx -> Add(h_pstartx_bac[3]);
-   hs_pstartx -> Add(h_pstartx_bac[4]);
-   hs_pstartx -> Add(h_pstartx_bac[5]);
-   hs_pstartx -> Add(h_pstartx_bac[6]);
-   hs_pstartx -> Add(h_pstartx_bac[7]);
-   hs_pstartx -> Add(h_pstartx_allsel[1]);
    hs_pstartx -> Draw("HIST,SAME");
 
-   h_pstartx_allsel[2]->Draw("same");
+   //h_pstartx_allsel[2]->Draw("same");
    h_pstartx_allsel[0]->Draw("same");
    //h_onoff_pstartx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4345,43 +3419,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pstarty = new THStack("hs_pstarty","");
 
-   h_pstarty_sig[0]-> SetFillColor(2); 
-   h_pstarty_sig[0]->Scale(normfac);
-   h_pstarty_bac[0]-> SetFillColor(46);
-   h_pstarty_bac[0]->Scale(normfac);
-   h_pstarty_bac[1]-> SetFillColor(4);
-   h_pstarty_bac[1]->Scale(normfac);
-   h_pstarty_bac[2]-> SetFillColor(8);
-   h_pstarty_bac[2]->Scale(normfac);
-   h_pstarty_bac[3] -> SetFillColor(5);
-   h_pstarty_bac[3]->Scale(normfac);
-   h_pstarty_bac[4]-> SetFillColor(3);
-   h_pstarty_bac[4]->Scale(normfac);
-   h_pstarty_bac[5]-> SetFillColor(6);
-   h_pstarty_bac[5]->Scale(normfac);
-   h_pstarty_bac[6]-> SetFillColor(7);
-   h_pstarty_bac[6]->Scale(normfac);
-   h_pstarty_bac[7]-> SetFillColor(9);
-   h_pstarty_bac[7]->Scale(normfac);
-  h_pstarty_allsel[1]->SetFillStyle(3005);
-  h_pstarty_allsel[1]->SetFillColor(28);
-  h_pstarty_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pstarty, h_pstarty_sig, h_pstarty_bac, h_pstarty_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pstarty -> Add(h_pstarty_sig[0]);
-   hs_pstarty -> Add(h_pstarty_bac[0]);
-   hs_pstarty -> Add(h_pstarty_bac[1]);
-   hs_pstarty -> Add(h_pstarty_bac[2]);
-   hs_pstarty -> Add(h_pstarty_bac[3]);
-   hs_pstarty -> Add(h_pstarty_bac[4]);
-   hs_pstarty -> Add(h_pstarty_bac[5]);
-   hs_pstarty -> Add(h_pstarty_bac[6]);
-   hs_pstarty -> Add(h_pstarty_bac[7]);
-   hs_pstarty -> Add(h_pstarty_allsel[1]);
    hs_pstarty -> Draw("HIST,SAME");
 
-   h_pstarty_allsel[2]->Draw("same");
+   //h_pstarty_allsel[2]->Draw("same");
     h_pstarty_allsel[0]->Draw("same");
    //h_onoff_pstarty->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4422,43 +3464,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pstartz = new THStack("hs_pstartz","");
 
-   h_pstartz_sig[0]-> SetFillColor(2); 
-   h_pstartz_sig[0]->Scale(normfac);
-   h_pstartz_bac[0]-> SetFillColor(46);
-   h_pstartz_bac[0]->Scale(normfac);
-   h_pstartz_bac[1]-> SetFillColor(4);
-   h_pstartz_bac[1]->Scale(normfac);
-   h_pstartz_bac[2]-> SetFillColor(8);
-   h_pstartz_bac[2]->Scale(normfac);
-   h_pstartz_bac[3] -> SetFillColor(5);
-   h_pstartz_bac[3]->Scale(normfac);
-   h_pstartz_bac[4]-> SetFillColor(3);
-   h_pstartz_bac[4]->Scale(normfac);
-   h_pstartz_bac[5]-> SetFillColor(6);
-   h_pstartz_bac[5]->Scale(normfac);
-   h_pstartz_bac[6]-> SetFillColor(7);
-   h_pstartz_bac[6]->Scale(normfac);
-   h_pstartz_bac[7]-> SetFillColor(9);
-   h_pstartz_bac[7]->Scale(normfac);
-  h_pstartz_allsel[1]->SetFillStyle(3005);
-  h_pstartz_allsel[1]->SetFillColor(28);
-  h_pstartz_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pstartz, h_pstartz_sig, h_pstartz_bac, h_pstartz_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pstartz -> Add(h_pstartz_sig[0]);
-   hs_pstartz -> Add(h_pstartz_bac[0]);
-   hs_pstartz -> Add(h_pstartz_bac[1]);
-   hs_pstartz -> Add(h_pstartz_bac[2]);
-   hs_pstartz -> Add(h_pstartz_bac[3]);
-   hs_pstartz -> Add(h_pstartz_bac[4]);
-   hs_pstartz -> Add(h_pstartz_bac[5]);
-   hs_pstartz -> Add(h_pstartz_bac[6]);
-   hs_pstartz -> Add(h_pstartz_bac[7]);
-   hs_pstartz -> Add(h_pstartz_allsel[1]);
    hs_pstartz -> Draw("HIST,SAME");
 
-   h_pstartz_allsel[2]->Draw("same");
+   //h_pstartz_allsel[2]->Draw("same");
    h_pstartz_allsel[0]->Draw("same");
 //h_onoff_pstartz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4499,43 +3509,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pendx = new THStack("hs_pendx","");
 
-   h_pendx_sig[0]-> SetFillColor(2); 
-   h_pendx_sig[0]->Scale(normfac);
-   h_pendx_bac[0]-> SetFillColor(46);
-   h_pendx_bac[0]->Scale(normfac);
-   h_pendx_bac[1]-> SetFillColor(4);
-   h_pendx_bac[1]->Scale(normfac);
-   h_pendx_bac[2]-> SetFillColor(8);
-   h_pendx_bac[2]->Scale(normfac);
-   h_pendx_bac[3] -> SetFillColor(5);
-   h_pendx_bac[3]->Scale(normfac);
-   h_pendx_bac[4]-> SetFillColor(3);
-   h_pendx_bac[4]->Scale(normfac);
-   h_pendx_bac[5]-> SetFillColor(6);
-   h_pendx_bac[5]->Scale(normfac);
-   h_pendx_bac[6]-> SetFillColor(7);
-   h_pendx_bac[6]->Scale(normfac);
-   h_pendx_bac[7]-> SetFillColor(9);
-   h_pendx_bac[7]->Scale(normfac);
-  h_pendx_allsel[1]->SetFillStyle(3005);
-  h_pendx_allsel[1]->SetFillColor(28);
-  h_pendx_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pendx, h_pendx_sig, h_pendx_bac, h_pendx_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pendx -> Add(h_pendx_sig[0]);
-   hs_pendx -> Add(h_pendx_bac[0]);
-   hs_pendx -> Add(h_pendx_bac[1]);
-   hs_pendx -> Add(h_pendx_bac[2]);
-   hs_pendx -> Add(h_pendx_bac[3]);
-   hs_pendx -> Add(h_pendx_bac[4]);
-   hs_pendx -> Add(h_pendx_bac[5]);
-   hs_pendx -> Add(h_pendx_bac[6]);
-   hs_pendx -> Add(h_pendx_bac[7]);
-   hs_pendx -> Add(h_pendx_allsel[1]);
    hs_pendx -> Draw("HIST,SAME");
 
-   h_pendx_allsel[2]->Draw("same");
+   //h_pendx_allsel[2]->Draw("same");
    h_pendx_allsel[0]->Draw("same");
 //h_onoff_pendx->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4577,43 +3555,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pendy = new THStack("hs_pendy","");
 
-   h_pendy_sig[0]-> SetFillColor(2); 
-   h_pendy_sig[0]->Scale(normfac);
-   h_pendy_bac[0]-> SetFillColor(46);
-   h_pendy_bac[0]->Scale(normfac);
-   h_pendy_bac[1]-> SetFillColor(4);
-   h_pendy_bac[1]->Scale(normfac);
-   h_pendy_bac[2]-> SetFillColor(8);
-   h_pendy_bac[2]->Scale(normfac);
-   h_pendy_bac[3] -> SetFillColor(5);
-   h_pendy_bac[3]->Scale(normfac);
-   h_pendy_bac[4]-> SetFillColor(3);
-   h_pendy_bac[4]->Scale(normfac);
-   h_pendy_bac[5]-> SetFillColor(6);
-   h_pendy_bac[5]->Scale(normfac);
-   h_pendy_bac[6]-> SetFillColor(7);
-   h_pendy_bac[6]->Scale(normfac);
-   h_pendy_bac[7]-> SetFillColor(9);
-   h_pendy_bac[7]->Scale(normfac);
-  h_pendy_allsel[1]->SetFillStyle(3005);
-  h_pendy_allsel[1]->SetFillColor(28);
-  h_pendy_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pendy, h_pendy_sig, h_pendy_bac, h_pendy_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pendy -> Add(h_pendy_sig[0]);
-   hs_pendy -> Add(h_pendy_bac[0]);
-   hs_pendy -> Add(h_pendy_bac[1]);
-   hs_pendy -> Add(h_pendy_bac[2]);
-   hs_pendy -> Add(h_pendy_bac[3]);
-   hs_pendy -> Add(h_pendy_bac[4]);
-   hs_pendy -> Add(h_pendy_bac[5]);
-   hs_pendy -> Add(h_pendy_bac[6]);
-   hs_pendy -> Add(h_pendy_bac[7]);
-   hs_pendy -> Add(h_pendy_allsel[1]);
    hs_pendy -> Draw("HIST,SAME");
 
-   h_pendy_allsel[2]->Draw("same");
+   //h_pendy_allsel[2]->Draw("same");
   h_pendy_allsel[0]->Draw("same");
   //h_onoff_pendy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4654,43 +3600,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_pendz = new THStack("hs_pendz","");
 
-   h_pendz_sig[0]-> SetFillColor(2); 
-   h_pendz_sig[0]->Scale(normfac);
-   h_pendz_bac[0]-> SetFillColor(46);
-   h_pendz_bac[0]->Scale(normfac);
-   h_pendz_bac[1]-> SetFillColor(4);
-   h_pendz_bac[1]->Scale(normfac);
-   h_pendz_bac[2]-> SetFillColor(8);
-   h_pendz_bac[2]->Scale(normfac);
-   h_pendz_bac[3] -> SetFillColor(5);
-   h_pendz_bac[3]->Scale(normfac);
-   h_pendz_bac[4]-> SetFillColor(3);
-   h_pendz_bac[4]->Scale(normfac);
-   h_pendz_bac[5]-> SetFillColor(6);
-   h_pendz_bac[5]->Scale(normfac);
-   h_pendz_bac[6]-> SetFillColor(7);
-   h_pendz_bac[6]->Scale(normfac);
-   h_pendz_bac[7]-> SetFillColor(9);
-   h_pendz_bac[7]->Scale(normfac);
-  h_pendz_allsel[1]->SetFillStyle(3005);
-  h_pendz_allsel[1]->SetFillColor(28);
-  h_pendz_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_pendz, h_pendz_sig, h_pendz_bac, h_pendz_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_pendz -> Add(h_pendz_sig[0]);
-   hs_pendz -> Add(h_pendz_bac[0]);
-   hs_pendz -> Add(h_pendz_bac[1]);
-   hs_pendz -> Add(h_pendz_bac[2]);
-   hs_pendz -> Add(h_pendz_bac[3]);
-   hs_pendz -> Add(h_pendz_bac[4]);
-   hs_pendz -> Add(h_pendz_bac[5]);
-   hs_pendz -> Add(h_pendz_bac[6]);
-   hs_pendz -> Add(h_pendz_bac[7]);
-   hs_pendz -> Add(h_pendz_allsel[1]);
    hs_pendz -> Draw("HIST,SAME");
 
-   h_pendz_allsel[2]->Draw("same");
+   //h_pendz_allsel[2]->Draw("same");
    h_pendz_allsel[0]->Draw("same");
 //h_onoff_pendz->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4708,7 +3622,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_Evis_allsel[0]->SetLineStyle(1);
    h_Evis_allsel[0]->GetXaxis()->SetTitle("Visible Energy [GeV]");
    h_Evis_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_Evis_allsel[0]->SetMaximum(500);
+   h_Evis_allsel[0]->SetMaximum(1.4*h_Evis_allsel[0]->GetMaximum());
    h_Evis_allsel[0]->Draw();
 
    //h_Evis_allsel[1]->SetLineColor(kRed);
@@ -4731,43 +3645,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_Evis = new THStack("hs_Evis","");
 
-   h_Evis_sig[0]-> SetFillColor(2); 
-   h_Evis_sig[0]->Scale(normfac);
-   h_Evis_bac[0]-> SetFillColor(46);
-   h_Evis_bac[0]->Scale(normfac);
-   h_Evis_bac[1]-> SetFillColor(4);
-   h_Evis_bac[1]->Scale(normfac);
-   h_Evis_bac[2]-> SetFillColor(8);
-   h_Evis_bac[2]->Scale(normfac);
-   h_Evis_bac[3] -> SetFillColor(5);
-   h_Evis_bac[3]->Scale(normfac);
-   h_Evis_bac[4]-> SetFillColor(3);
-   h_Evis_bac[4]->Scale(normfac);
-   h_Evis_bac[5]-> SetFillColor(6);
-   h_Evis_bac[5]->Scale(normfac);
-   h_Evis_bac[6]-> SetFillColor(7);
-   h_Evis_bac[6]->Scale(normfac);
-   h_Evis_bac[7]-> SetFillColor(9);
-   h_Evis_bac[7]->Scale(normfac);
-  h_Evis_allsel[1]->SetFillStyle(3005);
-  h_Evis_allsel[1]->SetFillColor(28);
-  h_Evis_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_Evis, h_Evis_sig, h_Evis_bac, h_Evis_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_Evis -> Add(h_Evis_sig[0]);
-   hs_Evis -> Add(h_Evis_bac[0]);
-   hs_Evis -> Add(h_Evis_bac[1]);
-   hs_Evis -> Add(h_Evis_bac[2]);
-   hs_Evis -> Add(h_Evis_bac[3]);
-   hs_Evis -> Add(h_Evis_bac[4]);
-   hs_Evis -> Add(h_Evis_bac[5]);
-   hs_Evis -> Add(h_Evis_bac[6]);
-   hs_Evis -> Add(h_Evis_bac[7]);
-   hs_Evis -> Add(h_Evis_allsel[1]);
    hs_Evis -> Draw("HIST,SAME");
 
-   h_Evis_allsel[2]->Draw("same");
+   //h_Evis_allsel[2]->Draw("same");
     h_Evis_allsel[0]->Draw("same");
 //h_onoff_Evis->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
@@ -4808,43 +3690,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
    THStack *hs_Q2cal = new THStack("hs_Q2cal","");
 
-   h_Q2cal_sig[0]-> SetFillColor(2); 
-   h_Q2cal_sig[0]->Scale(normfac);
-   h_Q2cal_bac[0]-> SetFillColor(46);
-   h_Q2cal_bac[0]->Scale(normfac);
-   h_Q2cal_bac[1]-> SetFillColor(4);
-   h_Q2cal_bac[1]->Scale(normfac);
-   h_Q2cal_bac[2]-> SetFillColor(8);
-   h_Q2cal_bac[2]->Scale(normfac);
-   h_Q2cal_bac[3] -> SetFillColor(5);
-   h_Q2cal_bac[3]->Scale(normfac);
-   h_Q2cal_bac[4]-> SetFillColor(3);
-   h_Q2cal_bac[4]->Scale(normfac);
-   h_Q2cal_bac[5]-> SetFillColor(6);
-   h_Q2cal_bac[5]->Scale(normfac);
-   h_Q2cal_bac[6]-> SetFillColor(7);
-   h_Q2cal_bac[6]->Scale(normfac);
-   h_Q2cal_bac[7]-> SetFillColor(9);
-   h_Q2cal_bac[7]->Scale(normfac);
-   h_Q2cal_allsel[1]->SetFillStyle(3005);
-   h_Q2cal_allsel[1]->SetFillColor(28);
-   h_Q2cal_allsel[1]->Scale(scale_onoffbeam);
+   stackHists(hs_Q2cal, h_Q2cal_sig, h_Q2cal_bac, h_Q2cal_allsel, normfac, scale_onoffbeam);
 
-
-
-   hs_Q2cal -> Add(h_Q2cal_sig[0]);
-   hs_Q2cal -> Add(h_Q2cal_bac[0]);
-   hs_Q2cal -> Add(h_Q2cal_bac[1]);
-   hs_Q2cal -> Add(h_Q2cal_bac[2]);
-   hs_Q2cal -> Add(h_Q2cal_bac[3]);
-   hs_Q2cal -> Add(h_Q2cal_bac[4]);
-   hs_Q2cal -> Add(h_Q2cal_bac[5]);
-   hs_Q2cal -> Add(h_Q2cal_bac[6]);
-   hs_Q2cal -> Add(h_Q2cal_bac[7]);
-   hs_Q2cal -> Add(h_Q2cal_allsel[1]);
    hs_Q2cal -> Draw("HIST,SAME");
 
-   h_Q2cal_allsel[2]->Draw("same");
+   //h_Q2cal_allsel[2]->Draw("same");
     h_Q2cal_allsel[0]->Draw("same");
    //h_onoff_Q2cal->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
