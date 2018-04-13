@@ -47,6 +47,11 @@ add_subdirectory(DQMTools)
 
 add_subdirectory(LEEPhotonAnalysis)
 
+add_subdirectory(MyClasses)
+add_subdirectory(UBXSec)
+add_subdirectory(CC1pi)
+add_subdirectory(ParticleID)
+
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
