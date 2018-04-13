@@ -129,7 +129,7 @@ namespace cosmictag {
     /// Name
     std::string _name;
     /// Request boolean to store full matching result (per Match function call)
-    bool _store_full;   
+    //bool _store_full;   
 
     std::ofstream _csvfile; 
   };
