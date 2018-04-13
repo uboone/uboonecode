@@ -35,11 +35,11 @@
     
     <stage name="CC1uNPSelection_BNB">
       <!-- <inputlist>/pnfs/uboone/persistent/users/arafique/file.txt</inputlist> -->
-      <inputdef>prod_reco_optfilter_bnb_v11_unblind_mcc8</inputdef>
+      <inputdef>prod_reco_optfilter_bnb_v12_unblind_mcc8</inputdef>
       <fcl>run_cc1unpselana.fcl</fcl>
-      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB-fou/out</outdir>
-      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB-fou/log</logdir>
-      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB-fou/work</workdir>
+      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB_mcc8.8/out</outdir>
+      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB_mcc8.8/log</logdir>
+      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/BNB_mcc8.8/work</workdir>
       
       <numjobs>1919</numjobs>
       <maxfilesperjob>10</maxfilesperjob> 

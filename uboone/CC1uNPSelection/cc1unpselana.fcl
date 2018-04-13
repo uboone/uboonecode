@@ -17,7 +17,8 @@ microboone_cc1unpselana:
  HitsModuleLabel:           "gaushit"
  OpFlashModuleLabel:        "simpleFlashBeam" 
  #RawDigitModuleLabel:      "daq"
- CalorimetryModuleLabel:    "pandoraNucalo"
+ //CalorimetryModuleLabel:    "pandoraNucalo"
+ CalorimetryModuleLabel:    "pandoraNucali" #mcc8.7
  ShowerModuleLabel:         "showerrecopandora"
  G4ModuleLabel:             "largeant"
  MCTruthMatching:           @local::AssociationsTruthTool
