@@ -41,7 +41,7 @@ void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH
 void plot_com_MCaddOffbeam_bacsep(){
   //loadStyle();
   int tune=1;
-  int cosmicCut=0;
+  int cosmicCut=1;
 
   TFile *input0;
   TFile *input1;
@@ -2276,7 +2276,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_costheta_allsel[0]->SetLineStyle(1);
   h_costheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{#mu}");
   h_costheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_costheta_allsel[0]->SetMaximum(2.3 * h_costheta_allsel[0]->GetMaximum());
+  h_costheta_allsel[0]->SetMaximum(2.5 * h_costheta_allsel[0]->GetMaximum());
   h_costheta_allsel[0]->Draw();
   //h_costheta_allsel[1]->SetLineColor(kRed);
   //h_costheta_allsel[1]->SetLineWidth(2);
@@ -2327,7 +2327,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_pcostheta_allsel[0]->SetLineStyle(1);
   h_pcostheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{p}");
   h_pcostheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pcostheta_allsel[0]->SetMaximum(2.3*h_pcostheta_allsel[0]->GetMaximum());
+  h_pcostheta_allsel[0]->SetMaximum(2.5*h_pcostheta_allsel[0]->GetMaximum());
    h_pcostheta_allsel[0]->Draw();
 
   //h_pcostheta_allsel[1]->SetLineColor(kRed);
@@ -2644,7 +2644,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_plep_allsel[0]->SetLineStyle(1);
   h_plep_allsel[0]->GetXaxis()->SetTitle("Momentum of the muon candidate[GeV]");
   h_plep_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_plep_allsel[0]->SetMaximum(600);
+  h_plep_allsel[0]->SetMaximum(1.4*h_plep_allsel[0]->GetMaximum());
   h_plep_allsel[0]->Draw();  
 
   //h_plep_allsel[1]->SetLineColor(kRed);
@@ -2865,7 +2865,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_phimup_allsel[0]->SetLineStyle(1);
   h_phimup_allsel[0]->GetXaxis()->SetTitle("|#phi_{#mu}-#phi_{P}|[Rad]");
   h_phimup_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phimup_allsel[0]->SetMaximum(1.4*h_phimup_allsel[0]->GetMaximum());
+  h_phimup_allsel[0]->SetMaximum(2.5*h_phimup_allsel[0]->GetMaximum());
   h_phimup_allsel[0]->Draw();
 
   //h_phimup_allsel[1]->SetLineColor(kRed);
@@ -3021,7 +3021,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_Nhitsproton_allsel[0]->SetLineStyle(1);
   h_Nhitsproton_allsel[0]->GetXaxis()->SetTitle("Number of Hits of The Proton Candidate");
   h_Nhitsproton_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_Nhitsproton_allsel[0]->SetMaximum(1.4 * h_Nhitsproton_allsel[0]->GetMaximum());
+  h_Nhitsproton_allsel[0]->SetMaximum(1.6 * h_Nhitsproton_allsel[0]->GetMaximum());
   h_Nhitsproton_allsel[0]->Draw();
 
   //h_Nhitsproton_allsel[1]->SetLineColor(kRed);
@@ -3828,7 +3828,7 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_Evis_allsel[0]->SetLineStyle(1);
    h_Evis_allsel[0]->GetXaxis()->SetTitle("Visible Energy [GeV]");
    h_Evis_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_Evis_allsel[0]->SetMaximum(1.4*h_Evis_allsel[0]->GetMaximum());
+   h_Evis_allsel[0]->SetMaximum(1.6*h_Evis_allsel[0]->GetMaximum());
    h_Evis_allsel[0]->Draw();
 
    //h_Evis_allsel[1]->SetLineColor(kRed);
