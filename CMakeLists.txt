@@ -15,7 +15,6 @@
 # It sets up all of the larsoft ups products (lardata, larsim, larreco, etc.)
 # ======================================================================
 
-
 # use cmake 2.8 or later
 cmake_minimum_required (VERSION 2.8)
 
