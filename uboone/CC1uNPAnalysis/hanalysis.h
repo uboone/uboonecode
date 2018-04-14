@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Feb 18 21:44:14 2018 by ROOT version 6.06/08
+// Fri Mar 23 09:20:02 2018 by ROOT version 6.06/08
 // from TTree fMC_TrunMean/Data Holder
-// found on file: /pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.6_dev/out/cc1unp_output.root
+// found on file: /pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/MCC8.7_tune1/out/cc1unp_MC_tune1.root
 //////////////////////////////////////////////////////////
 
 #ifndef hanalysis_h
@@ -18,6 +18,8 @@
 
 // Headers needed by this particular selector
 #include <vector>
+
+#include "TLorentzVector.h"
 
 
 
@@ -74,6 +76,7 @@ public :
    TTreeReaderValue<Float_t> trackmomcandidate = {fReader, "trackmomcandidate"};
    TTreeReaderValue<Float_t> trackmomcandidate_mcs = {fReader, "trackmomcandidate_mcs"};
    TTreeReaderValue<Float_t> trackmomprotoncandidate = {fReader, "trackmomprotoncandidate"};
+   TTreeReaderValue<Bool_t> mcs_isBestFwd_muoncand = {fReader, "mcs_isBestFwd_muoncand"};
    TTreeReaderValue<Float_t> fopflashtime = {fReader, "fopflashtime"};
    TTreeReaderValue<Float_t> fopflashmax = {fReader, "fopflashmax"};
    TTreeReaderValue<Float_t> flstrkdist = {fReader, "flstrkdist"};
@@ -83,6 +86,7 @@ public :
    TTreeReaderValue<Int_t> truthtop_200thresh = {fReader, "truthtop_200thresh"};
    TTreeReaderValue<Int_t> truthtop_300thresh = {fReader, "truthtop_300thresh"};
    TTreeReaderValue<Int_t> truthtop_400thresh = {fReader, "truthtop_400thresh"};
+   TTreeReaderValue<Bool_t> OOFVflag = {fReader, "OOFVflag"};
    TTreeReaderValue<Int_t> trackcand_origin = {fReader, "trackcand_origin"};
    TTreeReaderValue<Int_t> trackcand_nuset = {fReader, "trackcand_nuset"};
    TTreeReaderValue<Int_t> trackcand_parPDG = {fReader, "trackcand_parPDG"};
@@ -120,6 +124,7 @@ public :
    TTreeReaderValue<Float_t> Evis = {fReader, "Evis"};
    TTreeReaderValue<Float_t> Q2cal = {fReader, "Q2cal"};
    TTreeReaderValue<Float_t> Wcal = {fReader, "Wcal"};
+   //TTreeReaderValue<TLorentzVector> fHitNucP4 = {fReader, "fHitNucP4"};
    TTreeReaderArray<int> protoncandidate_id = {fReader, "protoncandidate_id"};
    TTreeReaderArray<float> protoncandidate_startx = {fReader, "protoncandidate_startx"};
    TTreeReaderArray<float> protoncandidate_starty = {fReader, "protoncandidate_starty"};
