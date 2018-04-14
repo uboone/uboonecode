@@ -13,5 +13,8 @@ add_subdirectory(test_fcl)
 add_subdirectory(Production)
 add_subdirectory(DataProduction)
 add_subdirectory(SparseRawDigits)
+add_subdirectory(Swizzle)
+add_subdirectory(CRTSwizzle)
+#add_subdirectory(CRTMerge)
 
 add_subdirectory(ci)
