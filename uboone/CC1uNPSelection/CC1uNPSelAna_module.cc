@@ -844,6 +844,7 @@ private:
     float fopflashtime;
     float fopflashmax;
     float fvtxx, fvtxy,fvtxz;
+    int numvtx;
     float flstrkdist;
     float vershwrdist; 
     float ftrklenmuoncand, ftrklenprotoncand;
@@ -1153,7 +1154,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_flashtag->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_flashtag->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
-
+    fMC_flashtag->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_flashtag->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_flashtag->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_flashtag->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1177,6 +1178,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_vtxinFV->Branch("fEvent",&fEvent,"fEvent/I");
     //branch for vertex position is here---------------------!
+    fMC_vtxinFV->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_vtxinFV->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_vtxinFV->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_vtxinFV->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1203,6 +1205,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("fRun",&fRun,"fRun/I");
     fMC_ntrks->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_ntrks->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_ntrks->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_ntrks->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_ntrks->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_ntrks->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1227,6 +1230,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("fRun",&fRun,"fRun/I");
     fMC_noshwr->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_noshwr->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_noshwr->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_noshwr->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_noshwr->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_noshwr->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1255,6 +1259,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_trkfls->Branch("fEvent",&fEvent,"fEvent/I");
 
+    fMC_trkfls->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_trkfls->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_trkfls->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_trkfls->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1283,6 +1288,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_NoExTrk->Branch("fEvent",&fEvent,"fEvent/I");
 
+    fMC_NoExTrk->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_NoExTrk->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_NoExTrk->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_NoExTrk->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1313,6 +1319,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_mupinFV->Branch("fEvent",&fEvent,"fEvent/I");
 
+    fMC_mupinFV->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_mupinFV->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_mupinFV->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_mupinFV->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1408,6 +1415,7 @@ void  CC1uNPSelAna::beginJob()
 
     //---------------------------------------------------------
 
+    fMC_TrunMean->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_TrunMean->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_TrunMean->Branch("fvtxy", &fvtxy, "fvtxy/F");
     fMC_TrunMean->Branch("fvtxz", &fvtxz, "fvtxz/F");
@@ -1577,16 +1585,16 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     
     fFlashWidth              = pset.get      ("FlashWidth", 80.);    
 
-    fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
-    fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
+    //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
+    //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
     fdQdx_scale              = pset.get("dQdxScale",196.98);
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
 
-    //fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
-    //fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
+    fBeamMin                 = pset.get      ("BeamMin", 3.3);   //bnb 
+    fBeamMax                 = pset.get      ("BeamMax", 4.9);   //bnb
   
     fPEThresh                = pset.get      ("PEThresh", 50.);    
     fMinTrk2VtxDist          = pset.get      ("MinTrk2VtxDist", 5.);    
@@ -2826,7 +2834,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             float nuvtxztest[500];
 
 
-
+            numvtx=nuvertexlist[0].size();
             //check if there are a track within 5cm from neutrino vertex
             //loop over all the neutrino vertex and check the vertex position
             for(size_t nuvtxIdx=0 ; nuvtxIdx<nuvertexlist[0].size(); nuvtxIdx++){

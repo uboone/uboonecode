@@ -36,11 +36,11 @@
     <stage name="CC1uNPSelection_EXTBNB">
       <!-- <inputlist>/pnfs/uboone/persistent/users/arafique/file.txt</inputlist> -->
       <!--inputdef>prod_reco_optfilter_extbnb_v11_mcc8</inputdef>-->
-      <inputdef>prod_reco_optfilter_extbnb_v11_mcc8_dev</inputdef>  
+      <inputdef>prod_reco_optfilter_extbnb_v12_mcc8</inputdef>  
       <fcl>run_cc1unpselana.fcl</fcl>
-      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB-thi/out</outdir>
-      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB-thi/log</logdir>
-      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB-thi/work</workdir>
+      <outdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB_mcc8.8/out</outdir>
+      <logdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB_mcc8.8/log</logdir>
+      <workdir>/pnfs/uboone/persistent/users/jiangl/CC1uNPSelection/EXTBNB_mcc8.8/work</workdir>
       
       <numjobs>1829</numjobs>
       <maxfilesperjob>10</maxfilesperjob> 
