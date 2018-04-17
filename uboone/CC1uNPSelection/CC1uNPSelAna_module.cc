@@ -829,6 +829,7 @@ private:
     std::vector<double> *trueProtonsTrueTheta;
     std::vector<double> *trueProtonsTruePhi;
     std::vector<double> *trueProtonsEndMomentum;
+    std::vector<std::string> *trueProtonsEndProcess;
 
     float fLlep;
     float fLhad;
@@ -1086,6 +1087,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_Geant->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_Geant->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_Geant->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_Geant->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_Geant->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_Geant->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_Geant->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1115,6 +1117,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_allsel->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_allsel->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_allsel->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_allsel->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_allsel->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_allsel->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_allsel->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1136,6 +1139,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashwin->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_flashwin->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_flashwin->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_flashwin->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_flashwin->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_flashwin->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_flashwin->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1164,6 +1168,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_flashtag->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_flashtag->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_flashtag->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_flashtag->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_flashtag->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_flashtag->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1194,6 +1199,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_vtxinFV->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_vtxinFV->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_vtxinFV->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_vtxinFV->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_vtxinFV->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_vtxinFV->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1221,6 +1227,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_ntrks->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_ntrks->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_ntrks->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_ntrks->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_ntrks->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_ntrks->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1249,6 +1256,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_noshwr->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_noshwr->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_noshwr->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_noshwr->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_noshwr->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_noshwr->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1278,6 +1286,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_trkfls->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_trkfls->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_trkfls->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_trkfls->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_trkfls->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_trkfls->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1307,6 +1316,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_NoExTrk->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_NoExTrk->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_NoExTrk->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_NoExTrk->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_NoExTrk->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_NoExTrk->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1373,6 +1383,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_mupinFV->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_mupinFV->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_mupinFV->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
     fMC_mupinFV->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_mupinFV->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_mupinFV->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1411,6 +1422,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
     fMC_TrunMean->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
     fMC_TrunMean->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
+    fMC_TrunMean->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
 
 
     //---------------------------------------------------------
@@ -2388,6 +2400,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     trueProtonsTrueTheta->clear();
     trueProtonsTruePhi->clear();
     trueProtonsEndMomentum->clear();
+    trueProtonsEndProcess->clear();
     for (int igeniepart(0); igeniepart<nGeniePrimaries; igeniepart++){
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
       if (part.PdgCode()==2212 && part.StatusCode()==1 && part.Mother()==0){
@@ -2395,6 +2408,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());
         trueProtonsEndMomentum->push_back(part.EndMomentum().P());
+        trueProtonsEndProcess->push_back(part.EndProcess());
       }
     }
     /// Also here we should get things like the true struck neutron momentum - I think we need a GTruth object for this
@@ -3439,7 +3453,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 //calculate Q2 and W from here
                  
                 float Emuoncand=TMath::Sqrt(muonmass*muonmass+fPlep*fPlep);
-                Q2cal=-(Evis-Emuoncand)*(Evis-Emuoncand)+fPlep*fPlep; 
+                Q2cal=-(Evis-Emuoncand)*(Evis-Emuoncand)+(Evis-fPlep*TMath::Cos(trackthetacand))*(Evis-fPlep*TMath::Cos(trackthetacand)) + fPlep*fPlep*(TMath::Sin(trackthetacand)*TMath::Sin(trackthetacand));
                 Wcal=TMath::Sqrt(Eptot*Eptot-Pxptot*Pxptot-Pyptot*Pyptot-Pzptot*Pzptot);                
                     
 
