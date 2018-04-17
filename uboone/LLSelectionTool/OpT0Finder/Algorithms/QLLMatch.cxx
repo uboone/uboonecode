@@ -12,8 +12,8 @@ namespace flashana {
 
   static QLLMatchFactory __global_QLLMatchFactory__;
 
-  QLLMatch *QLLMatch::_me = nullptr;
-  
+  QLLMatch *__qll_global__ = nullptr; // A global pointer to be used for MINUIT
+
   void MIN_vtx_qll(Int_t &, Double_t *, Double_t &, Double_t *, Int_t);
   
   QLLMatch::QLLMatch(const std::string name)
@@ -21,7 +21,7 @@ namespace flashana {
   { _current_llhd = _current_chi2 = -1.0; }
 
   QLLMatch::QLLMatch()
-  { throw OpT0FinderException("Use QLLMatch::GetME() to obtain singleton pointer!"); }
+  { throw OpT0FinderException("Use the other ctor"); }
   
   void QLLMatch::_Configure_(const Config_t &pset) {
     _record = pset.get<bool>("RecordHistory");
@@ -300,11 +300,11 @@ namespace flashana {
     //std::cout << "minuit offset : " << Fval << std::endl;
     ///std::cout << "minuit Xval?? : " << *Xval << std::endl;
     
-    auto const &hypothesis = QLLMatch::GetME()->ChargeHypothesis(*Xval);
-    auto const &measurement = QLLMatch::GetME()->Measurement();
-    Fval = QLLMatch::GetME()->QLL(hypothesis, measurement);
+    auto const &hypothesis = __qll_global__->ChargeHypothesis(*Xval);
+    auto const &measurement = __qll_global__->Measurement();
+    Fval = __qll_global__->QLL(hypothesis, measurement);
     
-    QLLMatch::GetME()->Record(Xval[0]);
+    __qll_global__->Record(Xval[0]);
     
     return;
   }
@@ -360,7 +360,9 @@ namespace flashana {
     _minuit_ptr->SetPrintLevel(-1);
     arglist[0] = 2.0;
     _minuit_ptr->mnexcm("SET STR", arglist, 1, ierrflag);
-    
+   
+    __qll_global__ = this;
+
     _minuit_ptr->SetFCN(MIN_vtx_qll);
     
     _minuit_ptr->DefineParameter(0, "X", reco_x, reco_x_err, -1.0, ActiveXMax() - (_raw_xmax_pt.x - _raw_xmin_pt.x) + 20.0 );
