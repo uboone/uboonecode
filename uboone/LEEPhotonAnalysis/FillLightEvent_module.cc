@@ -614,7 +614,8 @@ void FillLightEvent::Reconfigure(fhicl::ParameterSet const & p) {
   ftrackp_size = ftrack_producers.size();
   fshowerp_size = fshower_producers.size();
   frmcm_size = frmcmassociation_producers.size();
-  if(fmc && !frmcmassociation_producers.empty()) {
+  frmcm_first = nullptr;
+  if(fmc && frmcm_size != 0) {
     if(frmcm_size != fhitp_size ||
        frmcm_size != ftrackp_size ||
        frmcm_size != fshowerp_size) {
