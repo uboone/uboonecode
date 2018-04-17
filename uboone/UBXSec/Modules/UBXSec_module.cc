@@ -206,11 +206,11 @@ private:
 
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
-  const simb::Origin_t COSMIC_ORIGIN   = simb::kCosmicRay;
+  //const simb::Origin_t COSMIC_ORIGIN   = simb::kCosmicRay;
 
   // To be filled within module
   bool _is_data, _is_mc;
-  double _candidate_flash_time;
+  //double _candidate_flash_time;
   double _drift_velocity;
 
   // Outputs trees

@@ -1021,7 +1021,7 @@ bool UBXSecHelper::PointIsCloseToDeadRegion(double *reco_nu_vtx, int plane_no){
   // Now check close wires
   for(unsigned int new_ch = ch - 5; new_ch < ch - 5 + 11; new_ch++){
     //std::cout << "now trying with channel " << new_ch << std::endl;
-    if( new_ch < 0 || new_ch >= 8256) continue;
+    if( new_ch >= 8256) continue;
     if( chanFilt.Status(new_ch) < 4 ) return true;
   }
 

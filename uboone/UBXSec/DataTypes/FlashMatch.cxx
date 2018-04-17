@@ -13,7 +13,7 @@ namespace ubana {
     fXFixedLl   = -8888;
   }
 
-  FlashMatch::FlashMatch(double score = -8888) {
+  FlashMatch::FlashMatch(double score) {
     fScore      = score;
     fTPCX       = -8888;
     fEstimatedX = -8888;
