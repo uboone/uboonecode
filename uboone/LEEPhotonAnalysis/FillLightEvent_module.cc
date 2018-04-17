@@ -1762,7 +1762,9 @@ void FillLightEvent::FillRecoHitVectors(art::Event const & e, int const producer
   std::unordered_map<int, size_t> const * sp_map = nullptr;
   std::unordered_map<int, size_t> const * mcp_map = nullptr;
   art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData> * particles_per_hit = nullptr;
+  std::cout<<"JustBefore "<<std::endl;
   if(frmcm_first) {
+  std::cout<<"JustAFTER "<<std::endl;
     tp_map = &frmcm_first->GetMCTrackMap();
     sp_map = &frmcm_first->GetMCShowerMap();
     mcp_map = &frmcm_first->GetMCParticleMap();
