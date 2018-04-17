@@ -68,7 +68,7 @@ private:
   std::string _t0_reco_producer;
   std::string _opflash_producer_beam;
 
-  size_t _num_tracks;
+  //size_t _num_tracks;
   std::vector<double> _gain_correction;
 
   bool _do_opdet_swap;

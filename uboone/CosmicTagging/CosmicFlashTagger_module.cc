@@ -99,7 +99,8 @@ private:
   std::vector<int> _opdet_swap_map;    ///< The OpDet swap map for reco flashes
 
   TTree* _tree1;
-  int _run, _subrun, _event, _matchid;
+  //int _run, _subrun, _event, _matchid;
+  int _run, _subrun, _event;
   int _n_beam_flashes, _n_pfp;
   std::vector<std::vector<double>> _beam_flash_spec, _pfp_hypo_spec;
   std::vector<int> _pfp_id;

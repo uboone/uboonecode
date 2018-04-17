@@ -101,12 +101,12 @@ public:
   LEEPhotonAnalysis & operator = (LEEPhotonAnalysis &&) = delete;
 
   void reconfigure(fhicl::ParameterSet const & p);
-  void beginJob();
-  void beginSubRun(art::SubRun const & sr);
+  void beginJob() override;
+  void beginSubRun(art::SubRun const & sr) override;
   void fillwpandora(art::Event const & e,
 		    ParticleAssociations & pas);
   void analyze(art::Event const & e) override;
-  void endJob();  
+  void endJob() override;  
 
 };
 

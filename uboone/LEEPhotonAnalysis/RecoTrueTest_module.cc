@@ -67,7 +67,7 @@ class xsecAna::RecoTrueTest : public art::EDProducer {
 		std::string _hitfinderLabel;
 		std::string _geantModuleLabel;
 
-		bool _is_data;
+                //bool _is_data;
 		bool _debug;
 		bool _cosmic_only;
 };

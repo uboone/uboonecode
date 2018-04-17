@@ -97,7 +97,7 @@ private:
   double _cosmic_acpt_tag_score_cut;  ///< Score cut used in the analysis to consider the PFP as cosmic (applied to acpt tagger)
   double _cosmic_stopmu_tag_score_cut;  ///< Score cut used in the analysis to consider the PFP as cosmic (applied to stopmu tagger)
 
-  bool _recursiveMatching = true;
+  //bool _recursiveMatching = true;
   bool _debug = false;
 
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
