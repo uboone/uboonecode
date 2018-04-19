@@ -816,6 +816,7 @@ private:
     int fEvent;
     int fRun;
     int fSubRun;
+    double _correctionWeight;
     int truthtop; // true topology
     int truthtop_200thresh; // true topology assuming a 200MeV/c proton threshold
     int truthtop_300thresh; // true topology assuming a 300MeV/c proton threshold
@@ -1047,6 +1048,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_Truth->Branch("fRun",&fRun,"fRun/I");
     fMC_Truth->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_Truth->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_Truth->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_Truth->Branch("_fTrueccnc",&_fTrueccnc,"_fTrueccnc/I");
     fMC_Truth->Branch("_fTruemode",&_fTruemode,"_fTruemode/I");
     fMC_Truth->Branch("_fTrueinttype",&_fTrueinttype,"_fTrueinttype/I");
@@ -1069,6 +1071,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_Geant->Branch("fRun",&fRun,"fRun/I");
     fMC_Geant->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_Geant->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_Truth->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_Geant->Branch("nGEANTparticles", &nGEANTparticles , "nGEANTparticles/I");
     fMC_Geant->Branch("fhg4parpdg", "std::vector<int>",&fhg4parpdg);
     fMC_Geant->Branch("fhg4parstatus", "std::vector<int>", &fhg4parstatus);
@@ -1107,6 +1110,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_allsel->Branch("fRun",&fRun,"fRun/I");
     fMC_allsel->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_allsel->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_allsel->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_allsel->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_allsel->Branch("truthtop", &truthtop, "truthtop/I");
     fMC_allsel->Branch("truthtop_200thresh", &truthtop_200thresh, "truthtop_200thresh/I");
@@ -1128,6 +1132,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashwin->Branch("fRun",&fRun,"fRun/I");
     fMC_flashwin->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_flashwin->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_flashwin->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_flashwin->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_flashwin->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_flashwin->Branch("truthtop", &truthtop, "truthtop/I");
@@ -1151,6 +1156,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_flashtag->Branch("fRun",&fRun,"fRun/I");
     fMC_flashtag->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_flashtag->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_flashtag->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_flashtag->Branch("fopflashtime", &fopflashtime, "fopflashtime/F");
     fMC_flashtag->Branch("fopflashmax",  &fopflashmax,  "fopflashmax/F");
     fMC_flashtag->Branch("truthtop", &truthtop, "truthtop/I");
@@ -1182,6 +1188,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_vtxinFV->Branch("fRun",&fRun,"fRun/I");
     fMC_vtxinFV->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_vtxinFV->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_vtxinFV->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     //branch for vertex position is here---------------------!
     fMC_vtxinFV->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_vtxinFV->Branch("fvtxx", &fvtxx, "fvtxx/F");         
@@ -1211,6 +1218,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_ntrks->Branch("fRun",&fRun,"fRun/I");
     fMC_ntrks->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_ntrks->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_ntrks->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_ntrks->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_ntrks->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_ntrks->Branch("fvtxy", &fvtxy, "fvtxy/F");
@@ -1237,6 +1245,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("fRun",&fRun,"fRun/I");
     fMC_noshwr->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_noshwr->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_noshwr->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     fMC_noshwr->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_noshwr->Branch("fvtxx", &fvtxx, "fvtxx/F");         
     fMC_noshwr->Branch("fvtxy", &fvtxy, "fvtxy/F");
@@ -1266,6 +1275,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("fRun",&fRun,"fRun/I");
     fMC_trkfls->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_trkfls->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_trkfls->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
 
     fMC_trkfls->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_trkfls->Branch("fvtxx", &fvtxx, "fvtxx/F");         
@@ -1296,6 +1306,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("fRun",&fRun,"fRun/I");
     fMC_NoExTrk->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_NoExTrk->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_NoExTrk->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
 
     fMC_NoExTrk->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_NoExTrk->Branch("fvtxx", &fvtxx, "fvtxx/F");         
@@ -1328,6 +1339,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("fRun",&fRun,"fRun/I");
     fMC_mupinFV->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_mupinFV->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_mupinFV->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
 
     fMC_mupinFV->Branch("numvtx", &numvtx, "numvtx/I");
     fMC_mupinFV->Branch("fvtxx", &fvtxx, "fvtxx/F");         
@@ -1403,6 +1415,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("fRun",&fRun,"fRun/I");
     fMC_TrunMean->Branch("fSubRun",&fSubRun,"fSubRun/I");
     fMC_TrunMean->Branch("fEvent",&fEvent,"fEvent/I");
+    fMC_TrunMean->Branch("_correctionWeight",&_correctionWeight,"_correctionWeight/D");
     //--------------------------------------------------
     fMC_TrunMean->Branch("_fTrueccnc",&_fTrueccnc,"_fTrueccnc/I");
     fMC_TrunMean->Branch("_fTruemode",&_fTruemode,"_fTruemode/I");
@@ -2371,6 +2384,22 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
     std::vector<art::Ptr<simb::MCTruth> > mclist;
     if (event.getByLabel(fGenieGenModuleLabel,mctruthListHandle))
     art::fill_ptr_vector(mclist, mctruthListHandle);
+    
+    const art::InputTag bnbcorrection_label("eventweight");
+    std::cout << "getting event weight object container" << std::endl;
+    art::ValidHandle<std::vector< evwgh::MCEventWeight> > const& bnbcorrection_weight_H =event.getValidHandle<std::vector<evwgh::MCEventWeight>>(bnbcorrection_label);
+    std::cout << "getting first event weight object" << std::endl;
+    if(bnbcorrection_weight_H.isValid()){
+      auto correctionWeightMap = bnbcorrection_weight_H->at(0).fWeight;
+//      for (auto element : correctionWeightMap){
+//        std::cout << element.first << ", " <<  std::endl;
+//        for (auto weight : element.second){
+//          std::cout << weight << std::endl;
+//        }
+//      }
+      _correctionWeight = correctionWeightMap.find("bnbcorrection_FluxHist")->second.at(0);
+//      std::cout << "weight = " << _correctionWeight << std::endl;
+    }
 
     Nevt_truth=mclist.size();
     art::Ptr<simb::MCTruth> mctruth; 
@@ -3453,7 +3482,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 //calculate Q2 and W from here
                  
                 float Emuoncand=TMath::Sqrt(muonmass*muonmass+fPlep*fPlep);
-                Q2cal=-(Evis-Emuoncand)*(Evis-Emuoncand)+(Evis-fPlep*TMath::Cos(trackthetacand))*(Evis-fPlep*TMath::Cos(trackthetacand)) + fPlep*fPlep*(TMath::Sin(trackthetacand)*TMath::Sin(trackthetacand));
+                Q2cal=-(Evis-Emuoncand)*(Evis-Emuoncand)+(Evis-fPlep*TMath::Cos(fThetaLep))*(Evis-fPlep*TMath::Cos(fThetaLep)) + fPlep*fPlep*(TMath::Sin(fThetaLep)*TMath::Sin(fThetaLep));
                 Wcal=TMath::Sqrt(Eptot*Eptot-Pxptot*Pxptot-Pyptot*Pyptot-Pzptot*Pzptot);                
                     
 
