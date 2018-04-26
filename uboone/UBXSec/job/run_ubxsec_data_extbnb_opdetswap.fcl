@@ -28,8 +28,8 @@ physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillEnds:   5.25
 
 physics.producers.UBXSec.UseGENIEInfo:                   false
 
-physics.producers.pandoraCosmicFlashTag.DoOpDetSwap: false
-physics.producers.NeutrinoFlashMatch.DoOpDetSwap:    false
-physics.producers.UBXSec.DoOpDetSwap:                false
+physics.producers.pandoraCosmicFlashTag.DoOpDetSwap: true
+physics.producers.NeutrinoFlashMatch.DoOpDetSwap:    true
+physics.producers.UBXSec.DoOpDetSwap:                true
 
 
