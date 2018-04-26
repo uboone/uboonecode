@@ -1,3 +1,4 @@
+#include "services_microboone.fcl"
 #include "detsimmodules.fcl"
 
 BEGIN_PROLOG
@@ -26,6 +27,13 @@ microboone_simwire:
  Sample:              -1           # no test: 0-3 generates test output
 
  MakeNoiseDists:      true
+
+ #overlay:	     false 
+ CalibrationFileMCName:   "calibration_mcc8.4_v1.root"
+ Corr_YZ_MC:                 ["correction_yz_plane0", "correction_yz_plane1", "correction_yz_plane2"]
+ Corr_X_MC:                  ["correction_x_plane0", "correction_x_plane1", "correction_x_plane2"]
+ CalAreaConstantsMC:         [0.00518279,0.00507506,0.00507669]    
+ CalAreaConstantsData:       [0.00422657,0.00436579,0.00411911]
 }
 #microboone_simwireana: @local::standard_simwireana
 microboone_simwireana:

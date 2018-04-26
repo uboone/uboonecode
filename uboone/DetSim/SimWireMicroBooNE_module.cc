@@ -65,6 +65,17 @@
 #include "larevt/CalibrationDBI/Interface/ElectronicsCalibService.h"
 #include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
 
+#include "lardata/Utilities/AssociationUtil.h"
+#include "larreco/Calorimetry/CalorimetryAlg.h"
+#include "lardataobj/AnalysisBase/Calorimetry.h"
+#include "uboone/Database/TPCEnergyCalib/TPCEnergyCalibService.h"
+#include "uboone/Database/TPCEnergyCalib/TPCEnergyCalibProvider.h"
+
+#include "TH2F.h"
+#include "TH1F.h"
+#include "TFile.h"
+
+#include <memory>
 ///Detector simulation of raw signals on wires
 namespace detsim {
 
@@ -89,6 +100,20 @@ namespace detsim {
     void GenNoisePostFilter(std::vector<float> &noise, double noise_factor, size_t view, int chan);
     void MakeADCVec(std::vector<short>& adc, std::vector<float> const& noise, 
                     std::vector<double> const& charge, float ped_mean) const;
+
+    double GetYZCorrection(double y, double z, TH2F *his);
+    double GetXCorrection(double x, TH1F *his);
+
+
+    bool 		    fOverlay; 		///< true for overlay GENIE BNB + cosmic data sample false for regular MC
+    std::string fCalibrationFileName_MC;
+    std::vector<std::string> fCorr_YZ_MC;
+    std::vector<std::string> fCorr_X_MC;
+    //histograms for calibration
+    std::vector<TH2F*> hCorr_YZ_MC;
+    std::vector<TH1F*> hCorr_X_MC;
+    std::vector<double> fCalAreaConstantsMC;
+    std::vector<double> fCalAreaConstantsData;
 
     std::string             fDriftEModuleLabel; ///< module making the ionization electrons
     raw::Compress_t         fCompression;       ///< compression type to use
@@ -123,6 +148,8 @@ namespace detsim {
 
     int         fSample; // for histograms, -1 means no histos
 
+    double      fNoiseAmpScaleFactor; // For assessing systematic on noise amplitude 
+
     //std::vector<std::vector<std::vector<int> > > fYZwireOverlap; //channel ranges for shorted wires and corresponding channel ranges for wires effected on other planes
 
     //define max ADC value - if one wishes this can
@@ -136,12 +163,18 @@ namespace detsim {
     // little helper class to hold the params of each charge dep
     class ResponseParams {
     public:
-      ResponseParams(double charge, size_t time) : m_charge(charge), m_time(time) {}
+      ResponseParams(double charge, size_t time, double x=-9999. , double y=-9999., double z=-9999.) : m_charge(charge), m_time(time), m_x(x), m_y(y), m_z(z) {}
       double getCharge() { return m_charge; }
       size_t getTime()   { return m_time; }
+      double getX() {return m_x; }
+      double getY() {return m_y; }
+      double getZ() {return m_z; }
     private:
       double m_charge;
       size_t m_time;
+      double m_x;
+      double m_y;
+      double m_z;
     };
 
     //
@@ -176,6 +209,7 @@ namespace detsim {
     , _pfn_value_re()
     , _pfn_value_im()
   {
+    fOverlay = false; // default for detsim
 
     this->reconfigure(pset);
 
@@ -190,6 +224,7 @@ namespace detsim {
     art::ServiceHandle<rndm::NuRandomService> Seeds;
     Seeds->createEngine(*this, "HepJamesRandom", "noise", pset, "Seed");
     Seeds->createEngine(*this, "HepJamesRandom", "pedestal", pset, "SeedPedestal");
+
   }
 
   //-------------------------------------------------
@@ -219,6 +254,7 @@ namespace detsim {
     if(fTestIndex.size() != fTestCharge.size())
       throw cet::exception(__FUNCTION__)<<"# test pulse mismatched: check TestIndex and TestCharge fcl parameters...";
     fSample           = p.get<int                  >("Sample");
+    fNoiseAmpScaleFactor=p.get< double             >("NoiseAmpScaleFactor",1.0);
 
     //fYZwireOverlap    = p.get<std::vector<std::vector<std::vector<int> > > >("YZwireOverlap");
 
@@ -267,6 +303,23 @@ namespace detsim {
       }
     }
 
+    // fcl parameters for overlay dedicated data driven variation for the simwire in order to calibrate all sample as data at the reco2 stage
+    fOverlay                   = p.get< bool >("overlay",false);
+    if (fOverlay) { 
+       fCalibrationFileName_MC    = p.get< std::string >("CalibrationFileMCName");
+       fCorr_YZ_MC                = p.get< std::vector<std::string> >("Corr_YZ_MC");
+       fCorr_X_MC                 = p.get< std::vector<std::string> >("Corr_X_MC");
+       if (fCorr_YZ_MC.size()!=3 || fCorr_X_MC.size()!=3){
+       throw art::Exception(art::errors::Configuration)
+       <<"Size of Corr_YZ and Corr_X need to be 3.";
+       }
+       fCalAreaConstantsMC        = p.get< std::vector<double> >("CalAreaConstantsMC");
+       fCalAreaConstantsData      = p.get< std::vector<double> >("CalAreaConstantsData");
+       if (fCalAreaConstantsMC.size()!=3 || fCalAreaConstantsData.size()!=3){
+       throw art::Exception(art::errors::Configuration)
+       <<"Size of CalAreaConstants vectors need to be 3.";
+       }
+    }
     return;
   }
 
@@ -313,6 +366,33 @@ namespace detsim {
       }
     }
 
+    if (fOverlay) {
+       cet::search_path sp("FW_SEARCH_PATH");
+       std::string fROOTfile;
+       if( !sp.find_file(fCalibrationFileName_MC, fROOTfile) )
+       throw cet::exception("detsimwires_datadrivenvariation") << "cannot find the calibration root file: \n"<< fROOTfile << "\n bail ungracefully.\n";
+       TFile f(fROOTfile.c_str());
+
+      for (size_t i = 0; i<fCorr_YZ_MC.size(); ++i){
+        hCorr_YZ_MC.push_back((TH2F*)f.Get(fCorr_YZ_MC[i].c_str()));
+        if (!hCorr_YZ_MC.back()){
+          throw art::Exception(art::errors::Configuration)
+          <<"Could not find histogram "<<fCorr_YZ_MC[i]<<" in "<<fCalibrationFileName_MC;
+        }
+        hCorr_X_MC.push_back((TH1F*)f.Get(fCorr_X_MC[i].c_str()));
+        if (!hCorr_X_MC.back()){
+          throw art::Exception(art::errors::Configuration)
+          <<"Could not find histogram "<<fCorr_X_MC[i]<<" in "<<fCalibrationFileName_MC;
+        }
+	//fCalAreaConstantsMC.push_back(0.00518279);	
+	//fCalAreaConstantsMC.push_back(0.00507506);	
+	//fCalAreaConstantsMC.push_back(0.00507669);	
+	//fCalAreaConstantsData.push_back(0.00422657);	
+	//fCalAreaConstantsData.push_back(0.00436579);	
+	//fCalAreaConstantsData.push_back(0.00411911);	
+      }
+    }
+
     return;
 
   }
@@ -331,7 +411,11 @@ namespace detsim {
     // Get all of the services we will be using
     //
     //--------------------------------------------------------------------
-    
+   	
+    //handle to tpc energy calibration provider for the overlay dedicated data driven variation to the wires signal
+    const lariov::TPCEnergyCalibProvider& energyCalibProvider
+       = art::ServiceHandle<lariov::TPCEnergyCalibService>()->GetProvider();
+
     //get pedestal conditions
     const lariov::DetPedestalProvider& pedestalRetrievalAlg 
        = art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider();
@@ -496,8 +580,11 @@ namespace detsim {
 	    double charge = (double)energyDeposit.numElectrons;
 	    if(charge == 0) continue;
 
+	    double x = (double)energyDeposit.x; //used for overlatDedicatedCalibration 
 	    double y = (double)energyDeposit.y;
 	    double z = (double)energyDeposit.z;
+		
+	    //std::vector<double> overlayDedicatedCalibrationsPerPlane; 
 
 	    for(int wire = -(N_RESPONSES[0][view]-1); wire < (int)N_RESPONSES[0][view]; ++wire) {
 	      auto wireIndex = (size_t) wire + N_RESPONSES[0][view] - 1;
@@ -655,7 +742,7 @@ namespace detsim {
 		}
 	      } 
 	      if(YZflag == true){
-		responseParamsVec[wireChan][wireIndex].emplace_back(new ResponseParams(charge, raw_digit_index));
+		responseParamsVec[wireChan][wireIndex].emplace_back(new ResponseParams(charge, raw_digit_index,x,y,z));
 	      }	      
 	    } // wire
 	  } // energyDeposits
@@ -786,7 +873,8 @@ namespace detsim {
     // pedestal, noise, and direct&induced charges
     //
     //-------------------------------------------------------------------- 
-       
+    //bool overlay = false;
+
     // vectors for working in the following for loop
     std::vector<short>    adcvec(fNTimeSamples, 0);
     std::vector<double>   chargeWork(fNTicks,0.);
@@ -902,19 +990,60 @@ namespace detsim {
 
         auto & thisWire = thisChan[wireIndex];
         if(thisWire.empty()) continue;
-        std::fill(tempWork.begin(), tempWork.end(), 0.);
+	 std::fill(tempWork.begin(), tempWork.end(), 0.);
 
-        for(auto& item : thisWire) {
+         for(auto& item : thisWire) {
           auto charge = item->getCharge();
           if(charge==0) continue;
 	  auto raw_digit_index = item->getTime();
 	  if(raw_digit_index > 0 && raw_digit_index < fNTicks) {
+	    if (fOverlay) {
+		float yzcorrectionData = energyCalibProvider.YZdqdxCorrection(view, item->getY(), item->getZ());
+		float xcorrectionData  = energyCalibProvider.XdqdxCorrection(view, item->getX());
+		float yzcorrectionMC = GetYZCorrection(item->getY(), item->getZ(),hCorr_YZ_MC[view]); 
+		float xcorrectionMC = GetXCorrection(item->getX(), hCorr_X_MC[view]);
+		if (!yzcorrectionData) yzcorrectionData = 1.0;
+          	if (!xcorrectionData) xcorrectionData = 1.0;
+		if (!yzcorrectionMC) yzcorrectionMC = 1.0;
+          	if (!xcorrectionMC) xcorrectionMC = 1.0;
+		double overlayDedicatedCalibration = yzcorrectionMC*xcorrectionMC*fCalAreaConstantsData[view]/(yzcorrectionData*xcorrectionData*fCalAreaConstantsMC[view]);
+		charge = charge*overlayDedicatedCalibration;
+		//std::cout<<"-----------------------------------------------------------------"<<std::endl;
+		//std::cout<<"wireIndex "<<wireIndex<<" chan "<<chan<<" view "<<view<<" raw_digit_index "<<raw_digit_index<<std::endl;
+		//std::cout<<" X "<<item->getX()<<" Y "<<item->getY()<<" Z "<<item->getZ()<<std::endl;
+		//std::cout<<"overlayDedicatedCalibration "<<overlayDedicatedCalibration<<std::endl;
+		//std::cout<<"yzcorrectionData "<<yzcorrectionData<<std::endl;
+		//std::cout<<"xcorrectionData "<<xcorrectionData<<std::endl;
+		//std::cout<<"yzcorrectionMC "<<yzcorrectionMC<<std::endl;
+		//std::cout<<"xcorrectionMC "<<xcorrectionMC<<std::endl;
+	    }
             tempWork.at(raw_digit_index) += charge;
 	  }
-        }
+         }
         // now we have the tempWork for the adjacent wire of interest
         // convolve it with the appropriate response function
 	sss->Convolute(chan, fabs(wire), tempWork);
+
+	/*else {
+	 // adi change : first convolute every charge deposition and than add them in order to be able to apply an overlay dedicated calibration constants to the MC part of the overlay.
+         for(auto& item : thisWire) {
+          std::vector<double>   tempWorkPerCharge(fNTicks,0.);
+	  std::fill(tempWorkPerCharge.begin(),   tempWorkPerCharge.end(),   0.);
+	  auto charge = item->getCharge();
+          if(charge==0) continue;
+	  auto raw_digit_index = item->getTime();
+	  if(raw_digit_index > 0 && raw_digit_index < fNTicks) {
+            tempWorkPerCharge.at(raw_digit_index) += charge;
+	  }
+	  sss->Convolute(chan, fabs(wire), tempWorkPerCharge);
+	  for (unsigned int itempWork = 0 ; itempWork < tempWork.size() ; itempWork++) {
+	      tempWork[itempWork] += tempWorkPerCharge[itempWork];
+	  } 
+         }
+	 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	}*/
+        // now we have the tempWork for the adjacent wire of interest
+        // convolve it with the appropriate response function
 
 	// this is to generate some plots
         if(view==1 && wireNum==360 && fSample>=0) {
@@ -961,6 +1090,85 @@ namespace detsim {
     return;
   }
 
+  double SimWireMicroBooNE::GetXCorrection(double x, TH1F *his){
+
+    if (!his){
+      throw art::Exception(art::errors::Configuration)
+        <<"Histogram is empty";
+    }
+
+    int bin = his->GetXaxis()->FindBin(x);
+    if (bin == 0) bin = 1;
+    if (bin == his->GetNbinsX()+1) bin = his->GetNbinsX();
+
+    if (his->GetBinContent(bin)) return his->GetBinContent(bin);
+    else return 1.0;
+
+  }
+
+  double SimWireMicroBooNE::GetYZCorrection(double y, double z, TH2F *his){
+
+  if (!his){
+    throw art::Exception(art::errors::Configuration)
+      <<"Histogram is empty";
+  }
+  int biny = his->GetYaxis()->FindBin(y);
+  if (biny == 0) biny = 1;
+  if (biny == his->GetNbinsY()+1) biny = his->GetNbinsY();
+
+  int binz = his->GetXaxis()->FindBin(z);
+  if (binz == 0) binz = 1;
+  if (binz == his->GetNbinsX()+1) binz = his->GetNbinsX();
+
+  double corr = his->GetBinContent(binz, biny);
+
+  if (corr) return corr;
+  else return 1.0;
+
+/*    if (!his){
+      throw art::Exception(art::errors::Configuration)
+        <<"Histogram is empty";
+    }
+    int biny = his->GetXaxis()->FindBin(y);
+    if (biny == 0) biny = 1;
+    if (biny == his->GetNbinsX()+1) biny = his->GetNbinsX();
+  
+    int binz = his->GetYaxis()->FindBin(z);
+    if (binz == 0) binz = 1;
+    if (binz == his->GetNbinsY()+1) binz = his->GetNbinsY();
+  
+    double corr = his->GetBinContent(biny, binz);
+  
+    if (corr) return corr;
+    //looking at neighboring bins
+      for (int i = biny + 1; i <= his->GetNbinsX(); ++i){
+      if (his->GetBinContent(i, binz)){
+        return his->GetBinContent(i, binz);
+      }
+    }
+  
+    for (int i = biny - 1; i >= 1; --i){
+      if (his->GetBinContent(i, binz)){
+        return his->GetBinContent(i, binz);
+      }
+    }
+  
+    for (int i = binz + 1; i <= his->GetNbinsY(); ++i){
+      if (his->GetBinContent(biny, i)){
+        return his->GetBinContent(biny, i);
+      }
+    }
+  
+    for (int i = binz - 1; i >= 1; --i){
+      if (his->GetBinContent(biny, i)){
+        return his->GetBinContent(biny, i);
+      }
+    }
+  
+    //no nonzero correction found? just return 1
+    return 1.;
+*/
+}
 
   //-------------------------------------------------
   void SimWireMicroBooNE::MakeADCVec(std::vector<short>& adcvec, std::vector<float> const& noisevec, 
@@ -1212,7 +1420,7 @@ namespace detsim {
 
     // 0.77314 scale factor accounts for fact that original DDN designed based
     // on the Y plane, updated fit takes average of wires on 2400 on each plane
-    double scalefactor = 0.83 * (rms_quantilemethod/baseline) * sqrt(para*para + pow(parb*wirelength/100 + parc, 2));
+    double scalefactor = fNoiseAmpScaleFactor * 0.83 * (rms_quantilemethod/baseline) * sqrt(para*para + pow(parb*wirelength/100 + parc, 2));
     for(size_t i=0; i<waveform_size; ++i) {
       noise[i] = fb->GetBinContent(i+1)*scalefactor;
     }
