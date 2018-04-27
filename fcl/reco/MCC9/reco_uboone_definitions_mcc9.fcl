@@ -1,0 +1,449 @@
+## 
+##  Uboone reco on data for MCC9.
+##  This is the base file for defining modules
+##
+
+# generic/data includes
+#include "services_microboone.fcl"
+#include "beamdata_microboone.fcl"
+#include "beamdataquality.fcl"
+#include "caldata_microboone.fcl"
+#include "hitfindermodules_microboone.fcl"
+#include "cluster_microboone.fcl"
+#include "trackfindermodules_microboone.fcl"
+#include "kalmanfilterfinaltrackfitter.fcl"
+#include "opticaldetectormodules_microboone.fcl"
+#include "triggeralgo_service.fcl"
+#include "cosmicremovalmodules.fcl"
+#include "calorimetry_microboone.fcl"
+#include "particleid_microboone.fcl"
+#include "showerreco3d_microboone.fcl"
+#include "showerquality_microboone.fcl"
+#include "pandoramodules_microboone.fcl"
+#include "photpropservices_microboone.fcl"
+#include "correct_saturation.fcl"
+#include "MuCSTrackTagger_module.fcl"
+#include "T0RecoAnodeCathodePiercing.fcl"
+#include "ubflashfinder.fcl"
+#include "cosmicflashtagger.fcl"
+#include "microboone_dlpmtprecuts.fcl"
+#include "microboone_dqmhits.fcl"
+#include "microboone_dqmflashes.fcl"
+#include "microboone_dqmchannels.fcl"
+#include "microboone_dqmtpcbursts.fcl"
+#include "microboone_dqmgoodruns.fcl"
+#include "mcsfitproducer.fcl"
+#include "wcls.fcl"
+#include "calibration_microboone.fcl"
+#include "ophitremapproducer.fcl"
+
+# mc specific includes
+#include "mctrutht0matching.fcl"
+#include "mcsfitproducer.fcl"
+#include "mchitmodules.fcl"
+#include "mcreco.fcl"
+#include "eventweight_microboone_BNBcorrectionOnly.fcl"
+#include "dlprod_fclbase_analyzers.fcl"
+
+# hopefully we can replace this!
+#include "wirecellmodules_microboone.fcl"
+
+BEGIN_PROLOG
+
+microboone_reco_services:
+{
+  PhotonVisibilityService:    @local::microboone_photonvisibilityservice
+  OpDigiProperties:           @local::microboone_opdigiproperties
+                              @table::microboone_services_reco
+}
+
+# The following overrides are necessary to handle the truncation of RawDigits from
+# 9600 ticks to 6400 ticks. Unfortunately, these overrides are necessary in any 
+# downstream code as well! 
+microboone_reco_services.DetectorPropertiesService.NumberTimeSamples:        6400
+microboone_reco_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+microboone_reco_services.DetectorClocksService.InheritClockConfig:           false
+microboone_reco_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+microboone_reco_services.DetectorClocksService.TrigModuleName:               "daq"
+microboone_reco_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus: true
+
+# If you want to run without the above overrides use the following services definition
+microboone_reco_services_fullrawdigits:
+{
+  PhotonVisibilityService:    @local::microboone_photonvisibilityservice
+  OpDigiProperties:           @local::microboone_opdigiproperties
+                              @table::microboone_services_reco
+}
+
+### track containment base stuff ... putting this here, cause why not? ###
+### THESE SHOULD GET MOVED TO SPECIFIC DEFINITION FILES ###
+microboone_containment_tag:{ module_type: TrackContainmentTagger
+                             TrackModuleLabels: []
+                             #ApplyTags: []  #you can use this option to decide to apply tags or not. By default, yes.
+                             TrackContainmentAlg:{
+                                 ZBuffer:10
+                                 YBuffer:20
+                                 XBuffer:10
+                                 Isolation:2.5
+                                 Debug: false
+                                 FillOutputTree: true
+                             }
+                           }
+
+microboone_flashfilter: { module_type: "OpFlashFilter"
+   		  	                OpFlashTag: ""
+		  	                  Verbose: false
+		  	                 FlashCuts: [ [ { MinPE:40 MinTime:2.9 MaxTime:5.2 } ] ]
+   		                  }
+
+
+### This is the complete list of all producers! ###
+microboone_reco_producers:
+{
+    ### random number saver
+    rns:                              { module_type: RandomNumberSaver }
+
+    ### Beam data merging
+    beamdata:                         @local::microboone_beamdata
+
+    ### OpHit finders
+    ophitBeamNoRemap:                 @local::microboone_ophit_saturation_beam
+    ophitCosmicNoRemap:               @local::microboone_ophit_saturation_cosmic
+    ophitBeam:                        @local::ophitremap
+    ophitCosmic:                      @local::ophitremap
+
+    ### Saturation correction module
+    saturation:                       @local::correct_saturation
+
+    ### flash finders
+    simpleFlashBeam:                  @local::UBFlashBeam
+    simpleFlashBeamLowPE:             @local::UBFlashBeam
+    simpleFlashCosmic:                @local::UBFlashCosmic
+    simpleFlashBeamMC:                @local::UBFlashBeamMC
+    simpleFlashBeamLowPEMC:           @local::UBFlashBeamMC
+    simpleFlashCosmicMC:              @local::UBFlashCosmicMC
+    opflashBeam:                      @local::microboone_opflash_saturation_beam
+    opflashCosmic:                    @local::microboone_opflash_saturation_cosmic
+
+    ### noise filtering and signal processing from the wirecell toolkit
+    nfsp:                             @local::wcls.producers.nfsp
+    butcher:                          @local::wcls.producers.butcher
+    wcNoiseFilter:                    @local::microboone_wirecellnoisefilter
+
+    ### uboonecode version of ROI/Wire production which is to be depracated
+    caldata:                          @local::microboone_calroi
+
+    ### hit-finder producers
+    gaushit:                          @local::microboone_gaushitfinder
+
+    ### mc producers
+    mchitfinder:                      @local::standard_mchitfinder
+
+    ### cluster-finder producers
+    trajcluster:                      @local::microboone_trajcluster
+
+    ### pandora consolidated pass
+    pandoraPatRec:                    @local::microboone_pandoraFull
+    pandoraTrack:                     @local::microboone_pandoraTrackCreation
+    pandoraShower:                    @local::microboone_pandoraShowerCreation
+    pandora:                          @local::microboone_pandoraSplitting
+
+    ### pandora track3dkalmanhit
+    pandoraKHit:                      @local::microboone_track3Dkalmanhit
+
+    ### pandora cosmic kalmanhit
+    pandoraPMA:                       @local::microboone_pmalgtrajfitter
+
+    ### pandora analysis
+    pandoracalo:                      @local::microboone_calodata
+    pandorapid:                       @local::microboone_chi2pid
+    pandoracali:                      @local::microboone_calibrationdedx
+    pandoracalipid:                   @local::microboone_chi2pid
+    pandoraKHitcalo:                  @local::microboone_calodata
+    pandoraKHitpid:                   @local::microboone_chi2pid
+    pandoraKHitcali:                  @local::microboone_calibrationdedx
+    pandoraKHitcalipid:               @local::microboone_chi2pid
+    pandoraKalmanTrackcalo:           @local::microboone_calodata
+    pandoraKalmanTrackpid:            @local::microboone_chi2pid
+    pandoraKalmanTrackcali:           @local::microboone_calibrationdedx
+    pandoraKalmanTrackcalipid:        @local::microboone_chi2pid
+    pandoraKalmanShowercalo:          @local::microboone_calodata
+    pandoraKalmanShowerpid:           @local::microboone_chi2pid
+    pandoraPMAcalo:                   @local::microboone_calodata
+    pandoraPMApid:                    @local::microboone_chi2pid
+    pandoraPMAcali:                   @local::microboone_calibrationdedx
+    pandoraPMAcalipid:                @local::microboone_chi2pid
+
+    ### Cosmic Ray tagging
+    pandoratag:                       @local::microboone_cosmictracktagger
+    pandoraKHittag:                   @local::microboone_cosmictracktagger
+    pandoraKalmanTracktag:            @local::microboone_cosmictracktagger
+    pandoraKalmanShowertag:           @local::microboone_cosmictracktagger
+    pandoraPMAtag:                    @local::microboone_cosmictracktagger
+    pandoraKHitPFPart:                @local::microboone_cosmicpfparticletagger
+    pandoraPFPart:                    @local::microboone_cosmicpfparticletagger
+    pandoraFlashTag:                  @local::microboone_cosmicpfpflashtagger
+    pandoraKHitFlashMatch:            @local::microboone_beamflashtrackmatchtagger
+    pandoraKalmanTrackFlashMatch:     @local::microboone_beamflashtrackmatchtagger
+    pandoraKalmanShowerFlashMatch:    @local::microboone_beamflashtrackmatchtagger
+
+    ### pandora trackkalman
+    pandoraKalmanTrack:               @local::kalmantrackfit
+    pandoraKalmanShower:              @local::kalmantrackfit
+
+    ### shower reco producers
+    showerrecopandora:                @local::showerreco3d_uboone_pandora
+
+    ### CR hit removal 
+    cosmicRayHitRemoval:              @local::microboone_crhitremoval   # Remove hits, based on PFP geometry and flashes
+
+    ### PMA
+    pmtrack:                          @local::microboone_pmalgtrajfitter
+    pmtracktag:                       @local::microboone_cosmictracktagger
+    pmtrackcalo:                      @local::microboone_calodata
+    pmtrackpid:                       @local::microboone_chi2pid
+    pmtrackcali:                      @local::microboone_calibrationdedx
+    pmtrackcalipid:                   @local::microboone_chi2pid
+
+    ### Containment taggers
+    pandoraContTag:                   @local::microboone_containment_tag
+    pandoraPMAContTag:                @local::microboone_containment_tag
+    pmtrackContTag:                   @local::microboone_containment_tag
+
+    ### MCS Momentum
+    pandoraMCSMu:                     @local::mcsfitproducer
+    pmtrackMCSMu:                     @local::mcsfitproducer
+
+    ### T0 Anode/Cathode piercing track reco
+    pandoraKHitT0Reco:                @local::T0RecoAnodeCathodePiercing_data
+    pandoraT0Reco:                    @local::T0RecoAnodeCathodePiercing_data
+    pmtrackT0Reco:                    @local::T0RecoAnodeCathodePiercing_data
+    pandoraKHitT0RecoMC:              @local::T0RecoAnodeCathodePiercing_mc
+    pandoraT0RecoMC:                  @local::T0RecoAnodeCathodePiercing_mc
+    pmtrackT0RecoMC:                  @local::T0RecoAnodeCathodePiercing_mc
+
+    ### T0 Anode/Cathode piercing track reco
+    pandoraKHitT0RecoLoose:           @local::T0RecoAnodeCathodePiercing_data_loose
+    pandoraT0RecoLoose:               @local::T0RecoAnodeCathodePiercing_data_loose
+    pmtrackT0RecoLoose:               @local::T0RecoAnodeCathodePiercing_data_loose
+    pandoraKHitT0RecoLooseMC:         @local::T0RecoAnodeCathodePiercing_mc_loose
+    pandoraT0RecoLooseMC:             @local::T0RecoAnodeCathodePiercing_mc_loose
+    pmtrackT0RecoLooseMC:             @local::T0RecoAnodeCathodePiercing_mc_loose
+
+    ### T0 Anode/Cathode piercing track reco using beam-gate-flash
+    pandoraKHitT0RecoBeam:            @local::T0RecoAnodeCathodePiercing_data_beamgate
+    pandoraT0RecoBeam:                @local::T0RecoAnodeCathodePiercing_data_beamgate
+    pmtrackT0RecoBeam:                @local::T0RecoAnodeCathodePiercing_data_beamgate
+    pandoraKHitT0RecoBeamMC:          @local::T0RecoAnodeCathodePiercing_mc_beamgate
+    pandoraT0RecoBeamMC:              @local::T0RecoAnodeCathodePiercing_mc_beamgate
+    pmtrackT0RecoBeamMC:              @local::T0RecoAnodeCathodePiercing_mc_beamgate
+
+    #MuCS Track Taggers
+    MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
+    MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
+    MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
+
+    ### Adds the necessary event weights for the MC
+    eventweight:                      @local::microboone_eventweight
+  
+    ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
+    pandoraTruthMatch:                @local::standard_mctrutht0matching
+    pandoraKHitTruthMatch:            @local::standard_mctrutht0matching
+    pandoraKalmanTrackTruthMatch:     @local::standard_mctrutht0matching
+    pandoraKalmanShowerTruthMatch:    @local::standard_mctrutht0matching
+    pandoraPMATruthMatch:             @local::standard_mctrutht0matching
+    pmtrackTruthMatch:                @local::standard_mctrutht0matching
+    # Showers
+    showerrecopandoraTruthMatch:      @local::standard_mctrutht0matching
+    # PFParticles
+    trajclusterTruthMatch:            @local::standard_mctrutht0matching
+  
+    # MCTruth matching but this time hits only
+    gaushitTruthMatch:                @local::standard_mcparticlehitmatching
+    crHitRemovalTruthMatch:           @local::standard_mcparticlehitmatching
+    trajclusterTruthMatch:            @local::standard_mcparticlehitmatching
+}
+
+microboone_reco_analyzers:
+{
+    DQMHits:                          @local::microboone_dqmhits
+    DQMFlashes:                       @local::microboone_dqmflashes
+    DQMChannels:                      @local::microboone_dqmchannels
+    DQMTPCBursts:                     @local::microboone_dqmtpcbursts
+    DQMGoodRuns:                      @local::microboone_dqmgoodruns
+}
+
+microboone_reco_filters:
+{
+    #these ones are older and while still defined not the common ones
+    flashfilter:                      @local::microboone_flashfilter
+    dlpmtprecuts:                     @local::microboone_dlpmtprecuts
+
+    #here are the common filters
+    opfiltercommonbnb:                @local::microboone_common_op_precut_bnb
+    opfiltercommonext:                @local::microboone_common_op_precut_ext
+
+    # Beam data quality filter.
+    beamdataquality:                  @local::beam_data_quality
+}
+
+
+### Below are a list of convenient sequences that can be used for production/typical users. ###
+
+microboone_reco_optical:               [ saturation,
+                                         ophitCosmicNoRemap,
+                                         ophitBeamNoRemap,
+                                         ophitCosmic,
+                                         ophitBeam,
+                                         opflashCosmic,
+                                         opflashBeam,
+                                         simpleFlashCosmic,
+                                         simpleFlashBeam,
+                                         simpleFlashBeamLowPE
+                                       ]
+
+microboone_reco_signalprocessing:      [ nfsp,
+                                         butcher,
+                                         #caldata,
+                                         gaushit 
+                                       ]
+
+microboone_reco_signalprocessingMC:    [ wcNoiseFilter,
+                                         caldata,
+                                         gaushit 
+                                       ]
+
+microboone_reco_trajcluster:           [ trajcluster ]
+
+microboone_reco_cctracks:              [ pmtrack,
+                                         pmtracktag,
+                                         pmtrackContTag,
+					                     pmtrackMCSMu,
+                                         pmtrackT0Reco,
+                                         pmtrackT0RecoLoose,
+                                         pmtrackT0RecoBeam,
+                                         pmtrackcalo,
+                                         pmtrackpid,
+					                     pmtrackcali,
+                                         pmtrackcalipid
+                                       ]
+
+microboone_reco_ccpath:                [ @sequence::microboone_reco_trajcluster,
+                                         @sequence::microboone_reco_cctracks 
+                                       ]
+
+microboone_reco_consolidated_pandora:  [ pandoraPatRec,
+                                         pandoraTrack,
+                                         pandoraShower,
+                                         pandora 
+                                       ]
+
+microboone_reco_trackfits_pandora:     [ pandoraKHit,
+                                         pandoraKalmanTrack,
+                                         pandoraKalmanShower,
+                                         pandoraPMA
+                                       ]
+
+microboone_reco_post_pandora:          [ pandoraContTag,
+                                         pandoraMCSMu,
+                                         pandoracalo,
+                                         pandorapid,
+                                         pandoracali,
+                                         pandoracalipid,
+                                         pandoraKHitcalo,
+                                         pandoraKHitpid,
+                                         pandoraKHitcalipid,
+                                         pandoraKalmanTrackcalo,
+                                         pandoraKalmanTrackpid,
+                                         pandoraKalmanTrackcali,
+                                         pandoraKalmanTrackcalipid,
+                                         pandoraKalmanShowercalo,
+                                         pandoraKalmanShowerpid,
+                                         pandoraPMAContTag,
+                                         pandoraPMAcalo,
+                                         pandoraPMApid,
+                                         pandoraPMAcali,
+                                         pandoraPMAcalipid #,
+                                         #showerrecopandora 
+                                       ]
+
+microboone_reco_cosmic_tagging:        [ pandoratag,
+                                         pandoraKHittag,
+                                         pandoraKalmanTracktag,
+                                         pandoraKalmanShowertag,
+                                         pandoraPMAtag,
+                                         pandoraKHitPFPart,
+                                         pandoraPFPart,
+                                         pandoraFlashTag,
+                                         pandoraKHitFlashMatch,
+                                         pandoraKalmanTrackFlashMatch,
+                                         pandoraKalmanShowerFlashMatch,
+                                         cosmicRayHitRemoval
+                                       ]
+
+microboone_reco_truthmatch:            [ pandoraKHitTruthMatch,
+                                         pandoraKalmanTrackTruthMatch,
+                                         pandoraKalmanShowerTruthMatch,
+                                         pandoraPMATruthMatch,
+                                         pandoraTruthMatch,
+                                         pmtrackTruthMatch,
+                                         # Showers
+                                         showerrecopandoraTruthMatch,
+                                         # PFParticles
+                                         trajclusterTruthMatch  ]
+
+microboone_reco_pandora:               [ @sequence::microboone_reco_consolidated_pandora,
+                                         @sequence::microboone_reco_trackfits_pandora,
+                                         @sequence::microboone_reco_cosmic_tagging,
+                                         @sequence::microboone_reco_post_pandora 
+                                       ]
+
+microboone_reco_data:                  [ rns,
+                                         @sequence::microboone_reco_optical,
+                                         @sequence::microboone_reco_signalprocessing,
+                                         @sequence::microboone_reco_pandora,
+                                         @sequence::microboone_reco_ccpath 
+                                       ]
+
+microboone_reco_mc:                    [ @sequence::microboone_reco_data,
+                                         @sequence::microboone_reco_truthmatch
+                                       ]
+
+microboone_reco_stage1:                [ rns,
+                                         @sequence::microboone_reco_optical,
+                                         @sequence::microboone_reco_signalprocessing 
+                                       ]
+
+microboone_reco_stage1MC:              [ rns,
+                                         eventweight,
+                                         @sequence::microboone_reco_optical,
+                                         @sequence::microboone_reco_signalprocessingMC,
+                                         gaushitTruthMatch
+                                       ]
+
+microboone_reco_stage2:                [ rns,
+                                         @sequence::microboone_reco_pandora,
+                                         @sequence::microboone_reco_ccpath 
+                                       ]
+microboone_reco_stage2MC:              [ @sequence::microboone_reco_stage2,
+                                         @sequence::microboone_reco_truthmatch
+                                       ]
+
+microboone_reco_MucSTags:              [ MuCSTrackTaggerpandoraCosmic, 
+                                         MuCSTrackTaggerpandoraCosmicKHit, 
+                                         MuCSTrackTaggerpmtrack 
+                                       ]
+
+microboone_dqm_ana_stage1:             [ DQMHits,
+                                         DQMFlashes,
+                                         DQMChannels,
+                                         DQMTPCBursts 
+                                       ]
+
+microboone_dqm_ana_stage2:             [ DQMGoodRuns ]
+
+microboone_dqm_ana:                    [ @sequence::microboone_dqm_ana_stage1,
+		    			                 @sequence::microboone_dqm_ana_stage2 
+                                       ]
+
+END_PROLOG

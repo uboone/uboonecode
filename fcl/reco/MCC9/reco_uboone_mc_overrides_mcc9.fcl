@@ -1,0 +1,100 @@
+## 
+##  fhicl overrides for Uboone reco on data for MCC9.
+##
+
+#include "reco_uboone_data_overrides_mcc9.fcl"
+
+### Below we include overrides for the modules above
+### These are for specific for MCC 9 MC and are meant to override the MCC9 data values where necessary
+###        Variable to override                                                      Values overriding defaults ###
+
+## Flip the saturation correction from data to MC
+
+physics.producers.saturation.GainValues:                                           [1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1,1,1,1,1,1,1,
+                                                                                    1,1,1,1]
+
+physics.producers.saturation.BaselineValues:                                       [2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048,2048,2048,2048,2048,2048,2048,
+                                                                                    2048,2048,2048,2048]
+
+#wirecell noise filtering
+physics.producers.wcNoiseFilter.DoNoiseFiltering:                                   false
+physics.producers.caldata.DigitModuleLabel:                                         "wcNoiseFilter"
+physics.producers.gaushit.CalDataModuleLabel:                                       "caldata"
+
+## Flip the calorimetery to be "MC" modules (which reoverrides the overrides in the data definition)
+physics.producers.pandoracalo.CaloAlg:	                                            @local::standard_calorimetryalgmc
+physics.producers.pandoraKHitcalo.CaloAlg:	                                        @local::standard_calorimetryalgmc
+physics.producers.pandoraKalmanTrackcalo.CaloAlg:	                                @local::standard_calorimetryalgmc
+physics.producers.pandoraKalmanShowercalo.CaloAlg:	                                @local::standard_calorimetryalgmc
+physics.producers.pandoraPMAcalo.CaloAlg:	                                        @local::standard_calorimetryalgmc
+physics.producers.pmtrackcalo.CaloAlg:	                                            @local::standard_calorimetryalgmc
+
+## Truth matching configuration
+# General (tracks, possibly plus showers and/or pfparticles)
+physics.producers.pandoraKHitTruthMatch.TrackModuleLabel:                           "pandoraNuKHit"
+physics.producers.pandoraKHitTruthMatch.ShowerModuleLabel:                          "pandoraNuKHit"
+physics.producers.pandoraKHitTruthMatch.makeT0Assns:                                false
+physics.producers.pandoraKHitTruthMatch.makePFParticleAssns:                        false
+
+physics.producers.pandoraKalmanShowerTruthMatch.TrackModuleLabel:                   "pandoraNuKalmanShower"
+physics.producers.pandoraKalmanShowerTruthMatch.ShowerModuleLabel:                  "pandoraNuKalmanShower"
+physics.producers.pandoraKalmanShowerTruthMatch.makeT0Assns:                        false
+physics.producers.pandoraKalmanShowerTruthMatch.makePFParticleAssns:                false
+
+physics.producers.pandoraKalmanTrackTruthMatch.TrackModuleLabel:                    "pandoraNuKalmanTrack"
+physics.producers.pandoraKalmanTrackTruthMatch.ShowerModuleLabel:                   "pandoraNuKalmanTrack"
+physics.producers.pandoraKalmanTrackTruthMatch.makeT0Assns:                         false
+physics.producers.pandoraKalmanTrackTruthMatch.makePFParticleAssns:                 false
+
+physics.producers.pandoraPMATruthMatch.TrackModuleLabel:                            "pandoraPMA"
+physics.producers.pandoraPMATruthMatch.ShowerModuleLabel:                           "pandoraPMA"
+physics.producers.pandoraPMATruthMatch.makeT0Assns:                                 false
+physics.producers.pandoraPMATruthMatch.makePFParticleAssns:                         false
+
+physics.producers.pandoraTruthMatch.TrackModuleLabel:                               "pandora"
+physics.producers.pandoraTruthMatch.ShowerModuleLabel:                              "pandora"
+physics.producers.pandoraTruthMatch.PFParticleModuleLabel:                          "pandora"
+physics.producers.pandoraTruthMatch.makeT0Assns:                                    false
+physics.producers.pandoraTruthMatch.makePFParticleAssns:                            true
+
+physics.producers.pmtrackTruthMatch.TrackModuleLabel:                               "pmtrack"
+physics.producers.pmtrackTruthMatch.ShowerModuleLabel:                              "pmtrack"
+physics.producers.pmtrackTruthMatch.makeT0Assns:                                    false
+physics.producers.pmtrackTruthMatch.makePFParticleAssns:                            false
+
+# Shower only
+physics.producers.showerrecopandoraTruthMatch.TrackModuleLabel:                     "showerrecopandora"
+physics.producers.showerrecopandoraTruthMatch.ShowerModuleLabel:                    "showerrecopandora"
+physics.producers.showerrecopandoraTruthMatch.makeT0Assns:                          false
+physics.producers.showerrecopandoraTruthMatch.makePFParticleAssns:                  false
+
+# PFParticle only
+physics.producers.trajclusterTruthMatch.TrackModuleLabel:                           "trajcluster"
+physics.producers.trajclusterTruthMatch.ShowerModuleLabel:                          "trajcluster"
+physics.producers.trajclusterTruthMatch.PFParticleModuleLabel:                      "trajcluster"
+physics.producers.trajclusterTruthMatch.makeT0Assns:                                false
+physics.producers.trajclusterTruthMatch.makePFParticleAssns:                        true
+
+# Hit only
+physics.producers.gaushitTruthMatch.HitParticleAssociations:                        @local::DirectHitParticleAssnsTool
+physics.producers.gaushitTruthMatch.HitParticleAssociations.HitModuleLabel:         "gaushit"
+physics.producers.gaushitTruthMatch.HitParticleAssociations.MCParticleModuleLabel:  "largeant"
+
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations:                   @local::IndirectHitParticleAssnsTool
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations.HitPartAssnsLabel: "gaushitTruthMatch"
+physics.producers.crHitRemovalTruthMatch.HitParticleAssociations.HitModuleLabel:    "pandoraCosmicHitRemoval"
+
+physics.producers.trajclusterTruthMatch.HitParticleAssociations:                    @local::IndirectHitParticleAssnsTool
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
+
