@@ -1426,7 +1426,14 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("_fTrueWtruth",&_fTrueWtruth,"_fTrueWtruth/F");
     fMC_TrunMean->Branch("_fTrueXtruth",&_fTrueXtruth,"_fTrueXtruth/F");
     fMC_TrunMean->Branch("_fTrueYtruth",&_fTrueYtruth,"_fTrueYtruth/F");
-  
+    fMC_TrunMean->Branch("_fTruenuvrtxx",&_fTruenuvrtxx,"_fTruenuvrtxx/F");
+    fMC_TrunMean->Branch("_fTruenuvrtxy",&_fTruenuvrtxy,"_fTruenuvrtxy/F");
+    fMC_TrunMean->Branch("_fTruenuvrtxz",&_fTruenuvrtxz,"_fTruenuvrtxz/F");
+    
+    fMC_TrunMean->Branch("_fTruenuvrtxx_SCE",&_fTruenuvrtxx_SCE,"_fTruenuvrtxx_SCE/F");
+    fMC_TrunMean->Branch("_fTruenuvrtxy_SCE",&_fTruenuvrtxy_SCE,"_fTruenuvrtxy_SCE/F");
+    fMC_TrunMean->Branch("_fTruenuvrtxz_SCE",&_fTruenuvrtxz_SCE,"_fTruenuvrtxz_SCE/F");
+   
     fMC_TrunMean->Branch("trueMuonTrueMomentum",&trueMuonTrueMomentum,"trueMuonTrueMomentum/D");
     fMC_TrunMean->Branch("trueMuonTrueTheta",&trueMuonTrueTheta,"trueMuonTrueTheta/D");
     fMC_TrunMean->Branch("trueMuonTruePhi",&trueMuonTruePhi,"trueMuonTruePhi/D");
@@ -1613,7 +1620,9 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     //fBeamMin                 = pset.get      ("BeamMin", 3.2);   //BNB+COSMIC
     //fBeamMax                 = pset.get      ("BeamMax", 4.8);   //BNB+COSMIC
 
-    fdQdx_scale              = pset.get("dQdxScale",196.98);
+    //fdQdx_scale              = pset.get("dQdxScale",196.98);
+    fdQdx_scale              = pset.get("dQdxScale",242.77);
+
 
     //fBeamMin                 = pset.get      ("BeamMin", 3.65);   //extbnb 
     //fBeamMax                 = pset.get      ("BeamMax", 5.25);   //extbnb
