@@ -587,6 +587,10 @@ public:
 
     //declare the function to calculate truncated dQdx
     double GetDqDxTruncatedMean(std::vector<art::Ptr<anab::Calorimetry>> calos);
+    
+    double GetEnergy(std::vector<art::Ptr<anab::Calorimetry>> calos);
+    std::vector<double> GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
+    std::vector<double> GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos);
    
     double GetMean(std::vector<double> dqdx_v);
 
@@ -937,6 +941,9 @@ private:
     std::vector<double> *tracklengthpcand;// = new std::vector<double>;
     std::vector<double> *trackphipcand;// = new std::vector<double>;;
     std::vector<double> *tracktrunmeanpcand;// = new std::vector<double>;;
+    std::vector<double> *trackEcalopcand;// = new std::vector<double>;;
+    std::vector<std::vector<double>> *trackdEdxpcand;// = new std::vector<double>;;
+    std::vector<std::vector<double>> *trackRRpcand;// = new std::vector<double>;;
     std::vector<double> *trackpidapcand;
     //----------------------------------------
     int fNRecoTrks=-999;  //total number of tracks including muon, proton and others
@@ -1025,6 +1032,9 @@ private:
   delete trackthetapcand;
   delete tracklengthpcand;
   delete tracktrunmeanpcand;
+  delete trackEcalopcand;
+  delete trackdEdxpcand;
+  delete trackRRpcand;
 
   delete trackpidapcand;
   delete fHitNucP4;
@@ -1407,6 +1417,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("protoncandidate_theta","std::vector<double>",&trackthetapcand);
     fMC_mupinFV->Branch("protoncandidate_phi","std::vector<double>",&trackphipcand);
     fMC_mupinFV->Branch("protoncandidate_trunmeandqdx","std::vector<double>",&tracktrunmeanpcand);
+    fMC_mupinFV->Branch("protoncandidate_Ecalo","std::vector<double>",&trackEcalopcand);
+    fMC_mupinFV->Branch("protoncandidate_dEdx","std::vector<std::vector<double>>",&trackdEdxpcand);
+    fMC_mupinFV->Branch("protoncandidate_RR","std::vector<std::vector<double>>",&trackRRpcand);
     fMC_mupinFV->Branch("protoncandidate_pida", "std::vector<double>", &trackpidapcand);
 
 
@@ -1556,6 +1569,9 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("protoncandidate_theta","std::vector<double>",&trackthetapcand);
     fMC_TrunMean->Branch("protoncandidate_phi","std::vector<double>",&trackphipcand);
     fMC_TrunMean->Branch("protoncandidate_trunmeandqdx","std::vector<double>",&tracktrunmeanpcand);
+    fMC_TrunMean->Branch("protoncandidate_Ecalo","std::vector<double>",&trackEcalopcand);
+    fMC_TrunMean->Branch("protoncandidate_dEdx","std::vector<std::vector<double>>",&trackdEdxpcand);
+    fMC_TrunMean->Branch("protoncandidate_RR","std::vector<std::vector<double>>",&trackRRpcand);
     fMC_TrunMean->Branch("protoncandidate_pida", "std::vector<double>", &trackpidapcand);
 
     //-----------------------------------------------------------
@@ -1678,6 +1694,9 @@ void  CC1uNPSelAna::reconfigure(fhicl::ParameterSet const& pset)
     trackthetapcand = new std::vector<double>;
     tracklengthpcand = new std::vector<double>;
     tracktrunmeanpcand = new std::vector<double>;
+    trackEcalopcand = new std::vector<double>;
+    trackdEdxpcand = new std::vector<std::vector<double>>;
+    trackRRpcand = new std::vector<std::vector<double>>;
 
     trackpidapcand= new std::vector<double>;
     
@@ -1702,6 +1721,62 @@ bool CC1uNPSelAna::inFV(double x, double y, double z) const
 }
 
 
+std::vector<double> CC1uNPSelAna::GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> RR_v = c->ResidualRange(); 
+    return RR_v;
+  }
+  return result;
+}
+
+
+std::vector<double> CC1uNPSelAna::GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> dEdx_v = c->dEdx(); 
+//    if (dEdx_v.size() == 0){
+//      return 0;
+//    }
+    return dEdx_v;
+  }
+  return result;
+}
+
+double CC1uNPSelAna::GetEnergy(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  double result=-9999;
+
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+    std::cout << "old Energy =" << c->KineticEnergy() << "new result = ";  
+    std::vector<double> dEdx_v = c->dEdx(); 
+    std::vector<double> TrkPtch_v = c->TrkPitchVec(); 
+//
+    if (dEdx_v.size() == 0){
+      return result;
+    }
+    double totE=0;
+    for (unsigned int i(0); i < dEdx_v.size();++i){
+      totE += dEdx_v.at(i) * TrkPtch_v.at(i);
+    }
+    result = totE;
+    std::cout << totE << std::endl;
+  }
+  return result;
+}
 
 double CC1uNPSelAna::GetDqDxTruncatedMean(std::vector<art::Ptr<anab::Calorimetry>> calos) {
   double result = -9999;
@@ -1743,8 +1818,6 @@ double CC1uNPSelAna::GetDqDxTruncatedMean(std::vector<art::Ptr<anab::Calorimetry
   }
     
   return result;
-
-
 
 
 }
@@ -3365,6 +3438,9 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                 tracklengthpcand->clear();
                 trackphipcand->clear();
                 tracktrunmeanpcand->clear();
+                trackEcalopcand->clear();
+                trackdEdxpcand->clear();
+                trackRRpcand->clear();
                 trackpidapcand->clear();
 		for (auto const& TrackID : VertexTrackCollection2.find(VertexCandidate)->second)
                 {
@@ -3419,6 +3495,9 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                       art::FindManyP<anab::Calorimetry> calos_from_track(trackVecHandle, event, fCalorimetryModuleLabel) ;        
                       std:: vector<art::Ptr<anab::Calorimetry>> calos=calos_from_track.at(track.key());
                       tracktrunmeanpcand->push_back(GetDqDxTruncatedMean(calos));
+                      trackEcalopcand->push_back(GetEnergy(calos));
+                      trackdEdxpcand->push_back(GetdEdx(calos));
+                      trackRRpcand->push_back(GetRR(calos));
                       //---------------------------------------------------------------------- 
                     }
 

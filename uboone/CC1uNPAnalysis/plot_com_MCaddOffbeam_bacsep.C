@@ -376,7 +376,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allzoom[0]=(TH1D*)h_prange_allsel[0]->Clone();
   h_prange_allzoom[0]->Rebin(2);
   h_prange_allzoom[0]->Sumw2();
-  h_prange_allsel[0]->Rebin(10); 
+  h_prange_allsel[0]->Rebin(20); 
   h_prange_allsel[0]->Sumw2();
  
 
@@ -384,7 +384,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allzoom[1]=(TH1D*)h_prange_allsel[1]->Clone();
   h_prange_allzoom[1]->Rebin(2);
   h_prange_allzoom[1]->Sumw2();
-  h_prange_allsel[1]->Rebin(10);
+  h_prange_allsel[1]->Rebin(20);
   h_prange_allsel[1]->Sumw2();
  
 
@@ -394,7 +394,7 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_allzoom[2]=(TH1D*)h_prange_allsel[2]->Clone();
   h_prange_allzoom[2]->Rebin(2);
   h_prange_allzoom[2]->Sumw2();
-  h_prange_allsel[2]->Rebin(10);
+  h_prange_allsel[2]->Rebin(20);
   h_prange_allsel[2]->Sumw2();
 
   TH1D               *h_prange_sig[2];
@@ -405,63 +405,63 @@ void plot_com_MCaddOffbeam_bacsep(){
   h_prange_sigzoom[0]=(TH1D*)h_prange_sig[0]->Clone();
   h_prange_sigzoom[0]->Rebin(2);
   h_prange_sigzoom[0]->Sumw2();
-  h_prange_sig[0]->Rebin(10);
+  h_prange_sig[0]->Rebin(20);
   h_prange_sig[0]->Sumw2();
 
   h_prange_bac[0]=(TH1D*)input2->Get("trklen_proton_1");
   h_prange_baczoom[0]=(TH1D*)h_prange_bac[0]->Clone();
   h_prange_baczoom[0]->Rebin(2);
   h_prange_baczoom[0]->Sumw2();
-  h_prange_bac[0]->Rebin(10);
+  h_prange_bac[0]->Rebin(20);
   h_prange_bac[0]->Sumw2();
  
   h_prange_bac[1]=(TH1D*)input2->Get("trklen_proton_2");
   h_prange_baczoom[1]=(TH1D*)h_prange_bac[1]->Clone();
   h_prange_baczoom[1]->Rebin(2);
   h_prange_baczoom[1]->Sumw2();
-  h_prange_bac[1]->Rebin(10);
+  h_prange_bac[1]->Rebin(20);
   h_prange_bac[1]->Sumw2();
 
   h_prange_bac[2]=(TH1D*)input2->Get("trklen_proton_3");
   h_prange_baczoom[2]=(TH1D*)h_prange_bac[2]->Clone();
   h_prange_baczoom[2]->Rebin(2);
   h_prange_baczoom[2]->Sumw2();
-  h_prange_bac[2]->Rebin(10);
+  h_prange_bac[2]->Rebin(20);
   h_prange_bac[2]->Sumw2();
  
   h_prange_bac[3]=(TH1D*)input2->Get("trklen_proton_4");
   h_prange_baczoom[3]=(TH1D*)h_prange_bac[3]->Clone();
   h_prange_baczoom[3]->Rebin(2);
   h_prange_baczoom[3]->Sumw2();
-  h_prange_bac[3]->Rebin(10);
+  h_prange_bac[3]->Rebin(20);
   h_prange_bac[3]->Sumw2();
 
   h_prange_bac[4]=(TH1D*)input2->Get("trklen_proton_5");
   h_prange_baczoom[4]=(TH1D*)h_prange_bac[4]->Clone();
   h_prange_baczoom[4]->Rebin(2);
   h_prange_baczoom[4]->Sumw2();
-  h_prange_bac[4]->Rebin(10);
+  h_prange_bac[4]->Rebin(20);
   h_prange_bac[4]->Sumw2();
  
   h_prange_bac[5]=(TH1D*)input2->Get("trklen_proton_6");
   h_prange_baczoom[5]=(TH1D*)h_prange_bac[5]->Clone();
   h_prange_baczoom[5]->Rebin(2);
   h_prange_baczoom[5]->Sumw2();
-  h_prange_bac[5]->Rebin(10);
+  h_prange_bac[5]->Rebin(20);
   h_prange_bac[5]->Sumw2();
 
   h_prange_bac[6]=(TH1D*)input2->Get("trklen_proton_7");
   h_prange_baczoom[6]=(TH1D*)h_prange_bac[6]->Clone();
   h_prange_baczoom[6]->Rebin(2);
   h_prange_baczoom[6]->Sumw2();
-  h_prange_bac[6]->Rebin(10);
+  h_prange_bac[6]->Rebin(20);
   h_prange_bac[6]->Sumw2();
 
   h_prange_bac[7]=(TH1D*)input2->Get("trklen_proton_8");
   h_prange_baczoom[7]=(TH1D*)h_prange_bac[7]->Clone();
   h_prange_baczoom[7]->Rebin(2);
   h_prange_baczoom[7]->Sumw2();
-  h_prange_bac[7]->Rebin(10);
+  h_prange_bac[7]->Rebin(20);
   h_prange_bac[7]->Sumw2();
    //=============================================================
   TH1D                  *h_phi_allsel[3];
@@ -843,54 +843,54 @@ void plot_com_MCaddOffbeam_bacsep(){
   TH1D                  *h_phad_allsel[3];
 
   h_phad_allsel[0]=(TH1D*)input0->Get("Phad");
-  h_phad_allsel[0]->Rebin(2); 
+  h_phad_allsel[0]->Rebin(4); 
   h_phad_allsel[0]->Sumw2();
  
 
   h_phad_allsel[1]=(TH1D*)input1->Get("Phad");
-  h_phad_allsel[1]->Rebin(2);
+  h_phad_allsel[1]->Rebin(4);
   h_phad_allsel[1]->Sumw2();
 
   h_phad_allsel[2]=(TH1D*)input2->Get("Phad");
-  h_phad_allsel[2]->Rebin(2);
+  h_phad_allsel[2]->Rebin(4);
   h_phad_allsel[2]->Sumw2();
 
   TH1D               *h_phad_sig[2];
   TH1D               *h_phad_bac[8];
   h_phad_sig[0]=(TH1D*)input2->Get("fPproton_0");
-  h_phad_sig[0]->Rebin(2);
+  h_phad_sig[0]->Rebin(4);
   h_phad_sig[0]->Sumw2();
 
   h_phad_bac[0]=(TH1D*)input2->Get("fPproton_1");
-  h_phad_bac[0]->Rebin(2);
+  h_phad_bac[0]->Rebin(4);
   h_phad_bac[0]->Sumw2();
  
   h_phad_bac[1]=(TH1D*)input2->Get("fPproton_2");
-  h_phad_bac[1]->Rebin(2);
+  h_phad_bac[1]->Rebin(4);
   h_phad_bac[1]->Sumw2();
 
   h_phad_bac[2]=(TH1D*)input2->Get("fPproton_3");
-  h_phad_bac[2]->Rebin(2);
+  h_phad_bac[2]->Rebin(4);
   h_phad_bac[2]->Sumw2();
  
   h_phad_bac[3]=(TH1D*)input2->Get("fPproton_4");
-  h_phad_bac[3]->Rebin(2);
+  h_phad_bac[3]->Rebin(4);
   h_phad_bac[3]->Sumw2();
 
   h_phad_bac[4]=(TH1D*)input2->Get("fPproton_5");
-  h_phad_bac[4]->Rebin(2);
+  h_phad_bac[4]->Rebin(4);
   h_phad_bac[4]->Sumw2();
  
   h_phad_bac[5]=(TH1D*)input2->Get("fPproton_6");
-  h_phad_bac[5]->Rebin(2);
+  h_phad_bac[5]->Rebin(4);
   h_phad_bac[5]->Sumw2();
 
   h_phad_bac[6]=(TH1D*)input2->Get("fPproton_7");
-  h_phad_bac[6]->Rebin(2);
+  h_phad_bac[6]->Rebin(4);
   h_phad_bac[6]->Sumw2();
 
   h_phad_bac[7]=(TH1D*)input2->Get("fPproton_8");
-  h_phad_bac[7]->Rebin(2);
+  h_phad_bac[7]->Rebin(4);
   h_phad_bac[7]->Sumw2();
    //=============================================================== 
   TH1D                  *h_thetamup_allsel[3];

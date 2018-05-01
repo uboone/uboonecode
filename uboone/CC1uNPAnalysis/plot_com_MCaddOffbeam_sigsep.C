@@ -3,7 +3,7 @@
 void plot_com_MCaddOffbeam_sigsep(){
   gROOT->SetBatch();
   //loadStyle();
-  int tune = 3;
+  int tune = 1;
   TFile *input0 = new TFile("histAnalysis_onbeam_wCosmicCut.root");
   TFile *input1 = new TFile("histAnalysis_offbeam_wCosmicCut.root");
   TFile *input2;
@@ -407,7 +407,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_prange_allzoom[0]=(TH1D*)h_prange_allsel[0]->Clone("trklen_pcand0zoom");
   h_prange_allzoom[0]->Rebin(2);
   h_prange_allzoom[0]->Sumw2();
-  h_prange_allsel[0]->Rebin(5); 
+  h_prange_allsel[0]->Rebin(20); 
   h_prange_allsel[0]->Sumw2();
 
   TH1D *h_tmp1 = (TH1D*)input1->Get("trklen_pcand");
@@ -416,7 +416,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_prange_allzoom[1]=(TH1D*)h_prange_allsel[1]->Clone("trklen_pcand1zoom");
   h_prange_allzoom[1]->Rebin(2);
   h_prange_allzoom[1]->Sumw2();
-  h_prange_allsel[1]->Rebin(5);
+  h_prange_allsel[1]->Rebin(20);
   h_prange_allsel[1]->Sumw2();
 
   TH1D *h_tmp2 = (TH1D*)input2->Get("trklen_pcand");
@@ -425,7 +425,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_prange_allzoom[2]=(TH1D*)h_prange_allsel[2]->Clone();
   h_prange_allzoom[2]->Rebin(2);
   h_prange_allzoom[2]->Sumw2();
-  h_prange_allsel[2]->Rebin(5);
+  h_prange_allsel[2]->Rebin(20);
   h_prange_allsel[2]->Sumw2();
 
   TH1D               *h_prange_sig[8];
@@ -437,91 +437,91 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_prange_sigzoom[0]=(TH1D*)h_prange_sig[0]->Clone();
   h_prange_sigzoom[0]->Rebin(2);
   h_prange_sigzoom[0]->Sumw2();
-  h_prange_sig[0]->Rebin(5);
+  h_prange_sig[0]->Rebin(20);
   h_prange_sig[0]->Sumw2();
 
   h_prange_sig[1]=(TH1D*)input2->Get("trklen_proton_sig_0");
   h_prange_sigzoom[1]=(TH1D*)h_prange_sig[1]->Clone();
   h_prange_sigzoom[1]->Rebin(2);
   h_prange_sigzoom[1]->Sumw2();
-  h_prange_sig[1]->Rebin(5);
+  h_prange_sig[1]->Rebin(20);
   h_prange_sig[1]->Sumw2();
 
   h_prange_sig[2]=(TH1D*)input2->Get("trklen_proton_sig_1");
   h_prange_sigzoom[2]=(TH1D*)h_prange_sig[2]->Clone();
   h_prange_sigzoom[2]->Rebin(2);
   h_prange_sigzoom[2]->Sumw2();
-  h_prange_sig[2]->Rebin(5);
+  h_prange_sig[2]->Rebin(20);
   h_prange_sig[2]->Sumw2();
 
   h_prange_sig[3]=(TH1D*)input2->Get("trklen_proton_sig_2");
   h_prange_sigzoom[3]=(TH1D*)h_prange_sig[3]->Clone();
   h_prange_sigzoom[3]->Rebin(2);
   h_prange_sigzoom[3]->Sumw2();
-  h_prange_sig[3]->Rebin(5);
+  h_prange_sig[3]->Rebin(20);
   h_prange_sig[3]->Sumw2();
 
   h_prange_sig[4]=(TH1D*)input2->Get("trklen_proton_sig_3");
   h_prange_sigzoom[4]=(TH1D*)h_prange_sig[4]->Clone();
   h_prange_sigzoom[4]->Rebin(2);
   h_prange_sigzoom[4]->Sumw2();
-  h_prange_sig[4]->Rebin(5);
+  h_prange_sig[4]->Rebin(20);
   h_prange_sig[4]->Sumw2();
 
   h_prange_bac[0]=(TH1D*)input2->Get("trklen_proton_1");
   h_prange_baczoom[0]=(TH1D*)h_prange_bac[0]->Clone();
   h_prange_baczoom[0]->Rebin(2);
   h_prange_baczoom[0]->Sumw2();
-  h_prange_bac[0]->Rebin(5);
+  h_prange_bac[0]->Rebin(20);
   h_prange_bac[0]->Sumw2();
  
   h_prange_bac[1]=(TH1D*)input2->Get("trklen_proton_2");
   h_prange_baczoom[1]=(TH1D*)h_prange_bac[1]->Clone();
   h_prange_baczoom[1]->Rebin(2);
   h_prange_baczoom[1]->Sumw2();
-  h_prange_bac[1]->Rebin(5);
+  h_prange_bac[1]->Rebin(20);
   h_prange_bac[1]->Sumw2();
 
   h_prange_bac[2]=(TH1D*)input2->Get("trklen_proton_3");
   h_prange_baczoom[2]=(TH1D*)h_prange_bac[2]->Clone();
   h_prange_baczoom[2]->Rebin(2);
   h_prange_baczoom[2]->Sumw2();
-  h_prange_bac[2]->Rebin(5);
+  h_prange_bac[2]->Rebin(20);
   h_prange_bac[2]->Sumw2();
  
   h_prange_bac[3]=(TH1D*)input2->Get("trklen_proton_4");
   h_prange_baczoom[3]=(TH1D*)h_prange_bac[3]->Clone();
   h_prange_baczoom[3]->Rebin(2);
   h_prange_baczoom[3]->Sumw2();
-  h_prange_bac[3]->Rebin(5);
+  h_prange_bac[3]->Rebin(20);
   h_prange_bac[3]->Sumw2();
 
   h_prange_bac[4]=(TH1D*)input2->Get("trklen_proton_5");
   h_prange_baczoom[4]=(TH1D*)h_prange_bac[4]->Clone();
   h_prange_baczoom[4]->Rebin(2);
   h_prange_baczoom[4]->Sumw2();
-  h_prange_bac[4]->Rebin(5);
+  h_prange_bac[4]->Rebin(20);
   h_prange_bac[4]->Sumw2();
  
   h_prange_bac[5]=(TH1D*)input2->Get("trklen_proton_6");
   h_prange_baczoom[5]=(TH1D*)h_prange_bac[5]->Clone();
   h_prange_baczoom[5]->Rebin(2);
   h_prange_baczoom[5]->Sumw2();
-  h_prange_bac[5]->Rebin(5);
+  h_prange_bac[5]->Rebin(20);
   h_prange_bac[5]->Sumw2();
 
   h_prange_bac[6]=(TH1D*)input2->Get("trklen_proton_7");
   h_prange_baczoom[6]=(TH1D*)h_prange_bac[6]->Clone();
   h_prange_baczoom[6]->Rebin(2);
   h_prange_baczoom[6]->Sumw2();
-  h_prange_bac[6]->Rebin(5);
+  h_prange_bac[6]->Rebin(20);
   h_prange_bac[6]->Sumw2();
 
   h_prange_bac[7]=(TH1D*)input2->Get("trklen_proton_8");
   h_prange_baczoom[7]=(TH1D*)h_prange_bac[7]->Clone();
   h_prange_baczoom[7]->Rebin(2);
   h_prange_baczoom[7]->Sumw2();
-  h_prange_bac[7]->Rebin(5);
+  h_prange_bac[7]->Rebin(20);
   h_prange_bac[7]->Sumw2();
    //=============================================================
   TH1D                  *h_phi_allsel[3];
@@ -1022,71 +1022,71 @@ void plot_com_MCaddOffbeam_sigsep(){
   TH1D                  *h_phad_allsel[3];
 
   h_phad_allsel[0]=(TH1D*)input0->Get("Phad");
-  h_phad_allsel[0]->Rebin(2); 
+  h_phad_allsel[0]->Rebin(4); 
   h_phad_allsel[0]->Sumw2();
  
 
   h_phad_allsel[1]=(TH1D*)input1->Get("Phad");
-  h_phad_allsel[1]->Rebin(2);
+  h_phad_allsel[1]->Rebin(4);
   h_phad_allsel[1]->Sumw2();
 
   h_phad_allsel[2]=(TH1D*)input2->Get("Phad");
-  h_phad_allsel[2]->Rebin(2);
+  h_phad_allsel[2]->Rebin(4);
   h_phad_allsel[2]->Sumw2();
 
   TH1D               *h_phad_sig[8];
   TH1D               *h_phad_bac[8];
   h_phad_sig[0]=(TH1D*)input2->Get("fPproton_0");
-  h_phad_sig[0]->Rebin(2);
+  h_phad_sig[0]->Rebin(4);
   h_phad_sig[0]->Sumw2();
 
   h_phad_sig[1]=(TH1D*)input2->Get("fPproton_sig_0");
-  h_phad_sig[1]->Rebin(2);
+  h_phad_sig[1]->Rebin(4);
   h_phad_sig[1]->Sumw2();
 
   h_phad_sig[2]=(TH1D*)input2->Get("fPproton_sig_1");
-  h_phad_sig[2]->Rebin(2);
+  h_phad_sig[2]->Rebin(4);
   h_phad_sig[2]->Sumw2();
 
   h_phad_sig[3]=(TH1D*)input2->Get("fPproton_sig_2");
-  h_phad_sig[3]->Rebin(2);
+  h_phad_sig[3]->Rebin(4);
   h_phad_sig[3]->Sumw2();
 
   h_phad_sig[4]=(TH1D*)input2->Get("fPproton_sig_3");
-  h_phad_sig[4]->Rebin(2);
+  h_phad_sig[4]->Rebin(4);
   h_phad_sig[4]->Sumw2();
 
 
   h_phad_bac[0]=(TH1D*)input2->Get("fPproton_1");
-  h_phad_bac[0]->Rebin(2);
+  h_phad_bac[0]->Rebin(4);
   h_phad_bac[0]->Sumw2();
  
   h_phad_bac[1]=(TH1D*)input2->Get("fPproton_2");
-  h_phad_bac[1]->Rebin(2);
+  h_phad_bac[1]->Rebin(4);
   h_phad_bac[1]->Sumw2();
 
   h_phad_bac[2]=(TH1D*)input2->Get("fPproton_3");
-  h_phad_bac[2]->Rebin(2);
+  h_phad_bac[2]->Rebin(4);
   h_phad_bac[2]->Sumw2();
  
   h_phad_bac[3]=(TH1D*)input2->Get("fPproton_4");
-  h_phad_bac[3]->Rebin(2);
+  h_phad_bac[3]->Rebin(4);
   h_phad_bac[3]->Sumw2();
 
   h_phad_bac[4]=(TH1D*)input2->Get("fPproton_5");
-  h_phad_bac[4]->Rebin(2);
+  h_phad_bac[4]->Rebin(4);
   h_phad_bac[4]->Sumw2();
  
   h_phad_bac[5]=(TH1D*)input2->Get("fPproton_6");
-  h_phad_bac[5]->Rebin(2);
+  h_phad_bac[5]->Rebin(4);
   h_phad_bac[5]->Sumw2();
 
   h_phad_bac[6]=(TH1D*)input2->Get("fPproton_7");
-  h_phad_bac[6]->Rebin(2);
+  h_phad_bac[6]->Rebin(4);
   h_phad_bac[6]->Sumw2();
 
   h_phad_bac[7]=(TH1D*)input2->Get("fPproton_8");
-  h_phad_bac[7]->Rebin(2);
+  h_phad_bac[7]->Rebin(4);
   h_phad_bac[7]->Sumw2();
    //=============================================================== 
   TH1D                  *h_thetamup_allsel[3];
@@ -2646,6 +2646,7 @@ void plot_com_MCaddOffbeam_sigsep(){
    //h_onoff_range->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
   TLegend *legend = new TLegend(.60, .65, .90, .90);
+  TLegend *legendL = new TLegend(.10, .65, .35, .90);
 
   legend->AddEntry(h_range_allsel[0], "on_beam");
   legend->AddEntry(h_range_allsel[1], "off_beam");
@@ -2659,6 +2660,17 @@ void plot_com_MCaddOffbeam_sigsep(){
 
   legend -> AddEntry(h_range_bac[0], "Total-bac", "f");
 
+  legendL->AddEntry(h_range_allsel[0], "on_beam");
+  legendL->AddEntry(h_range_allsel[1], "off_beam");
+  //legend->AddEntry(h_onoff_range, "on beam - off beam");
+  //legend->AddEntry(h_range_allsel[2],"MC");
+  //legend -> AddEntry(h_range_sig[0], "1uNp (CC)", "f");
+  legendL -> AddEntry(h_range_sig[1], "1uNp (CCQE)", "f");
+  legendL -> AddEntry(h_range_sig[2], "1uNp (CCRES)", "f");
+  legendL -> AddEntry(h_range_sig[3], "1uNp (CCCoh)", "f");
+  legendL -> AddEntry(h_range_sig[4], "1uNp (CCMEC)", "f");
+
+  legendL -> AddEntry(h_range_bac[0], "Total-bac", "f");
   //legend -> AddEntry(h_range_bac[0], "CC0#pi0P", "f");
   //legend -> AddEntry(h_range_bac[1], "CC1#piNP", "f");
   //legend -> AddEntry(h_range_bac[2], "CCN#piNp", "f");
@@ -2684,7 +2696,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_trkmom_allsel[0]->SetLineStyle(1);
   h_trkmom_allsel[0]->GetXaxis()->SetTitle("Track Momentum of Muon Candidate with MCS calculation[cm]");
   h_trkmom_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_trkmom_allsel[0]->SetMaximum(600);
+  h_trkmom_allsel[0]->SetMaximum(1.4 * h_trkmom_allsel[0]->GetMaximum());
   h_trkmom_allsel[0]->Draw();
   
   //h_trkmom_allsel[1]->SetLineColor(kRed);
@@ -2787,7 +2799,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_prange_allsel[0]->SetLineStyle(1);
   h_prange_allsel[0]->GetXaxis()->SetTitle("Track Length of The Leading Proton Candidate[cm]");
   h_prange_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_prange_allsel[0]->SetMaximum(2.0*h_prange_allsel[0]->GetMaximum());
+  h_prange_allsel[0]->SetMaximum(1.6*h_prange_allsel[0]->GetMaximum());
   h_prange_allsel[0]->Draw();
   //h_prange_allsel[1]->SetLineColor(kRed);
   //h_prange_allsel[1]->SetLineWidth(2);
@@ -2960,7 +2972,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_costheta_allsel[0]->SetLineStyle(1);
   h_costheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{#mu}");
   h_costheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_costheta_allsel[0]->SetMaximum(800);
+  h_costheta_allsel[0]->SetMaximum(2.5 * h_costheta_allsel[0]->GetMaximum());
   h_costheta_allsel[0]->Draw();
   //h_costheta_allsel[1]->SetLineColor(kRed);
   //h_costheta_allsel[1]->SetLineWidth(2);
@@ -3044,7 +3056,7 @@ void plot_com_MCaddOffbeam_sigsep(){
    h_costheta_allsel[0]->Draw("same");
    //h_onoff_costheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-  legend->Draw("same");
+  legendL->Draw("same");
   if (tune==3){c1->Print("figures/Tune3/SigSep/h_costheta_allsel.png");}
   else{c1->Print("figures/Tune1/SigSep/h_costheta_allsel.png");}
 
@@ -3059,7 +3071,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_pcostheta_allsel[0]->SetLineStyle(1);
   h_pcostheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{p}");
   h_pcostheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pcostheta_allsel[0]->SetMaximum(500);
+  h_pcostheta_allsel[0]->SetMaximum(2.5*h_pcostheta_allsel[0]->GetMaximum());
    h_pcostheta_allsel[0]->Draw();
 
   //h_pcostheta_allsel[1]->SetLineColor(kRed);
@@ -3144,7 +3156,7 @@ void plot_com_MCaddOffbeam_sigsep(){
    h_pcostheta_allsel[0]->Draw("same");
    //h_onoff_pcostheta->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-   legend->Draw("same");
+   legendL->Draw("same");
   if (tune==3){c1->Print("figures/Tune3/SigSep/h_pcostheta_allsel.png");}
   else{c1->Print("figures/Tune1/SigSep/h_pcostheta_allsel.png");}
 
@@ -3364,7 +3376,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_phi_allsel[0]->SetLineStyle(1);
   h_phi_allsel[0]->GetXaxis()->SetTitle("#phi_{#mu}[Rad]");
   h_phi_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phi_allsel[0]->SetMaximum(240);
+  h_phi_allsel[0]->SetMaximum(2.0*h_phi_allsel[0]->GetMaximum());
   h_phi_allsel[0]->SetMinimum(0);
   h_phi_allsel[0]->Draw();
   
@@ -3465,7 +3477,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_pphi_allsel[0]->SetLineStyle(1);
   h_pphi_allsel[0]->GetXaxis()->SetTitle("#phi_{P}[Rad]");
   h_pphi_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pphi_allsel[0]->SetMaximum(200);
+  h_pphi_allsel[0]->SetMaximum(2.0 * h_pphi_allsel[0]->GetMaximum());
   h_pphi_allsel[0]->SetMinimum(0);
   h_pphi_allsel[0]->Draw();
 
@@ -3661,7 +3673,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_plep_allsel[0]->SetLineStyle(1);
   h_plep_allsel[0]->GetXaxis()->SetTitle("Momentum of the muon candidate[GeV]");
   h_plep_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_plep_allsel[0]->SetMaximum(600);
+  h_plep_allsel[0]->SetMaximum(1.4*h_plep_allsel[0]->GetMaximum());
   h_plep_allsel[0]->Draw();  
 
   //h_plep_allsel[1]->SetLineColor(kRed);
@@ -3764,7 +3776,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_phad_allsel[0]->SetLineStyle(1);
   h_phad_allsel[0]->GetXaxis()->SetTitle("Momentum of the leading proton candidates[GeV]");
   h_phad_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phad_allsel[0]->SetMaximum(600);
+  h_phad_allsel[0]->SetMaximum(1.4*h_phad_allsel[0]->GetMaximum());
   h_phad_allsel[0]->Draw();  
 
   //h_phad_allsel[1]->SetLineColor(kRed);
@@ -4075,7 +4087,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_phimup_allsel[0]->SetLineStyle(1);
   h_phimup_allsel[0]->GetXaxis()->SetTitle("|#phi_{#mu}-#phi_{P}|[Rad]");
   h_phimup_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_phimup_allsel[0]->SetMaximum(600);
+  h_phimup_allsel[0]->SetMaximum(2.5*h_phimup_allsel[0]->GetMaximum());
   h_phimup_allsel[0]->Draw();
 
   //h_phimup_allsel[1]->SetLineColor(kRed);
@@ -4278,7 +4290,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_Nhitsmuon_allsel[0]->SetLineStyle(1);
   h_Nhitsmuon_allsel[0]->GetXaxis()->SetTitle("Number of Hits of Muon Candidate");
   h_Nhitsmuon_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_Nhitsmuon_allsel[0]->SetMaximum(500);
+  h_Nhitsmuon_allsel[0]->SetMaximum(1.4* h_Nhitsmuon_allsel[0]->GetMaximum());
   h_Nhitsmuon_allsel[0]->Draw();
 
   //h_Nhitsmuon_allsel[1]->SetLineColor(kRed);
@@ -4378,7 +4390,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_Nhitsproton_allsel[0]->SetLineStyle(1);
   h_Nhitsproton_allsel[0]->GetXaxis()->SetTitle("Number of Hits of The Proton Candidate");
   h_Nhitsproton_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_Nhitsproton_allsel[0]->SetMaximum(600);
+  h_Nhitsproton_allsel[0]->SetMaximum(1.6 * h_Nhitsproton_allsel[0]->GetMaximum());
   h_Nhitsproton_allsel[0]->Draw();
 
   //h_Nhitsproton_allsel[1]->SetLineColor(kRed);
@@ -5955,7 +5967,7 @@ void plot_com_MCaddOffbeam_sigsep(){
    h_Evis_allsel[0]->SetLineStyle(1);
    h_Evis_allsel[0]->GetXaxis()->SetTitle("Visible Energy [GeV]");
    h_Evis_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_Evis_allsel[0]->SetMaximum(500);
+   h_Evis_allsel[0]->SetMaximum(1.6*h_Evis_allsel[0]->GetMaximum());
    h_Evis_allsel[0]->Draw();
 
    //h_Evis_allsel[1]->SetLineColor(kRed);
