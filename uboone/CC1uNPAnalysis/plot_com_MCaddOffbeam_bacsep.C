@@ -40,8 +40,8 @@ void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH
 
 void plot_com_MCaddOffbeam_bacsep(){
   //loadStyle();
-  int tune=5;
-  int cosmicCut=1;
+  int tune=1;
+  int cosmicCut=0;
 
   TFile *input0;
   TFile *input1;
@@ -3496,7 +3496,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    h_muendy_allsel[0]->SetLineStyle(1);
    h_muendy_allsel[0]->GetXaxis()->SetTitle("End Position Y of Muon Candidate[cm]");
    h_muendy_allsel[0]->GetYaxis()->SetTitle("No. of Events");
-   h_muendy_allsel[0]->SetMaximum(300);
+   if (cosmicCut){
+     h_muendy_allsel[0]->SetMaximum(300);
+   }
+   //else{
+   //}
    h_muendy_allsel[0]->Draw();
 
    //h_muendy_allsel[1]->SetLineColor(kRed);
