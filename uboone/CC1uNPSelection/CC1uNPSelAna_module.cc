@@ -924,6 +924,11 @@ private:
     float Q2cal=-999.0;
     float Wcal=-999.0;
 
+
+    bool showerFlag=false;
+
+
+
     TLorentzVector *fHitNucP4;
 
     //=============================================================
@@ -1268,7 +1273,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_noshwr->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_noshwr->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_noshwr->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
-
+    fMC_noshwr->Branch("showerFlag", & showerFlag, "showerFlag/O");
     fMC_noshwr->Branch("flstrkdist" ,  &flstrkdist,   "flstrkdist/F");
 
     fMC_noshwr->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
@@ -1300,6 +1305,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_trkfls->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_trkfls->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_trkfls->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_trkfls->Branch("showerFlag", & showerFlag, "showerFlag/O");
     fMC_trkfls->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_trkfls->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
     fMC_trkfls->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
@@ -1331,6 +1337,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_NoExTrk->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_NoExTrk->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_NoExTrk ->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_NoExTrk->Branch("showerFlag", & showerFlag, "showerFlag/O");
     fMC_NoExTrk->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_NoExTrk->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
     fMC_NoExTrk->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
@@ -1399,6 +1406,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_mupinFV->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_mupinFV->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_mupinFV->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_mupinFV->Branch("showerFlag", & showerFlag, "showerFlag/O");
     fMC_mupinFV->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_mupinFV->Branch("trackpcand_origin", &trackpcand_origin, "trackpcand_origin/I");
     fMC_mupinFV->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
@@ -1510,6 +1518,7 @@ void  CC1uNPSelAna::beginJob()
     fMC_TrunMean->Branch("truthtop_300thresh", &truthtop_300thresh, "truthtop_300thresh/I");
     fMC_TrunMean->Branch("truthtop_400thresh", &truthtop_400thresh, "truthtop_400thresh/I");
     fMC_TrunMean->Branch("OOFVflag", &OOFVflag, "OOFVflag/O");
+    fMC_TrunMean->Branch("showerFlag", & showerFlag, "showerFlag/O");
 
     fMC_TrunMean->Branch("trackcand_origin", &trackcand_origin, "trackcand_origin/I");
     fMC_TrunMean->Branch("trackcand_nuset", &trackcand_nuset, "trackcand_nuset/I");
@@ -3229,6 +3238,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                   if(vershwrdist<=50.0)  noshowerFlag=false;
                   }
 	    }
+            showerFlag=noshowerFlag;
             fvtxx=nuvtxxtest[VertexCandidate];
             fvtxy=nuvtxytest[VertexCandidate];
             fvtxz=nuvtxztest[VertexCandidate];
@@ -3244,7 +3254,8 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
                      if(Ntrack_sig==true)
                      {
                        fMC_ntrks->Fill();
-                       if(noshowerFlag==true){
+                       //if(noshowerFlag==true)
+                       {
                           fMC_noshwr->Fill();
                        } 
                      }
@@ -3261,7 +3272,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             {
             if(Ntrack_sig==true)
             {
-            if(noshowerFlag==true)
+            //if(noshowerFlag==true)
             {   //std::cout<<"event number 12 "<<fEvent<<"the vertex candidate is: "<<VertexCandidate<<std::endl;
                 // Looping over track IDs of tracks associated with the vertex candidate
 		for (auto const& TrackID : VertexTrackCollection2.find(VertexCandidate)->second)
@@ -3336,7 +3347,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             {
             if(Ntrack_sig==true)
             {
-            if(noshowerFlag==true)
+            //if(noshowerFlag==true)
             {   
             if(TrackCandidate>-1 && VertexCandidate>-1){
                // Create the candidate track
@@ -3418,7 +3429,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
             {
             if(Ntrack_sig==true)
             {
-            if(noshowerFlag==true)
+            //if(noshowerFlag==true)
             {   
             if(trackFlashFlag==true)
             {
