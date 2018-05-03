@@ -544,7 +544,9 @@ Bool_t hanalysis::Process(Long64_t entry)
    //if(inFV(*trackendxcandidate,*trackendycandidate,*trackendzcandidate) &&inFV(*trackstartxcandidate,*trackstartycandidate,*trackstartzcandidate)) 
    //if(!inFV(*trackendxcandidate,*trackendycandidate,*trackendzcandidate) || !inFV(*trackstartxcandidate,*trackstartycandidate,*trackstartzcandidate)) 
    
+   //cosmic-removal cut
    if (*trackendycandidate > 95 && *fPhiLep>0){return true;}
+   // DIC cut(s)
    if (TMath::Cos(thetax(*fThetaLep, *fPhiLep)) > 0.8){return true;}
    if (TMath::Cos(thetax(*fThetaLep, *fPhiLep)) < -0.8){return true;}
 
