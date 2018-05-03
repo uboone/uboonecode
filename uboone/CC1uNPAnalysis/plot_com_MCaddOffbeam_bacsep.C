@@ -40,7 +40,7 @@ void stackHists(THStack *stack, TH1D *histarray_sig[], TH1D *histarray_bac[], TH
 
 void plot_com_MCaddOffbeam_bacsep(){
   //loadStyle();
-  int tune=1;
+  int tune=5;
   int cosmicCut=1;
 
   TFile *input0;
@@ -59,9 +59,13 @@ void plot_com_MCaddOffbeam_bacsep(){
     if (cosmicCut){input2= new TFile("histAnalysis_Tune3_wCosmicCut.root");}
     else{input2= new TFile("histAnalysis_Tune3.root");}
   }
-  else{
+  else if (tune==1){
     if (cosmicCut){input2= new TFile("histAnalysis_MC_wCosmicCut.root");}
     else{input2= new TFile("histAnalysis_MC.root");}
+  }
+  else if (tune == 5){
+    if (cosmicCut){input2= new TFile("histAnalysis_DIC_wCosmicCut.root");}
+    else{input2= new TFile("histAnalysis_DIC.root");}
   }
 
   gROOT->SetBatch();
@@ -2038,7 +2042,8 @@ void plot_com_MCaddOffbeam_bacsep(){
   //Float_t mcbnbcos_POT = float(tot_bnbcos)/int_per_1e20POT ; // * dataPOT ; // 2.3 
   Float_t mcbnbcos_POT;
   if (tune==3){mcbnbcos_POT=4.0677e20;} // Tune1
-  else{mcbnbcos_POT=2.0237e20;} // Tune1
+  else if (tune==1){mcbnbcos_POT=2.0237e20;} // Tune1
+  else if (tune==5){mcbnbcos_POT=4.79e19;} // Tune1
   //Float_t mcbnbcos_POT=4.0677e20; // Tune3
   Float_t ondataPOT=4.714e19;
   Float_t offdataPOT=2.841e19;
@@ -2124,10 +2129,12 @@ void plot_com_MCaddOffbeam_bacsep(){
 
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_range_allsel.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_range_allsel.png");}
     else{c1->Print("figures/Tune1/BackSep/h_range_allsel.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_range_allsel.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_range_allsel.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_range_allsel.png");}
   }
 
@@ -2176,10 +2183,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   legendR->Draw("same");
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_trkmom_allsel.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_trkmom_allsel.png");}
     else{c1->Print("figures/Tune1/BackSep/h_trkmom_allsel.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_trkmom_allsel.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_trkmom_allsel.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_trkmom_allsel.png");}
   }
 
@@ -2227,10 +2236,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   legendR->Draw("same");
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_prange_allsel.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_prange_allsel.png");}
     else{c1->Print("figures/Tune1/BackSep/h_prange_allsel.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_prange_allsel.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_prange_allsel.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_prange_allsel.png");}
   }
 
@@ -2259,10 +2270,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_prange_zoom.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_prange_zoom.png");}
     else{c1->Print("figures/Tune1/BackSep/h_prange_zoom.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_prange_zoom.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_prange_zoom.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_prange_zoom.png");}
   }
 
@@ -2309,10 +2322,12 @@ void plot_com_MCaddOffbeam_bacsep(){
   legendL->Draw("same");
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_costheta_allsel.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_costheta_allsel.png");}
     else{c1->Print("figures/Tune1/BackSep/h_costheta_allsel.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_costheta_allsel.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_costheta_allsel.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_costheta_allsel.png");}
   }
 
@@ -2361,10 +2376,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
   if (cosmicCut){
     if(tune==3){c1->Print("figures/Tune3/BackSep/h_pcostheta_allsel.png");}
+    else if(tune==5){c1->Print("figures/DIC/BackSep/h_pcostheta_allsel.png");}
     else{c1->Print("figures/Tune1/BackSep/h_pcostheta_allsel.png");}
   }
   else{
     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pcostheta_allsel.png");}
+    else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pcostheta_allsel.png");}
     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pcostheta_allsel.png");}
   }
 
@@ -2416,10 +2433,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_trunmean_muon.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_trunmean_muon.png");}
      else{c1->Print("figures/Tune1/BackSep/h_trunmean_muon.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_trunmean_muon.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_trunmean_muon.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_trunmean_muon.png");}
    }
   //==================================================================================
@@ -2470,10 +2489,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_trunmean_proton.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_trunmean_proton.png");}
      else{c1->Print("figures/Tune1/BackSep/h_trunmean_proton.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_trunmean_proton.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_trunmean_proton.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_trunmean_proton.png");}
    }
   
@@ -2524,10 +2545,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_phi_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_phi_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_phi_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_phi_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_phi_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_phi_allsel.png");}
    }
 
@@ -2578,10 +2601,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pphi_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pphi_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pphi_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pphi_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pphi_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pphi_allsel.png");}
    }
    //================================================================================ 
@@ -2628,12 +2653,26 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_ntrksp_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_ntrksp_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_ntrksp_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_ntrksp_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_ntrksp_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_ntrksp_allsel.png");}
    }
+   c1->SetLogy();
+   if (cosmicCut){
+     if(tune==3){c1->Print("figures/Tune3/BackSep/h_ntrksp_allsel_log.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_ntrksp_allsel_log.png");}
+     else{c1->Print("figures/Tune1/BackSep/h_ntrksp_allsel_log.png");}
+   }
+   else{
+     if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_ntrksp_allsel_log.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_ntrksp_allsel_log.png");}
+     else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_ntrksp_allsel_log.png");}
+   }
+   c1->SetLogy(0);
 //===========================================================================
   TH1D *h_onoff_plep=(TH1D*)h_plep_allsel[1]->Clone(Form("%s_on-off", h_plep_allsel[1]->GetName()));
   cout<<"get all the histograms!"<<endl;
@@ -2678,10 +2717,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_plep_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_plep_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_plep_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_plep_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_plep_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_plep_allsel.png");}
    }
  //==============================================================
@@ -2729,10 +2770,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_phad_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_phad_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_phad_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_phad_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_phad_allsel.png");}
    }
 
@@ -2745,10 +2788,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_phad_zoom.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_phad_zoom.png");}
      else{c1->Print("figures/Tune1/BackSep/h_phad_zoom.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_phad_zoom.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_phad_zoom.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_phad_zoom.png");}
    }
 
@@ -2797,10 +2842,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_thetamup_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_thetamup_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_thetamup_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_thetamup_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_thetamup_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_thetamup_allsel.png");}
    }
 //==================================================================
@@ -2847,10 +2894,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_thetapp_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_thetapp_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_thetapp_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_thetapp_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_thetapp_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_thetapp_allsel.png");}
    }
 
@@ -2900,10 +2949,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_phimup_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_phimup_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_phimup_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_phimup_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_phimup_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_phimup_allsel.png");}
    }
 //================================================================
@@ -2951,10 +3002,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_phipp_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_phipp_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_phipp_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_phipp_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_phipp_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_phipp_allsel.png");}
    }
 
@@ -3003,10 +3056,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_Nhitsmuon_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_Nhitsmuon_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_Nhitsmuon_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_Nhitsmuon_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_Nhitsmuon_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_Nhitsmuon_allsel.png");}
    }
 
@@ -3055,10 +3110,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_Nhitsproton_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_Nhitsproton_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_Nhitsproton_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_Nhitsproton_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_Nhitsproton_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_Nhitsproton_allsel.png");}
    }
    //=====================================================================
@@ -3106,10 +3163,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){  
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxx_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_vtxx_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_vtxx_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_vtxx_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_vtxx_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_vtxx_allsel.png");}
    }
    //============================================================
@@ -3157,10 +3216,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxy_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_vtxy_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_vtxy_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_vtxy_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_vtxy_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_vtxy_allsel.png");}
    }
    //================================================================================ 
@@ -3208,9 +3269,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_vtxz_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_vtxz_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_vtxz_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_vtxz_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_vtxz_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_vtxz_allsel.png");}
    }
    //==================================================    
@@ -3258,10 +3321,12 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustartx_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_mustartx_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_mustartx_allsel.png");}
    }
    else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_mustartx_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_mustartx_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_mustartx_allsel.png");}
    }
  
@@ -3310,9 +3375,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustarty_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_mustarty_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_mustarty_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_mustarty_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_mustarty_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_mustarty_allsel.png");}
    }
   //==================================================================== 
@@ -3360,9 +3427,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_mustartz_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_mustartz_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_mustartz_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_mustartz_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_mustartz_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_mustartz_allsel.png");}
    }
   //================================================================= 
@@ -3410,9 +3479,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendx_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_muendx_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_muendx_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_muendx_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_muendx_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_muendx_allsel.png");}
    }
    //==========================================================
@@ -3457,12 +3528,14 @@ void plot_com_MCaddOffbeam_bacsep(){
    //h_onoff_muendy->Draw("E1CSAME");
   //~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
  
-   legendR->Draw("same");
+   legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendy_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_muendy_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_muendy_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_muendy_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_muendy_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_muendy_allsel.png");}
    }
   //==================================================================== 
@@ -3510,9 +3583,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendL->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_muendz_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_muendz_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_muendz_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_muendz_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_muendz_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_muendz_allsel.png");}
    }
    //==================================================================   
@@ -3560,9 +3635,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstartx_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pstartx_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pstartx_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pstartx_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pstartx_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pstartx_allsel.png");}
    }
  
@@ -3611,9 +3688,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstarty_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pstarty_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pstarty_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pstarty_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pstarty_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pstarty_allsel.png");}
    }
   //==================================================================== 
@@ -3661,9 +3740,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pstartz_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pstartz_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pstartz_allsel.png");}
    }else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pstartz_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pstartz_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pstartz_allsel.png");}
    }
   //================================================================= 
@@ -3711,9 +3792,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendx_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pendx_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pendx_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pendx_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pendx_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pendx_allsel.png");}
    }
  
@@ -3762,9 +3845,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendy_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pendy_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pendy_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pendy_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pendy_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pendy_allsel.png");}
    }
   //==================================================================== 
@@ -3812,9 +3897,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_pendz_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_pendz_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_pendz_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_pendz_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_pendz_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_pendz_allsel.png");}
    }
 
@@ -3863,9 +3950,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_Evis_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_Evis_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_Evis_allsel.png");}
    } else{
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_Evis_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_Evis_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_Evis_allsel.png");}
    }
   //============================================================
@@ -3913,9 +4002,11 @@ void plot_com_MCaddOffbeam_bacsep(){
    legendR->Draw("same");
    if (cosmicCut){
      if(tune==3){c1->Print("figures/Tune3/BackSep/h_Q2cal_allsel.png");}
+     else if(tune==5){c1->Print("figures/DIC/BackSep/h_Q2cal_allsel.png");}
      else{c1->Print("figures/Tune1/BackSep/h_Q2cal_allsel.png");}
    } else {
      if(tune==3){c1->Print("figures_noCosmicCut/Tune3/BackSep/h_Q2cal_allsel.png");}
+     else if(tune==5){c1->Print("figures_noCosmicCut/DIC/BackSep/h_Q2cal_allsel.png");}
      else{c1->Print("figures_noCosmicCut/Tune1/BackSep/h_Q2cal_allsel.png");}
    }
 
