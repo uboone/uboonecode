@@ -29,6 +29,7 @@
 #include <TH2.h>
 #include "TH2D.h"
 #include "TH1D.h"
+#include "TVector3.h"
 #include <TStyle.h>
 
 //histograms declarations here
@@ -265,6 +266,13 @@ bool inFV(double x, double y, double z) {
 }
 
 
+double thetax(double theta,double phi){
+  TVector3 v;
+  v.SetMagThetaPhi(1,theta,phi);
+  TVector3 x_axis(1,0,0);
+  double theta_x = v.Angle(x_axis);
+  return theta_x;
+}
 
 
 
@@ -537,6 +545,8 @@ Bool_t hanalysis::Process(Long64_t entry)
    //if(!inFV(*trackendxcandidate,*trackendycandidate,*trackendzcandidate) || !inFV(*trackstartxcandidate,*trackstartycandidate,*trackstartzcandidate)) 
    
    if (*trackendycandidate > 95 && *fPhiLep>0){return true;}
+   if (TMath::Cos(thetax(*fThetaLep, *fPhiLep)) > 0.8){return true;}
+   if (TMath::Cos(thetax(*fThetaLep, *fPhiLep)) < -0.8){return true;}
 
    {
 
