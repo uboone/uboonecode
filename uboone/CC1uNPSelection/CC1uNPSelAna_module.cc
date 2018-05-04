@@ -2525,7 +2525,7 @@ void  CC1uNPSelAna::analyze(const art::Event& event)
       simb::MCParticle part = mctruth->GetParticle(igeniepart);
       //std::cout << "True particle true momentum = "<<part.P() << "True particle PDGcode = "<<part.PdgCode() << " Mother = " <<part.Mother() << " status code = " << part.StatusCode() <<std::endl;
       if (part.PdgCode()==2212 && part.StatusCode()==1){
-        std::cout << "True proton true momentum = "<<part.P() << std::endl;
+        //std::cout << "True proton true momentum = "<<part.P() << std::endl;
         trueProtonsTrueMomentum->push_back(part.P());
         trueProtonsTrueTheta->push_back(part.Momentum().Theta());
         trueProtonsTruePhi->push_back(part.Momentum().Phi());

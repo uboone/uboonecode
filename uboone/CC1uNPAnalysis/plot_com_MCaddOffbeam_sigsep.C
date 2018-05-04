@@ -2972,7 +2972,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_costheta_allsel[0]->SetLineStyle(1);
   h_costheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{#mu}");
   h_costheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_costheta_allsel[0]->SetMaximum(2.5 * h_costheta_allsel[0]->GetMaximum());
+  h_costheta_allsel[0]->SetMaximum(2.0 * h_costheta_allsel[0]->GetMaximum());
   h_costheta_allsel[0]->Draw();
   //h_costheta_allsel[1]->SetLineColor(kRed);
   //h_costheta_allsel[1]->SetLineWidth(2);
@@ -3071,7 +3071,7 @@ void plot_com_MCaddOffbeam_sigsep(){
   h_pcostheta_allsel[0]->SetLineStyle(1);
   h_pcostheta_allsel[0]->GetXaxis()->SetTitle("cos#theta_{p}");
   h_pcostheta_allsel[0]->GetYaxis()->SetTitle("No. of Tracks");
-  h_pcostheta_allsel[0]->SetMaximum(2.5*h_pcostheta_allsel[0]->GetMaximum());
+  h_pcostheta_allsel[0]->SetMaximum(2.0*h_pcostheta_allsel[0]->GetMaximum());
    h_pcostheta_allsel[0]->Draw();
 
   //h_pcostheta_allsel[1]->SetLineColor(kRed);
@@ -3663,6 +3663,13 @@ void plot_com_MCaddOffbeam_sigsep(){
    legend->Draw("same");
    if (tune==3){c1->Print("figures/Tune3/SigSep/h_ntrksp_allsel.png");}
    else{c1->Print("figures/Tune1/SigSep/h_ntrksp_allsel.png");}
+   c1->SetLogy();
+   legend->Draw("same");
+   if (tune==3){c1->Print("figures/Tune3/SigSep/h_ntrksp_allsel_log.png");}
+   else{c1->Print("figures/Tune1/SigSep/h_ntrksp_allsel_log.png");}
+   c1->SetLogy(0);
+
+
 //===========================================================================
   TH1D *h_onoff_plep=(TH1D*)h_plep_allsel[1]->Clone(Form("%s_on-off", h_plep_allsel[1]->GetName()));
   cout<<"get all the histograms!"<<endl;
@@ -3867,11 +3874,12 @@ void plot_com_MCaddOffbeam_sigsep(){
    else{c1->Print("figures/Tune1/SigSep/h_phad_allsel.png");}
   
    h_phad_allsel[0]->GetXaxis()->SetRangeUser(0.2,0.5);  
+   h_phad_allsel[0]->SetMaximum(450);
    h_phad_allsel[0]->Draw();  
    hs_phad -> Draw("HIST,SAME");
 
    h_phad_allsel[0]->Draw("same");  
-   legend->Draw("same");
+   legendL->Draw("same");
    if (tune==3){c1->Print("figures/Tune3/SigSep/h_phad_zoom.png");}
    else{c1->Print("figures/Tune1/SigSep/h_phad_zoom.png");}
    
