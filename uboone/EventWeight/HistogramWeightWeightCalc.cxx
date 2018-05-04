@@ -82,6 +82,7 @@ void HistogramWeightWeightCalc::Configure(fhicl::ParameterSet const& p) {
   // Load weight histogram from a file
   double rwNormMu = pset.get<double>("rw_hist_norm", 1.0);
   double rwNormSigma = pset.get<double>("rw_hist_norm_sigma", 0.0);
+  bool rwNormCorrelated = pset.get<bool>("rw_hist_norm_correlated", false);
   std::string histFileName = pset.get<std::string>("rw_hist_file");
   std::string histObjectName = pset.get<std::string>("rw_hist_object");
 
@@ -109,11 +110,20 @@ void HistogramWeightWeightCalc::Configure(fhicl::ParameterSet const& p) {
   fWeightArray.resize(fNmultisims);
   for (int i=0; i<fNmultisims; i++) {
     if (fMode == "multisim") {
-      fNormArray[i] = \
-        fGaussRandom->shoot(&rng->getEngine(GetName()), rwNormMu, rwNormSigma);
       fWeightArray[i] = fGaussRandom->shoot(&rng->getEngine(GetName()), 0, 1);
+
+      // One sided uncertainty: upper half of standard normal
       if (fOneSided) {
         fWeightArray[i] = std::abs(fWeightArray[i]);
+      }
+
+      // Normalization uncertainty: shift with shape or sample
+      if (rwNormCorrelated) {
+        fNormArray[i] = rwNormMu + rwNormSigma * fWeightArray[i];
+      }
+      else {
+        fNormArray[i] = \
+          fGaussRandom->shoot(&rng->getEngine(GetName()), rwNormMu, rwNormSigma);
       }
     }
     else {
@@ -163,10 +173,10 @@ HistogramWeightWeightCalc::GetWeight(art::Event& e) {
         weight[inu][i] = 1.0 - (1.0 - fNormArray[i] * w) * fWeightArray[i];
         weight[inu][i] = std::max(0.0, weight[inu][i]);
 
-        std::cout << "Histogram weight: "
-                  << "q0 = " << q0 << ", "
-                  << "q3 = " << q3 << ", "
-                  << "w = " << weight[inu][i] << std::endl;
+        //std::cout << "Histogram weight: "
+        //          << "q0 = " << q0 << ", "
+        //          << "q3 = " << q3 << ", "
+        //          << "w = " << weight[inu][i] << std::endl;
       }
       else {
         weight[inu][i] = 1.0; 
