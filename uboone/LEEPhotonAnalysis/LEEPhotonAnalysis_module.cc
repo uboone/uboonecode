@@ -30,7 +30,7 @@
 
 #include "larcoreobj/SummaryData/POTSummary.h"
 
-#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
+#include "ubooneobj/ubdaqSoftwareTriggerData.h"
 
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Shower.h"

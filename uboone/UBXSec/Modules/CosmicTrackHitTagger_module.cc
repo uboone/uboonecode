@@ -21,7 +21,7 @@
 #include "lardataobj/RecoBase/Track.h"
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Hit.h"
-#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
+#include "ubooneobj/ubdaqSoftwareTriggerData.h"
 
 
 #include "uboone/UBXSec/Algorithms/CosmicTagToolInterface.h"

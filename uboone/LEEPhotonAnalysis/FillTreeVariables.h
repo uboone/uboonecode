@@ -14,7 +14,7 @@
 
 #include "larcoreobj/SummaryData/POTSummary.h"
 
-#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
+#include "ubooneobj/ubdaqSoftwareTriggerData.h"
 
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
