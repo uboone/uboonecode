@@ -100,6 +100,26 @@ private:
 
   //art::InputTag opFlashTag("opflashSat");
 
+
+  //quality plots
+
+  TH2F* hplavspla;
+  TH1F* hTlength;
+  TH1F* hTtime;
+  TH2F* hTlengthvsTime;
+  TH2F* hTlengthvsTimeAbs;
+  TProfile* hTlengthvsTimeAbs_prof;
+  TH1F* htheta;
+  TH1F* hphi;
+  TH1F* hts0_ns;
+  TH2F* hTvsH;
+
+  TH2F* HitDistBot;
+  TH2F* HitDistFT;
+  TH2F* HitDistPipe;
+  TH2F* HitDistTop;
+ //quality plots                                                                                                                                          
+
   TTree*       fTree;
   // run information
   int run;
@@ -120,6 +140,7 @@ private:
   int nCRTtracks;
   double ct_thetaxy[kMaxCRTtracks];
   double ct_phizy[kMaxCRTtracks];
+  double ct_length[kMaxCRTtracks];
   double ct_time_sec[kMaxCRTtracks];
   double ct_time0[kMaxCRTtracks];
   double ct_time1[kMaxCRTtracks];
@@ -266,6 +287,7 @@ void TrackDump::analyze(art::Event const & evt)
       trktheta[j]=dir_start.Theta();
       trkphi[j]=dir_start.Phi();
       
+
     }
   }   //  if (saveTPCtrackinfo)
 
@@ -312,6 +334,7 @@ void TrackDump::analyze(art::Event const & evt)
   if (nCRThits>kMaxCRThits) nCRThits=kMaxCRThits;
   for(int j = 0; j < nCRThits; j++) {
     
+    //fill tree
     crt::CRTHit my_CRTHit = CRTHitCollection[j];
     hit_time_s[j]=(double)my_CRTHit.ts0_s;
     hit_time0[j]=(double)my_CRTHit.ts0_ns - (double)evt_timeGPS_nsec;
@@ -322,7 +345,15 @@ void TrackDump::analyze(art::Event const & evt)
     hit_posy[j]=my_CRTHit.y_pos;
     hit_posz[j]=my_CRTHit.z_pos;
 
-  }    
+    //fillhistograms
+    if (my_CRTHit.plane==0) HitDistBot->Fill(my_CRTHit.z_pos,my_CRTHit.x_pos);
+    else if (my_CRTHit.plane==1) HitDistFT->Fill(my_CRTHit.z_pos,my_CRTHit.y_pos);
+    else if (my_CRTHit.plane==2) HitDistPipe->Fill(my_CRTHit.z_pos,my_CRTHit.y_pos);
+    else if (my_CRTHit.plane==3) HitDistTop->Fill(my_CRTHit.z_pos,my_CRTHit.x_pos);
+
+
+
+  }
 
   //get CRTTracks
   art::Handle< std::vector<crt::CRTTrack> > rawHandle_track;
@@ -351,6 +382,7 @@ void TrackDump::analyze(art::Event const & evt)
     crt::CRTTrack my_CRTTrack = CRTTrackCollection[j];
     ct_thetaxy[j]=my_CRTTrack.thetaxy;
     ct_phizy[j]=my_CRTTrack.phizy;
+    ct_length[j]=my_CRTTrack.length;
     ct_time_sec[j]=(double)my_CRTTrack.ts0_s;
     ct_time0[j]=(double)my_CRTTrack.ts0_ns;
     ct_time1[j]=(double)my_CRTTrack.ts1_ns;
@@ -364,6 +396,21 @@ void TrackDump::analyze(art::Event const & evt)
     ct_x2[j]=my_CRTTrack.x2_pos;
     ct_y2[j]=my_CRTTrack.y2_pos;
     ct_z2[j]=my_CRTTrack.z2_pos;
+
+    //fill histograms
+    hplavspla->Fill(my_CRTTrack.plane1,my_CRTTrack.plane2);
+    hTlength->Fill(my_CRTTrack.length);
+    double time_diff = my_CRTTrack.ts0_ns_h1-my_CRTTrack.ts0_ns_h2;
+    double time_diffABS = fabs(time_diff);
+    hTtime->Fill(time_diffABS);
+    hTlengthvsTimeAbs->Fill(my_CRTTrack.length,time_diffABS);
+    hTlengthvsTimeAbs_prof->Fill(my_CRTTrack.length,time_diffABS);
+    hTlengthvsTime->Fill(my_CRTTrack.length,time_diff);
+    htheta->Fill(57.30*my_CRTTrack.thetaxy);
+    hphi->Fill(57.30*my_CRTTrack.phizy);
+    hts0_ns->Fill(my_CRTTrack.ts0_ns);
+
+
   }
 
 
@@ -394,6 +441,7 @@ void TrackDump::beginJob()
   fTree->Branch("nCRTtracks",&nCRTtracks,"nCRTtracks/I");
   fTree->Branch("ct_thetaxy",ct_thetaxy,"ct_thetaxy[nCRTtracks]/D");
   fTree->Branch("ct_phizy",ct_phizy,"ct_phizy[nCRTtracks]/D");
+  fTree->Branch("ct_length",ct_length,"ct_length[nCRTtracks]/D");
   fTree->Branch("ct_time_sec",ct_time_sec,"ct_time_sec[nCRTtracks]/D");
   fTree->Branch("ct_time0",ct_time0,"ct_time0[nCRTtracks]/D");
   fTree->Branch("ct_time1",ct_time1,"ct_time1[nCRTtracks]/D");
@@ -422,6 +470,84 @@ void TrackDump::beginJob()
   fTree->Branch("trkphi",trkphi,"trkphi[nTPCtracks]/D");
   fTree->Branch("trklen",trklen,"trklen[nTPCtracks]/D");
   }
+
+
+  hplavspla = tfs->make<TH2F>("hplavspla","PlanevsPlane",4,0,4,4,0,4);
+  hplavspla->GetXaxis()->SetTitle("Plane (0=Bottom, 1=FT, 2=Pipe, 3=Top)");
+  hplavspla->GetYaxis()->SetTitle("Plane (0=Bottom, 1=FT, 2=Pipe, 3=Top)");
+  hplavspla->GetZaxis()->SetTitle("Entries/bin");
+  hplavspla->SetOption("COLZ");
+
+  hTvsH = tfs->make<TH2F>("hTvsH","Track_vs_Hits",500,0,500,500,0,500);
+  hTvsH->GetXaxis()->SetTitle("Number of CRTHits per event");
+  hTvsH->GetYaxis()->SetTitle("Number of CRTTracks per event");
+  hTvsH->GetZaxis()->SetTitle("Entries/bin");
+  hTvsH->SetOption("COLZ");
+
+  hTlength = tfs->make<TH1F>("hTlength","Track_Length",1500,0,1500);
+  hTlength->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlength->GetYaxis()->SetTitle("Entries/bin");
+
+  hTtime = tfs->make<TH1F>("hTtime","Track_time",120,-10,110);
+  hTtime->GetXaxis()->SetTitle("Track_time (ns)");
+  hTtime->GetYaxis()->SetTitle("Entries/bin");
+
+  hTlengthvsTime = tfs->make<TH2F>("hTlengthvsTime","Track_LengthvsTime",1500,0,1500,200,-100,100);
+  hTlengthvsTime->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlengthvsTime->GetYaxis()->SetTitle("Track_time (ns)");
+  hTlengthvsTime->GetZaxis()->SetTitle("Entries/bin");
+  hTlengthvsTime->SetOption("COLZ");
+
+  hTlengthvsTimeAbs = tfs->make<TH2F>("hTlengthvsTimeAbs","Track_LengthvsTimeAbs",1500,0,1500,110,-10,100);
+  hTlengthvsTimeAbs->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlengthvsTimeAbs->GetYaxis()->SetTitle("Track_time (ns)");
+  hTlengthvsTimeAbs->GetZaxis()->SetTitle("Entries/bin");
+  hTlengthvsTimeAbs->SetOption("COLZ");
+
+  hTlengthvsTimeAbs_prof = tfs->make<TProfile>("hTlengthvsTimeAbs_prof","Track_LengthvsTimeAbs_prof",1500,0,1500,"s");
+  hTlengthvsTimeAbs_prof->GetXaxis()->SetTitle("Track_Length (cm)");
+  hTlengthvsTimeAbs_prof->GetYaxis()->SetTitle("Track_time (ns)");
+
+  htheta = tfs->make<TH1F>("htheta","Track_theta",900,0,180);
+  htheta->GetXaxis()->SetTitle("Theta_xy (º)");
+  htheta->GetYaxis()->SetTitle("Entries/bin");
+ 
+  hphi = tfs->make<TH1F>("hphi","Track_phi",900,0,180);
+  hphi->GetXaxis()->SetTitle("Phi_zy (º)");
+  hphi->GetYaxis()->SetTitle("Entries/bin");
+
+  hts0_ns = tfs->make<TH1F>("hts0_ns","Track_time_ns",100000,0,1e9);
+  hts0_ns->GetXaxis()->SetTitle("Track time (ns)");
+  hts0_ns->GetYaxis()->SetTitle("Entries/bin");
+
+
+  double inch =2.54; //inch in cm                                                                                                                          
+  HitDistBot = tfs->make<TH2F>("hBottom","Bottom",125,-700+205*inch,-700+205*inch+125*10.89,60,-300+50.4*inch,-300+50.4*inch+60*10.89);
+  HitDistBot->GetXaxis()->SetTitle("Length long the beam (cm)");
+  HitDistBot->GetYaxis()->SetTitle("Length along the drift (cm)");
+  HitDistBot->GetZaxis()->SetTitle("Entries/bin");
+  HitDistBot->SetOption("COLZ");
+
+  HitDistFT = tfs->make<TH2F>("hFeedthroughSide","Feedthrough Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-308-19.1*inch,-308-19.1*inch+60*10.89);
+  HitDistFT->GetXaxis()->SetTitle("Length along the beam (cm)");
+  HitDistFT->GetYaxis()->SetTitle("Height (cm)");
+  HitDistFT->GetZaxis()->SetTitle("Entries/bin");
+  HitDistFT->SetOption("COLZ");
+
+  HitDistPipe = tfs->make<TH2F>("hPipeSide","Pipe Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-294-19.1*inch,-294-19.1*inch+60*10.89);
+  HitDistPipe->GetXaxis()->SetTitle("Length along the beam (cm)");
+  HitDistPipe->GetYaxis()->SetTitle("Height (cm)");
+  HitDistPipe->GetZaxis()->SetTitle("Entries/bin");
+  HitDistPipe->SetOption("COLZ");
+
+  HitDistTop = tfs->make<TH2F>("hTop","Top",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
+  HitDistTop->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  HitDistTop->GetYaxis()->SetTitle("Lenght along the drift (cm)");
+  HitDistTop->GetZaxis()->SetTitle("Entries/bin");
+  HitDistTop->SetOption("COLZ");
+
+
+
 }
 
 void TrackDump::endJob()
@@ -457,6 +583,7 @@ void TrackDump::ResetVars()
   for (int j = 0; j<kMaxCRTtracks; ++j){
     ct_thetaxy[j]=-99999.;
     ct_phizy[j]=-99999.;
+    ct_length[j]=-99999.;
     ct_time_sec[j]=-99999.;
     ct_time0[j]=-99999.;
     ct_time1[j]=-99999.;

@@ -32,7 +32,8 @@
   <class name="std::map< unsigned char, std::vector< std::pair<int,float> > > "/>
   <class name="art::Wrapper< std::vector<crt::CRTHit> >"/>
   
-  <class name="crt::CRTTrack" ClassVersion="15">
+  <class name="crt::CRTTrack" ClassVersion="16">
+   <version ClassVersion="16" checksum="3705353140"/>
    <version ClassVersion="15" checksum="317642251"/>
    <version ClassVersion="14" checksum="1784374890"/>
    <version ClassVersion="13" checksum="1459516781"/>

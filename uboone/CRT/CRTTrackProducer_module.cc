@@ -80,6 +80,33 @@ private:
   int store_track_;
   int verbose_ = 0;
 
+
+  //quality plots
+  double track_time_ns = -1e18;
+  double track_time_s = -1e18;
+  double time_diff = 1e24;
+  double length = -1e18;
+  double theta = -1e18;
+  double phi = -1e18;
+
+  TH2F* hplavspla;
+  TH1F* hTlength;
+  TH1F* hTtime;
+  TH2F* hTlengthvsTime;
+  TH2F* hTlengthvsTimeAbs;
+  TProfile* hTlengthvsTimeAbs_prof;
+  TH1F* htheta;
+  TH1F* hphi;
+  TH1F* hts0_ns;
+  TH2F* hTvsH;
+
+  TH2F* HitDistBot;
+  TH2F* HitDistFT;
+  TH2F* HitDistPipe;
+  TH2F* HitDistTop;
+ //quality plots                                                                                                     
+ 
+
 };
 
 void vmanip(std::vector<float> v, float* ave, float* rms);
@@ -98,10 +125,12 @@ struct CRTavehit{
   float z_pos;
   float z_err;
   float pe;
+
+  int plane;
 } tempah;
 
 
-CRTavehit fillme(uint32_t i,uint16_t j,int32_t k,uint16_t l,float a,float b, float c,float d, float e, float f, float g);
+CRTavehit fillme(uint32_t i,uint16_t j,int32_t k,uint16_t l,float a,float b, float c,float d, float e, float f, float g, int p);
 
 CRTavehit copyme(crt::CRTHit myhit);
 
@@ -231,7 +260,7 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	  tz[ip].push_back(hitlist[ah]->z_pos);
 	  pe[ip].push_back(hitlist[ah]->peshit);	
 	} // loop over hits
-	  
+	
 	  // now take averages if there are multiple hits in the same plane at the same time
 	uint planeA,planeB,planeC,planeD;
 	float totpe=0.0;
@@ -259,16 +288,17 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	vmanip(ty[planeA],&avey,&rmsy);
 	vmanip(tz[planeA],&avez,&rmsz);
 	totpe=std::accumulate(pe[planeA].begin(), pe[planeA].end(), 0.0);
-	CRTavehit pA = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe);      
+	CRTavehit pA = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe,planeA);      
 	//  average over hits in plane B
 	vmanip(thittime0[planeB],&avet0,&rmst0);
 	vmanip(thittime1[planeB],&avet1,&rmst1);
-	at0 = (uint32_t)avet0; rt0 = (uint16_t)rmst0;   at1 = (int32_t)avet1; rt1 = (uint16_t)rmst1;
+	at0 = (uint32_t)(avet0+time0_ns_A); rt0 = (uint16_t)rmst0;   
+	at1 = (int32_t)(avet1+time1_ns_A); rt1 = (uint16_t)rmst1;
 	vmanip(tx[planeB],&avex,&rmsx);
 	vmanip(ty[planeB],&avey,&rmsy);
 	vmanip(tz[planeB],&avez,&rmsz);
 	totpe=std::accumulate(pe[planeB].begin(), pe[planeB].end(), 0.0);
-	CRTavehit pB = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe);      
+	CRTavehit pB = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe,planeB);      
 	crt::CRTTrack CRTcanTrack=shcut(pA,pB,time_s_A,time_s_err);
 	CRTTrackCol->emplace_back(CRTcanTrack);
 	//second and third track
@@ -279,12 +309,13 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	  //	std::cout << "plane C is " << planeC << std::endl;
 	  vmanip(thittime0[planeC],&avet0,&rmst0);
 	  vmanip(thittime1[planeC],&avet1,&rmst1);
-	  at0 = (uint32_t)avet0; rt0 = (uint16_t)rmst0;   at1 = (int32_t)avet1; rt1 = (uint16_t)rmst1;
+	  at0 = (uint32_t)(avet0+time0_ns_A); rt0 = (uint16_t)rmst0;   
+	  at1 = (int32_t)(avet1+time1_ns_A); rt1 = (uint16_t)rmst1;
 	  vmanip(tx[planeC],&avex,&rmsx);
 	  vmanip(ty[planeC],&avey,&rmsy);
 	  vmanip(tz[planeC],&avez,&rmsz);
 	  totpe=std::accumulate(pe[planeC].begin(), pe[planeC].end(), 0.0);
-	  CRTavehit pC = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe);
+	  CRTavehit pC = fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe,planeC);
 	  CRTcanTrack=shcut(pA,pC,time_s_A,time_s_err);
 	  CRTTrackCol->emplace_back(CRTcanTrack);
 	  CRTcanTrack=shcut(pB,pC,time_s_A,time_s_err);
@@ -295,12 +326,13 @@ void bernfebdaq::CRTTrackProducer::produce(art::Event & evt)
 	    //	  std::cout << "plane D is " << planeD << std::endl;
 	    vmanip(thittime0[planeD],&avet0,&rmst0);
 	    vmanip(thittime1[planeD],&avet1,&rmst1);
-	    at0 = (uint32_t)avet0; rt0 = (uint16_t)rmst0;   at1 = (int32_t)avet1; rt1 = (uint16_t)rmst1;
+	    at0 = (uint32_t)(avet0+time0_ns_A); rt0 = (uint16_t)rmst0;   
+	    at1 = (int32_t)(avet1+time1_ns_A); rt1 = (uint16_t)rmst1;
 	    vmanip(tx[planeD],&avex,&rmsx);
 	    vmanip(ty[planeD],&avey,&rmsy);
 	    vmanip(tz[planeD],&avez,&rmsz);
 	    totpe=std::accumulate(pe[planeD].begin(), pe[planeD].end(), 0.0);
-	    CRTavehit pD =fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe);	  
+	    CRTavehit pD =fillme(at0,rt0,at1,rt1,avex,rmsx,avey,rmsy,avez,rmsz,totpe,planeD);	  
 	    CRTcanTrack=shcut(pA,pD,time_s_A,time_s_err);
 	    CRTTrackCol->emplace_back(CRTcanTrack);
 	    CRTcanTrack=shcut(pB,pD,time_s_A,time_s_err);
@@ -333,13 +365,14 @@ void bernfebdaq::CRTTrackProducer::endJob()
 }
 
 
+
 void vmanip(std::vector<float> v, float* ave, float* rms)
 {
   *ave=0.0; *rms =0.0;
   if (v.size()>0) {
 
-    //sanity check
-    /*    int np=v.size();
+    /*
+    int np=v.size();
     for (int i=0;i<np;++i) {
       std::cout << v[i] << " " ;
     }
@@ -351,17 +384,20 @@ void vmanip(std::vector<float> v, float* ave, float* rms)
     double mean = sum / v.size();
     *ave=mean;
     
+    if (v.size()>1) {
     double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
     double stdev = std::sqrt(sq_sum / v.size() - mean * mean);
     *rms=stdev;
+    }
+
   }
 
-  //  std::cout << "inside vmanip " << *ave << " " << *rms << std::endl;
+  //    std::cout << "inside vmanip " << *ave << " " << *rms << std::endl;
 }
 
 
 CRTavehit fillme(uint32_t i,uint16_t j,int32_t k,uint16_t l,float a,float b, 
-	    float c, float d, float e,float f,float g)
+		 float c, float d, float e,float f,float g,int p)
 {
 
   CRTavehit h;
@@ -377,6 +413,7 @@ CRTavehit fillme(uint32_t i,uint16_t j,int32_t k,uint16_t l,float a,float b,
   h.z_pos=e;
   h.z_err=f;
   h.pe=g;
+  h.plane=p;
   return(h);
 
 
@@ -390,8 +427,7 @@ CRTavehit copyme(crt::CRTHit myhit)
   h.ts0_ns=myhit.ts0_ns;
   h.ts0_ns_err=0;
   h.ts1_ns=myhit.ts1_ns;; 
-  h.ts1_ns_err=0;                                                        
-  
+  h.ts1_ns_err=0;       
   h.x_pos=myhit.x_pos;
   h.x_err=myhit.x_err;
   h.y_pos=myhit.y_pos;
@@ -399,6 +435,7 @@ CRTavehit copyme(crt::CRTHit myhit)
   h.z_pos=myhit.z_pos;
   h.z_err=myhit.z_err;
   h.pe=myhit.peshit;
+  h.plane=myhit.plane;
   return(h);
 
 
@@ -439,7 +476,8 @@ crt::CRTTrack shcut(CRTavehit ppA,CRTavehit ppB,uint32_t time0s,uint16_t terr)
   newtr.length=sqrt(deltax*deltax+deltay*deltay+deltaz*deltaz);
   newtr.thetaxy=atan2(deltax,deltay);
   newtr.phizy=atan2(deltaz,deltay);
-  
+  newtr.plane1=ppA.plane;
+  newtr.plane2=ppB.plane;
   return(newtr);
 
 }
