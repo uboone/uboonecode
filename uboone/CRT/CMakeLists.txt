@@ -16,11 +16,13 @@ art_make( BASENAME_ONLY
         CRTHitProducer_module.cc
         CRTCalibration_module.cc
         CRTTrackProducer_module.cc
+        CRTTzeroProducer_module.cc
 	FlashExt_module.cc	
 	CRTAuxFunctions.cc
   	CRTMerger_module.cc
 	CRTFlashAna_module.cc
 	TimeExtraction_module.cc
+	TrackDump_module.cc
 	MergeTest_module.cc
 	CRTRawtoCRTHit_source.cc
 	CRTRawtoCRTHitGPScorr_source.cc
@@ -159,6 +161,15 @@ simple_plugin(CRTTrackProducer "module"
           ${ROOT_BASIC_LIB_LIST} 
 	  cetlib #cetlib_except
 )
+simple_plugin(CRTTzeroProducer "module"
+            CRT
+              bernfebdaq-core_Overlays
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} 
+	  cetlib #cetlib_except
+)
 
 simple_plugin(FlashExt "module"
           CRT
@@ -178,6 +189,15 @@ simple_plugin(TimeExtraction "module"
           ${ROOT_BASIC_LIB_LIST} )
 
 simple_plugin(MergeTest "module"
+            CRT
+	  bernfebdaq-core_Overlays
+	  lardataobj_RecoBase
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
+
+simple_plugin(TrackDump "module"
             CRT
 	  bernfebdaq-core_Overlays
 	  lardataobj_RecoBase
