@@ -12,7 +12,6 @@
 
 #ifndef CRTTrack_hh_
 #define CRTTrack_hh_
-
 #include <cstdint>
 #include <vector>
 #include <map>
@@ -27,7 +26,7 @@ namespace crt {
     uint16_t ts0_s_err;
     uint32_t ts0_ns;
     uint16_t ts0_ns_err;
-    uint32_t ts1_ns; 
+    int32_t ts1_ns; 
     uint16_t ts1_ns_err;                                                                                                                             
     float x1_pos;
     float x1_err;
