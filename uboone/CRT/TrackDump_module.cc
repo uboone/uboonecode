@@ -138,8 +138,8 @@ private:
   double hit_posz[kMaxCRThits]; 
   // CRT tracks
   int nCRTtracks;
-  double ct_thetaxy[kMaxCRTtracks];
-  double ct_phizy[kMaxCRTtracks];
+  double ct_theta[kMaxCRTtracks];
+  double ct_phi[kMaxCRTtracks];
   double ct_length[kMaxCRTtracks];
   double ct_time_sec[kMaxCRTtracks];
   double ct_time0[kMaxCRTtracks];
@@ -287,7 +287,6 @@ void TrackDump::analyze(art::Event const & evt)
       trktheta[j]=dir_start.Theta();
       trkphi[j]=dir_start.Phi();
       
-
     }
   }   //  if (saveTPCtrackinfo)
 
@@ -380,8 +379,13 @@ void TrackDump::analyze(art::Event const & evt)
 
   for(int j = 0; j <nCRTtracks; j++) {
     crt::CRTTrack my_CRTTrack = CRTTrackCollection[j];
-    ct_thetaxy[j]=my_CRTTrack.thetaxy;
-    ct_phizy[j]=my_CRTTrack.phizy;
+    double temp = (my_CRTTrack.y1_pos-my_CRTTrack.y2_pos)*(my_CRTTrack.y1_pos-my_CRTTrack.y2_pos)
+      +(my_CRTTrack.x1_pos-my_CRTTrack.x2_pos)*(my_CRTTrack.x1_pos-my_CRTTrack.x2_pos);
+    double thetatemp =  atan2(sqrt(temp),my_CRTTrack.z1_pos-my_CRTTrack.z2_pos);
+    double phitemp = atan2(my_CRTTrack.y1_pos-my_CRTTrack.y2_pos,my_CRTTrack.x1_pos-my_CRTTrack.x2_pos);
+    // flip track to point downwards if needed
+    if (phitemp<0) { ct_phi[j]=phitemp+3.14159; ct_theta[j]=3.14159-thetatemp;}
+    else { ct_theta[j]=thetatemp;     ct_phi[j]=phitemp;}
     ct_length[j]=my_CRTTrack.length;
     ct_time_sec[j]=(double)my_CRTTrack.ts0_s;
     ct_time0[j]=(double)my_CRTTrack.ts0_ns;
@@ -407,7 +411,9 @@ void TrackDump::analyze(art::Event const & evt)
     hTlengthvsTimeAbs_prof->Fill(my_CRTTrack.length,time_diffABS);
     hTlengthvsTime->Fill(my_CRTTrack.length,time_diff);
     htheta->Fill(57.30*my_CRTTrack.thetaxy);
-    hphi->Fill(57.30*my_CRTTrack.phizy);
+    if (my_CRTTrack.phizy>3.14159) 
+      hphi->Fill(57.30*(my_CRTTrack.phizy-3.14159));
+    else    hphi->Fill(57.30*my_CRTTrack.phizy);
     hts0_ns->Fill(my_CRTTrack.ts0_ns);
 
 
@@ -439,8 +445,8 @@ void TrackDump::beginJob()
   fTree->Branch("hit_posz",hit_posz,"hit_posz[nCRThits]/D");
   // CRT tracks
   fTree->Branch("nCRTtracks",&nCRTtracks,"nCRTtracks/I");
-  fTree->Branch("ct_thetaxy",ct_thetaxy,"ct_thetaxy[nCRTtracks]/D");
-  fTree->Branch("ct_phizy",ct_phizy,"ct_phizy[nCRTtracks]/D");
+  fTree->Branch("ct_theta",ct_theta,"ct_theta[nCRTtracks]/D");
+  fTree->Branch("ct_phi",ct_phi,"ct_phi[nCRTtracks]/D");
   fTree->Branch("ct_length",ct_length,"ct_length[nCRTtracks]/D");
   fTree->Branch("ct_time_sec",ct_time_sec,"ct_time_sec[nCRTtracks]/D");
   fTree->Branch("ct_time0",ct_time0,"ct_time0[nCRTtracks]/D");
@@ -581,8 +587,8 @@ void TrackDump::ResetVars()
 
   nCRTtracks=0;
   for (int j = 0; j<kMaxCRTtracks; ++j){
-    ct_thetaxy[j]=-99999.;
-    ct_phizy[j]=-99999.;
+    ct_theta[j]=-99999.;
+    ct_phi[j]=-99999.;
     ct_length[j]=-99999.;
     ct_time_sec[j]=-99999.;
     ct_time0[j]=-99999.;
