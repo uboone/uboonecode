@@ -66,7 +66,7 @@
 #include "larsim/MCCheater/BackTracker.h"
 #include "lardata/Utilities/AssociationUtil.h"
 #include "larcore/Geometry/Geometry.h"
-#include "ubooneobj/ubdaqSoftwareTriggerData.h"
+#include "ubooneobj/Trigger/ubdaqSoftwareTriggerData.h"
 #include "lardataobj/AnalysisBase/T0.h"
 #include "lardataobj/MCBase/MCDataHolder.h"
 #include "lardataobj/MCBase/MCHitCollection.h"

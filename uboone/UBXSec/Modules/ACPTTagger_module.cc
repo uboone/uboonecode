@@ -52,7 +52,7 @@
 #include "lardataobj/AnalysisBase/T0.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardata/Utilities/AssociationUtil.h"
-#include "ubooneobj/ubdaqSoftwareTriggerData.h"
+#include "ubooneobj/Trigger/ubdaqSoftwareTriggerData.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
 #include "uboone/UBFlashFinder/PECalib.h"
 
