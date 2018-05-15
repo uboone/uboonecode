@@ -63,8 +63,8 @@
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/LightPath.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Algorithms/PhotonLibHypothesis.h"
 
-#include "uboone/UBXSec/DataTypes/FlashMatch.h"
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/FlashMatch.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 #include "uboone/UBXSec/Algorithms/UBXSecHelper.h"
 
 #include "TTree.h"

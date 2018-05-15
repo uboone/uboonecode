@@ -57,7 +57,7 @@
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardataobj/Simulation/SimChannel.h"
 #include "larsim/MCCheater/ParticleInventoryService.h"
-#include "uboone/UBXSec/DataTypes/MCGhost.h"
+#include "ubooneobj/UBXSec/MCGhost.h"
 
 #include <memory>
 

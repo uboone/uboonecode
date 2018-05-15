@@ -26,7 +26,7 @@
 #include <iostream>
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
-#include "uboone/UBXSec/DataTypes/UBXSecFMWKInterface.h"
+#include "ubooneobj/UBXSec/UBXSecFMWKInterface.h"
 
 namespace lar_pandora { 
   typedef std::map<art::Ptr<recob::PFParticle>, art::Ptr<simb::MCParticle>> PFParticlesToMCParticles;

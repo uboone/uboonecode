@@ -47,7 +47,7 @@
 //#include "larsim/MCCheater/BackTracker.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardata/Utilities/AssociationUtil.h"
-#include "uboone/UBXSec/DataTypes/MCGhost.h"
+#include "ubooneobj/UBXSec/MCGhost.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nusimdata/SimulationBase/MCTruth.h"

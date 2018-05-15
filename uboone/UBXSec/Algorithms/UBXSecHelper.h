@@ -24,7 +24,7 @@
 
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 #include "lardataobj/AnalysisBase/Calorimetry.h"
 
 typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;

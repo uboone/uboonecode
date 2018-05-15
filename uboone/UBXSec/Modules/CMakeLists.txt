@@ -11,8 +11,7 @@ art_make( BASENAME_ONLY
           LIBRARY_NAME     uboonecode_uboone_UBXSec
           LIB_LIBRARIES
                    uboonecode_uboone_UBXSec_Algorithms
-                   uboonecode_uboone_UBXSec_DataTypes
-                   HitCosmicTag_Base 
+                   ubooneobj_UBXSec                   HitCosmicTag_Base 
                    HitCosmicTag_Algorithms
                    uboonecode_uboone_BasicTool_GeoAlgo
                    uboone_UBFlashFinder
@@ -65,7 +64,7 @@ art_make( BASENAME_ONLY
 
           MODULE_LIBRARIES
                    uboonecode_uboone_UBXSec_Algorithms 
-                   uboonecode_uboone_UBXSec_DataTypes
+                   ubooneobj_UBXSec
                    HitCosmicTag_Base
                    HitCosmicTag_Algorithms
                    #uboonecode_uboone_UBXSec

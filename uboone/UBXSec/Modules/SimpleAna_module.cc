@@ -39,7 +39,7 @@
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Services/Optional/TFileDirectory.h"
 
-#include "uboone/UBXSec/DataTypes/SelectionResult.h"
+#include "ubooneobj/UBXSec/SelectionResult.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larsim/EventWeight/Base/MCEventWeight.h"

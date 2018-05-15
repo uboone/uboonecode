@@ -50,16 +50,16 @@
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/SpacePoint.h"
-#include "uboone/UBXSec/DataTypes/FlashMatch.h"
-#include "uboone/UBXSec/DataTypes/MCGhost.h"
+#include "ubooneobj/UBXSec/FlashMatch.h"
+#include "ubooneobj/UBXSec/MCGhost.h"
 #include "lardataobj/AnalysisBase/T0.h"
 #include "larcoreobj/SummaryData/POTSummary.h"
 #include "lardataobj/AnalysisBase/ParticleID.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 
-#include "uboone/UBXSec/DataTypes/UBXSecEvent.h"
+#include "ubooneobj/UBXSec/UBXSecEvent.h"
 
 // LArSoft include
 #include "uboone/UBFlashFinder/PECalib.h"

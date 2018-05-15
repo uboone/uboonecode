@@ -21,7 +21,7 @@
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
-#include "uboone/UBXSec/DataTypes/UBXSecEvent.h"
+#include "ubooneobj/UBXSec/UBXSecEvent.h"
 
 namespace ubana{
   

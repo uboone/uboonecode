@@ -54,7 +54,7 @@
 #include "uboone/LLBasicTool/GeoAlgo/GeoVector.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoAABox.h"
 
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 #include "uboone/UBXSec/Algorithms/McPfpMatch.h"
 #include "uboone/UBXSec/Algorithms/UBXSecHelper.h"
 #include "uboone/UBXSec/Algorithms/TPCObjectFilter.h"

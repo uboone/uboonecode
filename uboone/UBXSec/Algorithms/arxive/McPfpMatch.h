@@ -25,7 +25,7 @@
 #include <iostream>
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
-#include "uboone/UBXSec/DataTypes/UBXSecFMWKInterface.h"
+#include "ubooneobj/UBXSec/UBXSecFMWKInterface.h"
 
 typedef std::map< art::Ptr<recob::PFParticle>, unsigned int > RecoParticleToNMatchedHits;
 typedef std::map< art::Ptr<simb::MCParticle>,  RecoParticleToNMatchedHits > ParticleMatchingMap;

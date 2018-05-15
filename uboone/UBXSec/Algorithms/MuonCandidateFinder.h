@@ -22,7 +22,7 @@
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 #include "lardataobj/AnalysisBase/ParticleID.h"
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 
 namespace ubana{
   

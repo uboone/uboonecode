@@ -33,7 +33,7 @@
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/SpacePoint.h"
 #include "lardataobj/RecoBase/PFParticle.h"
-#include "uboone/UBXSec/DataTypes/TPCObject.h"
+#include "ubooneobj/UBXSec/TPCObject.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 
 #include <memory>
