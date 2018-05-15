@@ -28,7 +28,7 @@ set( hitfinder_tool_lib_list
                         art_Utilities
                         canvas
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         cetlib cetlib_except
                         ${Boost_FILESYSTEM_LIBRARY}
@@ -84,7 +84,7 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -130,7 +130,7 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
