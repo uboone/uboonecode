@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include "fhiclcpp/ParameterSet.h"
-//#include "uboone/LLSelectionTool/OpT0Finder/Base/OpT0FinderTypes.h"
+#include "uboone/LLSelectionTool/OpT0Finder/Base/OpT0FinderTypes.h"
 //#include "uboone/LLSelectionTool/OpT0Finder/Base/BaseAlgorithm.h"
 //#include "uboone/LLSelectionTool/OpT0Finder/Base/CustomAlgoFactory.h"
 
