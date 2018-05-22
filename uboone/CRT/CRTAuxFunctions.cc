@@ -1,5 +1,5 @@
 #include "uboone/CRT/CRTAuxFunctions.hh"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 int crt::auxfunctions::getFEBN(uint64_t febid){
   

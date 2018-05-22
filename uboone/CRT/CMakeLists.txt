@@ -42,7 +42,7 @@ art_make( BASENAME_ONLY
 	lardataobj_RecoBase
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
@@ -59,7 +59,7 @@ art_make_library(
     	#larcorealg_Geometry
         CRTData
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
@@ -77,7 +77,7 @@ simple_plugin( CRTGeometryHelper service
         art_Utilities canvas
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
         cetlib cetlib_except
 )
@@ -97,7 +97,7 @@ simple_plugin( CRTDetSim module
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
         ${CLHEP}
         cetlib cetlib_except
@@ -118,7 +118,7 @@ simple_plugin(CRTCalibration "module"
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
         ${CLHEP}
         cetlib cetlib_except
@@ -209,7 +209,7 @@ simple_plugin( CRTMerger "module"
   ${ARTDAQ_CORE}
   ${FHICLCPP}
   ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  
   ${CETLIB}
   ${GALLERY}
   CRTProducts

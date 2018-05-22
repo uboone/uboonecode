@@ -2,7 +2,7 @@
 #define __FLASHFINDERFMWKINTERFACE_H__
 
 //#include "FhiclLite/ConfigManager.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"
 #include <stdlib.h>

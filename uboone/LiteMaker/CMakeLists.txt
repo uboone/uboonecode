@@ -42,7 +42,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   art_Persistency_Provenance canvas
 		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -85,7 +85,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   art_Persistency_Provenance canvas
 		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -100,7 +100,7 @@ simple_plugin(LLMetaMaker "service"
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}

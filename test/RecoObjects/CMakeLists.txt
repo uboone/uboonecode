@@ -12,7 +12,7 @@ simple_plugin(KalmanFilterTest "module"
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${PQ}
@@ -28,7 +28,7 @@ simple_plugin(PropTest "module"
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
 	      ${MF_MESSAGELOGGER}
 	      ${CLHEP}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${PQ}
@@ -49,7 +49,7 @@ simple_plugin(InteractTest "module"
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${PQ}

@@ -8,7 +8,7 @@ art_make ( NO_PLUGINS
 			 ${ART_FRAMEWORK_SERVICES_BASIC}
                          ${ART_FRAMEWORK_SERVICES_REGISTRY}
 			 ${MF_MESSAGELOGGER}
-			 ${MF_UTILITIES}
+			 
 			 art_Persistency_Common canvas
 			 art_Persistency_Provenance canvas
 			 art_Utilities canvas
@@ -41,7 +41,7 @@ set( uboone_util_lib_list lardata_Utilities_LArFFT_service
 			${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 			${FHICLCPP}
 			cetlib cetlib_except
 			${Boost_FILESYSTEM_LIBRARY}

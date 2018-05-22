@@ -30,7 +30,7 @@ art_make( BASENAME_ONLY
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}

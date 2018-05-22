@@ -8,7 +8,7 @@ art_make( BASENAME_ONLY
                         ${ROOT_BASIC_LIB_LIST}
 	  SERVICE_LIBRARIES larcorealg_Geometry
 	  		uboone_Geometry
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}

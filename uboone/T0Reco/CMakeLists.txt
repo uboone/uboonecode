@@ -4,7 +4,7 @@ art_make(
 			${ART_FRAMEWORK_CORE}
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 			cetlib cetlib_except
                    	larpandora_LArPandoraInterface	
                         ${Boost_SYSTEM_LIBRARY}
@@ -32,7 +32,7 @@ art_make(
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
 			${CLHEP}

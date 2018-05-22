@@ -10,7 +10,6 @@
  * 
  * * `uboone_SpaceCharge`
  * * `mf_MessageLogger`
- * * `mf_Utilities`
  * * `fhiclcpp`
  * 
  */

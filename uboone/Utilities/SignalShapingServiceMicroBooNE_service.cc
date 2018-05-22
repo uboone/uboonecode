@@ -11,7 +11,7 @@
 #include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "larcore/CoreUtils/ServiceUtil.h" // lar::providerFrom<>()
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"

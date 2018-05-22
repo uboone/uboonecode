@@ -15,7 +15,7 @@
 #include "uboone/SpaceCharge/SpaceChargeMicroBooNE.h"
 
 // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 // ROOT includes
 #include "TFile.h"
