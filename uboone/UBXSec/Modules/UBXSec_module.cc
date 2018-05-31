@@ -63,7 +63,7 @@
 #include "uboone/UBXSec/DataTypes/TPCObject.h"
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/RawData/OpDetWaveform.h"
-#include "lardata/DetectorInfo/DetectorClocks.h"
+#include "lardataalg/DetectorInfo/DetectorClocks.h"
 #include "larsim/EventWeight/Base/MCEventWeight.h"
 
 #include "uboone/UBXSec/DataTypes/UBXSecEvent.h"
