@@ -463,6 +463,23 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("tracktrunmeandqdx_U",   "std::vector<float>", &tracktrunmeandqdx_U);
   _cc1unptree->Branch("tracktrunmeandqdx_V",   "std::vector<float>", &tracktrunmeandqdx_V);
 
+  _cc1unptree->Branch("trackcand_origin", "std::vector<int>", &trackcand_origin);
+  _cc1unptree->Branch("trackcand_nuset", "std::vector<int>", &trackcand_nuset);
+  _cc1unptree->Branch("trackcand_parPDG", "std::vector<int>", &trackcand_parPDG);
+  _cc1unptree->Branch("trackcand_parStatusCode", "std::vector<int>", &trackcand_parStatusCode);
+  _cc1unptree->Branch("trackcand_parTheta", "std::vector<float>", &trackcand_parTheta);
+  _cc1unptree->Branch("trackcand_parCosTheta", "std::vector<float>", &trackcand_parCosTheta);
+  _cc1unptree->Branch("trackcand_parSinTheta", "std::vector<float>", &trackcand_parSinTheta);
+  _cc1unptree->Branch("trackcand_parE", "std::vector<float>", &trackcand_parE);
+  _cc1unptree->Branch("trackcand_parMass", "std::vector<float>", &trackcand_parMass);
+  _cc1unptree->Branch("trackcand_parKE", "std::vector<float>", &trackcand_parKE);
+  _cc1unptree->Branch("trackcand_parEndE", "std::vector<float>", &trackcand_parEndE);
+  _cc1unptree->Branch("trackcand_parPx", "std::vector<float>", &trackcand_parPx);
+  _cc1unptree->Branch("trackcand_parPy", "std::vector<float>", &trackcand_parPy);
+  _cc1unptree->Branch("trackcand_parPz", "std::vector<float>", &trackcand_parPz);
+  _cc1unptree->Branch("trackcand_parCosPhi", "std::vector<float>", &trackcand_parCosPhi);
+  _cc1unptree->Branch("trackcand_parSinPhi", "std::vector<float>", &trackcand_parSinPhi);
+
 
  
 
@@ -1461,13 +1478,13 @@ void SimpleAna::analyze(art::Event const & e)
        if(mparticle) 
        {
                        
-       //const art::Ptr<simb::MCTruth> MCtruth = fMCTruthMatching->ParticleToMCTruth(mparticle);
+       const art::Ptr<simb::MCTruth> MCtruth = fMCTruthMatching->ParticleToMCTruth(mparticle);
        //std::cout<<"SimpleAna] MCTruth origin is "<<MCtruth->Origin()<<" MCTruth nuset is "<<MCtruth->NeutrinoSet()<<std::endl; 
        
         
-                         //trackcand_origin->push_back(MCtruth->Origin());
-                         //trackcand_nuset->push_back(MCtruth->NeutrinoSet()); 
-                         //trackcand_origin->push_back(bt->TrackIdToMCTruth_P(Track_mu_id)->Origin());
+                         trackcand_origin->push_back(MCtruth->Origin());
+                         trackcand_nuset->push_back(MCtruth->NeutrinoSet()); 
+                         
 
                          trackcand_parPDG->push_back(mparticle->PdgCode());
                          trackcand_parStatusCode->push_back(mparticle->StatusCode()); 
