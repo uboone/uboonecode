@@ -54,7 +54,7 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -102,7 +102,7 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
