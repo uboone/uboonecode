@@ -1,7 +1,6 @@
 #ifndef RECOTRUEHELPER_H
 #define RECOTRUEHELPER_H
 
-
 #include "AnaHelper.h"
 
 typedef std::set<art::Ptr<recob::PFParticle> > PFParticleSet;

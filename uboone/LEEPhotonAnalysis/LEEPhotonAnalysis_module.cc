@@ -32,11 +32,6 @@
 
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
-#include "nusimdata/SimulationBase/MCTruth.h"
-#include "nusimdata/SimulationBase/MCParticle.h"
-#include "lardataobj/MCBase/MCShower.h"
-#include "lardataobj/MCBase/MCTrack.h"
-
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Shower.h"
 #include "lardataobj/RecoBase/Track.h"
@@ -52,10 +47,18 @@
 #include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
 #include "../LLBasicTool/GeoAlgo/GeoAABox.h"
 
+
 #include "DetectorObjects.h"
 #include "ParticleAssociations.h"
+
 #include "VertexBuilder.h"
+#include "VertexQuality.h"
 #include "FillTreeVariables.h"
+#include "RecoMCMatching.h"
+
+#include "RecoMCMatching.h"
+#include "canvas/Persistency/Common/FindMany.h"
+#include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
 
 class LEEPhotonAnalysis : public art::EDAnalyzer {
 
@@ -76,6 +79,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
   std::string fopflash_producer;
   std::string fswtrigger_product;
 
+  RecoMCMatching frmcm;
 
   TTree * fPOTtree;
   int fnumber_of_events;
@@ -84,6 +88,7 @@ class LEEPhotonAnalysis : public art::EDAnalyzer {
   unsigned int fspec_event;
 
   VertexBuilderTree fvbt;
+  VertexQuality fvq;
   FillTreeVariables fftv;
 
 public:
@@ -117,7 +122,10 @@ LEEPhotonAnalysis::LEEPhotonAnalysis(fhicl::ParameterSet const & p) :
   fPOTtree(nullptr),
   fnumber_of_events(0),
   fpot(0),
-  fspec_event(UINT_MAX) {
+  fspec_event(UINT_MAX),
+  fvq(ftrack_producer,
+      fshower_producer,
+      frmcm) {
 
   art::ServiceHandle<art::TFileService> tfs;
   fPOTtree = tfs->make<TTree>("get_pot", "");
@@ -140,24 +148,29 @@ void LEEPhotonAnalysis::reconfigure(fhicl::ParameterSet const & p) {
   p.get_if_present<std::string>("pot_producer", fpot_producer);
   if(fpot_producer != ""){
     fPOTtree->Branch("pot", &fpot, "pot/D");
-
   }
   p.get_if_present<std::string>("pfp_producer", fpfp_producer);
   ftrack_producer = p.get<std::string>("track_producer");
   fshower_producer = p.get<std::string>("shower_producer");
   p.get_if_present<std::string>("hit_producer", fhit_producer);
   p.get_if_present<std::string>("rmcmassociation_producer", frmcmassociation_producer);
+  if(fmcrecomatching) {
+    frmcm.Configure(fhit_producer,
+		    ftrack_producer,
+		    fshower_producer,
+		    frmcmassociation_producer);
+  }
   fopflash_producer = p.get<std::string>("opflash_producer");
   fswtrigger_product = p.get<std::string>("trigger_product");
 
   fftv.SetProducers(fmcordata,
-		    fmcrecomatching,
 		    ftrack_producer,
 		    fshower_producer,
 		    fhit_producer,
-		    frmcmassociation_producer,
 		    fopflash_producer,
-		    fswtrigger_product);
+		    fswtrigger_product,
+		    frmcmassociation_producer,
+		    &frmcm);
 
   if(p.get<bool>("fill_vertex_builder_tree")) fvbt.Setup(); 
 
@@ -201,6 +214,7 @@ void LEEPhotonAnalysis::beginSubRun(art::SubRun const & sr) {
 
     art::Handle<sumdata::POTSummary> potSummaryHandlebnbETOR860;
     if (sr.getByLabel("beamdata","bnbETOR860",potSummaryHandlebnbETOR860)){
+
     std::cout<<"B0: "<<potSummaryHandlebnbETOR860->totpot<<std::endl;
     }
 
@@ -307,6 +321,7 @@ void LEEPhotonAnalysis::fillwpandora(art::Event const & e, ParticleAssociations 
 }
 
 
+
 void LEEPhotonAnalysis::analyze(art::Event const & e) {
 
   if(fspec_event != UINT_MAX && e.id().event() != fspec_event) {
@@ -355,6 +370,13 @@ void LEEPhotonAnalysis::analyze(art::Event const & e) {
     fillwpandora(e, pas);
   }
 
+  /////////////////
+
+  if(fmcrecomatching) {
+    frmcm.MatchWAssociations(e);
+    fvq.RunDist(e, pas);
+  }
+  
   /////////////////
 
   if(fverbose){ std::cout << "Fill tree variables\n";}
