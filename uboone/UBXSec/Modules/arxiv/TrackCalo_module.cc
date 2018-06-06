@@ -316,7 +316,7 @@ void TrackCalo::produce(art::Event& evt)
           const TVector3& dir = tracklist[trkIter]->DirectionAtPoint(vmeta[ii]->Index());
           double cosgamma = std::abs(std::sin(angleToVert)*dir.Y() + std::cos(angleToVert)*dir.Z());
           if (cosgamma){
-            pitch = geom->WirePitch(0,1,0)/cosgamma;
+            pitch = geom->WirePitch()/cosgamma;
           }
           else{
             pitch = 0;
