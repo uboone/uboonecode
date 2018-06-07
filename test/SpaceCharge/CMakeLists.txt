@@ -1,6 +1,6 @@
 cet_test( SpaceChargeMicroBooNE_test
   LIBRARIES
-    uboone_SpaceCharge
+    ubevt_SpaceCharge
     mf_MessageLogger
     fhiclcpp
     ${ROOT_GENVECTOR}
