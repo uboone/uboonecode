@@ -11,7 +11,8 @@
 #include "hitfindermodules_microboone.fcl"
 #include "cluster_microboone.fcl"
 #include "trackfindermodules_microboone.fcl"
-#include "kalmanfilterfinaltrackfitter.fcl"
+#include "trackproducerfrompfparticle.fcl"
+#include "vertexfitter.fcl"
 #include "opticaldetectormodules_microboone.fcl"
 #include "triggeralgo_service.fcl"
 #include "cosmicremovalmodules.fcl"
@@ -126,8 +127,8 @@ microboone_reco_producers:
     opflashCosmic:                    @local::microboone_opflash_saturation_cosmic
 
     ### noise filtering and signal processing from the wirecell toolkit
-    nfsp:                             @local::wcls.producers.nfsp
-    butcher:                          @local::wcls.producers.butcher
+    nfsp:                             @local::wcls.nfspl1
+    butcher:                          @local::wcls.butcher
     wcNoiseFilter:                    @local::microboone_wirecellnoisefilter
 
     ### uboonecode version of ROI/Wire production which is to be depracated
@@ -188,8 +189,11 @@ microboone_reco_producers:
     pandoraKalmanShowerFlashMatch:    @local::microboone_beamflashtrackmatchtagger
 
     ### pandora trackkalman
-    pandoraKalmanTrack:               @local::kalmantrackfit
-    pandoraKalmanShower:              @local::kalmantrackfit
+    pandoraKalmanTrack:               @local::trackproducerfrompfparticle
+    pandoraKalmanShower:              @local::trackproducerfrompfparticle
+
+    ### geometric 3d vertex fitter
+    pandoraGeomVertexFit:             @local::vertexfitter
 
     ### shower reco producers
     showerrecopandora:                @local::showerreco3d_uboone_pandora
@@ -338,19 +342,22 @@ microboone_reco_consolidated_pandora:  [ pandoraPatRec,
                                          pandora 
                                        ]
 
-microboone_reco_trackfits_pandora:     [ pandoraKHit,
-                                         pandoraKalmanTrack,
-                                         pandoraKalmanShower,
-                                         pandoraPMA
-                                       ]
-
 microboone_reco_post_pandora:          [ pandoraContTag,
                                          pandoraMCSMu,
                                          pandoracalo,
                                          pandorapid,
                                          pandoracali,
-                                         pandoracalipid,
-                                         pandoraKHitcalo,
+                                         pandoracalipid
+                                       ]
+
+microboone_reco_trackfits_pandora:     [ pandoraKHit,
+                                         pandoraKalmanTrack,
+                                         pandoraKalmanShower,
+                                         pandoraGeomVertexFit,
+                                         pandoraPMA
+                                       ]
+
+microboone_reco_post_pandorafits:      [ pandoraKHitcalo,
                                          pandoraKHitpid,
                                          pandoraKHitcalipid,
                                          pandoraKalmanTrackcalo,
@@ -393,9 +400,10 @@ microboone_reco_truthmatch:            [ pandoraKHitTruthMatch,
                                          trajclusterTruthMatch  ]
 
 microboone_reco_pandora:               [ @sequence::microboone_reco_consolidated_pandora,
+                                         @sequence::microboone_reco_post_pandora,
                                          @sequence::microboone_reco_trackfits_pandora,
                                          @sequence::microboone_reco_cosmic_tagging,
-                                         @sequence::microboone_reco_post_pandora 
+                                         @sequence::microboone_reco_post_pandorafits
                                        ]
 
 microboone_reco_data:                  [ rns,

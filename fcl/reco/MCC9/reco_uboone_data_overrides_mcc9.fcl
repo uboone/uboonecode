@@ -103,21 +103,19 @@ physics.producers.pandoraKHit.PFParticleModuleLabel:                            
 physics.producers.pandoraKHit.ClusterModuleLabel:                                                "pandora"
 physics.producers.pandoraKHit.HitFinderModuleLabel:                                              "gaushit"
 
-physics.producers.pandoraKalmanTrack.inputs.inputPFParticleLabel:                                "pandora"
-physics.producers.pandoraKalmanTrack.inputs.inputShowersLabel:                                   ""
-physics.producers.pandoraKalmanTrack.inputs.inputTracksLabel:                                    ""
-physics.producers.pandoraKalmanTrack.inputs.inputCaloLabel:                                      ""
-physics.producers.pandoraKalmanTrack.inputs.inputPidLabel:                                       ""
-physics.producers.pandoraKalmanTrack.options.trackFromPF:                                        true
-physics.producers.pandoraKalmanTrack.options.showerFromPF:                                       false
+physics.producers.pandoraKalmanTrack.inputCollection:                                            "pandora"
+physics.producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                       true
+physics.producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                            "pandoraContTag"
+physics.producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                        35.0
+physics.producers.pandoraKalmanTrack.trackFromPF:                                                true
+physics.producers.pandoraKalmanTrack.showerFromPF:                                               false
 
-physics.producers.pandoraKalmanShower.inputs.inputPFParticleLabel:                               "pandora"
-physics.producers.pandoraKalmanShower.inputs.inputShowersLabel:                                  "pandora"
-physics.producers.pandoraKalmanShower.inputs.inputTracksLabel:                                   ""
-physics.producers.pandoraKalmanShower.inputs.inputCaloLabel:                                     ""
-physics.producers.pandoraKalmanShower.inputs.inputPidLabel:                                      ""
-physics.producers.pandoraKalmanShower.options.trackFromPF:                                       false
-physics.producers.pandoraKalmanShower.options.showerFromPF:                                      true
+physics.producers.pandoraKalmanShower.inputCollection:                                           "pandora"
+physics.producers.pandoraKalmanShower.trackFromPF:                                               false
+physics.producers.pandoraKalmanShower.showerFromPF:                                              true
+
+physics.producers.pandoraGeomVertexFit.inputs.inputPFParticleLabel:                              "pandora"
+physics.producers.pandoraGeomVertexFit.inputs.inputTracksLabel:                                  "pandoraKalmanTrack"
 
 physics.producers.pandoraPMA.HitModuleLabel:                                                     "gaushit"
 physics.producers.pandoraPMA.PfpModuleLabel:                                                     "pandora"
