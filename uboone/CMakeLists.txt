@@ -51,7 +51,7 @@ add_subdirectory(BurstNoiseMetrics)
 add_subdirectory(ChargedTrackMultiplicity/MC)
 add_subdirectory(ChargedTrackMultiplicity/DataON)
 add_subdirectory(ChargedTrackMultiplicity/DataOFF)
-
+add_subdirectory(ShortRangeCorrelations)
 #add_subdirectory(ChargedTrackMultiplicitySinglegamma/MC)
 
 add_subdirectory(LEEPhotonAnalysis)
