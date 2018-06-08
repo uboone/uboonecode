@@ -66,6 +66,7 @@ include(BuildPlugins)
 add_subdirectory(fcl)
 add_subdirectory(test)
 add_subdirectory(tools)
+add_subdirectory(releaseDB)
 
 # ups - table and config files
 add_subdirectory(ups)
