@@ -1,0 +1,261 @@
+## 
+##  fhicl overrides for Uboone reco on data for MCC9.
+##
+
+#include "reco_uboone_mcc9_driver_common.fcl"
+
+##########################################################################
+# Temporary since new RawDigits are baseline corrected
+# In addition, this is really only needed for running caldata
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+##########################################################################
+
+### Below we include overrides for the modules above
+### These are for MCC 9
+###        Variable to override                                                                     Values overriding defaults ###
+
+physics.producers.nfsp.wcls_main.configs:                                                        [ "ubnfsp-before.json.bz2" ]
+
+# Cal data is no longer used, below is historic
+physics.producers.caldata.DigitModuleLabel:                                                      "butcher"
+physics.producers.caldata.Threshold:                                                             [0, 0, 0]  # Not what you think...
+physics.producers.caldata.NumSigma:                                                              [9, 9, 9]  # Closer to what you think...
+physics.producers.caldata.ROIFinder.Threshold:                                                   [0, 0, 0]
+physics.producers.caldata.ROIFinder.NumSigma:                                                    [6, 6, 6] # were [9, 9, 9]
+physics.producers.caldata.Deconvolution:                                                         @local::microboone_mcc7deconvolution
+physics.producers.caldata.DodQdxCalib:                                                           false
+physics.producers.caldata.MakeSparseRawDigits:                                                   true
+
+physics.producers.gaushit.CalDataModuleLabel:                                                    "butcher" #"caldata"
+physics.producers.gaushit.MinSig:                                                                [2.6,  3.4,  3.4]
+physics.producers.gaushit.MinWidth:                                                              [1.0,  1.0,  1.0]
+physics.producers.gaushit.LongMaxHits:                                                           [ 25, 25, 25]
+physics.producers.gaushit.MaxMultiHit:                                                           4
+physics.producers.gaushit.TryNplus1Fits:                                                         false
+physics.producers.gaushit.Chi2NDF:                                                               50.
+
+# ClusterCrawler / Track Maker related
+physics.producers.trajcluster.TrajClusterAlg.HitFinderModuleLabel:                               "cosmicRayHitRemoval"
+
+# Pandora consolidated reconstruction
+physics.producers.pandoraPatRec.HitFinderModuleLabel:                                            "gaushit"
+physics.producers.pandoraTrack.PFParticleLabel:                                                  "pandoraPatRec"
+physics.producers.pandoraShower.PFParticleLabel:                                                 "pandoraPatRec"
+physics.producers.pandora.InputProducerLabel:                                                    "pandoraPatRec"
+physics.producers.pandora.TrackProducerLabel:                                                    "pandoraTrack"
+physics.producers.pandora.ShowerProducerLabel:                                                   "pandoraShower"
+physics.producers.pandora.HitProducerLabel:                                                      "gaushit"
+
+# Pandora cosmic ray tagging
+physics.producers.pandoratag.TrackModuleLabel:                                                   "pandora"
+
+physics.producers.pandoraKHittag.TrackModuleLabel:                                               "pandoraKHit"
+
+physics.producers.pandoraKalmanTracktag.TrackModuleLabel:                                        "pandoraKalmanTrack"
+
+physics.producers.pandoraKalmanShowertag.TrackModuleLabel:                                       "pandoraKalmanShower"
+
+physics.producers.pandoraPMAtag.TrackModuleLabel:                                                "pandoraPMA"
+
+physics.producers.pandoraKHitPFPart.PFParticleModuleLabel:                                       "pandora"
+physics.producers.pandoraKHitPFPart.TrackModuleLabel:                                            "pandoraKHit"
+physics.producers.pandoraKHitPFPart.EndTickPadding:                                              75
+physics.producers.pandoraKHitPFPart.TPCYBoundary:                                                20
+physics.producers.pandoraKHitPFPart.TPCZBoundary:                                                5
+
+physics.producers.pandoraPFPart.PFParticleModuleLabel:                                           "pandora"
+physics.producers.pandoraPFPart.TrackModuleLabel:                                                "pandora"
+physics.producers.pandoraPFPart.EndTickPadding:                                                  75
+physics.producers.pandoraPFPart.TPCYBoundary:                                                    20
+physics.producers.pandoraPFPart.TPCZBoundary:                                                    5
+
+microboone_reco_data_producers.pandoraKHitFlashMatch.TrackModuleLabel:                           "pandoraKHit"
+microboone_reco_data_producers.pandoraKHitFlashMatch.FlashModuleLabel:                           "simpleFlashCosmic"
+microboone_reco_data_producers.pandoraKHitFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
+
+physics.producers.pandoraKHitFlashMatch.TrackModuleLabel:                                        "pandoraKHit"
+physics.producers.pandoraKHitFlashMatch.FlashModuleLabel:                                        "simpleFlashBeam"
+physics.producers.pandoraKHitFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags:       "true"
+
+physics.producers.pandoraKalmanTrackFlashMatch.TrackModuleLabel:                                 "pandoraKalmanTrack"
+physics.producers.pandoraKalmanTrackFlashMatch.FlashModuleLabel:                                 "simpleFlashBeam"
+physics.producers.pandoraKalmanTrackFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
+
+physics.producers.pandoraKalmanShowerFlashMatch.TrackModuleLabel:                                "pandoraKalmanShower"
+physics.producers.pandoraKalmanShowerFlashMatch.FlashModuleLabel:                                "simpleFlashBeam"
+physics.producers.pandoraKalmanShowerFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
+
+# Pandora post pat rec processing
+physics.producers.pandoraPatRec.HitFinderModuleLabel:                                            "gaushit"
+physics.producers.pandoraTrack.PFParticleLabel:                                                  "pandoraPatRec"
+physics.producers.pandoraShower.PFParticleLabel:                                                 "pandoraPatRec"
+physics.producers.pandora.InputProducerLabel:                                                    "pandoraPatRec"
+physics.producers.pandora.TrackProducerLabel:                                                    "pandoraTrack"
+physics.producers.pandora.ShowerProducerLabel:                                                   "pandoraShower"
+physics.producers.pandora.HitProducerLabel:                                                      "gaushit"
+
+physics.producers.pandoraKHit.UseClusterHits:                                                    false
+physics.producers.pandoraKHit.UsePFParticleHits:                                                 true
+physics.producers.pandoraKHit.Track3DKalmanHitAlg.SelfSeed:                                      true
+physics.producers.pandoraKHit.PFParticleModuleLabel:                                             "pandora"
+physics.producers.pandoraKHit.ClusterModuleLabel:                                                "pandora"
+physics.producers.pandoraKHit.HitFinderModuleLabel:                                              "gaushit"
+
+physics.producers.pandoraKalmanTrack.inputs.inputPFParticleLabel:                                "pandora"
+physics.producers.pandoraKalmanTrack.inputs.inputShowersLabel:                                   ""
+physics.producers.pandoraKalmanTrack.inputs.inputTracksLabel:                                    ""
+physics.producers.pandoraKalmanTrack.inputs.inputCaloLabel:                                      ""
+physics.producers.pandoraKalmanTrack.inputs.inputPidLabel:                                       ""
+physics.producers.pandoraKalmanTrack.options.trackFromPF:                                        true
+physics.producers.pandoraKalmanTrack.options.showerFromPF:                                       false
+
+physics.producers.pandoraKalmanShower.inputs.inputPFParticleLabel:                               "pandora"
+physics.producers.pandoraKalmanShower.inputs.inputShowersLabel:                                  "pandora"
+physics.producers.pandoraKalmanShower.inputs.inputTracksLabel:                                   ""
+physics.producers.pandoraKalmanShower.inputs.inputCaloLabel:                                     ""
+physics.producers.pandoraKalmanShower.inputs.inputPidLabel:                                      ""
+physics.producers.pandoraKalmanShower.options.trackFromPF:                                       false
+physics.producers.pandoraKalmanShower.options.showerFromPF:                                      true
+
+physics.producers.pandoraPMA.HitModuleLabel:                                                     "gaushit"
+physics.producers.pandoraPMA.PfpModuleLabel:                                                     "pandora"
+
+physics.producers.pandoracalo.TrackModuleLabel:                                                  "pandora"
+physics.producers.pandoracalo.SpacePointModuleLabel:                                             "pandora"
+
+physics.producers.pandorapid.CalorimetryModuleLabel:                                             "pandoracalo"
+physics.producers.pandorapid.TrackModuleLabel:                                                   "pandora"
+
+physics.producers.pandoracali.TrackModuleLabel:                                                  "pandora"
+physics.producers.pandoracali.CalorimetryModuleLabel:                                            "pandoracalo"
+
+physics.producers.pandoracalipid.TrackModuleLabel:                                               "pandora"
+physics.producers.pandoracalipid.CalorimetryModuleLabel:                                         "pandoracali"
+physics.producers.pandoracalipid.Chi2PIDAlg.UseMedian:                                           true
+
+physics.producers.pandoraKHitcalo.TrackModuleLabel:                                              "pandoraKHit"
+physics.producers.pandoraKHitcalo.SpacePointModuleLabel:                                         "pandoraKHit"
+
+physics.producers.pandoraKHitpid.CalorimetryModuleLabel:                                         "pandoraKHitcalo"
+physics.producers.pandoraKHitpid.TrackModuleLabel:                                               "pandoraKHit"
+
+physics.producers.pandoraKHitcali.TrackModuleLabel:                                              "pandoraKHit"
+physics.producers.pandoraKHitcali.CalorimetryModuleLabel:                                        "pandoraKHitcalo"
+
+physics.producers.pandoraKHitcalipid.TrackModuleLabel:                                           "pandoraKHit"
+physics.producers.pandoraKHitcalipid.CalorimetryModuleLabel:                                     "pandoraKHitcali"
+physics.producers.pandoraKHitcalipid.Chi2PIDAlg.UseMedian:                                       true
+
+physics.producers.pandoraKalmanTrackcalo.TrackModuleLabel:                                       "pandoraKalmanTrack"
+physics.producers.pandoraKalmanTrackcalo.SpacePointModuleLabel:                                  "pandoraKalmanTrack"
+
+physics.producers.pandoraKalmanTrackpid.CalorimetryModuleLabel:                                  "pandoraKalmanTrackcalo"
+physics.producers.pandoraKalmanTrackpid.TrackModuleLabel:                                        "pandoraKalmanTrack"
+
+physics.producers.pandoraKalmanTrackcali.TrackModuleLabel:                                       "pandoraKalmanTrack"
+physics.producers.pandoraKalmanTrackcali.CalorimetryModuleLabel:                                 "pandoraKalmanTrackcalo"
+
+physics.producers.pandoraKalmanTrackcalipid.TrackModuleLabel:                                    "pandoraKalmanTrack"
+physics.producers.pandoraKalmanTrackcalipid.CalorimetryModuleLabel:                              "pandoraKalmanTrackcali"
+physics.producers.pandoraKalmanTrackcalipid.Chi2PIDAlg.UseMedian:                                true
+
+physics.producers.pandoraKalmanShowercalo.TrackModuleLabel:                                      "pandoraKalmanShower"
+physics.producers.pandoraKalmanShowercalo.SpacePointModuleLabel:                                 "pandoraKalmanShower"
+
+physics.producers.pandoraKalmanShowerpid.CalorimetryModuleLabel:                                 "pandoraKalmanShowercalo"
+physics.producers.pandoraKalmanShowerpid.TrackModuleLabel:                                       "pandoraKalmanShower"
+
+physics.producers.pandoraPMAcalo.TrackModuleLabel:                                               "pandoraPMA"
+physics.producers.pandoraPMAcalo.SpacePointModuleLabel:                                          "pandoraPMA"
+
+physics.producers.pandoraPMApid.CalorimetryModuleLabel:                                          "pandoraPMAcalo"
+physics.producers.pandoraPMApid.TrackModuleLabel:                                                "pandoraPMA"
+
+physics.producers.pandoraPMAcali.TrackModuleLabel:                                               "pandoraPMA"
+physics.producers.pandoraPMAcali.CalorimetryModuleLabel:                                         "pandoraPMAcalo"
+
+physics.producers.pandoraPMAcalipid.TrackModuleLabel:                                            "pandoraPMA"
+physics.producers.pandoraPMAcalipid.CalorimetryModuleLabel:                                      "pandoraPMAcali"
+physics.producers.pandoraPMAcalipid.Chi2PIDAlg.UseMedian:                                           true
+
+physics.producers.showerrecopandora.InputProducer:                                               "pandoraShower"
+
+physics.producers.pmtrack.PfpModuleLabel:                                                        "trajcluster"
+physics.producers.pmtrack.HitModuleLabel:                                                        "trajcluster"
+physics.producers.pmtrack.PMAlgFitting.RunVertexing:                                             true
+
+physics.producers.pmtracktag.TrackModuleLabel:                                                   "pmtrack"
+physics.producers.pmtrackcalo.TrackModuleLabel:                                                  "pmtrack"
+physics.producers.pmtrackcalo.SpacePointModuleLabel:                                             "pmtrack"
+physics.producers.pmtrackpid.CalorimetryModuleLabel:                                             "pmtrackcalo"
+physics.producers.pmtrackpid.TrackModuleLabel:                                                   "pmtrack"
+physics.producers.pmtrackcali.TrackModuleLabel:                                                  "pmtrack"
+physics.producers.pmtrackcali.CalorimetryModuleLabel:                                            "pmtrackcalo"
+physics.producers.pmtrackcalipid.TrackModuleLabel:                                               "pmtrack"
+physics.producers.pmtrackcalipid.CalorimetryModuleLabel:                                         "pmtrackcali"
+physics.producers.pmtrackcalipid.Chi2PIDAlg.UseMedian:                                           true
+
+physics.producers.pandoraContTag.TrackModuleLabels:                                              ["pandora"]
+physics.producers.pandoraContTag.ApplyTags:                                                      [true]
+physics.producers.pandoraContTag.TrackModuleLabels:                                              ["pandora"]
+physics.producers.pandoraContTag.ApplyTags:                                                      [true]
+physics.producers.pandoraPMAContTag.TrackModuleLabels:                                           ["pandoraPMA"]
+physics.producers.pandoraPMAContTag.ApplyTags:                                                   [true]
+physics.producers.pmtrackContTag.TrackModuleLabels:                                              ["pmtrack"]
+physics.producers.pmtrackContTag.ApplyTags:                                                      [true]
+
+physics.producers.pandoraMCSMu.inputs.inputLabel:                                                "pandora"
+physics.producers.pmtrackMCSMu.inputs.inputLabel:                                                "pmtrack"
+
+physics.producers.pandoraKHitT0Reco.TrackProducer:                                               "pandoraKHit"
+physics.producers.pandoraT0Reco.TrackProducer:                                                   "pandora"
+physics.producers.pmtrackT0Reco.TrackProducer:                                                   "pmtrack"
+
+physics.producers.pandoraKHitT0RecoLoose.TrackProducer:                                          "pandoraKHit"
+physics.producers.pandoraT0RecoLoose.TrackProducer:                                              "pandora"
+physics.producers.pmtrackT0RecoLoose.TrackProducer:                                              "pmtrack"
+
+physics.producers.pandoraKHitT0RecoBeam.TrackProducer:                                           "pandoraKHit"
+physics.producers.pandoraT0RecoBeam.TrackProducer:                                               "pandora"
+physics.producers.pmtrackT0RecoBeam.TrackProducer:                                               "pmtrack"
+
+# override the default calorimetry constants for data
+physics.producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraKHitcalo.CaloAlg.CalAreaConstants:                                      [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraKHitcalo.CaloAlg.CalAreaConstants:                                      [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pandoraPMAcalo.CaloAlg.CalAreaConstants:                                       [4.746e-3, 4.7e-3, 4.688e-3]
+physics.producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.746e-3, 4.7e-3, 4.688e-3]
+
+# Remove hits                                                                                         Geometry tagger      Flash tagger
+physics.producers.cosmicRayHitRemoval.CosmicProducerLabels:                                      ["pandoraPFPart",       "pandoraFlashTag" ]
+physics.producers.cosmicRayHitRemoval.TrackProducerLabels:                                       ["pandora",             "pandora"         ]
+physics.producers.cosmicRayHitRemoval.AssnProducerLabels:                                        ["pandora",             "pandora"         ]
+physics.producers.cosmicRayHitRemoval.CosmicTagThresholds:                                       [0.6,                   0.99              ]
+physics.producers.cosmicRayHitRemoval.PFParticleProducerLabel:                                   "pandora"
+physics.producers.cosmicRayHitRemoval.EndTickPadding:                                            75
+
+#Setup MuCS track taggers with extra 20 cm buffer which increases acceptance and accounts for scattering
+physics.producers.MuCSTrackTaggerpandoraCosmic.BoxExtension:                                     20
+physics.producers.MuCSTrackTaggerpandoraCosmic.TrackModuleLabel:                                 "pandora"
+physics.producers.MuCSTrackTaggerpandoraCosmicKHit.BoxExtension:                                 20
+physics.producers.MuCSTrackTaggerpandoraCosmicKHit.TrackModuleLabel:                             "pandoraKHit"
+physics.producers.MuCSTrackTaggerpmtrack.BoxExtension:                                           20
+physics.producers.MuCSTrackTaggerpmtrack.TrackModuleLabel:                                       "pmtrack"
+
+physics.producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                   6
+
+physics.producers.ophitBeam.OpHitsInputTag:                                                      "ophitBeamNoRemap"
+physics.producers.ophitCosmic.OpHitsInputTag:                                                    "ophitCosmicNoRemap"
+physics.producers.ophitCosmic.MapOffset:                                                         200
+
+physics.filters.flashfilter.OpFlashTag:                                                          "simpleFlashBeam"
+physics.filters.dlpmtprecuts.OpHitProducer:                                                      "ophitBeam"
+physics.filters.opfiltercommonbnb.OpHitProducer:                                                 "ophitBeam"
+physics.filters.opfiltercommonext.OpHitProducer:                                                 "ophitBeam"
+
