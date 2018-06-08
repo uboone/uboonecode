@@ -127,7 +127,7 @@ microboone_reco_producers:
     opflashCosmic:                    @local::microboone_opflash_saturation_cosmic
 
     ### noise filtering and signal processing from the wirecell toolkit
-    nfsp:                             @local::wcls.nfspl1
+    nfspl1:                           @local::wcls.nfspl1
     butcher:                          @local::wcls.butcher
     wcNoiseFilter:                    @local::microboone_wirecellnoisefilter
 
@@ -306,7 +306,7 @@ microboone_reco_optical:               [ saturation,
                                          simpleFlashBeamLowPE
                                        ]
 
-microboone_reco_signalprocessing:      [ nfsp,
+microboone_reco_signalprocessing:      [ nfspl1,
                                          butcher,
                                          #caldata,
                                          gaushit 
