@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<!-- Production Project -->
+
+<!DOCTYPE project [
+<!ENTITY release      "v06_26_01_10" >
+<!ENTITY file_type    "mc"      >
+<!ENTITY run_type     "physics"   >
+<!ENTITY name         "SRCAna_v0">
+<!ENTITY prod_version "v6"        >
+<!ENTITY tardir       "/pnfs/uboone/resilient/users/renlu23/SRC_v0_2018/">
+]>
+
+<job>
+
+  <project name="&name;">
+    
+    <!-- Project size -->
+    <numevents>200000</numevents>
+    
+    <!-- Operating System -->
+    <os>SL6</os>
+    
+    <!-- Batch resources -->
+    <resource>DEDICATED,OPPORTUNISTIC,OFFSITE</resource>
+    
+    <!-- Larsoft information -->
+    <larsoft>
+      <tag>&release;</tag>
+      <qual>e10:prof</qual>
+      <local>&tardir;/SRC_test.tar</local>
+    </larsoft>
+    
+    <!-- Project stages -->
+    
+    <stage name="SRC_MC">
+      <inputdef>prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2_dev</inputdef>
+      <fcl>run_SRCAna_MC.fcl</fcl>
+      <outdir>/pnfs/uboone/scratch/users/renlu23/SRC_nu_cosmic_mcc87_dev_v0</outdir>
+      <logdir>/pnfs/uboone/scratch/users/renlu23/SRC_nu_cosmic_mcc87_dev_v0</logdir>
+      <workdir>/pnfs/uboone/scratch/users/renlu23/SRC_nu_cosmic_mcc87_dev_v0</workdir>
+      <numjobs>400</numjobs>
+      <maxfilesperjob>10</maxfilesperjob> 
+      <memory>4000</memory>
+      <datatier>reco</datatier>
+    </stage>    
+  </project>
+  
+</job>
