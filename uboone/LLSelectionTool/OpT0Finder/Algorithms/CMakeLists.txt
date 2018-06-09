@@ -10,6 +10,7 @@ art_make( BASENAME_ONLY
 			  larsim_PhotonPropagation_PhotonVisibilityService_service
 			  uboonecode_uboone_BasicTool_GeoAlgo
 			  uboonecode_uboone_SelectionTool_OpT0FinderBase
+			  ubooneobj_Trigger
                           UBOpReadoutMap_service
   		          ${ART_FRAMEWORK_CORE}
    		          ${ART_FRAMEWORK_PRINCIPAL}
@@ -17,9 +18,9 @@ art_make( BASENAME_ONLY
                           ${ART_FRAMEWORK_SERVICES_REGISTRY}
    		          ${ART_FRAMEWORK_SERVICES_OPTIONAL}
      		          ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-     		          ${ART_PERSISTENCY_COMMON}
-                          ${ART_PERSISTENCY_PROVENANCE}
-                          ${ART_UTILITIES}
+			  art_Persistency_Common canvas
+			  art_Persistency_Provenance canvas
+			  art_Utilities canvas
                           ${ROOT_BASIC_LIB_LIST}
                           ${FHICLCPP}
                           cetlib cetlib_except

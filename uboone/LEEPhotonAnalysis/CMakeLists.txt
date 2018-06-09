@@ -8,6 +8,7 @@ art_make( BASENAME_ONLY
 
           LIB_LIBRARIES
 			uboone_RawData
+			ubooneobj_Trigger
                         larcorealg_Geometry
                         larcore_Geometry_Geometry_service
 			uboonecode_uboone_BasicTool_GeoAlgo
