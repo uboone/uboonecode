@@ -3,6 +3,7 @@ cet_test( SpaceChargeMicroBooNE_test
     ubevt_SpaceCharge
     mf_MessageLogger
     fhiclcpp
+    cetlib cetlib_except
     ${ROOT_GENVECTOR}
     ${GSL} ${GSLCBLAS}
   DATAFILES spacechargetest_uboone.fcl
