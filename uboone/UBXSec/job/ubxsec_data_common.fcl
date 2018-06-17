@@ -31,6 +31,7 @@ services:
   #@table::microboone_services_reco
   #BackTracker:             @local::microboone_backtracker
   SpaceCharge:             @local::microboone_spacecharge
+  @table::microboone_reco_data_services
 }
 
 #services.DatabaseUtil.ShouldConnect: false
