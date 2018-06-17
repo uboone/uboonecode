@@ -35,6 +35,8 @@
 
 #include "tpcneutrinoidfilter_microboone.fcl"
 
+#include "mctrutht0matching.fcl"
+
 BEGIN_PROLOG
 #
 # Module configuration
@@ -52,6 +54,8 @@ ubxsec_mc_reco:
   pandoraCosmicACPTTagger:        @local::microboone_acpttagger_mc
   pandoraCosmicStoppingMu:        @local::microboone_cosmicstoppingmutagger_mc
   pandoraCosmicHitRemoval:        @local::microboone_crhitremoval
+
+  crHitRemovalTruthMatch:         @local::standard_mcparticlehitmatching
 
   pandoraNu:                      @local::microboone_pandora
   #pandoraNuAll:                   @local::microboone_pandora
@@ -109,6 +113,7 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        pandoraCosmicACPTTagger,
                        pandoraCosmicStoppingMu,
                        pandoraCosmicHitRemoval,
+                       crHitRemovalTruthMatch,
                        pandoraNu,
                        #pandoraNuAll,
                        pandoraNucalo,
@@ -157,9 +162,17 @@ ubxsec_mc_reco.pandoraCosmicHitRemoval.EndTickPadding:           75
 ubxsec_mc_reco.pandoraCosmicHitRemoval.CopyHitMCParticleAssns:   true
 ubxsec_mc_reco.pandoraCosmicHitRemoval.HitMCParticleAssnLabel:   "gaushitTruthMatch"
 
+ubxsec_mc_reco.crHitRemovalTruthMatch.OverrideRealData:                          true
+ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations:                   @local::IndirectHitParticleAssnsTool
+ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitPartAssnsLabel: "gaushitTruthMatch"
+ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitModuleLabel:    "pandoraCosmicHitRemoval::UBXSec"
+
 ubxsec_mc_reco.pandoraNu.GeantModuleLabel:                       "largeant"
 ubxsec_mc_reco.pandoraNu.HitFinderModuleLabel:                   "pandoraCosmicHitRemoval::UBXSec"
 ubxsec_mc_reco.pandoraNu.ConfigFile:                             "PandoraSettings_MicroBooNE_Neutrino.xml"
+
+ubxsec_mc_reco.RecoTrueMatcherCosmic.OverrideRealData:           true # to make overlay work
+ubxsec_mc_reco.RecoTrueMatcher.OverrideRealData:                 true # to make overlay work
 
 #ubxsec_mc_reco.pandoraNuAll.GeantModuleLabel:                    "largeant"
 #ubxsec_mc_reco.pandoraNuAll.HitFinderModuleLabel:                "gaushit"
