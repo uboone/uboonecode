@@ -45,9 +45,9 @@ physics.end_paths: [ larcv ]
 microboone_tfile_metadata:
 {
   JSONFileName:	[ "larlite_opreco.root.json",
-                  "larlite_gaushit_mcinfo_backtracker.root.json",
+                  "larlite_backtracker.root.json",
                   "larcv_wholeview.root.json" ]
   GenerateTFileMetadata: [ true, true, true ]
-  dataTier:              [ "larlite_opreco", "larlite_gaushit_mcinfo_backtracker", "larcv_wholeview" ]
+  dataTier:              [ "larlite_opreco", "larlite_backtracker", "larcv_wholeview" ]
   fileFormat:            [ "root", "root", "root" ]
 }
