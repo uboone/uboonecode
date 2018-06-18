@@ -288,8 +288,8 @@ namespace ubana {
 
     // FV
     bool in_fv = _ubxsec_event->slc_nuvtx_fv.at(scl_ll_max) == 1
-                 && (_ubxsec_event->slc_nuvtx_z.at(scl_ll_max) < 675 
-                     || _ubxsec_event->slc_nuvtx_z.at(scl_ll_max) > 775);
+                 /*&& (_ubxsec_event->slc_nuvtx_z.at(scl_ll_max) < 675 
+                     || _ubxsec_event->slc_nuvtx_z.at(scl_ll_max) > 775)*/;
     if(!in_fv) {
       reason = "fail_fiducial_volume";
       failure_map["fiducial_volume"] = false;
