@@ -31,6 +31,7 @@ services:
   #@table::microboone_services_reco
   #BackTracker:             @local::microboone_backtracker
   SpaceCharge:             @local::microboone_spacecharge
+  @table::microboone_reco_data_services
 }
 
 #services.DatabaseUtil.ShouldConnect: false
@@ -98,7 +99,7 @@ outputs:
  { 
    module_type: RootOutput
    fileName:    "%ifb_%tc_ubxsec.root"
-   dataTier:    "reconstructed"
+   dataTier:    "reco"
    compressionLevel: 1
    outputCommands: [
             "keep *_*_*_*"]
