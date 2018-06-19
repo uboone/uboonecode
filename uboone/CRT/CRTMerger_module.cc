@@ -198,6 +198,13 @@ void crt::CRTMerger::produce(art::Event& event)
 	std::cout<<"total: "<<crtrootfile.size()<<std::endl;
 	if (!crtrootfile.size())
 	  std::cout << "\n\t CRTMerger_module: No child CRT files found that conform to constraints: " << "file_format "<<"artroot"<<" and ub_project.version " << ubversion  << std::endl;
+
+	// Throw exception if there are fewer than six CRT files.
+
+	if(crtrootfile.size() < 6) {
+	  throw cet::exception("CRTMerger") << "Too few matching CRT files: " 
+					    << crtrootfile.size() << "\n";
+	}
 	  
 	
 	std::unique_ptr<std::vector<crt::CRTHit> > CRTHitEventsSet(new std::vector<crt::CRTHit>); //collection of CRTHits for this event
@@ -206,6 +213,17 @@ void crt::CRTMerger::produce(art::Event& event)
 	{
 	  if (_debug)
 	    std::cout<<"The child artroot file is "<<crtrootfile[crf_index]<<std::endl;
+
+	  // Add this file to set of seen CRT files.
+
+	  if(fCRTFiles.count(crtrootfile[crf_index]) == 0) {
+	    std::cout << "Adding CRT parent file: " << crtrootfile[crf_index] << std::endl;
+	    art::ServiceHandle<art::FileCatalogMetadata> md;
+	    std::ostringstream ostr;
+	    ostr << "mixparent" << fCRTFiles.size();
+	    md->addMetadataString(ostr.str(), crtrootfile[crf_index]);
+	    fCRTFiles.insert(crtrootfile[crf_index]);
+	  }
 	
 	  // Read off the root file by streaming over internet. Use xrootd URL
 	  // This is alternative to use gsiftp URL. In that approach we use the URL to ifdh::fetchInput the crt file to local directory and keep it open as long as we make use of it
@@ -219,7 +237,8 @@ void crt::CRTMerger::produce(art::Event& event)
 	  catch(...)
 	    {
 	      std::cout << "This Root File does not exist. No Merger CRTHit candidates put on event for this TPC evt for this chunk of the CRT." << std::endl;
-	      continue;
+	      throw cet::exception("CRTMerger") << "Could not locate CRT file: " 
+						<< crtrootfile[crf_index] << "\n";
 	    }
 	  std::cout<<"xrootd URL: "<<crtrootFile_xrootd_url[0]<<std::endl;
 	
@@ -229,17 +248,6 @@ void crt::CRTMerger::produce(art::Event& event)
 	  // when you would like to launch a 'lar -c ... ... ...'
 	  // In batch mode, this step is automatically done
 	  
-	  //	  try{
-	    gallery::Event fCRTEvent_tmp(crtrootFile_xrootd_url);
-	    /*
-	  }
-	  catch(...)
-	    {
-	      std::cout << "This Root File can not be opened by gallery. No Merger CRTHit candidates put on event for this TPC evt for this chunk of the CRT." << std::endl;
-	      continue;
-	    }
-	    */
-
 	  gallery::Event fCRTEvent(crtrootFile_xrootd_url);
 	  std::cout<<"Opened the CRT root file from xrootd URL"<<std::endl;
 	
