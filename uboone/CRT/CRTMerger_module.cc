@@ -72,7 +72,7 @@ crt::CRTMerger::CRTMerger(const fhicl::ParameterSet& pset): data_label_DAQHeader
 crt::CRTMerger::~CRTMerger()
 {
 	//fIFDH->cleanup();
-	std::cout<<"crt::CRTMerger::~CRTmerger"<<std::endl;
+	std::cout<<"crt::CRTMerger::~CRTMerger"<<std::endl;
 	
 	if ( ! tIFDH )
 	  delete tIFDH;
@@ -106,6 +106,17 @@ void crt::CRTMerger::produce(art::Event& event)
 	art::Timestamp evtTimeNTP = my_DAQHeader.ntp_time();
 	
 	std::cout<<"evt_timeGPS_sec "<<evtTimeGPS.timeHigh()<<",  evt_timeGPS_nsec "<<evtTimeGPS.timeLow()<<",  evt_timeNTP_sec "<<evtTimeNTP.timeHigh()<<",  evt_timeNTP_nsec "<<evtTimeNTP.timeLow()<<std::endl;
+
+	// Quit if GPS time is zero.
+	// This is somehow normal for the first event of a run...
+	if(evtTimeGPS.timeHigh() == 0 && evtTimeGPS.timeLow() == 0) {
+
+	  // We promised to put a collection of CRTHits into the event.
+
+	  std::unique_ptr<std::vector<crt::CRTHit> > p(new std::vector<crt::CRTHit>);
+	  event.put(std::move(p));
+	  return;
+	}
 	
 	// First find the art event time stamp
 	//art::Timestamp evtTime = event.time();
