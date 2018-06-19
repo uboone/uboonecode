@@ -4,7 +4,7 @@
 #include "litemc_reco2d.fcl"
 #include "litemc_opreco.fcl"
 #include "litemc_opdigit.fcl"
-#include "litemc_gaushit_mcinfo_backtracker.fcl"
+#include "litemc_backtracker.fcl"
 
 BEGIN_PROLOG
 
@@ -108,7 +108,7 @@ dlprod_analyzers.opdigit.out_filename:    "larlite_opdigit.root"
 dlprod_analyzers.opreco.out_filename:     "larlite_opreco.root"
 dlprod_analyzers.wire.out_filename:       "larlite_wire.root"
 dlprod_analyzers.reco2d.out_filename:     "larlite_reco2d.root"
-dlprod_analyzers.gaushitMCinfoBacktracker.out_filename: "larlite_gaushit_mcinfo_backtracker.root"
+dlprod_analyzers.gaushitMCinfoBacktracker.out_filename: "larlite_backtracker.root"
 
 dlprod_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
 

@@ -4,7 +4,7 @@ BEGIN_PROLOG
 
 litemc_gaushitMCinfoBacktracker: @local::litemaker_base
 
-litemc_gaushitMCinfoBacktracker.out_filename: "larlite_gaushit_mcinfo_backtracker.root"
+litemc_gaushitMCinfoBacktracker.out_filename: "larlite_backtracker.root"
 
 litemc_gaushitMCinfoBacktracker.pot_labels: ["generator"]
 
