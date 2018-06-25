@@ -40,12 +40,12 @@
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
 
-#include "../LLBasicTool/GeoAlgo/GeoVector.h"
-#include "../LLBasicTool/GeoAlgo/GeoSphere.h"
-#include "../LLBasicTool/GeoAlgo/GeoTrajectory.h"
-#include "../LLBasicTool/GeoAlgo/GeoCone.h"
-#include "../LLBasicTool/GeoAlgo/GeoAlgo.h"
-#include "../LLBasicTool/GeoAlgo/GeoAABox.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoVector.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoSphere.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoTrajectory.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoCone.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoAlgo.h"
+#include "uboone/LLBasicTool/GeoAlgo/GeoAABox.h"
 
 
 #include "DetectorObjects.h"
