@@ -141,7 +141,6 @@
 
 // Root include
 #include "TString.h"
-=======
 #include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoTrajectory.h"
 #include "uboone/LLBasicTool/GeoAlgo/GeoAABox.h"
