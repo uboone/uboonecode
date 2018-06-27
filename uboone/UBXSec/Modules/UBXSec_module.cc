@@ -161,8 +161,10 @@ private:
   // Database to understand particle pdg
   const TDatabasePDG* _database_pdg = TDatabasePDG::Instance();
 
-  // Detector info service
-  ::detinfo::DetectorProperties const* fDetectorProperties;
+  // Services
+  ::detinfo::DetectorProperties const* _detector_properties;
+  ::detinfo::DetectorClocks const* _detector_clocks;
+  spacecharge::SpaceCharge const* _SCE;
 
   // To be set via fcl parameters
   std::string _hitfinderLabel;
@@ -265,7 +267,6 @@ private:
   double _sr_pot;
 
   std::ofstream _csvfile, _csvfile2;
-  std::ofstream _run_subrun_list_file;
 };
 
 
@@ -335,20 +336,15 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   _trk_mom_calculator.SetMinLength(_min_track_len);
 
-  fDetectorProperties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
-/*
-  auto index = gROOT->GetListOfSpecials()->IndexOf(_database_pdg);
-  if (index == -1)
-    _database_pdg = new TDatabasePDG;
-  else 
-    _database_pdg = (TDatabasePDG*)gROOT->GetListOfSpecials()->At(index);
+  _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
+  _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
+  _SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
 
-  
-  if (!TDatabasePDG::fgInstance)
-    _database_pdg = TDatabasePDG::fgInstance;
-  else 
-    _database_pdg = new TDatabasePDG;
-*/
+  std::cout << "E Field: " << _detector_properties->Efield() << std::endl;
+  std::cout << "Temperature: " << _detector_properties->Temperature() << std::endl;
+  std::cout << "Drift Velocity: " << _detector_properties->DriftVelocity(_detector_properties->Efield(), _detector_properties->Temperature())<< std::endl;
+  std::cout << "Sampling Rate: " << _detector_properties->SamplingRate() << std::endl;
+
 
   art::ServiceHandle<art::TFileService> fs;
   _tree1 = fs->make<TTree>("tree","");
@@ -441,9 +437,6 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   if(_make_ophit_csv) _csvfile2.open("ophit.csv", std::ofstream::out | std::ofstream::trunc);
   if(_make_ophit_csv) _csvfile2 << "ophit,opdet,time,pe" << std::endl;
 
-  _run_subrun_list_file.open ("run_subrub_list.txt", std::ofstream::out | std::ofstream::trunc);
-
-
 
 
   produces<std::vector<ubana::SelectionResult>>();
@@ -486,11 +479,11 @@ void UBXSec::produce(art::Event & e) {
   _is_data = e.isRealData();
   _is_mc   = !_is_data;
 
-  if (_use_genie_info && _is_data) {
-    std::cout << "[UBXSec] You have asked to use GENIE info but you are running on a data file.";
-    std::cout << " _use_genie_info will be switched to false." << std::endl;
-    _use_genie_info = false;
-  }
+  // if (_use_genie_info && _is_data) {
+  //   std::cout << "[UBXSec] You have asked to use GENIE info but you are running on a data file.";
+  //   std::cout << " _use_genie_info will be switched to false." << std::endl;
+  //   _use_genie_info = false;
+  // }
 
   //::art::ServiceHandle<cheat::BackTracker> bt;
   ::art::ServiceHandle<geo::Geometry> geo;
@@ -854,17 +847,63 @@ void UBXSec::produce(art::Event & e) {
     if (e.getByLabel("generator",mctruthListHandle))
       art::fill_ptr_vector(mclist, mctruthListHandle);
 
-    int iList = 0; // 1 nu int per spill
+    // int iList = 0; // 1 nu int per spill
 
-    if (mclist[iList]->Origin() == NEUTRINO_ORIGIN) {
+    if (_debug) this->PrintMC(mclist); 
 
-      if (_debug) this->PrintMC(mclist); 
+    ubxsec_event->fv = 0;
+    ubxsec_event->fv_sce = 0;
 
+    ubxsec_event->ccnc = -1;
+    ubxsec_event->nupdg = -1;
+    ubxsec_event->nu_e = -1;
+    ubxsec_event->lep_costheta = -9999.;
+    ubxsec_event->true_muon_mom = -9999.;
+
+    ubxsec_event->ResizeGenieTruthVectors(mclist.size());
+
+    for (size_t iList = 0; iList < mclist.size(); iList++) {
+
+      if (mclist.at(iList)->Origin() != NEUTRINO_ORIGIN) {
+        std::cout << "[UBXSec] mclist from generator does not gave neutrino origin?!" << std::endl;
+      }
+
+      // Check if the true neutrino vertex is in the FV
       double truth_nu_vtx[3] = {mclist[iList]->GetNeutrino().Nu().Vx(),
                                 mclist[iList]->GetNeutrino().Nu().Vy(),
                                 mclist[iList]->GetNeutrino().Nu().Vz()};
-      if (_fiducial_volume.InFV(truth_nu_vtx)) ubxsec_event->fv = 1;
-      else ubxsec_event->fv = 0;
+      if (_fiducial_volume.InFV(truth_nu_vtx)) {
+        ubxsec_event->fv = 1;
+      }
+
+      // Save the vertex for all neutrinos
+      ubxsec_event->tvtx_x.at(iList) = mclist[iList]->GetNeutrino().Nu().Vx();
+      ubxsec_event->tvtx_y.at(iList) = mclist[iList]->GetNeutrino().Nu().Vy();
+      ubxsec_event->tvtx_z.at(iList) = mclist[iList]->GetNeutrino().Nu().Vz();
+
+      // Look at the space charge correction
+      std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
+                                                         mclist[iList]->GetNeutrino().Nu().Vy(),
+                                                         mclist[iList]->GetNeutrino().Nu().Vz());
+
+      double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
+                       + _detector_properties->GetXTicksOffset(0,0,0) 
+                       - _detector_properties->TriggerOffset();
+
+      // The following offsets to be summed to the original true vertex
+      double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
+      double yOffset = sce_corr.at(1);
+      double zOffset = sce_corr.at(2);
+
+      ubxsec_event->sce_corr_x = xOffset;
+      ubxsec_event->sce_corr_y = yOffset;
+      ubxsec_event->sce_corr_z = zOffset;
+
+      if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
+                                mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
+                                mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
+        ubxsec_event->fv_sce = 1;
+      } 
 
       int n_genie_particles = 0;
       int n_genie_particles_charged = 0;
@@ -878,30 +917,27 @@ void UBXSec::produce(art::Event & e) {
         n_genie_particles_charged ++;
       }
 
-      ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
-      ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
-      ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
-      ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
-      ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
-      ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
+      // Only save this if the true neutrino vertex is in the FV
+      if (ubxsec_event->fv == 1) {
+        ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
+        ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
+        ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
+        ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
+        ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
+        ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
                                                            mclist[iList]->GetNeutrino().Lepton().Py(),
                                                            mclist[iList]->GetNeutrino().Lepton().Pz()); 
-      ubxsec_event->genie_mult      = n_genie_particles;
-      ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-
-      ubxsec_event->tvtx_x.clear(); ubxsec_event->tvtx_x.clear(); ubxsec_event->tvtx_z.clear();
-      for(size_t n = 0; n < mclist.size(); n++ ) {
-        ubxsec_event->tvtx_x.emplace_back(mclist[n]->GetNeutrino().Nu().Vx());
-        ubxsec_event->tvtx_y.emplace_back(mclist[n]->GetNeutrino().Nu().Vy());
-        ubxsec_event->tvtx_z.emplace_back(mclist[n]->GetNeutrino().Nu().Vz());
+        ubxsec_event->genie_mult      = n_genie_particles;
+        ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
       }
+
 
       ubxsec_event->nsignal = 0;
       if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
 
-      // Also save muon momentum if is signal
+      // Also save muon momentum if is CC interaction
       ubxsec_event->true_muon_mom = -9999.;
-      if (ubxsec_event->nsignal == 1) {
+      if (mclist[iList]->GetNeutrino().CCNC() == 0) {
         for (int p = 0; p < mclist[iList]->NParticles(); p++) {
           auto const & mcp = mclist[iList]->GetParticle(p);
           if (mcp.Mother() != 0) continue;
@@ -909,21 +945,112 @@ void UBXSec::produce(art::Event & e) {
           ubxsec_event->true_muon_mom = mcp.P();
         }
       }
-    } // neutrino origin
-    else {
-      ubxsec_event->ccnc = -1;
-      ubxsec_event->nupdg = -1;
-      ubxsec_event->nu_e = -1;
-      ubxsec_event->lep_costheta = -9999.;
-      ubxsec_event->true_muon_mom = -9999.;
+
     }
-  } else {
-    ubxsec_event->ccnc = -1;
-    ubxsec_event->nupdg = -1;
-    ubxsec_event->nu_e = -1;
-    ubxsec_event->lep_costheta = -9999.;
-    ubxsec_event->true_muon_mom = -9999.;
   }
+
+
+
+
+
+  //   if (mclist[iList]->Origin() == NEUTRINO_ORIGIN) {
+
+  //     if (_debug) this->PrintMC(mclist); 
+
+  //     // Check if the true neutrino vertex is in the FV
+  //     double truth_nu_vtx[3] = {mclist[iList]->GetNeutrino().Nu().Vx(),
+  //                               mclist[iList]->GetNeutrino().Nu().Vy(),
+  //                               mclist[iList]->GetNeutrino().Nu().Vz()};
+  //     if (_fiducial_volume.InFV(truth_nu_vtx)) ubxsec_event->fv = 1;
+  //     else ubxsec_event->fv = 0;
+
+  //     // Look at the space charge correction
+  //     std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
+  //                                                        mclist[iList]->GetNeutrino().Nu().Vy(),
+  //                                                        mclist[iList]->GetNeutrino().Nu().Vz());
+
+  //     double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
+  //                      + _detector_properties->GetXTicksOffset(0,0,0) 
+  //                      - _detector_properties->TriggerOffset();
+
+  //     // The following offsets to be summed to the original true vertex
+  //     double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
+  //     double yOffset = sce_corr.at(1);
+  //     double zOffset = sce_corr.at(2);
+
+  //     ubxsec_event->sce_corr_x = xOffset;
+  //     ubxsec_event->sce_corr_y = yOffset;
+  //     ubxsec_event->sce_corr_z = zOffset;
+
+  //     if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
+  //                               mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
+  //                               mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
+  //       ubxsec_event->fv_sce = 1;
+  //     } else {
+  //       ubxsec_event->fv_sce = 0;
+  //     }
+
+  //     int n_genie_particles = 0;
+  //     int n_genie_particles_charged = 0;
+  //     for (int p = 0; p < mclist[iList]->NParticles(); p++) {
+  //       const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
+  //       if (mc_par.StatusCode() != 1) continue;
+  //       n_genie_particles ++;
+  //       const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
+  //       if (!par_pdg) continue;
+  //       if (par_pdg->Charge() == 0) continue;
+  //       n_genie_particles_charged ++;
+  //     }
+
+  //     ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
+  //     ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
+  //     ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
+  //     ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
+  //     ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
+  //     ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
+  //                                                          mclist[iList]->GetNeutrino().Lepton().Py(),
+  //                                                          mclist[iList]->GetNeutrino().Lepton().Pz()); 
+  //     ubxsec_event->genie_mult      = n_genie_particles;
+  //     ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
+
+      
+  //     // ubxsec_event->tvtx_x.resize(1); 
+  //     // ubxsec_event->tvtx_x.resize(1); 
+  //     // ubxsec_event->tvtx_z.resize(1);
+  //     // for(size_t n = 0; n < mclist.size(); n++ ) {
+  //     ubxsec_event->tvtx_x.at(0) = mclist[iList]->GetNeutrino().Nu().Vx();
+  //     ubxsec_event->tvtx_y.at(0) = mclist[iList]->GetNeutrino().Nu().Vy();
+  //     ubxsec_event->tvtx_z.at(0) = mclist[iList]->GetNeutrino().Nu().Vz();
+  //     // }
+
+  //     ubxsec_event->nsignal = 0;
+  //     if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
+
+  //     // Also save muon momentum if is signal
+  //     ubxsec_event->true_muon_mom = -9999.;
+  //     if (ubxsec_event->nsignal == 1) {
+  //       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
+  //         auto const & mcp = mclist[iList]->GetParticle(p);
+  //         if (mcp.Mother() != 0) continue;
+  //         if (mcp.PdgCode() != 13) continue;
+  //         ubxsec_event->true_muon_mom = mcp.P();
+  //       }
+  //     }
+  //   } // neutrino origin
+  //   else {
+  //     ubxsec_event->ccnc = -1;
+  //     ubxsec_event->nupdg = -1;
+  //     ubxsec_event->nu_e = -1;
+  //     ubxsec_event->lep_costheta = -9999.;
+  //     ubxsec_event->true_muon_mom = -9999.;
+  //   }
+  // } else {
+  //   ubxsec_event->ccnc = -1;
+  //   ubxsec_event->nupdg = -1;
+  //   ubxsec_event->nu_e = -1;
+  //   ubxsec_event->lep_costheta = -9999.;
+  //   ubxsec_event->true_muon_mom = -9999.;
+  // }
 
   ubxsec_event->is_signal = false;
   if (ubxsec_event->ccnc == 0 && ubxsec_event->nupdg == 14 && ubxsec_event->fv == 1) {
@@ -951,24 +1078,9 @@ void UBXSec::produce(art::Event & e) {
     std::cout << "[UBXSec] Cannot locate OpHits from ophitCosmic." << std::endl;
   }
 
-  /*art::Handle<std::vector<raw::OpDetWaveform> > waveform_h;
-  e.getByLabel("saturation", "OpdetCosmicHighGain", waveform_h);
-  if(!waveform_h.isValid()) {
-    std::cout << "[UBXSec] Cannot locate OpDetWaveform from saturation." << std::endl;
-  }
-  std::vector<raw::OpDetWaveform> const& waveform_v(*waveform_h);*/
+  std::cout << "[UBXSec] Trigger Time: " << _detector_clocks->TriggerTime() << std::endl;
+  std::cout << "[UBXSec] Tick Period:  " << _detector_clocks->OpticalClock().TickPeriod() << std::endl;
 
-  auto const& detectorClocks (*lar::providerFrom< detinfo::DetectorClocksService >());
-  std::cout << "[UBXSec] Trigger Time: " << detectorClocks.TriggerTime() << std::endl;
-  std::cout << "[UBXSec] Tick Period:  " << detectorClocks.OpticalClock().TickPeriod() << std::endl;
-
-
-  //std::cout << "Printing waveforms" << std::endl;
-  //for (auto w : waveform_v) {
-  //  std::cout << "timestamp: " << w.TimeStamp() 
-  //            << ", relative time: " << w.TimeStamp() - detectorClocks.TriggerTime() 
-  //            << ", channel: " << geo->OpDetFromOpChannel(w.ChannelNumber())<< std::endl;
-  //}
 
 
   // Check if the muon is reconstructed
@@ -1570,7 +1682,7 @@ void UBXSec::produce(art::Event & e) {
           if (candidate_track->HasValidPoint(i)) {
             TVector3 trk_pt = candidate_track->LocationAtPoint(i);
             double wire = geo->NearestWire(trk_pt, 2);
-            double time = fDetectorProperties->ConvertXToTicks(trk_pt.X(), geo::PlaneID(0,0,2));
+            double time = _detector_properties->ConvertXToTicks(trk_pt.X(), geo::PlaneID(0,0,2));
             TVector3 p (wire, time, 0.);
             //std::cout << "emplacing track point on wire " << p.X() << ", and time " << p.Y() << std::endl;
             track_v.emplace_back(p);
@@ -1966,9 +2078,6 @@ void UBXSec::endSubRun(art::SubRun& sr) {
 
   if (_debug) std::cout << "[UBXSec::endSubRun] Starts" << std::endl;
 
-  // Saving run and subrun number on file so that we can run Zarko's script easily
-  _run_subrun_list_file << sr.run() << " " << sr.subRun() << std::endl;
-
   _sr_run       = sr.run();
   _sr_subrun    = sr.subRun();
   _sr_begintime = sr.beginTime().value();
@@ -1987,7 +2096,7 @@ void UBXSec::endSubRun(art::SubRun& sr) {
       _sr_pot = 0.;
   }
 
-  // Data
+  // Data - Use Zarko's script instead
   if (_is_data) {
     if (_debug) std::cout << "[UBXSec::endSubRun] Getting POT for DATA, producer " << _potsum_producer << ", instance " << _potsum_instance << std::endl;
     if (sr.getByLabel(_potsum_producer, _potsum_instance, potsum_h)){
