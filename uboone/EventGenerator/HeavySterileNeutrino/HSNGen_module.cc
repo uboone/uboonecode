@@ -42,9 +42,9 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "nutools/EventGeneratorBase/evgenbase.h"
-#include "larcore/Geometry/geo.h"
+#include "larcorealg/Geometry/geo.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
+#include "larcorealg/Geometry/CryostatGeo.h"
 #include "larcoreobj/SummaryData/RunData.h"
 
 // HSNGen includes

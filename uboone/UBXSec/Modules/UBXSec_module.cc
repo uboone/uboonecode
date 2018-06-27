@@ -882,18 +882,18 @@ void UBXSec::produce(art::Event & e) {
       ubxsec_event->tvtx_z.at(iList) = mclist[iList]->GetNeutrino().Nu().Vz();
 
       // Look at the space charge correction
-      std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
-                                                         mclist[iList]->GetNeutrino().Nu().Vy(),
-                                                         mclist[iList]->GetNeutrino().Nu().Vz());
+      geo::Vector_t sce_corr = _SCE->GetPosOffsets(geo::Point_t(mclist[iList]->GetNeutrino().Nu().Vx(),
+								mclist[iList]->GetNeutrino().Nu().Vy(),
+								mclist[iList]->GetNeutrino().Nu().Vz()));
 
       double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
                        + _detector_properties->GetXTicksOffset(0,0,0) 
                        - _detector_properties->TriggerOffset();
 
       // The following offsets to be summed to the original true vertex
-      double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
-      double yOffset = sce_corr.at(1);
-      double zOffset = sce_corr.at(2);
+      double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.X();
+      double yOffset = sce_corr.Y();
+      double zOffset = sce_corr.Z();
 
       ubxsec_event->sce_corr_x = xOffset;
       ubxsec_event->sce_corr_y = yOffset;
