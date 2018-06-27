@@ -50,6 +50,7 @@ class UBXSecEvent /*: public TObject*/{
   Double_t        muon_tag_score; ///< Not used
   Double_t        fm_score; ///< Not used
   Int_t           fv; ///< Is 1 if the true neutrino vertex is in the fiducial volume
+  Int_t           fv_sce; ///< Is 1 if the true neutrino vertex is in the fiducial volume (takes into account the sce correction)
   Int_t           ccnc; ///< Is 0 if CC, 1 if NC
   Int_t           mode; ///< Iteraction mode: 0=Quasi-elastic or Elastic, 1=Resonant (RES), 2=DIS, 3=Coherent production, 10=MEC
   Int_t           nupdg; ///< Neutrino flavour (pdg code)
@@ -61,6 +62,10 @@ class UBXSecEvent /*: public TObject*/{
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
+
+  Double_t        sce_corr_x; ///< Space charge correction to be applied to the true nu vertex (to be summed on x)
+  Double_t        sce_corr_y; ///< Space charge correction to be applied to the true nu vertex (to be summed on y)
+  Double_t        sce_corr_z; ///< Space charge correction to be applied to the true nu vertex (to be summed on z)
 
   Int_t           mc_muon_contained; ///< Is 1 if the true mc muon is fully contained
   Int_t           is_swtriggered; ///< Is true if the event passed the software trigger
@@ -187,6 +192,7 @@ class UBXSecEvent /*: public TObject*/{
   virtual ~UBXSecEvent();
   void Init();
   void ResizeVectors(int); 
+  void ResizeGenieTruthVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
   void ResetFluxEventWeightVectorsMultisim();

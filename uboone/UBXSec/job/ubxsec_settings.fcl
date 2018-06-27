@@ -11,7 +11,7 @@ BEGIN_PROLOG
 UBXSec: {
   module_type:                  "UBXSec"
   PFParticleProducer:           "pandoraNu::UBXSec"
-  HitProducer:                  "pandoraCosmicHitRemoval::UBXSec"
+  HitProducer:                  "crHitRemovalTruthMatch::UBXSec" #"pandoraCosmicHitRemoval::UBXSec"
   GeantModule:                  "largeant"
   SpacePointProducer:           "pandoraNu::UBXSec"
   NeutrinoFlashMatchProducer:   "NeutrinoFlashMatch"
