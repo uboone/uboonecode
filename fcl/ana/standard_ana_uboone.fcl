@@ -78,24 +78,24 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 #physics.analyzers.analysistree:  @local::microboone_analysistree
 physics.analyzers.analysistree.OpFlashModuleLabel:              [ "simpleFlashBeam", "simpleFlashCosmic", "opflashBeam", "opflashCosmic", "simpleFlashBeamLowPE" ]
 physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
-physics.analyzers.analysistree.TrackModuleLabel:                ["pandoraCosmic","pandoraCosmicKHit","pandoraCosmicKalmanTrack","pandoraNu","pandoraNuKHit","pandoraNuKalmanTrack","pandoraNuKalmanShower","pandoraNuPMA","pmtrack"]
-physics.analyzers.analysistree.VertexModuleLabel:               ["pandoraNu", "pandoraCosmic","pmtrack","linecluster","trajcluster"]
-physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandoraNu"]
-physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraCosmiccalo","pandoraCosmicKHitcalo","pandoraCosmicKalmanTrackcalo","pandoraNucali","pandoraNuKHitcali","pandoraNuKalmanTrackcali","pandoraNuKalmanShowercalo","pandoraNuPMAcali","pmtrackcali"]
-physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandoraCosmicpid","pandoraCosmicKHitpid","pandoraCosmicKalmanTrackpid","pandoraNucalipid","pandoraNuKHitcalipid","pandoraNuKalmanTrackcalipid","pandoraNuKalmanShowerpid","pandoraNuPMAcalipid","pmtrackcalipid"]
-physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["pandoraCosmictag","pandoraCosmicKHitPFPart","pandoraCosmicKalmantag","pandoraNutag","pandoraNuKHittag","pandoraNuKalmanTracktag","pandoraNuKalmanShowertag","pandoraNuPMAtag","pmtracktag"]
-physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["pandoraCosmicContTag","dummy","dummy","pandoraNuContTag","dummy","dummy","dummy","pandoraNuPMAContTag","pmtrackContTag"]
-physics.analyzers.analysistree.FlashMatchAssocLabel:            ["pandoraCosmicFlashMatch","pandoraCosmicKHitFlashMatch","pandoraCosmicKalmanTrackFlashMatch","pandoraNuFlashMatch","pandoraNuKHitFlashMatch","pandoraNuKalmanTrackFlashMatch","pandoraNuKalmanShowerFlashMatch","pandoraNuPMAFlashMath","pmtrackFlashMatch"]
-physics.analyzers.analysistree.PFParticleModuleLabel:           "pandoraNu"
-physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0","t0","t0","t0","t0","t0"]
-physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0"]
-physics.analyzers.analysistree.TrackMCSFitLabel:                ["pandoraCosmicMCSMu","pandoraCosmicKHitMCSMu","pandoraCosmicKalmanTrackMCSMu","pandoraNuMCSMu","pandoraNuKHitMCSMu","pandoraNuKalmanTrackMCSMu","pandoraNuKalmanShowerMCSMu","pandoraNuPMAMCSMu","pmtrackMCSMu"]
-physics.analyzers.analysistree.T0RecoAnodeCathodePiercingLabel: ["t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco"]
+physics.analyzers.analysistree.TrackModuleLabel:                ["pandoraCosmic","pandoraCosmicKHit","pandoraCosmicKalmanTrack","pandoraNu","pandoraNuKHit","pandoraNuKalmanTrack","pandoraNuKalmanShower","pandoraNuPMA","pmtrack","pandora"]
+physics.analyzers.analysistree.VertexModuleLabel:               ["pandoraNu", "pandoraCosmic","pmtrack","linecluster","trajcluster","pandora"]
+physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandora"]
+physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraCosmiccalo","pandoraCosmicKHitcalo","pandoraCosmicKalmanTrackcalo","pandoraNucali","pandoraNuKHitcali","pandoraNuKalmanTrackcali","pandoraNuKalmanShowercalo","pandoraNuPMAcali","pmtrackcali","pandoracali"]
+physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandoraCosmicpid","pandoraCosmicKHitpid","pandoraCosmicKalmanTrackpid","pandoraNucalipid","pandoraNuKHitcalipid","pandoraNuKalmanTrackcalipid","pandoraNuKalmanShowerpid","pandoraNuPMAcalipid","pmtrackcalipid","pandoracalipid"]
+physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["pandoraCosmictag","pandoraCosmicKHitPFPart","pandoraCosmicKalmantag","pandoraNutag","pandoraNuKHittag","pandoraNuKalmanTracktag","pandoraNuKalmanShowertag","pandoraNuPMAtag","pmtracktag","pandoratag"]
+physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["pandoraCosmicContTag","dummy","dummy","pandoraNuContTag","dummy","dummy","dummy","pandoraNuPMAContTag","pmtrackContTag","pandoraContTag"]
+physics.analyzers.analysistree.FlashMatchAssocLabel:            ["pandoraCosmicFlashMatch","pandoraCosmicKHitFlashMatch","pandoraCosmicKalmanTrackFlashMatch","pandoraNuFlashMatch","pandoraNuKHitFlashMatch","pandoraNuKalmanTrackFlashMatch","pandoraNuKalmanShowerFlashMatch","pandoraNuPMAFlashMath","pmtrackFlashMatch","dummy"]
+physics.analyzers.analysistree.PFParticleModuleLabel:           "pandora"
+physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0","t0","t0","t0","t0","t0","t0"]
+physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0","mct0"]
+physics.analyzers.analysistree.TrackMCSFitLabel:                ["pandoraCosmicMCSMu","pandoraCosmicKHitMCSMu","pandoraCosmicKalmanTrackMCSMu","pandoraNuMCSMu","pandoraNuKHitMCSMu","pandoraNuKalmanTrackMCSMu","pandoraNuKalmanShowerMCSMu","pandoraNuPMAMCSMu","pmtrackMCSMu","pandoraMCSMu"]
+physics.analyzers.analysistree.T0RecoAnodeCathodePiercingLabel: ["t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco","t0reco"]
 physics.analyzers.analysistree.CosmicScoreThresholds:           [0.0]
 physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
 physics.analyzers.analysistree.POTModuleLabel:                  "generator"
 physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
-physics.analyzers.analysistree.ShowerModuleLabel:               ["showerrecopandora","pandoraCosmic","pandoraNu"]
+physics.analyzers.analysistree.ShowerModuleLabel:               ["showerrecopandora","pandoraCosmic","pandoraNu","pandora"]
 physics.analyzers.analysistree.SWTriggerModuleLabel:            "swtrigger"
 physics.analyzers.analysistree.OpticalFilterLabel:              "opfiltercommon"
 
