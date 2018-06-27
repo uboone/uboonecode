@@ -5,13 +5,13 @@
 <!DOCTYPE project [
 <!ENTITY release "v06_26_01_13">
 <!ENTITY releasetag "e10:prof">
-<!ENTITY name "ubxsec_mc_bnbcosmic_mcc8.9_test7">
-<!ENTITY outdefname "ubxsec_mc_bnbcosmic_mcc89_test7">
+<!ENTITY name "ubxsec_mc_bnbcosmic_mcc8.9_test6_tune3">
+<!ENTITY outdefname "ubxsec_mc_bnbcosmic_mcc89_test6_tune3">
 <!ENTITY tag "ubxsec">
 <!ENTITY file_type "mc">
 <!ENTITY run_type "physics">
 <!ENTITY PNFSpath "/pnfs/uboone/resilient/users/mdeltutt/">
-<!ENTITY ubxsec_version "mcc8.9_test7">
+<!ENTITY ubxsec_version "mcc8.9_test6_tune3">
 ]>
 
 
@@ -33,14 +33,14 @@
   <larsoft>
     <tag>&release;</tag>
     <qual>&releasetag;</qual>
-    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.9_test7.tgz</local>
+    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_MCC8.9_test6.tgz</local>
   </larsoft>
 
   <!-- Project stages -->
 
   <stage name="ubxsec">
     <fcl>run_ubxsec_mc_bnbcosmic.fcl</fcl>
-    <inputdef>prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2</inputdef>
+    <inputdef>prodgenie_bnb_nu_cosmic_uboone_MCC8Tune3_mcc8.7_reco2_dev</inputdef>
     <schema>root</schema>
     <!--<inputlist>&PNFSpath;bnb_cosmic_files_mcc8.3.list</inputlist>-->
     <defname>mdeltutt_&name;_180323</defname>
@@ -48,9 +48,9 @@
     <outdir>/pnfs/uboone/scratch/users/mdeltutt/&release;/ubxsec_&ubxsec_version;_mc_bnbcosmic</outdir>
     <workdir>&PNFSpath;grid_workdir/grid_workdir_ubxsec_&ubxsec_version;_mc_bnbcosmic</workdir>
     <bookdir>/uboone/data/users/mdeltutt/grid_bookdir/ubxsec_&ubxsec_version;_mc_bnbcosmic</bookdir>
-    <numjobs>500</numjobs>
+    <numjobs>200</numjobs>
     <datatier>reconstructed</datatier>
-    <memory>3000</memory>
+    <memory>6000</memory>
     <jobsub>  --expected-lifetime=20h -q --generate-email-summary </jobsub>
     <disk>60GB</disk>
   </stage>
