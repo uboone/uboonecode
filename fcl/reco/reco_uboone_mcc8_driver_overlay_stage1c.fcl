@@ -28,7 +28,7 @@ outputs.out1.dataTier: "reconstructed-2d"
 #source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
 source.inputCommands: ["keep *_*_*_*" ]
 
-physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
+#physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
 #physics.producers.wcNoiseFilter.DigitModuleLabel: "daqnonoise"
 #physics.producers.digitfilter.DigitModuleLabel: "mixer"
 #physics.producers.ophit.InputModule: "mixer"

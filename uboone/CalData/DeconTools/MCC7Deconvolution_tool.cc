@@ -4,16 +4,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/MCC7Deconvolution.h"
+#include "uboone/CalData/DeconTools/IDeconvolution.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
+#include "lardata/Utilities/LArFFT.h"
 
-#include "uboone/CalData/DeconTools/BaselineStandard.h"
-#include "uboone/CalData/DeconTools/BaselineMostProbAve.h"
+#include "art/Utilities/make_tool.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
 
 #include "TH1D.h"
 
@@ -22,9 +25,38 @@
 namespace uboone_tool
 {
 
+class MCC7Deconvolution : public IDeconvolution
+{
+public:
+    explicit MCC7Deconvolution(const fhicl::ParameterSet& pset);
+    
+    ~MCC7Deconvolution();
+    
+    void configure(const fhicl::ParameterSet& pset)              override;
+    void outputHistograms(art::TFileDirectory&)            const override;
+    
+    void Deconvolve(IROIFinder::Waveform const&,
+                    raw::ChannelID_t,
+                    IROIFinder::CandidateROIVec const&,
+                    recob::Wire::RegionsOfInterest_t& )    const override;
+    
+private:
+    
+    // Member variables from the fhicl file
+    bool                                                     fDodQdxCalib;                ///< Do we apply wire-by-wire calibration?
+    std::string                                              fdQdxCalibFileName;          ///< Text file for constants to do wire-by-wire calibration
+    std::map<unsigned int, float>                            fdQdxCalib;                  ///< Map to do wire-by-wire calibration, key is channel
+    
+    std::unique_ptr<uboone_tool::IBaseline>                  fBaseline;
+    
+    const geo::GeometryCore*                                 fGeometry = lar::providerFrom<geo::Geometry>();
+    art::ServiceHandle<util::LArFFT>                         fFFT;
+    art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
+};
+    
 //----------------------------------------------------------------------
 // Constructor.
-MCC7Deconvolution::MCC7Deconvolution(const fhicl::ParameterSet& pset)
+MCC7Deconvolution::MCC7Deconvolution(const fhicl::ParameterSet& pset) 
 {
     configure(pset);
 }
@@ -37,7 +69,7 @@ void MCC7Deconvolution::configure(const fhicl::ParameterSet& pset)
 {
     // Start by recovering the parameters
     //wire-by-wire calibration
-    fDodQdxCalib = pset.get< bool >("DodQdxCalib", false);
+    fDodQdxCalib   = pset.get< bool >("DodQdxCalib", false);
     
     if (fDodQdxCalib)
     {
@@ -69,17 +101,7 @@ void MCC7Deconvolution::configure(const fhicl::ParameterSet& pset)
     }
     
     // Recover the baseline tool
-    fhicl::ParameterSet pb = pset.get<fhicl::ParameterSet>("Baseline");
-    std::string pb_type = pb.get<std::string>("tool_type");
-    if(pb_type == std::string("BaselineStandard")) {
-        fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineStandard(pb));
-    }
-    else if(pb_type == std::string("BaselineMostProbAve")) {
-        fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineMostProbAve(pb));
-    }
-    else {
-        throw art::Exception(art::errors::Configuration) << "Unknown baseline tool type" << pb_type;
-    }
+    fBaseline  = art::make_tool<uboone_tool::IBaseline> (pset.get<fhicl::ParameterSet>("Baseline"));
     
     // Get signal shaping service.
     fSignalShaping = art::ServiceHandle<util::SignalShapingServiceMicroBooNE>();
@@ -100,7 +122,7 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
     size_t dataSize = waveform.size();
     
     // Make sure the deconvolution size is set correctly (this will probably be a noop after first call)
-    fSignalShaping->SetDecon(dataSize, channel);
+    fSignalShaping->SetDecon(dataSize);
     
     size_t transformSize = fFFT->FFTSize();
     
@@ -116,7 +138,7 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
     std::copy(waveform.begin(),waveform.end(),rawAdcLessPedVec.begin()+binOffset);
     
     // Strategy is to run deconvolution on the entire channel and then pick out the ROI's we found above
-    fSignalShaping->Deconvolute(channel,rawAdcLessPedVec);
+    fSignalShaping->Deconvolute(channel,rawAdcLessPedVec,"nominal");
     
     std::vector<float> holder;
     
@@ -132,7 +154,7 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
         std::copy(rawAdcLessPedVec.begin()+binOffset+roi.first, rawAdcLessPedVec.begin()+binOffset+roi.second, holder.begin());
         std::transform(holder.begin(),holder.end(),holder.begin(),[deconNorm](float& deconVal){return deconVal/deconNorm;});
         
-        // Now we do the baseline determination (and I'm left wondering if there is a better way using the entire waveform?)
+        // Get the baseline from the tool
         float base = fBaseline->GetBaseline(holder, channel, 0, roiLen);
         
         std::transform(holder.begin(),holder.end(),holder.begin(),[base](float& adcVal){return adcVal - base;});
@@ -147,14 +169,13 @@ void MCC7Deconvolution::Deconvolve(IROIFinder::Waveform const&       waveform,
                 }
             }
         }
-
+        
         // add the range into ROIVec
         ROIVec.add_range(roi.first, std::move(holder));
     }
     
     return;
 }
-
     
 void MCC7Deconvolution::outputHistograms(art::TFileDirectory& histDir) const
 {
@@ -185,4 +206,5 @@ void MCC7Deconvolution::outputHistograms(art::TFileDirectory& histDir) const
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(MCC7Deconvolution)
 }

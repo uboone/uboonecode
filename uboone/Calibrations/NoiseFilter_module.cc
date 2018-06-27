@@ -69,7 +69,7 @@ namespace calibration {
   private:
 
     //Keep Track of event number
-    int fEvtNum; //Number of current event
+    //int fEvtNum; //Number of current event
 
     //******************************
     //Variables Taken from FHICL File
@@ -80,8 +80,9 @@ namespace calibration {
     int fEvent, fRun,fSubrun,fChan, fPlaneNum;
     float fMax, fMin, fMean, fRms;
     int fMaxtime, fMintime;
-    bool fisChirp;
-    float fZigZagVal, fChirp;
+    //bool fisChirp;
+    //float fZigZagVal
+    float fChirp;
     std::vector<short> fWf;
       
     int fMaxTicks; ///< maximum number of ticks expected (should get from RawDigit in future)
@@ -89,7 +90,7 @@ namespace calibration {
     TH1F *fHistMod;
     TH1F** waveNoiseHists;
     TH1F *currentHist;
-    TH1F *currentFFTHist;
+    //TH1F *currentFFTHist;
 
     const lariov::DetPedestalProvider&  fPedestalRetrievalAlg; ///< Keep track of an instance to the pedestal retrieval alg
   }; //end class Noise
@@ -192,8 +193,9 @@ namespace calibration {
     std::vector< short > waveform;
     int waveNoiseGroupNum  = 48;
     Int_t waveNoiseCounter = -1;
-    int waveNoiseHistsCh[waveNoiseGroupNum];
-    float waveNoiseHistsChirp[waveNoiseGroupNum];
+    // just use the value of waveNoiseGroupNum
+    int waveNoiseHistsCh[48];
+    float waveNoiseHistsChirp[48];
 
     //loop over channels in raw digit container, get mapping to wire plane and number
     const unsigned int n_channels = rawDigitVector.size();
@@ -216,8 +218,8 @@ namespace calibration {
         // Recover plane and wire in the plane
         unsigned int view = wids[0].Plane;
         unsigned int wire = wids[0].Wire;
-        if( view < 0 || view > fGeometry->Nplanes()) continue;
-        if( wire < 0 || wire > wireMaxNum[view] ) continue;
+        if( view > fGeometry->Nplanes()) continue;
+        if( wire > wireMaxNum[view] ) continue;
         wirePlaneNum[view][wire] = ich;
     }//end loop over raw digit container channels
 
@@ -833,8 +835,8 @@ void NoiseFilter::RawAdaptiveBaselineAlg(TH1F *filtHist)
   Int_t numBins = filtHist->GetNbinsX();
   Int_t minWindowBins = windowSize/2;
 
-  Double_t baselineVec[numBins];
-  Bool_t isFilledVec[numBins];
+  std::vector<Double_t> baselineVec(numBins,0);
+  std::vector<Bool_t> isFilledVec(numBins,0);
 
   Int_t numFlaggedBins = 0;
   for(Int_t j = 0; j < numBins; j++)

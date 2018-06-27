@@ -1,6 +1,6 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "larcore/Geometry/AuxDetGeometryCore.h"
-#include "larcore/Geometry/AuxDetGeo.h"
+#include "larcorealg/Geometry/AuxDetGeometryCore.h"
+#include "larcorealg/Geometry/AuxDetGeo.h"
 
 #include "uboone/CRT/CRTGeometryHelper.hh"
 #include "uboone/CRT/CRTChannelMapAlg.hh"

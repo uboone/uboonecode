@@ -1,1 +1,2 @@
 services.SignalShapingServiceMicroBooNE.FieldResponseFVersion:  [ "v3.13", "v3.13" ]
+services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [ 0, 2.4, 0 ]

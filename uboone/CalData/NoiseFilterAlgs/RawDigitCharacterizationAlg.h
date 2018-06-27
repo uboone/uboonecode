@@ -55,10 +55,11 @@ public:
     void initializeHists(art::ServiceHandle<art::TFileService>&);
     
     // Basic waveform mean and rms
-    void getMeanAndRms(const RawDigitVector& rawWaveform,
-                       float&                aveVal,
-                       float&                rmsVal,
-                       float                 fracBins) const;
+    void getMeanRmsAndMinMax(const RawDigitVector& rawWaveform,
+                             float&                aveVal,
+                             float&                rmsVal,
+                             float&                minMax,
+                             float                 fracBins) const;
     
     // Truncated rms calculation
     void getTruncatedRMS(const RawDigitVector& rawWaveform,
@@ -66,13 +67,12 @@ public:
                          float&                truncRms) const;
    
     // Basic waveform mean, rms and pedestal offset
-    void getMeanRmsAndPedCor(const RawDigitVector& rawWaveform,
-                             unsigned int          channel,
-                             unsigned int          view,
-                             unsigned int          wire,
-                             float&                aveVal,
-                             float&                rmsVal,
-                             float&                pedCorVal) const;
+    void getMeanRmsMinMaxAndPedCor(const RawDigitVector& rawWaveform,
+                                   unsigned int          channel,
+                                   float&                aveVal,
+                                   float&                rmsVal,
+                                   float&                minMax,
+                                   float&                pedCorVal) const;
     
     // Basic waveform mean, rms and pedestal offset
     void getWaveformParams(const RawDigitVector& rawWaveform,
@@ -117,7 +117,7 @@ private:
     bool                 fFillHistograms;        ///< if true then will fill diagnostic hists
 
     // Statistics.
-    int                  fNumEvent;        ///< Number of events seen.
+    //int                  fNumEvent;        ///< Number of events seen.
     
     // Make sure hists for this instance are initialized
     bool                 fHistsInitialized;
@@ -136,7 +136,7 @@ private:
     std::vector<TProfile*>              fSkewnessProfiles;
     std::vector<TProfile*>              fModeRatioProfiles;
     
-    bool                                fFirstEvent;
+    //bool                                fFirstEvent;
 
     caldata::ChannelGroups              fChannelGroups;
     

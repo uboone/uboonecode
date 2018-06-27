@@ -13,6 +13,30 @@ microboone_roifinderstandard:
     zPlaneROIPad: [ 50, 50 ] # number of bins to pad both ends of the ROIs
 }
 
+microboone_roifinderdifferential:
+{
+    tool_type:      ROIFinderDifferential
+    NumSigma:            [  4.0,  4.0,  4.0]
+    NumBinsToAve:        [ 10,   10,   10   ]
+    Max2MinDistance:     [ 60,   60,   60   ]
+    TruncRMSMinFraction: 0.6
+    uPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+    vPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+    zPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+}
+
+microboone_roifindermorphological:
+{
+    tool_type:      ROIFinderMorphological
+    NumSigma:            [  4.5,  4.5,  4.25]
+    Max2MinDistance:     [ 60,   60,   60   ]
+    HalfWindowSize:      [10, 10, 10]
+    TruncRMSMinFraction: 0.6
+    uPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+    vPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+    zPlaneROIPad:        [ 50, 50 ] # number of bins to pad both ends of the ROIs
+}
+
 microboone_baselinestandard:
 {
     tool_type: BaselineStandard
@@ -38,7 +62,7 @@ microboone_nobaseline:
 microboone_roideconvolution:
 {
     tool_type: ROIDeconvolution
-    FFTSize:                    128      # re-initialize FFT service to this size
+    FFTSize:                    1024     # re-initialize FFT service to this size
     SaveWireWF:                 0
     DodQdxCalib:                false  # apply wire-by-wire calibration?
     dQdxCalibFileName:          "dQdxCalibrationPlanev1.txt"
@@ -47,10 +71,11 @@ microboone_roideconvolution:
 
 microboone_mcc7deconvolution:
 {
-    tool_type:                           MCC7Deconvolution
-    DoBaselineSub:                       true
-    DodQdxCalib:                         false  # apply wire-by-wire calibration?
-    dQdxCalibFileName:                   "dQdxCalibrationPlanev1.txt"
+    tool_type:                  MCC7Deconvolution
+    DoBaselineSub:              true
+    DodQdxCalib:                false  # apply wire-by-wire calibration?
+    dQdxCalibFileName:          "dQdxCalibrationPlanev1.txt"
+    MinROIAverageTickThreshold: -0.5
     Baseline:                   @local::microboone_baselinemostprobave
 }
 

@@ -5,7 +5,7 @@
 #include "FillTreeVariables.h"
 
 
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "lardataobj/MCBase/MCTrack.h"

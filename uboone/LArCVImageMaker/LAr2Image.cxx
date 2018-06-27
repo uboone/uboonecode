@@ -42,7 +42,7 @@ namespace supera {
     std::vector<larcv::Image2D> res_v;
     for (size_t p = 0; p < ::supera::Nplanes(); ++p) {
       auto const& meta = meta_v.at(p);
-      res_v.emplace_back(std::move(Hit2Image2D(meta,hits,time_offset)));
+      res_v.emplace_back(Hit2Image2D(meta,hits,time_offset));
       res_v.back().index(res_v.size()-1);
     }
     return res_v;
@@ -151,7 +151,7 @@ namespace supera {
     std::vector<larcv::Image2D> res_v;
     for (size_t p = 0; p < ::supera::Nplanes(); ++p) {
       auto const& meta = meta_v.at(p);
-      res_v.emplace_back(std::move(Wire2Image2D(meta,wires,time_offset)));
+      res_v.emplace_back(Wire2Image2D(meta,wires,time_offset));
       res_v.back().index(res_v.size()-1);
     }
     return res_v;

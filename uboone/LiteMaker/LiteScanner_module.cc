@@ -32,7 +32,7 @@
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "uboone/MuCS/MuCSData.h"
 #include "uboone/MuCS/MuCSRecoData.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "larcore/Geometry/Geometry.h"
@@ -108,9 +108,9 @@ public:
 
   // Required functions.
   void analyze(art::Event const & e) override;
-  void beginJob();
-  void endJob();
-  void beginSubRun(const art::SubRun& sr);
+  void beginJob() override;
+  void endJob() override;
+  void beginSubRun(const art::SubRun& sr) override;
 
 private:
 
@@ -151,7 +151,7 @@ private:
   std::string fOutFileName;
   /// Stream name
   std::string fStreamName;
-  /// RawDigit producer name (if needed) for ChStatus 
+  /// RawDigitproducer name (if needed) for ChStatus 
   std::string _chstatus_rawdigit_producer;
 };
 
@@ -611,8 +611,6 @@ template<class T> void LiteScanner::ScanData(const art::Event& evt, const size_t
   // All cases except for optical
   if(lite_id.first == ::larlite::data::kOpDetWaveform) {
     art::ServiceHandle<geo::UBOpReadoutMap> ub_pmt_channel_map;
-    //auto const* ts = lar::providerFrom<detinfo::DetectorClocksService>();
-    //std::cout << "OpticalDRAM: Trigger time=" << ts->TriggerTime() << " Beam gate time=" << ts->BeamGateTime() << std::endl;
 
     if(label.find("::")<label.size()) {
       evt.getByLabel(label.substr(0,label.find("::")),
@@ -777,7 +775,11 @@ template<class T> void LiteScanner::ScanAssociation(const art::Event& evt, const
   for(auto const& ass_producer : fAssProducer_v) {
 
     auto lite_ass = (::larlite::event_ass*)(_mgr.get_data(::larlite::data::kAssociation,ass_producer));
-    
+    /*
+    std::cout << "LArLite product type: " << lite_id.first
+	      << " ... label: " << lite_id.second
+	      << " ... pointer: " << lite_ass << std::endl;
+    */    
     switch(lite_id.first){
     case ::larlite::data::kUndefined:    break;
     case ::larlite::data::kEvent:        break;

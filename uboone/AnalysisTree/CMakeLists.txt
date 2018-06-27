@@ -1,13 +1,13 @@
 add_subdirectory(MCTruth)
 
-art_make( 
-          MODULE_LIBRARIES larcore_Geometry
+art_make( MODULE_LIBRARIES larcorealg_Geometry
 			               larcore_Geometry_Geometry_service
-			               larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
-                           uboone_AnalysisTree_MCTruth
+                           larsim_Simulation
+                           nutools_ParticleNavigation
+                           lardataobj_Simulation
 	                       lardata_Utilities
 			               larevt_Filters
-                           lardataobj_RawData
+			               lardataobj_RawData
 			               lardataobj_RecoBase
 			               lardata_RecoObjects larreco_Deprecated
 			               larreco_RecoAlg
@@ -23,13 +23,13 @@ art_make(
 			               ${ART_FRAMEWORK_SERVICES_REGISTRY}
 			               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 			               ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-			               art_Persistency_Common canvas_Persistency_Common
-			               art_Persistency_Provenance canvas_Persistency_Provenance
-			               art_Utilities canvas_Utilities
+			               art_Persistency_Common canvas
+			               art_Persistency_Provenance canvas
+			               art_Utilities canvas
 			               ${MF_MESSAGELOGGER}
-			               ${MF_UTILITIES}
+			               
 	                       ${FHICLCPP}
-			               ${CETLIB}
+			               cetlib cetlib_except
                            ${ROOT_GEOM}
                            ${ROOT_XMLIO}
                            ${ROOT_GDML}

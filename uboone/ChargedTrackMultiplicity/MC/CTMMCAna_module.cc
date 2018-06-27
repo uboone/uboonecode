@@ -9,7 +9,7 @@
   #define CTMMCANA_H
   
   // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Principal/Event.h"
@@ -26,12 +26,13 @@
 #include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-  
+#include "art/Utilities/make_tool.h"
+
   // LArSoft Includes
 #include "larcore/CoreUtils/ServiceUtil.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/GeometryCore.h"
-#include "larcore/Geometry/WireGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/WireGeo.h"
 #include "larcore/Geometry/Geometry.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "lardataobj/MCBase/MCShower.h"
@@ -64,7 +65,7 @@
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 #include "larreco/Deprecated/BezierTrack.h"
 #include "larreco/RecoAlg/TrackMomentumCalculator.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
@@ -1789,17 +1790,8 @@
     fMinTrk2VtxDist          = pset.get<double>      ("MinTrk2VtxDist", 5.);
     fMinTrackLen             = pset.get<double>      ("MinTrackLen", 75.);
 
-  // Get the tool for MC Truth matching
-  const fhicl::ParameterSet& truthParams = pset.get<fhicl::ParameterSet>("MCTruthMatching");
-  
-    if (truthParams.get<std::string>("tool_type") == "AssociationsTruth")
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::AssociationsTruth(truthParams));
-    }
-    else
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::BackTrackerTruth(truthParams));
-    }
+    // Get the tool for MC Truth matching
+    fMCTruthMatching = art::make_tool<truth::IMCTruthMatching>(pset.get<fhicl::ParameterSet>("MCTruthMatching"));
 
    }
  
@@ -2203,9 +2195,9 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	_fTruenuvrtxx=MCtruth->GetNeutrino().Nu().Vx();
 	_fTruenuvrtxy=MCtruth->GetNeutrino().Nu().Vy();
 	_fTruenuvrtxz=MCtruth->GetNeutrino().Nu().Vz();
-	_fTrueSPcorrnuvtxx = MCtruth->GetNeutrino().Nu().Vx() - SCE->GetPosOffsets(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())[0];
-	_fTrueSPcorrnuvtxy = MCtruth->GetNeutrino().Nu().Vy() + SCE->GetPosOffsets(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())[1];
-	_fTrueSPcorrnuvtxz = MCtruth->GetNeutrino().Nu().Vz() + SCE->GetPosOffsets(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())[2];
+	_fTrueSPcorrnuvtxx = MCtruth->GetNeutrino().Nu().Vx() - SCE->GetPosOffsets(geo::Point_t(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())).X();
+	_fTrueSPcorrnuvtxy = MCtruth->GetNeutrino().Nu().Vy() + SCE->GetPosOffsets(geo::Point_t(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())).Y();
+	_fTrueSPcorrnuvtxz = MCtruth->GetNeutrino().Nu().Vz() + SCE->GetPosOffsets(geo::Point_t(MCtruth->GetNeutrino().Nu().Vx(),MCtruth->GetNeutrino().Nu().Vy(),MCtruth->GetNeutrino().Nu().Vz())).Z();
       }  
       else 
       {
@@ -2333,12 +2325,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	    _fGtrueparEndx[genie_particle]=part.EndPosition()[0];
 	    _fGtrueparEndy[genie_particle]=part.EndPosition()[1];
 	    _fGtrueparEndz[genie_particle]=part.EndPosition()[2];
-	    _fGtrueparSPcorrStartx[genie_particle]=part.Vx() - SCE->GetPosOffsets(part.Vx(),part.Vy(),part.Vz())[0]; 
-	    _fGtrueparSPcorrStarty[genie_particle]=part.Vy() + SCE->GetPosOffsets(part.Vx(),part.Vy(),part.Vz())[1];
-	    _fGtrueparSPcorrStartz[genie_particle]=part.Vz() + SCE->GetPosOffsets(part.Vx(),part.Vy(),part.Vz())[2]; 
-	    _fGtrueparSPcorrEndx[genie_particle]=part.EndPosition()[0] - SCE->GetPosOffsets(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])[0]; 
-	    _fGtrueparSPcorrEndy[genie_particle]=part.EndPosition()[1] + SCE->GetPosOffsets(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])[1];
-	    _fGtrueparSPcorrEndz[genie_particle]=part.EndPosition()[2] + SCE->GetPosOffsets(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])[2]; 
+	    _fGtrueparSPcorrStartx[genie_particle]=part.Vx() - SCE->GetPosOffsets(geo::Point_t(part.Vx(),part.Vy(),part.Vz())).X();
+	    _fGtrueparSPcorrStarty[genie_particle]=part.Vy() + SCE->GetPosOffsets(geo::Point_t(part.Vx(),part.Vy(),part.Vz())).Y();
+	    _fGtrueparSPcorrStartz[genie_particle]=part.Vz() + SCE->GetPosOffsets(geo::Point_t(part.Vx(),part.Vy(),part.Vz())).Z(); 
+	    _fGtrueparSPcorrEndx[genie_particle]=part.EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])).X(); 
+	    _fGtrueparSPcorrEndy[genie_particle]=part.EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])).Y();
+	    _fGtrueparSPcorrEndz[genie_particle]=part.EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(part.EndPosition()[0],part.EndPosition()[1],part.EndPosition()[2])).Z(); 
 	    _fGtrueparPhi[genie_particle]=part.Momentum().Phi();	
 	    _fGtrueparCosPhi[genie_particle]=TMath::Cos(part.Momentum().Phi());
 	    _fGtrueparSinPhi[genie_particle]=TMath::Sin(part.Momentum().Phi());
@@ -2460,12 +2452,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	  _ftruematchparEndx[ntruematchpart]=mparticle->EndPosition()[0];
 	  _ftruematchparEndy[ntruematchpart]=mparticle->EndPosition()[1];
 	  _ftruematchparEndz[ntruematchpart]=mparticle->EndPosition()[2];
-	  _ftruematchparSPcorrStartx[ntruematchpart]=mparticle->Vx() - SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[0]; 
-	  _ftruematchparSPcorrStarty[ntruematchpart]=mparticle->Vy() + SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[1];
-	  _ftruematchparSPcorrStartz[ntruematchpart]=mparticle->Vz() + SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[2]; 
-	  _ftruematchparSPcorrEndx[ntruematchpart]=mparticle->EndPosition()[0] - SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[0]; 
-	  _ftruematchparSPcorrEndy[ntruematchpart]=mparticle->EndPosition()[1] + SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[1];
-	  _ftruematchparSPcorrEndz[ntruematchpart]=mparticle->EndPosition()[2] + SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[2]; 
+	  _ftruematchparSPcorrStartx[ntruematchpart]=mparticle->Vx() - SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).X(); 
+	  _ftruematchparSPcorrStarty[ntruematchpart]=mparticle->Vy() + SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).Y();
+	  _ftruematchparSPcorrStartz[ntruematchpart]=mparticle->Vz() + SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).Z(); 
+	  _ftruematchparSPcorrEndx[ntruematchpart]=mparticle->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).X(); 
+	  _ftruematchparSPcorrEndy[ntruematchpart]=mparticle->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).Y();
+	  _ftruematchparSPcorrEndz[ntruematchpart]=mparticle->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).Z(); 
 	  _ftruematchparPhi[ntruematchpart]=mparticle->Momentum().Phi();
 	  _ftruematchparCosPhi[ntruematchpart]=TMath::Cos(mparticle->Momentum().Phi());
 	  _ftruematchparSinPhi[ntruematchpart]=TMath::Sin(mparticle->Momentum().Phi());
@@ -2506,12 +2498,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	  _fSeconparEndx[nsecondaryPar]=mparticle->EndPosition()[0];
 	  _fSeconparEndy[nsecondaryPar]=mparticle->EndPosition()[1];
 	  _fSeconparEndz[nsecondaryPar]=mparticle->EndPosition()[2];
-	  _fSeconparSPcorrStartx[nsecondaryPar]=mparticle->Vx() - SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[0]; 
-	  _fSeconparSPcorrStarty[nsecondaryPar]=mparticle->Vy() + SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[1];
-	  _fSeconparSPcorrStartz[nsecondaryPar]=mparticle->Vz() + SCE->GetPosOffsets(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())[2]; 
-	  _fSeconparSPcorrEndx[nsecondaryPar]=mparticle->EndPosition()[0] - SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[0]; 
-	  _fSeconparSPcorrEndy[nsecondaryPar]=mparticle->EndPosition()[1] + SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[1];
-	  _fSeconparSPcorrEndz[nsecondaryPar]=mparticle->EndPosition()[2] + SCE->GetPosOffsets(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])[2]; 
+	  _fSeconparSPcorrStartx[nsecondaryPar]=mparticle->Vx() - SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).X(); 
+	  _fSeconparSPcorrStarty[nsecondaryPar]=mparticle->Vy() + SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).Y();
+	  _fSeconparSPcorrStartz[nsecondaryPar]=mparticle->Vz() + SCE->GetPosOffsets(geo::Point_t(mparticle->Vx(),mparticle->Vy(),mparticle->Vz())).Z(); 
+	  _fSeconparSPcorrEndx[nsecondaryPar]=mparticle->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).X(); 
+	  _fSeconparSPcorrEndy[nsecondaryPar]=mparticle->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).Y();
+	  _fSeconparSPcorrEndz[nsecondaryPar]=mparticle->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(mparticle->EndPosition()[0],mparticle->EndPosition()[1],mparticle->EndPosition()[2])).Z(); 
 	  _fSeconparPhi[nsecondaryPar]=mparticle->Momentum().Phi();
 	  _fSeconparCosPhi[nsecondaryPar]=TMath::Cos(mparticle->Momentum().Phi());
 	  _fSeconparSinPhi[nsecondaryPar]=TMath::Sin(mparticle->Momentum().Phi());
@@ -2593,12 +2585,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	  _ftrueparEndx[ntruepart]=part->EndPosition()[0];
 	  _ftrueparEndy[ntruepart]=part->EndPosition()[1];
 	  _ftrueparEndz[ntruepart]=part->EndPosition()[2];
-	  _ftrueparSPcorrStartx[ntruepart]=part->Vx() - SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[0]; 
-	  _ftrueparSPcorrStarty[ntruepart]=part->Vy() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[1];
-	  _ftrueparSPcorrStartz[ntruepart]=part->Vz() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[2]; 
-	  _ftrueparSPcorrEndx[ntruepart]=part->EndPosition()[0] - SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[0]; 
-	  _ftrueparSPcorrEndy[ntruepart]=part->EndPosition()[1] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[1];
-	  _ftrueparSPcorrEndz[ntruepart]=part->EndPosition()[2] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[2]; 
+	  _ftrueparSPcorrStartx[ntruepart]=part->Vx() - SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).X(); 
+	  _ftrueparSPcorrStarty[ntruepart]=part->Vy() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Y();
+	  _ftrueparSPcorrStartz[ntruepart]=part->Vz() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Z(); 
+	  _ftrueparSPcorrEndx[ntruepart]=part->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).X(); 
+	  _ftrueparSPcorrEndy[ntruepart]=part->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Y();
+	  _ftrueparSPcorrEndz[ntruepart]=part->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Z(); 
 	  _ftrueparPhi[ntruepart]=part->Momentum().Phi();
 	  _ftrueparCosPhi[ntruepart]=TMath::Cos(part->Momentum().Phi());
 	  _ftrueparSinPhi[ntruepart]=TMath::Sin(part->Momentum().Phi());
@@ -2641,12 +2633,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	        _ftrueInAccpparEndx[trueInAccep]=part->EndPosition()[0];
 	        _ftrueInAccpparEndy[trueInAccep]=part->EndPosition()[1];
 	        _ftrueInAccpparEndz[trueInAccep]=part->EndPosition()[2];
-	        _ftrueInAccpparSPcorrStartx[trueInAccep]=part->Vx() - SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[0]; 
-	        _ftrueInAccpparSPcorrStarty[trueInAccep]=part->Vy() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[1];
-	        _ftrueInAccpparSPcorrStartz[trueInAccep]=part->Vz() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[2]; 
-	        _ftrueInAccpparSPcorrEndx[trueInAccep]=part->EndPosition()[0] - SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[0]; 
-	        _ftrueInAccpparSPcorrEndy[trueInAccep]=part->EndPosition()[1] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[1];
-	        _ftrueInAccpparSPcorrEndz[trueInAccep]=part->EndPosition()[2] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[2]; 
+	        _ftrueInAccpparSPcorrStartx[trueInAccep]=part->Vx() - SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).X(); 
+	        _ftrueInAccpparSPcorrStarty[trueInAccep]=part->Vy() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Y();
+	        _ftrueInAccpparSPcorrStartz[trueInAccep]=part->Vz() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Z(); 
+	        _ftrueInAccpparSPcorrEndx[trueInAccep]=part->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).X(); 
+	        _ftrueInAccpparSPcorrEndy[trueInAccep]=part->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Y();
+	        _ftrueInAccpparSPcorrEndz[trueInAccep]=part->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Z(); 
 	        _ftrueInAccpparPhi[trueInAccep]=part->Momentum().Phi();
 	        _ftrueInAccpparCosPhi[trueInAccep]=TMath::Cos(part->Momentum().Phi());
 	        _ftrueInAccpparSinPhi[trueInAccep]=TMath::Sin(part->Momentum().Phi());
@@ -2695,12 +2687,12 @@ double CTMMCAna::FlashTrackDist(double flash, double start, double end) const
 	        _ftruelongInAccpparEndx[truelongInAccep]=part->EndPosition()[0];
 	        _ftruelongInAccpparEndy[truelongInAccep]=part->EndPosition()[1];
 	        _ftruelongInAccpparEndz[truelongInAccep]=part->EndPosition()[2];
-	        _ftruelongInAccpparSPcorrStartx[truelongInAccep]=part->Vx() - SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[0]; 
-	        _ftruelongInAccpparSPcorrStarty[truelongInAccep]=part->Vy() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[1];
-	        _ftruelongInAccpparSPcorrStartz[truelongInAccep]=part->Vz() + SCE->GetPosOffsets(part->Vx(),part->Vy(),part->Vz())[2]; 
-	        _ftruelongInAccpparSPcorrEndx[truelongInAccep]=part->EndPosition()[0] - SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[0]; 
-	        _ftruelongInAccpparSPcorrEndy[truelongInAccep]=part->EndPosition()[1] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[1];
-	        _ftruelongInAccpparSPcorrEndz[truelongInAccep]=part->EndPosition()[2] + SCE->GetPosOffsets(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])[2]; 
+	        _ftruelongInAccpparSPcorrStartx[truelongInAccep]=part->Vx() - SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).X(); 
+	        _ftruelongInAccpparSPcorrStarty[truelongInAccep]=part->Vy() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Y();
+	        _ftruelongInAccpparSPcorrStartz[truelongInAccep]=part->Vz() + SCE->GetPosOffsets(geo::Point_t(part->Vx(),part->Vy(),part->Vz())).Z(); 
+	        _ftruelongInAccpparSPcorrEndx[truelongInAccep]=part->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).X(); 
+	        _ftruelongInAccpparSPcorrEndy[truelongInAccep]=part->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Y();
+	        _ftruelongInAccpparSPcorrEndz[truelongInAccep]=part->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(part->EndPosition()[0],part->EndPosition()[1],part->EndPosition()[2])).Z(); 
 	        _ftruelongInAccpparPhi[truelongInAccep]=part->Momentum().Phi();
 	        _ftruelongInAccpparCosPhi[truelongInAccep]=TMath::Cos(part->Momentum().Phi());
 	        _ftruelongInAccpparSinPhi[truelongInAccep]=TMath::Sin(part->Momentum().Phi());

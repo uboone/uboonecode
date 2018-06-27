@@ -101,10 +101,16 @@ microboone_pmtgain_provider:
     UseDB: false
     UseFile: false
     
-    DefaultGain:       20.0
-    DefaultGainErr:    0.02
+    DefaultGain:       130.0
+    DefaultGainErr:    0.1
+    
+    DefaultAmplitudeGain:  20.0
+    DefaultAmplitudeGainErr: 0.01
+    
+    DefaultBaselineMean: 0.0
+    DefaultBaselineRms:  0.6 
 }
-microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "pmtgains_data"
+microboone_pmtgain_provider.DatabaseRetrievalAlg.DBFolderName: "detpmtgains_data"
 microboone_pmtgain_provider.DatabaseRetrievalAlg.DBTag: "v1r1"
 
 microboone_pmtgain_service:
@@ -129,6 +135,8 @@ microboone_electronicscalib_provider:
     DefaultGainErr:        0.0
     DefaultShapingTime:    2.0
     DefaultShapingTimeErr: 0.0
+    
+    OnlyMisconfigStatusFromDB: true
 }
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBFolderName: "electronicscalib_data"
 microboone_electronicscalib_provider.DatabaseRetrievalAlg.DBTag: "v1r2"

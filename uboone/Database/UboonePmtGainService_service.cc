@@ -6,7 +6,7 @@
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/PmtGainService.h"
-#include "larevt/CalibrationDBI/Providers/SIOVPmtGainProvider.h"
+#include "UboonePmtGainProvider.h"
 #include "UbooneCalibrationServiceHelper.h"
 
 namespace lariov{
@@ -36,7 +36,7 @@ namespace lariov{
         return &fProvider; 
       }
     
-      SIOVPmtGainProvider fProvider;
+      UboonePmtGainProvider fProvider;
       UbooneCalibrationServiceHelper fHelper;
   };
 }//end namespace lariov

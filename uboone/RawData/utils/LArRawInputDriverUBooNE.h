@@ -23,6 +23,9 @@
 #include "datatypes/ub_EventRecord.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
+//root
+#include "TTree.h"
+
 #include "uboone/Geometry/UBOpChannelTypes.h"
 #include "lardata/Utilities/DatabaseUtil.h" // lardata
 
@@ -106,14 +109,14 @@ namespace lris {
     
     double _trigger_beam_window_time;
 
-    art::SourceHelper            fSourceHelper;
+    art::SourceHelper const&       fSourceHelper;
     art::SubRunID                  fCurrentSubRunID;
     std::ifstream                  fInputStream;
     std::vector<std::streampos>    fEventLocation;
     uint32_t                       fEventCounter; 
     uint32_t                       fNumberEventsInFile;
     uint32_t                       fFinalEventCutOff;
-    std::ios::streampos            fPreviousPosition;
+    std::streampos                 fPreviousPosition;
     bool                           fCompleteFile;
     bool                           fHuffmanDecode;
     bool                           fUseGPS;    // fhicl parameter force use GPS time.
@@ -147,11 +150,11 @@ namespace lris {
     // TPC Helper Methods
     std::vector<short> decodeChannelTrailer(unsigned short last_adc, unsigned short data);
     
-   //Stuf that Andy added to make fun trigger plots! :)
-   int N_discriminators [40];
-    int discriminatorFrame [40][100];
-    int discriminatorSample [40][100];
-    int discriminatorType [40][100];
+    //Stuf that Andy added to make fun trigger plots! :)
+    //int N_discriminators [40];
+    //int discriminatorFrame [40][100];
+    //int discriminatorSample [40][100];
+    //int discriminatorType [40][100];
     double PMT_waveform_times[400];
     int N_PMT_waveforms; 
 

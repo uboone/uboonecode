@@ -16,11 +16,12 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	  LIBRARY_NAME     uboonecode_uboone_LiteMaker
 	  LIB_LIBRARIES
 		   uboone_RawData
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   uboone_Geometry
 		   uboonecode_uboone_MuCS
 		   larcore_Geometry_Geometry_service
 	   	   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+		   larsim_MCCheater_ParticleInventoryService_service
 		   lardataobj_RecoBase
 		   nusimdata_SimulationBase
 		   lardataobj_MCBase
@@ -37,13 +38,13 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-		   art_Persistency_Common canvas_Persistency_Common
-		   art_Persistency_Provenance canvas_Persistency_Provenance
-		   art_Utilities canvas_Utilities
+		   art_Persistency_Common canvas
+		   art_Persistency_Provenance canvas
+		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -56,7 +57,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 	      	   FileCatalogMetadataMicroBooNE_service
 		   LLMetaMaker_service
 		   uboonecode_uboone_MuCS
-		   larcore_Geometry
+		   larcorealg_Geometry
 		   uboone_Geometry
 		   larcore_Geometry_Geometry_service
 		   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
@@ -80,13 +81,13 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   ${ART_FRAMEWORK_SERVICES_REGISTRY}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 		   ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-		   art_Persistency_Common canvas_Persistency_Common
-		   art_Persistency_Provenance canvas_Persistency_Provenance
-		   art_Utilities canvas_Utilities
+		   art_Persistency_Common canvas
+		   art_Persistency_Provenance canvas
+		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
@@ -97,11 +98,11 @@ simple_plugin(LLMetaMaker "service"
 	      TFileMetadataMicroBooNE_service
 	      FileCatalogMetadataMicroBooNE_service
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
-	      art_Utilities canvas_Utilities
+	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
-	      ${CETLIB}
+	      cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}
               BASENAME_ONLY
 )

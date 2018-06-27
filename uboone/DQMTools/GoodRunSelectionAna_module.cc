@@ -10,7 +10,7 @@
   #define GOODRUNSELECTIONANA_H
   
   // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Principal/Event.h"
@@ -46,14 +46,10 @@
 #include "lardataobj/RecoBase/PFParticle.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
-#include "larreco/RecoAlg/TrackMomentumCalculator.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
 #include "lardataobj/AnalysisBase/T0.h"
-
-
-#include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 
 #include <cstddef> // std::ptrdiff_t
 #include <cstring> // std::memcpy()

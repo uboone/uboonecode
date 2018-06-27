@@ -24,7 +24,7 @@
 
 #include "larcore/Geometry/Geometry.h"
 
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 
 #include "nusimdata/SimulationBase/MCParticle.h"
 
@@ -133,7 +133,7 @@ namespace MuCSReader
   private:
     
     std::string fMergerProducerLabel; 
-    Int_t group = 0;
+    //Int_t group = 0;
     Int_t trigID = 0;
     Int_t run0;
     Int_t srun0;

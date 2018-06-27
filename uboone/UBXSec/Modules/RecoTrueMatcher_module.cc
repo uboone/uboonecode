@@ -56,7 +56,7 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardataobj/Simulation/SimChannel.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 #include "uboone/UBXSec/DataTypes/MCGhost.h"
 
 #include <memory>
@@ -198,14 +198,14 @@ void RecoTrueMatcher::PrintInfo(lar_pandora::PFParticlesToMCParticles matched_pf
 
   std::cout << "[RecoTrueMatcher] ~~~~~~~~~~ Printing Additional Info" << std::endl;
 
-  ::art::ServiceHandle<cheat::BackTracker> bt;
+  ::art::ServiceHandle<cheat::ParticleInventoryService> pi;
 
   for (auto iter : matched_pfp_to_mcp_map) {
 
     art::Ptr<recob::PFParticle> pf_par = iter.first;    // The PFParticle 
     art::Ptr<simb::MCParticle>  mc_par = iter.second;   // The matched MCParticle
 
-    const art::Ptr<simb::MCTruth> mc_truth = bt->TrackIDToMCTruth(mc_par->TrackId());
+    const art::Ptr<simb::MCTruth> mc_truth = pi->TrackIdToMCTruth_P(mc_par->TrackId());
 
     if (!mc_truth) {
       std::cerr << "[RecoTrueMatcher] Problem with MCTruth pointer." << std::endl;

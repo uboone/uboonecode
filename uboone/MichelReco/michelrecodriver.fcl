@@ -1,0 +1,8 @@
+BEGIN_PROLOG
+MichelReco: {
+ module_type     : "MichelRecoDriver"  
+ ClusterProducer : "pandoraCosmic"
+ HitProducer     : "gaushit"
+ MinClusSize     : 5
+}
+END_PROLOG

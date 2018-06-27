@@ -55,7 +55,7 @@ public:
   
   void reconfigure( fhicl::ParameterSet const &pset ); // override;
   void produce( art::Event &evt ) override;
-  void beginRun(art::Run& run);
+  void beginRun(art::Run& run) override;
   
 private:
   
@@ -63,7 +63,7 @@ private:
   std::string fMuCSFile;
   
   Int_t trigID = 0;
-  TH1F *hDT;
+  //TH1F *hDT;
   Int_t run0;
   Int_t srun0;
   TFile *fTFMuCSData;
@@ -132,7 +132,7 @@ void MuCSMerger::beginRun(art::Run& run){
   std::string fetchedfile(fIFDH->fetchInput(fMuCSFile));
   mf::LogInfo("MuCSMerger") << "Fetched; local path: "<<fetchedfile<<"\n";    
 
-  fTFMuCSData = new TFile( Form( fetchedfile.c_str() ), "read" );  
+  fTFMuCSData = new TFile( Form( "%s", fetchedfile.c_str() ), "read" );  
   
   if ( fTFMuCSData->IsZombie() ) {
     cout << " - mucs file not existing ! " << endl;

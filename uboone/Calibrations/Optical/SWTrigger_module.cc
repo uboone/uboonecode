@@ -37,11 +37,11 @@
 //#include "larcore/LArUtilities/TimeService.h"
 #include "larcore/CoreUtils/ServiceUtil.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "uboonecode/uboone/TriggerSim/UBTriggerTypes.h"
+#include "uboone/TriggerSim/UBTriggerTypes.h"
 
 //Optical Channel Maps
-#include "uboonecode/uboone/Geometry/UBOpChannelTypes.h"
-#include "uboonecode/uboone/Geometry/UBOpReadoutMap.h"
+#include "uboone/Geometry/UBOpChannelTypes.h"
+#include "uboone/Geometry/UBOpReadoutMap.h"
 
 //RawDigits
 #include "lardataobj/RawData/raw.h"
@@ -50,8 +50,8 @@
 #include "lardataobj/RecoBase/OpFlash.h"
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/RawData/DAQHeader.h"
-#include "uboonecode/uboone/TriggerSim/UBTriggerTypes.h"
-#include "uboonecode/uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
+#include "uboone/TriggerSim/UBTriggerTypes.h"
+#include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 
 // Trigger Emulator Code
 #include "SWTriggerBase/SWTriggerTypes.h"
@@ -191,8 +191,8 @@ SWTrigger::SWTrigger(fhicl::ParameterSet const & p)
     m_algos.declareAlgo( triggerbit, type, instance_name );
     auto& cfg = m_algos.GetConfig( instance_name );
 
-    sprintf(zinstance_name, instance_name.c_str() );
-    sprintf(ztype_name, type.c_str() );
+    sprintf(zinstance_name, "%s", instance_name.c_str() );
+    sprintf(ztype_name, "%s", type.c_str() );
     
     for ( auto const& key : cfg.ListKeys<bool>() )        cfg.Set( key, cfg_ps.get<bool>(key), true );
     for ( auto const& key : cfg.ListKeys<std::string>() ) cfg.Set( key, cfg_ps.get<std::string>(key), true );

@@ -358,7 +358,7 @@ namespace opdet {
 	}
       }
       // TRIGGER GATE
-      else if ( (chcat == opdet::BNBLogicPulse ) ) {
+      else if ( chcat == opdet::BNBLogicPulse ) {
 	pulse_times.push_back( trigger.Start() );
       }//end of if TRIGGER GATE
 

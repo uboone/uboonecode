@@ -1,6 +1,10 @@
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+cet_add_compiler_flags(CXX -Wno-return-type-c-linkage )
+endif()
+
 art_make( BASENAME_ONLY
           EXCLUDE SimWireMicroBooNE_module.cc 
-          MODULE_LIBRARIES larcore_Geometry
+          MODULE_LIBRARIES larcorealg_Geometry
                         larcore_Geometry_Geometry_service
                         larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
                         lardata_Utilities
@@ -15,13 +19,13 @@ art_make( BASENAME_ONLY
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
                         ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-                        art_Persistency_Common canvas_Persistency_Common
-                        art_Persistency_Provenance canvas_Persistency_Provenance
-                        art_Utilities canvas_Utilities
+                        art_Persistency_Common canvas
+                        art_Persistency_Provenance canvas
+                        art_Utilities canvas
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
-                        ${CETLIB}
+                        cetlib cetlib_except
                         ${CLHEP}
                         ${ROOT_GEOM}
                         ${ROOT_XMLIO}
@@ -31,7 +35,7 @@ art_make( BASENAME_ONLY
 
 simple_plugin(SimWireMicroBooNE "module"
           BASENAME_ONLY
-              larcore_Geometry
+              larcorealg_Geometry
               larcore_Geometry_Geometry_service
               larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
               lardata_Utilities
@@ -47,13 +51,13 @@ simple_plugin(SimWireMicroBooNE "module"
               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
               ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
               ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
-              art_Persistency_Common canvas_Persistency_Common
-              art_Persistency_Provenance canvas_Persistency_Provenance
-              art_Utilities canvas_Utilities
+              art_Persistency_Common canvas
+              art_Persistency_Provenance canvas
+              art_Utilities canvas
               ${MF_MESSAGELOGGER}
-              ${MF_UTILITIES}
+              
               ${FHICLCPP}
-              ${CETLIB}
+              cetlib cetlib_except
               ${CLHEP}
               ${ROOT_GEOM}
               ${ROOT_XMLIO}

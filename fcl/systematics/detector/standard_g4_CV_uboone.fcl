@@ -2,7 +2,7 @@
 
 process_name: G4CV
 
-outputs.out1.fileName: "detsyst_%tc_g4_CV.root"
+outputs.out1.fileName: "%ifb_%tc_g4_CV.root"
 
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true

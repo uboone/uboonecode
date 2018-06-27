@@ -24,7 +24,7 @@
 #include "art/Framework/Core/FileBlock.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "cetlib/cpu_timer.h"
 
 // LArSoft includes
@@ -35,7 +35,7 @@
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 #include "larcore/CoreUtils/ServiceUtil.h" // lar::providerFrom<>()
-#include "larcore/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/GeometryCore.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"

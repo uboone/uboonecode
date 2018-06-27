@@ -9,7 +9,7 @@ art_make( BASENAME_ONLY
 		   uboonecode_uboone_BasicTool_GeoAlgo
 		   uboonecode_uboone_SelectionTool_OpT0FinderBase
 		   uboonecode_uboone_SelectionTool_OpT0FinderAlgorithms
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
                    uboonecode_uboone_CosmicTagging_CosmicTaggingAlgorithms
                    #Simulation
@@ -32,16 +32,17 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}
 		   ${ROOT_BASIC_LIB_LIST}
 
           MODULE_LIBRARIES 	  		   
-                   larsim_MCCheater_BackTracker_service
+                   larsim_MCCheater_ParticleInventoryService_service
+                   larsim_MCCheater_BackTrackerService_service
 		   larpandora_LArPandoraInterface
 
 		   uboonecode_uboone_BasicTool_GeoAlgo
@@ -50,7 +51,7 @@ art_make( BASENAME_ONLY
 
                    uboonecode_uboone_CosmicTagging_CosmicTaggingAlgorithms
 
-	  	   larcore_Geometry
+	  	   larcorealg_Geometry
 		   larcore_Geometry_Geometry_service
 		   lardataobj_RecoBase
                    lardataobj_AnalysisBase
@@ -69,9 +70,9 @@ art_make( BASENAME_ONLY
 		   ${ART_PERSISTENCY_PROVENANCE}
 		   ${ART_UTILITIES}
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
-		   ${CETLIB}
+		   cetlib cetlib_except
 		   ${ROOT_GEOM}
 		   ${ROOT_XMLIO}
 		   ${ROOT_GDML}

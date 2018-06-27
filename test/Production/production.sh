@@ -4,6 +4,10 @@
 
 env > env.txt
 
+# Set wire cell path.
+
+export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
+
 # This script runs the full mc+reco chain using standard released fcl files.
 
 input=''

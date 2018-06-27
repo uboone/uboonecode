@@ -24,10 +24,10 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "art/Framework/Core/ModuleMacros.h"
-//#include "art/Utilities/make_tool.h"
+#include "art/Utilities/make_tool.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "canvas/Persistency/Common/FindManyP.h"
 #include "canvas/Persistency/Common/PtrVector.h"
 
@@ -48,10 +48,9 @@
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 
 // The stuff we really need
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/BackTrackerService.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 #include "uboone/AnalysisTree/MCTruth/IMCTruthMatching.h"
-#include "uboone/AnalysisTree/MCTruth/AssociationsTruth_tool.h"
-#include "uboone/AnalysisTree/MCTruth/BackTrackerTruth_tool.h"
 
 // ROOT includes. Note: To look up the properties of the ROOT classes,
 // use the ROOT web site; e.g.,
@@ -192,19 +191,7 @@ void MCTruthTestAna::reconfigure(fhicl::ParameterSet const& pset)
     fTrackProducerLabel            = pset.get<art::InputTag>("TrackProducerLabel");
 
     // Get the tool for MC Truth matching
-//    fMCTruthMatching = art::make_tool<truth::IMCTruthMatching>(pset.get<fhicl::ParameterSet>("MCTruthMatching"));
-
-    // Get the tool for MC Truth matching
-    const fhicl::ParameterSet& truthParams = pset.get<fhicl::ParameterSet>("MCTruthMatching");
-    
-    if (truthParams.get<std::string>("tool_type") == "AssociationsTruth")
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::AssociationsTruth(truthParams));
-    }
-    else
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::BackTrackerTruth(truthParams));
-    }
+    fMCTruthMatching = art::make_tool<truth::IMCTruthMatching>(pset.get<fhicl::ParameterSet>("MCTruthMatching"));
 
     return;
 }
@@ -213,14 +200,15 @@ void MCTruthTestAna::reconfigure(fhicl::ParameterSet const& pset)
 void MCTruthTestAna::analyze(const art::Event& event)
 {
     // Recover the backtracker
-    art::ServiceHandle<cheat::BackTracker> backTracker;
-    
+    art::ServiceHandle<cheat::BackTrackerService>       backTracker;
+    art::ServiceHandle<cheat::ParticleInventoryService> partInventory;
+   
     // "Rebuild" the maps used by the parallel backtracker
     fMCTruthMatching->Rebuild(event);
     
     // Begin the comparisons by simply checking that the number of MCParticles agree between the two
     const sim::ParticleList& particleList = fMCTruthMatching->ParticleList();
-    const sim::ParticleList& btPartList   = backTracker->ParticleList();
+    const sim::ParticleList& btPartList   = partInventory->ParticleList();
     
     if (particleList.size() != btPartList.size())
     {
@@ -243,7 +231,7 @@ void MCTruthTestAna::analyze(const art::Event& event)
             
             // Check the claimed parentage of the current hit
             std::vector<sim::TrackIDE> trackIDEVec = fMCTruthMatching->HitToTrackID(hit);
-            std::vector<sim::TrackIDE> btTrkIDEVec = backTracker->HitToTrackID(hit);
+            std::vector<sim::TrackIDE> btTrkIDEVec = backTracker->HitToTrackIDEs(hit);
             
             int deltaIDs = int(btTrkIDEVec.size()) - int(trackIDEVec.size());
             
@@ -310,7 +298,7 @@ void MCTruthTestAna::analyze(const art::Event& event)
             std::vector<art::Ptr<recob::Hit>> trackHitVec = hitTrackAssns.at(track.key());
             
             std::set<int> trackIDSet = fMCTruthMatching->GetSetOfTrackIDs(trackHitVec);
-            std::set<int> btTrkIDSet = backTracker->GetSetOfTrackIDs(trackHitVec);
+            std::set<int> btTrkIDSet = backTracker->GetSetOfTrackIds(trackHitVec);
             
             // Check for case were we might have negative track IDs from the BackTracker
             if (btTrkIDSet.size() > trackIDSet.size())
@@ -334,8 +322,13 @@ void MCTruthTestAna::analyze(const art::Event& event)
             for(auto& trackID : btTrkIDSet) btTrkIDVec.emplace_back(trackID);
             
             // And then use this to recover the vectors of hits associated to each MC track
-            std::vector<std::vector<art::Ptr<recob::Hit>>> trkHitVecVec = backTracker->TrackIDsToHits(hitPtrVector, btTrkIDVec);
-            
+            std::vector<std::vector<art::Ptr<recob::Hit>>> trkHitVecVec;
+
+            for(const auto& tkID : btTrkIDVec)
+            {
+                std::vector<art::Ptr<recob::Hit>> hitVec = backTracker->TrackIdToHits_Ps(tkID, hitPtrVector);
+                trkHitVecVec.push_back(hitVec);
+            }
             // Apply majority logic - we declare the MCParticle with the most hits to be the "winner"
             std::vector<std::vector<art::Ptr<recob::Hit>>>::iterator bestTrkHitVecItr = std::max_element(trkHitVecVec.begin(),trkHitVecVec.end(),[](const auto& a, const auto& b){return a.size() < b.size();});
             

@@ -5,9 +5,10 @@ process_name: DLprod
 
 services:
 {
+  TFileService: { fileName: "larcv_data.root" }
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   TimeTracker:  {}
-  MemoryTracker:     { ignoreTotal: 1 } # default is one
+  MemoryTracker:     {} # default is one
   message:      @local::microboone_message_services_prod_debug
   FileCatalogMetadata:  @local::art_file_catalog_data
   LLMetaMaker:       {Enable: false}

@@ -22,7 +22,7 @@ services:
   # Load the service that manages root files for histograms.
   TFileService:            { fileName: "reco_stage_1_hist.root" }
   TimeTracker:             {}
-  MemoryTracker:           { ignoreTotal: 1 } # default is one
+  MemoryTracker:           { } # default is one
   RandomNumberGenerator:   {} #ART native random number generator
   message:                 @local::microboone_message_services_prod_debug
   FileCatalogMetadata:     @local::art_file_catalog_data
@@ -83,7 +83,7 @@ physics:
   cluster3dpcatag:     @local::microboone_cosmicpcaxistagger
 
   ### pandora cosmic pass
-  pandoraCosmic:       @local::microboone_pandora
+  pandoraCosmic:       @local::microboone_pandoraAllHitsCR
  }
 
  #define the producer and filter modules for this path, order matters, 
@@ -188,7 +188,6 @@ physics.producers.cctrack.VertexModuleLabel:                     "linecluster"
 
 physics.producers.pandoraCosmic.GeantModuleLabel:                "largeant"
 physics.producers.pandoraCosmic.HitFinderModuleLabel:            "gaushit"
-physics.producers.pandoraCosmic.ConfigFile:                      "PandoraSettings_MicroBooNE_Cosmic.xml"
 
 physics.producers.cluster3dpcatag.PFParticleModuleLabel:         "cluster3d"
 physics.producers.cluster3dpcatag.PCAxisModuleLabel:             "cluster3d"

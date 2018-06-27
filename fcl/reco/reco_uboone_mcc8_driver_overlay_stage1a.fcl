@@ -25,7 +25,7 @@ outputs.out1.fileName: "%ifb_%tc_reco1a.root"
 outputs.out1.dataTier: "reconstructed-2d"
 source.inputCommands: ["keep *_*_*_*" ]
 
-physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
+#physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
 #physics.producers.wcNoiseFilter.DigitModuleLabel: "daqnonoise"
 #physics.producers.digitfilter.DigitModuleLabel: "mixer"
 #physics.producers.ophit.InputModule: "mixer"

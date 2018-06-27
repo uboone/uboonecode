@@ -19,6 +19,9 @@
 
 #include "lardataobj/RecoBase/OpHit.h"
 
+#include "uboone/Utilities/PMTRemapService.h"
+#include "uboone/Utilities/PMTRemapProvider.h"
+
 #include <memory>
 
 class OpHitRemapProducer;
@@ -63,11 +66,19 @@ void OpHitRemapProducer::produce(art::Event & e)
 {
   auto output = std::make_unique<std::vector<recob::OpHit> >();
   const auto& input = e.getValidHandle<std::vector<recob::OpHit> >(inputTag_);
+  
+  const util::PMTRemapProvider& pmt_remap = art::ServiceHandle<util::PMTRemapService>()->GetProvider();
+  
   for (const auto& oph : *input){
     //std::cout << "original ophit OpChannel=" << oph.OpChannel() << " PeakTimeAbs=" << oph.PeakTimeAbs() << " PeakTime=" << oph.PeakTime() << " Frame=" << oph.Frame()
     //      << " Width=" << oph.Width() << " Area=" << oph.Area() << " Amplitude=" << oph.Amplitude() << " PE=" << oph.PE() << " FastToTotal=" << oph.FastToTotal() 
     //	      << std::endl;
-    output->emplace_back( recob::OpHit(opchanmap_[oph.OpChannel()], 
+    
+    if ((int)pmt_remap.CorrectedOpChannel(oph.OpChannel()) != opchanmap_[oph.OpChannel()]) {
+      std::cout<<" WARNING MISMATCH CH "<<oph.OpChannel()<<": "<<pmt_remap.CorrectedOpChannel(oph.OpChannel())<<" vs "<<opchanmap_[oph.OpChannel()]<<std::endl;
+    }
+    
+    output->emplace_back( recob::OpHit(pmt_remap.CorrectedOpChannel(oph.OpChannel()), 
 				       oph.PeakTime(), 
 				       oph.PeakTimeAbs(), 
 				       oph.Frame(), 

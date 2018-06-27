@@ -67,7 +67,7 @@ namespace caldata {
  
   private:
     
-    int          fDataSize;          ///< size of raw data on one wire
+    //int          fDataSize;          ///< size of raw data on one wire
     int          fPostsample;        ///< number of postsample bins
     int          fDoBaselineSub;        ///< do original baseline subtraction
     int          fDoSimpleBaselineSub;   ///< do simple baseline subtraction (M. Mooney)
@@ -167,12 +167,6 @@ namespace caldata {
     art::ServiceHandle<util::SignalShapingServiceMicroBooNE> sss;
     double DeconNorm = sss->GetDeconNorm();
     bool doInducedChargeDeconv = false;
-    std::vector<std::vector<size_t> > respNums = sss->GetNResponses();
-    for (size_t i = 0; i < respNums.at(1).size(); i++) {
-      if (respNums.at(1).at(i) > 1) {
-        doInducedChargeDeconv = true;
-      }
-    }
 
     // make a collection of Wires
     std::unique_ptr<std::vector<recob::Wire> > wirecol(new std::vector<recob::Wire>);
@@ -251,7 +245,7 @@ namespace caldata {
       	  //Xin remove the time_offset
       	  int time_offset = 0;//sss->FieldResponseTOffset(channel);
       	  for(bin = 0; bin < dataSize; ++bin) {
-      	    if ( (bin-time_offset >= 0) and (bin-time_offset < holder.size())  ) {
+      	    if ( bin-time_offset < holder.size() ) {
       	      holder[bin-time_offset]=(rawadc[bin]-pdstl);
 	    }
       	  }
@@ -261,7 +255,7 @@ namespace caldata {
       	  }
           
       	  // Do deconvolution.
-      	  sss->Deconvolute(channel, holder);
+      	  sss->Deconvolute(channel, holder,"nominal");
       	  for(bin = 0; bin < holder.size(); ++bin) {
             holder[bin] /= DeconNorm;
 	  }
@@ -298,7 +292,7 @@ namespace caldata {
         // add an association between the last object in wirecol
         // (that we just inserted) and digitVec
         if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn, fSpillName)) {
-          throw art::Exception(art::errors::InsertFailure)
+          throw art::Exception(art::errors::ProductRegistrationFailure)
             << "Can't associate wire #" << (wirecol->size() - 1)
             << " with raw digit #" << digitVec.key();
         } // if failed to add association
@@ -347,7 +341,7 @@ namespace caldata {
           //Xin remove the time_offset
           int time_offset = 0;//sss->FieldResponseTOffset(channel);
           for(bin = 0; bin < dataSize; ++bin) {
-            if ( (bin-time_offset >= 0) and (bin-time_offset < holder.size())  ) {
+            if ( bin-time_offset < holder.size() ) {
               holder[bin-time_offset]=(rawadc[bin]-pdstl);
             }
           }
@@ -418,7 +412,7 @@ namespace caldata {
           // add an association between the last object in wirecol
           // (that we just inserted) and digitVec
           if (!util::CreateAssn(*this, evt, *wirecol, digitVec, *WireDigitAssn, fSpillName)) {
-            throw art::Exception(art::errors::InsertFailure)
+            throw art::Exception(art::errors::ProductRegistrationFailure)
               << "Can't associate wire #" << (wirecol->size() - 1)
               << " with raw digit #" << digitVec.key();
           } // if failed to add association
@@ -527,8 +521,8 @@ namespace caldata {
     int numBins = deconvVec.size();
     int window = TMath::Min(windowSize,numBins);
     window = TMath::Max(window,20);    
-    double baselineVec[numBins];
-    double newValVec[numBins];
+    std::vector<double> baselineVec(numBins,0.);
+    std::vector<double> newValVec(numBins,0.);
     
     // find first baseline adjustment
     double baselineVal = 0.0;
@@ -586,9 +580,9 @@ namespace caldata {
     int numBins = deconvVec.size();
     int window = TMath::Min(windowSize,numBins);
     int minWindowBins = window/2;
-    bool isNearSigVec[numBins];
-    double baselineVec[numBins];
-    bool isFilledVec[numBins];
+    std::vector<bool> isNearSigVec(numBins,0);
+    std::vector<double> baselineVec(numBins,0.);
+    std::vector<bool> isFilledVec(numBins,0);
   
     // initialize signal region array
     for(int j = 0; j < numBins; j++) {
@@ -770,7 +764,7 @@ template <class T> void caldata::CalWireMicroBooNE::DeconvoluteInducedCharge(siz
   auto planeNum = (size_t)geom->View(firstChannel);
   int numBins = signal.at(0).size();
   int numWires = signal.size();
-  int numResp = sss->GetNResponses().at(1).at(planeNum);
+  int numResp = sss->GetNResponses().at(planeNum);
 
   // setup vectors
   std::vector<std::vector<TComplex> > signalFreqVecs;
@@ -791,7 +785,13 @@ template <class T> void caldata::CalWireMicroBooNE::DeconvoluteInducedCharge(siz
 
   // do response function time-domain FFT
   for(size_t k = 0; k < (size_t)numResp; k++) {
-    respFreqVecs[numResp-1-k] = sss->GetConvKernel(firstChannel,k);
+    std::string response_name = ( k==0 ) ? "nominal" : "alt_"+std::to_string(k);
+    const std::vector<util::ComplexF>& tmp = sss->GetConvKernel(firstChannel, response_name);
+    respFreqVecs[numResp-1-k].resize(tmp.size());
+    for (unsigned int vi=0; vi!=tmp.size(); ++vi) {
+      respFreqVecs[numResp-1-k][vi] = TComplex(tmp[vi].Re,tmp[vi].Im);
+    }
+
     respFreqVecs[numResp-1-k].resize(numBins);
     respFreqVecs[numResp-1+k].resize(numBins);
     for(size_t j = 1; j < (size_t)((numBins/2)+1); j++) {
@@ -901,7 +901,7 @@ template <class T> void caldata::CalWireMicroBooNE::DeconvoluteInducedCharge(siz
   fft->ReinitializeFFT(numBins,fft->FFTOptions(),fft->FFTFitBins());
 
   // do time-domain inverse-FFT for results vectors and store final result of 2D deconvolution
-  int time_offset = sss->FieldResponseTOffset(firstChannel,1);
+  int time_offset = sss->FieldResponseTOffset(firstChannel,"nominal");
   for(size_t k = 0; k < (size_t)numWires; k++) {
     fft->DoInvFFT(signalFreqVecs[k],signal[k]);
 

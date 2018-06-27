@@ -3,6 +3,9 @@
 
 process_name: McRecoStage1CV
 
+services.TFileService.fileName: "reco_stage_1_hist.root"
+services.BackTracker:  @local::microboone_backtrackerservice
+
 # Add larcv required services.
 services.LLMetaMaker: {Enable: false}
 services.LArCVMetaMaker: {Enable: false}

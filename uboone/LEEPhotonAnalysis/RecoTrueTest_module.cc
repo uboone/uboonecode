@@ -34,7 +34,6 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 #include "lardataobj/Simulation/SimChannel.h"
-#include "larsim/MCCheater/BackTracker.h"
 //#include "MCGhost.h"
 
 #include <memory>
@@ -68,7 +67,7 @@ class xsecAna::RecoTrueTest : public art::EDProducer {
 		std::string _hitfinderLabel;
 		std::string _geantModuleLabel;
 
-		bool _is_data;
+                //bool _is_data;
 		bool _debug;
 		bool _cosmic_only;
 };

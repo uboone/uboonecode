@@ -13,7 +13,7 @@ microboone_analysistree:
  G4ModuleLabel:            "largeant"
  TrackModuleLabel:         [ "track3d" ]
  VertexModuleLabel:        [ "vertex3d" ]
- PandoraNuVertexModuleLabel: "pandoraNu"
+ PandoraNuVertexModuleLabel: ["pandoraNu"]
  ClusterModuleLabel:       "linecluster"
  OpFlashModuleLabel:       [ "opflash" ]
  MCShowerModuleLabel:      "mcreco" 
@@ -58,7 +58,7 @@ microboone_analysistree:
  CalWireROI:               3.0 
  RawDigitThresh:           10 
  CalWireThresh:            10
- MCTruthMatching:          @local::AssociationsTruthTool
+ MCTruthMatching:          @local::BackTrackerTruthTool
 }
 
 END_PROLOG

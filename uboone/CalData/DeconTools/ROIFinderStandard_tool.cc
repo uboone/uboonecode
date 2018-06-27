@@ -4,11 +4,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/ROIFinderStandard.h"
+#include "uboone/CalData/DeconTools/IROIFinder.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larcore/Geometry/Geometry.h"
 
 #include "TH1D.h"
 
@@ -17,9 +20,33 @@
 namespace uboone_tool
 {
 
+class ROIFinderStandard : public IROIFinder
+{
+public:
+    explicit ROIFinderStandard(const fhicl::ParameterSet& pset);
+    
+    ~ROIFinderStandard();
+    
+    void configure(const fhicl::ParameterSet& pset)                          override;
+    void outputHistograms(art::TFileDirectory&)                        const override;
+    
+    void FindROIs(const Waveform&, size_t, double, CandidateROIVec&)   const override;
+    
+private:
+    // Member variables from the fhicl file
+    unsigned short                fNumBinsHalf;                ///< Determines # bins in ROI running sum
+    std::vector<unsigned short>   fThreshold;                  ///< abs(threshold) ADC counts for ROI
+    std::vector<int>              fNumSigma;                   ///< "# sigma" rms noise for ROI threshold
+    std::vector<unsigned short>   fPreROIPad;                  ///< ROI padding
+    std::vector<unsigned short>   fPostROIPad;                 ///< ROI padding
+    
+    // Services
+    const geo::GeometryCore*                                 fGeometry = lar::providerFrom<geo::Geometry>();
+    art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
+};
+    
 //----------------------------------------------------------------------
 // Constructor.
-
 ROIFinderStandard::ROIFinderStandard(const fhicl::ParameterSet& pset)
 {
     configure(pset);
@@ -59,16 +86,25 @@ void ROIFinderStandard::configure(const fhicl::ParameterSet& pset)
     fPreROIPad[2]  = zin[0];
     fPostROIPad[2] = zin[1];
     
+    // Get signal shaping service.
+    fSignalShaping = art::ServiceHandle<util::SignalShapingServiceMicroBooNE>();
+    
     return;
 }
     
-void ROIFinderStandard::FindROIs(Waveform& waveform, size_t plane, double rawNoise, CandidateROIVec& roiVec) const
+void ROIFinderStandard::FindROIs(const Waveform& waveform, size_t channel, double rmsNoise, CandidateROIVec& roiVec) const
 {
+    // First up, translate the channel to plane
+    std::vector<geo::WireID> wids    = fGeometry->ChannelToWire(channel);
+    const geo::PlaneID&      planeID = wids[0].planeID();
+    
     size_t numBins(2 * fNumBinsHalf + 1);
     size_t startBin(0);
     size_t stopBin(numBins);
+    float  elecNoise = fSignalShaping->GetRawNoise(channel);
+    float  rawNoise  = std::max(rmsNoise, double(elecNoise));
     
-    float startThreshold = sqrt(float(numBins)) * (fNumSigma[plane] * rawNoise + fThreshold[plane]);
+    float startThreshold = sqrt(float(numBins)) * (fNumSigma[planeID.Plane] * rawNoise + fThreshold[planeID.Plane]);
     float stopThreshold  = startThreshold;
     
     // Setup
@@ -117,9 +153,9 @@ void ROIFinderStandard::FindROIs(Waveform& waveform, size_t plane, double rawNoi
     for(auto& roi : roiVec)
     {
         // low ROI end
-        roi.first  = std::max(int(roi.first - fPreROIPad[plane]),0);
+        roi.first  = std::max(int(roi.first - fPreROIPad[planeID.Plane]),0);
         // high ROI end
-        roi.second = std::min(roi.second + fPostROIPad[plane], waveform.size() - 1);
+        roi.second = std::min(roi.second + fPostROIPad[planeID.Plane], waveform.size() - 1);
     }
     
     // merge overlapping (or touching) ROI's
@@ -183,4 +219,5 @@ void ROIFinderStandard::outputHistograms(art::TFileDirectory& histDir) const
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(ROIFinderStandard)
 }

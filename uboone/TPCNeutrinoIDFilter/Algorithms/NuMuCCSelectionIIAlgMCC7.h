@@ -11,7 +11,7 @@
 #include "uboone/TPCNeutrinoIDFilter/Algorithms/NeutrinoIDAlgBase.h"
 
 // LArSoft includes
-#include "larcore/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/GeometryCore.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 // Root includes
@@ -96,9 +96,9 @@ private:
     double                     fMaxEnddEdx1stTrk;        ///< Maximum dEdx of track end
     bool                       fDoHists;                 ///< Fill histograms
     int                        fDebug;                   ///< Print out debug information
-    TH1D*                      fNFlashPerEvent;          ///< number of flashes per event
-    TH1D*                      fFlashPE;                 ///< flash photoelectrons
-    TH1D*                      fFlashTime;               ///< flash timing
+    //TH1D*                      fNFlashPerEvent;          ///< number of flashes per event
+    //TH1D*                      fFlashPE;                 ///< flash photoelectrons
+    //TH1D*                      fFlashTime;               ///< flash timing
     
     art::EDProducer*           fMyProducerModule;        ///< The producer module driving us
     

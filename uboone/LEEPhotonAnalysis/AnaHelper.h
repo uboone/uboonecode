@@ -1,4 +1,4 @@
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "canvas/Persistency/Common/FindOneP.h"
 #include "lardata/Utilities/AssociationUtil.h"
 
@@ -35,7 +35,8 @@
 #include "lardataobj/MCBase/MCTrack.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
-#include "larsim/MCCheater/BackTracker.h"
+#include "larsim/MCCheater/BackTrackerService.h"
+#include "larsim/MCCheater/ParticleInventoryService.h"
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 

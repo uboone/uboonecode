@@ -1,7 +1,7 @@
 BEGIN_PROLOG
 microboone_eventweight:
 {
- module_type:	"EventWeight"
+ module_type:	"UBEventWeight"
   #Completed Flux Correction
   weight_functions:   [bnbcorrection]
   #Completed Hadron Productio Uncertainties 

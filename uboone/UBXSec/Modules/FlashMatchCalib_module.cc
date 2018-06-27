@@ -25,9 +25,9 @@
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/T0.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/CryostatGeo.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/CryostatGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 
 #include <memory>
@@ -68,7 +68,7 @@ private:
   std::string _t0_reco_producer;
   std::string _opflash_producer_beam;
 
-  size_t _num_tracks;
+  //size_t _num_tracks;
   std::vector<double> _gain_correction;
 
   bool _do_opdet_swap;

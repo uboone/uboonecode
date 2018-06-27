@@ -45,7 +45,7 @@ class MuCSData
     
  private:
   
-  Int_t group;
+  //Int_t group;
   
   Float_t ft0;
   

@@ -12,8 +12,8 @@
 #include "AnodeCathodePMAlg.h"
 
 #include "fhiclcpp/ParameterSet.h"
-#include "larcore/Geometry/GeometryCore.h"
-#include "lardata/DetectorInfo/DetectorProperties.h"
+#include "larcorealg/Geometry/GeometryCore.h"
+#include "lardataalg/DetectorInfo/DetectorProperties.h"
 #include "lardataobj/RecoBase/Hit.h"
 
 #include <math.h>

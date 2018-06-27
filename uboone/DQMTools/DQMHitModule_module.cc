@@ -56,7 +56,7 @@ public:
   void analyze(art::Event const & e) override;
 
   void beginJob() override;
-  void reconfigure(fhicl::ParameterSet const & p) override;
+  void reconfigure(fhicl::ParameterSet const & p) ;
 
 private:
   using HitWireAssns_t = art::Assns<recob::Hit, recob::Wire>;
@@ -113,9 +113,9 @@ private:
   TH1F *HitChargeSkew_Plane2;
 
 
-  TH1F *NFlashes;
+  //TH1F *NFlashes;
 
-  TH1F *MeanFlashLight;
+  //TH1F *MeanFlashLight;
 
   DQMHitAlg analysisAlg;
 

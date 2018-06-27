@@ -17,7 +17,7 @@ microboone_crt_geometry: {
   }
 }
 microboone_crt_geo_interface: {
-  service_provider: "CRTGeometryHelper"
+  service_provider: "uboone/CRT/CRTGeometryHelper"
 }
 
 END_PROLOG

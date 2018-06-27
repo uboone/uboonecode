@@ -4,14 +4,18 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/ROIDeconvolution.h"
+#include "uboone/CalData/DeconTools/IDeconvolution.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "larcore/Geometry/Geometry.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
+#include "lardata/Utilities/LArFFT.h"
 
-#include "uboone/CalData/DeconTools/BaselineStandard.h"
-#include "uboone/CalData/DeconTools/BaselineMostProbAve.h"
+#include "art/Utilities/make_tool.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
 
 #include "TH1D.h"
 
@@ -19,6 +23,36 @@
 
 namespace uboone_tool
 {
+
+class ROIDeconvolution : public IDeconvolution
+{
+public:
+    explicit ROIDeconvolution(const fhicl::ParameterSet& pset);
+    
+    ~ROIDeconvolution();
+    
+    void configure(const fhicl::ParameterSet& pset)              override;
+    void outputHistograms(art::TFileDirectory&)            const override;
+    
+    void Deconvolve(const IROIFinder::Waveform&,
+                    raw::ChannelID_t,
+                    IROIFinder::CandidateROIVec const&,
+                    recob::Wire::RegionsOfInterest_t& )    const override;
+    
+private:
+    // Member variables from the fhicl file
+    size_t                                                   fFFTSize;                    ///< FFT size for ROI deconvolution
+    bool                                                     fDodQdxCalib;                ///< Do we apply wire-by-wire calibration?
+    std::string                                              fdQdxCalibFileName;          ///< Text file for constants to do wire-by-wire calibration
+    std::map<unsigned int, float>                            fdQdxCalib;                  ///< Map to do wire-by-wire calibration, key is channel
+    ///< number, content is correction factor
+    
+    std::unique_ptr<uboone_tool::IBaseline>                  fBaseline;
+    
+    const geo::GeometryCore*                                 fGeometry = lar::providerFrom<geo::Geometry>();
+    art::ServiceHandle<util::LArFFT>                         fFFT;
+    art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
+};
     
 //----------------------------------------------------------------------
 // Constructor.
@@ -34,7 +68,7 @@ ROIDeconvolution::~ROIDeconvolution()
 void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
 {
     // Start by recovering the parameters
-    fFFTSize     = pset.get< size_t >("FFTSize"                );
+    fFFTSize    = pset.get< size_t >("FFTSize"                );
     
     //wire-by-wire calibration
     fDodQdxCalib = pset.get< bool >("DodQdxCalib", false);
@@ -69,18 +103,7 @@ void ROIDeconvolution::configure(const fhicl::ParameterSet& pset)
     }
     
     // Recover the baseline tool
-
-    fhicl::ParameterSet pb = pset.get<fhicl::ParameterSet>("Baseline");
-    std::string pb_type = pb.get<std::string>("tool_type");
-    if(pb_type == std::string("BaselineStandard")) {
-      fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineStandard(pb));
-    }
-    else if(pb_type == std::string("BaselineMostProbAve")) {
-      fBaseline  = std::unique_ptr<uboone_tool::IBaseline>(new uboone_tool::BaselineMostProbAve(pb));
-    }
-    else {
-      throw art::Exception(art::errors::Configuration) << "Unknown baseline tool type" << pb_type;
-    }
+    fBaseline  = art::make_tool<uboone_tool::IBaseline> (pset.get<fhicl::ParameterSet>("Baseline"));
     
     // Get signal shaping service.
     fSignalShaping = art::ServiceHandle<util::SignalShapingServiceMicroBooNE>();
@@ -94,7 +117,7 @@ void ROIDeconvolution::Deconvolve(const IROIFinder::Waveform&        waveform,
                                   recob::Wire::RegionsOfInterest_t&  ROIVec) const
 {
     double deconNorm = fSignalShaping->GetDeconNorm();
-    
+
     // And now process them
     for(auto const& roi : roiVec)
     {
@@ -112,7 +135,7 @@ void ROIDeconvolution::Deconvolve(const IROIFinder::Waveform&        waveform,
         }
         
         // In theory, most ROI's are around the same size so this should mostly be a noop
-        fSignalShaping->SetDecon(deconSize, channel);
+        fSignalShaping->SetDecon(deconSize);
         
         deconSize = fFFT->FFTSize();
         
@@ -156,26 +179,28 @@ void ROIDeconvolution::Deconvolve(const IROIFinder::Waveform&        waveform,
         
         size_t roiStart(roiStartInt);
         size_t roiStop(roiStopInt);
+        size_t holderOffset = 0; //deconSize > waveform.size() ? (deconSize - waveform.size()) / 2 : 0;
         
         // Fill the buffer and do the deconvolution
-        std::copy(waveform.begin()+firstOffset, waveform.begin()+secondOffset, holder.begin());
+        std::copy(waveform.begin()+firstOffset, waveform.begin()+secondOffset, holder.begin() + holderOffset);
         
-        // Deconvolute the raw signal
-        fSignalShaping->Deconvolute(channel,holder);
+        // Deconvolute the raw signal using the channel's nominal response
+        fSignalShaping->Deconvolute(channel,holder,"nominal");
         
+        // Get rid of the leading and trailing "extra" bins needed to keep the FFT happy
+        if (roiStart > 0 || holderOffset > 0) std::copy(holder.begin() + holderOffset + roiStart, holder.begin() + holderOffset + roiStop, holder.begin());
+        
+        // Resize the holder to the ROI length
+        holder.resize(roiLen);
+       
         // "normalize" the vector
         std::transform(holder.begin(),holder.end(),holder.begin(),[deconNorm](float& deconVal){return deconVal/deconNorm;});
         
         // Now we do the baseline determination and correct the ROI
-        float base = fBaseline->GetBaseline(holder, channel, roiStart, roiLen);
+        //float base = fBaseline->GetBaseline(holder, channel, roiStart, roiLen);
+        float base = fBaseline->GetBaseline(holder, channel, 0, roiLen);
         
         std::transform(holder.begin(),holder.end(),holder.begin(),[base](float& adcVal){return adcVal - base;});
-        
-        // Get rid of the leading and trailing "extra" bins needed to keep the FFT happy
-        if (roiStart > 0) std::copy(holder.begin() + roiStart, holder.begin() + roiStop, holder.begin());
-        
-        // Resize the holder to the ROI length
-        holder.resize(roiLen);
         
         // apply wire-by-wire calibration
         if (fDodQdxCalib)
@@ -226,4 +251,5 @@ void ROIDeconvolution::outputHistograms(art::TFileDirectory& histDir) const
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(ROIDeconvolution)
 }

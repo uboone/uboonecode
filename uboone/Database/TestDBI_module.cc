@@ -133,7 +133,16 @@ void TestDBI::analyze(art::Event const & evt)
   const lariov::PmtGainProvider& gain_provider = art::ServiceHandle<lariov::PmtGainService>()->GetProvider();
   for (unsigned int i=0; i!= geo->NOpDets(); ++i) {
     if (geo->IsValidOpChannel(i) && i<32) {
-      std::cout<<"Channel "<<i <<" GAIN: "<<gain_provider.Gain(i)<<" "<<gain_provider.GainErr(i) <<std::endl;
+      std::cout<<"Channel "<<i <<" "<<gain_provider.Gain(i)<<" "
+               <<gain_provider.GainErr(i) <<" "
+	       <<gain_provider.ExtraInfo(i).GetStringData("gain_fit_status")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("amplitude_gain")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("amplitude_gain_err")<<" "
+	       <<gain_provider.ExtraInfo(i).GetStringData("amplitude_gain_fit_status")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("pedestal_mean")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("pedestal_mean_err")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("pedestal_rms")<<" "
+	       <<gain_provider.ExtraInfo(i).GetFloatData("pedestal_rms_err")<<std::endl;
     }
     else if (geo->IsValidOpChannel(i)) {
       std::cout<<"Channel "<<i<<std::endl;

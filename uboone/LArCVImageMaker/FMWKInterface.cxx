@@ -143,10 +143,10 @@ namespace supera {
 
   void ApplySCE(double& x, double& y, double& z)
   {
-    auto xyz = ::lar::providerFrom<spacecharge::SpaceChargeService>()->GetPosOffsets(x,y,z);
-    x = x - xyz[0] + 0.7;
-    y = y + xyz[1];
-    z = z + xyz[2];
+    auto xyz = ::lar::providerFrom<spacecharge::SpaceChargeService>()->GetPosOffsets(geo::Point_t(x,y,z));
+    x = x - xyz.X() + 0.7;
+    y = y + xyz.Y();
+    z = z + xyz.Z();
   }
 
   void ApplySCE(double* xyz)

@@ -6,6 +6,7 @@
 #include <vector>
 #include <numeric>
 #include <string>
+#include <cmath>
 
 namespace cosmictag {
 

@@ -4,11 +4,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/BaselineWaveformProperties.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
+#include "uboone/CalData/DeconTools/WaveformPropertiesAlg.h"
 
 #include "TH1D.h"
 
@@ -17,6 +19,22 @@
 namespace uboone_tool
 {
 
+class BaselineWaveformProperties : public IBaseline
+{
+public:
+    explicit BaselineWaveformProperties(const fhicl::ParameterSet& pset);
+    
+    ~BaselineWaveformProperties();
+    
+    void configure(const fhicl::ParameterSet& pset)                                override;
+    void outputHistograms(art::TFileDirectory&)                              const override;
+    
+    float GetBaseline(std::vector<float> const&, raw::ChannelID_t, size_t, size_t) const override;
+    
+private:
+    mutable util::WaveformPropertiesAlg<float> fROIPropertiesAlg;
+};
+    
 //----------------------------------------------------------------------
 // Constructor.
 BaselineWaveformProperties::BaselineWaveformProperties(const fhicl::ParameterSet& pset) :
@@ -74,4 +92,5 @@ void BaselineWaveformProperties::outputHistograms(art::TFileDirectory& histDir) 
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(BaselineWaveformProperties)
 }

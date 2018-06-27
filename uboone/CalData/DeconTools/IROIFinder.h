@@ -38,7 +38,7 @@ namespace uboone_tool
         using CandidateROIVec = std::vector<CandidateROI>;
         
         // Find the ROI's
-        virtual void FindROIs(Waveform&, size_t, double, CandidateROIVec&) const = 0;
+        virtual void FindROIs(const Waveform&, size_t, double, CandidateROIVec&) const = 0;
     };
 }
 

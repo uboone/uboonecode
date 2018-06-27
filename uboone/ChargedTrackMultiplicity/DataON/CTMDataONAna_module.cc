@@ -9,7 +9,7 @@
   #define CTMDATAONANA_H
   
   // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Principal/Event.h"
@@ -28,9 +28,9 @@
   
   // LArSoft Includes
 #include "larcore/CoreUtils/ServiceUtil.h"
-#include "larcore/Geometry/PlaneGeo.h"
-#include "larcore/Geometry/GeometryCore.h"
-#include "larcore/Geometry/WireGeo.h"
+#include "larcorealg/Geometry/PlaneGeo.h"
+#include "larcorealg/Geometry/GeometryCore.h"
+#include "larcorealg/Geometry/WireGeo.h"
 #include "lardata/Utilities/AssociationUtil.h"  
 #include "larcore/Geometry/Geometry.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
@@ -63,7 +63,7 @@
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 #include "larreco/Deprecated/BezierTrack.h"
 #include "larreco/RecoAlg/TrackMomentumCalculator.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
@@ -117,14 +117,14 @@
   //NuMuccinclusive includes
   //#include "uboone/TPCNeutrinoIDFilter/Algorithms/NuMuCCInclusiveAlg.h"
   #include "uboone/TPCNeutrinoIDFilter/Algorithms/NeutrinoIDAlgBase.h"
-    constexpr int kMaxGpar = 50000;
+    //constexpr int kMaxGpar = 50000;
     constexpr int kMaxRecoallpar = 50000;
     constexpr int kMaxRecoselpar = 50000;
-    constexpr int kMaxtruematchpar = 50000;
-    constexpr int kMaxSeconpar = 500000;
-    constexpr int kMaxtruepar = 900000;
-    constexpr int kMaxtrueInAccppar = 50000;
-    constexpr int kMaxtruelongInAccppar = 50000;
+    //constexpr int kMaxtruematchpar = 50000;
+    //constexpr int kMaxSeconpar = 500000;
+    //constexpr int kMaxtruepar = 900000;
+    //constexpr int kMaxtrueInAccppar = 50000;
+    //constexpr int kMaxtruelongInAccppar = 50000;
   namespace CTMDataONAna {  
    
     class CTMDataONAna : public art::EDAnalyzer

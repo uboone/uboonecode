@@ -11,9 +11,11 @@ services:
   # Load the service that manages root files for histograms.
   TFileService: { fileName: "ana_hist.root" }
   TimeTracker:  {}
-  MemoryTracker:     { ignoreTotal: 1 } # default is one
+  MemoryTracker:     { } # default is one
   message:      @local::microboone_message_services_prod_debug
   FileCatalogMetadata:  @local::art_file_catalog_mc
+  BackTrackerService: @local::microboone_backtrackerservice
+  ParticleInventoryService: @local::standard_particleinventoryservice
   @table::microboone_services_reco
 }
 

@@ -59,7 +59,7 @@ public:
   // Required functions.
   void produce(art::Event & e) override;
 
-  void beginRun(art::Run& run);
+  void beginRun(art::Run& run) override;
 
   void GenPosition(double& x, double& y, double& z);
 

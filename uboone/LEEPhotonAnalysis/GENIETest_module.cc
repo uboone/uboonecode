@@ -42,7 +42,7 @@ class GENIETest : public art::EDAnalyzer {
   int fmode;
   int finteractiontype;
 
-  int fis_ncdeltarad;
+  //int fis_ncdeltarad;
   int fnphotons;
 
   int fdpdg;

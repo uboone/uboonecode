@@ -84,19 +84,19 @@ void spacecharge::ShiftEdepSCE::produce(art::Event & e)
   
   outEdepVec.reserve(inEdepVec.size());
   
-  std::vector<double> posOffsets{0.0,0.0,0.0};
+  geo::Vector_t posOffsets;
   for(auto const& edep : inEdepVec){
     if(sce->EnableSimSpatialSCE())
-      posOffsets = sce->GetPosOffsets(edep.X(),edep.Y(),edep.Z());
+      posOffsets = sce->GetPosOffsets(edep.MidPoint());
     outEdepVec.emplace_back(edep.NumPhotons(),
 			    edep.NumElectrons(),
 			    edep.Energy(),
-			    sim::SimEnergyDeposit::Point_t{(float)(edep.StartX()+posOffsets[0]),
-				(float)(edep.StartY()+posOffsets[1]),
-				(float)(edep.StartZ()+posOffsets[2])},
-			    sim::SimEnergyDeposit::Point_t{(float)(edep.EndX()+posOffsets[0]),
-				(float)(edep.EndY()+posOffsets[1]),
-				(float)(edep.EndZ()+posOffsets[2])},
+			    sim::SimEnergyDeposit::Point_t(edep.StartX()+posOffsets.X(),
+							   edep.StartY()+posOffsets.Y(),
+							   edep.StartZ()+posOffsets.Z()),
+			    sim::SimEnergyDeposit::Point_t(edep.EndX()+posOffsets.X(),
+							   edep.EndY()+posOffsets.Y(),
+							   edep.EndZ()+posOffsets.Z()),
 			    edep.StartT(),
 			    edep.EndT(),
 			    edep.TrackID(),

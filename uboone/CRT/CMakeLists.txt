@@ -1,3 +1,7 @@
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+cet_add_compiler_flags(CXX -Wno-dynamic-exception-spec -Wno-return-type-c-linkage -Wno-undefined-var-template )
+endif()
+
 # canvas_utlities
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 include_directories( $ENV{NUTOOLS_INC} )
@@ -27,86 +31,76 @@ art_make( BASENAME_ONLY
     LIBRARY_NAME  
         CRTData
     LIB_LIBRARIES
-        larcore_Geometry
+        larcorealg_Geometry
         larcore_Geometry_Geometry_service
-	lardataobj_RecoBase
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
-        art_Persistency_Common 
-        canvas_Persistency_Common
-        art_Persistency_Provenance 
-        canvas_Persistency_Provenance
-        art_Utilities 
-        canvas_Utilities
+        art_Persistency_Common canvas
+        art_Persistency_Provenance canvas
+        art_Utilities canvas
 	lardataobj_RecoBase
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
-        ${CETLIB}
+        cetlib cetlib_except
 )
 
-art_make_library( LIBRARY_NAME CRT
+art_make_library( 
+    LIBRARY_NAME 
+    	CRT
     SOURCE
         CRTChannelMapAlg.cc 
 	CRTAuxFunctions.cc	
     LIBRARIES 
-    	larcore_Geometry
+    	#larcorealg_Geometry
         CRTData
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${FHICLCPP}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GEOM}
-        ${CETLIB}
+        cetlib cetlib_except
 )
 
 simple_plugin( CRTGeometryHelper service
-        larcore_Geometry
+        larcorealg_Geometry
         CRT
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
-        art_Persistency_Common 
-        canvas_Persistency_Common
-        art_Persistency_Provenance 
-        canvas_Persistency_Provenance
-        art_Utilities 
-        canvas_Utilities
+        art_Persistency_Common canvas
+        art_Persistency_Provenance canvas
+        art_Utilities canvas
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
-        ${CETLIB}
-    BASENAME_ONLY
+        cetlib cetlib_except
 )
 
 simple_plugin( CRTDetSim module
-        larcore_Geometry
-	CRT
+        CRT
 	CRTData
 	CRTProducts
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
-        art_Persistency_Common 
-        canvas_Persistency_Common
-        art_Persistency_Provenance
-        canvas_Persistency_Provenance
-        art_Utilities 
-        canvas_Utilities
+        art_Persistency_Common canvas
+        art_Persistency_Provenance canvas
+        art_Utilities canvas
         lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
         nutools_RandomUtils_NuRandomService_service
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
         ${CLHEP}
-        ${CETLIB}
+        cetlib cetlib_except
     BASENAME_ONLY
 )
 
@@ -116,21 +110,18 @@ simple_plugin(CRTCalibration "module"
         ${ART_FRAMEWORK_CORE}
         ${ART_FRAMEWORK_IO_SOURCES}
         ${ART_FRAMEWORK_PRINCIPAL}
-        art_Persistency_Common 
-        #canvas
-        art_Persistency_Provenance 
-        #canvas
-        art_Utilities 
-        #canvas
+        art_Persistency_Common canvas
+        art_Persistency_Provenance canvas
+        art_Utilities canvas
         lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
       nutools_RandomUtils_NuRandomService_service
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
         ${MF_MESSAGELOGGER}
-        ${MF_UTILITIES}
+        
         ${ROOT_BASIC_LIB_LIST}
         ${CLHEP}
-        cetlib #cetlib_except
+        cetlib cetlib_except
     BASENAME_ONLY
           bernfebdaq-core_Overlays
           art_Framework_Services_Optional
@@ -146,7 +137,7 @@ simple_plugin(CRTHitProducer "module"
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} 
-	  cetlib #cetlib_except
+	  cetlib cetlib_except
 )
 
 simple_plugin(CRTTrackProducer "module"
@@ -156,13 +147,12 @@ simple_plugin(CRTTrackProducer "module"
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} 
-	  cetlib #cetlib_except
+	  cetlib cetlib_except
 )
 
 simple_plugin(FlashExt "module"
-          CRT
-          bernfebdaq-core_Overlays
-	  lardataobj_RecoBase
+            CRT
+              bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
@@ -179,7 +169,6 @@ simple_plugin(TimeExtraction "module"
 simple_plugin(MergeTest "module"
             CRT
 	  bernfebdaq-core_Overlays
-	  lardataobj_RecoBase
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service
@@ -212,7 +201,6 @@ simple_plugin(CRTAnalyser "module"
 simple_plugin( CRTMerger "module"
   CRT
   bernfebdaq-core_Overlays
-   lardataobj_RecoBase
   ${CETLIB}	
   ${ROOT_BASIC_LIB_LIST}
   ${ART_UTILITIES}
@@ -221,14 +209,14 @@ simple_plugin( CRTMerger "module"
   ${ARTDAQ_CORE}
   ${FHICLCPP}
   ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  
   ${CETLIB}
   ${GALLERY}
   CRTProducts
   ifdh
   gallery
   boost_date_time
-  cetlib #cetlib_except	
+  cetlib cetlib_except	
 )
 
 

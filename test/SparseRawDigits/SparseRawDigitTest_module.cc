@@ -30,7 +30,7 @@
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "canvas/Persistency/Common/FindOneP.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "lardataobj/RawData/RawDigit.h"
 #include "ubooneobj/SparseRawDigit.h"

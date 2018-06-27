@@ -1,7 +1,7 @@
 #include "BernZMQFragment.hh"
 #include <iostream>
 
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 void bernfebdaq::BernZMQFragmentMetadata::CheckTimeWindow() const {
   if(_time_end_seconds*1e9+_time_end_nanosec < _time_start_seconds*1e9+_time_start_nanosec)

@@ -2,6 +2,7 @@
 #include "larproperties.fcl"
 #include "detectorclocks.fcl"
 #include "detectorproperties.fcl"
+#include "seedservice.fcl"
 
 process_name: PropTest
 
@@ -12,6 +13,8 @@ services:
   LArPropertiesService:      @local::standard_properties
   DetectorClocksService:     @local::standard_detectorclocks
   DetectorPropertiesService: @local::standard_detproperties
+  RandomNumberGenerator:     {}
+  NuRandomService:           @local::autoincrement_NuRandomService
 }
 
 source:
@@ -45,7 +48,3 @@ physics:
  end_paths:     [ana]  
 }
 
-physics.analyzers.proptest:
-{
-  module_type: "PropTest"
-}

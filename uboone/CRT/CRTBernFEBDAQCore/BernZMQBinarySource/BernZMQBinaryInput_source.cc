@@ -56,7 +56,7 @@ public:
 
 private:
   
-  art::SourceHelper  fSourceHelper;
+  art::SourceHelper const&  fSourceHelper;
 
   std::string        fModuleLabel;
   std::string        fInstanceLabel;

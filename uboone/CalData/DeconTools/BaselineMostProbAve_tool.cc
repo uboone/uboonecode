@@ -4,11 +4,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/BaselineMostProbAve.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 
 #include <fstream>
 #include <algorithm> // std::minmax_element()
@@ -16,6 +18,24 @@
 namespace uboone_tool
 {
 
+class BaselineMostProbAve : IBaseline
+{
+public:
+    explicit BaselineMostProbAve(const fhicl::ParameterSet& pset);
+    
+    ~BaselineMostProbAve();
+    
+    void configure(const fhicl::ParameterSet& pset)                                      override;
+    void outputHistograms(art::TFileDirectory&)                                    const override;
+    
+    float GetBaseline(const std::vector<float>&, raw::ChannelID_t, size_t, size_t) const override;
+    
+private:
+    std::pair<float,int> GetBaseline(const std::vector<float>&, int, size_t, size_t) const;
+
+    art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
+};
+    
 //----------------------------------------------------------------------
 // Constructor.
 BaselineMostProbAve::BaselineMostProbAve(const fhicl::ParameterSet& pset)
@@ -42,7 +62,7 @@ float BaselineMostProbAve::GetBaseline(const std::vector<float>& holder,
                                        size_t                    roiLen) const
 {
     float base(0.);
-    
+
     if (roiLen > 1)
     {
         // Recover the expected electronics noise on this channel
@@ -87,32 +107,39 @@ std::pair<float,int> BaselineMostProbAve::GetBaseline(const std::vector<float>& 
         {
             int intVal = std::round(2.*holder.at(idx));
             
-            frequencyMap[intVal]++;
+            int binCount = ++frequencyMap[intVal];
             
-            if (frequencyMap.at(intVal) > mpCount)
+            if (binCount > mpCount)
             {
-                mpCount = frequencyMap.at(intVal);
+                mpCount = binCount;
                 mpVal   = intVal;
             }
         }
         
-        // take a weighted average of two neighbor bins
-        int meanCnt  = 0;
-        int meanSum  = 0;
-        
-        for(int idx = -binRange; idx <= binRange; idx++)
+        // Safety check...
+        if (mpCount > 0)
         {
-            std::map<int,int>::iterator neighborItr = frequencyMap.find(mpVal+idx);
-            
-            if (neighborItr != frequencyMap.end() && 5 * neighborItr->second > mpCount)
+            // take a weighted average of two neighbor bins
+            int meanCnt  = 0;
+            int meanSum  = 0;
+        
+            for(int idx = -binRange; idx <= binRange; idx++)
             {
-                meanSum += neighborItr->first * neighborItr->second;
-                meanCnt += neighborItr->second;
+                std::map<int,int>::iterator neighborItr = frequencyMap.find(mpVal+idx);
+            
+                if (neighborItr != frequencyMap.end() && 5 * neighborItr->second > mpCount)
+                {
+                    meanSum += neighborItr->first * neighborItr->second;
+                    meanCnt += neighborItr->second;
+                }
+            }
+
+            if (meanCnt > 0)
+            {
+                base.first  = 0.5 * float(meanSum) / float(meanCnt);
+                base.second = meanCnt;
             }
         }
-        
-        base.first  = 0.5 * float(meanSum) / float(meanCnt);
-        base.second = meanCnt;
     }
     
     return base;
@@ -123,8 +150,29 @@ void BaselineMostProbAve::outputHistograms(art::TFileDirectory& histDir) const
     // It is assumed that the input TFileDirectory has been set up to group histograms into a common
     // folder at the calling routine's level. Here we create one more level of indirection to keep
     // histograms made by this tool separate.
+/*
+    std::string dirName = "BaselinePlane_" + std::to_string(fPlane);
+    
+    art::TFileDirectory dir = histDir.mkdir(dirName.c_str());
+    
+    auto const* detprop      = lar::providerFrom<detinfo::DetectorPropertiesService>();
+    double      samplingRate = detprop->SamplingRate();
+    double      numBins      = fBaselineVec.size();
+    double      maxFreq      = 500. / samplingRate;
+    std::string histName     = "BaselinePlane_" + std::to_string(fPlane);
+    
+    TH1D*       hist         = dir.make<TH1D>(histName.c_str(), "Baseline;Frequency(MHz)", numBins, 0., maxFreq);
+    
+    for(int bin = 0; bin < numBins; bin++)
+    {
+        double freq = maxFreq * double(bin + 0.5) / double(numBins);
+        
+        hist->Fill(freq, fBaselineVec.at(bin).Re());
+    }
+*/
     
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(BaselineMostProbAve)
 }

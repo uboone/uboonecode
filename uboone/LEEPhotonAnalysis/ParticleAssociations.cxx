@@ -92,7 +92,7 @@ void ParticleAssociations::AddShower(size_t const index,
 				     size_t const n,
 				     geoalgo::Point_t const & vert) {
   
-  if(index > fassociations.size() - 1 || index < 0) {
+  if(index > fassociations.size() - 1) {
     std::cout << "No association with index: " << index << std::endl;
     return;
   }

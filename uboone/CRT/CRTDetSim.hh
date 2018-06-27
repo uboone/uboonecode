@@ -28,7 +28,7 @@
 #include "art/Framework/Core/ModuleMacros.h"
 #include "art/Framework/Core/EDProducer.h"
 #include "art/Framework/Principal/Event.h"
-#include "lardata/DetectorInfo/ElecClock.h"
+#include "lardataalg/DetectorInfo/ElecClock.h"
 #include "CLHEP/Random/RandomEngine.h"
 #include "fhiclcpp/ParameterSet.h"
 
@@ -86,7 +86,7 @@ namespace crt{
     virtual void produce (art::Event&);
 
     /// Set up the Configuration Parameters
-    void reconfigure(fhicl::ParameterSet const & p) override;
+    void reconfigure(fhicl::ParameterSet const & p) ;
 
   };
 }

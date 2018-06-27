@@ -11,17 +11,16 @@
 #define MCTruthAssociations_H
 
 // LArSoft libraries
-#include "larcore/Geometry/GeometryCore.h"
-#include "lardata/DetectorInfo/DetectorProperties.h"
+#include "larcorealg/Geometry/GeometryCore.h"
+#include "lardataalg/DetectorInfo/DetectorProperties.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
 #include "lardataobj/RecoBase/Track.h"
 #include "lardataobj/RecoBase/Hit.h"
 #include "lardataobj/RecoBase/SpacePoint.h"
 #include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
-//#include "lardataobj/Simulation/SimChannel.h"   // need this for TrackIDE definition
+#include "lardataobj/Simulation/SimChannel.h"   // need this for TrackIDE definition
 #include "canvas/Persistency/Common/Assns.h"
-#include "canvas/Persistency/Common/FindOneP.h"
 
 // nutools
 #include "uboone/AnalysisTree/MCTruth/MCTruthBase/MCTruthParticleList.h"
@@ -36,21 +35,10 @@
 namespace truth
 {
 using MCTruthTruthVec             = std::vector<art::Ptr<simb::MCTruth>>;
-using MCParticleVec               = std::vector<art::Ptr<simb::MCParticle>>;
-using MCTruthAssns                = art::FindOneP<simb::MCTruth>;
 using HitParticleAssociations     = art::Assns<simb::MCParticle, recob::Hit, anab::BackTrackerHitMatchingData>;
 using HitParticleAssociationsVec  = std::vector<const HitParticleAssociations*>;
 using MCTruthParticleAssociations = art::Assns<simb::MCTruth, simb::MCParticle, void>;
-
-// Definition of TrackIDE here to avoid pulling in SimChannel.h
-/// Ionization energy from a Geant4 track
-struct TrackIDE{
-    int   trackID;      ///< Geant4 supplied trackID
-    float energyFrac;   ///< fraction of hit energy from the particle with this trackID
-    float energy;       ///< energy from the particle with this trackID [MeV]
-    float numElectrons; ///< number of electrons from the particle detected on the wires
-};
-
+    
 /**
  * @brief Obtains truth matching by using hit <--> MCParticle associations
  * 
@@ -65,8 +53,7 @@ public:
     MCTruthAssociations(fhicl::ParameterSet const& config);
   
     void setup(const HitParticleAssociationsVec&,
-               const MCParticleVec&,
-               const MCTruthAssns&,
+               const MCTruthParticleAssociations&,
                const geo::GeometryCore&,
                const detinfo::DetectorProperties&);
     
@@ -85,8 +72,8 @@ public:
     
     // this method will return the Geant4 track IDs of
     // the particles contributing ionization electrons to the identified hit
-    std::vector<TrackIDE> HitToTrackID(const recob::Hit*)           const;
-    std::vector<TrackIDE> HitToTrackID(art::Ptr<recob::Hit> const&) const;
+    std::vector<sim::TrackIDE> HitToTrackID(const recob::Hit*)           const;
+    std::vector<sim::TrackIDE> HitToTrackID(art::Ptr<recob::Hit> const&) const;
 
     // method to return a subset of allhits that are matched to a list of TrackIDs
     const std::vector<std::vector<art::Ptr<recob::Hit>>> TrackIDsToHits(std::vector<art::Ptr<recob::Hit>> const&,
@@ -94,7 +81,7 @@ public:
 
     // method to return the EveIDs of particles contributing ionization
     // electrons to the identified hit
-    std::vector<TrackIDE> HitToEveID(art::Ptr<recob::Hit> const& hit) const;
+    std::vector<sim::TrackIDE> HitToEveID(art::Ptr<recob::Hit> const& hit) const;
 
     // method to return the XYZ position of the weighted average energy deposition for a given hit
     std::vector<double>  HitToXYZ(art::Ptr<recob::Hit> const& hit) const;

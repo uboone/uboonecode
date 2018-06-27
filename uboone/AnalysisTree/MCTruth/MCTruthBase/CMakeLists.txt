@@ -1,18 +1,17 @@
 cet_enable_asserts()
 
 art_make( LIB_LIBRARIES lardataobj_RecoBase
-                        larcore_Geometry
+                        larcorealg_Geometry
                         larcore_Geometry_Geometry_service
                         lardata_RecoObjects
                         lardata_Utilities
                         nusimdata_SimulationBase
-                        canvas_Persistency_Common
-                        canvas_Persistency_Provenance
-                        canvas_Utilities
+                        canvas
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         ${CETLIB}
+                        cetlib_except
                         ${Boost_FILESYSTEM_LIBRARY}
                         ${Boost_SYSTEM_LIBRARY}
                         ${CLHEP}

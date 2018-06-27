@@ -54,7 +54,7 @@ public:
   T0RecoAnodeCathodePiercingAna & operator = (T0RecoAnodeCathodePiercingAna const &) = delete;
   T0RecoAnodeCathodePiercingAna & operator = (T0RecoAnodeCathodePiercingAna &&) = delete;
 
-  void beginJob();
+  void beginJob() override;
 
   // Required functions.
   void analyze(art::Event const & e) override;

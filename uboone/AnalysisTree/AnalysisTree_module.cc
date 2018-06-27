@@ -282,6 +282,7 @@
 #include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
+#include "art/Utilities/make_tool.h"
 
 #include "larcore/Geometry/Geometry.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
@@ -313,15 +314,13 @@
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"
 #include "larreco/Deprecated/BezierTrack.h"
 #include "larreco/RecoAlg/TrackMomentumCalculator.h"
-#include "uboone/EventWeight/MCEventWeight.h"
+#include "larsim/EventWeight/Base/MCEventWeight.h"
 #include "uboone/RawData/utils/ubdaqSoftwareTriggerData.h"
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
 #include "lardataobj/AnalysisBase/T0.h"
 #include "ubooneobj/UbooneOpticalFilter.h"
-
-#include "uboone/AnalysisTree/MCTruth/AssociationsTruth_tool.h"
-#include "uboone/AnalysisTree/MCTruth/BackTrackerTruth_tool.h"
+#include "uboone/AnalysisTree/MCTruth/IMCTruthMatching.h"
 
 #include "larpandora/LArPandoraInterface/LArPandoraHelper.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
@@ -361,8 +360,8 @@ constexpr int kMaxNDaughtersPerPFP = 100; //maximum number of daughters per PFPa
 constexpr int kMaxNClustersPerPFP  = 100; //maximum number of clusters per PFParticle
 constexpr int kMaxNPFPNeutrinos    = 10;  //maximum number of reconstructed neutrino PFParticles
 
-constexpr int kMaxSysts = 1000;
-constexpr int kMaxWeights = 1000;
+//constexpr int kMaxSysts = 1000;
+//constexpr int kMaxWeights = 1000;
 
 /// total_extent\<T\>::value has the total number of elements of an array
 template <typename T>
@@ -1657,12 +1656,13 @@ namespace microboone {
     double driftedLength(const sim::MCTrack& mctrack, TLorentzVector& tpcstart, TLorentzVector& tpcend, TLorentzVector& tpcmom);
     double length(const simb::MCParticle& part, TLorentzVector& start, TLorentzVector& end, unsigned int &starti, unsigned int &endi);
     double bdist(const TVector3& pos);
+
+    TTree* fTree;
+    TTree* fPOT;
       
     // For keeping track of the replacement backtracker
     std::unique_ptr<truth::IMCTruthMatching> fMCTruthMatching;
 
-    TTree* fTree;
-    TTree* fPOT;
     // event information is huge and dynamic;
     // run information is much smaller and we still store it statically
     // in the event
@@ -4232,16 +4232,7 @@ microboone::AnalysisTree::AnalysisTree(fhicl::ParameterSet const& pset) :
   } // if too many flashes
 
   // Get the tool for MC Truth matching
-  const fhicl::ParameterSet& truthParams = pset.get<fhicl::ParameterSet>("MCTruthMatching");
-  
-    if (truthParams.get<std::string>("tool_type") == "AssociationsTruth")
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::AssociationsTruth(truthParams));
-    }
-    else
-    {
-        fMCTruthMatching = std::unique_ptr<truth::IMCTruthMatching>(new truth::BackTrackerTruth(truthParams));
-    }
+  fMCTruthMatching = art::make_tool<truth::IMCTruthMatching>(pset.get<fhicl::ParameterSet>("MCTruthMatching"));
 } // microboone::AnalysisTree::AnalysisTree()
 
 //-------------------------------------------------
@@ -4441,6 +4432,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       //} //end (fSaveGenieInfo)
       
       const sim::ParticleList& plist = fMCTruthMatching->ParticleList();
+
       nGEANTparticles = plist.size();
 
       // to know the number of particles in AV would require
@@ -4517,9 +4509,10 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       lar_pandora::VertexVector   vertex_v   = it->second;
       if (vertex_v.empty()) continue;
       if (lar_pandora::LArPandoraHelper::IsNeutrino(pfParticle)) {
-        if (vertex_v.size() == 1) // require 1 vtx associated to the neutrino PFP
+        if (vertex_v.size() == 1) { // require 1 vtx associated to the neutrino PFP
           nuvertexlist[vtxLabel].emplace_back(vertex_v[0]); 
           nuvertexlistToPfp[vtxLabel].emplace_back(pfParticle);
+        }
       }
     }
   }
@@ -4592,6 +4585,11 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
   if (evt.getByLabel(fGenieGenModuleLabel,mcfluxListHandle))
     art::fill_ptr_vector(fluxlist, mcfluxListHandle);
 
+  std::vector<const sim::AuxDetSimChannel*> fAuxDetSimChannels;
+  if (fSaveAuxDetInfo){
+    evt.getView(fLArG4ModuleLabel, fAuxDetSimChannels);
+  }
+
   fData->run = evt.run();
   fData->subrun = evt.subRun();
   fData->event = evt.id().event();
@@ -4625,7 +4623,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 
   art::Handle< std::vector< evwgh::MCEventWeight > > evtWeights;
 
-  if (evt.getByLabel("eventweight",evtWeights)) {
+  if (evt.getByLabel("genieeventweight",evtWeights)) {
     const std::vector< evwgh::MCEventWeight > * evtwgt_vec = evtWeights.product();
 
     evwgh::MCEventWeight evtwgt = evtwgt_vec->at(0); // just for the first neutrino interaction
@@ -4721,24 +4719,10 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
       fData->hit_rms[i] = hitlist[i]->RMS();
       fData->hit_goodnessOfFit[i] = hitlist[i]->GoodnessOfFit();
       fData->hit_multiplicity[i] = hitlist[i]->Multiplicity();
-      //std::vector<double> xyz = bt->HitToXYZ(hitlist[i]);
+
       //when the size of simIDEs is zero, the above function throws an exception
       //and crashes, so check that the simIDEs have non-zero size before 
       //extracting hit true XYZ from simIDEs
-      // *** REMOVING IN SWITCH TO ASSOCIATIONS TRUTH SINCE SIMCHANNEL DOESN'T EXIST
-      /*
-      if (isMC){
-        std::vector<sim::IDE> ides;
-	try{
-	  fMCTruthMatching->HitToSimIDEs(hitlist[i], ides);
-	}
-	catch(...){}
-        if (ides.size()>0){
-          std::vector<double> xyz = fMCTruthMatching->SimIDEsToXYZ(ides);
-          fData->hit_trueX[i] = xyz[0];
-        }
-      }
-       */
       
       /*
 	for (unsigned int it=0; it<fTrackModuleLabel.size();++it){
@@ -4836,71 +4820,72 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	    fData->rawD_rms[i] = sqrt(mean_t2-mean_t*mean_t);
 	  }   }
       
-      //Hit to SimChannel information
-       if (isMC && fSaveSimChannelInfo){
-           std::vector<const sim::SimChannel*> fSimChannels;
-           if (isMC && fSaveGeantInfo)
-               evt.getView(fLArG4ModuleLabel, fSimChannels);
-   	 
-           const sim::SimChannel* chan = 0;
-           for(size_t sc = 0; sc < fSimChannels.size(); ++sc){
-               if(fSimChannels[sc]->Channel() == hitlist[i]->Channel())
-                   chan = fSimChannels[sc];
-           }
-   	 if (chan){
-   	   auto const& tdcidemap = chan->TDCIDEMap();
-   	   int k=-1;
-   	   double elec[tdcidemap.size()];
-   	   int tdc[tdcidemap.size()];
-   	   for(auto mapitr = tdcidemap.begin(); mapitr != tdcidemap.end(); mapitr++){
-   	      k++;
-   	      tdc[k]=(*mapitr).first;
-   	      const std::vector<sim::IDE> idevec = (*mapitr).second;
-   	      double nelec=0;
-   	      for(size_t iv = 0; iv < idevec.size(); ++iv){
-   		 nelec += idevec[iv].numElectrons;   		 
-   	      }
-   	      elec[k] = nelec;
-   	   }
-   	   fData->sim_ph[i] = -1;
-   	   fData->sim_tdc[i] = -1;
-   	   for(unsigned int f=0;f<tdcidemap.size();f++){
-   	     if (elec[f]>fData->sim_ph[i]){
-   	       fData->sim_ph[i] = elec[f];
-   	       fData->sim_tdc[i] = tdc[f]; 
-   	     }         
-   	   }
-   	   fData->sim_charge[i] = 0;
-	   fData->sim_fwhh[i] = 0;
-   	   double mean_t = 0;
-   	   double mean_t2 = 0;
-   	   for (unsigned int f = 0; f<tdcidemap.size();f++){
-	      if (elec[f]>=0.5*fData->sim_ph[i]){
-		++fData->sim_fwhh[i];
-	      }	   
-   	      if (elec[f]>=0.1*fData->sim_ph[i]){
-   		  fData->sim_charge[i]+= elec[f];
-   		  mean_t+= double(tdc[f])*elec[f];
-   		  mean_t2+= double(tdc[f])*double(tdc[f])*elec[f];
-   	      }
-   	   }
-   	   mean_t/=fData->sim_charge[i];
-   	   mean_t2/=fData->sim_charge[i];
-   	   fData->sim_rms[i] = sqrt(mean_t2-mean_t*mean_t);
-   	 }
+        //Hit to SimChannel information
+        if (isMC && fSaveSimChannelInfo)
+        {
+            std::vector<const sim::SimChannel*> fSimChannels;
+            evt.getView(fLArG4ModuleLabel, fSimChannels);
+            
+            const sim::SimChannel* chan = 0;
+            for(size_t sc = 0; sc < fSimChannels.size(); ++sc){
+                if(fSimChannels[sc]->Channel() == hitlist[i]->Channel())
+                    chan = fSimChannels[sc];
+            }
+            if (chan){
+                auto const& tdcidemap = chan->TDCIDEMap();
+                int k=-1;
+                std::vector<double> elec(tdcidemap.size(),0.);
+                std::vector<int> tdc(tdcidemap.size(),0.);
+                for(auto mapitr = tdcidemap.begin(); mapitr != tdcidemap.end(); mapitr++){
+                    k++;
+                    tdc[k]=(*mapitr).first;
+                    const std::vector<sim::IDE> idevec = (*mapitr).second;
+                    double nelec=0;
+                    for(size_t iv = 0; iv < idevec.size(); ++iv){
+                        nelec += idevec[iv].numElectrons;
+                    }
+                    elec[k] = nelec;
+                }
+                fData->sim_ph[i] = -1;
+                fData->sim_tdc[i] = -1;
+                for(unsigned int f=0;f<tdcidemap.size();f++){
+                    if (elec[f]>fData->sim_ph[i]){
+                        fData->sim_ph[i] = elec[f];
+                        fData->sim_tdc[i] = tdc[f];
+                    }
+                }
+                fData->sim_charge[i] = 0;
+                fData->sim_fwhh[i] = 0;
+                double mean_t = 0;
+                double mean_t2 = 0;
+                for (unsigned int f = 0; f<tdcidemap.size();f++){
+                    if (elec[f]>=0.5*fData->sim_ph[i]){
+                        ++fData->sim_fwhh[i];
+                    }
+                    if (elec[f]>=0.1*fData->sim_ph[i]){
+                        fData->sim_charge[i]+= elec[f];
+                        mean_t+= double(tdc[f])*elec[f];
+                        mean_t2+= double(tdc[f])*double(tdc[f])*elec[f];
+                    }
+                }
+                mean_t/=fData->sim_charge[i];
+                mean_t2/=fData->sim_charge[i];
+                fData->sim_rms[i] = sqrt(mean_t2-mean_t*mean_t);
+            }
        } 
       
-      if (!evt.isRealData()&&!isCosmics){
-          std::vector<sim::TrackIDE> trackIDEVec = fMCTruthMatching->HitToTrackID(hitlist[i]);
-          fData -> hit_nelec[i] = 0;
-          fData -> hit_energy[i] = 0;
-          
-          for(const auto& trackIDE : trackIDEVec)
-          {
-              fData -> hit_nelec[i]  += trackIDE.numElectrons;
-              fData -> hit_energy[i] += trackIDE.energy;
-          }
-      }
+        if (!evt.isRealData()&&!isCosmics)
+        {
+            std::vector<sim::TrackIDE> trackIDEVec = fMCTruthMatching->HitToTrackID(hitlist[i]);
+            fData -> hit_nelec[i] = 0;
+            fData -> hit_energy[i] = 0;
+            
+            for(const auto& trackIDE : trackIDEVec)
+            {
+                fData -> hit_nelec[i]  += trackIDE.numElectrons;
+                fData -> hit_energy[i] += trackIDE.energy;
+            }
+        }
     }
 
     if (evt.getByLabel(fHitsModuleLabel,hitListHandle)){
@@ -5359,8 +5344,8 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
             end.SetXYZ(xyz[0],xyz[1],xyz[2]);
 
             tlen = btrack.GetLength();
-            if (btrack.NumberTrajectoryPoints() > 0)
-              mom = btrack.VertexMomentum();
+            if (btrack.GetTrajectory().NPoints() > 0)
+              mom = btrack.GetTrajectory().StartMomentum();
             // fill bezier track reco branches
             TrackID = iTrk;  //bezier has some screwed up track IDs
           }
@@ -5578,13 +5563,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	      const art::Ptr<simb::MCTruth> mc = fMCTruthMatching->TrackIDToMCTruth(TrackerData.trkidtruth[iTrk][ipl]);
 	      TrackerData.trkorigin[iTrk][ipl] = mc->Origin();
 	      const simb::MCParticle *particle = fMCTruthMatching->TrackIDToParticle(TrackerData.trkidtruth[iTrk][ipl]);
-          double tote = particle->E(); //0;
-            /*
-	      std::vector<sim::IDE> vide(fMCTruthMatching->TrackIDToSimIDE(TrackerData.trkidtruth[iTrk][ipl]));
-	      for (const sim::IDE& ide: vide) {
-		tote += ide.energy;
-	      }
-             */
+
+          double tote = 1.; //0;
+
 	      TrackerData.trkpdgtruth[iTrk][ipl] = particle->PdgCode();
 	      TrackerData.trkefftruth[iTrk][ipl] = maxe/(tote/kNplanes); //tote include both induction and collection energies
 	      //std::cout<<"\n"<<trkpdgtruth[iTracker][iTrk][ipl]<<"\t"<<trkefftruth[iTracker][iTrk][ipl];
@@ -5607,7 +5588,8 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 
 		art::Ptr<recob::Hit> hit = all_hits[h];
 		std::vector<sim::IDE> ides;
-		//bt->HitToSimIDEs(hit,ides);
+
+		//fMCTruthMatching->HitToSimIDEs(hit,ides);
 		std::vector<sim::TrackIDE> eveIDs = fMCTruthMatching->HitToEveID(hit);
 		
 		for(size_t e = 0; e < eveIDs.size(); ++e){
@@ -5831,9 +5813,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	    fData->nuvtxx_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vx();
 	    fData->nuvtxy_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vy();
 	    fData->nuvtxz_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vz();
-	    fData->sp_charge_corrected_nuvtxx_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vx() - SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())[0];
-	    fData->sp_charge_corrected_nuvtxy_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vy() + SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())[1];
-	    fData->sp_charge_corrected_nuvtxz_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vz() + SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())[2];
+	    fData->sp_charge_corrected_nuvtxx_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vx() - SCE->GetPosOffsets(geo::Point_t(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())).X();
+	    fData->sp_charge_corrected_nuvtxy_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vy() + SCE->GetPosOffsets(geo::Point_t(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())).Y();
+	    fData->sp_charge_corrected_nuvtxz_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Vz() + SCE->GetPosOffsets(geo::Point_t(mclist[iList]->GetNeutrino().Nu().Vx(),mclist[iList]->GetNeutrino().Nu().Vy(),mclist[iList]->GetNeutrino().Nu().Vz())).Z();
 	    
 	    if (mclist[iList]->GetNeutrino().Nu().P()){
 	      fData->nu_dcosx_truth[neutrino_i] = mclist[iList]->GetNeutrino().Nu().Px()/mclist[iList]->GetNeutrino().Nu().P();
@@ -6094,16 +6076,16 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	    fData->StartPointx[geant_particle]=pPart->Vx();
 	    fData->StartPointy[geant_particle]=pPart->Vy();
 	    fData->StartPointz[geant_particle]=pPart->Vz();
-	    fData->sp_charge_corrected_StartPointx[geant_particle] = pPart->Vx() - SCE->GetPosOffsets(pPart->Vx(),pPart->Vy(),pPart->Vz())[0]; 
-	    fData->sp_charge_corrected_StartPointy[geant_particle] = pPart->Vy() + SCE->GetPosOffsets(pPart->Vx(),pPart->Vy(),pPart->Vz())[1]; 
-	    fData->sp_charge_corrected_StartPointz[geant_particle] = pPart->Vz() + SCE->GetPosOffsets(pPart->Vx(),pPart->Vy(),pPart->Vz())[2]; 
+	    fData->sp_charge_corrected_StartPointx[geant_particle] = pPart->Vx() - SCE->GetPosOffsets(geo::Point_t(pPart->Vx(),pPart->Vy(),pPart->Vz())).X(); 
+	    fData->sp_charge_corrected_StartPointy[geant_particle] = pPart->Vy() + SCE->GetPosOffsets(geo::Point_t(pPart->Vx(),pPart->Vy(),pPart->Vz())).Y(); 
+	    fData->sp_charge_corrected_StartPointz[geant_particle] = pPart->Vz() + SCE->GetPosOffsets(geo::Point_t(pPart->Vx(),pPart->Vy(),pPart->Vz())).Z(); 
 	    fData->StartT[geant_particle] = pPart->T();
 	    fData->EndPointx[geant_particle]=pPart->EndPosition()[0];
 	    fData->EndPointy[geant_particle]=pPart->EndPosition()[1];
 	    fData->EndPointz[geant_particle]=pPart->EndPosition()[2];
-	    fData->sp_charge_corrected_EndPointx[geant_particle] = pPart->EndPosition()[0] - SCE->GetPosOffsets(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])[0]; 
-	    fData->sp_charge_corrected_EndPointy[geant_particle] = pPart->EndPosition()[1] + SCE->GetPosOffsets(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])[1]; 
-	    fData->sp_charge_corrected_EndPointz[geant_particle] = pPart->EndPosition()[2] + SCE->GetPosOffsets(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])[2]; 
+	    fData->sp_charge_corrected_EndPointx[geant_particle] = pPart->EndPosition()[0] - SCE->GetPosOffsets(geo::Point_t(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])).X(); 
+	    fData->sp_charge_corrected_EndPointy[geant_particle] = pPart->EndPosition()[1] + SCE->GetPosOffsets(geo::Point_t(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])).Y(); 
+	    fData->sp_charge_corrected_EndPointz[geant_particle] = pPart->EndPosition()[2] + SCE->GetPosOffsets(geo::Point_t(pPart->EndPosition()[0],pPart->EndPosition()[1],pPart->EndPosition()[2])).Z(); 
 	    fData->EndT[geant_particle] = pPart->EndT();
 	    fData->theta[geant_particle] = pPart->Momentum().Theta();
 	    fData->phi[geant_particle] = pPart->Momentum().Phi();
@@ -6123,9 +6105,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	      fData->StartPointx_tpcAV[geant_particle] = mcstart.X();
 	      fData->StartPointy_tpcAV[geant_particle] = mcstart.Y();
 	      fData->StartPointz_tpcAV[geant_particle] = mcstart.Z();
-	      fData->sp_charge_corrected_StartPointx_tpcAV[geant_particle] = mcstart.X() - SCE->GetPosOffsets(mcstart.X(),mcstart.Y(),mcstart.Z())[0]; 
-	      fData->sp_charge_corrected_StartPointy_tpcAV[geant_particle] = mcstart.Y() + SCE->GetPosOffsets(mcstart.X(),mcstart.Y(),mcstart.Z())[1]; 
-	      fData->sp_charge_corrected_StartPointz_tpcAV[geant_particle] = mcstart.Z() + SCE->GetPosOffsets(mcstart.X(),mcstart.Y(),mcstart.Z())[2]; 
+	      fData->sp_charge_corrected_StartPointx_tpcAV[geant_particle] = mcstart.X() - SCE->GetPosOffsets(geo::Point_t(mcstart.X(),mcstart.Y(),mcstart.Z())).X(); 
+	      fData->sp_charge_corrected_StartPointy_tpcAV[geant_particle] = mcstart.Y() + SCE->GetPosOffsets(geo::Point_t(mcstart.X(),mcstart.Y(),mcstart.Z())).Y(); 
+	      fData->sp_charge_corrected_StartPointz_tpcAV[geant_particle] = mcstart.Z() + SCE->GetPosOffsets(geo::Point_t(mcstart.X(),mcstart.Y(),mcstart.Z())).Z(); 
 	      fData->StartT_tpcAV[geant_particle] = mcstart.T();
 	      fData->StartE_tpcAV[geant_particle] = pPart->E(pstarti);
 	      fData->StartP_tpcAV[geant_particle] = pPart->P(pstarti);
@@ -6135,9 +6117,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	      fData->EndPointx_tpcAV[geant_particle] = mcend.X();
 	      fData->EndPointy_tpcAV[geant_particle] = mcend.Y();
 	      fData->EndPointz_tpcAV[geant_particle] = mcend.Z();
-	      fData->sp_charge_corrected_EndPointx_tpcAV[geant_particle] = mcend.X() - SCE->GetPosOffsets(mcend.X(),mcend.Y(),mcend.Z())[0]; 
-	      fData->sp_charge_corrected_EndPointy_tpcAV[geant_particle] = mcend.Y() + SCE->GetPosOffsets(mcend.X(),mcend.Y(),mcend.Z())[1]; 
-	      fData->sp_charge_corrected_EndPointz_tpcAV[geant_particle] = mcend.Z() + SCE->GetPosOffsets(mcend.X(),mcend.Y(),mcend.Z())[2]; 
+	      fData->sp_charge_corrected_EndPointx_tpcAV[geant_particle] = mcend.X() - SCE->GetPosOffsets(geo::Point_t(mcend.X(),mcend.Y(),mcend.Z())).X(); 
+	      fData->sp_charge_corrected_EndPointy_tpcAV[geant_particle] = mcend.Y() + SCE->GetPosOffsets(geo::Point_t(mcend.X(),mcend.Y(),mcend.Z())).Y(); 
+	      fData->sp_charge_corrected_EndPointz_tpcAV[geant_particle] = mcend.Z() + SCE->GetPosOffsets(geo::Point_t(mcend.X(),mcend.Y(),mcend.Z())).Z(); 
 	      fData->EndT_tpcAV[geant_particle] = mcend.T();
 	      fData->EndE_tpcAV[geant_particle] = pPart->E(pendi);
 	      fData->EndP_tpcAV[geant_particle] = pPart->P(pendi);
@@ -6149,9 +6131,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	      fData->StartPointx_drifted[geant_particle] = mcstartdrifted.X();
 	      fData->StartPointy_drifted[geant_particle] = mcstartdrifted.Y();
 	      fData->StartPointz_drifted[geant_particle] = mcstartdrifted.Z();
-	      fData->sp_charge_corrected_StartPointx_drifted[geant_particle] = mcstartdrifted.X() - SCE->GetPosOffsets(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())[0];
-	      fData->sp_charge_corrected_StartPointy_drifted[geant_particle] = mcstartdrifted.Y() + SCE->GetPosOffsets(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())[1];
-	      fData->sp_charge_corrected_StartPointz_drifted[geant_particle] = mcstartdrifted.Z() + SCE->GetPosOffsets(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())[2];
+	      fData->sp_charge_corrected_StartPointx_drifted[geant_particle] = mcstartdrifted.X() - SCE->GetPosOffsets(geo::Point_t(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())).X();
+	      fData->sp_charge_corrected_StartPointy_drifted[geant_particle] = mcstartdrifted.Y() + SCE->GetPosOffsets(geo::Point_t(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())).Y();
+	      fData->sp_charge_corrected_StartPointz_drifted[geant_particle] = mcstartdrifted.Z() + SCE->GetPosOffsets(geo::Point_t(mcstartdrifted.X(),mcstartdrifted.Y(),mcstartdrifted.Z())).Z();
 	      fData->StartT_drifted[geant_particle] = mcstartdrifted.T();
 	      fData->StartE_drifted[geant_particle] = pPart->E(pstartdriftedi);
 	      fData->StartP_drifted[geant_particle] = pPart->P(pstartdriftedi);
@@ -6161,9 +6143,9 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	      fData->EndPointx_drifted[geant_particle] = mcenddrifted.X();
 	      fData->EndPointy_drifted[geant_particle] = mcenddrifted.Y();
 	      fData->EndPointz_drifted[geant_particle] = mcenddrifted.Z();
-	      fData->sp_charge_corrected_EndPointx_drifted[geant_particle] = mcenddrifted.X() - SCE->GetPosOffsets(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())[0];
-	      fData->sp_charge_corrected_EndPointy_drifted[geant_particle] = mcenddrifted.Y() + SCE->GetPosOffsets(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())[1];
-	      fData->sp_charge_corrected_EndPointz_drifted[geant_particle] = mcenddrifted.Z() + SCE->GetPosOffsets(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())[2];
+	      fData->sp_charge_corrected_EndPointx_drifted[geant_particle] = mcenddrifted.X() - SCE->GetPosOffsets(geo::Point_t(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())).X();
+	      fData->sp_charge_corrected_EndPointy_drifted[geant_particle] = mcenddrifted.Y() + SCE->GetPosOffsets(geo::Point_t(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())).Y();
+	      fData->sp_charge_corrected_EndPointz_drifted[geant_particle] = mcenddrifted.Z() + SCE->GetPosOffsets(geo::Point_t(mcenddrifted.X(),mcenddrifted.Y(),mcenddrifted.Z())).Z();
 	      fData->EndT_drifted[geant_particle] = mcenddrifted.T();
 	      fData->EndE_drifted[geant_particle] = pPart->E(penddriftedi);
 	      fData->EndP_drifted[geant_particle] = pPart->P(penddriftedi);
@@ -6174,12 +6156,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
 	    //access auxiliary detector parameters
             if (fSaveAuxDetInfo) {
               unsigned short nAD = 0; // number of cells that particle hit
-                
-              std::vector<const sim::AuxDetSimChannel*> fAuxDetSimChannels;
-              if (fSaveAuxDetInfo){
-                evt.getView(fLArG4ModuleLabel, fAuxDetSimChannels);
-              }
-
+              
               // find deposit of this particle in each of the detector cells
               for (const sim::AuxDetSimChannel* c: fAuxDetSimChannels) {
 		
@@ -6435,7 +6412,7 @@ void microboone::AnalysisTree::FillShowers(
 void microboone::AnalysisTree::HitsPurity(std::vector< art::Ptr<recob::Hit> > const& hits, Int_t& trackid, Float_t& purity, double& maxe){
 
   trackid = -1;
-  purity  = -1;
+  purity = -1;
 
   std::map<int,double> trkide;
 
@@ -6443,7 +6420,7 @@ void microboone::AnalysisTree::HitsPurity(std::vector< art::Ptr<recob::Hit> > co
 
     art::Ptr<recob::Hit> hit = hits[h];
     std::vector<sim::IDE> ides;
-    //bt->HitToSimIDEs(hit,ides);
+
     std::vector<sim::TrackIDE> eveIDs = fMCTruthMatching->HitToEveID(hit);
 
     for(size_t e = 0; e < eveIDs.size(); ++e){

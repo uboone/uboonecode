@@ -1,4 +1,4 @@
-#include "reco_uboone_stage_2.fcl"
+#include "reco_uboone_mcc8_driver_stage2.fcl"
 
 services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234

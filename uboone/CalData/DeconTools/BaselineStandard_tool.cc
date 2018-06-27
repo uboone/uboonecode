@@ -4,11 +4,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
-#include "uboone/CalData/DeconTools/BaselineStandard.h"
+#include "uboone/CalData/DeconTools/IBaseline.h"
+#include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Principal/Handle.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
+#include "uboone/Utilities/SignalShapingServiceMicroBooNE.h"
 
 #include "TH1D.h"
 
@@ -16,6 +18,25 @@
 
 namespace uboone_tool
 {
+
+class BaselineStandard : public IBaseline
+{
+public:
+    explicit BaselineStandard(const fhicl::ParameterSet& pset);
+    
+    ~BaselineStandard();
+    
+    void configure(const fhicl::ParameterSet& pset)                                override;
+    void outputHistograms(art::TFileDirectory&)                              const override;
+    
+    float GetBaseline(std::vector<float> const&, raw::ChannelID_t, size_t, size_t) const override;
+    
+private:
+    // fhicl parameters
+    int    fNumBinsToAverage;
+    
+    art::ServiceHandle<util::SignalShapingServiceMicroBooNE> fSignalShaping;
+};
     
 //----------------------------------------------------------------------
 // Constructor.
@@ -53,7 +74,6 @@ float BaselineStandard::GetBaseline(std::vector<float> const& holder,
     size_t roiStop(roiStart + roiLen);
     size_t newRoiStart(roiStart);
     size_t newRoiStop(roiStop);
-    size_t nTries(0);
     
     // Calculate baslines from the very front of the deconvolution buffer and from the end
     float  basePre  = std::accumulate(holder.begin() + roiStart, holder.begin() + roiStart + nBinsToAve, 0.) / float(nBinsToAve);
@@ -64,7 +84,7 @@ float BaselineStandard::GetBaseline(std::vector<float> const& holder,
     
     // If the estimated baseline from the front of the roi does not agree well with that from the end
     // of the roi then we'll extend the roi hoping for good agreement
-    while(!(fabs(basePre - basePost) < deconNoise) && nTries++ < 0) //3)
+    while(!(fabs(basePre - basePost) < deconNoise)) //3)
     {
         size_t nBinsToAdd(10);
         
@@ -155,4 +175,5 @@ void BaselineStandard::outputHistograms(art::TFileDirectory& histDir) const
     return;
 }
     
+DEFINE_ART_CLASS_TOOL(BaselineStandard)
 }

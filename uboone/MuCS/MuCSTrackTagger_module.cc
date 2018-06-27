@@ -21,7 +21,7 @@
 #include <iterator>
 
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/geo.h"
+#include "larcorealg/Geometry/geo.h"
 
 #include "lardataobj/RecoBase/Track.h"
 
@@ -45,7 +45,7 @@ public:
   void produce(art::Event & e) override;
 
   void beginJob() override;
-  void reconfigure(fhicl::ParameterSet const & p) override;
+  void reconfigure(fhicl::ParameterSet const & p) ;
 
 
 private:

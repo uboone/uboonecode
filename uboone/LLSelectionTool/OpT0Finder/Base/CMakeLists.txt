@@ -6,7 +6,7 @@ art_make( BASENAME_ONLY
 	  uboonecode_uboone_BasicTool_GeoAlgo
 	  ${ROOT_BASIC_LIB_LIST}
 	  ${FHICLCPP}
-          ${CETLIB}
+          cetlib cetlib_except
 	)
 install_headers()
 install_source()

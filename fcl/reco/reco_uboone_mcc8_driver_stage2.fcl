@@ -5,6 +5,8 @@ process_name: McRecoStage2
 services.DetectorClocksService.InheritClockConfig:  false
 
 services.TFileService.fileName: "reco_stage_2_hist.root"
+services.BackTrackerService:  @local::microboone_backtrackerservice
+services.ParticleInventoryService: @local::standard_particleinventoryservice
 
 services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcenergycalib_provider_mc
 

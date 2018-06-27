@@ -11,7 +11,7 @@ art_make( LIBRARY_NAME bernfebdaq_BernZMQBinarySource
 				art_Framework_IO_Sources
 				art_Framework_Principal
 				art_Persistency_Provenance
-#				canvas
+				canvas
 				${CANVAS_LIB_LIST}
 				MF_MessageLogger
 				${ROOT_CINTEX}

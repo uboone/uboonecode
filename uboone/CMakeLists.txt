@@ -35,6 +35,8 @@ add_subdirectory(LLSelectionTool)
 add_subdirectory(LLBasicTool)
 add_subdirectory(LLApp)
 add_subdirectory(CosmicTagging)
+#add_subdirectory(SNStreamSim)
+#add_subdirectory(MichelReco)
 add_subdirectory(QuietEventFilter)
 add_subdirectory(DLFilters)
 
@@ -42,7 +44,10 @@ add_subdirectory(DataOverlay)
 add_subdirectory(PatternFilter)
 add_subdirectory(MicroBooNEPandora)
 
+add_subdirectory(MicroBooNEWireCell)
+add_subdirectory(FakeNEWS)
 add_subdirectory(DQMTools)
+add_subdirectory(BurstNoiseMetrics)
 add_subdirectory(ChargedTrackMultiplicity/MC)
 add_subdirectory(ChargedTrackMultiplicity/DataON)
 add_subdirectory(ChargedTrackMultiplicity/DataOFF)
@@ -56,7 +61,7 @@ add_subdirectory(UBXSec)
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
-#     "larcore_Geometry",
+#     "larcorealg_Geometry",
 #     "larcoreobj_SummaryData",
 #     "lardataobj_RawData",
 #     "lardataobj_RecoBase",

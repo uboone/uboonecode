@@ -26,7 +26,7 @@
 #include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/AuxDetExptGeoHelperInterface.h"
-#include "larcore/Geometry/AuxDetChannelMapAlg.h"
+#include "larcorealg/Geometry/AuxDetChannelMapAlg.h"
 
 #include <memory> //For std::shared_ptr
 

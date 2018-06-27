@@ -2,6 +2,6 @@
 
 process_name: DetsimNoiseAmpUp
 
-outputs.out1.fileName: "detsyst_%tc_detsim_noise_amp_up.root"
+outputs.out1.fileName: "%ifb_%tc_detsim_noise_amp_up.root"
 
 #include "sys_var_noise_amp_up_uboone.fcl"

@@ -72,4 +72,14 @@ ubtrigger_dark_numi:       @local::ubtrigger_standard
 ubtrigger_dark_numi.NUMITrigger: [-54.8675]
 ubtrigger_dark_numi.Mask:  [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20]
 
+trigger_timing_standard:
+{
+  module_type: "TriggerTiming"
+
+  TriggerModuleLabel: "daq"
+  PMTModuleLabel:     "pmtreadout"
+  PMTModuleInstance:  "OpdetBeamLowGain"
+  PMTMinLength:       1500
+}
+
 END_PROLOG

@@ -113,6 +113,21 @@ services.DetectorPropertiesService.NumberTimeSamples:                  6400
 services.DetectorPropertiesService.ReadOutWindowSize:                  6400
 services.DetectorClocksService.InheritClockConfig:                     false
 services.DetectorClocksService.TriggerOffsetTPC:                       -0.400e3
+# Remove all calls to the calibrations database
+services.ChannelStatusService.ChannelStatusProvider.UseDB: false
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB: false
+services.ElectronicsCalibService.ElectronicsCalibProvider.UseDB: false
+services.PmtGainService.PmtGainProvider.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XNormCorrectionProvider.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane0.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane1.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane2.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane0.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane1.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.UseDB: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.dEdxCorrectionProvider.UseDB: false
 
 #ccinc
 physics.filters.tpcneutrinoidfilternumuccinc.VertexModuleLabelVec: [ "pandoraNu::SlimAndFilterCCIncl" ]

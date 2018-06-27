@@ -4,7 +4,7 @@
 #include "UbooneTPCEnergyCalibProvider.h"
 
 // art/LArSoft libraries
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 #include <fstream>
 

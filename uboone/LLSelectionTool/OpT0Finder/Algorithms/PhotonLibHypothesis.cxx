@@ -6,7 +6,7 @@
 //#include "OpT0Finder/PhotonLibrary/PhotonVisibilityService.h"
 #include "uboone/LLSelectionTool/OpT0Finder/Base/OpT0FinderException.h"
 #include "larcore/Geometry/Geometry.h"
-#include "larcore/Geometry/OpDetGeo.h"
+#include "larcorealg/Geometry/OpDetGeo.h"
 #include "uboone/Geometry/UBOpReadoutMap.h"
 
 namespace flashana {

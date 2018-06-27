@@ -10,8 +10,8 @@
 
 #include "canvas/Persistency/Common/Wrapper.h"
 #include "canvas/Persistency/Common/Assns.h"
-#include "UbooneOpticalFilter.h"
-#include "SparseRawDigit.h"
+#include "ubooneobj/UbooneOpticalFilter.h"
+#include "ubooneobj/SparseRawDigit.h"
 #include "lardataobj/RecoBase/Wire.h"
 
 //

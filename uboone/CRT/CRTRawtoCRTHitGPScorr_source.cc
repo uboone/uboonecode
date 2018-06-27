@@ -233,7 +233,7 @@ private:
   int ts1ref_counter[100];
   uint32_t ts1ref_second[100];
   uint32_t previous_sec_mac[MAXFEBNR+1];
-  uint32_t previous_sec_mac2[MAXFEBNR+1];
+  //uint32_t previous_sec_mac2[MAXFEBNR+1];
   //////////////////////////////////
   int ts0ref_counter[MAXFEBNR+1];
   int ts1_ref_counter[MAXFEBNR+1]; // nrwm2[MAXFEBNR+1];
@@ -273,7 +273,7 @@ private:
   int ev_counter_filter_scan[MAXFEBNR+1];  //Number of events per module (mac) in the scanning buffer
   int ev_counter_filter[MAXFEBNR+1];
   //////////////////////////////////
-  uint32_t act_time[2][MAXFEBNR+1];    //number to read out the second and ms out of received special event [0]:sec, [1]:ms [][mac]:module [][MAXFEBNR]:time last poll
+  //uint32_t act_time[2][MAXFEBNR+1];    //number to read out the second and ms out of received special event [0]:sec, [1]:ms [][mac]:module [][MAXFEBNR]:time last poll
   //uint32_t previous_sec;// previous_ms;
   //uint32_t previous2_sec;
   int event_time_diff[MAXFEBNR+1];
@@ -286,9 +286,9 @@ private:
   crt::EVENT_tpro evbuf_scan[MAXFEBNR+1][4*EVSPERFEB+1]; //buffer for scanning for coincidences (same structure as the buffer for processing)
   crt::EVENT_tpro evbuf_filter[MAXFEBNR+1][4*EVSPERFEB+1];
   crt::EVENT_tpro evbuf_filter_scan[MAXFEBNR+1][4*EVSPERFEB+1];
-  crt::EVENT_t_send beam_ev[10][4*EVSPERFEB+1];    //buffer to send out the coincidences (structure idealy same as the received events)
-  crt::EVENT_t ts0_ref_event[2];
-  crt::EVENT_t_send ts0_ref_event_buffer[MAXFEBNR+1][2];
+  //crt::EVENT_t_send beam_ev[10][4*EVSPERFEB+1];    //buffer to send out the coincidences (structure idealy same as the received events)
+  //crt::EVENT_t ts0_ref_event[2];
+  //crt::EVENT_t_send ts0_ref_event_buffer[MAXFEBNR+1][2];
   crt::EVENT_t_send coincidence[MAXFEBNR+1];    //buffer to send out the coincidences (structure idealy same as the received events)
   crt::EOP_EVENT_t refevent;
   std::vector<crt::CRTHit>  allmyCRTHits;
@@ -838,7 +838,7 @@ void crt::CRTRawInputDetail::receive_data(){
               if(std::abs(event_time_diff_old-event_time_diff_now)>500){ // the jump has to be bigger than 500
                 all_fine=0;
                 //check for what referent event was missed or if it was a stucked event...
-                if(std::labs(event_time_diff_old-event_time_diff_now-1e9)<30000){ //check if ts0_ref was missed 30us > dead time FEB
+                if(std::abs(event_time_diff_old-event_time_diff_now-1e9)<30000){ //check if ts0_ref was missed 30us > dead time FEB
                   if(evbuf_pro[febnr][j-one_back].flags==5 || evbuf_pro[febnr][j-one_back].flags==7) all_fine=1;
                   if(all_fine!=1){
                     for(int counter=ev_counter_mac[febnr]; counter>=j; counter--){ //shift all events after one further

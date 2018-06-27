@@ -41,13 +41,13 @@ public:
      void reconfigure(fhicl::ParameterSet const&)  ;
      
      // Recover information from the start of a run (if processing across runs)
-     void beginRun(const art::Run&);
+     void beginRun(const art::Run&) override;
 
      // Recover information at the end of a run (if processing across runs)
-     void endRun(const art::Run&);
+     void endRun(const art::Run&) override;
 
      // Called when job completes to deal with output of stuff from beginJob
-     void endJob();
+     void endJob() override;
 
 private:
 
