@@ -93,7 +93,7 @@ namespace michel {
     if((dqdscandidate_loc >= cluster._hits.size()))
       return false;
     
-    if(std::abs(int(dqdscandidate_loc) - int(candidate_loc)) > (_maxDistance))
+    if(std::abs(int(dqdscandidate_loc) - int(candidate_loc)) > int(_maxDistance))
       return false;
 
     size_t right = 0;
