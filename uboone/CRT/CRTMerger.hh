@@ -24,42 +24,42 @@ using namespace std;
 
 namespace crt
 {
-	class CRTMerger : public art::EDProducer
-	{
-		std::vector<std::string> fFileNames;
-		std::vector<std::string> fTestFiles;
-		std::string previouscrtrootfile;
+  class CRTMerger : public art::EDProducer
+  {
+    std::vector<std::string> fFileNames;
+    std::vector<std::string> fTestFiles;
+    std::string previouscrtrootfile;
 		 
-		// Producer tag of the CRT events
-		art::InputTag fTag;
-        	std::string fUBversion_CRTHits;
-		std::string Merged_Object;
+    // Producer tag of the CRT events
+    art::InputTag fTag;
+    std::string fUBversion_CRTHits;
+    std::string Merged_Object;
 		
-		// Time window
-		unsigned long fTimeWindow;
-		unsigned int fMaxCount;
-		std::vector<unsigned long> fTimeOffSet;
-		bool _debug;
+    // Time window
+    unsigned long fTimeWindow;
+    unsigned int fMaxCount;
+    std::vector<unsigned long> fTimeOffSet;
+    bool _debug;
 		
-		public:
-		CRTMerger(const fhicl::ParameterSet&);
-		~CRTMerger();
-		//explicit CRTMerger(fhicl::ParameterSet const &p);
+  public:
+    CRTMerger(const fhicl::ParameterSet&);
+    ~CRTMerger();
+    //explicit CRTMerger(fhicl::ParameterSet const &p);
 		
-		void produce( art::Event &evt ) override;
+    void produce( art::Event &evt ) override;
 		
-		void reconfigure(fhicl::ParameterSet const & p) override;
-		private:
+    void reconfigure(fhicl::ParameterSet const & p) override;
+  private:
 		
-		std::vector< std::vector< artdaq::Fragment > > w;
-		ifdh_ns::ifdh* tIFDH=0;
-		ifdh_ns::ifdh* fIFDH=0;
+    std::vector< std::vector< artdaq::Fragment > > w;
+    ifdh_ns::ifdh* tIFDH=0;
+    ifdh_ns::ifdh* fIFDH=0;
 		
-		std::string data_label_DAQHeader_;
-		std::string cTag;
+    std::string data_label_DAQHeader_;
+    std::string cTag;
 
-		std::set<std::string> fCRTFiles;
+    std::set<std::string> fCRTFiles;
 		
-	};
+  };
 }
 #endif // CRT_MERGER_HH
