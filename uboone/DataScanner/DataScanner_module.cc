@@ -1850,9 +1850,10 @@ namespace datascanner {
 	track_light.add_covariance (track_ptr->CovarianceAtPoint(i));
 
       // Momentum
-      for(size_t i=0; i<track_ptr->NumberFitMomentum(); i++)
-
-	track_light.add_momentum   (track_ptr->MomentumAtPoint(i));
+      if (track_ptr->HasMomentum()) {
+	for(size_t i=0; i<track_ptr->NumberTrajectoryPoints(); i++)
+	  track_light.add_momentum   (track_ptr->MomentumAtPoint(i));
+      }
       
       for(auto const type : ass_types) {
 

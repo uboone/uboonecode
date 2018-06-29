@@ -1036,8 +1036,10 @@ namespace larlite {
       for(size_t i=0; i<track_ptr->NumberCovariance(); i++)
 	track_lite.add_covariance (track_ptr->CovarianceAtPoint(i));
       // Momentum
-      for(size_t i=0; i<track_ptr->NumberFitMomentum(); i++)
-	track_lite.add_momentum   (track_ptr->MomentumAtPoint(i));
+      if (track_ptr->HasMomentum()) {
+	for(size_t i=0; i<track_ptr->NumberTrajectoryPoints(); i++)
+	  track_lite.add_momentum   (track_ptr->MomentumAtPoint(i));
+      }
       
       // Store address map for downstream association
       //fPtrIndex_track[track_ptr] = std::make_pair(lite_data->size(),name_index);

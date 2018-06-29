@@ -38,6 +38,7 @@ void UBXSecEvent::Init()
   muon_tag_score = _default_value;
   fm_score = _default_value;
   fv = _default_value;
+  fv_sce = _default_value;
   ccnc = _default_value;
   mode = _default_value;
   nupdg = _default_value;
@@ -49,6 +50,10 @@ void UBXSecEvent::Init()
   genie_mult_ch = _default_value;
   bnb_weight = _default_value;
   is_selected = false;
+
+  sce_corr_x = _default_value;
+  sce_corr_y = _default_value;
+  sce_corr_z = _default_value;
 
   mc_muon_contained = _default_value;
   is_swtriggered = _default_value;
@@ -62,6 +67,10 @@ void UBXSecEvent::Init()
   pot = _default_value;
  
   no_mcflash_but_op_activity = false;
+
+  tvtx_x.clear(); 
+  tvtx_y.clear(); 
+  tvtx_z.clear(); 
 
   ResizeVectors(0);
 
@@ -148,6 +157,13 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_geocosmictag.resize(vsize, false);
   slc_consistency.resize(vsize, true);
   slc_consistency_score.resize(vsize, 0.);
+}
+
+void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {
+
+  tvtx_x.resize(vsize);
+  tvtx_y.resize(vsize);
+  tvtx_z.resize(vsize);
 
 }
 
