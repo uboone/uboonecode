@@ -11,10 +11,10 @@ physics.stream1:       [ out1 ]
 physics.end_paths:     [ ana, stream1 ]
 
 outputs.out1.fileName: "%ifb_%tc_ubxsec.root"
-outputs.out1.dataTier: "reconstructed"
+outputs.out1.dataTier: "ubxsec"
 outputs.out1.SelectEvents: [ reco ]
 
-source.inputCommands: ["keep *_*_*_*"]
+#source.inputCommands: ["keep *_*_*_*", "drop *_simpleFlashBeam_*_*"]
 
 
 physics.producers.NeutrinoFlashMatch.FlashVetoTimeStart: 3.65
@@ -27,9 +27,3 @@ physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillStarts: 3.65
 physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillEnds:   5.25
 
 physics.producers.UBXSec.UseGENIEInfo:                   false
-
-physics.producers.pandoraCosmicFlashTag.DoOpDetSwap: false
-physics.producers.NeutrinoFlashMatch.DoOpDetSwap:    false
-physics.producers.UBXSec.DoOpDetSwap:                false
-
-
