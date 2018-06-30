@@ -12,7 +12,7 @@ simple_plugin(SparseRawDigitTest "module"
               ${MF_MESSAGELOGGER}
               
               ${FHICLCPP}
-              ${CETLIB}
+              cetlib cetlib_except
               ${PQ}
               BASENAME_ONLY
              )

@@ -33,7 +33,7 @@
 #include "cetlib_except/exception.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "lardataobj/RawData/RawDigit.h"
-#include "ubooneobj/SparseRawDigit.h"
+#include "ubobj/RawData/SparseRawDigit.h"
 
 namespace raw{
 
