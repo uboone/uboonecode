@@ -27,10 +27,7 @@
 #include "TStyle.h"
 #include "TSystem.h"
 
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
 #include "boost/date_time/gregorian/gregorian.hpp"
-#include "boost/date_time/posix_time/posix_time.hpp"
 #include "boost/date_time/local_time_adjustor.hpp"
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/filesystem.hpp>
@@ -50,7 +47,7 @@ crt::CRTMerger::CRTMerger(const fhicl::ParameterSet& pset) :
 {
   std::cout<<"crt::CRTMerger::CRTMerger"<<std::endl;
 
-  setenv("TZ", "CST+6CDT", 1);
+  setenv("TZ", "CST+6CDT", 1);  // Fermilab time zone.
   tzset();
 
   //setenv("IFDH_DATA_DIR","/uboone/data/users/kolahalb/MicroBooNE/",1);
@@ -157,76 +154,11 @@ void crt::CRTMerger::produce(art::Event& event)
   std::cout << "Local time of event: " 
 	    << boost::posix_time::to_iso_extended_string(this_event_localtime)<<std::endl;
 
-  std::cout << boost::posix_time::to_iso_extended_string(this_event_time)<<std::endl;
-  
-  std::string stringTime = boost::posix_time::to_iso_extended_string(this_event_localtime);
-  stringTime = "'"+stringTime+"'";
-  
-  struct tm tm;
-  memset(&tm, 0, sizeof(tm));
-  tm.tm_isdst = -1;
-  
-  if (_debug)
-    std::cout<<"TPC event time (s) "<<evt_time_sec<<"   event time (ns) "<<evt_time_nsec<<std::endl;
-  
-  // At this stage, find out the crtdaq files that may be time co-incident
-  std::ostringstream dim;
-  dim << "file_format " << "crt-binaryraw"
-      <<" and file_type " << "data"
-      <<" and start_time < " << stringTime 
-      << " and end_time > " << stringTime;
-  
-  if (_debug)
-    std::cout<<"dim = "<<dim.str()<<std::endl;
-  
-  // List those crtdaq files:
-  std::vector< std::string > crtfiles = tIFDH->translateConstraints(dim.str());
-  
-  // Find the corresponding child artroot file
-  std::vector< std::string > crtrootfile;
-  std::vector< std::string > tmprootfile;
+  std::cout << "UTC time of event:   "
+	    << boost::posix_time::to_iso_extended_string(this_event_time)<<std::endl;
 
-  if ( fUBversion_CRTHits == NULL ) {
-    std::cout << "Did not retrieve value for UBOONECODE_VERSION nor is there a specified CRTHits version to use. Will not find any proper CRT artroot daughters to merge." << std::endl;
-  }
-
-  std::string ubversion(fUBversion_CRTHits);
-
-  for(unsigned k =0; k<crtfiles.size(); k++) {
-    std::ostringstream dim1;
-    // add constraint that current CRTMerge job release must match that in which the 
-    // CRTHits were created/swizzled.
-    dim1 << "file_format " << "artroot"
-	 <<" and ub_project.version " << ubversion 
-	 << " and ischildof: (file_name " << crtfiles[k]
-	 <<" with availability physical )" << std::endl;
-    
-    if (_debug)
-      std::cout<<"dim1 = "<<dim1.str()<<std::endl;
-    
-    tmprootfile = tIFDH->translateConstraints(dim1.str());
-    
-    if (tmprootfile.size()>0) {
-      std::cout << "We get " << tmprootfile.size()
-		<< " daughters of " << crtfiles[k]
-		<< ". Pushing them/it onto vector of artroot files "  << std::endl;
-      for (const auto& artrootchild : tmprootfile)
-        crtrootfile.push_back(artrootchild);
-    }
-  }
-  std::cout<<"total: "<<crtrootfile.size()<<std::endl;
-  if (!crtrootfile.size())
-    std::cout << "\n\t CRTMerger_module: No child CRT files found that conform to constraints: "
-	      << "file_format " << "artroot" << " and ub_project.version "
-	      << ubversion  << std::endl;
-
-  // Throw exception if there are fewer than six CRT files.
-
-  if(crtrootfile.size() < 6) {
-    throw cet::exception("CRTMerger") << "Too few matching CRT files: " 
-				      << crtrootfile.size() << "\n";
-  }
-
+  std::vector<std::string> crtrootfile = findMatchingCRTFiles(this_event_localtime);
+  
   //collection of CRTHits for this event
   std::unique_ptr<std::vector<crt::CRTHit> > CRTHitEventsSet(new std::vector<crt::CRTHit>);
   
@@ -236,13 +168,13 @@ void crt::CRTMerger::produce(art::Event& event)
 
     // Add this file to set of seen CRT files.
 
-    if(fCRTFiles.count(crtrootfile[crf_index]) == 0) {
+    if(fCRTSwizzledFiles.count(crtrootfile[crf_index]) == 0) {
       std::cout << "Adding CRT parent file: " << crtrootfile[crf_index] << std::endl;
       art::ServiceHandle<art::FileCatalogMetadata> md;
       std::ostringstream ostr;
-      ostr << "mixparent" << fCRTFiles.size();
+      ostr << "mixparent" << fCRTSwizzledFiles.size();
       md->addMetadataString(ostr.str(), crtrootfile[crf_index]);
-      fCRTFiles.insert(crtrootfile[crf_index]);
+      fCRTSwizzledFiles.insert(crtrootfile[crf_index]);
     }
   
     // Read off the root file by streaming over internet. Use xrootd URL
@@ -392,11 +324,169 @@ void crt::CRTMerger::produce(art::Event& event)
 void crt::CRTMerger::reconfigure(fhicl::ParameterSet const & pset)
 {
   std::cout<<"crt::CRTMerger::reconfigure"<<std::endl;
-  char const* ubchar = std::getenv( "UBOONECODE_VERSION" );
-  
   cTag = {pset.get<std::string>("data_label_CRTHit_")};
   fTag = {pset.get<std::string>("InputTagName","crthit")};
   fTimeWindow = pset.get<unsigned>("TimeWindow",5000000);
-  fUBversion_CRTHits   = pset.get<std::string>   ("ubversion_CRTHits",ubchar);
+  fUBversion_CRTHits   = pset.get<std::string>   ("ubversion_CRTHits");
 }
+
+// Find matching CRT files for a TPC event time.
+//
+// Notes:
+//
+// 1.  The argument should be the event time in the local (Fermilab) time zone.
+// 2.  Start and end times in sam metadata are in the local time zone.
+
+std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time::ptime event_time)
+{
+
+  // Result vector.
+  std::vector< std::string > crtrootfiles;
+
+  // Check cached files.
+
+  for(const auto& crtfileinfo : fCRTFiles) {
+    const std::string& crtfile = crtfileinfo.first;
+    const CRTFileInfo& fileinfo = crtfileinfo.second;
+    if(event_time >= fileinfo.fStartTime && event_time <= fileinfo.fEndTime) {
+      std::cout << "Found cached file " << crtfile << std::endl;
+      for(auto const& crt_swizzled : fileinfo.fSwizzled)
+	crtrootfiles.push_back(crt_swizzled);
+    }
+  }
+  if(crtrootfiles.size() == 0) {
+
+    // Didn't match any cached files.
+    // Query CRT binery files.
+
+    std::string stringTime = boost::posix_time::to_iso_extended_string(event_time);
+    stringTime = "'"+stringTime+"'";
+    std::ostringstream dim;
+    dim << "file_format " << "crt-binaryraw"
+	<<" and file_type " << "data"
+	<<" and start_time < " << stringTime 
+	<< " and end_time > " << stringTime;
+  
+    if (_debug)
+      std::cout<<"dim = "<<dim.str()<<std::endl;
+  
+    // List those crtdaq files:
+    std::vector< std::string > crtfiles = tIFDH->translateConstraints(dim.str());
+    if(_debug)
+      std::cout << "Found " << crtfiles.size() << " CRT binary files." << std::endl;
+
+    // Get metadata of binary CRT files.
+
+    for(auto const & crtfile : crtfiles) {
+      if(_debug)
+	std::cout << "\n" << crtfile << std::endl;
+      std::string md = tIFDH->getMetadata(crtfile);
+
+      // Extract CRT binary file start and end time from metadata as strings.
+
+      std::string start_time;
+      size_t n = md.find("Start Time: ");
+      size_t m = 0;
+      if(n < std::string::npos) {
+	n += 12;
+	m = md.find("+", n);
+	if(m > n && m < std::string::npos) {
+	  start_time = md.substr(n, m-n);
+	  if(_debug)
+	    std::cout << "Start time = " << start_time << std::endl;
+	}
+      }
+      std::string end_time;
+      n = md.find("End Time: ");
+      if(n < std::string::npos) {
+	n += 10;
+	m = md.find("+", n);
+	if(m > n && m < std::string::npos) {
+	  end_time = md.substr(n, m-n);
+	  if(_debug)
+	    std::cout << "End time = " << end_time << std::endl;
+	}
+      }
+
+      // Convert start and end times to boost ptime.
+
+      boost::posix_time::ptime start_time_ptime =
+	boost::date_time::parse_delimited_time<boost::posix_time::ptime>(start_time, 'T');
+      boost::posix_time::ptime end_time_ptime =
+	boost::date_time::parse_delimited_time<boost::posix_time::ptime>(end_time, 'T');
+
+      // Make sure we closed the loop.
+
+      std::string start_time2 = boost::posix_time::to_iso_extended_string(start_time_ptime);
+      std::string end_time2 = boost::posix_time::to_iso_extended_string(end_time_ptime);
+      if(_debug) {
+	std::cout << "Start ptime " << start_time2 << std::endl;
+	std::cout << "End ptime " << end_time2 << std::endl;
+      }
+      if(start_time2 != start_time || end_time2 != end_time) {
+	std::cout << "Start ptime " << start_time2 << std::endl;
+	std::cout << "End ptime " << end_time2 << std::endl;
+	throw cet::exception("CRTMerger") << "Problem converting start and end time.";
+      }
+  
+      // Query CRT swizzled files that are children of this CRT binary file.
+
+      std::ostringstream dim1;
+      dim1 << "file_format " << "artroot"
+	   <<" and ub_project.version " << fUBversion_CRTHits
+	   << " and ischildof: (file_name " << crtfile
+	   <<" with availability physical )";
+
+      if (_debug)
+	std::cout << "dim1 = " << dim1.str() << std::endl;
+    
+      std::vector< std::string > tmprootfiles = tIFDH->translateConstraints(dim1.str());
+    
+      std::cout << "Found " << tmprootfiles.size()
+		<< " daughters of " << crtfile << std::endl;
+      if (tmprootfiles.size()>0) {
+	for (const auto& artrootchild : tmprootfiles) {
+	  crtrootfiles.push_back(artrootchild);
+	  if(_debug)
+	    std::cout << artrootchild << std::endl;
+	}
+      }
+
+      // Construct a CRTFileInfo struct and stash it in our cache.
+
+      if(fCRTFiles.count(crtfile) == 0) {
+	std::cout << "Adding " << crtfile << " to file cache." << std::endl;
+	CRTFileInfo fileinfo;
+	fileinfo.fFileName = crtfile;
+	fileinfo.fStartTime = start_time_ptime;
+	fileinfo.fEndTime = end_time_ptime;
+	fileinfo.fSwizzled = tmprootfiles;
+	fCRTFiles[crtfile] = fileinfo;
+	std::cout << "File cache contains " << fCRTFiles.size() << " files." << std::endl;
+      }
+    }
+  }
+  std::cout<<"\nNumber of matching CRT swizzled files: "<<crtrootfiles.size()<<std::endl;
+  if(_debug) {
+    for(const auto& crt_swizzled : crtrootfiles)
+      std::cout << crt_swizzled << std::endl;
+  }
+  if (!crtrootfiles.size())
+    std::cout << "\n\t CRTMerger_module: No child CRT files found that conform to constraints: "
+	      << "file_format " << "artroot" << " and ub_project.version "
+	      << fUBversion_CRTHits << std::endl;
+
+  // Throw exception if there are fewer than six CRT files.
+
+  if(crtrootfiles.size() < 6) {
+    throw cet::exception("CRTMerger") << "Too few matching CRT files: " 
+				      << crtrootfiles.size() << "\n";
+  }
+
+  // Done.
+
+  return crtrootfiles;
+
+}
+
 DEFINE_ART_MODULE(crt::CRTMerger)

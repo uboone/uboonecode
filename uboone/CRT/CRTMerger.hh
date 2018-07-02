@@ -16,8 +16,10 @@
 #include <string>
 #include <istream>
 #include <set>
+#include <map>
 //#include "ifdh.h"
 #include "IFDH_service.h"
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 using namespace art;
 using namespace std;
@@ -42,6 +44,16 @@ namespace crt
     bool _debug;
 		
   public:
+
+    // Nested struct with information about CRT files.
+
+    struct CRTFileInfo
+    {
+      std::string fFileName;                 // Name of CRT binary file.
+      boost::posix_time::ptime fStartTime;   // Start time of CRT binary file.
+      boost::posix_time::ptime fEndTime;     // End time of CRT binary file.
+      std::vector<std::string> fSwizzled;    // Names of CRT swizzled files.
+    };
     CRTMerger(const fhicl::ParameterSet&);
     ~CRTMerger();
     //explicit CRTMerger(fhicl::ParameterSet const &p);
@@ -49,6 +61,11 @@ namespace crt
     void produce( art::Event &evt ) override;
 		
     void reconfigure(fhicl::ParameterSet const & p) override;
+
+    // Find CRT swizzled files that matches a particular event time.
+
+    std::vector<std::string> findMatchingCRTFiles(boost::posix_time::ptime event_time);
+
   private:
 		
     std::vector< std::vector< artdaq::Fragment > > w;
@@ -58,8 +75,10 @@ namespace crt
     std::string data_label_DAQHeader_;
     std::string cTag;
 
-    std::set<std::string> fCRTFiles;
-		
+    // Files that we know about.
+
+    std::map<std::string, CRTFileInfo> fCRTFiles;
+    std::set<std::string> fCRTSwizzledFiles;		
   };
 }
 #endif // CRT_MERGER_HH
