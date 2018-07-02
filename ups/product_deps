@@ -61,6 +61,7 @@ e10:debug	e10:debug   e10:debug	e10:debug	DefaultPlusMECWithNC	e10:debug	e10:nu:
 e10:opt		e10:opt     e10:opt	e10:opt		DefaultPlusMECWithNC	e10:opt		e10:nu:opt:s59		e10:nu:opt	e10:opt		-nq-        	e10:opt
 e10:prof	e10:prof    e10:prof	e10:prof	DefaultPlusMECWithNC	e10:prof	e10:nu:prof:s59		e10:nu:prof	e10:prof	-nq-        	e10:prof
 e10:prof:fg	e10:prof    e10:prof	e10:prof	LocalFGNievesQEAndMEC	e10:prof	e10:nu:prof:s59		e10:nu:prof	e10:prof	-nq-        	e10:prof
+e10:prof:fgncmec e10:prof    e10:prof	e10:prof	LFGhA2014NCMEC		e10:prof	e10:nu:prof:s59		e10:nu:prof	e10:prof	-nq-        	e10:prof
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
