@@ -1,14 +1,13 @@
+#include <algorithm>
 #include "uboone/CRT/CRTMerger.hh"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 ////#include "uboone/CRT/CRTProducts/MSetCRTFrag.hh"
 #include <artdaq-core/Data/Fragment.hh>
-#include "gallery/Event.h"
 #include "CRTBernFEBDAQCore/Overlays/BernZMQFragment.hh"
 #include "art/Framework/Services/System/FileCatalogMetadata.h"
 #include "art/Framework/Principal/Handle.h"
 #include "IFDH_service.h"
 #include "uboone/RawData/utils/DAQHeaderTimeUBooNE.h"
-#include "uboone/CRT/CRTProducts/CRTHit.hh"
 
 #include <memory>
 #include <string>
@@ -35,10 +34,13 @@
 
 namespace {
 
-  // Local function to calculate absolute difference between two unsigned longs.
+  // Local function to compare CRT hits according to time.
 
-  unsigned int absdiff(unsigned long a, unsigned long b) {
-    return (a>b ? a-b : b-a);
+  bool CRTHitComp(const crt::CRTHit& crthit1, const crt::CRTHit& crthit2)
+  {
+    bool result = (crthit1.ts0_s < crthit2.ts0_s ||
+		   (crthit1.ts0_s == crthit2.ts0_s && crthit1.ts0_ns < crthit2.ts0_ns));
+    return result;
   }
 }
 
@@ -55,7 +57,6 @@ crt::CRTMerger::CRTMerger(const fhicl::ParameterSet& pset) :
 
   this->reconfigure(pset);
   produces< std::vector<crt::CRTHit> >();
-  fTag = pset.get<art::InputTag>("InputTagName");
   _debug = pset.get<bool>("debug");
   fTimeOffSet = pset.get<std::vector< unsigned long > > ("test_t_offset");
 
@@ -157,24 +158,28 @@ void crt::CRTMerger::produce(art::Event& event)
   std::cout << "UTC time of event:   "
 	    << boost::posix_time::to_iso_extended_string(this_event_time)<<std::endl;
 
-  std::vector<std::string> crtrootfile = findMatchingCRTFiles(this_event_localtime);
+  // Get matching swizzled CRT files.
+
+  std::vector<std::string> crtrootfiles = findMatchingCRTFiles(this_event_localtime);
   
-  //collection of CRTHits for this event
+  // collection of CRTHits for this event
+
   std::unique_ptr<std::vector<crt::CRTHit> > CRTHitEventsSet(new std::vector<crt::CRTHit>);
+
+  // Loop over swizzled CRT files.
   
-  for(unsigned crf_index = 0; crf_index < crtrootfile.size(); crf_index++) {
-    if (_debug)
-      std::cout<<"The child artroot file is "<<crtrootfile[crf_index]<<std::endl;
+  for(auto const& crtrootfile : crtrootfiles) {
+    std::cout << "\nThe child artroot file is " << crtrootfile << std::endl;
 
     // Add this file to set of seen CRT files.
 
-    if(fCRTSwizzledFiles.count(crtrootfile[crf_index]) == 0) {
-      std::cout << "Adding CRT parent file: " << crtrootfile[crf_index] << std::endl;
+    if(fCRTSwizzledFiles.count(crtrootfile) == 0) {
+      std::cout << "Adding CRT parent file: " << crtrootfile << std::endl;
       art::ServiceHandle<art::FileCatalogMetadata> md;
       std::ostringstream ostr;
       ostr << "mixparent" << fCRTSwizzledFiles.size();
-      md->addMetadataString(ostr.str(), crtrootfile[crf_index]);
-      fCRTSwizzledFiles.insert(crtrootfile[crf_index]);
+      md->addMetadataString(ostr.str(), crtrootfile);
+      fCRTSwizzledFiles.insert(crtrootfile);
     }
   
     // Read off the root file by streaming over internet. Use xrootd URL
@@ -182,133 +187,113 @@ void crt::CRTMerger::produce(art::Event& event)
     // ifdh::fetchInput the crt file to local directory and keep it open as long
     // as we make use of it
     //xrootd URL
-    std::string schema = "root";
-    std::vector< std::string > crtrootFile_xrootd_url;
-    try {
-      std::vector<std::string> tmp(tIFDH->locateFile(crtrootfile[crf_index], schema));
-      crtrootFile_xrootd_url.swap(tmp);
+
+    std::shared_ptr<gallery::Event> crt_event;
+
+    // Do we have an open gallery event for this file?
+
+    if(fCRTEvents.count(crtrootfile) > 0) {
+
+      // Yes, reuse the open gallery event.
+
+      std::cout << "Reusing open gallery event for file " << crtrootfile << std::endl;
+      crt_event = fCRTEvents[crtrootfile];
     }
-    catch(...) {
-      std::cout << "This Root File does not exist. No Merger CRTHit candidates put on event for this TPC evt for this chunk of the CRT." << std::endl;
-      throw cet::exception("CRTMerger") << "Could not locate CRT file: " 
-					<< crtrootfile[crf_index] << "\n";
-    }
-    std::cout<<"xrootd URL: "<<crtrootFile_xrootd_url[0]<<std::endl;
+
+    else {
+
+      // No, open a new gallery event.
+
+      std::string schema = "root";
+      std::vector< std::string > crtrootfiles_xrootd_url;
+      try {
+	std::vector<std::string> tmp(tIFDH->locateFile(crtrootfile, schema));
+	crtrootfiles_xrootd_url.swap(tmp);
+      }
+      catch(...) {
+	std::cout << "This Root File does not exist. No Merger CRTHit candidates put on event for this TPC evt for this chunk of the CRT." << std::endl;
+	throw cet::exception("CRTMerger") << "Could not locate CRT file: " 
+					  << crtrootfile << "\n";
+      }
+
+      // Ignore all locations except the first.
+
+      if(crtrootfiles_xrootd_url.size() > 1)
+	crtrootfiles_xrootd_url.erase(crtrootfiles_xrootd_url.begin()+1,
+				      crtrootfiles_xrootd_url.end());
+      std::cout<<"xrootd URL: "<<crtrootfiles_xrootd_url[0]<<std::endl;
   
-    // gallery, when fed the list of the xrootd URL, internally calls TFile::Open()
-    // to open the file-list
-    // In interactive mode, you have to get your proxy authenticated by issuing:
-    // voms-proxy-init -noregen -rfc -voms fermilab:/fermilab/uboone/Role=Analysis
-    // when you would like to launch a 'lar -c ... ... ...'
-    // In batch mode, this step is automatically done
+      // gallery, when fed the list of the xrootd URL, internally calls TFile::Open()
+      // to open the file-list
+      // In interactive mode, you have to get your proxy authenticated by issuing:
+      // voms-proxy-init -noregen -rfc -voms fermilab:/fermilab/uboone/Role=Analysis
+      // when you would like to launch a 'lar -c ... ... ...'
+      // In batch mode, this step is automatically done
     
-    gallery::Event fCRTEvent(crtrootFile_xrootd_url);
-    std::cout<<"Opened the CRT root file from xrootd URL"<<std::endl;
+      crt_event = std::shared_ptr<gallery::Event>(new gallery::Event(crtrootfiles_xrootd_url));
+      std::cout<<"Opened the CRT root file from xrootd URL"<<std::endl;
+      fCRTEvents[crtrootfile] = crt_event;
   
-    if (_debug)
-      std::cout<<"Start merging attempts"<<std::endl;
-    
-    unsigned int merging = 0;
-    //int triscuit = 0;
-    if (_debug)
       std::cout << "New [collection of] CRTEvent[s]. Its size is  "
-		<< fCRTEvent.numberOfEventsInFile() << "." << std::endl;
+		<< crt_event->numberOfEventsInFile() << "." << std::endl;
+    }
 
-    unsigned long jump = 1; 
-    bool firstE(true);
-    unsigned long cnt(0);
-    int cnt2(0);
-    for(fCRTEvent.toBegin(); !fCRTEvent.atEnd(); ++fCRTEvent) {
-      // would rather be allowed to advance the iterator by more than 1, 
-      // but gallery doesn't seem to allow it. So must do the below.
+    // Attempt to reposition the CRT event.
+    // In case of initial failure, rewind the file and retry once.
 
-      if (jump!=1 && cnt!=jump) {
-	cnt++;
-	continue;
+    std::cout << "CRT event entry before reposition = " << crt_event->eventEntry() << std::endl;
+    bool ok = reposition(*crt_event, evt_time_sec, T0);
+    if(!ok) {
+      std::cout << "Rewinding file." << std::endl;
+      crt_event->toBegin();
+      ok = reposition(*crt_event, evt_time_sec, T0);
+    }
+
+    // If reposition failed, throw an exception.
+
+    if(!ok)
+      throw cet::exception("CRTMerger") << "Failed to reposition CRT file.";
+
+    std::cout << "CRT event entry after reposition = " << crt_event->eventEntry() << std::endl;
+
+    int merging = 0;
+    double TPCtime = evt_time_sec + 1.e-9 * evt_time_nsec;
+    double MergingWindow_start = TPCtime - 0.002;
+    double MergingWindow_end   = TPCtime + 0.004;
+
+    // Loop over CRT events.
+
+    bool done = false;
+    for(; !crt_event->atEnd(); ++*crt_event) {
+
+      // Loop over events in the current CRT hit collection.
+
+      gallery::ValidHandle<std::vector<crt::CRTHit> > h =
+	crt_event->getValidHandle< std::vector<crt::CRTHit> >(cTag);
+      std::vector<crt::CRTHit> CRTHitCollection;
+      filter_crt_hits(*h, CRTHitCollection);
+      if(_debug) {
+	uint32_t first_sec = CRTHitCollection.front().ts0_s;
+	uint32_t last_sec = CRTHitCollection.back().ts0_s;
+	std::cout << "\nTPC event time = " << evt_time_sec << std::endl;
+	std::cout << "First event time = " << first_sec << std::endl;
+	std::cout << "Last event time = " << last_sec << std::endl;
       }
-      if (cnt==jump && _debug) 
-	std::cout << "Okay we've jumped fwd " << cnt << " CRT sub events. " << std::endl;
-      //art::Handle< std::vector< crt::CRTHit> > rawHandle;
-      //fCRTEvent.getByLabel(cTag, rawHandle);
-
-      std::vector< crt::CRTHit >  const& CRTHitCollection =
-	*(fCRTEvent.getValidHandle< std::vector<crt::CRTHit> >(cTag));
-      jump = 1;
-      // If our TPC evt is more than T0 sec beyond the end of the first CRT event's last Hit,
-      // then ffwd
-      // I am assuming these CRT events are precisely 1 second long each. 
-      if ( ( evt_time_sec > (CRTHitCollection[CRTHitCollection.size()-1].ts0_s + T0) ) && firstE ) {
-	firstE = false;
-
-	// Let's stop T0 sec short of where we'd like to land.
-	jump = evt_time_sec - CRTHitCollection[CRTHitCollection.size()-1].ts0_s - T0; 
-	// if jump is a large number, don't zip off end of list. Stop short by 2 files.
-	if (jump > (unsigned long)(fCRTEvent.numberOfEventsInFile()-2) && 
-	    ((fCRTEvent.numberOfEventsInFile()-2)>0) )
-	  jump = fCRTEvent.numberOfEventsInFile()-2;
-	// Sometimes the Top panel has tiny (0,1) values, so make sure seconds are
-	// not crazy since the time since Epoch.
-	if (CRTHitCollection[0].ts0_s<1300000000 &&
-	    CRTHitCollection[CRTHitCollection.size()-1].ts0_s<1300000000) {
-          // don't ffwd any sub-events, but don't rule out doing it later
-	  // (meaning, keep firstE set to true)
-          jump = 1;
-          firstE = true;
-          cnt2++;
-          if( _debug)
-	    std::cout << "Count of hits w bad times in this file is " << cnt2 << std::endl;
-          continue;
+      for(auto const& CRTHitevent : CRTHitCollection) {
+	double CRTtime = CRTHitevent.ts0_s + 1.e-9 * CRTHitevent.ts0_ns;
+	if (CRTtime >= MergingWindow_start && CRTtime <= MergingWindow_end) {
+	  if (_debug)
+	    std::cout<<"found match"<<std::endl;
+	  CRTHitEventsSet->emplace_back(CRTHitevent);
+	  merging += 1;
         }
-	if (_debug)
-	  std::cout << "Within this CRT sub event the first and last CRT Hit times in seconds are "
-		    << CRTHitCollection[0].ts0_s << " and "
-		    << CRTHitCollection[CRTHitCollection.size()-1].ts0_s
-		    << " whereas TPC event sec is " << evt_time_sec
-		    << " ... and therefore we are going to jump fwd "
-		    << jump << " sub events." <<  std::endl;
-	continue;
-      }
-      if ( evt_time_sec < (CRTHitCollection[0].ts0_s-T0)) {
-	std::cout << "Within this CRT sub event the last CRT Hit times in seconds is "
-		  << CRTHitCollection[CRTHitCollection.size()-1].ts0_s
-		  << " whereas TPC event sec is " << evt_time_sec
-		  << " ... and therefore we are moving to next full collection of CRT Events (new file)."
-		  <<  std::endl;
-	break;
-      }
-
-      if (_debug)
-	std::cout << "CRT Event second falls inside CRT sub-event Window ..." << std::endl;
-
-      bool exitCollection(false);
-      for(std::vector<int>::size_type hit_index=0; hit_index!=CRTHitCollection.size(); hit_index++) {
-	crt::CRTHit CRTHitevent = CRTHitCollection[hit_index];
-	unsigned long CRTtime_s  = CRTHitevent.ts0_s;
-	unsigned long CRTtime_ns= CRTHitevent.ts0_ns;
-      
-	//unsigned long TPCtime_ns= evt_time_sec*1000000000+evt_time_nsec;
-	unsigned long TPCtime_s  = evt_time_sec;
-	unsigned long TPCtime_ns= evt_time_nsec;
-      
-	unsigned long MergingWindow_start = TPCtime_ns - 2000000;
-	unsigned long MergingWindow_end    = TPCtime_ns + 4000000;
-
-	if (_debug && 0) { // TMI, even in debug mode
-          std::cout<<"TPC_ns: "<<TPCtime_s<<", CRT_ns: "<<CRTtime_s<<std::endl;
-        }
-
-	if(absdiff(CRTtime_s, TPCtime_s)<1 ) { // was <2. Change at  DL's request. EC, 12-Apr-2018.
-          if ((CRTtime_ns > MergingWindow_start) && (CRTtime_ns < MergingWindow_end)) {
-	    if (_debug)
-	      std::cout<<"found match"<<std::endl;
-	    CRTHitEventsSet->emplace_back(CRTHitevent);
-	    merging += 1;
-	  }
-        }
+	else if(CRTtime > MergingWindow_end) {
+	  done = true;
+	  break;
+	}
       } // end loop on Hit Collection within CRT evt
-      if (exitCollection)
+      if(done)
 	break;
-        
     } // end loop on CRT evts
     std::cout<<"# merging in the stream: "<<merging<<std::endl;
   } // end loop on ROOT File
@@ -325,7 +310,6 @@ void crt::CRTMerger::reconfigure(fhicl::ParameterSet const & pset)
 {
   std::cout<<"crt::CRTMerger::reconfigure"<<std::endl;
   cTag = {pset.get<std::string>("data_label_CRTHit_")};
-  fTag = {pset.get<std::string>("InputTagName","crthit")};
   fTimeWindow = pset.get<unsigned>("TimeWindow",5000000);
   fUBversion_CRTHits   = pset.get<std::string>   ("ubversion_CRTHits");
 }
@@ -486,7 +470,108 @@ std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time:
   // Done.
 
   return crtrootfiles;
-
 }
+
+// Reposiiton gallery event to approximate time in seconds.
+// Return true if success, false if fail.
+
+bool crt::CRTMerger::reposition(gallery::Event& event, unsigned long evt_time_sec, int delta_t)
+{
+  // Result.
+
+  bool ok = false;
+
+  try {
+
+    // Loop over events until we get a non-empty CRT his collection or an exception.
+
+    for(;;event.next()) {
+
+      // Look for a non-empty CRT hit collection.
+
+      gallery::ValidHandle<std::vector<crt::CRTHit> > h =
+	event.getValidHandle< std::vector<crt::CRTHit> >(cTag);
+      std::vector< crt::CRTHit > CRTHitCollection;
+      filter_crt_hits(*h, CRTHitCollection);
+      if(_debug)
+	std::cout << "Number of CRT hits in event = " << CRTHitCollection.size() << std::endl;
+      if(CRTHitCollection.size() > 0) {
+
+	// Got a non-empty CRT hit collection.
+
+	uint32_t first_sec = CRTHitCollection.front().ts0_s;
+	uint32_t last_sec = CRTHitCollection.back().ts0_s;
+	if(_debug) {
+	  std::cout << "TPC event time = " << evt_time_sec << std::endl;
+	  std::cout << "First event time = " << first_sec << std::endl;
+	  std::cout << "Last event time = " << last_sec << std::endl;
+	}
+
+	// Compare TPC and CRT times.
+
+	if(evt_time_sec > last_sec + delta_t) {
+
+	  // TPC event is in the future relative to CRT event.
+	  // Skip events assuming each CRT event is exactly one second.
+	  // Return success.
+
+	  int jump = evt_time_sec - last_sec - delta_t;
+	  if(_debug)
+	    std::cout << "Skipping ahead " << jump << " CRT events." << std::endl;
+	  for(; jump>0; --jump)
+	    event.next();
+	  ok = true;
+	  break;
+	}
+	else if(evt_time_sec < first_sec) {
+
+	  // TPC event is in the past relative to CRT event.
+	  // Return failure, which may signal the calling program to rewind
+	  // the file and try again.
+
+	  ok = false;
+	  break;
+	}
+	else {
+
+	  // TPC event is close to CRT event.
+	  // Stay at the current position and return success.
+
+	  ok = true;
+	  break;
+	}
+      }
+    }
+  }
+  catch(...) {
+    ok = false;
+  }
+  return ok;
+}
+
+// Filter CRT hit collection.
+// Remove bad CRT hits.
+// Sort CRT hits into increasing time order.
+
+void crt::CRTMerger::filter_crt_hits(const std::vector<crt::CRTHit>& input_hits, 
+				     std::vector<crt::CRTHit>& output_hits) const
+{
+  // Copy hits from input collectio to output collection, removing bad hits.
+
+  output_hits.reserve(input_hits.size());
+
+  for(const auto& crthit : input_hits) {
+
+    // Filter out hits with bad times.
+
+    if(crthit.ts0_s > 1300000000)
+      output_hits.push_back(crthit);
+  }
+
+  // Sort hits into increaseing time order.
+
+  std::sort(output_hits.begin(), output_hits.end(), CRTHitComp);
+}
+
 
 DEFINE_ART_MODULE(crt::CRTMerger)
