@@ -11,7 +11,7 @@
 #include <artdaq-core/Data/Fragment.hh>
 #include "fhiclcpp/ParameterSet.h"
 #include "canvas/Utilities/InputTag.h"
-//#include "gallery/Event.h"
+#include "gallery/Event.h"
 //#include "gallery/ValidHandle.h"
 #include <string>
 #include <istream>
@@ -20,6 +20,7 @@
 //#include "ifdh.h"
 #include "IFDH_service.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include "uboone/CRT/CRTProducts/CRTHit.hh"
 
 using namespace art;
 using namespace std;
@@ -33,7 +34,6 @@ namespace crt
     std::string previouscrtrootfile;
 		 
     // Producer tag of the CRT events
-    art::InputTag fTag;
     std::string fUBversion_CRTHits;
     std::string Merged_Object;
 		
@@ -45,7 +45,7 @@ namespace crt
 		
   public:
 
-    // Nested struct with information about CRT files.
+    // Nested struct with information about CRT binary files.
 
     struct CRTFileInfo
     {
@@ -54,6 +54,7 @@ namespace crt
       boost::posix_time::ptime fEndTime;     // End time of CRT binary file.
       std::vector<std::string> fSwizzled;    // Names of CRT swizzled files.
     };
+
     CRTMerger(const fhicl::ParameterSet&);
     ~CRTMerger();
     //explicit CRTMerger(fhicl::ParameterSet const &p);
@@ -65,6 +66,15 @@ namespace crt
     // Find CRT swizzled files that matches a particular event time.
 
     std::vector<std::string> findMatchingCRTFiles(boost::posix_time::ptime event_time);
+
+    // Reposiiton gallery event to tpc event time.
+
+    bool reposition(gallery::Event& event, unsigned long evt_time_sec, int delta_t);
+
+    // Filter CRT hit collection.
+
+    void filter_crt_hits(const std::vector<crt::CRTHit>& input_hits, 
+			 std::vector<crt::CRTHit>& output_hits) const;
 
   private:
 		
@@ -79,6 +89,15 @@ namespace crt
 
     std::map<std::string, CRTFileInfo> fCRTFiles;
     std::set<std::string> fCRTSwizzledFiles;		
+
+    // Open CRT swizzled gallery files.
+    // After a CRT swizzled file is open, we never close it.
+    // In normal circumstances, we should never have more than 18 
+    // CRT swizzled files open (one seven-hour TPC run can overlap
+    // with up to three four-hour CRT runs, and there are six CRT
+    // swizzled streams).
+
+    std::map<std::string, std::shared_ptr<gallery::Event> > fCRTEvents;
   };
 }
 #endif // CRT_MERGER_HH
