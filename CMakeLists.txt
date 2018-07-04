@@ -52,6 +52,7 @@ find_ups_product( ubraw v1_00_00 )
 find_ups_product( larana v1_00_00 )
 find_ups_product( larpandora v1_00_00 )
 find_ups_product( art v1_00_00 )
+find_ups_product( larcore )
 find_ups_product( nutools )
 
 # macros for dictionary and simple_plugin
