@@ -186,7 +186,7 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
   }
 
   if ((unsigned) MCTruth_NParticles > kMaxParticles) {
-    throw cet::exception(__PRETTY_FUNCTION__)
+    std::cout
       << "Number of MCTruth particles (" << MCTruth_NParticles << ") "
          "exceeds kMaxParticles (" << kMaxParticles << ")" << std::endl;
   }
@@ -204,7 +204,7 @@ bool NTupleInterface::FillMCTruth(Long64_t ientry, simb::MCTruth& mctruth) {
 
     // Add daughter track IDs for this particle
     if (MCTruth_particles_NumberDaughters[i] > 100) {
-      throw cet::exception(__PRETTY_FUNCTION__)
+      std::cout
         << "Number of MCTruth particles ("
         << MCTruth_particles_NumberDaughters[i] << ") "
         << "exceeds maximum (" << 100 << ")" << std::endl;
