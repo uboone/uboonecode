@@ -187,7 +187,17 @@ microboone_reco_mcc8_producers:
   pandoraNuKHitFlashMatch:        @local::microboone_beamflashtrackmatchtagger
   pandoraNuKalmanTrackFlashMatch: @local::microboone_beamflashtrackmatchtagger
   pandoraNuKalmanShowerFlashMatch: @local::microboone_beamflashtrackmatchtagger
+    
+  ### pandora consolidated output (not necessarily complete, just all the things needed for analysistree)
+  pandoratag:                     @local::microboone_cosmictracktagger
+  pandoracalo:                    @local::microboone_calomc
+  pandoracali:                    @local::microboone_calibrationdedx
+  pandoracalipid:                 @local::microboone_chi2pid
+  pandoraContTag:                 @local::microboone_containment_tag
+  pandoraMCSMu:                   @local::mcsfitproducer
+    
 
+    
   ### pandora cosmic trackkalman
   pandoraCosmicKalmanTrack:       @local::kalmantrackfit
   pandoraNuKalmanTrack:           @local::kalmantrackfit
@@ -456,7 +466,13 @@ microboone_reco_mcc8_pandoraNu: [        pandoraNuPatRec,
 microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandoraFull,
                                          @sequence::microboone_reco_mcc8_pandoraCosmic,
 					 crHitRemovalTruthMatch,
-                                         @sequence::microboone_reco_mcc8_pandoraNu ]
+                                         @sequence::microboone_reco_mcc8_pandoraNu,
+                                         pandoracalo,
+                                         pandoracali,
+                                         pandoracalipid,
+                                         pandoratag,
+                                         pandoraContTag,
+                                         pandoraMCSMu ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -620,7 +636,7 @@ microboone_reco_mcc8_producers.trajcluster.TrajClusterAlg.HitFinderModuleLabel: 
 #microboone_reco_mcc8_producers.stitchkalmanhittagcc.ClusterModuleLabel:          "trajcluster"
 #microboone_reco_mcc8_producers.stitchkalmanhittagcc.TrackModuleLabel:            "stitchkalmanhitcc"
 
-# Pandora consolidated reconstruction
+# Pandora consolidated reconstruction related
 microboone_reco_mcc8_producers.pandoraPatRec.HitFinderModuleLabel:                "gaushit"
 microboone_reco_mcc8_producers.pandoraTrack.PFParticleLabel:                      "pandoraPatRec"
 microboone_reco_mcc8_producers.pandoraShower.PFParticleLabel:                     "pandoraPatRec"
@@ -628,6 +644,23 @@ microboone_reco_mcc8_producers.pandora.InputProducerLabel:                      
 microboone_reco_mcc8_producers.pandora.TrackProducerLabel:                        "pandoraTrack"
 microboone_reco_mcc8_producers.pandora.ShowerProducerLabel:                       "pandoraShower"
 microboone_reco_mcc8_producers.pandora.HitProducerLabel:                          "gaushit"
+
+microboone_reco_mcc8_producers.pandoratag.TrackModuleLabel:                    "pandora"
+
+microboone_reco_mcc8_producers.pandoracalo.TrackModuleLabel:                   "pandora"
+microboone_reco_mcc8_producers.pandoracalo.SpacePointModuleLabel:              "pandora"
+
+microboone_reco_mcc8_producers.pandoracali.TrackModuleLabel:                   "pandora"
+microboone_reco_mcc8_producers.pandoracali.CalorimetryModuleLabel:             "pandoracalo"
+
+microboone_reco_mcc8_producers.pandoracalipid.TrackModuleLabel:                "pandora"
+microboone_reco_mcc8_producers.pandoracalipid.CalorimetryModuleLabel:          "pandoracali"
+microboone_reco_mcc8_producers.pandoracalipid.Chi2PIDAlg.UseMedian:            true
+
+microboone_reco_mcc8_producers.pandoraContTag.TrackModuleLabels:               ["pandora"]
+microboone_reco_mcc8_producers.pandoraContTag.ApplyTags:                       [true]
+
+microboone_reco_mcc8_producers.pandoraMCSMu.inputs.inputLabel:                  "pandora"
 
 # Pandora cosmic pass related
 microboone_reco_mcc8_producers.pandoraCosmicPatRec.HitFinderModuleLabel:          "gaushit"
