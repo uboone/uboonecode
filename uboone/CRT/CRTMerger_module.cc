@@ -230,7 +230,36 @@ void crt::CRTMerger::produce(art::Event& event)
       // when you would like to launch a 'lar -c ... ... ...'
       // In batch mode, this step is automatically done
     
-      crt_event = std::shared_ptr<gallery::Event>(new gallery::Event(crtrootfiles_xrootd_url));
+      // Make several attempts to open file.
+
+      int mtry = 5;
+      int wait = 0;
+      bool open_ok = false;
+
+      while(mtry-- > 0 && !open_ok) {
+	if(wait != 0) {
+	  std::cout << "Waiting " << wait << " seconds." << std::endl;
+	  sleep(wait);
+	  wait *= 2;
+	}
+	else
+	  wait = 1;
+
+	try {
+	  std::cout << "Open file." << std::endl;
+	  crt_event = std::shared_ptr<gallery::Event>(new gallery::Event(crtrootfiles_xrootd_url));
+	  open_ok = true;
+	}
+	catch(...) {
+	  open_ok = false;
+	}
+
+	if(open_ok)
+	  std::cout << "Open succeeded." << std::endl;
+	else {
+	  std::cout << "Open failed." << std::endl;
+	}
+      }
       std::cout<<"Opened the CRT root file from xrootd URL"<<std::endl;
       fCRTEvents[crtrootfile] = crt_event;
   
@@ -579,11 +608,14 @@ bool crt::CRTMerger::reposition(gallery::Event& event, unsigned long evt_time_se
 
 	if(rewind_ok)
 	  std::cout << "Rewind succeeded." << std::endl;
-	else {
+	else
 	  std::cout << "Rewind failed." << std::endl;
-	  break;   // Break out of overall retry loop.  Reposition has failed.
-	}
       }
+
+      // If rewind failed, break out of overall retry loop.  Reposition has failed.
+
+      if(!rewind_ok)
+	break;
     }
   }
   return ok;
