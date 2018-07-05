@@ -249,10 +249,12 @@ void crt::CRTMerger::produce(art::Event& event)
       ok = reposition(*crt_event, evt_time_sec, T0);
     }
 
-    // If reposition failed, throw an exception.
+    // If reposition failed, skip this file.a
 
-    if(!ok)
-      throw cet::exception("CRTMerger") << "Failed to reposition CRT file.";
+    if(!ok) {
+      std::cout << "Failed to reposition file." << std::endl;
+      continue;
+    }
 
     std::cout << "CRT event entry after reposition = " << crt_event->eventEntry() << std::endl;
 
@@ -329,10 +331,12 @@ std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time:
 
   // Check cached files.
 
+  boost::posix_time::time_duration one_minute(0, 1, 0, 0);
   for(const auto& crtfileinfo : fCRTFiles) {
     const std::string& crtfile = crtfileinfo.first;
     const CRTFileInfo& fileinfo = crtfileinfo.second;
-    if(event_time >= fileinfo.fStartTime && event_time <= fileinfo.fEndTime) {
+    if(event_time >= fileinfo.fStartTime + one_minute && 
+       event_time <= fileinfo.fEndTime - one_minute) {
       std::cout << "Found cached file " << crtfile << std::endl;
       for(auto const& crt_swizzled : fileinfo.fSwizzled)
 	crtrootfiles.push_back(crt_swizzled);
@@ -436,7 +440,7 @@ std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time:
 	}
       }
 
-      // Construct a CRTFileInfo struct and stash it in our cache.
+      // Construct a CRTFileInfo struct and stash it in our cache, if not already there.
 
       if(fCRTFiles.count(crtfile) == 0) {
 	std::cout << "Adding " << crtfile << " to file cache." << std::endl;
