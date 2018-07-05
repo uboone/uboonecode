@@ -243,11 +243,6 @@ void crt::CRTMerger::produce(art::Event& event)
 
     std::cout << "CRT event entry before reposition = " << crt_event->eventEntry() << std::endl;
     bool ok = reposition(*crt_event, evt_time_sec, T0);
-    if(!ok) {
-      std::cout << "Rewinding file." << std::endl;
-      crt_event->toBegin();
-      ok = reposition(*crt_event, evt_time_sec, T0);
-    }
 
     // If reposition failed, skip this file.a
 
@@ -485,70 +480,111 @@ bool crt::CRTMerger::reposition(gallery::Event& event, unsigned long evt_time_se
 
   bool ok = false;
 
-  try {
+  // Number of retries.
 
-    // Loop over events until we get a non-empty CRT his collection or an exception.
+  int ntry = 2;
+  while(ntry-- > 0 && !ok) {
 
-    for(;;event.next()) {
+    try {
 
-      // Look for a non-empty CRT hit collection.
+      // Loop over events until we get a non-empty CRT his collection or an exception.
 
-      gallery::ValidHandle<std::vector<crt::CRTHit> > h =
-	event.getValidHandle< std::vector<crt::CRTHit> >(cTag);
-      std::vector< crt::CRTHit > CRTHitCollection;
-      filter_crt_hits(*h, CRTHitCollection);
-      if(_debug)
-	std::cout << "Number of CRT hits in event = " << CRTHitCollection.size() << std::endl;
-      if(CRTHitCollection.size() > 0) {
+      for(;;event.next()) {
 
-	// Got a non-empty CRT hit collection.
+	// Look for a non-empty CRT hit collection.
 
-	uint32_t first_sec = CRTHitCollection.front().ts0_s;
-	uint32_t last_sec = CRTHitCollection.back().ts0_s;
-	if(_debug) {
-	  std::cout << "TPC event time = " << evt_time_sec << std::endl;
-	  std::cout << "First event time = " << first_sec << std::endl;
-	  std::cout << "Last event time = " << last_sec << std::endl;
-	}
+	gallery::ValidHandle<std::vector<crt::CRTHit> > h =
+	  event.getValidHandle< std::vector<crt::CRTHit> >(cTag);
+	std::vector< crt::CRTHit > CRTHitCollection;
+	filter_crt_hits(*h, CRTHitCollection);
+	if(_debug)
+	  std::cout << "Number of CRT hits in event = " << CRTHitCollection.size() << std::endl;
+	if(CRTHitCollection.size() > 0) {
 
-	// Compare TPC and CRT times.
+	  // Got a non-empty CRT hit collection.
 
-	if(evt_time_sec > last_sec + delta_t) {
+	  uint32_t first_sec = CRTHitCollection.front().ts0_s;
+	  uint32_t last_sec = CRTHitCollection.back().ts0_s;
+	  if(_debug) {
+	    std::cout << "TPC event time = " << evt_time_sec << std::endl;
+	    std::cout << "First event time = " << first_sec << std::endl;
+	    std::cout << "Last event time = " << last_sec << std::endl;
+	  }
 
-	  // TPC event is in the future relative to CRT event.
-	  // Skip events assuming each CRT event is exactly one second.
-	  // Return success.
+	  // Compare TPC and CRT times.
 
-	  int jump = evt_time_sec - last_sec - delta_t;
-	  if(_debug)
-	    std::cout << "Skipping ahead " << jump << " CRT events." << std::endl;
-	  for(; jump>0; --jump)
-	    event.next();
-	  ok = true;
-	  break;
-	}
-	else if(evt_time_sec < first_sec) {
+	  if(evt_time_sec > last_sec + delta_t) {
 
-	  // TPC event is in the past relative to CRT event.
-	  // Return failure, which may signal the calling program to rewind
-	  // the file and try again.
+	    // TPC event is in the future relative to CRT event.
+	    // Skip events assuming each CRT event is exactly one second.
+	    // Return success.
 
-	  ok = false;
-	  break;
-	}
-	else {
+	    int jump = evt_time_sec - last_sec - delta_t;
+	    if(_debug)
+	      std::cout << "Skipping ahead " << jump << " CRT events." << std::endl;
+	    for(; jump>0; --jump)
+	      event.next();
+	    ok = true;
+	    break;  // Break out of loop over events.
+	  }
+	  else if(evt_time_sec < first_sec) {
 
-	  // TPC event is close to CRT event.
-	  // Stay at the current position and return success.
+	    // TPC event is in the past relative to CRT event.
+	    // Return failure, which may signal the calling program to rewind
+	    // the file and try again.
 
-	  ok = true;
-	  break;
+	    ok = false;
+	    break;  // Break out of loop over events.
+	  }
+	  else {
+
+	    // TPC event is close to CRT event.
+	    // Stay at the current position and return success.
+
+	    ok = true;
+	    break;  // Break out of loop over events.
+	  }
 	}
       }
     }
-  }
-  catch(...) {
-    ok = false;
+    catch(...) {
+      ok = false;
+    }
+
+    if(!ok) {
+
+      // Make several attempts to rewind/reopen file.
+
+      int mtry = 5;
+      int wait = 0;
+      bool rewind_ok = false;
+
+      while(mtry-- > 0 && !rewind_ok) {
+	if(wait != 0) {
+	  std::cout << "Waiting " << wait << " seconds." << std::endl;
+	  sleep(wait);
+	  wait *= 2;
+	}
+	else
+	  wait = 1;
+
+	try {
+	  std::cout << "Rewinding file." << std::endl;
+	  event.toBegin();
+	  rewind_ok = true;
+	}
+	catch(...) {
+	  rewind_ok = false;
+	}
+
+	if(rewind_ok)
+	  std::cout << "Rewind succeeded." << std::endl;
+	else {
+	  std::cout << "Rewind failed." << std::endl;
+	  break;   // Break out of overall retry loop.  Reposition has failed.
+	}
+      }
+    }
   }
   return ok;
 }
