@@ -342,6 +342,7 @@ namespace lris {
     fb = new art::FileBlock(art::FileFormatVersion(1, "LArRawInput 2011a"),
                             name);
 
+    std::cout << "\nSwizzler opening " << name << std::endl;
     fInputStream.open(name.c_str(),std::ios_base::in | std::ios_base::binary);
 
 
