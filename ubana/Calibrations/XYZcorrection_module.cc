@@ -129,6 +129,7 @@ private:
     Float_t  AC_trkhitx[kMaxTracks][3][3000];
     Float_t  AC_trkhity[kMaxTracks][3][3000];
     Float_t  AC_trkhitz[kMaxTracks][3][3000];
+    Float_t  AC_t0[kMaxTracks];
     
     std::string fDigitModuleLabel;
     std::string fHitsModuleLabel;
@@ -229,6 +230,7 @@ void XYZcorrection::beginJob(){
   fACTree->Branch("AC_trkhitx",AC_trkhitx,"AC_trkhitx[AC_trks][3][3000]/F");
   fACTree->Branch("AC_trkhity",AC_trkhity,"AC_trkhity[AC_trks][3][3000]/F");
   fACTree->Branch("AC_trkhitz",AC_trkhitz,"AC_trkhitz[AC_trks][3][3000]/F");
+  fACTree->Branch("AC_t0",&AC_t0,"AC_t0[AC_trks]/F");
 }
 
 //========================================================================
@@ -414,6 +416,7 @@ void XYZcorrection::analyze( const art::Event& evt){
          double theta_yz = std::atan2(dir_start.Y(), dir_start.Z());
      	 float X = std::abs(pos.X()-end.X());
 	 AC_trklen[AC_trks-1]=track.Length();
+	 AC_t0[AC_trks-1]=t_zero;
 	 AC_TrkID[AC_trks-1]=track.ID();
 	 AC_xprojectedlen[AC_trks-1]=X;
 	 AC_trackthetaxz[AC_trks-1]=theta_xz;
@@ -489,6 +492,7 @@ void XYZcorrection::reset(){
 	 AC_ntrkhits[i][0]=-9999;
 	 AC_ntrkhits[i][1]=-9999;
 	 AC_ntrkhits[i][2]=-9999;
+	 AC_t0[i]=-9999;
 	 for(int j=0; j<3; j++){
 	      for(int k=0; k<3000; k++){
 	          trkdqdx[i][j][k]=-9999;

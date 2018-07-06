@@ -574,6 +574,7 @@ namespace microboone {
       TrackData_t<Float_t> trkmcsbwderr;   // MCS uncertainty assuming backward direction
       TrackData_t<Short_t> trksvtxid;     // Vertex ID associated with the track start
       TrackData_t<Short_t> trkevtxid;     // Vertex ID associated with the track end
+      TrackData_t<int>     trkntraj; // Number of trajectory points on the track (there is a one-to-one correspondence between trajectory points and hits, so this should also tell you the number of hits)
       PlaneData_t<Int_t> trkpidpdg;       // particle PID pdg code
       PlaneData_t<Float_t> trkpidchi;
       PlaneData_t<Float_t> trkpidchipr;   // particle PID chisq for proton
@@ -581,7 +582,7 @@ namespace microboone {
       PlaneData_t<Float_t> trkpidchipi;   // particle PID chisq for pion
       PlaneData_t<Float_t> trkpidchimu;   // particle PID chisq for muon
       PlaneData_t<Float_t> trkpidpida;    // particle PIDA
-      TrackData_t<Short_t> trkpidbestplane; // this is defined as the plane with most hits   
+      TrackData_t<Short_t> trkpidbestplane; // this is defined as the plane with most hits
 	
 	  TrackData_t<Short_t> trkhasPFParticle; // whether this belongs to a PFParticle 
 	  TrackData_t<Short_t> trkPFParticleID;  // if hasPFParticle, its ID
@@ -2103,6 +2104,7 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::Resize(size_t nTracks)
   trklen.resize(MaxTracks);
   trksvtxid.resize(MaxTracks);
   trkevtxid.resize(MaxTracks);
+  trkntraj.resize(MaxTracks);
   // PID variables
   trkpidpdg.resize(MaxTracks);
   trkpidchi.resize(MaxTracks);
@@ -2189,6 +2191,7 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::Clear() {
   FillWith(trklen       , -99999.);
   FillWith(trksvtxid    , -1);
   FillWith(trkevtxid    , -1);
+  FillWith(trkntraj     , -99999 );
   FillWith(trkpidbestplane, -1); 
   
   FillWith(trkhasPFParticle, -1);
@@ -2428,6 +2431,9 @@ void microboone::AnalysisTreeDataStruct::TrackDataStruct::SetAddresses(
   
   BranchName = "trkevtxid_" + TrackLabel;
   CreateBranch(BranchName, trkevtxid, BranchName + NTracksIndexStr + "/S");
+  
+  BranchName = "trkntraj_" + TrackLabel;
+  CreateBranch(BranchName, trkntraj, BranchName + NTracksIndexStr + "/I");
 
   BranchName = "trkpidpdg_" + TrackLabel;
   CreateBranch(BranchName, trkpidpdg, BranchName + NTracksIndexStr + "[3]/I");
@@ -5396,6 +5402,7 @@ void microboone::AnalysisTree::analyze(const art::Event& evt)
           TrackerData.trkmomrange[iTrk] 	  = trkm.GetTrackMomentum(tlen,13);
           //TrackerData.trkmommschi2[iTrk]	  = trkm.GetMomentumMultiScatterChi2(ptrack);
           //TrackerData.trkmommsllhd[iTrk]	  = trkm.GetMomentumMultiScatterLLHD(ptrack);
+	  TrackerData.trkntraj[iTrk]              = ntraj;
           if (tracklist[iTracker].size() == mcsfitlist[iTracker].size()){
             TrackerData.trkmcsfwdmom[iTrk]        = mcsfitlist[iTracker][iTrk]->fwdMomentum();
             TrackerData.trkmcsfwdll[iTrk]         = mcsfitlist[iTracker][iTrk]->fwdLogLikelihood();
