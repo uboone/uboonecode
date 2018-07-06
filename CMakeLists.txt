@@ -55,6 +55,7 @@ find_ups_product( gsl v1_00_00 )
 find_ups_product( cetbuildtools v3_10_00 )
 find_ups_boost( v1_53_0 )
 find_ups_product( canvas )
+find_ups_product( nutools )
 
 cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 
