@@ -52,15 +52,11 @@ crt::CRTMerger::CRTMerger(const fhicl::ParameterSet& pset) :
   setenv("TZ", "CST+6CDT", 1);  // Fermilab time zone.
   tzset();
 
-  //setenv("IFDH_DATA_DIR","/uboone/data/users/kolahalb/MicroBooNE/",1);
-  //std::cout<<"ifdh_data_dir "<<getenv("IFDH_DATA_DIR")<<std::endl;
-
   this->reconfigure(pset);
   produces< std::vector<crt::CRTHit> >();
   _debug = pset.get<bool>("debug");
   fTimeOffSet = pset.get<std::vector< unsigned long > > ("test_t_offset");
 
-  previouscrtrootfile = "";
   if ( ! tIFDH ) tIFDH = new ifdh_ns::ifdh;
 }
 
@@ -366,9 +362,12 @@ std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time:
 	crtrootfiles.push_back(crt_swizzled);
     }
   }
-  if(crtrootfiles.size() == 0) {
+  if(crtrootfiles.size() < 4) {
 
-    // Didn't match any cached files.
+    // Didn't match enough cached files.
+
+    crtrootfiles.erase(crtrootfiles.begin(), crtrootfiles.end());
+
     // Query CRT binery files.
 
     std::string stringTime = boost::posix_time::to_iso_extended_string(event_time);
