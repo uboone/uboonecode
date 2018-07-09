@@ -279,9 +279,9 @@ void crt::CRTMerger::produce(art::Event& event)
     std::cout << "CRT event entry after reposition = " << crt_event->eventEntry() << std::endl;
 
     int merging = 0;
-    double TPCtime = evt_time_sec + 1.e-9 * evt_time_nsec;
-    double MergingWindow_start = TPCtime - 0.002;
-    double MergingWindow_end   = TPCtime + 0.004;
+    long double TPCtime = evt_time_sec + 1.e-9L * evt_time_nsec;
+    long double MergingWindow_start = TPCtime - 0.002L;
+    long double MergingWindow_end   = TPCtime + 0.004L;
 
     // Loop over CRT events.
 
@@ -302,7 +302,7 @@ void crt::CRTMerger::produce(art::Event& event)
 	std::cout << "Last event time = " << last_sec << std::endl;
       }
       for(auto const& CRTHitevent : CRTHitCollection) {
-	double CRTtime = CRTHitevent.ts0_s + 1.e-9 * CRTHitevent.ts0_ns;
+	long double CRTtime = CRTHitevent.ts0_s + 1.e-9L * CRTHitevent.ts0_ns;
 	if (CRTtime >= MergingWindow_start && CRTtime <= MergingWindow_end) {
 	  if (_debug)
 	    std::cout<<"found match"<<std::endl;
