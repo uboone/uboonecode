@@ -362,7 +362,7 @@ std::vector<std::string> crt::CRTMerger::findMatchingCRTFiles(boost::posix_time:
 	crtrootfiles.push_back(crt_swizzled);
     }
   }
-  if(crtrootfiles.size() < 4) {
+  if(crtrootfiles.size() < 6) {
 
     // Didn't match enough cached files.
 
