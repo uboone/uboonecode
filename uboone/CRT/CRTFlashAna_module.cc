@@ -183,6 +183,7 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
       for(auto const& flash : *hflash) {
 	double flash_time = flash.Time();   // microseconds.
 	double flash_pe = flash.TotalPE();  // Total PE.
+	fHPE[all]->Fill(flash_pe);
 	fHPE[algo]->Fill(flash_pe);
 
 	if(flash_pe >= fFlashMinPE) {
@@ -224,25 +225,33 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
   if(fAlgos.count(algo) == 0) {
     fAlgos.insert(algo);
     art::TFileDirectory dir = fTopDir.mkdir(algo);
+
     fHPE[algo] = dir.make<TH1F>("FlashPE", "Flash PE", 100, 0., 1000.);
     fHPE[algo]->GetXaxis()->SetTitle("Flash PE (ADC)");
+
     fHcrt0[algo] = dir.make<TH1F>("crt0", "CRT vs. Flash Time Difference", 1000, -5000., 5000.);
     fHcrt0[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
+
     fHcrt0x[algo] = dir.make<TH1F>("crt0x", "CRT vs. Flash Time Difference Expanded",
 				  500, -500., 0.);
     fHcrt0x[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
+
     fHcrt0d[algo] = dir.make<TH1F>("crt0d", "CRT vs. Flash Time Difference Detail",
 				  100, -100., -50.);
     fHcrt0d[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
+
     fHcrtadj0[algo] = dir.make<TH1F>("crtadj0", "CRT vs. Flash Time Difference (Adj)",
 				     1000, -5000., 5000.);
+
     fHcrtadj0[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
     fHcrtadj0x[algo] = dir.make<TH1F>("crtadj0x", "CRT vs. Flash Time Difference (Adj) Expanded",
 				     500, -500., 0.);
+
     fHcrtadj0x[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
     fHcrtadj0d[algo] = dir.make<TH1F>("crtadj0d", "CRT vs. Flash Time Difference (Adj) Detail",
 				     100, -100., -50.);
     fHcrtadj0d[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
+
   }
 }
 
