@@ -76,6 +76,9 @@ private:
   std::map<std::string, TH1F*> fHcrtadj0;   // Flash vs. CRT t0 (adj) time difference.
   std::map<std::string, TH1F*> fHcrtadj0x;  // Flash vs. CRT t0 (adj) time difference expanded.
   std::map<std::string, TH1F*> fHcrtadj0d;  // Flash vs. CRT t0 (adj) time difference detail.
+  std::map<std::string, TH1F*> fHcrt1;      // Flash vs. CRT t1 time difference.
+  std::map<std::string, TH1F*> fHcrt1x;     // Flash vs. CRT t1 time difference expanded.
+  std::map<std::string, TH1F*> fHcrt1d;     // Flash vs. CRT t1 time difference detail.
 };
 
 // Constructor.
@@ -167,6 +170,24 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
     return;
   }
 
+  //for(auto const& crthit : *hcrthit) {
+
+    // Calculate CRT hit time relative to gps time (units microseconds).
+
+    //double crthit_t0 =
+    //  1.e6 * (double(crthit.ts0_s) - double(gps_sec)) +
+    //  1.e-3 * (double(crthit.ts0_ns) - double(gps_nsec));
+    //double crthit_adj_t0 =
+    //  1.e6 * (double(crthit.ts0_s) - double(gps_adj_sec)) +
+    //  1.e-3 * (double(crthit.ts0_ns) - double(gps_adj_nsec));
+    //double crthit_t1 = 1.e-3 * crthit.ts1_ns;
+    //std::cout << "\nt0       = " << crthit_t0 << "\n"
+  //	      << "t0adj    = " << crthit_adj_t0 << "\n"
+  //	      << "t1       = " << crthit_t1 << "\n"
+  //	      << "t1-t0    = " << crthit_t1 - crthit_t0 << "\n"
+  //	      << "t1-t0adj = " << crthit_t1 - crthit_adj_t0 << std::endl;
+  //}
+
   // Loop over software triggers.
 
   auto const& swtrig = *hswtrig; 
@@ -192,27 +213,39 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
 	    // Calculate CRT hit time relative to gps time (units microseconds).
 
-	    double crthit_time =
+	    double crthit_t0 =
 	      1.e6 * (double(crthit.ts0_s) - double(gps_sec)) +
 	      1.e-3 * (double(crthit.ts0_ns) - double(gps_nsec));
-	    double crthit_adj_time =
+	    double crthit_adj_t0 =
 	      1.e6 * (double(crthit.ts0_s) - double(gps_adj_sec)) +
 	      1.e-3 * (double(crthit.ts0_ns) - double(gps_adj_nsec));
+	    double crthit_t1 = 1.e-3 * crthit.ts1_ns;
 
 	    // Fill histograms.
 
-	    fHcrt0[algo]->Fill(crthit_time - flash_time);
-	    fHcrt0x[algo]->Fill(crthit_time - flash_time);
-	    fHcrt0d[algo]->Fill(crthit_time - flash_time);
-	    fHcrt0[all]->Fill(crthit_time - flash_time);
-	    fHcrt0x[all]->Fill(crthit_time - flash_time);
-	    fHcrt0d[all]->Fill(crthit_time - flash_time);
-	    fHcrtadj0[algo]->Fill(crthit_adj_time - flash_time);
-	    fHcrtadj0x[algo]->Fill(crthit_adj_time - flash_time);
-	    fHcrtadj0d[algo]->Fill(crthit_adj_time - flash_time);
-	    fHcrtadj0[all]->Fill(crthit_adj_time - flash_time);
-	    fHcrtadj0x[all]->Fill(crthit_adj_time - flash_time);
-	    fHcrtadj0d[all]->Fill(crthit_adj_time - flash_time);
+	    fHcrt0[algo]->Fill(crthit_t0 - flash_time);
+	    fHcrt0x[algo]->Fill(crthit_t0 - flash_time);
+	    fHcrt0d[algo]->Fill(crthit_t0 - flash_time);
+
+	    fHcrt0[all]->Fill(crthit_t0 - flash_time);
+	    fHcrt0x[all]->Fill(crthit_t0 - flash_time);
+	    fHcrt0d[all]->Fill(crthit_t0 - flash_time);
+
+	    fHcrtadj0[algo]->Fill(crthit_adj_t0 - flash_time);
+	    fHcrtadj0x[algo]->Fill(crthit_adj_t0 - flash_time);
+	    fHcrtadj0d[algo]->Fill(crthit_adj_t0 - flash_time);
+
+	    fHcrtadj0[all]->Fill(crthit_adj_t0 - flash_time);
+	    fHcrtadj0x[all]->Fill(crthit_adj_t0 - flash_time);
+	    fHcrtadj0d[all]->Fill(crthit_adj_t0 - flash_time);
+
+	    fHcrt1[algo]->Fill(crthit_t1 - flash_time);
+	    fHcrt1x[algo]->Fill(crthit_t1 - flash_time);
+	    fHcrt1d[algo]->Fill(crthit_t1 - flash_time);
+
+	    fHcrt1[all]->Fill(crthit_t1 - flash_time);
+	    fHcrt1x[all]->Fill(crthit_t1 - flash_time);
+	    fHcrt1d[all]->Fill(crthit_t1 - flash_time);
 	  }
 	}
       }
@@ -237,7 +270,7 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
     fHcrt0x[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
 
     fHcrt0d[algo] = dir.make<TH1F>("crt0d", "CRT vs. Flash Time Difference Detail",
-				  100, -100., -50.);
+				  100, -75., -25.);
     fHcrt0d[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
 
     fHcrtadj0[algo] = dir.make<TH1F>("crtadj0", "CRT vs. Flash Time Difference (Adj)",
@@ -249,8 +282,19 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 
     fHcrtadj0x[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
     fHcrtadj0d[algo] = dir.make<TH1F>("crtadj0d", "CRT vs. Flash Time Difference (Adj) Detail",
-				     100, -100., -50.);
+				     100, -75., -25.);
     fHcrtadj0d[algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
+
+    fHcrt1[algo] = dir.make<TH1F>("crt1", "CRT (t1) vs. Flash Time Difference", 1000, -5000., 5000.);
+    fHcrt1[algo]->GetXaxis()->SetTitle("CRT (t1) Flash Time Difference (us)");
+
+    fHcrt1x[algo] = dir.make<TH1F>("crt1x", "CRT (t1) vs. Flash Time Difference Expanded",
+				  500, -500., 0.);
+    fHcrt1x[algo]->GetXaxis()->SetTitle("CRT (t1) Flash Time Difference (us)");
+
+    fHcrt1d[algo] = dir.make<TH1F>("crt1d", "CRT (t1) vs. Flash Time Difference Detail",
+				  100, -75., -25.);
+    fHcrt1d[algo]->GetXaxis()->SetTitle("CRT (t1) Flash Time Difference (us)");
 
   }
 }
