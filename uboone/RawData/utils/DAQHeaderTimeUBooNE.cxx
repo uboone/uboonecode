@@ -21,19 +21,12 @@ namespace raw{
     fNTPTime(0),
     fPPSsec(0),
     fPPSmicro(0),
-    fPPSnano(0)
-  {}
-
-  //----------------------------------------------------------------------
-  // Initializing constructor.
-  DAQHeaderTimeUBooNE::DAQHeaderTimeUBooNE(time_t gps_time, time_t gps_adj_time, time_t ntp_time,
-					   uint32_t pps_sec, uint32_t pps_micro,
-					   uint32_t pps_nano) :
-    fGPSTime(gps_time),
-    fGPSAdjTime(gps_adj_time),
-    fNTPTime(ntp_time),
-    fPPSsec(pps_sec),
-    fPPSmicro(pps_micro),
-    fPPSnano(pps_nano)
+    fPPSnano(0),
+    fTrigFrame(0),
+    fTrigSample(0),
+    fTrigDiv(0),
+    fTrigPPSFrame(0),
+    fTrigPPSSample(0),
+    fTrigPPSDiv(0)
   {}
 }
