@@ -345,6 +345,7 @@ private:
   std::vector<float> *track_pfp_endz;
   std::vector<float> *track_pfp_Mom; 
   std::vector<float> *track_pfp_Mom_p;
+  std::vector<float> *track_pfp_Mom_MCS;
   std::vector<float> *track_pfp_trunmeandqdx;
   std::vector<float> *track_pfp_trunmeandqdx_U;
   std::vector<float> *track_pfp_trunmeandqdx_V;
@@ -356,7 +357,7 @@ private:
 
   float track_pfp_mom_mucand; 
   std::vector<float> *track_pfp_mom_pcand;
-
+ 
  //===============================================================
   //----add the variables for CC1uNP analysis here-----------
 
@@ -595,7 +596,7 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("track_pfp_endz", "std::vector<float>", &track_pfp_endz); 
   _cc1unptree->Branch("track_pfp_Mom", "std::vector<float>", &track_pfp_Mom); 
   _cc1unptree->Branch("track_pfp_Mom_p", "std::vector<float>", &track_pfp_Mom_p); 
-
+  _cc1unptree->Branch("track_pfp_Mom_MCS", "std::vector<float>", &track_pfp_Mom_MCS);
   _cc1unptree->Branch("track_pfp_trunmeandqdx", "std::vector<float>", &track_pfp_trunmeandqdx); 
   _cc1unptree->Branch("track_pfp_trunmeandqdx_U", "std::vector<float>", &track_pfp_trunmeandqdx_U); 
   _cc1unptree->Branch("track_pfp_trunmeandqdx_V", "std::vector<float>", &track_pfp_trunmeandqdx_V); 
@@ -769,6 +770,7 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   track_pfp_endz=new std::vector<float>;
   track_pfp_Mom=new std::vector<float>;
   track_pfp_Mom_p=new std::vector<float>;
+  track_pfp_Mom_MCS=new std::vector<float>;
   track_pfp_trunmeandqdx=new std::vector<float>;
   track_pfp_trunmeandqdx_U=new std::vector<float>;
   track_pfp_trunmeandqdx_V=new std::vector<float>;
@@ -924,6 +926,7 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   delete track_pfp_endz;
   delete track_pfp_Mom;
   delete track_pfp_Mom_p;
+  delete track_pfp_Mom_MCS;
   delete track_pfp_trunmeandqdx;
   delete track_pfp_trunmeandqdx_U;
   delete track_pfp_trunmeandqdx_V;
@@ -1190,6 +1193,7 @@ void SimpleAna::analyze(art::Event const & e)
   }
 
   _ccinclflag=selection_v.at(0)->GetSelectionStatus();
+
   if(!_ccinclflag) return;
   //===================================================================================================================
 
@@ -1426,7 +1430,8 @@ void SimpleAna::analyze(art::Event const & e)
   track_pfp_endy->clear();
   track_pfp_endz->clear();
   track_pfp_Mom->clear();
-  track_pfp_Mom_p->clear(); 
+  track_pfp_Mom_p->clear();
+  track_pfp_Mom_MCS->clear(); 
   track_pfp_trunmeandqdx->clear();
   track_pfp_trunmeandqdx_U->clear();
   track_pfp_trunmeandqdx_V->clear();
@@ -1535,6 +1540,7 @@ void SimpleAna::analyze(art::Event const & e)
         track_pfp_endz->push_back(trackEnd_pfp.Z());
         track_pfp_Mom->push_back(track_pfp->VertexMomentum());
         track_pfp_Mom_p->push_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),2212));
+        track_pfp_Mom_MCS->push_back(mcsfitlist[track_pfp->ID()]->bestMomentum());
         std::vector<art::Ptr<anab::Calorimetry>> calos_track_pfp=calos_from_track.at(track_pfp.key());
 
         track_pfp_trunmeandqdx->push_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp));
@@ -1917,6 +1923,14 @@ void SimpleAna::analyze(art::Event const & e)
 
   } //end of if isMC for the bnb correction weight
   //---------------------------------------------------------------------------------
+
+
+
+  //if(!_ccinclflag) return;
+
+
+
+
   //get the vertex position
   Double_t xyz[3]={};
   //int Naux=0;
@@ -1934,6 +1948,7 @@ void SimpleAna::analyze(art::Event const & e)
 
   //do the CC1uNP event selection here
   //#1 total number of tracks cut
+  //if(!_ccinclflag) return;
 
 
   upflag->clear();
