@@ -76,6 +76,7 @@ private:
 
   // Histograms.
 
+  TH1F* fHgpsntp;                                         // GPS-NTP time difference.
   std::map<std::string, TH1F*> fHPE;                      // Flash PE.
   std::vector<std::map<std::string, TH1F*> > fHcrt0;      // Flash vs. CRT t0 time difference.
   std::vector<std::map<std::string, TH1F*> > fHcrt0x;     // Flash vs. CRT t0 time difference expanded.
@@ -113,6 +114,11 @@ crt::CRTFlashAna::CRTFlashAna(fhicl::ParameterSet const & p)
   fTimeDescrip.push_back(std::string("Recalculated GPS time (no PPS round, no freq tune)"));
   fTimeDescrip.push_back(std::string("Recalculated GPS time (PPS round, no freq tune)"));
   fTimeDescrip.push_back(std::string("Recalculated GPS time (PPS round, freq tune)"));
+
+  // Book histograms that don't depend on trigger algorithm.
+
+  fHgpsntp = fTopDir.make<TH1F>("gpsntp", "GPS-NTP Time Difference", 200, -1., 1.);
+  fHgpsntp->GetXaxis()->SetTitle("GPS-NTP Time Difference (sec)");
 
   // Add pseudoalgorithm "All."
 
@@ -194,10 +200,10 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
   // Calculate remainder time.
 
-  double t_daq = 1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
-                 0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
-                 0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
-  double t_remainder = t_daq - int(t_daq);
+  double t_remainder = 1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
+                       0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
+                       0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
+  std::cout << "Remainder = " << t_remainder << std::endl;
 
   // Print out the times we calculated.
 
@@ -207,6 +213,16 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
     unsigned int t_nsec = (t & 0xffffffff);
     std::cout << "\n" << fTimeDescrip[n++] << "\n"
 	      << "time = "<< t_sec << " seconds, " << t_nsec << " nanoseconds." << std::endl;
+  }
+
+  // Fill GPS-NTP time difference histogram.
+
+  time_t gps = htime->gps_time();
+  if(gps != 0) {
+    time_t ntp = htime->ntp_time();
+    double dt = (double(gps>>32) - double(ntp>>32)) +
+      1.e-9 * (double(gps & 0xffffffff) - double(ntp & 0xffffffff));
+    fHgpsntp->Fill(dt);
   }
 
   // Get hardware trigger information (not used except to print out).
@@ -484,7 +500,7 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	name << "crt102d_t" << i;
 	title << "CRT Hit t1 vs. t0 Time Difference vs. Remainder, " << fTimeDescrip[i];
 	fHcrt102d[i][algo] = dir.make<TH2F>(name.str().c_str(), title.str().c_str(),
-					    100, 0., 1., 200, 0., 100.);
+					    20, 0., 1., 1000, 0., 100.);
 	fHcrt102d[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
 	fHcrt102d[i][algo]->GetYaxis()->SetTitle("CRT Hit Time Difference (us)");
       }
@@ -497,7 +513,7 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	name << "crt10pr_t" << i;
 	title << "CRT Hit t1 vs. t0 Time Difference vs. Remainder, " << fTimeDescrip[i];
 	fHcrt10pr[i][algo] = dir.make<TProfile>(name.str().c_str(), title.str().c_str(),
-						100, 0., 1., 0., 100.);
+						20, 0., 1., -100., 100.);
 	fHcrt10pr[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
 	fHcrt10pr[i][algo]->GetYaxis()->SetTitle("CRT Hit Time Difference (us)");
       }
