@@ -165,9 +165,9 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
   long double gps1 = htime->pps_sec() +
                     (htime->pps_micro() > 500000 ? 1.L : 0.L) +
-                    1.6e-3L * (htime->trig_frame() - htime->trig_pps_frame()) +
-                    0.5e-6L * (htime->trig_sample() - htime->trig_pps_sample()) +
-                    0.0625e-6L * (htime->trig_div() - htime->trig_pps_div());
+                    1.6e-3L * (int64_t(htime->trig_frame()) - int64_t(htime->trig_pps_frame())) +
+                    0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
+                    0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
   uint64_t gps1_sec = gps1;
   uint64_t gps1_nsec = 1.e9L * (gps1 - gps1_sec);
   time_t gps1_time = (gps1_sec << 32) | gps1_nsec;
