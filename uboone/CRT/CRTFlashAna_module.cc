@@ -26,6 +26,7 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 
 namespace crt {
   class CRTFlashAna;
@@ -89,6 +90,7 @@ private:
   std::vector<std::map<std::string, TH1F*> > fHcrt10d;    // CRT t1 vs. CRT t0 time difference detail.
   std::vector<std::map<std::string, TH1F*> > fHcrt10dd;   // CRT t1 vs. CRT t0 time difference fine detail.
   std::vector<std::map<std::string, TH2F*> > fHcrt102d;   // CRT t1 vs. CRT t0 time difference vs. Remainder.
+  std::vector<std::map<std::string, TProfile*> > fHcrt10pr; // CRT t1 vs. CRT t0 time difference vs. Remainder.
 };
 
 // Constructor.
@@ -153,9 +155,9 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
   long double gps0 = htime->pps_sec() +
                     1.e-6L * htime->pps_micro() +
                     1.e-9L * htime->pps_nano() +
-                    1.6e-3L * (htime->trig_frame() - htime->trig_pps_frame()) +
-                    0.5e-6L * (htime->trig_sample() - htime->trig_pps_sample()) +
-                    0.0625e-6L * (htime->trig_div() - htime->trig_pps_div());
+                    1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
+                    0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
+                    0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
   uint64_t gps0_sec = gps0;
   uint64_t gps0_nsec = 1.e9L * (gps0 - gps0_sec);
   time_t gps0_time = (gps0_sec << 32) | gps0_nsec;
@@ -165,7 +167,7 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
   long double gps1 = htime->pps_sec() +
                     (htime->pps_micro() > 500000 ? 1.L : 0.L) +
-                    1.6e-3L * (int64_t(htime->trig_frame()) - int64_t(htime->trig_pps_frame())) +
+                    1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
                     0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
                     0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
   uint64_t gps1_sec = gps1;
@@ -178,9 +180,9 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
   long double tunefac = 1.000006882L;
   long double gps2 = htime->pps_sec() +
                     (htime->pps_micro() > 500000 ? 1.L : 0.L) +
-                    tunefac * (1.6e-3L * (htime->trig_frame() - htime->trig_pps_frame()) +
-			       0.5e-6L * (htime->trig_sample() - htime->trig_pps_sample()) +
-			       0.0625e-6L * (htime->trig_div() - htime->trig_pps_div()));
+                    tunefac * (1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
+			       0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
+			       0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div())));
   uint64_t gps2_sec = gps2;
   uint64_t gps2_nsec = 1.e9L * (gps2 - gps2_sec);
   time_t gps2_time = (gps2_sec << 32) | gps2_nsec;
@@ -192,9 +194,9 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
   // Calculate remainder time.
 
-  double t_daq = 1.6e-3L * (htime->trig_frame() - htime->trig_pps_frame()) +
-                 0.5e-6L * (htime->trig_sample() - htime->trig_pps_sample()) +
-                 0.0625e-6L * (htime->trig_div() - htime->trig_pps_div());
+  double t_daq = 1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
+                 0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
+                 0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
   double t_remainder = t_daq - int(t_daq);
 
   // Print out the times we calculated.
@@ -334,6 +336,7 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 	fHcrt10d[i][algo]->Fill(crthit_t1 - crthit_t0);
 	fHcrt10dd[i][algo]->Fill(crthit_t1 - crthit_t0);
 	fHcrt102d[i][algo]->Fill(t_remainder, crthit_t1 - crthit_t0);
+	fHcrt10pr[i][algo]->Fill(t_remainder, crthit_t1 - crthit_t0);
       }
     }
   }
@@ -481,9 +484,22 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	name << "crt102d_t" << i;
 	title << "CRT Hit t1 vs. t0 Time Difference vs. Remainder, " << fTimeDescrip[i];
 	fHcrt102d[i][algo] = dir.make<TH2F>(name.str().c_str(), title.str().c_str(),
-					    100, 0., 1., 200, 25., 30.);
+					    100, 0., 1., 200, 0., 100.);
 	fHcrt102d[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
 	fHcrt102d[i][algo]->GetYaxis()->SetTitle("CRT Hit Time Difference (us)");
+      }
+
+      if(fHcrt10pr.size() <= i)
+	fHcrt10pr.push_back(std::map<std::string, TProfile*>());
+      {
+	std::ostringstream name;
+	std::ostringstream title;
+	name << "crt10pr_t" << i;
+	title << "CRT Hit t1 vs. t0 Time Difference vs. Remainder, " << fTimeDescrip[i];
+	fHcrt10pr[i][algo] = dir.make<TProfile>(name.str().c_str(), title.str().c_str(),
+						100, 0., 1., 0., 100.);
+	fHcrt10pr[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
+	fHcrt10pr[i][algo]->GetYaxis()->SetTitle("CRT Hit Time Difference (us)");
       }
     }
   }
