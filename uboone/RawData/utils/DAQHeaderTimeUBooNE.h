@@ -25,7 +25,6 @@ namespace raw {
     //Set Methods
 
     void SetGPSTime(time_t t);
-    void SetGPSAdjTime(time_t t);
     void SetNTPTime(time_t t);
     void SetPPSTime(uint32_t sec, uint32_t micro, uint32_t nano);
     void SetTrigTime(uint32_t frame, uint16_t sample, uint16_t div);
@@ -34,7 +33,6 @@ namespace raw {
     // Accessors.
 
     time_t gps_time() const {return fGPSTime;}
-    time_t gps_adj_time() const {return fGPSAdjTime;}
     time_t ntp_time() const {return fNTPTime;}
 
     uint32_t pps_sec() const {return fPPSsec;}
@@ -56,7 +54,6 @@ namespace raw {
     // Complete event times.
 
     time_t fGPSTime;    // (high, low)=(seconds, nanoseconds)
-    time_t fGPSAdjTime; // (high, low)=(seconds, nanoseconds)
     time_t fNTPTime;    // (high, low)=(seconds, nanoseconds)
 
     // GPS PPS.
@@ -80,7 +77,6 @@ namespace raw {
 }
 
 inline void raw::DAQHeaderTimeUBooNE::SetGPSTime(time_t t)    { fGPSTime = t; }
-inline void raw::DAQHeaderTimeUBooNE::SetGPSAdjTime(time_t t) { fGPSAdjTime = t; }
 inline void raw::DAQHeaderTimeUBooNE::SetNTPTime(time_t t)    { fNTPTime = t; }
 inline void raw::DAQHeaderTimeUBooNE::SetPPSTime(uint32_t sec, uint32_t micro, uint32_t nano)
 {

@@ -17,7 +17,6 @@ namespace raw{
 
   DAQHeaderTimeUBooNE::DAQHeaderTimeUBooNE() :
     fGPSTime(0),
-    fGPSAdjTime(0),
     fNTPTime(0),
     fPPSsec(0),
     fPPSmicro(0),
