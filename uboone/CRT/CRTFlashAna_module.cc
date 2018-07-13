@@ -82,6 +82,8 @@ private:
   std::vector<std::map<std::string, TH1F*> > fHcrt0x;     // Flash vs. CRT t0 time difference expanded.
   std::vector<std::map<std::string, TH1F*> > fHcrt0d;     // Flash vs. CRT t0 time difference detail.
   std::vector<std::map<std::string, TH1F*> > fHcrt0dd;    // Flash vs. CRT t0 time difference fine detail.
+  std::vector<std::map<std::string, TH2F*> > fHcrt02d;    // Flash vs. CRT t0 time difference vs. Remainder.
+  std::vector<std::map<std::string, TProfile*> > fHcrt0pr; // Flash vs. CRT t0 time difference vs. Remainder.
   std::map<std::string, TH1F*> fHcrt1;                    // Flash vs. CRT t1 time difference.
   std::map<std::string, TH1F*> fHcrt1x;                   // Flash vs. CRT t1 time difference expanded.
   std::map<std::string, TH1F*> fHcrt1d;                   // Flash vs. CRT t1 time difference detail.
@@ -324,6 +326,8 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 	      fHcrt0x[i][algo]->Fill(crthit_t0 - flash_time);
 	      fHcrt0d[i][algo]->Fill(crthit_t0 - flash_time);
 	      fHcrt0dd[i][algo]->Fill(crthit_t0 - flash_time);
+	      fHcrt02d[i][algo]->Fill(t_remainder, crthit_t0 - flash_time);
+	      fHcrt0pr[i][algo]->Fill(t_remainder, crthit_t0 - flash_time);
 
 	      fHcrt1[algo]->Fill(crthit_t1 - flash_time);
 	      fHcrt1x[algo]->Fill(crthit_t1 - flash_time);
@@ -443,6 +447,32 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	fHcrt0dd[i][algo]->GetXaxis()->SetTitle("CRT Flash Time Difference (us)");
       }
 
+       if(fHcrt02d.size() <= i)
+	fHcrt02d.push_back(std::map<std::string, TH2F*>());
+      {
+	std::ostringstream name;
+	std::ostringstream title;
+	name << "crt02d_t" << i;
+	title << "CRT vs. Flash Time Difference vs. Remainder, " << fTimeDescrip[i];
+	fHcrt02d[i][algo] = dir.make<TH2F>(name.str().c_str(), title.str().c_str(),
+					   20, 0., 1., 1000, -100., -50.);
+	fHcrt02d[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
+	fHcrt02d[i][algo]->GetYaxis()->SetTitle("CRT Flash Time Difference (us)");
+      }
+
+      if(fHcrt0pr.size() <= i)
+	fHcrt0pr.push_back(std::map<std::string, TProfile*>());
+      {
+	std::ostringstream name;
+	std::ostringstream title;
+	name << "crt0pr_t" << i;
+	title << "CRT vs. Flash Time Difference vs. remainder, " << fTimeDescrip[i];
+	fHcrt0pr[i][algo] = dir.make<TProfile>(name.str().c_str(), title.str().c_str(),
+					       20, 0., 1., -100., 100.);
+	fHcrt0pr[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
+	fHcrt0pr[i][algo]->GetYaxis()->SetTitle("CRT Flash Time Difference (us)");
+      }
+
       // Add t0 vs. t1 histograms.
       // The only difference of these plots is the time scale.
 
@@ -477,7 +507,7 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	std::ostringstream title;
 	name << "crt10d_t" << i;
 	title << "CRT Hit t1 vs. t0 Time Difference Detail, " << fTimeDescrip[i];
-	fHcrt10d[i][algo] = dir.make<TH1F>(name.str().c_str(), title.str().c_str(), 200, 0., 100.);
+	fHcrt10d[i][algo] = dir.make<TH1F>(name.str().c_str(), title.str().c_str(), 200, 0., 50.);
 	fHcrt10d[i][algo]->GetXaxis()->SetTitle("CRT Hit Time Difference (us)");
       }
 
@@ -500,7 +530,7 @@ void crt::CRTFlashAna::add_algorithm(const std::string& algo)
 	name << "crt102d_t" << i;
 	title << "CRT Hit t1 vs. t0 Time Difference vs. Remainder, " << fTimeDescrip[i];
 	fHcrt102d[i][algo] = dir.make<TH2F>(name.str().c_str(), title.str().c_str(),
-					    20, 0., 1., 1000, 0., 100.);
+					    20, 0., 1., 1000, 0., 50.);
 	fHcrt102d[i][algo]->GetXaxis()->SetTitle("Remainder Time (sec)");
 	fHcrt102d[i][algo]->GetYaxis()->SetTitle("CRT Hit Time Difference (us)");
       }
