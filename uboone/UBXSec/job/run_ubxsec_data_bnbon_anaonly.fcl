@@ -4,7 +4,8 @@ process_name: UBXSecAnaOnly
 
 services.TFileService.fileName: "ubxsec_output_data_bnbon.root"
 
-physics.reco:          [ @sequence::ubxsec_data_producers_anaonly ]
+physics.reco:          [ @sequence::ubxsec_data_producers_anaonly,  pidcalibration, simcalibration, pid]
+#physics.reco:          [ @sequence::ubxsec_data_producers_anaonly]
 physics.trigger_paths: [ reco ]
 physics.ana:           [ @sequence::ubxsec_data_analyzers ]
 physics.stream1:       [ out1 ]
@@ -32,3 +33,17 @@ physics.producers.pandoraCosmicFlashTag.DoOpDetSwap: false
 physics.producers.NeutrinoFlashMatch.DoOpDetSwap:    false
 physics.producers.UBXSec.DoOpDetSwap:                false
 
+#configurations for the particle ID included June 29, 2018 - Kirby
+#First three are only needed if you don't have dEdx calibration already applied.
+physics.producers.pidcalibration.CaloAlg: @local::microboone_calorimetryalgmcc84data 
+physics.producers.pidcalibration.TrackModuleLabel: "pandoraNu::UBXSec"
+physics.producers.pidcalibration.CalorimetryModuleLabel: "pandoraNucalo::UBXSec"
+
+physics.producers.simcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_UBXSec_uncalib_simcalib_data
+physics.producers.simcalibration.IsSimulationSmearing: false
+
+physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_UBXSec_simcalib_data
+physics.producers.pid.BraggAlgo: @local::braggalgo_mcc8_data
+
+physics.producers.simcalibration.ProducerLabels.CalorimetryLabel: "pidcalibration::UBXSecAnaOnly"
+physics.producers.pid.ProducerLabels.CalorimetryLabel: "simcalibration::UBXSecAnaOnly"

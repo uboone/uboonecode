@@ -70,6 +70,10 @@ art_make( BASENAME_ONLY
                    HitCosmicTag_Algorithms
                    #uboonecode_uboone_UBXSec
                    larsim_MCCheater_BackTracker_service
+                   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+                   uboone_AnalysisTree_MCTruth
+                   #larsim_MCCheater_BackTracker_service
+                   #larsim_MCCheater_BackTrackerService_service
 		   larpandora_LArPandoraInterface
                    #                   larpandora_LArPandoraContent
 
