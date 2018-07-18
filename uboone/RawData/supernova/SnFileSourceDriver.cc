@@ -269,8 +269,8 @@ bool SnFileSourceDriver::readNext(
   size_t from_tdc = 0;
   size_t to_tdc = fTotalSamplesPerRecord;
   if(do_subframe>0) {
-    offset_tdc = (-3200)*do_subframe; // Shift back in time N frames
-    from_tdc   = 3200*do_subframe;    // Look at ticks from 3200*N on
+    offset_tdc = (-3200)*do_subframe+fSamplesOverlapPre; // Shift back in time N frames, plus the presample window
+    from_tdc   = 3200*do_subframe-fSamplesOverlapPre;    // Look at ticks from 3200*N on
     to_tdc     = from_tdc + fTotalSamplesPerRecord;
   }
   fCurrRecord->addSupernovaTpcData( roi_map, offset_tdc, from_tdc, to_tdc, fTotalSamplesPerRecord, fRemovePedestal );
