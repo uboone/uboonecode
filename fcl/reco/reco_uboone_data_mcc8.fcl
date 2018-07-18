@@ -33,6 +33,7 @@
 #include "microboone_dqmgoodruns.fcl"
 #include "mcsfitproducer.fcl"
 #include "calibration_microboone.fcl"
+#include "ophitremapproducer.fcl"
 
 BEGIN_PROLOG
 
@@ -97,8 +98,10 @@ microboone_reco_data_producers:
   #ophitSatFW  :                  @local::ub_ophitfinder_satfw
   #ophitSatSW  :                  @local::ub_ophitfinder_satsw
   #ophitSatCFD :                  @local::ub_ophitfinder_satcfd
-  ophitBeam         : @local::microboone_ophit_saturation_beam
-  ophitCosmic       : @local::microboone_ophit_saturation_cosmic
+  ophitBeamNoRemap         : @local::microboone_ophit_saturation_beam
+  ophitCosmicNoRemap       : @local::microboone_ophit_saturation_cosmic
+  ophitBeam         : @local::ophitremap
+  ophitCosmic       : @local::ophitremap
 
   ### Saturation correction module
   saturation : @local::correct_saturation
@@ -299,6 +302,8 @@ microboone_reco_data_filters:
 ### Below are a list of convenient sequences that can be used for production/typical users. ###
 
 microboone_reco_data_optical: [ saturation,
+                                ophitCosmicNoRemap,
+                                ophitBeamNoRemap,
                                 ophitCosmic,
                                 ophitBeam,
                                 opflashCosmic,
@@ -822,6 +827,10 @@ microboone_reco_data_producers.MuCSTrackTaggerpmtrack.BoxExtension: 20
 microboone_reco_data_producers.MuCSTrackTaggerpmtrack.TrackModuleLabel: "pmtrack"
 
 microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold: 6
+
+microboone_reco_data_producers.ophitBeam.OpHitsInputTag: "ophitBeamNoRemap"
+microboone_reco_data_producers.ophitCosmic.OpHitsInputTag: "ophitCosmicNoRemap"
+microboone_reco_data_producers.ophitCosmic.MapOffset: 200
 
 microboone_reco_data_filters.flashfilter.OpFlashTag: "simpleFlashBeam"
 microboone_reco_data_filters.dlpmtprecuts.OpHitProducer: "ophitBeam"

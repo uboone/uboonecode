@@ -17,13 +17,15 @@ namespace raw{
 
   DAQHeaderTimeUBooNE::DAQHeaderTimeUBooNE() :
     fGPSTime(0),
-    fNTPTime(0)
-  {}
-
-  //----------------------------------------------------------------------
-  // Initializing constructor.
-  DAQHeaderTimeUBooNE::DAQHeaderTimeUBooNE(time_t gps_time, time_t ntp_time) :
-    fGPSTime(gps_time),
-    fNTPTime(ntp_time)
+    fNTPTime(0),
+    fPPSsec(0),
+    fPPSmicro(0),
+    fPPSnano(0),
+    fTrigFrame(0),
+    fTrigSample(0),
+    fTrigDiv(0),
+    fTrigPPSFrame(0),
+    fTrigPPSSample(0),
+    fTrigPPSDiv(0)
   {}
 }

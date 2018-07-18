@@ -11,6 +11,10 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/System/FileCatalogMetadata.h"
 
+#include "art/Framework/Principal/SubRun.h"
+#include "art/Framework/Principal/Handle.h"
+#include "larcoreobj/SummaryData/POTSummary.h"
+
 //--------------------------------------------------------------------
 // Constructor.
 
@@ -28,6 +32,8 @@ FileCatalogMetadataMicroBooNE(fhicl::ParameterSet const& pset, art::ActivityRegi
   // Register for callbacks.
 
   reg.sPostBeginJob.watch(this, &FileCatalogMetadataMicroBooNE::postBeginJob);
+  reg.sPostEndSubRun.watch(this, &FileCatalogMetadataMicroBooNE::postEndSubRun);
+
 }
 
 //--------------------------------------------------------------------
@@ -47,5 +53,25 @@ void util::FileCatalogMetadataMicroBooNE::postBeginJob()
   mds->addMetadata("ubProjectStage", fProjectStage);
   mds->addMetadata("ubProjectVersion", fProjectVersion);
 }
+
+//--------------------------------------------------------------------
+// PostEndSubrun callback.
+void util::FileCatalogMetadataMicroBooNE::postEndSubRun(art::SubRun const& sr)
+{
+
+  art::ServiceHandle<art::FileCatalogMetadata> mds;
+
+  std::string fPOTModuleLabel= "generator";
+  art::Handle< sumdata::POTSummary > potListHandle;
+  if(sr.getByLabel(fPOTModuleLabel,potListHandle)){
+    fTotPOT+=potListHandle->totpot;}
+
+  std::ostringstream streamObj;
+  streamObj << fTotPOT;
+  std::string strPOT = streamObj.str();
+  mds->addMetadata("mc.pot", strPOT);
+}
+
+
 
 DEFINE_ART_SERVICE(util::FileCatalogMetadataMicroBooNE)

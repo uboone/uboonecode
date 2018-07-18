@@ -8,7 +8,7 @@ physics.producers.btload:   { module_type: BackTrackerLoader }
 physics.reco: [@sequence::microboone_reco_mcc8_stage1, btload, @sequence::microboone_reco_mcc8_stage2]
 physics.trigger_paths: [ reco ]
 
-outputs.out1.fileName: "%ifb_%tc_reco12_CV.root"
+outputs.out1.fileName: "%ifb_reco12_CV.root"
 outputs.out1.dataTier: "reconstructed"
 
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*", "drop sumdata::RunData_*_*_*" ]

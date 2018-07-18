@@ -14,7 +14,7 @@ outputs.out1.fileName: "%ifb_%tc_ubxsec.root"
 outputs.out1.dataTier: "ubxsec"
 outputs.out1.SelectEvents: [ reco ]
 
-source.inputCommands: ["keep *_*_*_*"]
+#source.inputCommands: ["keep *_*_*_*", "drop *_simpleFlashBeam_*_*"]
 
 
 physics.producers.NeutrinoFlashMatch.FlashVetoTimeStart: 3.65

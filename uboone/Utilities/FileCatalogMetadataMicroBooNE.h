@@ -53,6 +53,7 @@ namespace util {
     // Callbacks.
 
     void postBeginJob();
+    void postEndSubRun(art::SubRun const& subrun);
 
     // Data members.
 
@@ -61,6 +62,9 @@ namespace util {
     std::string fProjectName;
     std::string fProjectStage;
     std::string fProjectVersion;
+
+    double fTotPOT = 0;
+    
   };
 
 } // namespace util

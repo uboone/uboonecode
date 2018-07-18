@@ -4,6 +4,10 @@
 
 env > env.txt
 
+# Set environment
+
+export FW_SEARCH_PATH=${FW_SEARCH_PATH}:${UBOONEDATA_DIR}:${UBOONEDATA_DIR}/CRT:${UBOONEDATA_DIR}/Calibration:${UBOONEDATA_DIR}/Response
+
 # This script runs the full mc+reco chain using standard released fcl files.
 
 input=''
@@ -22,7 +26,7 @@ do
   stat=$?
   echo "Command finished with status $stat"
   if [ $stat -ne 0 ]; then
-    exit $stat
+    exit $st
   fi
   input=$output
 done

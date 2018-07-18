@@ -19,9 +19,11 @@ art_make( BASENAME_ONLY
 	FlashExt_module.cc	
 	CRTAuxFunctions.cc
   	CRTMerger_module.cc
+	CRTFlashAna_module.cc
 	TimeExtraction_module.cc
 	MergeTest_module.cc
 	CRTRawtoCRTHit_source.cc
+	CRTRawtoCRTHitGPScorr_source.cc
 	CRTAnalyser_module.cc	
     LIBRARY_NAME  
         CRTData
@@ -192,6 +194,14 @@ simple_plugin(CRTRawtoCRTHit "source"
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} )
 
+simple_plugin(CRTRawtoCRTHitGPScorr "source"
+            CRT
+          bernfebdaq-core_Overlays
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
+
 simple_plugin(CRTAnalyser "module"
             CRT
           bernfebdaq-core_Overlays
@@ -220,6 +230,27 @@ simple_plugin( CRTMerger "module"
   gallery
   boost_date_time
   cetlib #cetlib_except	
+)
+
+simple_plugin( CRTFlashAna "module"
+  CRT
+  lardataobj_RecoBase
+  uboone_RawData
+  ${ART_UTILITIES}
+  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+  ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+  ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+  ${FHICLCPP}
+  art_Persistency_Common
+  canvas_Persistency_Common
+  art_Persistency_Provenance
+  canvas_Persistency_Provenance
+  art_Utilities
+  canvas_Utilities
+  ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+  cetlib #cetlib_except
+  ${ROOT_BASIC_LIB_LIST}
 )
 
 

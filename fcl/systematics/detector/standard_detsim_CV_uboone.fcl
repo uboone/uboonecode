@@ -25,7 +25,7 @@ source:
   module_type: RootInput
   maxEvents:  10        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*", "drop sumdata::RunData_*_*_*"]
+  inputCommands: ["keep *_*_*_*", "drop sim::SimEnergyDeposits_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*", "drop sumdata::RunData_*_*_*"]
 
 }
 
@@ -84,3 +84,7 @@ services.DetectorPropertiesService.NumberTimeSamples: 9600
 services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
+
+physics.filters.swtrigger.BNB_FEMBeamTriggerAlgo.Verbosity: 5
+physics.filters.swtrigger.BNB_HSN_c0_FEMBeamTriggerAlgo.Verbosity: 5
+physics.filters.swtrigger.BNB_2017Dec_SWTrigger5PE_FEMBeamTriggerAlgo.Verbosity: 5

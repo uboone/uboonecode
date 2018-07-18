@@ -46,7 +46,8 @@ art_make(
                         ${ART_FRAMEWORK_PRINCIPAL}
                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
                         ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-                        art_Persistency_Common canvas_Persistency_Common
+			uboone_Utilities
+			art_Persistency_Common canvas_Persistency_Common
                         art_Utilities canvas_Utilities
 			ifdh
                         ${MF_MESSAGELOGGER}

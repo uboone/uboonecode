@@ -37,6 +37,10 @@ microboone_basic_services:
  DetectorClocksService:                    @local::microboone_detectorclocks
  SpaceCharge:                    @local::microboone_spacecharge
  NuRandomService:                    @local::microboone_seedservice
+ PMTRemapService:
+ {
+   PMTRemapProvider: {}
+ }
 }
 
 microboone_basic_services.DetectorPropertiesService.Electronlifetime: 999999 #1 s lifetime

@@ -1,4 +1,4 @@
-#include "services_microboone_simulation.fcl"
+#include "services_microboone.fcl"
 
 #include "microboone_overlay.fcl"
 #include "swtrigger_microboone.fcl"
@@ -18,9 +18,8 @@ services : {
   RandomNumberGenerator: {}                     #ART native random number generator
 
   @table::microboone_simulation_services
-  FileCatalogMetadata:  @local::art_file_catalog_mc
+  FileCatalogMetadata:  @local::art_file_catalog_overlay
   message:      @local::standard_info
-
 }
 
 outputs: {

@@ -17,7 +17,14 @@
 #include "cetlib/search_path.h"
 
 
+
 namespace crt {
+  
+struct TS0_CORRECTION{
+  uint32_t sec;
+  double offset;
+  double scale;
+};
   
   namespace auxfunctions {
     
@@ -47,9 +54,21 @@ namespace crt {
     
     double getTcorr(std::vector<double>& inpos1, std::vector<double>& inpos2 , double T);//return corrected time, along the fiber. 6.2ns/m 
 
-    std::string filename;
+    std::string filePartTop;
     int mac_buffer[3][100];
-    void FillPartTop(std::string filename, int mac_buffer[3][100]);
+    void FillPartTop(std::string filePartTop, int mac_buffer[3][100]);
+
+    std::string fileTS0corr;
+    TS0_CORRECTION correctionpoints[50]; 
+    uint32_t start_s, end_s;
+    void Init_TS0_corr(std::string fileTS0corr,TS0_CORRECTION correctionpoints[50] , uint32_t start_s,uint32_t end_s);
+    
+    std::string file_FEB_MS_delay;
+    double Ms_delay[200];
+    void Init_mspoll_delay(std::string file_FEB_MS_delay, double Ms_delay[200]);
+    
+    double offset;
+    double CRT_Only_Offset(uint32_t sec);
     
   }
   
