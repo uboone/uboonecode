@@ -35,7 +35,6 @@ build_cet ubsim @UBSIM_VERSION@ ${basequal}
 build_cet ubreco @UBRECO_VERSION@ ${basequal}
 build_cet ubana @UBANA_VERSION@ ${basequal}
 build_cet ublite @UBLITE_VERSION@ ${basequal}
-build_cet ubxsec @UBXSEC_VERSION@ ${basequal}
 build_cet -n uboonecode @UBOONECODE_VERSION@ ${basequal}
 
 return 0
