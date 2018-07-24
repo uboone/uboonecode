@@ -23,6 +23,7 @@ fwdir   product_dir scripts
 # table fragment to set FW_SEARCH_PATH
 table_fragment_begin
 pathPrepend(FHICL_FILE_PATH, .:./job)
+pathPrepend(GXMLPATH, ${UBOONECODE_DIR}/source/fcl/gen/genie)
 table_fragment_end
 
 # With "product  version" table below, we now define depdendencies
@@ -31,6 +32,7 @@ table_fragment_end
 
 product                 version
 larsoft                 v06_82_00
+ubsim			v06_82_01
 ubcv                    v06_82_01
 ubcrt                   v06_82_01
 ubutil                  v06_82_00
@@ -39,15 +41,15 @@ genie_xsec              v2_12_10
 cetbuildtools	        v7_03_03	-	only_for_build
 end_product_list
 
-qualifier      larsoft        ubcv           ubcrt          ubutil         uboonedata     genie_xsec     
-c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           DefaultPlusMECWithNC
-c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC
-c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC
-c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC
-e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      -nq-           DefaultPlusMECWithNC
-e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        -nq-           DefaultPlusMECWithNC
-e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           DefaultPlusMECWithNC
-e15:prof:fg    e15:prof       e15:prof       e15:prof       e15:prof       -nq-           LocalFGNievesQEAndMEC
+qualifier      larsoft        ubsim           ubcv           ubcrt          ubutil         uboonedata     genie_xsec     
+c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           DefaultPlusMECWithNC
+c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC
+c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC
+c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC
+e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      -nq-           DefaultPlusMECWithNC
+e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        -nq-           DefaultPlusMECWithNC
+e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           DefaultPlusMECWithNC
+e15:prof:fg    e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           LocalFGNievesQEAndMEC
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
