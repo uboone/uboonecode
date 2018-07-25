@@ -215,18 +215,10 @@ private:
   double _candidate_flash_time;
   double _drift_velocity;
 
-  // Outputs trees
+  // Outputs tree - This is the main analysis TTree
   TTree* _tree1;
   UBXSecEvent *ubxsec_event = new UBXSecEvent();
  
-  /* 
-  TTree* _tree2;
-  int _total_matches, _nmatch;
-  std::vector<double> _hypo_spec, _beam_spec, _fixx_spec;
-  double _score;
-  int _is_muon;
-  */
-
   TH2F * _deadRegion2P;
   TH2F * _deadRegion3P;
   
@@ -272,50 +264,49 @@ private:
 
 UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
-  //::art::ServiceHandle<cheat::BackTracker> bt;
   ::art::ServiceHandle<geo::Geometry> geo;
 
-  _pfp_producer                   = p.get<std::string>("PFParticleProducer");
-  _hitfinderLabel                 = p.get<std::string>("HitProducer");
-  _geantModuleLabel               = p.get<std::string>("GeantModule");
-  _spacepointLabel                = p.get<std::string>("SpacePointProducer");
-  _neutrino_flash_match_producer  = p.get<std::string>("NeutrinoFlashMatchProducer");
-  _cosmic_flash_match_producer    = p.get<std::string>("CosmicFlashMatchProducer");
-  _opflash_producer_beam          = p.get<std::string>("OpFlashBeamProducer");
-  _acpt_producer                  = p.get<std::string>("ACPTProducer");
-  _tpcobject_producer             = p.get<std::string>("TPCObjectProducer");
-  _potsum_producer                = p.get<std::string>("POTSummaryProducer");
-  _potsum_instance                = p.get<std::string>("POTSummaryInstance");
-  _particle_id_producer           = p.get<std::string>("ParticleIDProducer");
-  _mc_ghost_producer              = p.get<std::string>("MCGhostProducer");
-  _geocosmictag_producer          = p.get<std::string>("GeoCosmicTaggerProducer");
-  _candidateconsistency_producer  = p.get<std::string>("CandidateConsistencyProducer");
-  _mcsfitresult_mu_producer       = p.get<std::string>("MCSFitResultMuProducer");
-  _mcsfitresult_pi_producer       = p.get<std::string>("MCSFitResultPiProducer");
-  _calorimetry_producer           = p.get<std::string>("CalorimetryProducer");
-  _eventweight_producer           = p.get<std::string>("EventWeightProducer");
-  _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
-  _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
-  _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
+  _pfp_producer                         = p.get<std::string>("PFParticleProducer");
+  _hitfinderLabel                       = p.get<std::string>("HitProducer");
+  _geantModuleLabel                     = p.get<std::string>("GeantModule");
+  _spacepointLabel                      = p.get<std::string>("SpacePointProducer");
+  _neutrino_flash_match_producer        = p.get<std::string>("NeutrinoFlashMatchProducer");
+  _cosmic_flash_match_producer          = p.get<std::string>("CosmicFlashMatchProducer");
+  _opflash_producer_beam                = p.get<std::string>("OpFlashBeamProducer");
+  _acpt_producer                        = p.get<std::string>("ACPTProducer");
+  _tpcobject_producer                   = p.get<std::string>("TPCObjectProducer");
+  _potsum_producer                      = p.get<std::string>("POTSummaryProducer");
+  _potsum_instance                      = p.get<std::string>("POTSummaryInstance");
+  _particle_id_producer                 = p.get<std::string>("ParticleIDProducer");
+  _mc_ghost_producer                    = p.get<std::string>("MCGhostProducer");
+  _geocosmictag_producer                = p.get<std::string>("GeoCosmicTaggerProducer");
+  _candidateconsistency_producer        = p.get<std::string>("CandidateConsistencyProducer");
+  _mcsfitresult_mu_producer             = p.get<std::string>("MCSFitResultMuProducer");
+  _mcsfitresult_pi_producer             = p.get<std::string>("MCSFitResultPiProducer");
+  _calorimetry_producer                 = p.get<std::string>("CalorimetryProducer");
+  _eventweight_producer                 = p.get<std::string>("EventWeightProducer");
+  _genie_eventweight_pm1_producer       = p.get<std::string>("GenieEventWeightPMOneProducer");
+  _genie_eventweight_multisim_producer  = p.get<std::string>("GenieEventWeightMultisimProducer");
+  _flux_eventweight_multisim_producer   = p.get<std::string>("FluxEventWeightMultisimProducer");
 
-  _use_genie_info                 = p.get<bool>("UseGENIEInfo", false);
-  _minimumHitRequirement          = p.get<int>("MinimumHitRequirement", 3);
-  _minimumDistDeadReg             = p.get<double>("MinimumDistanceToDeadRegion", 5.);
+  _use_genie_info                       = p.get<bool>("UseGENIEInfo", false);
+  _minimumHitRequirement                = p.get<int>("MinimumHitRequirement", 3);
+  _minimumDistDeadReg                   = p.get<double>("MinimumDistanceToDeadRegion", 5.);
 
-  _beam_spill_start               = p.get<double>("BeamSpillStart", 3.2);
-  _beam_spill_end                 = p.get<double>("BeamSpillEnd",   4.8);
-  _total_pe_cut                   = p.get<double>("TotalPECut",     50);
+  _beam_spill_start                     = p.get<double>("BeamSpillStart", 3.2);
+  _beam_spill_end                       = p.get<double>("BeamSpillEnd",   4.8);
+  _total_pe_cut                         = p.get<double>("TotalPECut",     50);
 
-  _do_opdet_swap                  = p.get<bool>("DoOpDetSwap", false);
-  _opdet_swap_map                 = p.get<std::vector<int> >("OpDetSwapMap");
+  _do_opdet_swap                        = p.get<bool>("DoOpDetSwap", false);
+  _opdet_swap_map                       = p.get<std::vector<int> >("OpDetSwapMap");
 
-  _geo_cosmic_score_cut           = p.get<double>("GeoCosmicScoreCut", 0.6);
-  _tolerance_track_multiplicity   = p.get<double>("ToleranceTrackMultiplicity", 5.);
+  _geo_cosmic_score_cut                 = p.get<double>("GeoCosmicScoreCut", 0.6);
+  _tolerance_track_multiplicity         = p.get<double>("ToleranceTrackMultiplicity", 5.);
 
-  _min_track_len                  = p.get<double>("MinTrackLength", 0.1);
+  _min_track_len                        = p.get<double>("MinTrackLength", 0.1);
 
-  _make_ophit_csv                 = p.get<bool>("MakeOpHitCSV", false);
-  _make_pida_csv                  = p.get<bool>("MakePIDACSV", false);
+  _make_ophit_csv                       = p.get<bool>("MakeOpHitCSV", false);
+  _make_pida_csv                        = p.get<bool>("MakePIDACSV", false);
 
   _pecalib.Configure(p.get<fhicl::ParameterSet>("PECalib"));
 
@@ -340,10 +331,10 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
   _SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
 
-  std::cout << "E Field: " << _detector_properties->Efield() << std::endl;
-  std::cout << "Temperature: " << _detector_properties->Temperature() << std::endl;
-  std::cout << "Drift Velocity: " << _detector_properties->DriftVelocity(_detector_properties->Efield(), _detector_properties->Temperature())<< std::endl;
-  std::cout << "Sampling Rate: " << _detector_properties->SamplingRate() << std::endl;
+  std::cout << "[UBXSec] E Field: " << _detector_properties->Efield() << std::endl;
+  std::cout << "[UBXSec] Temperature: " << _detector_properties->Temperature() << std::endl;
+  std::cout << "[UBXSec] Drift Velocity: " << _detector_properties->DriftVelocity(_detector_properties->Efield(), _detector_properties->Temperature())<< std::endl;
+  std::cout << "[UBXSec] Sampling Rate: " << _detector_properties->SamplingRate() << std::endl;
 
 
   art::ServiceHandle<art::TFileService> fs;
@@ -353,20 +344,6 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   int splitlevel = 99;
   _tree1->Branch("ubxsec_event_split", &ubxsec_event, bufsize, splitlevel);
 
-  /*
-  _tree2 = fs->make<TTree>("matchtree","");
-  _tree2->Branch("run",                &_run,                "run/I");
-  _tree2->Branch("subrun",             &_subrun,             "subrun/I");
-  _tree2->Branch("event",              &_event,              "event/I");
-  _tree2->Branch("total_matches",      &_total_matches,      "total_matches/I");
-  _tree2->Branch("nmatch",             &_nmatch,             "nmatch/I");
-  _tree2->Branch("score",              &_score,              "score/D");
-  _tree2->Branch("hypo_spec",          "std::vector<double>", &_hypo_spec);
-  _tree2->Branch("beam_spec",          "std::vector<double>", &_beam_spec);
-  _tree2->Branch("fixx_spec",          "std::vector<double>", &_fixx_spec);
-  _tree2->Branch("is_muon",            &_is_muon,            "is_muon/I");
-  _tree2->Branch("muon_is_reco",       &_muon_is_reco,       "muon_is_reco/I");
-  */
 
   _deadRegion2P = fs->make<TH2F>("deadRegion2P","deadRegion2P", 10350,0.0,1035.0,2300,-115.0,115.0);
   _deadRegion3P = fs->make<TH2F>("deadRegion3P","deadRegion3P", 10350,0.0,1035.0,2300,-115.0,115.0);
@@ -472,20 +449,14 @@ void UBXSec::produce(art::Event & e) {
   // Initialize the UBXSecEvent
   ubxsec_event->Init();
 
-  _run = ubxsec_event->run = e.id().run();
+  _run    = ubxsec_event->run    = e.id().run();
   _subrun = ubxsec_event->subrun = e.id().subRun();
-  _event = ubxsec_event->event  = e.id().event();
+  _event  = ubxsec_event->event  = e.id().event();
 
   _is_data = e.isRealData();
   _is_mc   = !_is_data;
 
-  // if (_use_genie_info && _is_data) {
-  //   std::cout << "[UBXSec] You have asked to use GENIE info but you are running on a data file.";
-  //   std::cout << " _use_genie_info will be switched to false." << std::endl;
-  //   _use_genie_info = false;
-  // }
 
-  //::art::ServiceHandle<cheat::BackTracker> bt;
   ::art::ServiceHandle<geo::Geometry> geo;
 
   // Prepare the dead region finder
@@ -518,13 +489,8 @@ void UBXSec::produce(art::Event & e) {
   lar_pandora::LArPandoraHelper::CollectShowers(e, _pfp_producer, _shower_v, _pfp_to_shower_map);
 
   // Collect PFParticles and match Reco Particles to Hits
-  //lar_pandora::PFParticleVector  recoParticleVector;
-  //lar_pandora::PFParticleVector  recoNeutrinoVector;
   lar_pandora::PFParticlesToHits recoParticlesToHits;
   lar_pandora::HitsToPFParticles recoHitsToParticles;
-
-  //lar_pandora::LArPandoraHelper::CollectPFParticles(e, _pfp_producer, recoParticleVector);
-  //lar_pandora::LArPandoraHelper::SelectNeutrinoPFParticles(recoParticleVector, recoNeutrinoVector);
   lar_pandora::LArPandoraHelper::BuildPFParticleHitMaps(e, _pfp_producer, _spacepointLabel, recoParticlesToHits, recoHitsToParticles, lar_pandora::LArPandoraHelper::kUseDaughters, true);
 
   // Get TPCObjects from the Event
@@ -925,8 +891,8 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
         ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
         ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
-                                                           mclist[iList]->GetNeutrino().Lepton().Py(),
-                                                           mclist[iList]->GetNeutrino().Lepton().Pz()); 
+                                                             mclist[iList]->GetNeutrino().Lepton().Py(),
+                                                             mclist[iList]->GetNeutrino().Lepton().Pz()); 
         ubxsec_event->genie_mult      = n_genie_particles;
         ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
       }
@@ -950,107 +916,6 @@ void UBXSec::produce(art::Event & e) {
   }
 
 
-
-
-
-  //   if (mclist[iList]->Origin() == NEUTRINO_ORIGIN) {
-
-  //     if (_debug) this->PrintMC(mclist); 
-
-  //     // Check if the true neutrino vertex is in the FV
-  //     double truth_nu_vtx[3] = {mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vz()};
-  //     if (_fiducial_volume.InFV(truth_nu_vtx)) ubxsec_event->fv = 1;
-  //     else ubxsec_event->fv = 0;
-
-  //     // Look at the space charge correction
-  //     std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vz());
-
-  //     double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
-  //                      + _detector_properties->GetXTicksOffset(0,0,0) 
-  //                      - _detector_properties->TriggerOffset();
-
-  //     // The following offsets to be summed to the original true vertex
-  //     double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
-  //     double yOffset = sce_corr.at(1);
-  //     double zOffset = sce_corr.at(2);
-
-  //     ubxsec_event->sce_corr_x = xOffset;
-  //     ubxsec_event->sce_corr_y = yOffset;
-  //     ubxsec_event->sce_corr_z = zOffset;
-
-  //     if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
-  //       ubxsec_event->fv_sce = 1;
-  //     } else {
-  //       ubxsec_event->fv_sce = 0;
-  //     }
-
-  //     int n_genie_particles = 0;
-  //     int n_genie_particles_charged = 0;
-  //     for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //       const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
-  //       if (mc_par.StatusCode() != 1) continue;
-  //       n_genie_particles ++;
-  //       const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
-  //       if (!par_pdg) continue;
-  //       if (par_pdg->Charge() == 0) continue;
-  //       n_genie_particles_charged ++;
-  //     }
-
-  //     ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
-  //     ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
-  //     ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
-  //     ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
-  //     ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
-  //     ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Py(),
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Pz()); 
-  //     ubxsec_event->genie_mult      = n_genie_particles;
-  //     ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-
-      
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_z.resize(1);
-  //     // for(size_t n = 0; n < mclist.size(); n++ ) {
-  //     ubxsec_event->tvtx_x.at(0) = mclist[iList]->GetNeutrino().Nu().Vx();
-  //     ubxsec_event->tvtx_y.at(0) = mclist[iList]->GetNeutrino().Nu().Vy();
-  //     ubxsec_event->tvtx_z.at(0) = mclist[iList]->GetNeutrino().Nu().Vz();
-  //     // }
-
-  //     ubxsec_event->nsignal = 0;
-  //     if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
-
-  //     // Also save muon momentum if is signal
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //     if (ubxsec_event->nsignal == 1) {
-  //       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //         auto const & mcp = mclist[iList]->GetParticle(p);
-  //         if (mcp.Mother() != 0) continue;
-  //         if (mcp.PdgCode() != 13) continue;
-  //         ubxsec_event->true_muon_mom = mcp.P();
-  //       }
-  //     }
-  //   } // neutrino origin
-  //   else {
-  //     ubxsec_event->ccnc = -1;
-  //     ubxsec_event->nupdg = -1;
-  //     ubxsec_event->nu_e = -1;
-  //     ubxsec_event->lep_costheta = -9999.;
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //   }
-  // } else {
-  //   ubxsec_event->ccnc = -1;
-  //   ubxsec_event->nupdg = -1;
-  //   ubxsec_event->nu_e = -1;
-  //   ubxsec_event->lep_costheta = -9999.;
-  //   ubxsec_event->true_muon_mom = -9999.;
-  // }
 
   ubxsec_event->is_signal = false;
   if (ubxsec_event->ccnc == 0 && ubxsec_event->nupdg == 14 && ubxsec_event->fv == 1) {
@@ -1134,15 +999,15 @@ void UBXSec::produce(art::Event & e) {
 
   for (unsigned int slice = 0; slice < tpcobj_h->size(); slice++){
 
-    std::cout << "[UBXSec] >>> SLICE " << slice << std::endl;
+    std::cout << "[UBXSec] >>> TPCObject " << slice << std::endl;
 
     ubana::TPCObject tpcobj = (*tpcobj_h)[slice];
 
-    ubxsec_event->slc_npfp[slice]    = tpcobj.GetNPFP();
-    ubxsec_event->slc_ntrack[slice]  = tpcobj.GetNTracks();
-    ubxsec_event->slc_nshower[slice] = tpcobj.GetNShowers();
+    ubxsec_event->slc_npfp[slice]    = tpcobj.GetNPFP();     // Number of PFPs in this interaction
+    ubxsec_event->slc_ntrack[slice]  = tpcobj.GetNTracks();  // Number of Tracks in this interaction
+    ubxsec_event->slc_nshower[slice] = tpcobj.GetNShowers(); // Number of Showers in this interaction
 
-    // Slice origin 
+    // TPCObject origin 
     ubxsec_event->slc_origin[slice] = tpcobj.GetOrigin();
     std::cout << "[UBXSec] \t Origin is " << ubxsec_event->slc_origin[slice] << std::endl;
 
@@ -1151,7 +1016,7 @@ void UBXSec::produce(art::Event & e) {
     else 
       ubxsec_event->n_tpcobj_cosmic_origin ++;
 
-    // Slice origin extra
+    // TPCObject origin extra
     ubxsec_event->slc_origin_extra[slice] = tpcobj.GetOriginExtra();
     std::cout << "[UBXSec] \t Origin extra is " << ubxsec_event->slc_origin_extra[slice] << std::endl;
 
@@ -1161,7 +1026,6 @@ void UBXSec::produce(art::Event & e) {
     // Reco vertex
     double reco_nu_vtx_raw[3];
     recob::Vertex tpcobj_nu_vtx = tpcobj.GetVertex();
-    //tpcobj_nu_vtx.XYZ(reco_nu_vtx_raw);
     std::vector<art::Ptr<recob::Vertex>> recob_vtx_v = tpcobjToVertexAssns.at(slice);
     if (recob_vtx_v.size() > 0) {
       recob_vtx_v.at(0)->XYZ(reco_nu_vtx_raw);
@@ -1423,123 +1287,10 @@ void UBXSec::produce(art::Event & e) {
 
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
 
-    /*for (size_t oh = 0; oh < ophit_cosmic_h->size(); oh++) {
-      auto const & ophit = (*ophit_cosmic_h)[oh];
-      if (ophit.PeakTime() < -150 || ophit.PeakTime() > -50) continue;
-      size_t opdet = geo->OpDetFromOpChannel(ophit.OpChannel());
-      std::cout << "Cosmic Disc OpHit::  OpDet: " << opdet
-                << ", PeakTime: " << ophit.PeakTime()
-                << ", PE: " << _pecalib.CosmicPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
-    }*/
 
-    // Distance from recon nu vertex to thefar away track in TPCObject
-    //_slc_maxdistance_vtxtrack = UBXSecHelper::GetMaxTrackVertexDistance();
-
-    // Other showers in the event
-    /*
-    std::vector<art::Ptr<recob::Shower>> other_showers;
-    bool ignore_shower = false;
-    for (size_t s = 0; s < _shower_v.size(); s++) {
-
-      ignore_shower = false;
-
-      // Check this shower is not in this TPCObject
-      for (size_t this_s = 0; this_s < shower_v_v.at(slice).size(); this_s++) {
-        if (_shower_v.at(s).key() == shower_v_v.at(slice).at(this_s).key()) {
-          ignore_shower = true;
-          continue;
-        }
-      }
-
-      if (ignore_shower) continue;
-     
-      other_showers.push_back(_shower_v.at(s));
-    }
-
-    double max_length = -1, index_max_length = -1;
-    double max_costheta = -1e9, index_max_costheta = -1;
-    double min_flashvtxdistance = 1e9, index_min_flashvtxdistance = -1;
-
-    for (size_t s = 0; s < other_showers.size(); s++) {
-
-      if (other_showers.at(s)->Length() > max_length) {
-        max_length = other_showers.at(s)->Length();
-        index_max_length = s;
-      }
-
-      double costheta = UBXSecHelper::GetCosTheta(other_showers.at(s)->Direction());
-      if (costheta > max_costheta) {
-        costheta = max_costheta;
-        index_max_costheta = s;
-      }
-
-      double distance = std::abs(other_showers.at(s)->ShowerStart().Z() - ubxsec_event->candidate_flash_z);
-      if (distance < min_flashvtxdistance) {
-        min_flashvtxdistance = distance;
-        index_min_flashvtxdistance = s;
-      }
-    }
-
-    if (index_max_length != -1) {
-      auto shower = other_showers.at(index_max_length);
-      ubxsec_event->slc_othershowers_longest_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_longest_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_longest_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_longest_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_longest_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_longest_length[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;      
-    }
-    if (index_max_costheta != -1) {
-      auto shower = other_showers.at(index_max_costheta);
-      ubxsec_event->slc_othershowers_forward_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_forward_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_forward_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_forward_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_forward_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_forward_length[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = -1;
-    }
-    if (index_min_flashvtxdistance != -1) {
-      auto shower = other_showers.at(index_min_flashvtxdistance);
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;
-    }
-
-    std::cout << "[UBXSec] Shower info saved." << std::endl;
-    */
-
-
+    //
     // Muon Candidate
+    //
     _muon_finder.Reset();
     _muon_finder.SetTracks(track_v_v[slice]);
     _muon_finder.SetTrackToPIDMap(track_to_pid_map);
@@ -1566,14 +1317,14 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_muoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(candidate_track.key())->fwdMomentum();
         ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
         ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->fwdMomentum();
-        std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
-        std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
+        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
+        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
       } else {
         ubxsec_event->slc_muoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(candidate_track.key())->bwdMomentum();
         ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
         ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->bwdMomentum();
-        std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
-        std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
+        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
+        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
       }
       // Also see if the track is recon going downwards (for cosmic studies)
       bool track_going_down = candidate_track->Vertex().Y() > candidate_track->End().Y();
@@ -1648,6 +1399,65 @@ void UBXSec::produce(art::Event & e) {
       if (_debug) std::cout << "[UBXSec] \t \t Mom by Range:    " << ubxsec_event->slc_muoncandidate_mom_range[slice] << std::endl;
       if (_debug) std::cout << "[UBXSec] \t \t Mom by MCS:      " << ubxsec_event->slc_muoncandidate_mom_mcs[slice] << std::endl;
       if (_debug) std::cout << "[UBXSec] \t \t Fully Contained? " << (ubxsec_event->slc_muoncandidate_contained[slice] ? "YES" : "NO") << std::endl;
+
+
+
+      //
+      // Check if there is a proton candidate
+      //
+      // We have:
+      // art::Ptr<recob::Track> candidate_track; <- The candidate muon track
+      // track_v_v[slice] <- A vector of tracks for this interaction
+      bool proton_cand_exists = false;
+      art::Ptr<recob::Track> proton_candidate_track;
+
+      std::vector<art::Ptr<recob::Track>> tracks = track_v_v[slice];
+
+      // Require 2 tracks
+      if (tracks.size() == 2) {
+
+        // Loop over the tracks        
+        for (auto t : tracks) {
+
+          // Exclude the muon track, we want the other one
+          if (t == candidate_track) continue;
+
+          // Get the calorimetry for the second track     
+          std::vector<art::Ptr<anab::Calorimetry>> calos = calos_from_track.at(t.key());
+          double dqdx_mean_secondtrack = UBXSecHelper::GetDqDxTruncatedMean(calos);
+
+          // Now check the dQdx values are compatible with the proton hypothesis
+          bool not_muon = !_muon_finder.MIPConsistency(dqdx_mean_secondtrack, t->Length());
+
+          if (not_muon) {
+            proton_cand_exists = true;
+            proton_candidate_track = t;
+          }
+        }
+      }
+
+      // Save proton information to the output tree (to be inplemented)
+      if (proton_cand_exists) {
+        // ubxsec_event->slc_protoncandidate_exists[slice]    = true;
+        // ubxsec_event->slc_protoncandidate_contained[slice] = fully_contained;
+        // ubxsec_event->slc_protoncandidate_length[slice]    = 
+        // ubxsec_event->slc_protoncandidate_phi[slice]       =  
+        // ubxsec_event->slc_protoncandidate_theta[slice]     = 
+      } else {
+        // ubxsec_event->slc_protoncandidate_exists[slice]    = false;
+        // ubxsec_event->slc_protoncandidate_contained[slice] = false;
+        // ubxsec_event->slc_protoncandidate_length[slice]    = 
+        // ubxsec_event->slc_protoncandidate_phi[slice]       = 
+        // ubxsec_event->slc_protoncandidate_theta[slice]     = 
+      }
+
+
+
+
+
+
+
+
 
       // Try look at MCS for stopping muons
       bool down_track = candidate_track->Vertex().Y() > candidate_track->End().Y();
@@ -1876,33 +1686,23 @@ void UBXSec::produce(art::Event & e) {
     if (muon_cand_exists && tpcobj.GetOrigin() == ubana::kCosmicRay) {
       bool best_fwd = mcsfitresult_mu_v.at(candidate_track.key())->isBestFwd();
       bool down_track = candidate_track->Vertex().Y() > candidate_track->End().Y();
-      //double deltall = mcsfitresult_mu_v.at(candidate_track.key())->deltaLogLikelihood();
-      //double ratioll = _mcs_cosmic_track_fwdll / _mcs_cosmic_track_bwdll;  
       if (down_track && best_fwd) {               // Track is reco going down and mcs agrees (true for cosmic)
         _h_mcs_cosmic_track_direction->Fill(0);
-        //_h_mcs_cosmic_track_direction_deltall->Fill(0., deltall);
-        //_h_mcs_cosmic_track_direction_ratioll->Fill(0., ratioll);
         _mcs_cosmic_track_direction = 0;
         _mcs_cosmic_track_downll = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
         _mcs_cosmic_track_upll = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
       } else if (!down_track && best_fwd) {       // Track is reco going up and mcs agrees
         _h_mcs_cosmic_track_direction->Fill(1);
-        //_h_mcs_cosmic_track_direction_deltall->Fill(1., deltall);
-        //_h_mcs_cosmic_track_direction_ratioll->Fill(1., ratioll);
         _mcs_cosmic_track_direction = 1;
         _mcs_cosmic_track_downll = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
         _mcs_cosmic_track_upll = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
       } else if (down_track && !best_fwd) {       // Track is reco going down and mcs disagrees
         _h_mcs_cosmic_track_direction->Fill(1);
-        //_h_mcs_cosmic_track_direction_deltall->Fill(1., deltall);
-        //_h_mcs_cosmic_track_direction_ratioll->Fill(1., ratioll);
         _mcs_cosmic_track_direction = 2;
         _mcs_cosmic_track_downll = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
         _mcs_cosmic_track_upll = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
       } else if (!down_track && !best_fwd) {      // Track is reco going up and mcs disagrees (true for cosmic)
         _h_mcs_cosmic_track_direction->Fill(0);
-        //_h_mcs_cosmic_track_direction_deltall->Fill(0., deltall);
-        //_h_mcs_cosmic_track_direction_ratioll->Fill(0., ratioll);
         _mcs_cosmic_track_direction = 3;
         _mcs_cosmic_track_downll = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
         _mcs_cosmic_track_upll = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
@@ -1910,18 +1710,8 @@ void UBXSec::produce(art::Event & e) {
       _mcs_cosmic_track_direction_tree->Fill();
     }
 
-
     std::cout << "[UBXSec] --- SLICE INFORMATION SAVED" << std::endl;
   } // slice loop
-
-
-
-  /* Dead regions
-  //art::ServiceHandle<FindDeadRegions> deadRegionsFinder;
-  FindDeadRegions deadRegionsFinder;
-  deadRegionsFinder.GetDeadRegionHisto2P(_deadRegion2P);
-  deadRegionsFinder.GetDeadRegionHisto3P(_deadRegion3P);
-  */
 
 
 
