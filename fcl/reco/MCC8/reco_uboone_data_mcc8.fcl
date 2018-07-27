@@ -329,10 +329,10 @@ microboone_reco_data_optical: [ saturation,
                                 simpleFlashBeamLowPE]
 
 microboone_reco_data_signalprocessing: [ #digitfilter,
-				         #wcNoiseFilter,
-					 nfspl1,
-					 butcher,
-				         caldata,
+				                                 #wcNoiseFilter,
+					                               nfspl1,
+					                               butcher,
+				                                 caldata,
                                          gaushit ]
 
 microboone_reco_data_fuzzycluster: [     #fuzzycluster ]
@@ -526,7 +526,7 @@ microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                      
 microboone_reco_data_producers.caldata.DodQdxCalib:                              false
 microboone_reco_data_producers.caldata.MakeSparseRawDigits:                      true
 
-microboone_reco_data_producers.gaushit.CalDataModuleLabel:                       "butcher"
+microboone_reco_data_producers.gaushit.CalDataModuleLabel:                       "caldata"
 microboone_reco_data_producers.gaushit.LongMaxHits:                              [ 25, 25, 25]
 microboone_reco_data_producers.gaushit.MaxMultiHit:                              4
 microboone_reco_data_producers.gaushit.TryNplus1Fits:                            false
