@@ -30,7 +30,7 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v06_84_00
+larsoft                 v06_85_00
 ubcv                    v06_84_00
 ubcrt                   v06_84_00
 ublite			v06_84_00
@@ -45,6 +45,10 @@ c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:de
 c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC
 c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC
 c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC
+e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           DefaultPlusMECWithNC
+e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           DefaultPlusMECWithNC
+e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           DefaultPlusMECWithNC
+e17:prof:fg    e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           LocalFGNievesQEAndMEC
 e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      -nq-           DefaultPlusMECWithNC
 e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        -nq-           DefaultPlusMECWithNC
 e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           DefaultPlusMECWithNC
