@@ -7,6 +7,7 @@
 
 #include "genie_eventweight_microboone_ubxsec.fcl"
 #include "flux_eventweight_microboone_ubxsec.fcl"
+#include "eventweight_microboone_models.fcl"
 
 #include "tpcobjectmaker.fcl"
 #include "neutrinomcflash.fcl"
@@ -56,7 +57,7 @@ ubxsec_mc_reco:
   pandoraCosmicStoppingMu:        @local::microboone_cosmicstoppingmutagger_mc
   pandoraCosmicHitRemoval:        @local::microboone_crhitremoval
 
-  crHitRemovalTruthMatch:         @local::standard_mcparticlehitmatching
+  #crHitRemovalTruthMatch:         @local::standard_mcparticlehitmatching
 
   pandoraNu:                      @local::microboone_pandora
   #pandoraNuAll:                   @local::microboone_pandora
@@ -90,6 +91,7 @@ ubxsec_mc_flashmatch:
 
    genieeventweightpm1:            @local::genie_microboone_eventweight_ubxsec
    genieeventweightmultisim:       @local::genie_microboone_eventweight_ubxsec
+   geniemodelseventweightmultisim: @local::microboone_eventweight
    fluxeventweightmultisim:        @local::flux_microboone_eventweight_ubxsec
 
    UBXSec:                         @local::UBXSec_mc
@@ -116,13 +118,13 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        pandoraCosmicACPTTagger,
                        pandoraCosmicStoppingMu,
                        pandoraCosmicHitRemoval,
-                       crHitRemovalTruthMatch,
+                       #crHitRemovalTruthMatch,
                        pandoraNu,
                        #pandoraNuAll,
                        pandoraNucalo,
                        pandoraNupid,
-                       pandoraNucali,
-                       pandoraNucalipid,
+                       #pandoraNucali,
+                       #pandoraNucalipid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
                        RecoTrueMatcher, 
@@ -134,6 +136,7 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        CandidateConsistency,
                        #genieeventweightpm1,
                        #genieeventweightmultisim,
+                       #geniemodelseventweightmultisim,
                        #fluxeventweightmultisim,
                        UBXSec ] 
 
@@ -167,10 +170,10 @@ ubxsec_mc_reco.pandoraCosmicHitRemoval.EndTickPadding:           75
 ubxsec_mc_reco.pandoraCosmicHitRemoval.CopyHitMCParticleAssns:   true
 ubxsec_mc_reco.pandoraCosmicHitRemoval.HitMCParticleAssnLabel:   "gaushitTruthMatch"
 
-ubxsec_mc_reco.crHitRemovalTruthMatch.OverrideRealData:                          true
-ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations:                   @local::IndirectHitParticleAssnsTool
-ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitPartAssnsLabel: "gaushitTruthMatch"
-ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitModuleLabel:    "pandoraCosmicHitRemoval::UBXSec"
+#ubxsec_mc_reco.crHitRemovalTruthMatch.OverrideRealData:                          true
+#ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations:                   @local::IndirectHitParticleAssnsTool
+#ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitPartAssnsLabel: "gaushitTruthMatch"
+#ubxsec_mc_reco.crHitRemovalTruthMatch.HitParticleAssociations.HitModuleLabel:    "pandoraCosmicHitRemoval::UBXSec"
 
 ubxsec_mc_reco.pandoraNu.GeantModuleLabel:                       "largeant"
 ubxsec_mc_reco.pandoraNu.HitFinderModuleLabel:                   "pandoraCosmicHitRemoval::UBXSec"
