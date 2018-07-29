@@ -184,6 +184,14 @@ void UBXSecEvent::ResetGenieEventWeightVectorsMultisim() {
 
 }
 
+void UBXSecEvent::ResetGenieModelsEventWeightVectorsMultisim() {
+
+  evtwgt_genie_models_multisim_funcname.clear();
+  evtwgt_genie_models_multisim_weight.clear();
+  evtwgt_genie_models_multisim_nweight.clear();
+
+}
+
 void UBXSecEvent::ResetFluxEventWeightVectorsMultisim() {
 
   evtwgt_flux_multisim_funcname.clear();
