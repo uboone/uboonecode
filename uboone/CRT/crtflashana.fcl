@@ -1,0 +1,14 @@
+BEGIN_PROLOG
+
+crtflashana:
+{
+  DAQTimeModuleLabel: "daq"
+  TriggerModuleLabel: "daq"
+  SWTriggerModuleLabel: "daq"
+  FlashModuleLabel: "simpleFlashCosmic"
+  CRTModuleLabel: "merger"
+  FlashMinPE: 500
+  module_type: "CRTFlashAna"
+}
+
+END_PROLOG
