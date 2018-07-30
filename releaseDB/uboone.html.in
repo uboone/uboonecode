@@ -38,12 +38,12 @@ Release notes and previous versions of uboonecode can be found at the following 
     <ul>
       <li>Download the script.</li>
       <li>chmod +x pullProducts</li>
-      <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s68-e15 &lt;prof|debug&gt;</pre></li>
-      <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s68-e15 &lt;prof|debug&gt;</pre></li>
-      <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s68-c2 &lt;prof|debug&gt;</pre></li>
-      <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s68-c2 &lt;prof|debug&gt;</pre></li>
-      <li>Sierra: <pre>./pullProducts &lt;product-directory&gt; d16 uboone-@UBOONECODE_DOT_VERSION@ s68-c2 &lt;prof|debug&gt;</pre></li>
-      <li>High Sierra: <pre>./pullProducts &lt;product-directory&gt; d17 uboone-@UBOONECODE_DOT_VERSION@ s68-c2 &lt;prof|debug&gt;</pre></li>
+      <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s70-e15 &lt;prof|debug&gt;</pre></li>
+      <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s70-e15 &lt;prof|debug&gt;</pre></li>
+      <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s70-c2 &lt;prof|debug&gt;</pre></li>
+      <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s70-c2 &lt;prof|debug&gt;</pre></li>
+      <li>Sierra: <pre>./pullProducts &lt;product-directory&gt; d16 uboone-@UBOONECODE_DOT_VERSION@ s70-c2 &lt;prof|debug&gt;</pre></li>
+      <li>High Sierra: <pre>./pullProducts &lt;product-directory&gt; d17 uboone-@UBOONECODE_DOT_VERSION@ s70-c2 &lt;prof|debug&gt;</pre></li>
       <!--<li>Larsoft needs to be installed separately:  <pre>./pullProducts &lt;product-directory&gt; &lt;slf6|d13&gt; larsoft-@LARSOFT_DOT_VERSION@ s10-e14 &lt;prof|debug&gt;</pre></li>-->
     </ul></li>
   </ul></li>
