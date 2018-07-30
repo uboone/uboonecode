@@ -41,9 +41,7 @@ public:
     ParticleDef() {}
     ParticleDef(std::string _name, int _pdg, float _sigma, TFile* probFile)
         : name(_name), pdg(_pdg), par_sigma(_sigma) {
-      TDirectory* dir = dynamic_cast<TDirectory*>(probFile->Get(name.c_str()));
-      assert(dir);
-      pint = dynamic_cast<TH1F*>(dir->Get("pint"));
+      pint = dynamic_cast<TH1F*>(probFile->Get(name.c_str()));
       assert(pint);
     }
 
@@ -74,6 +72,7 @@ void ReinteractionWeightCalc::Configure(fhicl::ParameterSet const& p) {
   std::vector<std::string> pars = pset.get< std::vector<std::string> >("parameter_list");	
   std::vector<float> sigmas = pset.get<std::vector<float> >("parameter_sigma");	
   std::string mode = pset.get<std::string>("mode");
+  std::string probFileName = pset.get<std::string>("ProbFileName", "systematics/reint/interaction_probabilities.root");
   fNsims = pset.get<int> ("number_of_multisims", 0);
 
   // Prepare random generator
@@ -81,8 +80,10 @@ void ReinteractionWeightCalc::Configure(fhicl::ParameterSet const& p) {
   fGaussRandom = new CLHEP::RandGaussQ(rng->getEngine(GetName()));    
 
   // Load interaction probabilities
-  fProbFile = TFile::Open("pint.root");  // FIXME
-  assert(fProbFile);
+  cet::search_path sp("FW_SEARCH_PATH");
+  std::string probFilePath = sp.find_file(probFileName);
+  fProbFile = TFile::Open(probFilePath.c_str());
+  assert(fProbFile && fProbFile->IsOpen());
 
   // Build parameter list
   for (size_t i=0; i<pars.size(); i++) {
