@@ -62,6 +62,7 @@ class UBXSecEvent /*: public TObject*/{
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
+  Int_t           selected_slice; ///< The index of the selected slice
 
   Double_t        sce_corr_x; ///< Space charge correction to be applied to the true nu vertex (to be summed on x)
   Double_t        sce_corr_y; ///< Space charge correction to be applied to the true nu vertex (to be summed on y)

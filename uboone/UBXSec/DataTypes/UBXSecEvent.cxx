@@ -50,6 +50,7 @@ void UBXSecEvent::Init()
   genie_mult_ch = _default_value;
   bnb_weight = _default_value;
   is_selected = false;
+  selected_slice = -1;
 
   sce_corr_x = _default_value;
   sce_corr_y = _default_value;

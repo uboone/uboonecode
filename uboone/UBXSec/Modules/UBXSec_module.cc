@@ -2068,6 +2068,7 @@ void UBXSec::produce(art::Event & e) {
     selection_result.SetSelectionStatus(true);
 
     ubxsec_event->is_selected = true;
+    ubxsec_event->selected_slice = slice_index;
 
     // Grab the selected TPCObject
     std::vector<art::Ptr<ubana::TPCObject>> tpcobj_v;
