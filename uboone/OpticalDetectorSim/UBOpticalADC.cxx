@@ -113,8 +113,8 @@ namespace opdet {
 
     // services
     art::ServiceHandle<opdet::UBOpticalChConfig> ch_conf;
-    //art::ServiceHandle<detinfo::LArPropertiesService> lar_prop;
-auto const* lar_prop = lar::providerFrom<detinfo::LArPropertiesService>();
+    auto const* lar_prop = lar::providerFrom<detinfo::LArPropertiesService>();
+
     //
     // Generate Signal & DarkNoise
     //
@@ -140,22 +140,13 @@ auto const* lar_prop = lar::providerFrom<detinfo::LArPropertiesService>();
     //const double qe = ch_conf->GetFloat(kQE,ch);
 
     for(auto const &v : fDarkPhotonTime) fPhotonTime.push_back(v);
-    //std::cout << "[UBOpticalADC] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> qe is set to " << qe  << " for ch " << ch  << std::endl;
 
-    double mycounter = 0.;
 
     for(size_t i = 0; i < fInputPhotonTime.size(); i++) {
 
       double v = fInputPhotonTime.at(i);               // The photon time
       double set_in_sd = fInputPhotonStatus.at(i);     // False if it comes from photon library, True otherwise
       double energy = fInputPhotonEnergy.at(i) * 1.e6; // The photon enrgy [eV]
-
-      //double qe = ch_conf->GetFloat(kQE,ch);
-      //if (set_in_sd) {
-      //  qe *= lar_prop->ScintPreScale();
-      //}
-
-      //std::cout << "Photon " << (set_in_sd ? "set" : "not set") << " in SD. Energy is " << energy << ". QE is " << ch_conf->GetFloatAtSpectrumValue(kQESpec, ch, energy) << std::endl;
 
       // Get the quantum efficiency for this channel (ch) and this photon energy
       double qe = ch_conf->GetFloatAtSpectrumValue(kQESpec, ch, energy);
@@ -166,20 +157,11 @@ auto const* lar_prop = lar::providerFrom<detinfo::LArPropertiesService>();
         qe /= lar_prop->ScintPreScale();
       }
 
-      if (v > 3911.87 - 100 && v < 3911.87 + 8000)
-        std::cout << "[UBOpticalADC] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> at our photon, qe is  " << qe << std::endl;
-
       // Apply quantum efficiency
       if(RandomServer::GetME().Uniform(1.) < qe) {
-        if (v > 3911.87 - 100 && v < 3911.87 + 8000) {
-          std::cout << "[UBOpticalADC] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> >> passed " << std::endl;
-          mycounter++;
-        }
         fPhotonTime.push_back(v);
       }
     }
-
-    std::cout << "[UBOpticalADC] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> >> At the end we have mycounter = "<< mycounter << std::endl;
 
     fSPE.SetPhotons(fPhotonTime);
     fSPE.Process(wfm_tmp,fTimeInfo);
