@@ -30,16 +30,24 @@ namespace flashana {
 
     enum QLLMode_t { kChi2, kLLHD };
 
+  private:
+    /// Valid ctor hidden (singleton)
+    QLLMatch(const std::string);
+    
   public:
     
-    /// Default ctor (throws exception, use alternative)
+    /// Default ctor throws exception (singleton)
     QLLMatch();
-
-    /// Valid ctor
-    QLLMatch(const std::string);
     
     /// Default destructor
     ~QLLMatch(){}
+
+    /// Singleton shared instance getter
+    static QLLMatch* GetME()
+    {
+      if(!_me) _me = new QLLMatch("QLLMatch");
+      return _me;
+    }
 
     /// Core function: execute matching
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
@@ -124,7 +132,7 @@ namespace flashana {
     /// dtor
     ~QLLMatchFactory() {}
     /// creation method
-    BaseFlashMatch* create(const std::string instance_name) { return new QLLMatch(instance_name); }
+    BaseFlashMatch* create(const std::string instance_name) { return QLLMatch::GetME(); }
   };
   
 }

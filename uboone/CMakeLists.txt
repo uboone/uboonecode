@@ -50,10 +50,8 @@ add_subdirectory(ChargedTrackMultiplicity/DataOFF)
 #add_subdirectory(ChargedTrackMultiplicitySinglegamma/MC)
 
 add_subdirectory(LEEPhotonAnalysis)
-
-add_subdirectory(UBXSec)
-
 add_subdirectory(ParticleID)
+add_subdirectory(UBXSec)
 
 # Respect the order specified in lar_build, which is:
 #

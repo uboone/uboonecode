@@ -4,14 +4,16 @@ process_name: UBXSec
 
 services.TFileService.fileName: "ubxsec_output_mc_intimecosmic.root"
 
-physics.reco:          [ @sequence::ubxsec_mc_producers ]
+physics.reco:          [ @sequence::ubxsec_mc_producers , simcalibration, pid ]
+#Turn the line below on if the pandoraNucali objects from McRecoCali aren't present
+#physics.reco:          [ @sequence::ubxsec_mc_producers , @sequence::ubxsec_mc_filters, pidcalibration, simcalibration, pid ]
 physics.trigger_paths: [ reco ]
 physics.ana:           [ @sequence::ubxsec_mc_analyzers ]
 physics.stream1:       [ out1 ]
 physics.end_paths:     [ ana, stream1 ]
 
 outputs.out1.fileName: "%ifb_%tc_ubxsec.root"
-outputs.out1.dataTier: "reconstructed"
+outputs.out1.dataTier: "ubxsec"
 source.inputCommands: ["keep *_*_*_*"]
 
 
@@ -26,3 +28,17 @@ physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillStarts: 3.65
 physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillEnds:   5.25
 
 physics.producers.UBXSec.UseGENIEInfo:                   false
+
+#turn these on is you're running over files without pandoraNucali objects from McRecoCali
+#physics.producers.pidcalibration.TrackModuleLabel: "pandoraNu::UBXSec"
+#physics.producers.pidcalibration.CalorimetryModuleLabel: "pandoraNucalo::UBXSec"
+
+physics.producers.simcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_calib_simcalib
+###the line below is if the pandoraNucali objects from McRecoCali aren't present
+#physics.producers.simcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_UBXSec_uncalib_simcalib
+
+physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_simcalib
+physics.producers.pid.ProducerLabels.CalorimetryLabel: "simcalibration::UBXSec"
+#the line below is for running over UBXSec files where the pandoraNucali objects weren't present from McRecoCali
+#physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_UBXSec_simcalib
+physics.producers.pid.BraggAlgo: @local::braggalgo_mcc8_simcalib

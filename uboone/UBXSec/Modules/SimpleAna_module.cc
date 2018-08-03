@@ -1,3 +1,5 @@
+//This is a backup of the SimpleAna that has incoporated the Bragg Peak Particle ID
+//As far as I can tell, it doesn't work with the fcl file here: /build/kirby/cc1muNp_v06_26_01_13/testing_v06_26_01_13/run_ubxsec_data_bnbon_anaonly.fcl_dump.log
 ////////////////////////////////////////////////////////////////////////
 // Class:       SimpleAna
 // Plugin Type: analyzer (art v2_05_00)
@@ -138,6 +140,7 @@
 #include "lardataobj/AnalysisBase/CosmicTag.h"
 #include "lardataobj/AnalysisBase/FlashMatch.h"
 #include "lardataobj/AnalysisBase/BackTrackerMatchingData.h"
+#include "uboone/ParticleID/Algorithms/uB_PlaneIDBitsetHelperFunctions.h"
 
 // Root include
 #include "TString.h"
@@ -182,6 +185,7 @@ public:
  
   double GetEnergy(std::vector<art::Ptr<anab::Calorimetry>> calos);
   std::vector<double> GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
+  std::vector<double> GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
   std::vector<double> GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos);
 
 
@@ -352,12 +356,16 @@ private:
   std::vector<float> *track_pfp_trunmeandqdx_V;
 
   std::vector<float> *track_pfp_pida;
-  std::vector<float> *track_pfp_pida_bragg;
-  std::vector<float> *track_pfp_pida_bragg_fwd_proton;
-  std::vector<float> *track_pfp_pida_bragg_bwd_proton;
-  std::vector<float> *track_pfp_pida_bragg_fwd_mip;
+  std::vector<float> *track_pfp_newpid_pida;
+  std::vector<float> *track_pfp_chi2_proton;
+  std::vector<float> *track_pfp_bragg_ratio;
+  std::vector<float> *track_pfp_bragg_proton;
+  std::vector<float> *track_pfp_bragg_fwd_proton;
+  std::vector<float> *track_pfp_bragg_bwd_proton;
+  std::vector<float> *track_pfp_bragg_fwd_mip;
   std::vector<int> *track_pfp_nhits;
   std::vector<std::vector<double>> *track_pfp_dEdx;
+  std::vector<std::vector<double>> *track_pfp_dQdx;
   std::vector<std::vector<double>> *track_pfp_RR;
 
   float track_pfp_mom_mucand; 
@@ -443,8 +451,6 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _tpcobject_producer        = p.get<std::string>("TPCObjectProducer",  "TPCObjectMaker::UBXSec");
   _shower_producer           = p.get<std::string>("ShowerProducer",     "pandoraNu::UBXSec");
   _track_producer            = p.get<std::string>("TrackProducer",      "pandoraNu::UBXSec");
-
-  //This is the old school PIDa producer
   _particle_id_producer           = p.get<std::string>("ParticleIDProducer", "pandoraNupid::UBXSec");   
 
   //This is the new fangled particle ID from Adam and Kirsty - Kirby @ July 2, 2018
@@ -613,12 +619,16 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("track_pfp_trunmeandqdx_V", "std::vector<float>", &track_pfp_trunmeandqdx_V); 
 
   _cc1unptree->Branch("track_pfp_pida", "std::vector<float>", &track_pfp_pida);
-  _cc1unptree->Branch("track_pfp_pida_bragg", "std::vector<float>", &track_pfp_pida_bragg);
-  _cc1unptree->Branch("track_pfp_pida_bragg_fwd_proton", "std::vector<float>", &track_pfp_pida_bragg_fwd_proton);
-  _cc1unptree->Branch("track_pfp_pida_bragg_bwd_proton", "std::vector<float>", &track_pfp_pida_bragg_bwd_proton);
-  _cc1unptree->Branch("track_pfp_pida_bragg_fwd_mip", "std::vector<float>", &track_pfp_pida_bragg_fwd_mip);
+  _cc1unptree->Branch("track_pfp_newpid_pida", "std::vector<float>", &track_pfp_newpid_pida);
+  _cc1unptree->Branch("track_pfp_chi2_proton", "std::vector<float>", &track_pfp_chi2_proton);
+  _cc1unptree->Branch("track_pfp_bragg_ratio", "std::vector<float>", &track_pfp_bragg_ratio);
+  _cc1unptree->Branch("track_pfp_bragg_proton", "std::vector<float>", &track_pfp_bragg_proton);
+  _cc1unptree->Branch("track_pfp_bragg_fwd_proton", "std::vector<float>", &track_pfp_bragg_fwd_proton);
+  _cc1unptree->Branch("track_pfp_bragg_bwd_proton", "std::vector<float>", &track_pfp_bragg_bwd_proton);
+  _cc1unptree->Branch("track_pfp_bragg_fwd_mip", "std::vector<float>", &track_pfp_bragg_fwd_mip);
   _cc1unptree->Branch("track_pfp_nhits", "std::vector<int>", &track_pfp_nhits);
   _cc1unptree->Branch("track_pfp_dEdx", "std::vector<std::vector<double>>", &track_pfp_dEdx);
+  _cc1unptree->Branch("track_pfp_dQdx", "std::vector<std::vector<double>>", &track_pfp_dQdx);
   _cc1unptree->Branch("track_pfp_RR", "std::vector<std::vector<double>>", &track_pfp_RR);
 
  
@@ -791,12 +801,16 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   track_pfp_trunmeandqdx_V=new std::vector<float>;
  
   track_pfp_pida=new std::vector<float>; 
-  track_pfp_pida_bragg=new std::vector<float>; 
-  track_pfp_pida_bragg_fwd_proton=new std::vector<float>; 
-  track_pfp_pida_bragg_bwd_proton=new std::vector<float>; 
-  track_pfp_pida_bragg_fwd_mip=new std::vector<float>; 
+  track_pfp_newpid_pida=new std::vector<float>; 
+  track_pfp_chi2_proton=new std::vector<float>; 
+  track_pfp_bragg_ratio=new std::vector<float>; 
+  track_pfp_bragg_proton=new std::vector<float>; 
+  track_pfp_bragg_fwd_proton=new std::vector<float>; 
+  track_pfp_bragg_bwd_proton=new std::vector<float>; 
+  track_pfp_bragg_fwd_mip=new std::vector<float>; 
   track_pfp_nhits=new std::vector<int>;
   track_pfp_dEdx=new std::vector<std::vector<double>>;
+  track_pfp_dQdx=new std::vector<std::vector<double>>;
   track_pfp_RR=new std::vector<std::vector<double>>;
 
   track_pfp_mom_pcand=new std::vector<float>;
@@ -951,12 +965,16 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   delete track_pfp_trunmeandqdx_V;
  
   delete track_pfp_pida; 
-  delete track_pfp_pida_bragg; 
-  delete track_pfp_pida_bragg_fwd_proton; 
-  delete track_pfp_pida_bragg_bwd_proton; 
-  delete track_pfp_pida_bragg_fwd_mip; 
+  delete track_pfp_chi2_proton;
+  delete track_pfp_newpid_pida;
+  delete track_pfp_bragg_ratio; 
+  delete track_pfp_bragg_proton; 
+  delete track_pfp_bragg_fwd_proton; 
+  delete track_pfp_bragg_bwd_proton; 
+  delete track_pfp_bragg_fwd_mip; 
   delete track_pfp_nhits;
   delete track_pfp_dEdx;
+  delete track_pfp_dQdx;
   delete track_pfp_RR;
 
   delete track_pfp_mom_pcand;
@@ -1141,6 +1159,20 @@ double SimpleAna::GetEnergy(std::vector<art::Ptr<anab::Calorimetry>> calos) {
     }
     result = totE;
     std::cout << totE << std::endl;
+  }
+  return result;
+}
+
+std::vector<double> SimpleAna::GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> dQdx_v = c->dQdx(); 
+    return dQdx_v;
   }
   return result;
 }
@@ -1336,6 +1368,7 @@ void SimpleAna::analyze(art::Event const & e)
   std::cout << "[SimpleAna] Numeber of particleids_from_track " << particleids_from_track.size() << std::endl;
 
   //Get new ParticleID information - Kirby @ July 2, 2018
+  std::cout << "[SimpleAna] Getting Bragg Particle ID vector from this producer label: " << _particle_id_label_Bragg << std::endl;
   art::FindManyP<anab::ParticleID> particleids_Bragg_from_track(track_h, e, _particle_id_label_Bragg);
   if (!particleids_Bragg_from_track.isValid()) {
     std::cout << "[SimpleAna] anab::ParticleID_Bragg is not valid." << std::endl;
@@ -1358,9 +1391,10 @@ void SimpleAna::analyze(art::Event const & e)
 
 
   auto const& TrackToHits = *(e.getValidHandle<art::Assns<recob::Hit, recob::Track>>("pandoraNu::UBXSec"));
-  for (auto const& TrackAndHit: TrackToHits ) {
-    std::cout << "Hit: " << TrackAndHit.first << " -- Track: " << TrackAndHit.second << std::endl;
-  }
+  std::cout << "[SimpleAna] The TrackToHits size is " << TrackToHits.size() << std::endl;
+  //for (auto const& TrackAndHit: TrackToHits ) {
+    //std::cout << "Hit: " << TrackAndHit.first << " -- Track: " << TrackAndHit.second << std::endl;
+  //}
 
   art::FindManyP<recob::Hit> fmht (track_h, e, "pandoraNu::UBXSec");
   //art::FindMany<recob::Hit> fmh(track_h, e, "pandoraNu::UBXSec");
@@ -1384,9 +1418,10 @@ void SimpleAna::analyze(art::Event const & e)
     std::cout << "Assn '" << label << "'" << std::endl;
     try {
       auto const& HitToMCParticle = *(e.getValidHandle<art::Assns<recob::Hit, simb::MCParticle, anab::BackTrackerHitMatchingData>>(label));
-      for (auto const& HitAndMCParticle: HitToMCParticle ) {
-        std::cout << "Hit: " << HitAndMCParticle.first << " -- MCParticle: " << HitAndMCParticle.second << std::endl;
-      }
+      std::cout << "[SimpleAna] The HitToMCParticle size is " << HitToMCParticle.size() << std::endl;
+      //for (auto const& HitAndMCParticle: HitToMCParticle ) {
+        //std::cout << "Hit: " << HitAndMCParticle.first << " -- MCParticle: " << HitAndMCParticle.second << std::endl;
+      //}
     }
     catch(art::Exception const& e) {
       std::cout << " ==> not present" << std::endl;
@@ -1466,12 +1501,16 @@ void SimpleAna::analyze(art::Event const & e)
   track_pfp_trunmeandqdx_V->clear();
 
   track_pfp_pida->clear();
-  track_pfp_pida_bragg->clear();
-  track_pfp_pida_bragg_fwd_proton->clear(); 
-  track_pfp_pida_bragg_bwd_proton->clear(); 
-  track_pfp_pida_bragg_fwd_mip->clear(); 
+  track_pfp_chi2_proton->clear();
+  track_pfp_newpid_pida->clear();
+  track_pfp_bragg_ratio->clear();
+  track_pfp_bragg_proton->clear(); 
+  track_pfp_bragg_fwd_proton->clear(); 
+  track_pfp_bragg_bwd_proton->clear(); 
+  track_pfp_bragg_fwd_mip->clear(); 
   track_pfp_nhits->clear();
   track_pfp_dEdx->clear();
+  track_pfp_dQdx->clear();
   track_pfp_RR->clear();
 
   trkf::TrackMomentumCalculator trkm_pfp;
@@ -1538,104 +1577,127 @@ void SimpleAna::analyze(art::Event const & e)
     }//end of if isMC in pfp loopi
     //?????????????????//check this line???????????????????????????????????????
     std::vector<art::Ptr<recob::Track>> tracks_pfp=tracks_from_pfp.at(pfp.key());
-    std::cout<<"[SimpleAna] \t\t  n tracks assoc to this pfp: "<<tracks_pfp.size()<<std::endl;
-    //loop over all the tracks ass to this pfp
+    std::cout<<"[SimpleAna] Number of tracks assoc to this pfp: "<<tracks_pfp.size()<<std::endl;
+    //loop over all the tracks assoc to this pfp
     for(auto track_pfp : tracks_pfp){
         std::vector<art::Ptr<anab::ParticleID>> pids = particleids_from_track.at(track_pfp.key());
-        if(pids.size()==0) std::cout<<"[SimpleAna] \t\t Zero Particle ID  "<<std::endl;
-        if(pids.size()>1) std::cout<<"[SimpleAna] \t\t Particle ID Vector is bigger than 1. Only 1 saved.   "<<std::endl;
+        if(pids.size()==0) std::cout<<"[SimpleAna] Zero Particle ID  "<<std::endl;
+        if(pids.size()>1) std::cout<<"[SimpleAna] Particle ID Vector is " << pids.size() << ". Only plane 2 saved.   "<<std::endl;
         for(auto pid : pids){
-            if(!pid->PlaneID().isValid) continue;
-            int planenum=pid->PlaneID().Plane;
-            if(planenum<0 || planenum>2) continue;
-            /*if(mcpars[0]->PdgCode()==13){ 
-                _h_pida_muon->Fill(pid->PIDA());
+	  //std::cout << "[SimpleAna] The plane ID for pfp track key: " << track_pfp.key() << " is " << pid->PlaneID() << std::endl;
+	  //std::cout << "[SimpleAna] The plane ID for pfp track ID: " << track_pfp->ID() << " is " << pid->PlaneID() << std::endl;
+	  //std::cout << "[SimpleAna] The plane for pfp track key: " << track_pfp.key() << " is " << pid->PlaneID().Plane << std::endl;
+	  if(!pid->PlaneID().isValid) continue;
+	  int planenum=pid->PlaneID().Plane;
+	  if(planenum<0 || planenum>2) continue;
+	  /*if(mcpars[0]->PdgCode()==13){ 
+	    _h_pida_muon->Fill(pid->PIDA());
             } else if(mcpars[0]->PdgCode()==2212)
-                _h_pida_proton->Fill(pid->PIDA());
+	    _h_pida_proton->Fill(pid->PIDA());
             } 
-            */
-            if(planenum==2){
-            track_pfp_pida->push_back(pid->PIDA());
-            }
-        }
-
-	//std::cout << "[SimpleAna] Getting track-PID based on track_pfp key " << track_pfp.key() << "." << std::endl;
-	std::vector<art::Ptr<anab::ParticleID>> pids_Bragg = particleids_Bragg_from_track.at(track_pfp.key());
-	if (pids_Bragg.size()==0) std::cout << "[SimpleAna] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
-        if (pids_Bragg.size()>0) {
-	  std::cout<<"[SimpleAna] \t\t Particle ID Bragg Vector is bigger than 0. Will loop over " << pids_Bragg.size() << " particle IDs."<<std::endl;
-	  
-	  int planenum_Bragg = -1;	 
-	  if (pids_Bragg.at(0)->PlaneID().isValid) {
-	    planenum_Bragg = pids_Bragg.at(0)->PlaneID().Plane;
-	    std::cout << "[SimpleAna] The plane ID for track ID: " << track_pfp.key() << " is " << pids_Bragg.at(0)->PlaneID() << std::endl;
+	  */
+	  if(planenum==2){
+	    std::cout << "[SimpleAna] \t Getting track-PIDA based on track_pfp key " << track_pfp.key() << " the PIDA is: " << pid->PIDA() << "." << std::endl;
+	    track_pfp_pida->push_back(pid->PIDA());
 	  }
-	  if (planenum_Bragg==2) {
-	  
-	    float fwd_proton=-999.;
-	    float bwd_proton=-999.;
-	    float fwd_mip=0.; //mip assumption only has the forward direction option
-	    float final_value=-999.;
-	    
-	    //std::cout << "[SimpleAna] Here is the default PIDA value from pids_Bragg..." << pids_Bragg.at(0)->PIDA() << std::endl;
-	    //std::cout << "[SimpleAna] Trying to get the vector of ParticleIDAlgScores from the pids_Bragg object." << std::endl;
-	    std::vector<anab::sParticleIDAlgScores> AlgScoresVec = pids_Bragg.at(0)->ParticleIDAlgScores();
-	    //std::cout << "[SimpleAna] Have obtained the AlgScoresVec will now loop over the Algs." << std::endl;
-	    // Loop through AlgScoresVec and find the variables we want
-	    //This is a loop over all algorithms (pida, braggllh, etc) and all particle assumptions
-	    for ( size_t i_algscore=0; i_algscore<AlgScoresVec.size(); i_algscore++) {
-	      //std::cout << "[SimpleAna] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
-	      anab::sParticleIDAlgScores AlgScore = AlgScoresVec.at(i_algscore);
-	      //std::cout << "[SimpleAna] The PlaneID is " << AlgScore.fPlaneID.Plane << " for at index: " << i_algscore << std::endl;
-	      //std::cout << "[SimpleAna] The AlgName is " << AlgScore.fAlgName << " for at index: " << i_algscore << std::endl;
-	      //std::cout << "[SimpleAna] The AlgScore is " << AlgScore.fValue << " for at index: " << i_algscore << std::endl;
+	}
 
-	      if(AlgScore.fAlgName == "BraggPeakLLH"){
-	    	if(anab::kVariableType(AlgScore.fVariableType) == anab::kLikelihood_fwd){
-	    	  if(TMath::Abs(AlgScore.fAssumedPdg) == 2212) {
-	    	    std::cout << "[SimpleAna] Found the BraggPeakLLH Proton FWD likelihood and grabbing the AlgScore." << std::endl;
-	    	    fwd_proton=AlgScore.fValue;
+	//std::cout << "[SimpleAna] Getting track Bragg-pid based on track_pfp key " << track_pfp.key() << "." << std::endl;
+	std::vector<art::Ptr<anab::ParticleID>> pids_Bragg = particleids_Bragg_from_track.at(track_pfp.key());
+	//std::cout << "[SimpleAna] The size of the vector of ParticleID is " << pids_Bragg.size() << " taken from particleids_Bragg_from_track for track pfp key " << track_pfp.key() << std::endl;
+	if (pids_Bragg.size()==0) std::cout << "[SimpleAna] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
+        if (pids_Bragg.size()>0) { std::cout<<"[SimpleAna] Particle ID Bragg Vector is bigger than 0. Will loop over " << pids_Bragg.size() << " particle IDs."<<std::endl; }
+	for (auto pid : pids_Bragg ) {
+	  float newpid_pida=-999.;
+	  float chi2_proton=-999.;
+	  float llh_fwd_proton=-999.;
+	  float llh_bwd_proton=-999.;
+	  float llh_fwd_mip=-999.; //mip assumption only has the forward direction option
+	  float final_value=-999.;
+
+	  std::vector<anab::sParticleIDAlgScores> fAlgScoresVec = pid->ParticleIDAlgScores();
+	  //std::cout << "[SimpleAna] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
+	  for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
+	    //std::cout << "[SimpleAna] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
+	    anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
+	    //std::cout << "[SimpleAna] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
+	    //std::cout << "[SimpleAna] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
+	    //std::cout << "[SimpleAna] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
+	    //std::cout << "[SimpleAna] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
+	    //std::cout << "[SimpleAna] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
+	    //std::cout << "[SimpleAna] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	    
+	    if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
+
+	      if(fAlgScore.fAlgName == "Chi2"){
+	    	if((anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+	    	    std::cout << "[SimpleAna] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+	    	    chi2_proton=fAlgScore.fValue;
 	    	  }
 	    	}
-	    	if(anab::kVariableType(AlgScore.fVariableType) == anab::kLikelihood_bwd){
-	    	  if(TMath::Abs(AlgScore.fAssumedPdg) == 2212) {
-	    	    std::cout << "[SimpleAna] Found the BraggPeakLLH Proton BWD likelihood and grabbing the AlgScore." << std::endl;
-	    	    bwd_proton=AlgScore.fValue;
+	      }
+
+	      if(fAlgScore.fAlgName == "PIDA_median"){
+	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kPIDA) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		  std::cout << "[SimpleAna] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		  newpid_pida=fAlgScore.fValue;
+	    	}
+	      }
+
+	      if(fAlgScore.fAlgName == "BraggPeakLLH"){
+	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		    std::cout << "[SimpleAna] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+	    	    llh_fwd_proton=fAlgScore.fValue;
 	    	  }
 	    	}
-	    	if(anab::kVariableType(AlgScore.fVariableType) == anab::kLikelihood_fwd){
-	    	  if(TMath::Abs(AlgScore.fAssumedPdg) == 0) {
-	    	    std::cout << "[SimpleAna] Found the BraggPeakLLH MIP FWD likelihood and grabbing the AlgScore." << std::endl;
-	    	    fwd_mip=AlgScore.fValue;
+	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kBackward ) ){
+	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		    std::cout << "[SimpleAna] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+	    	    llh_bwd_proton=fAlgScore.fValue;
+	    	  }
+	    	}
+	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 0) {
+		    std::cout << "[SimpleAna] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+	    	    llh_fwd_mip=fAlgScore.fValue;
 	    	  }
 	    	}
 	      }
 	    }
-	    AlgScoresVec.clear();
+	  }
+	  fAlgScoresVec.clear();
+	  
 
-	    
-	    track_pfp_pida_bragg_fwd_proton->push_back(fwd_proton);
-	    track_pfp_pida_bragg_bwd_proton->push_back(bwd_proton);
-	    track_pfp_pida_bragg_fwd_mip->push_back(fwd_mip);
-
-	    if (fwd_proton>bwd_proton) {
-	      final_value=fwd_proton;
+	  track_pfp_chi2_proton->push_back(chi2_proton);
+	  track_pfp_newpid_pida->push_back(newpid_pida);
+	  track_pfp_bragg_fwd_proton->push_back(llh_fwd_proton);
+	  track_pfp_bragg_bwd_proton->push_back(llh_bwd_proton);
+	  track_pfp_bragg_proton->push_back(llh_fwd_proton>llh_bwd_proton ? llh_fwd_proton : llh_bwd_proton);
+	  track_pfp_bragg_fwd_mip->push_back(llh_fwd_mip);
+	  
+	  if (llh_fwd_proton>llh_bwd_proton) {
+	    final_value=llh_fwd_proton;
+	  } else {
+	    final_value=llh_bwd_proton;
+	  }
+	  if ((final_value!=-999.) and (llh_fwd_mip!=-999.)) {
+	    if (TMath::Abs(final_value)!=0.0) {
+	      std::cout << "[SimpleAna] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
+	      std::cout << "[SimpleAna] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
+	      track_pfp_bragg_ratio->push_back(TMath::Log(llh_fwd_mip/final_value)); 
 	    } else {
-	      final_value=bwd_proton;
+	      std::cout << "[SimpleAna] Crap, we're about to divide by zero ( max(BraggPeakLLH fwd|bwd)==0 ).... Do not do that!" << std::endl;
+	      std::cout << "[SimpleAna] Pushing back llh_fwd_mip value." << std::endl;
+	      std::cout << "[SimpleAna] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip) << std::endl;
+	      track_pfp_bragg_ratio->push_back(TMath::Log(llh_fwd_mip));
 	    }
-	    if (TMath::Abs(fwd_mip)!=0.0) {
-	      std::cout << "[SimpleAna] Making the ratio of max(BraggPeakLLH fwd|bwd)/(BraggPeakLLH MIP) " << std::endl;
-	      std::cout << "[SimpleAna] ParticleID Bragg final value is " << final_value/fwd_mip << std::endl;
-	      track_pfp_pida_bragg->push_back(TMath::Log(final_value/fwd_mip)); //Note that the ParticleID group is using the ratio of llh(mip)/llh(proton)
-	    } else {
-	      std::cout << "[SimpleAna] Crap, we're about to divide by zero.... Do not do that!" << std::endl;
-	      std::cout << "[SimpleAna] Pushing back max(BraggPeakLLH fwd|bwd)" << std::endl;
-	      std::cout << "[SimpleAna] ParticleID Bragg final value is " << final_value << std::endl;
-	      track_pfp_pida_bragg->push_back(TMath::Log(final_value));
-	    }
+	  } else {
+	    track_pfp_bragg_ratio->push_back(final_value);
 	  }
 	}
-
+	
         TVector3  trackPos_pfp=track_pfp->Vertex();
         TVector3  trackEnd_pfp=track_pfp->End();
         track_pfp_Id->push_back(track_pfp->ID());
@@ -1659,6 +1721,7 @@ void SimpleAna::analyze(art::Event const & e)
         track_pfp_trunmeandqdx_V->push_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));  
         track_pfp_upflag->push_back(_muon_finder.MIPConsistency(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp), track_pfp->Length()));
         track_pfp_dEdx->push_back(GetdEdx(calos_track_pfp));
+        track_pfp_dQdx->push_back(GetdQdx(calos_track_pfp));
         track_pfp_RR->push_back(GetRR(calos_track_pfp));
 
 

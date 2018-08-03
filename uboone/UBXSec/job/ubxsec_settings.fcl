@@ -2,6 +2,7 @@
 #include "ubflashcalib.fcl"
 #include "fiducial_volume_settings.fcl"
 #include "numucc_eventselection_settings.fcl"
+#include "mctruthmatching_uboone.fcl"
 
 BEGIN_PROLOG
 #
@@ -11,7 +12,7 @@ BEGIN_PROLOG
 UBXSec: {
   module_type:                  "UBXSec"
   PFParticleProducer:           "pandoraNu::UBXSec"
-  HitProducer:                  "pandoraCosmicHitRemoval::UBXSec"
+  HitProducer:                  "crHitRemovalTruthMatch::UBXSec" #"pandoraCosmicHitRemoval::UBXSec"
   GeantModule:                  "largeant"
   SpacePointProducer:           "pandoraNu::UBXSec"
   NeutrinoFlashMatchProducer:   "NeutrinoFlashMatch"

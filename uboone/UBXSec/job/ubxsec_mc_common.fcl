@@ -11,16 +11,14 @@
 #include "caldata_microboone.fcl" 
 #include "time_memory_tracker_microboone.fcl"
 #include "photpropservices_microboone.fcl"
+#include "config_particle_identification.fcl"
+#include "config_particle_identification_validation.fcl"
+#include "config_dedx_calibration.fcl"
 #include "calibration_microboone.fcl"
 #include "tpcneutrinoidfilter_microboone.fcl"
 
-#these three are included so that the new particle ID can be run - Kirby June 29, 2018
-
-#include "config_particle_identification.fcl"
-#include "config_particle_identification_validation.fcl"
-#include "config_simulation_calibration.fcl"
-
 #include "ubxsec_mc.fcl"
+
 
 process_name : UBXSec      #The process name must NOT contain any underscores
 
@@ -37,7 +35,7 @@ services:
   @table::microboone_simulation_services
   #BackTracker:             @local::microboone_backtracker
   SpaceCharge:             @local::microboone_spacecharge
-  @table::microboone_services_reco
+  TPCEnergyCalib: @local::microboone_tpcenergycalib_service
 }
 
 services.PmtGainService.PmtGainProvider.UseDB:                   false
@@ -84,7 +82,7 @@ physics:
    NuMuCCSelectionII: @local::microboone_tpcNeutrinoID  #CCPi0 Selection 
    Calorimetry: @local::microboone_calibrationdedx
    pidcalibration: @local::microboone_calibrationdedx
-   simcalibration: @local::simulation_calibration
+   dedxcalibration: @local::simulation_calibration
    pid: @local::particleidconfig
    #@table::ubxsec_acpt
  }
@@ -111,7 +109,7 @@ outputs:
  { 
    module_type: RootOutput
    fileName:    "%ifb_%tc_ubxsec.root"
-   dataTier:    "reconstructed"
+   dataTier:    "reco"
    compressionLevel: 1
    outputCommands: [
             "keep *_*_*_*"]

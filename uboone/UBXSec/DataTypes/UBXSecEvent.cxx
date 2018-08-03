@@ -49,19 +49,7 @@ void UBXSecEvent::Init()
   genie_mult_ch = _default_value;
   bnb_weight = _default_value;
   is_selected = false;
-  //================================================
-  ngenie_muons = _default_value;
-  ngenie_protons = _default_value;
-  ngenie_electrons = _default_value;
-  ngenie_pipms = _default_value;
-  ngenie_pion0s = _default_value;
-  ngenie_protons_200 = _default_value;
-  ngenie_protons_300 = _default_value;
-  ngenie_protons_400 = _default_value;
 
-
-
-  //===============================================
   mc_muon_contained = _default_value;
   is_swtriggered = _default_value;
   vtx_resolution = _default_value;

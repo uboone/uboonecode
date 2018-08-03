@@ -3,7 +3,6 @@
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "opticaldetectormodules_microboone.fcl"
 #include "correct_saturation.fcl"
-#include "calibration_microboone.fcl"
 
 #include "genie_eventweight_microboone_ubxsec.fcl"
 #include "flux_eventweight_microboone_ubxsec.fcl"
@@ -27,6 +26,10 @@
 #include "stoppingmuontagger.fcl"
 #include "candidateconsistency.fcl"
 
+#include "opticaldetectormodules_microboone.fcl"
+#include "ubflashfinder.fcl"
+#include "correct_saturation.fcl"
+
 #include "mcsfitproducer.fcl"
 
 #include "fiducial_volume_settings.fcl"
@@ -36,8 +39,7 @@
 
 #include "tpcneutrinoidfilter_microboone.fcl"
 
-#!include "mctrutht0matching.fcl"
-#include "mctruthmatching_uboone.fcl"
+#include "mctrutht0matching.fcl"
 
 BEGIN_PROLOG
 #
@@ -66,8 +68,6 @@ ubxsec_mc_reco:
 
   pandoraNucalo:                  @local::microboone_calomc
   pandoraNupid:                   @local::microboone_chi2pid
-  pandoraNucali:                  @local::microboone_calibrationdedx
-  pandoraNucalipid:               @local::microboone_chi2pid
 
   pandoraNuMCSMu:                 @local::mcsfitproducer
   pandoraNuMCSPi:                 @local::mcsfitproducer
@@ -104,11 +104,13 @@ ubxsec_mc_filter:
 
 ubxsec_mc_ana:
 {
-   SimpleAna:                      { module_type: SimpleAna 
-     MCTruthMatching:              @local::AssociationsTruthTool
-     FiducialVolumeSettings:       @local::UBXSecFiducialVolumeSettings
-     MuonCandidateFinderSettings:  @local::MuonCandidateFinder_mc
-     }
+   #SimpleAna:                      { module_type: SimpleAna }
+   SimpleAna:                      { module_type: SimpleAna
+        MCTruthMatching:              @local::AssociationsTruthTool
+        FiducialVolumeSettings:       @local::UBXSecFiducialVolumeSettings
+        MuonCandidateFinderSettings:  @local::MuonCandidateFinder_mc
+	ParticleIDProducer_Bragg:     "pid::UBXSec"
+   }
 
    CosmicTaggerAna :               @local::CosmicTaggerAna 
 }
@@ -119,8 +121,6 @@ ubxsec_mc_ana.SimpleAna.MCTruthMatching.AssnsProducerLabels: [
                "pandoraCosmicHitRemoval::UBXSec",
                "trajclusterTruthMatch"
             ]
- 
-
 
 ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        RecoTrueMatcherCosmic,
@@ -134,8 +134,6 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        #pandoraNuAll,
                        pandoraNucalo,
                        pandoraNupid,
-                       pandoraNucali,
-                       pandoraNucalipid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
                        RecoTrueMatcher, 
@@ -203,13 +201,6 @@ ubxsec_mc_reco.pandoraNucalo.FlipTrack_dQdx:                     false
 
 ubxsec_mc_reco.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo::UBXSec"
 ubxsec_mc_reco.pandoraNupid.TrackModuleLabel:                    "pandoraNu::UBXSec"
-
-ubxsec_mc_reco.pandoraNucali.TrackModuleLabel:                   "pandoraNu::UBXSec"
-ubxsec_mc_reco.pandoraNucali.CalorimetryModuleLabel:             "pandoraNucalo::UBXSec"
-
-ubxsec_mc_reco.pandoraNucalipid.CalorimetryModuleLabel:          "pandoraNucali::UBXSec"
-ubxsec_mc_reco.pandoraNucalipid.TrackModuleLabel:                "pandoraNu::UBXSec"
-ubxsec_mc_reco.pandoraNucalipid.Chi2PIDAlg.UseMedian:            true
 
 ubxsec_mc_reco.pandoraNuMCSMu.inputs.inputLabel:                 "pandoraNu::UBXSec"
 

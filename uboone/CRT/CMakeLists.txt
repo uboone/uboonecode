@@ -22,7 +22,6 @@ art_make( BASENAME_ONLY
 	TimeExtraction_module.cc
 	MergeTest_module.cc
 	CRTRawtoCRTHit_source.cc
-	CRTRawtoCRTHitGPScorr_source.cc
 	CRTAnalyser_module.cc	
     LIBRARY_NAME  
         CRTData
@@ -188,14 +187,6 @@ simple_plugin(MergeTest "module"
 simple_plugin(CRTRawtoCRTHit "source"
             CRT
 	  bernfebdaq-core_Overlays
-          art_Framework_Services_Optional
-          art_Framework_Services_Registry
-          art_Framework_Services_Optional_TFileService_service
-          ${ROOT_BASIC_LIB_LIST} )
-
-simple_plugin(CRTRawtoCRTHitGPScorr "source"
-            CRT
-          bernfebdaq-core_Overlays
           art_Framework_Services_Optional
           art_Framework_Services_Registry
           art_Framework_Services_Optional_TFileService_service

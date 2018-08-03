@@ -868,16 +868,6 @@ void UBXSec::produce(art::Event & e) {
 
       int n_genie_particles = 0;
       int n_genie_particles_charged = 0;
-
-      int n_genie_muons=0;
-      int n_genie_protons=0;
-      int n_genie_electrons=0;
-      int n_genie_pipms=0;
-      int n_genie_pion0s=0;
-      int n_genie_protons_200=0;
-      int n_genie_protons_300=0;
-      int n_genie_protons_400=0;
-
       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
         const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
         if (mc_par.StatusCode() != 1) continue;
@@ -886,15 +876,6 @@ void UBXSec::produce(art::Event & e) {
         if (!par_pdg) continue;
         if (par_pdg->Charge() == 0) continue;
         n_genie_particles_charged ++;
-
-        if(abs(mc_par.PdgCode())==13) {n_genie_muons=n_genie_muons+1;}
-        if(abs(mc_par.PdgCode())==211) {n_genie_pipms=n_genie_pipms+1;}
-        if(abs(mc_par.PdgCode())==111) {n_genie_pion0s=n_genie_pion0s+1;}
-        if(abs(mc_par.PdgCode())==11)  {n_genie_electrons=n_genie_electrons+1;}
-        if(abs(mc_par.PdgCode())==2212) {n_genie_protons=n_genie_protons+1;}
-        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.2){n_genie_protons_200=n_genie_protons_200+1;}
-        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.3){n_genie_protons_300=n_genie_protons_300+1;}
-        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.4){n_genie_protons_400=n_genie_protons_400+1;}
       }
 
       ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
@@ -914,16 +895,7 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->tvtx_y.emplace_back(mclist[n]->GetNeutrino().Nu().Vy());
         ubxsec_event->tvtx_z.emplace_back(mclist[n]->GetNeutrino().Nu().Vz());
       }
-      // count the number of different particles===================================================
-      ubxsec_event->ngenie_muons=n_genie_muons;
-      ubxsec_event->ngenie_pipms=n_genie_pipms;
-      ubxsec_event->ngenie_pion0s=n_genie_pion0s;
-      ubxsec_event->ngenie_electrons=n_genie_electrons;
-      ubxsec_event->ngenie_protons=n_genie_protons;
-      ubxsec_event->ngenie_protons_200=n_genie_protons_200;
-      ubxsec_event->ngenie_protons_300=n_genie_protons_300;
-      ubxsec_event->ngenie_protons_400=n_genie_protons_400;
-      //============================================================================================
+
       ubxsec_event->nsignal = 0;
       if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
 

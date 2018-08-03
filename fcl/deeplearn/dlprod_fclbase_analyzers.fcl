@@ -56,7 +56,7 @@ SuperaCCPi0Data.supera_params: "supera_basic_focused.fcl"
 SuperaCCPi0Data.CSVSuperaMetaMaker: "ccpi0_constraint.fcl"
 
 SuperaMCBasic: @local::SuperaWholeView
-SuperaMCBasic.supera_params: "supera_basic.fcl"
+SuperaMCBasic.supera_params: "supera_segment.fcl"
 
 SuperaMCTruthOnly: @local::SuperaWholeView
 SuperaMCTruthOnly.supera_params: "supera_mctruthonly.fcl"
@@ -84,7 +84,6 @@ dlprod_analyzers:
    superaMCLArFlow:   @local::SuperaMCLArFlow
    superaMCInstance:  @local::SuperaMCInstance
    superaMCFullSet:   @local::SuperaMCFullSet
-   superaMCBasic:     @local::SuperaMCBasic
    superaMCTruthOnly: @local::SuperaMCTruthOnly
 }
 

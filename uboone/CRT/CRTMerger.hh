@@ -31,7 +31,6 @@ namespace crt
 		 
 		// Producer tag of the CRT events
 		art::InputTag fTag;
-        	std::string fUBversion_CRTHits;
 		std::string Merged_Object;
 		
 		// Time window

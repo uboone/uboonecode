@@ -56,7 +56,6 @@
 #include "uboone/Utilities/TFileMetadataMicroBooNE.h"
 #include "uboone/Utilities/FileCatalogMetadataMicroBooNE.h"
 #include "art/Framework/Principal/SubRun.h"
-#include "larcoreobj/SummaryData/POTSummary.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/System/FileCatalogMetadata.h"
 #include "art/Utilities/OutputFileInfo.h"
@@ -90,7 +89,6 @@ util::TFileMetadataMicroBooNE::TFileMetadataMicroBooNE(fhicl::ParameterSet const
   reg.sPostEndJob.watch(this, &TFileMetadataMicroBooNE::postEndJob);
   reg.sPostProcessEvent.watch(this, &TFileMetadataMicroBooNE::postEvent);
   reg.sPostBeginSubRun.watch(this, &TFileMetadataMicroBooNE::postBeginSubRun);
-  reg.sPostEndSubRun.watch(this, &TFileMetadataMicroBooNE::postEndSubRun);
 }
 
 //--------------------------------------------------------------------
@@ -242,25 +240,6 @@ void util::TFileMetadataMicroBooNE::postBeginSubRun(art::SubRun const& sr)
   }
 }
 
-//--------------------------------------------------------------------  	
-// PostEndSubRun callback.
-void util::TFileMetadataMicroBooNE::postEndSubRun(art::SubRun const& sr)
-{
-
-  if(!fEnable) return;
- 
-  std::string fPOTModuleLabel= "generator";
-  art::Handle< sumdata::POTSummary > potListHandle;
-  double fTotPOT = 0;
-  if(sr.getByLabel(fPOTModuleLabel,potListHandle)){
-    fTotPOT+=potListHandle->totpot;
-  }
-
-  md.fTotPOT += fTotPOT;
-  
-}
-
-
 //--------------------------------------------------------------------
 // PostCloseFile callback.
 void util::TFileMetadataMicroBooNE::postEndJob()
@@ -315,7 +294,6 @@ void util::TFileMetadataMicroBooNE::postEndJob()
       jsonfile<<"\"first_event\": "<<md.ffirst_event<<",\n  ";
       jsonfile<<"\"group\": "<<md.fgroup<<",\n  ";
       jsonfile<<"\"last_event\": "<<md.flast_event<<",\n  ";
-      jsonfile<<"\"mc.pot\": "<<md.fTotPOT<<",\n  ";
       //if (md.fdataTier != "generated"){
       unsigned int c=0;
       jsonfile<<"\"parents\": [\n";

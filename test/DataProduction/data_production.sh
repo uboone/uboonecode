@@ -4,14 +4,6 @@
 
 env > env.txt
 
-# Exit if stash cache isn't mounted.
-
-UBOONE_EXAMPLE_DATA_DIR=/cvmfs/uboone.osgstorage.org/stash/uboone_example_data
-if [ ! -d $UBOONE_EXAMPLE_DATA_DIR ]; then
-  echo "Quittig because stash cache isn't available."
-  exit
-fi
-
 # This script runs the full mc+reco chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2016_3_14_9_22_21-0005432-00021_20160322T065603_ext_bnb_20160323T041757_merged.root
