@@ -19,11 +19,12 @@ namespace opdet {
     kFEMChannelNuMI = 47
   };
 
+  // These parameters depend on channel number only
   enum ChConfigType_t {
     kPedestalMean=0, // Pedestal mean in ADC count
     kPedestalSpread, // Pedestal standard deviation in ADC count
-    kQE,             // Quantum efficiency
     kPMTGain,        // p.e/photon
+    kQE,             // Quantum efficiency
     kSplitterGain,   // adc/p.e.
     kGainSpread,     // Spread in gain (in fraction)
     kT0,             // T0 in ns
@@ -34,6 +35,14 @@ namespace opdet {
     kDisc3Threshold, // Discriminator 3 threshold
     
     kChConfigTypeMax
+  };
+
+  // These parameters depend on both the channel number and the energy of the photon
+  enum ChSpectrumConfigType_t {
+    kEnergySpectrum=0, // The energy spectrum (to each value corresponds a QE value below)
+    kQESpec,           // Quantum efficiency
+
+    kChSpectrumConfigTypeMax
   };
   
 }

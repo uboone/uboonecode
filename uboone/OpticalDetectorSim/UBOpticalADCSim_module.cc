@@ -200,10 +200,13 @@ namespace opdet {
     //
     // Loop over opdets, and make waveforms for each readout channels. process photons, make, then store waveforms
     //
+    double ph_counter = 0.;
     for(unsigned int ipmt=0; ipmt<geom->NOpDets(); ipmt++) {
       
       // transfer the time of each hit (in opdet 'ch') into a vector<double>
       std::vector<double> photon_time;
+      std::vector<bool> photon_setinsd;
+      std::vector<float> photon_energy;
 
       for(auto const &pmt_index : pmt_indexes.at(ipmt)) {
 	
@@ -211,12 +214,27 @@ namespace opdet {
 	
 	photon_time.reserve(photon_time.size() + pmt_ptr->size());
 	
-	for(size_t photon_index=0; photon_index<pmt_ptr->size(); ++photon_index)
+	for(size_t photon_index=0; photon_index<pmt_ptr->size(); ++photon_index) {
 	  photon_time.push_back(pmt_ptr->at(photon_index).Time);
+          photon_setinsd.push_back(pmt_ptr->at(photon_index).SetInSD);
+          photon_energy.push_back(pmt_ptr->at(photon_index).Energy);
+
+          // Marco's Addition
+          double nuTime = 3911.87;
+          if (pmt_ptr->at(photon_index).Time > nuTime + 8000 ) continue;
+          if (pmt_ptr->at(photon_index).Time > nuTime - 100){ 
+            ph_counter += 1;
+          }
+          // Marco's Addition Ends
+        }
       }
       //std::cout<<"INPUT: pmt="<<ipmt<<" PE ="<<photon_time.size()<<std::endl;
       // send the hits over to the waveform generator
       fOpticalGen.SetPhotons(photon_time);
+
+      fOpticalGen.SetPhotonsStatus(photon_setinsd);
+
+      fOpticalGen.SetPhotonsEnergy(photon_energy);
       
       // generate dark noise hits
       fOpticalGen.GenDarkNoise(ipmt,fG4StartTime);
@@ -253,6 +271,8 @@ namespace opdet {
 	wfs->emplace_back( adc_wfm );
       }	
     } // loop over pmts
+
+    std::cout << "[UBOpticalADCSim] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   ph_counter is " << ph_counter << std::endl;
     
     // ================================================================================================================================
     //

@@ -48,6 +48,19 @@ namespace opdet {
 
     std::vector< unsigned int >  channel_list = pset.get<std::vector<unsigned int> >("ChannelList");
 
+    std::vector< float >                                 wavelength_spectrum;       // The photon energy discrete points
+    std::vector < std::vector < std::vector< float > > > tmp_spectrum_float_params; // The parameter values that correspond to the energies in wavelength_spectrum (also per channel)
+    tmp_spectrum_float_params.resize(kChSpectrumConfigTypeMax);
+    wavelength_spectrum = pset.get<std::vector <float> >("WavelengthSpectrum");
+    tmp_spectrum_float_params.at (kQESpec) = pset.get<std::vector< std::vector <float> > >("QESpec");
+    
+    //
+    std::cout << "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]" << std::endl;
+    std::cout << "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] wavelength_spectrum.size() " << wavelength_spectrum.size() << std::endl;
+    std::cout << "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] tmp_spectrum_float_params.at(kQESpec).size()       " << tmp_spectrum_float_params.at(kQESpec).size() << std::endl;
+    std::cout << "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] tmp_spectrum_float_params.at(kQESpec).at(0).size() " << tmp_spectrum_float_params.at(kQESpec).at(0).size() << std::endl;
+    std::cout << "[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]" << std::endl;
+
     // ------------------------------------------------------------------------------------------------------
     // sanity check: number of readout channels in geo service matches number of channels in parameters
     unsigned int nchannel_values = channel_list.size();
@@ -65,7 +78,19 @@ namespace opdet {
 				      nchannel_values));
       }
     }
-    
+
+   for(size_t i=1; i<kChSpectrumConfigTypeMax; ++i) {
+
+      size_t nchannel_input = tmp_spectrum_float_params.at(i).size();
+
+      if(nchannel_input != nchannel_values)  {
+        throw UBOpticalException(Form("ChConfigType_t enum=%zu # values (%zu) != # channels (%d)!",
+                                      i,
+                                      nchannel_input,
+                                      nchannel_values));
+      }
+    } 
+
     // ------------------------------------------------------------------------------------------------------
     
     // Correct QE by prescaling set in LArProperties
@@ -125,9 +150,21 @@ namespace opdet {
 	}
       }
     }
-    
-  }
   
+
+    fSpectrum = wavelength_spectrum;
+    for (size_t i = 1; i < kChSpectrumConfigTypeMax; ++i) {
+      if(tmp_spectrum_float_params[i].size()) {
+        int nch = 0;
+        for ( auto channel : channel_list ) {
+          fSpectrumFloatParams[ (ChSpectrumConfigType_t)i ][ channel ] = tmp_spectrum_float_params[ i ][ nch ];
+          ++nch;
+        }
+      }
+    }
+
+
+  }
   
   DEFINE_ART_SERVICE(UBOpticalChConfig)
   
