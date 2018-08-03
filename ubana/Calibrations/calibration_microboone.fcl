@@ -32,4 +32,7 @@ microboone_calibrationdedx :
     CaloAlg:                 @local::microboone_calorimetryalgmcc84mc
 }
 
+microboone_calibrationdedx_data :        @local::microboone_calibrationdedx
+microboone_calibrationdedx_data.CaloAlg: @local::microboone_calorimetryalgmcc84data
+
 END_PROLOG
