@@ -50,8 +50,10 @@
 #include <typeinfo>
 
 const int kMaxCRThits = 1000;
+const int kMaxCRTtzeros = 1000;
 const int kMaxCRTtracks = 1000;
 const int kMaxTPCtracks = 100;
+const int kMaxPMTflashes = 100;
 
 
  // namespace crt {
@@ -89,17 +91,15 @@ private:
   uint32_t fsubRunNum;             //Subrun Number taken from event         
   std::string  fTrackModuleLabel;
   bool fSaveTPCTrackInfo;
-  std::string  data_labeltrack_;
-  std::string  data_labelhit_;
-  std::string  data_label_flash_;
-  std::string  data_label_DAQHeader_;
+  bool fSavePMTFlashInfo;
+  std::string data_labeltrack_;
+  std::string data_labeltzero_;
+  std::string data_labelhit_;
+  std::string data_label_flash_;
+  std::string data_label_DAQHeader_;
   int fHardDelay_;
   int verbose_;
   
-
-
-  //art::InputTag opFlashTag("opflashSat");
-
 
   //quality plots
 
@@ -125,7 +125,10 @@ private:
   int run;
   int subrun;
   int event;
-  double evttime;
+  double evttime_sec;
+  double evttime_nsec;
+  double evttime_GPS_sec;
+  double evttime_GPS_nsec;
   // CRT hits
   int nCRThits;
   int hit_plane[kMaxCRThits];
@@ -136,6 +139,11 @@ private:
   double hit_posx[kMaxCRThits];
   double hit_posy[kMaxCRThits];
   double hit_posz[kMaxCRThits]; 
+  // CRT tzeros
+  int nCRTtzeros;
+  double tz_time_s[kMaxCRTtzeros];
+  double tz_time0[kMaxCRTtzeros];
+  double tz_time1[kMaxCRTtzeros];
   // CRT tracks
   int nCRTtracks;
   double ct_theta[kMaxCRTtracks];
@@ -167,7 +175,14 @@ private:
   double trktheta[kMaxTPCtracks];
   double trkphi[kMaxTPCtracks];
   double trklen[kMaxTPCtracks];
-  
+  //  Flash information 
+  int nPMTflash;
+  double Yflash[kMaxPMTflashes];
+  double Zflash[kMaxPMTflashes];
+  double PEflash[kMaxPMTflashes];
+  double Timeflash[kMaxPMTflashes];
+  double fbeam[kMaxPMTflashes];
+
 };
 
 
@@ -175,11 +190,13 @@ TrackDump::TrackDump(fhicl::ParameterSet const & p)
   : EDAnalyzer(p),
     fTrackModuleLabel(p.get<std::string>("TrackModuleLabel")),
     fSaveTPCTrackInfo(p.get< bool >("SaveTPCTrackInfo", false)), 
+    fSavePMTFlashInfo(p.get< bool >("SavePMTFlashInfo", false)), 
     data_labeltrack_(p.get<std::string>("data_labeltrack")),
+    data_labeltzero_(p.get<std::string>("data_labeltzero")),
     data_labelhit_(p.get<std::string>("data_labelhit")),
     data_label_flash_(p.get<std::string>("data_label_flash_")),
     data_label_DAQHeader_(p.get<std::string>("data_label_DAQHeader_")),
-    fHardDelay_(p.get<int>("fHardDelay",40000)),
+    fHardDelay_(p.get<int>("fHardDelay",40000)), // 40 us
     verbose_(p.get<int>("verbose"))
     // More initializers here.    
 {
@@ -199,7 +216,6 @@ void TrackDump::analyze(art::Event const & evt)
   auto evt_time_nsec = evtTime.timeLow();
 
    //get DAQ Header                                                                  
-  //Commentar para old swizzler, sin DAQ Header
   art::Handle< raw::DAQHeaderTimeUBooNE > rawHandle_DAQHeader;  
   evt.getByLabel(data_label_DAQHeader_, rawHandle_DAQHeader);
   
@@ -221,7 +237,12 @@ void TrackDump::analyze(art::Event const & evt)
   double evt_timeNTP_sec = evtTimeNTP.timeHigh();
   double evt_timeNTP_nsec = (double)evtTimeNTP.timeLow();
   double timstp_diff = std::abs(evt_timeGPS_nsec - evt_timeNTP_nsec);
-  
+  //fill tree variables
+  evttime_sec=evt_time_sec;
+  evttime_nsec=evt_time_nsec;
+  evttime_GPS_sec=evt_timeGPS_sec;
+  evttime_GPS_nsec=evt_timeGPS_nsec;
+
   if(verbose_==1){
     std::cout<< "Run:  "<<frunNum << "   subRun: " <<fsubRunNum<<std::endl;
     std::cout<<"event: "<<fEvtNum <<std::endl;
@@ -239,7 +260,33 @@ void TrackDump::analyze(art::Event const & evt)
     if( (evt_time_sec==evt_timeNTP_sec) && (evt_time_nsec==evt_timeNTP_nsec))  std::cout<<" Event time type is: NTP  "<<std::endl;
     //getchar();
   }  
-  
+    
+
+  if (fSavePMTFlashInfo) {
+
+    //get Optical Flash
+    art::Handle< std::vector<recob::OpFlash> > rawHandle_OpFlash;
+    evt.getByLabel(data_label_flash_, rawHandle_OpFlash);
+    
+    std::vector<recob::OpFlash> const& OpFlashCollection(*rawHandle_OpFlash);
+    
+    if(verbose_==1){ 
+      std::cout<<"  OpFlashCollection.size()  "<<OpFlashCollection.size()<<std::endl; 
+    }
+    
+    nPMTflash=OpFlashCollection.size();
+    if (nPMTflash>kMaxPMTflashes) nPMTflash=kMaxPMTflashes;
+    for(int i = 0; i< nPMTflash; i++) {
+      
+      recob::OpFlash my_OpFlash = OpFlashCollection[i];      
+      Yflash[i]=my_OpFlash.YCenter();
+      Zflash[i]=my_OpFlash.ZCenter();
+      PEflash[i]=my_OpFlash.TotalPE();
+      Timeflash[i]=my_OpFlash.Time(); //in us from trigger time
+      fbeam[i]=my_OpFlash.OnBeamTime();
+    }
+    
+  }
 
   if (fSaveTPCTrackInfo) {
 
@@ -337,7 +384,7 @@ void TrackDump::analyze(art::Event const & evt)
     crt::CRTHit my_CRTHit = CRTHitCollection[j];
     hit_time_s[j]=(double)my_CRTHit.ts0_s;
     hit_time0[j]=(double)my_CRTHit.ts0_ns - (double)evt_timeGPS_nsec;
-    hit_time1[j]=(double)my_CRTHit.ts1_ns + (double)fHardDelay_;  //  + 40000 for hardware offset;
+    hit_time1[j]=(double)my_CRTHit.ts1_ns + (double)fHardDelay_;  
     hit_charge[j]=my_CRTHit.peshit;
     hit_plane[j]=my_CRTHit.plane;
     hit_posx[j]=my_CRTHit.x_pos;
@@ -388,10 +435,10 @@ void TrackDump::analyze(art::Event const & evt)
     else { ct_theta[j]=thetatemp;     ct_phi[j]=phitemp;}
     ct_length[j]=my_CRTTrack.length;
     ct_time_sec[j]=(double)my_CRTTrack.ts0_s;
-    ct_time0[j]=(double)my_CRTTrack.ts0_ns;
-    ct_time1[j]=(double)my_CRTTrack.ts1_ns;
-    // ct_time0[j]=(double)my_CRTTrack.ts0_ns - (double)evt_timeGPS_nsec;
-    // ct_time1[j]=(double)my_CRTTrack.ts1_ns + (double)fHardDelay_;    + 40000 for hardware offset;;
+    // ct_time0[j]=(double)my_CRTTrack.ts0_ns;
+    // ct_time1[j]=(double)my_CRTTrack.ts1_ns;
+    ct_time0[j]=(double)my_CRTTrack.ts0_ns - (double)evt_timeGPS_nsec;
+    ct_time1[j]=(double)my_CRTTrack.ts1_ns + (double)fHardDelay_;
     // std::cout << my_CRTTrack.ts0_ns << " " << ct_time0[j] << std::endl;
     // std::cout << my_CRTTrack.ts1_ns << " " << ct_time1[j] << std::endl;
     ct_x1[j]=my_CRTTrack.x1_pos;
@@ -433,7 +480,16 @@ void TrackDump::beginJob()
   fTree->Branch("run",&run,"run/I");
   fTree->Branch("subrun",&subrun,"subrun/I");
   fTree->Branch("event",&event,"event/I");
-  fTree->Branch("evttime",&evttime,"evttime/D");
+  fTree->Branch("evttime_sec",&evttime_sec,"evttime_sec/D");
+  fTree->Branch("evttime_nsec",&evttime_nsec,"evttime_nsec/D");
+  fTree->Branch("evttime_GPS_sec",&evttime_GPS_sec,"evttime_GPS_sec/D");
+  fTree->Branch("evttime_GPS_nsec",&evttime_GPS_nsec,"evttime_GPS_nsec/D");
+  //
+  fTree->Branch("nCRTtzeros",&nCRTtzeros,"nCRTtzeros/I");
+  fTree->Branch("tz_time_s",tz_time_s,"tz_time_s[nCRTtzeros]/D");
+  fTree->Branch("tz_time0",tz_time0,"tz_time0[nCRTtzeros]/D");
+  fTree->Branch("tz_time1",tz_time1,"tz_time1[nCRTtzeros]/D");
+  //
   fTree->Branch("nCRThits",&nCRThits,"nCRThits/I");
   fTree->Branch("hit_plane",hit_plane,"hit_plane[nCRThits]/I");
   fTree->Branch("hit_time_s",hit_time_s,"hit_time_s[nCRThits]/D");
@@ -475,6 +531,15 @@ void TrackDump::beginJob()
   fTree->Branch("trktheta",trktheta,"trktheta[nTPCtracks]/D");
   fTree->Branch("trkphi",trkphi,"trkphi[nTPCtracks]/D");
   fTree->Branch("trklen",trklen,"trklen[nTPCtracks]/D");
+  }
+  //PMT flashes
+  if (fSavePMTFlashInfo) {
+  fTree->Branch("nPMTflash",&nPMTflash,"nPMTflash/I");
+  fTree->Branch("Yflash",Yflash,"Yflash[nPMTflash]/D");
+  fTree->Branch("Zflash",Zflash,"Zflash[nPMTflash]/D");
+  fTree->Branch("PEflash",PEflash,"PEflash[nPMTflash]/D");
+  fTree->Branch("Timeflash",Timeflash,"Timeflash[nPMTflash]/D");
+  fTree->Branch("fbeam",fbeam,"fbeam[nPMTflash]/D");
   }
 
 
@@ -571,7 +636,10 @@ void TrackDump::ResetVars()
   run = -99999;
   subrun = -99999;
   event = -99999;
-  evttime = -99999;
+  evttime_sec = -99999;
+  evttime_nsec = -99999;
+  evttime_GPS_sec = -99999;
+  evttime_GPS_nsec = -99999;
   nCRThits = 0;
   for (int i = 0; i<kMaxCRThits; ++i){
     hit_plane[i] = -999;
@@ -582,6 +650,13 @@ void TrackDump::ResetVars()
     hit_posx[i] = -99999.;
     hit_posy[i] = -99999.;
     hit_posz[i] = -99999.;
+  }
+
+  nCRTtzeros = 0;
+  for (int i = 0; i<kMaxCRTtzeros; ++i){
+    tz_time_s[i] = -99999.;
+    tz_time0[i] = -99999.;
+    tz_time1[i] = -99999.;
   }
 
 
@@ -602,25 +677,38 @@ void TrackDump::ResetVars()
   }
 
   if (fSaveTPCTrackInfo) {
-  nTPCtracks=0;
-  for (int i = 0; i<kMaxTPCtracks; ++i){
-    trkstartx[i]=-9999.;
-    trkstarty[i]=-9999.;
-    trkstartz[i]=-9999.;
-    trkendx[i]=-9999.;
-    trkendy[i]=-9999.;
-    trkendz[i]=-9999.;
-    trkstartdcosx[i]=-9999.;
-    trkstartdcosy[i]=-9999.;
-    trkstartdcosz[i]=-9999.;
-    trkenddcosx[i]=-9999.;
-    trkenddcosy[i]=-9999.;
-    trkenddcosz[i]=-9999.;
-    trktheta[i]=-9999.;
-    trkphi[i]=-9999.;
-    trklen[i]=-9999.;
+    nTPCtracks=0;
+    for (int i = 0; i<kMaxTPCtracks; ++i){
+      trkstartx[i]=-9999.;
+      trkstarty[i]=-9999.;
+      trkstartz[i]=-9999.;
+      trkendx[i]=-9999.;
+      trkendy[i]=-9999.;
+      trkendz[i]=-9999.;
+      trkstartdcosx[i]=-9999.;
+      trkstartdcosy[i]=-9999.;
+      trkstartdcosz[i]=-9999.;
+      trkenddcosx[i]=-9999.;
+      trkenddcosy[i]=-9999.;
+      trkenddcosz[i]=-9999.;
+      trktheta[i]=-9999.;
+      trkphi[i]=-9999.;
+      trklen[i]=-9999.;
+    }
   }
-}
+  
+  if (fSavePMTFlashInfo) {
+    
+    nPMTflash=0;
+    for (int i = 0; i<kMaxPMTflashes; ++i){
+      Yflash[i]=-9999.;
+      Zflash[i]=-9999.;
+      PEflash[i]=-9999.;
+      Timeflash[i]=-9999.;
+      fbeam[i]=-9999.;
+    }
+  }
+
 
 }
 DEFINE_ART_MODULE(TrackDump)
