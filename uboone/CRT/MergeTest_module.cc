@@ -142,7 +142,7 @@ crt::MergeTest::MergeTest(fhicl::ParameterSet const & p)
     data_labelhit_(p.get<std::string>("data_labelhit")),
     data_label_flash_(p.get<std::string>("data_label_flash_")),
     data_label_DAQHeader_(p.get<std::string>("data_label_DAQHeader_")),
-    fHardDelay_(p.get<int>("fHardDelay",40000)),
+    fHardDelay_(p.get<int>("fHardDelay",40000)),  // consider 44480 instead for BNB data
     verbose_(p.get<int>("verbose"))
     // More initializers here.
 {
