@@ -2,7 +2,7 @@
 
 # The *parent* line must the first non-commented line and defines this product and version
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
-parent uboonecode v06_84_00
+parent uboonecode v07_00_01
 
 defaultqual e15
 
@@ -30,14 +30,14 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v06_84_00
-ubcv                    v06_84_00
-ubcrt                   v06_84_00
-ublite			v06_84_00
-ubutil                  v06_84_00
+larsoft                 v07_00_01
+ubcv                    v07_00_01
+ubcrt                   v07_00_01
+ublite			v07_00_01
+ubutil                  v07_00_01
 uboonedata              v01_18_11
 genie_xsec              v2_12_10
-cetbuildtools	        v7_03_03	-	only_for_build
+cetbuildtools	        v7_04_00	-	only_for_build
 end_product_list
 
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec     
@@ -49,6 +49,10 @@ e15:debug      e15:debug      e15:debug      e15:debug      e15:debug      e15:d
 e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        e15:opt        -nq-           DefaultPlusMECWithNC
 e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           DefaultPlusMECWithNC
 e15:prof:fg    e15:prof       e15:prof       e15:prof       e15:prof       e15:prof       -nq-           LocalFGNievesQEAndMEC
+e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           DefaultPlusMECWithNC
+e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           DefaultPlusMECWithNC
+e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           DefaultPlusMECWithNC
+e17:prof:fg    e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           LocalFGNievesQEAndMEC
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
