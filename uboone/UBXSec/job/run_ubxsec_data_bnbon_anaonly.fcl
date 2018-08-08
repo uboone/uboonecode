@@ -4,8 +4,8 @@ process_name: UBXSecAnaOnly
 
 services.TFileService.fileName: "ubxsec_output_data_bnbon.root"
 
-#physics.reco:          [ @sequence::ubxsec_data_producers_anaonly, pidcalibration, dedxcalibration, pid ]
-physics.reco:          [ pidcalibration, dedxcalibration, pid ]
+physics.reco:          [ @sequence::ubxsec_data_producers_anaonly, pidcalibration, dedxcalibration, pid ]
+#physics.reco:          [ pidcalibration, dedxcalibration, pid ]
 physics.trigger_paths: [ reco ]
 physics.ana:           [ @sequence::ubxsec_data_analyzers ]
 physics.stream1:       [ out1 ]
@@ -37,10 +37,9 @@ physics.producers.pidcalibration.CalorimetryModuleLabel: "pandoraNucalo::UBXSec"
 
 physics.producers.dedxcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_UBXSec_uncalib_dedxcalib_data
 physics.producers.dedxcalibration.IsSimulationSmearing: false
+physics.producers.dedxcalibration.ProducerLabels.CalorimetryLabel: "pidcalibration::UBXSecAnaOnly"
 
 physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_UBXSec_dedxcalib_data
 physics.producers.pid.BraggAlgo: @local::braggalgo_mcc8_data
-
-physics.producers.dedxcalibration.ProducerLabels.CalorimetryLabel: "pidcalibration::UBXSecAnaOnly"
 physics.producers.pid.ProducerLabels.CalorimetryLabel: "dedxcalibration::UBXSecAnaOnly"
 

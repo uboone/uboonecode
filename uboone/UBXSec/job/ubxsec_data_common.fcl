@@ -85,7 +85,7 @@ physics:
    @table::ubxsec_data_reco
    @table::ubxsec_data_flashmatch
    pidcalibration: @local::microboone_calibrationdedx
-   dedxcalibration: @local::simulation_calibration
+   dedxcalibration: @local::data_newboxrecomb
    pid: @local::particleidconfig
 
  }
