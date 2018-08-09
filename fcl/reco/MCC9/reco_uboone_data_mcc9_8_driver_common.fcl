@@ -1,7 +1,7 @@
 ## 
 ##  Shared art job configuartions for MCC9 uboone reco
 ##
-#include "reco_uboone_data_mcc9.fcl"
+#include "reco_uboone_data_mcc9_8.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
 services:
