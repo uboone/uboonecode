@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_driver_common.fcl"
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
 process_name: DataRecoStage2
 
