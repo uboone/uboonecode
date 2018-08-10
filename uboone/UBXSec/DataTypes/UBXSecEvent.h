@@ -130,7 +130,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<bool>     slc_muoncandidate_exists; ///< Is true if we found a muon candidate for the TPCObject
   vector<double>   slc_muoncandidate_length; ///< Track length for the muon candidate in the TPCObject
   vector<double>   slc_muoncandidate_phi; ///< Phi angle for the muon candidate in the TPCObject
-  vector<double>   slc_muoncandidate_theta; ///< Cos(theta) for the muon candidate in the TPCObject
+  vector<double>   slc_muoncandidate_theta; ///< Theta angle for the muon candidate in the TPCObject
   vector<double>   slc_muoncandidate_mom_range; ///< Momentum (by range) of the muon candidate in the TPCObject
   vector<double>   slc_muoncandidate_mom_mcs; ///< Momentum (by MCS) of the muon candidate in the TPCObject
   vector<double>   slc_muoncandidate_mom_mcs_pi; ///<  Momentum (by MCS) of the muon candidate in the TPCObject (using pion hypo)
