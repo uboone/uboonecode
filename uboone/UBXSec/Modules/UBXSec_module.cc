@@ -2027,7 +2027,7 @@ void UBXSec::produce(art::Event & e) {
 
   _event_selection.SetEvent(ubxsec_event);
 
-  size_t slice_index;
+  int slice_index;
   std::string reason = "no_failure";
   std::map<std::string,bool> failure_map;
   bool is_selected = _event_selection.IsSelected(slice_index, failure_map);
@@ -2059,6 +2059,7 @@ void UBXSec::produce(art::Event & e) {
     selection_result.SetSelectionStatus(false);
 
     ubxsec_event->is_selected = false;
+    ubxsec_event->selected_slice = -1;
 
     selectionResultVector->emplace_back(std::move(selection_result));
     //util::CreateAssn(*this, e, *selectionResultVector, tpcobj_v, *assnOutSelectionResultTPCObject);
