@@ -61,7 +61,38 @@ class UBXSecEvent /*: public TObject*/{
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
+  //=======================================================================
+  Int_t ngenie_muons;
+  Int_t ngenie_protons;
+  Int_t ngenie_electrons;
+  Int_t ngenie_pipms;
+  Int_t ngenie_pion0s;
+  Int_t ngenie_protons_200;
+  Int_t ngenie_protons_300;
+  Int_t ngenie_protons_400;
+  vector<double> genie_mcpar_pdgcode;
+  vector<double> genie_mcpar_energy;
+  vector<double> genie_mcpar_px;
+  vector<double> genie_mcpar_py;
+  vector<double> genie_mcpar_pz;
+  vector<double> genie_mcpar_startx;
+  vector<double> genie_mcpar_starty;
+  vector<double> genie_mcpar_startz;
+  double genie_mcpar_W;
+  double genie_mcpar_QSqr;
+  //vector<double> genie_mcpar_end_pos;
 
+  vector<double> geant_mcpar_pdgcode;
+  vector<double> geant_mcpar_energy;
+  vector<double> geant_mcpar_px;
+  vector<double> geant_mcpar_py;
+  vector<double> geant_mcpar_pz;
+  vector<double> geant_mcpar_startx;
+  vector<double> geant_mcpar_starty;
+  vector<double> geant_mcpar_startz;
+  vector<std::string> geant_mcpar_end_process;
+
+  //========================================================================
   Int_t           mc_muon_contained; ///< Is 1 if the true mc muon is fully contained
   Int_t           is_swtriggered; ///< Is true if the event passed the software trigger
   Double_t        vtx_resolution; ///< Stores the vertex resolution

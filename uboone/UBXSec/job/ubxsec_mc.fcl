@@ -133,6 +133,7 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        pandoraNu,
                        #pandoraNuAll,
                        pandoraNucalo,
+		       pidcalibration,
                        pandoraNupid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
@@ -199,7 +200,9 @@ ubxsec_mc_reco.pandoraNucalo.SpacePointModuleLabel:              "pandoraNu::UBX
 ubxsec_mc_reco.pandoraNucalo.Flip_dQdx:                          false
 ubxsec_mc_reco.pandoraNucalo.FlipTrack_dQdx:                     false
 
-ubxsec_mc_reco.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo::UBXSec"
+#ubxsec_mc_reco.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo::UBXSec"
+#This is implemented because the pidcalibration is run in between the two...
+ubxsec_mc_reco.pandoraNupid.CalorimetryModuleLabel:              "pidcalibration::UBXSec"
 ubxsec_mc_reco.pandoraNupid.TrackModuleLabel:                    "pandoraNu::UBXSec"
 
 ubxsec_mc_reco.pandoraNuMCSMu.inputs.inputLabel:                 "pandoraNu::UBXSec"

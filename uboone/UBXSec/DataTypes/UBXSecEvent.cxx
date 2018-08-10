@@ -49,7 +49,37 @@ void UBXSecEvent::Init()
   genie_mult_ch = _default_value;
   bnb_weight = _default_value;
   is_selected = false;
+  //================================================
+  ngenie_muons = _default_value;
+  ngenie_protons = _default_value;
+  ngenie_electrons = _default_value;
+  ngenie_pipms = _default_value;
+  ngenie_pion0s = _default_value;
+  ngenie_protons_200 = _default_value;
+  ngenie_protons_300 = _default_value;
+  ngenie_protons_400 = _default_value;
+  genie_mcpar_W = _default_value;
+  genie_mcpar_QSqr = _default_value;
+  genie_mcpar_pdgcode.resize(0,_default_value);
+  genie_mcpar_energy.resize(0,_default_value);
+  genie_mcpar_px.resize(0,_default_value);
+  genie_mcpar_py.resize(0,_default_value);
+  genie_mcpar_pz.resize(0,_default_value);
+  genie_mcpar_startx.resize(0,_default_value);
+  genie_mcpar_starty.resize(0,_default_value);
+  genie_mcpar_startz.resize(0,_default_value);
 
+  geant_mcpar_pdgcode.resize(0,_default_value);
+  geant_mcpar_energy.resize(0,_default_value);
+  geant_mcpar_px.resize(0,_default_value);
+  geant_mcpar_py.resize(0,_default_value);
+  geant_mcpar_pz.resize(0,_default_value);
+  geant_mcpar_startx.resize(0,_default_value);
+  geant_mcpar_starty.resize(0,_default_value);
+  geant_mcpar_startz.resize(0,_default_value);  
+  geant_mcpar_end_process.resize(0,std::string(""));  
+
+  //===============================================
   mc_muon_contained = _default_value;
   is_swtriggered = _default_value;
   vtx_resolution = _default_value;

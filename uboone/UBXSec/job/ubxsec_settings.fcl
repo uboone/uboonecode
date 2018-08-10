@@ -28,7 +28,9 @@ UBXSec: {
   CandidateConsistencyProducer: "CandidateConsistency"
   MCSFitResultMuProducer:       "pandoraNuMCSMu"
   MCSFitResultPiProducer:       "pandoraNuMCSPi"
-  CalorimetryProducer:          "pandoraNucalo"
+#  CalorimetryProducer:          "pandoraNucalo"
+# use the line below when running on v13 samples that don't have the pandoraNucali objects
+  CalorimetryProducer:	  	"pidcalibration::UBXSec"
   EventWeightProducer:          "eventweight"
   GenieEventWeightPMOneProducer: "genieeventweightpm1::UBXSec"
   GenieEventWeightMultisimProducer: "genieeventweightmultisim::UBXSec"

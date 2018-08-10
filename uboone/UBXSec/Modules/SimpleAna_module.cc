@@ -454,14 +454,19 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _particle_id_producer           = p.get<std::string>("ParticleIDProducer", "pandoraNupid::UBXSec");   
 
   //This is the new fangled particle ID from Adam and Kirsty - Kirby @ July 2, 2018
-  _particle_id_label_Bragg       = p.get<std::string>("ParticleIDProducer_Bragg", "pid::UBXSecAnaOnly");
+  //These really shouldn't be hard coded. This needs to be fixed!!!!!!
+  //when you're running on v13 data or MCC8.9 MC use this line
+  //_particle_id_label_Bragg       = p.get<std::string>("ParticleIDProducer_Bragg", "pid::UBXSecAnaOnly");
+  //when you're running on v12 data or MCC8.7 MC use this line
+  _particle_id_label_Bragg       = p.get<std::string>("ParticleIDProducer_Bragg", "pid::UBXSec");
 
   _mc_ghost_producer           = p.get<std::string>("MCGhostProducer", "RecoTrueMatcher");
 
   _pfp_producer                   = p.get<std::string>("PFParticleProducer", "pandoraNu::UBXSec");
 
   _acpt_producer                  = p.get<std::string>("ACPTProducer", "pandoraCosmicT0Reco");
-  _calorimetry_producer           = p.get<std::string>("CalorimetryProducer", "pandoraNucalo");
+  //_calorimetry_producer           = p.get<std::string>("CalorimetryProducer", "pandoraNucalo");
+  _calorimetry_producer           = p.get<std::string>("CalorimetryProducer", "pidcalibration::UBXSec");
   _hit_producer                    = p.get<std::string>("HitProducer", "pandoraCosmicHitRemoval::UBXSec");
   //_hit_producer                    = p.get<std::string>("HitProducer", "pandoraCosmicHitRemoval");
 
@@ -504,7 +509,8 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   }
   
 
-
+  //do this before so that the pointer is instantiated before being linked to the branch.
+  fHitNucP4 = new TLorentzVector(-999,-999,-999,-999);
 
   //===============================================================================================
   art::ServiceHandle<art::TFileService> fs;
@@ -532,7 +538,7 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("_lep_mom",        &_lep_mom,          "_lep_mom/D");
   _cc1unptree->Branch("_lep_costheta",        &_lep_costheta,          "_lep_costheta/D");
   _cc1unptree->Branch("_lep_phi",        &_lep_phi,          "_lep_phi/D");
-  //_cc1unptree->Branch("fHitNucP4","TLorentzVector",&fHitNucP4);
+  _cc1unptree->Branch("fHitNucP4","TLorentzVector",&fHitNucP4);
 
   _cc1unptree->Branch("_fTruenuvrtxx",   &_fTruenuvrtxx,     "_fTruenuvrtxx/F");
   _cc1unptree->Branch("_fTruenuvrtxy",   &_fTruenuvrtxy,     "_fTruenuvrtxy/F");
@@ -861,7 +867,6 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   trackcand_parCosPhi=new std::vector<float>;
   trackcand_parSinPhi=new std::vector<float>;
 
-  fHitNucP4 = new TLorentzVector(-999,-999,-999,-999);
 
  
   //-----------------------------------------------------------------
@@ -1258,15 +1263,12 @@ void SimpleAna::analyze(art::Event const & e)
   e.getByLabel(_tpcobject_producer, tpcobj_h);
   //e.getByLabel("TPCObjectMaker", tpcobj_h);
 
- 
-
   
   if (!tpcobj_h.isValid()) {
     std::cout << "[UBXSec] Cannote locate ubana::TPCObject." << std::endl;
   }
 
-  std::cout<<"Start Getting the tracks from PF particles<<<<<<<<<<<<<"<<std::endl;
- 
+  std::cout<<"Start Getting the tracks from PF particles<<<<<<<<<<<<<"<<std::endl; 
 
   // Get Tracks 
   art::Handle<std::vector<recob::Track>> track_h;
@@ -1279,23 +1281,10 @@ void SimpleAna::analyze(art::Event const & e)
   std::vector<art::Ptr<recob::Track>> track_p_v;
   art::fill_ptr_vector(track_p_v, track_h);
 
-  art::FindManyP<recob::OpFlash> opfls_ptr_coll_v(track_h, e, _acpt_producer);
-  art::FindManyP<recob::PFParticle> pfp_from_track(track_h, e, _pfp_producer);
+  //art::FindManyP<recob::OpFlash> opfls_ptr_coll_v(track_h, e, _acpt_producer);
+  //art::FindManyP<recob::PFParticle> pfp_from_track(track_h, e, _pfp_producer);
   art::FindManyP<anab::Calorimetry> calos_from_track(track_h, e, _calorimetry_producer);
 
-
-
-
-
-
-  // Get Tracks
-  /*art::Handle<std::vector<recob::Track>> track_h;
-  e.getByLabel(_pfp_producer,track_h);
-  if (!track_h.isValid() || track_h->empty()) {
-    std::cout << "[UBXSec] Track handle is not valid or empty." << std::endl;
-    //throw std::exception();
-  }
-  */
   std::cout<<"Start Getting the PF Particles<<<<<<<<<<<<<<<<<<<<<<<<<<"<<std::endl;
 
   // Get PFP
@@ -1309,22 +1298,6 @@ void SimpleAna::analyze(art::Event const & e)
        std::cout << "[UBXSec] PFP " << _pfp_producer << " is empty." << std::endl;
   }
    
-  //===================================================================================== 
-                        
-  //get tracks from pfp
-  /*std::vector<art::Ptr<recob::PFParticle>> pfp_v;
-  art::fill_ptr_vector(pfp_v, pfp_h);
-  art::FindManyP<recob::Track> tracks_from_pfp(pfp_h, e, _pfp_producer);
-  std::vector<art::Ptr<recob::Track>> tracks = tracks_from_pfp.at(pfp.key());
-  */
-  /*ubxsec_event->n_pfp = ubxsec_event->n_pfp_primary = 0;
-  for (size_t i = 0; i < pfp_h->size(); i++) {
-    ubxsec_event->n_pfp++;
-    if ((*pfp_h)[i].IsPrimary())
-      ubxsec_event->n_pfp_primary++;
-  }
-  */
-  //==================================================================================== 
   std::cout<<"Start Getting the associated TPC object<<<<<<<<<<<<<<<<<<"<<std::endl;
 
   // if the event is selected, get the associated TPC object here
@@ -1358,6 +1331,7 @@ void SimpleAna::analyze(art::Event const & e)
 
   std::cout<<"Start Getting the tracks form PF particles<<<<<<<<<<<<<<<<<<<<<<<<<<<"<<std::endl;
   art::FindManyP<recob::Track> tracks_from_pfp(pfp_h, e, _pfp_producer);
+  ///art::Handle<std::vector<recob::Track>> track_h = art::GetHandle(tracks_from_pfp);
   //std::vector<art::Ptr<recob::Track>> tracks = tracks_from_pfp.at(pfp.key());
  
   //Get PID information
@@ -1921,7 +1895,7 @@ void SimpleAna::analyze(art::Event const & e)
   std::vector<art::Ptr<simb::MCParticle>> mcparticlelist;
 
   if (e.getByLabel("largeant", mcparticleListHandle))
-  art::fill_ptr_vector(mcparticlelist, mcparticleListHandle);
+    art::fill_ptr_vector(mcparticlelist, mcparticleListHandle);
 
 
   fhg4parpdg->clear();

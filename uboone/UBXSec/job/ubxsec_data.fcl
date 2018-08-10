@@ -106,6 +106,8 @@ ubxsec_data_ana:
      MCTruthMatching:              @local::AssociationsTruthTool
      FiducialVolumeSettings:       @local::UBXSecFiducialVolumeSettings
      MuonCandidateFinderSettings:  @local::MuonCandidateFinder_data
+     ParticleIDProducer_Bragg:     "pid::UBXSec"
+
 
    }
 
@@ -129,6 +131,7 @@ ubxsec_data_producers: [ simpleFlashBeam,
                          pandoraCosmicHitRemoval,
                          pandoraNu,
                          pandoraNucalo,
+			 pidcalibration,
                          pandoraNupid,
                          pandoraNuMCSMu,
                          pandoraNuMCSPi,
@@ -184,7 +187,9 @@ ubxsec_data_reco.pandoraNucalo.SpacePointModuleLabel:              "pandoraNu::U
 ubxsec_data_reco.pandoraNucalo.FlipTrack_dQdx:                     false
 ubxsec_data_reco.pandoraNucalo.Flip_dQdx:                          false 
 
-ubxsec_data_reco.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo::UBXSec"
+#ubxsec_data_reco.pandoraNupid.CalorimetryModuleLabel:              "pandoraNucalo::UBXSec"
+#use this line below for files that don't have the pnadoraNucali since it's run by pidcalibration
+ubxsec_data_reco.pandoraNupid.CalorimetryModuleLabel:              "pidcalibration::UBXSec"
 ubxsec_data_reco.pandoraNupid.TrackModuleLabel:                    "pandoraNu::UBXSec"
 
 ubxsec_data_reco.pandoraNuMCSMu.inputs.inputLabel:                 "pandoraNu::UBXSec"
