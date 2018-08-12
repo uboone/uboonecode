@@ -25,6 +25,7 @@
 #include "lardataobj/AnalysisBase/Calorimetry.h"
 #include "ubevt/Database/TPCEnergyCalib/TPCEnergyCalibService.h"
 #include "ubevt/Database/TPCEnergyCalib/TPCEnergyCalibProvider.h"
+#include "larcoreobj/SimpleTypesAndConstants/PhysicalConstants.h"
 
 
 #include "TH2F.h"
@@ -66,6 +67,10 @@ private:
 
   calo::CalorimetryAlg caloAlg;
 
+  // modified box model parameters for data
+  double fModBoxA;
+  double fModBoxB;
+
   //histograms for calibration
   std::vector<TH2F*> hCorr_YZ;
   std::vector<TH1F*> hCorr_X;
@@ -86,6 +91,8 @@ ub::CalibrationdEdX::CalibrationdEdX(fhicl::ParameterSet const & p)
   , fCorr_X                (p.get< std::vector<std::string> >("Corr_X"))
   , fUseRecoTrackDir       (p.get< bool>("UseRecoTrackDir"))
   , caloAlg(p.get< fhicl::ParameterSet >("CaloAlg"))
+  , fModBoxA               (p.get< double >("ModBoxA"))
+  , fModBoxB               (p.get< double >("ModBoxB")) 
 {
   // Call appropriate produces<>() functions here.
   if (fCorr_YZ.size()!=3 || fCorr_X.size()!=3){
@@ -206,9 +213,21 @@ void ub::CalibrationdEdX::produce(art::Event & evt)
 	  }*/
 	  
           vdQdx[j] = yzcorrection*xcorrection*vdQdx[j];
+          /*
           //set time to be trgger time so we don't do lifetime correction
           //we will turn off lifetime correction in caloAlg, this is just to be double sure
           vdEdx[j] = caloAlg.dEdx_AREA(vdQdx[j], detprop->TriggerOffset(), planeID.Plane, 0);
+          */
+
+          //Calculate dE/dx using the new recombination constants
+          double dQdx_e = caloAlg.ElectronsFromADCArea(vdQdx[j], planeID.Plane);
+          double rho = detprop->Density();            // LAr density in g/cm^3
+          double Wion = 1000./util::kGeVToElectrons;  // 23.6 eV = 1e, Wion in MeV/e
+          double E_field = detprop->Efield();        // Electric Field in the drift region in KV/cm
+          double Beta = fModBoxB / (rho * E_field);
+          double Alpha = fModBoxA;
+          vdEdx[j] = (exp(Beta * Wion * dQdx_e ) - Alpha) / Beta;
+
           if (flipdir) {
             double rr = Trk_Length - vresRange[j];
             if (rr<0) rr = 0;
