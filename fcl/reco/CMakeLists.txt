@@ -1,4 +1,6 @@
 # include the subfolders which have fhicl files by epoch
+add_subdirectory(Feb2016)
+add_subdirectory(MCC7)
 add_subdirectory(MCC8)
 add_subdirectory(MCC9)
 
