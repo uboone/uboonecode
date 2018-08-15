@@ -189,6 +189,7 @@ private:
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
   std::string _genie_eventweight_multisim_producer;
+  std::string _genie_models_eventweight_multisim_producer;
   std::string _flux_eventweight_multisim_producer;
   bool _debug = true;                   ///< Debug mode
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
@@ -296,6 +297,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
+  _genie_models_eventweight_multisim_producer = p.get<std::string>("GenieModelsEventWeightMultisimProducer");
   _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
 
   _use_genie_info                 = p.get<bool>("UseGENIEInfo", false);
@@ -739,6 +741,36 @@ void UBXSec::produce(art::Event & e) {
     }
   }
 
+  // GENIE Models reweigthing (systematics - multisim)
+  ubxsec_event->ResetGenieModelsEventWeightVectorsMultisim();
+  if (_is_mc) {
+    art::Handle<std::vector<evwgh::MCEventWeight>> geniemodelseventweight_h;
+    e.getByLabel(_genie_models_eventweight_multisim_producer, geniemodelseventweight_h);
+    if(!geniemodelseventweight_h.isValid()){
+      std::cout << "[UBXSec] MCEventWeight for GENIE Models reweight multisim, product " << _genie_models_eventweight_multisim_producer << " not found..." << std::endl;
+      //throw std::exception();
+    } else {
+      std::vector<art::Ptr<evwgh::MCEventWeight>> geniemodelseventweight_v;
+      art::fill_ptr_vector(geniemodelseventweight_v, geniemodelseventweight_h);
+      if (geniemodelseventweight_v.size() > 0) {
+        art::Ptr<evwgh::MCEventWeight> evt_wgt = geniemodelseventweight_v.at(0); // Just for the first nu interaction
+        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+        int countFunc = 0;
+        // loop over the map and save the name of the function and the vector of weights for each function
+        for(auto it : evtwgt_map) {
+          std::string func_name = it.first;
+          std::vector<double> weight_v = it.second; 
+          //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
+          ubxsec_event->evtwgt_genie_models_multisim_funcname.push_back(func_name);
+          ubxsec_event->evtwgt_genie_models_multisim_weight.push_back(weight_v);
+          ubxsec_event->evtwgt_genie_models_multisim_nweight.push_back(weight_v.size());
+          countFunc++;
+        }
+        ubxsec_event->evtwgt_genie_models_multisim_nfunc = countFunc;
+      }
+    }
+  }
+
   // FLUX reweigthing (systematics - multisim)
   ubxsec_event->ResetFluxEventWeightVectorsMultisim();
   if (_is_mc) {
@@ -836,6 +868,7 @@ void UBXSec::produce(art::Event & e) {
 
     std::cout << "[UBXSec] Flash time: " << ubxsec_event->beamfls_time[n] << ", Old flash position: " << flash.ZCenter() << std::endl;
     std::cout << "[UBXSec] Flash time: " << ubxsec_event->beamfls_time[n] << ", New flash position: " << Zcenter << std::endl;
+    std::cout << "[UBXSec] Flash time: " << ubxsec_event->beamfls_time[n] << ", Flash PEs: " << flash.TotalPE() << std::endl;
   } // flash loop
 
 
@@ -1554,8 +1587,8 @@ void UBXSec::produce(art::Event & e) {
       ubxsec_event->slc_muoncandidate_exists[slice]    = true;
       ubxsec_event->slc_muoncandidate_contained[slice] = fully_contained;
       ubxsec_event->slc_muoncandidate_length[slice]    = candidate_track->Length();
-      ubxsec_event->slc_muoncandidate_phi[slice]       = UBXSecHelper::GetCorrectedPhi((*candidate_track), tpcobj_nu_vtx); 
-      ubxsec_event->slc_muoncandidate_theta[slice]     = UBXSecHelper::GetCorrectedCosTheta((*candidate_track), tpcobj_nu_vtx);
+      ubxsec_event->slc_muoncandidate_phi[slice]       = candidate_track->Phi(); //UBXSecHelper::GetCorrectedPhi((*candidate_track), tpcobj_nu_vtx); 
+      ubxsec_event->slc_muoncandidate_theta[slice]     = candidate_track->Theta(); //UBXSecHelper::GetCorrectedCosTheta((*candidate_track), tpcobj_nu_vtx);
       ubxsec_event->slc_muoncandidate_mom_range[slice] = _trk_mom_calculator.GetTrackMomentum(candidate_track->Length(), 13);
       //ubxsec_event->slc_muoncandidate_mom_mcs[slice]   = _trk_mom_calculator.GetMomentumMultiScatterLLHD(candidate_track);
 
@@ -2035,6 +2068,7 @@ void UBXSec::produce(art::Event & e) {
     selection_result.SetSelectionStatus(true);
 
     ubxsec_event->is_selected = true;
+    ubxsec_event->selected_slice = slice_index;
 
     // Grab the selected TPCObject
     std::vector<art::Ptr<ubana::TPCObject>> tpcobj_v;
