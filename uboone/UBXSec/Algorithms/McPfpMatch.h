@@ -46,7 +46,30 @@ namespace ubana {
 
     /// Configure
     void _Configure_(const Config_t &pset);
-     
+
+    /**
+     *  @brief Collect a vector of MCParticle objects from the ART event record
+     *
+     *  @param evt the ART event record
+     *  @param label the label for the truth information in the event
+     *  @param particleVector the output vector of MCParticle objects
+     */
+    void CollectMCParticles(const art::Event &evt,
+                            const std::string &label,
+                            lar_pandora::MCParticleVector &particleVector);
+    /**
+     *  @brief Collect truth information from the ART event record
+     *
+     *  @param evt the ART event record
+     *  @param label the label for the truth information in the event
+     *  @param truthToParticles output map from MCTruth to MCParticle objects
+     *  @param particlesToTruth output map from MCParticle to MCTruth objects
+     */
+    void CollectMCParticles(const art::Event &evt,
+                            const std::string &label,
+                            lar_pandora::MCTruthToMCParticles &truthToParticles,
+                            lar_pandora::MCParticlesToMCTruth &particlesToTruth);
+
     /// Configure function parameters
      /**
      *  @brief Configure function parameters (call this function first)
@@ -79,6 +102,13 @@ namespace ubana {
      *  @param matchedParticles the output matches between reconstructed and true particles
      */  
     void GetRecoToTrueMatches(lar_pandora::PFParticlesToMCParticles & matchedParticles);
+
+    /**
+     *  @brief If calles
+     *
+     *  @param option It true, considers the event as MC always
+     */
+    void OverrideRealData(bool option) {_override_real_data = option;};
   
 
   protected:
@@ -92,6 +122,9 @@ namespace ubana {
 
     bool _debug      = false;
     bool _verbose    = false;
+
+    bool _is_data    = false; ///< If true, we are running over a real data file.
+    bool _override_real_data = true;
 
   };
 }

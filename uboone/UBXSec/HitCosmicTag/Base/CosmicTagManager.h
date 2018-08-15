@@ -121,9 +121,6 @@ namespace cosmictag {
     /// Readiness flag
     bool _ready = false;
 
-    /// If true makes a CSV file
-    bool _make_csv = false;
-
     /// Configuration file
     std::string _config_file;
     /// Name

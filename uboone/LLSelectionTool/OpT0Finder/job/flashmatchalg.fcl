@@ -88,6 +88,11 @@ LightPath: {
     MIPdEdx:     2.07
 }
 
+LightCharge: {
+  PlaneNumber:  2
+  ChargeToLight:1.0
+}
+
 #
 # Geometry (do not change by hand)
 #

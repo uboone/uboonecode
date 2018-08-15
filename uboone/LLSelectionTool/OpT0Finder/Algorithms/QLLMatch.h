@@ -41,6 +41,13 @@ namespace flashana {
     /// Default destructor
     ~QLLMatch(){}
 
+    /// Singleton shared instance getter
+    //static QLLMatch* GetME()
+    //{
+    //  if(!_me) _me = new QLLMatch("QLLMatch");
+    //  return _me;
+    //}
+
     /// Core function: execute matching
     FlashMatch_t Match(const QCluster_t&, const Flash_t&);
 

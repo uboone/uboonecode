@@ -106,7 +106,7 @@ void UBXSecHelper::GetRecoToTrueMatches(art::Event const & e,
                                            lar_pandora::MCParticlesToHits &matchedParticleHits)
 {
 
-   bool _debug = true; 
+   bool _debug = true;
 
   // --- Collect hits
   lar_pandora::HitVector hitVector;
@@ -1167,9 +1167,6 @@ double UBXSecHelper::GetDqDxTruncatedMean(std::vector<double> dqdx_v) {
   double median = GetMedian(dqdx_v);
   double std    = GetSTD(dqdx_v);
 
-  std::cout << "median " << median << std::endl;
-  std::cout << "std    " << std << std::endl;
-
   std::vector<double> dqdx_v_trimmed;
   dqdx_v_trimmed.clear();
 
@@ -1271,8 +1268,28 @@ art::Ptr<simb::MCTruth> UBXSecHelper::TrackIDToMCTruth(art::Event const & e, std
 
     lar_pandora::MCTruthToMCParticles truthToParticles;
     lar_pandora::MCParticlesToMCTruth particlesToTruth;
+    art::Ptr<simb::MCTruth> null_ptr;
 
-    lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
+    // lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
+
+    art::Handle<std::vector<simb::MCParticle>> theParticles;
+    e.getByLabel(_geant_producer, theParticles);
+
+    if (!theParticles.isValid())
+    {
+      std::cout << "[LArPandora]"
+                << "  Failed to find MC particles... " << std::endl;
+      return null_ptr;
+    }
+
+    art::FindOneP<simb::MCTruth> theTruthAssns(theParticles, e, _geant_producer);
+    for (unsigned int i = 0, iEnd = theParticles->size(); i < iEnd; ++i)
+    {
+      const art::Ptr<simb::MCParticle> particle(theParticles, i);
+      const art::Ptr<simb::MCTruth> truth(theTruthAssns.at(i));
+      truthToParticles[truth].push_back(particle);
+      particlesToTruth[particle] = truth;
+    }
 
     for (auto iter : particlesToTruth) {
       if (iter.first->TrackId() == geant_track_id) {
@@ -1280,7 +1297,6 @@ art::Ptr<simb::MCTruth> UBXSecHelper::TrackIDToMCTruth(art::Event const & e, std
       }
     }  
 
-    art::Ptr<simb::MCTruth> null_ptr;
     return null_ptr;
 }
 

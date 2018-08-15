@@ -58,12 +58,81 @@ namespace ubana {
 
   }
 
-   
+  void McPfpMatch::CollectMCParticles(const art::Event &evt, const std::string &label, lar_pandora::MCParticleVector &particleVector)
+  {
+    if (_is_data)
+      throw cet::exception("LArPandora") << " PandoraCollector::CollectMCParticles --- Trying to access MC truth from real data 1";
+
+    art::Handle<std::vector<simb::MCParticle>> theParticles;
+    evt.getByLabel(label, theParticles);
+    if (!theParticles.isValid())
+    {
+      std::cout << "[LArPandora]"
+                << "  Failed to find MC particles... " << std::endl;
+      return;
+    }
+    else
+    {
+      if (_debug)
+      {
+        std::cout << "[LArPandora]"
+                  << "  Found: " << theParticles->size() << " MC particles " << std::endl;
+      }
+    }
+    for (unsigned int i = 0; i < theParticles->size(); ++i)
+    {
+      const art::Ptr<simb::MCParticle> particle(theParticles, i);
+      particleVector.push_back(particle);
+    }
+  }
+
+  void McPfpMatch::CollectMCParticles(const art::Event &evt,
+                                                  const std::string &label,
+                                                  lar_pandora::MCTruthToMCParticles &truthToParticles,
+                                                  lar_pandora::MCParticlesToMCTruth &particlesToTruth)
+  {
+    if (_is_data)
+      throw cet::exception("LArPandora") << " PandoraCollector::CollectMCParticles --- Trying to access MC truth from real data 2";
+
+    art::Handle<std::vector<simb::MCParticle>> theParticles;
+    evt.getByLabel(label, theParticles);
+
+    if (!theParticles.isValid())
+    {
+      std::cout << "[LArPandora]"
+                << "  Failed to find MC particles... " << std::endl;
+      return;
+    }
+    else
+    {
+      if (_debug)
+      {
+        std::cout << "[LArPandora]"
+                  << "  Found: " << theParticles->size() << " MC particles " << std::endl;
+      }
+    }
+
+    art::FindOneP<simb::MCTruth> theTruthAssns(theParticles, evt, label);
+    for (unsigned int i = 0, iEnd = theParticles->size(); i < iEnd; ++i)
+    {
+      const art::Ptr<simb::MCParticle> particle(theParticles, i);
+      const art::Ptr<simb::MCTruth> truth(theTruthAssns.at(i));
+      truthToParticles[truth].push_back(particle);
+      particlesToTruth[particle] = truth;
+    }
+  }
+
   void McPfpMatch::Configure(art::Event const & e, 
                              std::string _pfp_producer, 
                              std::string _spacepoint_producer, 
                              std::string _hitfinder_producer, 
                              std::string _geant_producer) {
+    _is_data = e.isRealData();
+
+    if (_override_real_data)
+    {
+      _is_data = false;
+    }
 
     // Collect hits
     lar_pandora::HitVector hitVector;
@@ -97,9 +166,9 @@ namespace ubana {
     lar_pandora::MCParticlesToHits    trueParticlesToHits;
     lar_pandora::HitsToMCParticles    hit_to_mcps_map;
 
-    if (!e.isRealData()) {
-      lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, trueParticleVector);
-      lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
+    if (!_is_data) {
+      CollectMCParticles(e, _geant_producer, trueParticleVector);
+      CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
       lar_pandora::LArPandoraHelper::BuildMCParticleHitMaps(e, 
                                                             _geant_producer, 
                                                             hitVector, 
@@ -147,6 +216,13 @@ namespace ubana {
                              std::string _hit_mcp_producer,
                              lar_pandora::LArPandoraHelper::DaughterMode daughterMode) {
 
+
+    _is_data = e.isRealData();
+
+    if (_override_real_data) {
+      _is_data = false;
+    }
+
     // Collect hits
     lar_pandora::HitVector hitVector;
     //lar_pandora::LArPandoraHelper::CollectHits(e, _hitfinder_producer, hitVector);
@@ -187,9 +263,9 @@ namespace ubana {
     lar_pandora::MCParticlesToHits    trueParticlesToHits;
     lar_pandora::HitsToMCParticles    hit_to_mcps_map;
 
-    if (!e.isRealData()) {
-      lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, trueParticleVector);
-      lar_pandora::LArPandoraHelper::CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
+    if (!_is_data) {
+      CollectMCParticles(e, _geant_producer, trueParticleVector);
+      CollectMCParticles(e, _geant_producer, truthToParticles, particlesToTruth);
 
       // Construct a Particle Map (trackID to MCParticle)
       lar_pandora::MCParticleMap particleMap;

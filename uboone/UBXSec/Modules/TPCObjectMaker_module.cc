@@ -142,7 +142,7 @@ private:
   ubana::TPCObjectFilter *_tpcobj_filter;
 
   bool _is_mc;
-
+  bool _override_real_data;
   std::string _pfp_producer;
   std::string _vertexLabel;
   std::string _trackLabel;
@@ -169,6 +169,7 @@ ubana::TPCObjectMaker::TPCObjectMaker(fhicl::ParameterSet const & p)
   _geantModuleLabel    = p.get<std::string>("GeantModule");
   _spacepointLabel     = p.get<std::string>("SpacePointProducer");
   _mcpHitAssLabel      = p.get<std::string>("MCPHitAssProducer", "pandoraCosmicHitRemoval");
+  _override_real_data  = p.get<bool>("OverrideRealData", false);
 
   _use_premade_ass     = p.get<bool>       ("UsePremadeMCPHitAss");
   _do_filter           = p.get<bool>       ("FilterObjects");
@@ -185,12 +186,11 @@ ubana::TPCObjectMaker::TPCObjectMaker(fhicl::ParameterSet const & p)
 }
 
 void ubana::TPCObjectMaker::produce(art::Event & e){
-
   if (_debug) std::cout << "[TPCObjectMaker] Starts" << std::endl;
- 
-  _is_mc = !e.isRealData();
 
-  if (_is_mc && _use_premade_ass) 
+  _is_mc = !e.isRealData() || _override_real_data;
+
+  if (_is_mc && _use_premade_ass)
     mcpfpMatcher.Configure(e, _pfp_producer, _spacepointLabel, _hitfinderLabel, _geantModuleLabel, _mcpHitAssLabel, lar_pandora::LArPandoraHelper::kAddDaughters);
   else if (_is_mc)
     mcpfpMatcher.Configure(e, _pfp_producer, _spacepointLabel, _hitfinderLabel, _geantModuleLabel);
@@ -283,7 +283,7 @@ void ubana::TPCObjectMaker::produce(art::Event & e){
       if (_debug) std::cout << "[TPCObjectMaker] PFP " << pf_par->Self() << " has cosmic origin" << std::endl;
       cosmicOriginPFP.emplace_back(pf_par);
 
-      // Check if this is a stopping muon in the TPC 
+      // Check if this is a stopping muon in the TPC
       ::geoalgo::Vector mcpar_end(mc_par->EndX(), mc_par->EndY(), mc_par->EndZ());
 
       ::geoalgo::AABox tpc_vol(0., (-1.)*(geo->DetHalfHeight()), 0.,
