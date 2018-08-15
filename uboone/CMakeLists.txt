@@ -52,6 +52,7 @@ add_subdirectory(ChargedTrackMultiplicity/DataOFF)
 add_subdirectory(LEEPhotonAnalysis)
 
 add_subdirectory(UBXSec)
+add_subdirectory(Filters)
 
 # Respect the order specified in lar_build, which is:
 #
