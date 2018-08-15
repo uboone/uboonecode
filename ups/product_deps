@@ -4,7 +4,7 @@
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
 parent ubana v07_01_00
 
-defaultqual e15
+defaultqual e17
 
 # These optional lines define where headers, libraries, and executables go and should
 # be used only if your product does not conform to the defaults.
