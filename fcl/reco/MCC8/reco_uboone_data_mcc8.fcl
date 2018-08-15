@@ -329,9 +329,8 @@ microboone_reco_data_optical: [ saturation,
                                 simpleFlashBeamLowPE]
 
 microboone_reco_data_signalprocessing: [ #digitfilter,
-				                                 wcNoiseFilter,
-					                               #nfspl1,
-					                               #butcher,
+					                               nfspl1,
+					                               butcher,
 				                                 caldata,
                                          gaushit ]
 
@@ -518,7 +517,7 @@ microboone_dqm_ana: [                    @sequence::microboone_dqm_ana_stage1,
 
 #microboone_reco_data_producers.nfsp.wcls_main.configs:                           [ "ubnfsp-before.bz2" ]
 
-microboone_reco_data_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
+microboone_reco_data_producers.caldata.DigitModuleLabel:                         "butcher"
 microboone_reco_data_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
 microboone_reco_data_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
 microboone_reco_data_producers.caldata.ROIFinder.Threshold:                      [0, 0, 0]
