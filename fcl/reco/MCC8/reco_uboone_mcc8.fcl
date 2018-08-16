@@ -42,10 +42,15 @@ microboone_reco_mcc8_services:
                               @table::microboone_services_reco
 
 }
-microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:        6400
-microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:        6400
-microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:           false
-microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:                6400
+microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:                6400
+microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:                   false
+microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:                     -0.400e3
+
+### note that the wirecell noise filtering and signal processing will return zero baseline RawDigits
+microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
 microboone_reco_mcc8_services_fullrawdigits:
 {
