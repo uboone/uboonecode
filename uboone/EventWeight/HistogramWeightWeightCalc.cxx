@@ -13,11 +13,10 @@
  *
  *     rw_hist_file         string  Name of the histogram ROOT file
  *     rw_hist_object       string  Name of the histogram object in the file
- *     rw_hist_norm         double  Additional normalization scale factor
- *     rw_hist_norm_sigma   double  Uncertainty on normalization (or zero)
+ *     sigma                double  Scale of shifts (alternative model is 1 sigma)
+ *     norm_scale           double  Additional normalization scale factor
  *
  *     event_filter         string  Event type ("ccqe" or "ccmec")
- *     one_sided            bool    If true, use only upper half of normal
  *
  * The file is located based on the FW_SEARCH_PATH environment variable.
  *
@@ -56,7 +55,7 @@ public:
 private:
   CLHEP::RandGaussQ* fGaussRandom;  //!< Random number generator
   std::vector<double> fWeightArray;  //!< Random numbers for weights
-  std::vector<double> fNormArray;  //!< Random numbers for normalization scale
+  double fNormScale;  //!< Normalization scaling
   int fNmultisims;  //!< Number of multisim universes
   std::string fGenieModuleLabel;  //!< Module name for MCTruth
   std::string fMode;  //!< Multisim vs. unisim mode
@@ -80,9 +79,7 @@ void HistogramWeightWeightCalc::Configure(fhicl::ParameterSet const& p) {
   fGaussRandom = new CLHEP::RandGaussQ(rng->getEngine(GetName()));    
 
   // Load weight histogram from a file
-  double rwNormMu = pset.get<double>("rw_hist_norm", 1.0);
-  double rwNormSigma = pset.get<double>("rw_hist_norm_sigma", 0.0);
-  bool rwNormCorrelated = pset.get<bool>("rw_hist_norm_correlated", false);
+  double sigma = pset.get<double>("sigma");
   std::string histFileName = pset.get<std::string>("rw_hist_file");
   std::string histObjectName = pset.get<std::string>("rw_hist_object");
 
@@ -102,36 +99,26 @@ void HistogramWeightWeightCalc::Configure(fhicl::ParameterSet const& p) {
   fNmultisims = pset.get<int>("number_of_multisims");
   fMode = pset.get<std::string>("mode");
   fEventFilter = pset.get<std::string>("event_filter");
-  fOneSided = pset.get<bool>("one_sided", false);
+  fOneSided = pset.get<bool>("one_sided", true);
+  fNormScale = pset.get<double>("norm_scale");
   assert(fEventFilter == "ccqe" || fEventFilter == "ccmec");
 
   // Initialize the list of random numbers for each universe
-  fNormArray.resize(fNmultisims);
   fWeightArray.resize(fNmultisims);
   for (int i=0; i<fNmultisims; i++) {
     if (fMode == "multisim") {
-      fWeightArray[i] = fGaussRandom->shoot(&rng->getEngine(GetName()), 0, 1);
+      fWeightArray[i] = fGaussRandom->shoot(&rng->getEngine(GetName()), 0, sigma);
 
       // One sided uncertainty: upper half of standard normal
       if (fOneSided) {
         fWeightArray[i] = std::abs(fWeightArray[i]);
       }
-
-      // Normalization uncertainty: shift with shape or sample
-      if (rwNormCorrelated) {
-        fNormArray[i] = rwNormMu + rwNormSigma * fWeightArray[i];
-      }
-      else {
-        fNormArray[i] = \
-          fGaussRandom->shoot(&rng->getEngine(GetName()), rwNormMu, rwNormSigma);
-      }
     }
     else {
-      fNormArray[i] = rwNormMu;
-      fWeightArray[i] = 1.0;
+      assert(fNmultisims == 1);
+      fWeightArray[i] = sigma;
     }
   }
-
 }
 
 
@@ -169,11 +156,14 @@ HistogramWeightWeightCalc::GetWeight(art::Event& e) {
     for (int i=0; i<fNmultisims; i++) {
       if ((fEventFilter == "ccqe"  && ccnc == simb::kCC && mode == simb::kQE ) ||
           (fEventFilter == "ccmec" && ccnc == simb::kCC && mode == simb::kMEC)) {
-        double w = fRWHist->GetBinContent(fRWHist->FindBin(q0, q3)); 
-        weight[inu][i] = 1.0 - (1.0 - fNormArray[i] * w) * fWeightArray[i];
+        int xbin = fRWHist->GetXaxis()->FindBin(q3);
+        int ybin = fRWHist->GetYaxis()->FindBin(q0);
+        double w = fRWHist->GetBinContent(xbin, ybin);
+        weight[inu][i] = 1.0 - (1.0 - fNormScale * w) * fWeightArray[i];
         weight[inu][i] = std::max(0.0, weight[inu][i]);
 
         //std::cout << "Histogram weight: "
+        //          << "type = " << fEventFilter << ", "
         //          << "q0 = " << q0 << ", "
         //          << "q3 = " << q3 << ", "
         //          << "w = " << weight[inu][i] << std::endl;

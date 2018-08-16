@@ -29,28 +29,24 @@ microboone_eventweight: {
     type: HistogramWeight
     random_seed: 54
     mode: multisim
-    number_of_multisims: 2000
+    number_of_multisims: 1000
     rw_hist_file: "systematics/q0q3_rw/q0q3_rw_valencia.root"
     rw_hist_object: "q0q3_ccmec_valencia_default"
-    rw_hist_norm: 1.0
-    rw_hist_norm_sigma: 0.617
-    rw_hist_norm_correlated: true
+    sigma: 1
+    norm_scale: 0.6
     event_filter: "ccmec"
-    one_sided: false
   }
 
   model_q0q3_ccqe: {
     type: HistogramWeight
-    random_seed: 55
+    random_seed: 54
     mode: multisim
-    number_of_multisims: 2000
+    number_of_multisims: 1000
     rw_hist_file: "systematics/q0q3_rw/q0q3_rw_valencia.root"
     rw_hist_object: "q0q3_ccqe_valencia_default"
-    rw_hist_norm: 1.0
-    rw_hist_norm_sigma: 0.025
-    rw_hist_norm_correlated: true
+    sigma: 1
+    norm_scale: 1.1
     event_filter: "ccqe"
-    one_sided: true
   }
 }
 
