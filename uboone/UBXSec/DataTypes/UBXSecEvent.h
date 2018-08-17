@@ -37,6 +37,7 @@ class UBXSecEvent /*: public TObject*/{
   Int_t           run; ///< Run number
   Int_t           subrun; ///< Subrun number
   Int_t           event; ///< Event number
+  TString         file_type; ///< File type (bnbcosmic, dirt, overlay, bnbon, extbnb)
   Bool_t          muon_is_reco; ///< Is true if the muon from the neutrino interaction is reconstructed
   Double_t        muon_reco_pur; ///< If reco, stores the reco muon purity
   Double_t        muon_reco_eff; ///< If reco, stores the reco muon efficiency
