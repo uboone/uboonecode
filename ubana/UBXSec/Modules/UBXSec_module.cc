@@ -191,6 +191,7 @@ private:
   std::string _genie_eventweight_multisim_producer;
   std::string _genie_models_eventweight_multisim_producer;
   std::string _flux_eventweight_multisim_producer;
+  std::string _file_type;
   bool _debug = true;                   ///< Debug mode
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
   double _minimumDistDeadReg;           ///< Minimum distance the track end points can have to a dead region
@@ -299,6 +300,8 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
   _genie_models_eventweight_multisim_producer = p.get<std::string>("GenieModelsEventWeightMultisimProducer");
   _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
+
+  _file_type                      = p.get<std::string>("FileType");
 
   _use_genie_info                 = p.get<bool>("UseGENIEInfo", false);
   _minimumHitRequirement          = p.get<int>("MinimumHitRequirement", 3);
@@ -477,6 +480,8 @@ void UBXSec::produce(art::Event & e) {
   _run = ubxsec_event->run = e.id().run();
   _subrun = ubxsec_event->subrun = e.id().subRun();
   _event = ubxsec_event->event  = e.id().event();
+
+  ubxsec_event->file_type = _file_type; 
 
   _is_data = e.isRealData();
   _is_mc   = !_is_data;
