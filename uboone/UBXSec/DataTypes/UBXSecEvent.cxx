@@ -25,6 +25,7 @@ void UBXSecEvent::Init()
   run = _default_value;
   subrun = _default_value;
   event = _default_value;
+  file_type = "not_set";
   muon_is_reco = false;
   muon_reco_pur = _default_value;
   muon_reco_eff = _default_value;
