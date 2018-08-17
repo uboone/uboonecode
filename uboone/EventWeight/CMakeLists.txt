@@ -1,5 +1,6 @@
 file(GLOB WGHCALCFILES *WeightCalc* Factory* )
 include_directories ( $ENV{GENIE_INC}/GENIE )
+include_directories ( $ENV{G4INCLUDE} )
 
 art_make_library(LIBRARY_NAME WeightCalculators 
                  SOURCE	      ${WGHCALCFILES}
@@ -23,6 +24,11 @@ art_make_library(LIBRARY_NAME WeightCalculators
 		      ${CLHEP}
                       ${ROOT_BASIC_LIB_LIST}
                       ${Boost_SYSTEM_LIBRARY}
+                      nutools_G4Base
+                      G4particles
+                      G4materials
+                      G4processes
+                      ${G4_LIB_LIST}
 	        ) 
 
 art_make(LIBRARY_NAME   EventWeight
