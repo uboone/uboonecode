@@ -71,7 +71,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "%ifb_%tc_detsim_CV.root"
+   fileName:    "%ifb_detsim_CV.root"
    dataTier:    "detector-simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1

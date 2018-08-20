@@ -71,7 +71,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "%ifb_%tc_propagate.root"
+   fileName:    "%ifb_propagate.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
