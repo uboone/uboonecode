@@ -106,7 +106,7 @@ void UBXSecHelper::GetRecoToTrueMatches(art::Event const & e,
                                            lar_pandora::MCParticlesToHits &matchedParticleHits)
 {
 
-   bool _debug = true;
+   bool _debug = false;
 
   // --- Collect hits
   lar_pandora::HitVector hitVector;
@@ -1296,7 +1296,7 @@ art::Ptr<simb::MCTruth> UBXSecHelper::TrackIDToMCTruth(art::Event const & e, std
         return iter.second;
       }
     }  
-
+    std::cout << "Return null ptr" << std::endl;
     return null_ptr;
 }
 

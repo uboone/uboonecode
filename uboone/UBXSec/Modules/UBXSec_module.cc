@@ -191,7 +191,7 @@ private:
   std::string _genie_eventweight_multisim_producer;
   std::string _genie_models_eventweight_multisim_producer;
   std::string _flux_eventweight_multisim_producer;
-  bool _debug = true;                   ///< Debug mode
+  bool _debug = false;                   ///< Debug mode
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
   double _minimumDistDeadReg;           ///< Minimum distance the track end points can have to a dead region
   bool _use_genie_info;                 ///< Turn this off if looking at cosmic only files
@@ -915,7 +915,7 @@ void UBXSec::produce(art::Event & e) {
       if (_fiducial_volume.InFV(truth_nu_vtx)) {
         ubxsec_event->fv = 1;
       }
-      std::cout << "vy " << mclist[iList]->GetNeutrino().Nu().Vy() << std::endl;
+
       // Save the vertex for all neutrinos
       ubxsec_event->tvtx_x.at(iList) = mclist[iList]->GetNeutrino().Nu().Vx();
       ubxsec_event->tvtx_y.at(iList) = mclist[iList]->GetNeutrino().Nu().Vy();
@@ -1234,8 +1234,6 @@ void UBXSec::produce(art::Event & e) {
     std::cout << "[UBXSec] \t Reco vertex is " << ubxsec_event->slc_nuvtx_x[slice] << ", " << ubxsec_event->slc_nuvtx_y[slice] << ", " << ubxsec_event->slc_nuvtx_z[slice] << std::endl;
     std::cout << "[UBXSec] \t Reco vertex is " << (ubxsec_event->slc_nuvtx_fv[slice]==1 ? "in" : "ouside") << " the FV." << std::endl;
 
-    
-
     // Through-going?
     ubxsec_event->slc_geocosmictag[slice] = false;
     std::vector<art::Ptr<anab::CosmicTag>> geo_cosmic_tags = tpcobjToCosmicTagAssns.at(slice);
@@ -1248,17 +1246,14 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_geocosmictag[slice] = true;
       }
     }
-    std::cout << "[UBXSec] After through-going" << std::endl;
     // Vertex resolution
     if (ubxsec_event->slc_origin[slice] == ubana::kBeamNeutrino) {
-      std::cout << "[UBXSec] After if" << std::endl;
       std::cout << ubxsec_event->slc_nuvtx_y[slice] << std::endl;
       std::cout << ubxsec_event->tvtx_y[0] << std::endl;
       std::cout << ubxsec_event->slc_nuvtx_z[slice] << std::endl;
       std::cout << ubxsec_event->tvtx_z[0] << std::endl;
       ubxsec_event->vtx_resolution = sqrt(pow(ubxsec_event->slc_nuvtx_y[slice] - ubxsec_event->tvtx_y[0], 2) + pow(ubxsec_event->slc_nuvtx_z[slice] - ubxsec_event->tvtx_z[0], 2));
     }
-    std::cout << "[UBXSec] After vertex resolution" << std::endl;
 
     // Multiplicity
     int p, t, s;
@@ -1267,7 +1262,6 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->slc_mult_track[slice] = t;
     ubxsec_event->slc_mult_shower[slice] = s;
     ubxsec_event->slc_mult_track_tolerance[slice] = tpcobj.GetNTracksCloseToVertex(_tolerance_track_multiplicity);
-    std::cout << "[UBXSec] After multiplicity" << std::endl;
 
     // Candidate Consistency
     ubxsec_event->slc_consistency[slice] = true;
@@ -1284,7 +1278,6 @@ void UBXSec::produce(art::Event & e) {
       }
       ubxsec_event->slc_consistency_score[slice] = ct->CosmicScore();
     }
-    std::cout << "[UBXSec] After candidate consistency" << std::endl;
 
     // Neutrino Flash match
     ubxsec_event->slc_flsmatch_score[slice] = -9999;
@@ -1309,7 +1302,6 @@ void UBXSec::produce(art::Event & e) {
       std::cout << "[UBXSec] \t FM score:       " << ubxsec_event->slc_flsmatch_score[slice] << std::endl;
       std::cout << "[UBXSec] \t qllx - tpcx is: " << ubxsec_event->slc_flsmatch_qllx[slice] - ubxsec_event->slc_flsmatch_tpcx[slice] << std::endl;
     }
-    std::cout << "[UBXSec] After neutrino flash match" << std::endl;
 
     // Hits
     int nhits_u, nhits_v, nhits_w;
@@ -1387,7 +1379,7 @@ void UBXSec::produce(art::Event & e) {
     if (goodTrack) ubxsec_event->slc_passed_min_track_quality[slice] = true;
     else ubxsec_event->slc_passed_min_track_quality[slice] = false;
 
-    std::cout << "[UBXSec] \t " << (goodTrack ? "Passed" : "Did not pass") 
+    std::cout << "[UBXSec] \t " << (goodTrack ? "Passed" : "Did not pass")
               << " minimum track quality." << std::endl;
 
     // Vertex quality
@@ -1615,14 +1607,10 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_muoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(candidate_track.key())->fwdMomentum();
         ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood();
         ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->fwdMomentum();
-        std::cout << "[UBXSec] Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
-        std::cout << "[UBXSec] Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
       } else {
         ubxsec_event->slc_muoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(candidate_track.key())->bwdMomentum();
         ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
         ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->bwdMomentum();
-        std::cout << "[UBXSec] Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
-        std::cout << "[UBXSec] Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
       }
       // Also see if the track is recon going downwards (for cosmic studies)
       bool track_going_down = candidate_track->Vertex().Y() > candidate_track->End().Y();
@@ -1637,10 +1625,12 @@ void UBXSec::produce(art::Event & e) {
                                                                                            ubxsec_event->slc_muoncandidate_length[slice]);
       ubxsec_event->slc_muoncandidate_mip_consistency2[slice] = _muon_finder.SVMPredict(ubxsec_event->slc_muoncandidate_dqdx_trunc[slice],
                                                                                         ubxsec_event->slc_muoncandidate_length[slice]);
-      std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 0): " << ubxsec_event->slc_muoncandidate_dqdx_trunc[slice] << std::endl;
-      std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 1): " << ubxsec_event->slc_muoncandidate_dqdx_u_trunc[slice] << std::endl;
-      std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 2): " << ubxsec_event->slc_muoncandidate_dqdx_v_trunc[slice] << std::endl;
-      std::cout << "[UBXSec] \t MIP consistent ? : " << (ubxsec_event->slc_muoncandidate_mip_consistency[slice] ? "YES" : "NO") << std::endl;
+      if (_debug) {
+        std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 0): " << ubxsec_event->slc_muoncandidate_dqdx_trunc[slice] << std::endl;
+        std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 1): " << ubxsec_event->slc_muoncandidate_dqdx_u_trunc[slice] << std::endl;
+        std::cout << "[UBXSec] \t Truncated mean dQ/ds for candidate is (plane 2): " << ubxsec_event->slc_muoncandidate_dqdx_v_trunc[slice] << std::endl;
+        std::cout << "[UBXSec] \t MIP consistent ? : " << (ubxsec_event->slc_muoncandidate_mip_consistency[slice] ? "YES" : "NO") << std::endl;
+      }
 
       // Get the related PFP
       art::Ptr<recob::PFParticle> candidate_pfp = pfp_from_track.at(candidate_track.key()).at(0);
@@ -1844,6 +1834,7 @@ void UBXSec::produce(art::Event & e) {
 
     for (auto pfp : pfps_from_tpcobj){
 
+
       std::cout << "[UBXSec] \t This is PFP " << pfp->Self()  << std::endl;
       std::vector<art::Ptr<ubana::MCGhost>> mcghosts = mcghost_from_pfp.at(pfp.key());
       std::vector<art::Ptr<simb::MCParticle>> mcpars;
@@ -1873,7 +1864,7 @@ void UBXSec::produce(art::Event & e) {
         }
         ubxsec_event->true_muon_mom_matched = mcpars[0]->P();
 
-        if (_fiducial_volume.InFV(mcpars[0]->Vx(), mcpars[0]->Vy(), mcpars[0]->Vz()) && 
+        if (_fiducial_volume.InFV(mcpars[0]->Vx(), mcpars[0]->Vy(), mcpars[0]->Vz()) &&
           _fiducial_volume.InFV(mcpars[0]->EndX(), mcpars[0]->EndY(), mcpars[0]->EndZ())) {
           ubxsec_event->mc_muon_contained = true;
         }
@@ -1893,7 +1884,8 @@ void UBXSec::produce(art::Event & e) {
           if (!pid->PlaneID().isValid) continue;
           int planenum = pid->PlaneID().Plane;
           if (planenum < 0 || planenum > 2) continue;
-          std::cout << "[UBXSec] \t\t ParticleID PIDA is " << pid->PIDA() << ", plane is " << planenum << std::endl;
+          if (_debug)
+            std::cout << "[UBXSec] \t\t ParticleID PIDA is " << pid->PIDA() << ", plane is " << planenum << std::endl;
           if (/*_is_signal && (ubxsec_event->slc_origin[slice] == 0 || ubxsec_event->slc_origin[slice] == 2) &&*/ planenum == 2) {
             if (pdg == 13) {
               _h_pida_muon->Fill(pid->PIDA());
