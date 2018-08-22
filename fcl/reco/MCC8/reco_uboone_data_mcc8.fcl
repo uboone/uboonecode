@@ -864,4 +864,6 @@ microboone_reco_data_filters.dlpmtprecuts.OpHitProducer: "ophitBeam"
 microboone_reco_data_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_data_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
 
+microboone_reco_data_analyzers.DQMFlashes.OpFlashModuleLabel:  "simpleFlashCosmic"
+microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel: "simpleFlashCosmic"
 END_PROLOG
