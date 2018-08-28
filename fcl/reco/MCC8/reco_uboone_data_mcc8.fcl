@@ -545,7 +545,8 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiT
 #microboone_reco_data_producers.stitchkalmanhittag.TrackModuleLabel:              "stitchkalmanhit"
 
 # ClusterCrawler / Track Maker related
-microboone_reco_data_producers.trajcluster.TrajClusterAlg.HitFinderModuleLabel: "pandoraCosmicHitRemoval"
+microboone_reco_data_producers.trajcluster.HitModuleLabel:                        "pandoraCosmicHitRemoval"
+microboone_reco_data_producers.trajcluster.HitTruthModuleLabel:                   "NA"
 
 #microboone_reco_data_producers.trackkalmanhitcc.HitModuleLabel:                  "trajcluster"
 #microboone_reco_data_producers.trackkalmanhitcc.ClusterModuleLabel:              "trajcluster"
