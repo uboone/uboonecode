@@ -11,10 +11,29 @@ microboone_calroi:
     DigitModuleLabel:           "daq"
     NoiseSource:                3
     FFTSize:                    128      # re-initialize FFT service to this size
-    SaveWireWF:                 0
+    SaveWireWF:                 0 # save TH1D with deconvolved waveform
     MinAllowedChannelStatus:    3 # All channels greater than or equal to this status level are considered
 
     ROIFinder:                  @local::microboone_roifinderstandard
+    Deconvolution:              @local::microboone_roideconvolution
+}
+
+# Deconvolution of zero-suppressed waveforms (e.g. from SN stream) stored as recob::Wires
+microboone_calzs:
+{
+    module_type:                "CalWireZS"
+    DigitModuleLabel:           "sndaq" # Defined by the SN swizzler
+    FFTSize:                    16 # minimum size of SN stream ROI, re-initialize FFT service to this size
+    SaveWireWF:                 0 # save TH1D with deconvolved waveform (for debugging)
+    OutputHistograms:           true
+    MinAllowedChannelStatus:    3 # All channels greater than or equal to this status level are considered. So far, most of them have status 4
+
+    ZSPresamples:               7 # Number of samples saved before crossing the zero-suppression threshold
+    ZSPostsamples:              8 # Number of samples saved after crossing the zero-suppression threshold
+    MaxADCInterpolDiff:         32 # Maximum abs ADC difference to the interpolation using nearest neighbors to be considered non-flipped bits
+    MaxADCNNDiff:               64 # Maximum abs ADC difference between nearest neighbors to be considered for interpolation
+    MaxADCMedianCut:            15 # Maximum abs ADC difference between a presample/postsample and the median to be considered as baseline
+
     Deconvolution:              @local::microboone_roideconvolution
 }
 
