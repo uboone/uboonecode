@@ -521,8 +521,6 @@ microboone_dqm_ana:                    [ @sequence::microboone_dqm_ana_stage1,
 ### These are for MCC 9
 ###        Variable to override                                                                                    Values overriding defaults ###
 
-#microboone_reco_data_producers.nfsp.wcls_main.configs:                                                        [ "ubnfsp-before.json.bz2" ]
-
 # Cal data is no longer used, below is historic
 microboone_reco_data_producers.caldata.DigitModuleLabel:                                                      "butcher"
 microboone_reco_data_producers.caldata.Threshold:                                                             [0, 0, 0]  # Not what you think...

@@ -8,6 +8,8 @@
 #include "cluster_microboone.fcl"
 #include "trackfindermodules_microboone.fcl"
 #include "kalmanfilterfinaltrackfitter.fcl"
+#include "trackproducerfrompfparticle.fcl"
+#include "vertexfitter.fcl"
 #include "opticaldetectormodules_microboone.fcl"
 #include "triggeralgo_service.fcl"
 #include "cosmicremovalmodules.fcl"
@@ -18,6 +20,7 @@
 #include "pandoramodules_microboone.fcl"
 #include "photpropservices_microboone.fcl"
 #include "correct_saturation.fcl"
+#include "MuCSTrackTagger_module.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "ubflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
@@ -149,12 +152,14 @@ microboone_reco_mcc8_producers:
   ### pandora track3dkalmanhit  
   pandoraCosmicKHit:                @local::microboone_track3Dkalmanhit
   pandoraNuKHit:                    @local::microboone_track3Dkalmanhit
+  pandoraKHit:                      @local::microboone_track3Dkalmanhit
+
   
   ### pandora cosmic kalmanhit  
   pandoraCosmicPMA:                 @local::microboone_pmalgtrajfitter
   pandoraNuPMA:                     @local::microboone_pmalgtrajfitter
-  pandoraKHit:                      @local::microboone_track3Dkalmanhit
-  
+  pandoraPMA:                       @local::microboone_pmalgtrajfitter
+
   ### pandora cosmic pfparticle  
   pandoraCosmicKHitPFPart:          @local::microboone_cosmicpfparticletagger
   pandoraCosmicPFPart:              @local::microboone_cosmicpfparticletagger
