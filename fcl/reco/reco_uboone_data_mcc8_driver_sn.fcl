@@ -1,0 +1,22 @@
+#include "reco_uboone_data_mcc8_driver_common.fcl"
+
+process_name: DataRecoSN
+
+services.TFileService.fileName: "reco_sn_hist.root"
+services.DetectorClocksService.TrigModuleName: "sndaq" # SN swizzler
+
+physics.producers.sndeco: @local::microboone_calzs # SN caldata
+physics.producers.gaushit.CalDataModuleLabel: "sndeco" # Use wires from SN caldata defined above
+
+microboone_reco_data_snseq: [ rns,
+                              sndeco, # Defined above
+                              gaushit,
+                              pandoraCosmic ]
+
+physics.reco: [@sequence::microboone_reco_data_snseq]
+
+physics.trigger_paths: [ reco ]
+outputs.out1.fileName: "%ifb_%tc_recosn.root"
+outputs.out1.dataTier: "reconstructed"
+#source.inputCommands: ["keep *_*_*_*", "drop *_*_*_Data*Reco*" ]
+source.inputCommands: ["keep *_*_*_*" ]
