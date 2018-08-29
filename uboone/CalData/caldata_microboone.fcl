@@ -28,11 +28,13 @@ microboone_calzs:
     OutputHistograms:           true
     MinAllowedChannelStatus:    3 # All channels greater than or equal to this status level are considered. So far, most of them have status 4
 
+    SubtractBaseline:           true
     ZSPresamples:               7 # Number of samples saved before crossing the zero-suppression threshold
     ZSPostsamples:              8 # Number of samples saved after crossing the zero-suppression threshold
+    MaxADCMedianCut:            15 # Maximum abs ADC difference between a presample/postsample and the median to be considered as baseline
+    FixFlippingBits:            true # Try to correct flipping bits
     MaxADCInterpolDiff:         32 # Maximum abs ADC difference to the interpolation using nearest neighbors to be considered non-flipped bits
     MaxADCNNDiff:               64 # Maximum abs ADC difference between nearest neighbors to be considered for interpolation
-    MaxADCMedianCut:            15 # Maximum abs ADC difference between a presample/postsample and the median to be considered as baseline
 
     Deconvolution:              @local::microboone_roideconvolution
 }

@@ -69,6 +69,9 @@ class CalWireZS : public art::EDProducer
     // Subtract baseline from zero-suppressed ROIs and copy them to a vector of floats spanning the full wire readout. 
     // Also return a vector of pairs with the beginning/end of each ROI needed by the Deconvolve function
     void extractZSROIs(const recob::Wire::RegionsOfInterest_t&, const raw::ChannelID_t, uboone_tool::IROIFinder::CandidateROIVec&, std::vector<float>&) const;
+
+    // Get parameters for baseline modeled as linear
+    void getBaselineParams(const recob::Wire::RegionsOfInterest_t::range_const_iterator, const raw::ChannelID_t, float&, float&) const;
     
     std::string                                              fDigitModuleLabel;           ///< module that made zero-suppressed digits (stored as recob::Wires)
     std::string                                              fSpillName;                  ///< nominal spill is an empty string
@@ -87,11 +90,13 @@ class CalWireZS : public art::EDProducer
     const geo::GeometryCore*                                 fGeometry = lar::providerFrom<geo::Geometry>();
     art::ServiceHandle<util::LArFFT>                         fFFT;
 
+    bool fSubtractBaseline; ///< Subtract baseline?
     size_t fZSPresamples; ///< Number of samples saved before crossing the zero-suppression threshold
     size_t fZSPostsamples; ///< Number of samples saved after crossing the zero-suppression threshold
-    float fMaxADCInterpolDiff; //< Maximum abs ADC difference to the interpolation using nearest neighbors to be considered non-flipped bits
-    float fMaxADCNNDiff; //< Maximum abs ADC difference between nearest neighbors to be considered for interpolation
-    float fMaxADCMedianCut; //< Maximum abs ADC difference between a presample/postsample and the median to be considered as baseline
+    float fMaxADCMedianCut; ///< Maximum abs ADC difference between a presample/postsample and the median to be considered as baseline
+    bool fFixFlippingBits; ///< Try to fix flipping bits?
+    float fMaxADCInterpolDiff; ///< Maximum abs ADC difference to the interpolation using nearest neighbors to be considered non-flipped bits
+    float fMaxADCNNDiff; ///< Maximum abs ADC difference between nearest neighbors to be considered for interpolation
     
     // Define here a temporary set of histograms...
     std::vector<TH1D*> fNumROIsHistVec; // Number of ROIs after zero-suppression
@@ -138,11 +143,13 @@ void CalWireZS::reconfigure(fhicl::ParameterSet const& p)
     fSpillName.clear();
 
     // Add to FHiCL file
+    fSubtractBaseline = p.get< bool >("SubtractBaseline", true);
     fZSPresamples = p.get< size_t > ("ZSPresamples", 7);
     fZSPostsamples = p.get< size_t > ("ZSPostsamples", 8);
+    fMaxADCMedianCut = p.get< float > ("MaxADCMedianCut", 15);
+    fFixFlippingBits = p.get< bool >("FixFlippingBits", true);
     fMaxADCInterpolDiff = p.get< float > ("MaxADCInterpolDiff", 32); 
     fMaxADCNNDiff = p.get< float > ("MaxADCNNDiff", 64); 
-    fMaxADCMedianCut = p.get< float > ("MaxADCMedianCut", 15);
     
     size_t pos = fDigitModuleLabel.find(":");
     if( pos!=std::string::npos )
@@ -360,10 +367,10 @@ void CalWireZS::produce(art::Event& evt)
     return;
 } // produce
 
-  // Subtract baseline from zero-suppressed ROIs, try to correct flippling bits, and copy them to a vector of floats, also filling a CandRoiVec with the ROI limits
-  void CalWireZS::extractZSROIs( const recob::Wire::RegionsOfInterest_t & zsROIs, const raw::ChannelID_t channel, 
-				  uboone_tool::IROIFinder::CandidateROIVec& roiLimits, std::vector<float>& waveform) const
-  {
+// Subtract baseline from zero-suppressed ROIs, try to correct flippling bits, and copy them to a vector of floats, also filling a CandRoiVec with the ROI limits
+void CalWireZS::extractZSROIs( const recob::Wire::RegionsOfInterest_t & zsROIs, const raw::ChannelID_t channel, 
+			       uboone_tool::IROIFinder::CandidateROIVec& roiLimits, std::vector<float>& waveform) const
+{
     if(zsROIs.n_ranges() == 0) return; // do not waste time with empty waveforms
 
     art::ServiceHandle<art::TFileService> tfs;
@@ -382,66 +389,11 @@ void CalWireZS::produce(art::Event& evt)
 
       //roiLimits.push_back(uboone_tool::IROIFinder::CandidateROI(firstTick, pastEndTick - 1));
       roiLimits.push_back(uboone_tool::IROIFinder::CandidateROI(firstTick, pastEndTick));
-      
-      // Find the median of presamples/postsamples
-      std::vector<float> presamples; 
-      std::vector<float> postsamples; 
-      presamples.reserve(fZSPresamples);
-      postsamples.reserve(fZSPostsamples);
-      for(size_t isample = 0; isample < fZSPresamples; isample++){
-	// Get rid of weird ADC values (swizzler errors?)
-	if(ROI[firstTick + isample] > 1 && ROI[firstTick + isample] < 4096){ 
-	  presamples.push_back(ROI[firstTick + isample]); 
-	}
-      }
-      for(size_t isample = 0; isample < fZSPostsamples; isample++){
-	// Get rid of weird ADC values (swizzler errors?)
-	if(ROI[pastEndTick - 1 - isample] > 1 && ROI[pastEndTick - 1 - isample] < 4096){
-	  postsamples.push_back(ROI[pastEndTick - 1 - isample]);
-	}
-      }
-      std::sort(presamples.begin(), presamples.end()); 
-      std::sort(postsamples.begin(), postsamples.end()); 
-      const size_t goodPresamples = presamples.size();
-      const size_t goodPostsamples = postsamples.size();
-      const float medianPresample = ((goodPresamples % 2) == 0)?
-	(presamples[goodPresamples/2 - 1] + presamples[goodPresamples/2])/2. : presamples[goodPresamples/2];
-      const float medianPostsample = ((goodPostsamples % 2) == 0)?
-	(postsamples[goodPostsamples/2 - 1] + postsamples[goodPostsamples/2])/2. : postsamples[goodPostsamples/2];
 
-      // Get the earliest presample and latest postsample which are close to the medians
-      float prebaseline = -4095; // baseline estimated from presamples
-      float postbaseline = -4095; // baseline estimated from postsamples
-      size_t pretick = -1; // tick with baseline estimated from presamples
-      size_t postick = -1; // tick with baseline estimated from postsamples
-      for(size_t isample = 0; isample < fZSPresamples; isample++){
-	if(fOutputHistograms && ROI[firstTick + isample] > 1 && ROI[firstTick + isample] < 4096) 
-	  fDiffPresamplesMedianHist->Fill(channel, ROI[firstTick + isample]- medianPresample);
-
-	if(fabs(ROI[firstTick + isample]- medianPresample) < fMaxADCMedianCut){
-	  pretick = firstTick + isample;
-	  prebaseline = ROI[pretick];
-	  break;
-	}
-      }
-      for(size_t isample = 0; isample < fZSPostsamples; isample++){
-	// Clara's bug: first sample over threshold is copied as last postsample
-	if( isample == 0 && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples] ) continue;
-
-	if(fOutputHistograms && ROI[pastEndTick - 1 - isample] > 1 && ROI[pastEndTick - 1 - isample] < 4096)
-	  fDiffPostsamplesMedianHist->Fill(channel, ROI[pastEndTick - isample]- medianPostsample);
-
-	if(fabs(ROI[pastEndTick - 1 -  isample] - medianPostsample) < fMaxADCMedianCut){
-	  postick = pastEndTick - 1 - isample;
-	  postbaseline = ROI[postick];
-	  break;
-	}
-      }
-      
       // Linear interpolation for baseline
-      const float slope = (postbaseline - prebaseline)/(postick - pretick);
-      //const float intercept = (postick*prebaseline - postbaseline*pretick)/(postick - pretick);
-      const float intercept = prebaseline - slope*pretick;;
+      float slope = 0.;
+      float intercept = 0.;
+      if( fSubtractBaseline ) getBaselineParams(iROI, channel, slope, intercept);
       
       // Loop over ADCs within a zero-suppressed ROI and subtract baseline
       // Also correct flipping bits
@@ -450,23 +402,24 @@ void CalWireZS::produce(art::Event& evt)
 	// Get rid of weird ADC values (swizzler errors?)
 	if(ROI[iTick] > 1 && ROI[iTick] < 4096) waveform[iTick] = ROI[iTick]- slope*iTick - intercept;
 
-	// Check for flipping bits and correct if needed
-	// Get neighbor ADCs for comparison to interpolation
-	float preADC = iTick > 0? waveform[iTick - 1] : 0.; // Assume 0 ADC for the sample preceding the 0th sample
-	float postADC = 0.;
-	if( iTick < pastEndTick - 1 ){ // If not at the last sample
-	  // Check the neighbor ADC has not flipped bits
-	  if( fabs(ROI[iTick + 1] - slope*(iTick + 1) - intercept - preADC) < 2.*fMaxADCNNDiff ){
-	    postADC = ROI[iTick + 1]- slope*(iTick + 1) - intercept;
-	    // Clara's bug: first sample over threshold is copied as last postsample
-	    if( iTick + 1 == (pastEndTick - 1) && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples] ) postADC = preADC; 
-	  } else postADC = preADC;
+	if( fFixFlippingBits ){
+	  // Check for flipping bits and correct if needed
+	  // Get neighbor ADCs for comparison to interpolation
+	  float preADC = iTick > 0? waveform[iTick - 1] : 0.; // Assume 0 ADC for the sample preceding the 0th sample
+	  float postADC = 0.;
+	  if( iTick < pastEndTick - 1 ){ // If not at the last sample
+	    // Check the neighbor ADC has not flipped bits
+	    if( fabs(ROI[iTick + 1] - slope*(iTick + 1) - intercept - preADC) < 2.*fMaxADCNNDiff ){
+	      postADC = ROI[iTick + 1]- slope*(iTick + 1) - intercept;
+	      // Clara's bug: first sample over threshold is copied as last postsample
+	      if( iTick + 1 == (pastEndTick - 1) && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples] ) postADC = preADC; 
+	    } else postADC = preADC;
+	  }
+	  // Interpolate to correct for flipped bits
+	  waveform[iTick] = fabs(waveform[iTick] - (preADC + postADC)/2.) < fMaxADCInterpolDiff? waveform[iTick] : (preADC + postADC)/2.;
+	  // Clara's bug: first sample over threshold is copied as last postsample
+	  if(iTick == (pastEndTick - 1) && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples]) waveform[iTick] = waveform[iTick - 1]; 
 	}
-
-	// Interpolate to correct for flipped bits
-	waveform[iTick] = fabs(waveform[iTick] - (preADC + postADC)/2.) < fMaxADCInterpolDiff? waveform[iTick] : (preADC + postADC)/2.;
-	// Clara's bug: first sample over threshold is copied as last postsample
-	if(iTick == (pastEndTick - 1) && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples]) waveform[iTick] = waveform[iTick - 1]; 
       }
 
       // Low-level plot of each ROI before and after background subtraction
@@ -493,18 +446,6 @@ void CalWireZS::produce(art::Event& evt)
       // 	// canvas.Print(".png");
       // }
       
-      // Make some histograms?
-      if (fOutputHistograms){
-	// First up, determine what kind of wire we have
-	std::vector<geo::WireID> wids    = fGeometry->ChannelToWire(channel);
-	const geo::PlaneID&      planeID = wids[0].planeID();
-	fPedPresampleHistVec.at(planeID.Plane)->Fill(prebaseline);
-	fPedPostsampleHistVec.at(planeID.Plane)->Fill(postbaseline);
-	fPedPresampleHist->Fill(channel, prebaseline);
-	fPedPostsampleHist->Fill(channel, postbaseline);
-	fGoodPresamplesHist->Fill(channel, goodPresamples);
-	fGoodPostsamplesHist->Fill(channel, goodPostsamples);
-      }
       ctrROI++;
     } // End of loop over zero-suppressed ROIs within a wire
 
@@ -515,6 +456,88 @@ void CalWireZS::produce(art::Event& evt)
 	hWF->Fill((int)i, waveform[i]);
       }
     }
-  } // end of CalWireZS::extractZSROIs
+} // end of CalWireZS::extractZSROIs
+
+// Get parameters for baseline modeled as linear
+void CalWireZS::getBaselineParams( const recob::Wire::RegionsOfInterest_t::range_const_iterator itROI, const raw::ChannelID_t channel,
+				   float& slope, float& intercept ) const
+{
+    auto ROI = *itROI;
+    const size_t firstTick = ROI.begin_index();
+    const size_t pastEndTick = ROI.end_index();
+
+    // Find the median of presamples/postsamples
+    std::vector<float> presamples; 
+    std::vector<float> postsamples; 
+    presamples.reserve(fZSPresamples);
+    postsamples.reserve(fZSPostsamples);
+    for(size_t isample = 0; isample < fZSPresamples; isample++){
+      // Get rid of weird ADC values (swizzler errors?)
+      if(ROI[firstTick + isample] > 1 && ROI[firstTick + isample] < 4096){ 
+	presamples.push_back(ROI[firstTick + isample]); 
+      }
+    }
+    for(size_t isample = 0; isample < fZSPostsamples; isample++){
+      // Get rid of weird ADC values (swizzler errors?)
+      if(ROI[pastEndTick - 1 - isample] > 1 && ROI[pastEndTick - 1 - isample] < 4096){
+	postsamples.push_back(ROI[pastEndTick - 1 - isample]);
+      }
+    }
+    std::sort(presamples.begin(), presamples.end()); 
+    std::sort(postsamples.begin(), postsamples.end()); 
+    const size_t goodPresamples = presamples.size();
+    const size_t goodPostsamples = postsamples.size();
+    const float medianPresample = ((goodPresamples % 2) == 0)?
+      (presamples[goodPresamples/2 - 1] + presamples[goodPresamples/2])/2. : presamples[goodPresamples/2];
+    const float medianPostsample = ((goodPostsamples % 2) == 0)?
+      (postsamples[goodPostsamples/2 - 1] + postsamples[goodPostsamples/2])/2. : postsamples[goodPostsamples/2];
+    
+    // Get the earliest presample and latest postsample which are close to the medians
+    float prebaseline = -4095; // baseline estimated from presamples
+    float postbaseline = -4095; // baseline estimated from postsamples
+    size_t pretick = -1; // tick with baseline estimated from presamples
+    size_t postick = -1; // tick with baseline estimated from postsamples
+    for(size_t isample = 0; isample < fZSPresamples; isample++){
+      if(fOutputHistograms && ROI[firstTick + isample] > 1 && ROI[firstTick + isample] < 4096) 
+	fDiffPresamplesMedianHist->Fill(channel, ROI[firstTick + isample]- medianPresample);
+      
+      if(fabs(ROI[firstTick + isample]- medianPresample) < fMaxADCMedianCut){
+	pretick = firstTick + isample;
+	prebaseline = ROI[pretick];
+	break;
+      }
+    }
+    for(size_t isample = 0; isample < fZSPostsamples; isample++){
+      // Clara's bug: first sample over threshold is copied as last postsample
+      if( isample == 0 && ROI[pastEndTick - 1] == ROI[firstTick + fZSPresamples] ) continue;
+      
+      if(fOutputHistograms && ROI[pastEndTick - 1 - isample] > 1 && ROI[pastEndTick - 1 - isample] < 4096)
+	fDiffPostsamplesMedianHist->Fill(channel, ROI[pastEndTick - isample]- medianPostsample);
+      
+      if(fabs(ROI[pastEndTick - 1 -  isample] - medianPostsample) < fMaxADCMedianCut){
+	postick = pastEndTick - 1 - isample;
+	postbaseline = ROI[postick];
+	break;
+      }
+    }
+      
+    // Linear interpolation for baseline
+    slope = (postbaseline - prebaseline)/(postick - pretick);
+    // intercept = (postick*prebaseline - postbaseline*pretick)/(postick - pretick);
+    intercept = prebaseline - slope*pretick;;
+    
+    // Make some histograms?
+    if (fOutputHistograms){
+      // First up, determine what kind of wire we have
+      std::vector<geo::WireID> wids    = fGeometry->ChannelToWire(channel);
+      const geo::PlaneID&      planeID = wids[0].planeID();
+      fPedPresampleHistVec.at(planeID.Plane)->Fill(prebaseline);
+      fPedPostsampleHistVec.at(planeID.Plane)->Fill(postbaseline);
+      fPedPresampleHist->Fill(channel, prebaseline);
+      fPedPostsampleHist->Fill(channel, postbaseline);
+      fGoodPresamplesHist->Fill(channel, goodPresamples);
+      fGoodPostsamplesHist->Fill(channel, goodPostsamples);
+    }
+} //end of CalWireZS::getBaselineParams
 
 } // end namespace caldata
