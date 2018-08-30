@@ -797,10 +797,10 @@ microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromComb
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
-microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                fals
+microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandora"
 microboone_reco_mcc8_producers.pandoraKalmanShower.trackFromPF:                                                false
-microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               tru
+microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               true
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputPFParticleLabel:                               "pandora"
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputTracksLabel:                                   "pandoraKalmanTrack"
 
