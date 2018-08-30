@@ -51,7 +51,7 @@ namespace ubana{
     void SetEvent(UBXSecEvent*);
 
     /// Returns true if this event is selected
-    bool IsSelected(size_t & slice_index, std::map<std::string,bool> & failure_map);
+    bool IsSelected(int & slice_index, std::map<std::string,bool> & failure_map);
 
   protected:
 
@@ -72,8 +72,8 @@ namespace ubana{
     double _ntrack_cut;
     double _residuals_std_down_cut;
     double _residuals_std_up_cut;
-    double _residuals_mean_down_cut;
-    double _residuals_mean_up_cut;
+    // double _residuals_mean_down_cut;
+    // double _residuals_mean_up_cut;
     double _perc_used_hits_in_cluster_cut;
 
     double _pe_cut;
