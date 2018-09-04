@@ -105,11 +105,12 @@ wcls: {
           tool_type: WCLS
           apps: ["Pgrapher"]
           plugins: ["WireCellPgraph", "WireCellGen","WireCellSio", "WireCellLarsoft"]
-          configs: ["simulation/uboone-driftsim.jsonnet"]
+          configs: ["pgrapher/experiment/uboone/uboone-sim.jsonnet"]
           inputers: ["wclsSimDepoSource"]
-          outputers: ["wclsFrameSaver"]
+          outputers: [
+             "wclsFrameSaver:simdigits"
+          ]
           params: {
-              detector: "uboone"
           }
       }
    }
