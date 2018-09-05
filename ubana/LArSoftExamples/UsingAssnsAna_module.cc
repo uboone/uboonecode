@@ -90,7 +90,17 @@ class UsingAssnsAna : public art::EDAnalyzer {
 
     // initialise service handles
     // services basically contain a lot of functions which
-    // make your life easier. Use liberally.
+    // make your life easier. 
+    // There are a few Services you might want to use as an analyzer:
+    // * art::TFileService
+    //   -- used for saving information to root files (Trees, histograms, etc.)
+    // * cheat::BackTracker
+    //   -- used to do reco-true matching
+    // * geo::Geometry
+    //   -- used to access detector geometry information (length, height, 
+    //      convert ticks to X position, etc.)
+    // * sim::LArG4Parameters
+    //   -- used to access information about LAr
     art::ServiceHandle< art::TFileService > tfs;
 
     // defining private member variables here
