@@ -149,6 +149,9 @@ microboone_reco_data_producers:
     pandoraNuShower:                  @local::microboone_pandoraShowerCreation
     pandoraNu:                        @local::microboone_pandoraSplitting
 
+    ### pandora debug
+    pandoraWriter:                    @local::microboone_pandoraWriter
+
     ### pandora track3dkalmanhit
     pandoraCosmicKHit:                @local::microboone_track3Dkalmanhit
     pandoraNuKHit:                    @local::microboone_track3Dkalmanhit
@@ -352,7 +355,8 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
                                          @sequence::microboone_reco_data_cctracks 
                                        ]
 
-microboone_reco_data_pandoraFull:      [ pandoraPatRec,
+microboone_reco_data_pandoraFull:      [ pandoraWriter,
+                                         pandoraPatRec,
                                          pandoraTrack,
                                          pandoraShower,
                                          pandora,
@@ -586,6 +590,8 @@ microboone_reco_data_producers.pandoraCosmic.InputProducerLabel:                
 microboone_reco_data_producers.pandoraCosmic.TrackProducerLabel:                                              "pandoraCosmicTrack"
 microboone_reco_data_producers.pandoraCosmic.ShowerProducerLabel:                                             "pandoraCosmicShower"
 microboone_reco_data_producers.pandoraCosmic.HitProducerLabel:                                                "gaushit"
+
+microboone_reco_data_producers.pandoraWriter.EnableMCParticles:                                                false
 
 microboone_reco_data_producers.pandoraCosmicKHit.UseClusterHits:                                              false
 microboone_reco_data_producers.pandoraCosmicKHit.UsePFParticleHits:                                           true

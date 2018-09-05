@@ -148,12 +148,14 @@ microboone_reco_mcc8_producers:
   pandoraNuTrack:                   @local::microboone_pandoraTrackCreation
   pandoraNuShower:                  @local::microboone_pandoraShowerCreation
   pandoraNu:                        @local::microboone_pandoraSplitting
+
+  ### pandora debug
+  pandoraWriter:                    @local::microboone_pandoraWriter
   
   ### pandora track3dkalmanhit  
   pandoraCosmicKHit:                @local::microboone_track3Dkalmanhit
   pandoraNuKHit:                    @local::microboone_track3Dkalmanhit
   pandoraKHit:                      @local::microboone_track3Dkalmanhit
-
   
   ### pandora cosmic kalmanhit  
   pandoraCosmicPMA:                 @local::microboone_pmalgtrajfitter
@@ -366,7 +368,8 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
                                          @sequence::microboone_reco_mcc8_cctracks,
                                          trajclusterTruthMatch ]
 
-microboone_reco_mcc8_pandoraFull: [      pandoraPatRec,
+microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
+                                         pandoraPatRec,
                                          pandoraTrack,
                                          pandoraShower,
                                          pandora,
@@ -604,7 +607,9 @@ microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                
 microboone_reco_mcc8_producers.pandoraCosmic.TrackProducerLabel:                                               "pandoraCosmicTrack"
 microboone_reco_mcc8_producers.pandoraCosmic.ShowerProducerLabel:                                              "pandoraCosmicShower"
 microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                                                 "gaushit"
-                             
+
+microboone_reco_mcc8_producers.pandoraWriter.EnableMCParticles:                                                true
+
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UseClusterHits:                                               false
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UsePFParticleHits:                                            true
 microboone_reco_mcc8_producers.pandoraCosmicKHit.Track3DKalmanHitAlg.SelfSeed:                                 true
