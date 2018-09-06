@@ -13,12 +13,13 @@ wcls: {
          // The tool marshals the art::Event to these visitors before
          inputers: ["wclsRawFrameSource", "wclsMultiChannelNoiseDB"]
          // or after the WCT app is run.
-         outputers: ["wclsFrameSaver:nfsaver", "wclsFrameSaver:thsaver", "wclsFrameSaver:spsaver"]
+         //outputers: ["wclsFrameSaver:nfsaver", "wclsFrameSaver:thsaver", "wclsFrameSaver:spsaver"]
+         outputers: ["wclsFrameSaver:nfsaver", "wclsFrameSaver:spsaver"]
 
          // This is relative to the wire-cell-cfg directory.  If the
          // "uboone/nfspl1/" part is split out by itself, just make
          // sure to still have around the top level cfg/*.jsonnet files.
-         configs: ["nfspl1/uboone-nfspl1.jsonnet"]
+         configs: ["pgrapher/experiment/uboone/wcls-nf-sp.jsonnet"]
 
          // Allow setting of select WCT parameters as
          //   key <--> scalar
@@ -27,8 +28,9 @@ wcls: {
          // access the key via a call to the std.extVar(key) function.
          // An entry is equivalent to one "-V" option to wire-cell CLI.
          params : {
-            // key1: "value"
-            // key2: 42
+           raw_input_label: "daq"
+	   reality: "data"
+           epoch: "dynamic"
          }
 
          // Allow setting of select WCT parameters as
@@ -45,7 +47,7 @@ wcls: {
             // override: "{noisedb:{epoch:\"multi\", flavor:\"wcls\", run12boundary:7000}}"
 
             // Run without services
-            override: "{noisedb:{epoch:\"multi\", flavor:\"wct\", run12boundary:7000}}"
+            //override: "{noisedb:{epoch:\"multi\", flavor:\"wct\", run12boundary:7000}}"
          }
       }
    }
@@ -60,14 +62,14 @@ wcls: {
          plugins: ["WireCellGen", "WireCellSigProc", "WireCellSio", "WireCellPgraph", "WireCellLarsoft"]
 
          // The tool marshals the art::Event to these visitors before
-         inputers: ["wclsRawFrameSource", "wclsMultiChannelNoiseDB"]
+         inputers: ["wclsRawFrameSource"]
          // or after the WCT app is run.
-         outputers: ["wclsFrameSaver:nfsaver", "wclsFrameSaver:thsaver", "wclsFrameSaver:spsaver"]
+         outputers: ["wclsFrameSaver:nfsaver", "wclsFrameSaver:spsaver"]
 
          // This is relative to the wire-cell-cfg directory.  If the
          // "uboone/nfspl1/" part is split out by itself, just make
          // sure to still have around the top level cfg/*.jsonnet files.
-         configs: ["simulation/uboone-simnfspl1.jsonnet"]
+         configs: ["pgrapher/experiment/uboone/wcls-nf-sp.jsonnet"]
 
          // Allow setting of select WCT parameters as
          //   key <--> scalar
@@ -76,8 +78,9 @@ wcls: {
          // access the key via a call to the std.extVar(key) function.
          // An entry is equivalent to one "-V" option to wire-cell CLI.
          params : {
-            // key1: "value"
-            // key2: 42
+           raw_input_label: "driftWC:orig"
+	   reality: "sim"
+           epoch: "perfect"
          }
 
          // Allow setting of select WCT parameters as
@@ -94,7 +97,7 @@ wcls: {
             // override: "{noisedb:{epoch:\"multi\", flavor:\"wcls\", run12boundary:7000}}"
 
             // Run without services
-            override: "{noisedb:{epoch:\"multi\", flavor:\"wct\", run12boundary:7000}}"
+            //override: "{noisedb:{epoch:\"multi\", flavor:\"wct\", run12boundary:7000}}"
          }
       }
    }
