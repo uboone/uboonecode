@@ -23,6 +23,6 @@ microboone_tfile_metadata:
 {
   JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
   GenerateTFileMetadata: [true, true]
-  dataTier:              ["root-tuple", "pandora"]
+  dataTier:              ["root-tuple", "pandora_debug"]
   fileFormat:            ["root", "pndr"]
 }
