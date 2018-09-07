@@ -1,7 +1,7 @@
 // default denotes which options to be marked as true for nominal WCLS production
 
 BEGIN_PROLOG
-celltreeub: {
+celltreeub_mc: {
  module_type : "CellTreeUB"
  TPC_rawProducer               : "daq"
  TPC_rawLabel                  : ""
@@ -33,7 +33,7 @@ celltreeub: {
  POT_bnb2label                 : "bnbETOR860"
  POT_numilabel                 : "numiETORTGT"
  SaveTPC_raw                   : false # noise filtered short or raw (unfiltered) waveform  
- SaveTPC_noiseFiltered         : false   # default, noise filtered waveform float type; subsequently converted to short through scale & shift
+ SaveTPC_noiseFiltered         : false # noise filtered waveform float type; subsequently converted to short through scale & shift
  SaveTPC_deconWiener           : true  # default
  SaveTPC_deconGaussian         : true  # default
  SaveTPC_badChannelList        : true  # default

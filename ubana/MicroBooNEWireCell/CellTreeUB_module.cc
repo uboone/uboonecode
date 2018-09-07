@@ -454,19 +454,19 @@ namespace wc{
   void CellTreeUB::reset(){
     if(fSaveTPC_raw){
       fTPCraw_channelId.clear();
-      fTPCraw_wf->Clear();
+      fTPCraw_wf->Delete();
     }
     if(fSaveTPC_noiseFiltered){
       fTPCnoiseFiltered_channelId.clear();
-      fTPCnoiseFiltered_wf->Clear();
+      fTPCnoiseFiltered_wf->Delete();
     }
     if(fSaveTPC_deconWiener){
       fTPCdeconWiener_channelId.clear();
-      fTPCdeconWiener_wf->Clear();
+      fTPCdeconWiener_wf->Delete();
     }
     if(fSaveTPC_deconGaussian){
       fTPCdeconGaussian_channelId.clear();
-      fTPCdeconGaussian_wf->Clear();
+      fTPCdeconGaussian_wf->Delete();
     }
     if(fSaveTPC_badChannelList){
       fBadChannel.clear();
@@ -485,13 +485,13 @@ namespace wc{
       fOp_cosmic_lg_timestamp.clear();
       fOp_beam_hg_timestamp.clear();
       fOp_beam_lg_timestamp.clear();
-      fOp_cosmic_hg_wf->Clear();
-      fOp_cosmic_lg_wf->Clear();
-      fOp_beam_hg_wf->Clear();
-      fOp_beam_lg_wf->Clear();
+      fOp_cosmic_hg_wf->Delete();
+      fOp_cosmic_lg_wf->Delete();
+      fOp_beam_hg_wf->Delete();
+      fOp_beam_lg_wf->Delete();
     }
     if(fSavePMT_wfmSaturation){
-      fOp_wf->Clear();
+      fOp_wf->Delete();
       fOp_femch.clear();
       fOp_timestamp.clear();
     }
