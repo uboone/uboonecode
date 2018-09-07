@@ -51,6 +51,9 @@ microboone_reco_data_services:
 # downstream code as well! 
 microboone_reco_data_services.DetectorPropertiesService.NumberTimeSamples:        6400
 microboone_reco_data_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+microboone_reco_data_services.DetectorPropertiesService.TimeOffsetU:              0.
+microboone_reco_data_services.DetectorPropertiesService.TimeOffsetV:              -4.539
+microboone_reco_data_services.DetectorPropertiesService.TimeOffsetZ:              -7.782
 microboone_reco_data_services.DetectorClocksService.InheritClockConfig:           false
 microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 microboone_reco_data_services.DetectorClocksService.TrigModuleName:               "daq"
