@@ -47,6 +47,9 @@ microboone_reco_mcc8_services:
 }
 microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:                6400
 microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:                6400
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetU:                      0.
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetV:                      -4.539
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetZ:                      -7.782
 microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:                   false
 microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:                     -0.400e3
 
@@ -148,12 +151,14 @@ microboone_reco_mcc8_producers:
   pandoraNuTrack:                   @local::microboone_pandoraTrackCreation
   pandoraNuShower:                  @local::microboone_pandoraShowerCreation
   pandoraNu:                        @local::microboone_pandoraSplitting
+
+  ### pandora debug
+  pandoraWriter:                    @local::microboone_pandoraWriter
   
   ### pandora track3dkalmanhit  
   pandoraCosmicKHit:                @local::microboone_track3Dkalmanhit
   pandoraNuKHit:                    @local::microboone_track3Dkalmanhit
   pandoraKHit:                      @local::microboone_track3Dkalmanhit
-
   
   ### pandora cosmic kalmanhit  
   pandoraCosmicPMA:                 @local::microboone_pmalgtrajfitter
@@ -366,12 +371,13 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
                                          @sequence::microboone_reco_mcc8_cctracks,
                                          trajclusterTruthMatch ]
 
-microboone_reco_mcc8_pandoraFull: [      pandoraPatRec,
+microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
+                                         pandoraPatRec,
                                          pandoraTrack,
                                          pandoraShower,
                                          pandora,
                                          pandoratag,
-                                         pandoraContTag,
+                                         #pandoraContTag,
                                          pandoraMCSMu,
                                          pandoracalo,
                                          pandorapid,
@@ -395,7 +401,7 @@ microboone_reco_mcc8_pandoraFull: [      pandoraPatRec,
                                          pandoraKalmanShowercalo,
                                          pandoraKalmanShowerpid,
                                          pandoraPMAtag,
-                                         pandoraPMAContTag,
+                                         #pandoraPMAContTag,
                                          pandoraPMAcalo,
                                          pandoraPMApid,
                                          pandoraPMAcali,
@@ -604,7 +610,9 @@ microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                
 microboone_reco_mcc8_producers.pandoraCosmic.TrackProducerLabel:                                               "pandoraCosmicTrack"
 microboone_reco_mcc8_producers.pandoraCosmic.ShowerProducerLabel:                                              "pandoraCosmicShower"
 microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                                                 "gaushit"
-                             
+
+microboone_reco_mcc8_producers.pandoraWriter.EnableMCParticles:                                                true
+
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UseClusterHits:                                               false
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UsePFParticleHits:                                            true
 microboone_reco_mcc8_producers.pandoraCosmicKHit.Track3DKalmanHitAlg.SelfSeed:                                 true
@@ -793,14 +801,16 @@ microboone_reco_mcc8_producers.pandoraKHit.ClusterModuleLabel:                  
 microboone_reco_mcc8_producers.pandoraKHit.HitFinderModuleLabel:                                               "gaushit"
 
 microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandora"
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
+#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
+#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        false
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             ""
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
-microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                fals
+microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandora"
 microboone_reco_mcc8_producers.pandoraKalmanShower.trackFromPF:                                                false
-microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               tru
+microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               true
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputPFParticleLabel:                               "pandora"
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputTracksLabel:                                   "pandoraKalmanTrack"
 
