@@ -10,5 +10,5 @@ physics.ana: [ @sequence::microboone_dlprod_ana ]
 physics.trigger_paths: [ reco ]
 physics.end_paths: [ ana, stream1 ]
 outputs.out1.fileName: "%ifb_%tc_reco1.root"
-outputs.out1.dataTier: "reconstructed-2d"
+outputs.out1.dataTier: "reconstructed"
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
