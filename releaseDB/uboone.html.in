@@ -38,8 +38,6 @@ Release notes and previous versions of uboonecode can be found at the following 
     <ul>
       <li>Download the script.</li>
       <li>chmod +x pullProducts</li>
-      <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s70-e15 &lt;prof|debug&gt;</pre></li>
-      <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s70-e15 &lt;prof|debug&gt;</pre></li>
       <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s70-e17 &lt;prof|debug&gt;</pre></li>
       <li>Scientific Linux 7.x: <pre>./pullProducts &lt;product-directory&gt; slf7 uboone-@UBOONECODE_DOT_VERSION@ s70-e17 &lt;prof|debug&gt;</pre></li>
       <li>Scientific Linux 6.x: <pre>./pullProducts &lt;product-directory&gt; slf6 uboone-@UBOONECODE_DOT_VERSION@ s70-c2 &lt;prof|debug&gt;</pre></li>
