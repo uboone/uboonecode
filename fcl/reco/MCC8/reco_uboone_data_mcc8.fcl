@@ -329,9 +329,9 @@ microboone_reco_data_optical: [ saturation,
                                 simpleFlashBeamLowPE]
 
 microboone_reco_data_signalprocessing: [ #digitfilter,
-    wcNoiseFilter,
-    #nfspl1,
-    #butcher,
+    #wcNoiseFilter,
+    nfspl1,
+    butcher,
     caldata,
     gaushit ]
 
