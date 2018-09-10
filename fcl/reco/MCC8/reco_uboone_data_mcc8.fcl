@@ -51,6 +51,12 @@ microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:           
 microboone_reco_data_services.DetectorClocksService.TrigModuleName:               "daq"
 microboone_reco_data_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus: true
 
+### note that the wirecell noise filtering and signal processing will return zero baseline RawDigits
+microboone_reco_data_services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+microboone_reco_data_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+microboone_reco_data_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+
+
 microboone_reco_data_services_fullrawdigits:
 {
   PhotonVisibilityService:    @local::microboone_photonvisibilityservice
@@ -335,33 +341,6 @@ microboone_reco_data_signalprocessing: [ #digitfilter,
     caldata,
     gaushit ]
 
-microboone_reco_data_fuzzycluster: [     #fuzzycluster ]
-                                         #fuzzyclustermerger ]
-					 ]
-
-microboone_reco_data_fuzzytracks: [      #trackkalmanhit,
-                                         #stitchkalmanhit,
-                                         #trackkalmanhitcalo,
-                                         #stitchkalmanhitcalo,
-                                         #trackkalmanhitpid,
-                                         #stitchkalmanhitpid,
-                                         #trackkalmanhittag,
-                                         #stitchkalmanhittag,
-                                         #trackkalmanhitContTag,
-                                         #stitchkalmanhitContTag,
-                                         #trackkalmanhitT0Reco,
-                                         #stitchkalmanhitT0Reco,
-                                         #trackkalmanhitT0RecoLoose,
-                                         #stitchkalmanhitT0RecoLoose,
-                                         #trackkalmanhitT0RecoBeam,
-                                         #stitchkalmanhitT0RecoBeam ]
-                                         #showerrecofuzzy ]
-					 ]
-
-microboone_reco_data_fuzzypath: [        #@sequence::microboone_reco_data_fuzzycluster,
-                                         #@sequence::microboone_reco_data_fuzzytracks ]
-					 ]
-
 microboone_reco_data_clustercrawler: [   trajcluster ]
 
 microboone_reco_data_cctracks: [         #trackkalmanhitcc,
@@ -516,8 +495,7 @@ microboone_dqm_ana: [                    @sequence::microboone_dqm_ana_stage1,
 # this turns on the truncation of the RawDigits
 #microboone_reco_data_producers.digitfilter.TruncateTicks:                        true
 
-#microboone_reco_data_producers.nfsp.wcls_main.configs:                           [ "ubnfsp-before.bz2" ]
-microboone_reco_data_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
+microboone_reco_data_producers.caldata.DigitModuleLabel:                         "butcher"
 microboone_reco_data_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
 microboone_reco_data_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
 microboone_reco_data_producers.caldata.ROIFinder.Threshold:                      [0, 0, 0]
