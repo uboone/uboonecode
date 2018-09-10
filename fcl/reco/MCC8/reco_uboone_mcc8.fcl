@@ -27,7 +27,6 @@
 
 #include "mchitmodules.fcl"
 #include "mcreco.fcl"
-#include "eventweight_microboone_BNBcorrectionOnly.fcl"
 
 #include "microboone_dlpmtprecuts.fcl"
 #include "dlprod_fclbase_analyzers.fcl"
@@ -267,10 +266,6 @@ microboone_reco_mcc8_producers:
   #stitchkalmanhitT0RecoBeam:     @local::T0RecoAnodeCathodePiercing_mc_beamgate
   #trackkalmanhitT0RecoBeam:      @local::T0RecoAnodeCathodePiercing_mc_beamgate
 
-  ### Adds the necessary event weights for the MC
-  eventweight:                   @local::microboone_eventweight
-  
-
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
   pandoraCosmicKalmanTrackTruthMatch:     @local::standard_mctrutht0matching
@@ -477,8 +472,7 @@ microboone_reco_mcc8_truthmatch: [       pandoraCosmicKHitTruthMatch,
 
 microboone_reco_mcc8: [                  rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
-					                               @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
                                          gaushitTruthMatch,
 					                               #@sequence::microboone_reco_mcc8_fuzzypath,
@@ -488,8 +482,7 @@ microboone_reco_mcc8: [                  rns,
 
 microboone_reco_mcc8_stage1: [           rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
-					                               @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
 					                               gaushitTruthMatch ]
                                          #@sequence::microboone_reco_mcc8_fuzzypath ]
@@ -501,7 +494,6 @@ microboone_reco_mcc8_stage2: [           rns,
 
 microboone_reco_mcc8_core: [             rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
 					                               @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
 					                               gaushitTruthMatch ]
