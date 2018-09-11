@@ -17,7 +17,6 @@ services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
-
 microboone_tfile_metadata:
 {
     JSONFileName:          "reco_stage_1_hist.root.json"

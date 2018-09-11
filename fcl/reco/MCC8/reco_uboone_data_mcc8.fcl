@@ -44,12 +44,12 @@ microboone_reco_data_services:
   OpDigiProperties:           @local::microboone_opdigiproperties
                               @table::microboone_services_reco
 }
-microboone_reco_data_services.DetectorPropertiesService.NumberTimeSamples:                6400
-microboone_reco_data_services.DetectorPropertiesService.ReadOutWindowSize:                6400
-microboone_reco_data_services.DetectorClocksService.InheritClockConfig:                   false
-microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:                     -0.400e3
-microboone_reco_data_services.DetectorClocksService.TrigModuleName:                       "daq"
-microboone_reco_data_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus:       true
+microboone_reco_data_services.DetectorPropertiesService.NumberTimeSamples:        6400
+microboone_reco_data_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+microboone_reco_data_services.DetectorClocksService.InheritClockConfig:           false
+microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+microboone_reco_data_services.DetectorClocksService.TrigModuleName:               "daq"
+microboone_reco_data_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus: true
 
 ### note that the wirecell noise filtering and signal processing will return zero baseline RawDigits
 microboone_reco_data_services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
@@ -335,10 +335,11 @@ microboone_reco_data_optical: [ saturation,
                                 simpleFlashBeamLowPE]
 
 microboone_reco_data_signalprocessing: [ #digitfilter,
-                                         nfspl1,
-                                         butcher,
-                                         caldata,
-                                         gaushit ]
+    #wcNoiseFilter,
+    nfspl1,
+    butcher,
+    caldata,
+    gaushit ]
 
 microboone_reco_data_clustercrawler: [   trajcluster ]
 
@@ -353,13 +354,13 @@ microboone_reco_data_cctracks: [         #trackkalmanhitcc,
                                          pmtrack,
                                          pmtracktag,
                                          pmtrackContTag,
-                                         pmtrackMCSMu,
+					 pmtrackMCSMu,
                                          pmtrackT0Reco,
                                          pmtrackT0RecoLoose,
                                          pmtrackT0RecoBeam,
                                          pmtrackcalo,
                                          pmtrackpid,
-                                         pmtrackcali,
+					 pmtrackcali,
                                          pmtrackcalipid]
 
 microboone_reco_data_ccpath: [           @sequence::microboone_reco_data_clustercrawler,
@@ -413,17 +414,17 @@ microboone_reco_data_pandoraNu: [        pandoraNuPatRec,
                                          pandoraNuMCSMu,
                                          pandoraNucalo,
                                          pandoraNupid,
-                                         pandoraNucali,
+					 pandoraNucali,
                                          pandoraNucalipid,
                                          pandoraNuKHittag,
                                          pandoraNuKHitcalo,
                                          pandoraNuKHitpid,
-                                         pandoraNuKHitcali,
+					 pandoraNuKHitcali,
                                          pandoraNuKHitcalipid,
                                          pandoraNuKalmanTracktag,
                                          pandoraNuKalmanTrackcalo,
                                          pandoraNuKalmanTrackpid,
-                                         pandoraNuKalmanTrackcali,
+					 pandoraNuKalmanTrackcali,
                                          pandoraNuKalmanTrackcalipid,
                                          pandoraNuKalmanShowertag,
                                          pandoraNuKalmanShowercalo,
@@ -432,7 +433,7 @@ microboone_reco_data_pandoraNu: [        pandoraNuPatRec,
                                          pandoraNuPMAContTag,
                                          pandoraNuPMAcalo,
                                          pandoraNuPMApid,
-                                         pandoraNuPMAcali,
+					 pandoraNuPMAcali,
                                          pandoraNuPMAcalipid,
                                          pandoraNuKHitFlashMatch,
                                          pandoraNuKalmanTrackFlashMatch,
@@ -486,7 +487,7 @@ microboone_dqm_ana_stage1: [             DQMHits,
 microboone_dqm_ana_stage2: [             DQMGoodRuns ]
 
 microboone_dqm_ana: [                    @sequence::microboone_dqm_ana_stage1,
-                                         @sequence::microboone_dqm_ana_stage2 ]
+		    			 @sequence::microboone_dqm_ana_stage2 ]
 
 ### Below we include overrides for the modules above
 ### These are for MCC 7
