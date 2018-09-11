@@ -12,3 +12,11 @@ physics.end_paths: [ ana, stream1 ]
 outputs.out1.fileName: "%ifb_%tc_reco1.root"
 outputs.out1.dataTier: "reconstructed"
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "reco_stage_1_hist.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}

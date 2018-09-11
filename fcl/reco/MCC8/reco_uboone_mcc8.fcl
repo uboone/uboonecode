@@ -21,13 +21,12 @@
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "ubflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
+#include "wirecellmodules_microboone.fcl"
 #include "mctrutht0matching.fcl"
 #include "mcsfitproducer.fcl"
-#include "wcls.fcl"
 
 #include "mchitmodules.fcl"
 #include "mcreco.fcl"
-#include "eventweight_microboone_BNBcorrectionOnly.fcl"
 
 #include "microboone_dlpmtprecuts.fcl"
 #include "dlprod_fclbase_analyzers.fcl"
@@ -42,15 +41,10 @@ microboone_reco_mcc8_services:
                               @table::microboone_services_reco
 
 }
-microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:                6400
-microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:                6400
-microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:                   false
-microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:                     -0.400e3
-
-### note that the wirecell noise filtering and signal processing will return zero baseline RawDigits
-microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
-microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
-microboone_reco_mcc8_services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:        6400
+microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:        6400
+microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:           false
+microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 
 microboone_reco_mcc8_services_fullrawdigits:
 {
@@ -106,8 +100,7 @@ microboone_reco_mcc8_producers:
 
   ### noise filtering (if needed)
   #digitfilter:                    @local::microboone_rawdigitfilter
-  nfspl1:                          @local::wcls.nfspl1
-  butcher:                         @local::wcls.butcher
+  wcNoiseFilter:                  @local::microboone_wirecellnoisefilter
 
   ### calwire producers
   caldata:                        @local::microboone_calroi
@@ -273,10 +266,6 @@ microboone_reco_mcc8_producers:
   #stitchkalmanhitT0RecoBeam:     @local::T0RecoAnodeCathodePiercing_mc_beamgate
   #trackkalmanhitT0RecoBeam:      @local::T0RecoAnodeCathodePiercing_mc_beamgate
 
-  ### Adds the necessary event weights for the MC
-  eventweight:                   @local::microboone_eventweight
-  
-
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
   pandoraCosmicKalmanTrackTruthMatch:     @local::standard_mctrutht0matching
@@ -328,8 +317,7 @@ microboone_reco_mcc8_optical: [ saturation,
 
 microboone_reco_mcc8_signalprocessing: [ #digitfilter,
                                          caldataFull,
-                                         nfspl1,
-                                         butcher,
+                                         wcNoiseFilter,
                                          caldata,
                                          gaushit ]
 
@@ -484,8 +472,7 @@ microboone_reco_mcc8_truthmatch: [       pandoraCosmicKHitTruthMatch,
 
 microboone_reco_mcc8: [                  rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
-					                               @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
                                          gaushitTruthMatch,
 					                               #@sequence::microboone_reco_mcc8_fuzzypath,
@@ -495,8 +482,7 @@ microboone_reco_mcc8: [                  rns,
 
 microboone_reco_mcc8_stage1: [           rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
-					                               @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
 					                               gaushitTruthMatch ]
                                          #@sequence::microboone_reco_mcc8_fuzzypath ]
@@ -508,7 +494,6 @@ microboone_reco_mcc8_stage2: [           rns,
 
 microboone_reco_mcc8_core: [             rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-                                         eventweight,
 					                               @sequence::microboone_reco_mcc8_optical,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
 					                               gaushitTruthMatch ]
@@ -536,6 +521,10 @@ microboone_dlprod_ana: [ ]
 #microboone_reco_mcc8_producers.digitfilter.FFTAlg.TransformViewVec:              [false,false,false]
 #microboone_reco_mcc8_producers.digitfilter.FFTAlg.ZigZagCorrectVec:              [false,false,false]
 
+#wirecell noise filtering
+microboone_reco_mcc8_producers.wcNoiseFilter.DoNoiseFiltering:                   false
+
+
 physics.producers.saturation.CalibrationCorr : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                                                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
@@ -548,7 +537,7 @@ microboone_reco_mcc8_producers.caldataFull.ROIFinder.NumSigma:                  
 microboone_reco_mcc8_producers.caldataFull.DodQdxCalib:                          false
 microboone_reco_mcc8_producers.caldataFull.MakeSparseRawDigits:                  false
 
-microboone_reco_mcc8_producers.caldata.DigitModuleLabel:                         "butcher"
+microboone_reco_mcc8_producers.caldata.DigitModuleLabel:                         "wcNoiseFilter"
 microboone_reco_mcc8_producers.caldata.Threshold:                                [0, 0, 0]  # Not what you think...
 microboone_reco_mcc8_producers.caldata.NumSigma:                                 [9, 9, 9]  # Closer to what you think...
 microboone_reco_mcc8_producers.caldata.ROIFinder.Threshold:                      [0, 0, 0]
