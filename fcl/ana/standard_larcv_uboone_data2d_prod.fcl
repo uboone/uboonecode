@@ -1,0 +1,3 @@
+#include "standard_larcv_uboone_data_prod.fcl"
+
+physics.analyzers.superaWholeView.supera_params: "supera_basic2d.fcl"
