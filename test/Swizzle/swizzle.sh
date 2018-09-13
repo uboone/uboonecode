@@ -41,3 +41,7 @@ echo "Command finished with status $stat"
 if [ $stat -ne 0 ]; then
   exit $stat
 fi
+
+# Done (success).
+
+rm *.root   # Clean up.
