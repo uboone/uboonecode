@@ -27,7 +27,8 @@ IF (NOT CETBUILDTOOLS_VERSION)
     MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
 ENDIF()
 
-set(CMAKE_MODULE_PATH $ENV{CANVAS_DIR}/Modules
+
+set(CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules
 		      $ENV{CETBUILDTOOLS_DIR}/Modules
 		      ${CMAKE_MODULE_PATH})
 
@@ -61,7 +62,12 @@ find_ups_product( postgresql v9_1_5 )
 find_ups_boost( v1_53_0 )
 find_ups_product( uboonedaq_datatypes )
 find_ups_product( ifdh_art )
+find_ups_product( canvas )
 find_ups_product( gsl )
+find_ups_product( gallery )
+find_ups_product( artdaq_core v1_00_00 )
+######find_ups_product( bernfebdaq_core v00_04_00 )
+
 
 cet_find_library( GSL NAMES gsl PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
@@ -74,6 +80,7 @@ include(ArtMake)
 include(BuildPlugins)
 
 # ADD SOURCE CODE SUBDIRECTORIES HERE
+add_subdirectory(ubooneobj)
 add_subdirectory(uboone)
 # subdirectory for test code
 add_subdirectory(test)

@@ -4,11 +4,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <functional>
 #include "uboone/CalData/DeconTools/IROIFinder.h"
 #include "art/Utilities/ToolMacros.h"
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "larcore/Geometry/Geometry.h"
 
@@ -382,7 +383,7 @@ void ROIFinderMorphological::getTruncatedMeanRMS(const Waveform& waveform, float
     // do rms calculation - the old fashioned way and over all adc values
     Waveform locWaveform = waveform;
     
-    std::transform(locWaveform.begin(), locWaveform.end(), locWaveform.begin(),std::bind2nd(std::minus<float>(),mean));
+    std::transform(locWaveform.begin(), locWaveform.end(), locWaveform.begin(),std::bind(std::minus<float>(), std::placeholders::_1, mean));
     
     // sort in ascending order so we can truncate the sume
     std::sort(locWaveform.begin(), locWaveform.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});

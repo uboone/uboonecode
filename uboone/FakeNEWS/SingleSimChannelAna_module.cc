@@ -41,8 +41,8 @@ public:
   // Required functions.
   void analyze(art::Event const & e) override;
   
-  void beginJob();
-  void endJob();
+  void beginJob() override;
+  void endJob() override;
   void compute_params(const std::vector<float>& wf,
 		      float& mean, float& rms, float& min, float& max,
 		      int& argmin, int& argmax);
@@ -69,7 +69,7 @@ private:
   int _signal_id;
   int _start_tick;
   std::vector<float> _wf;
-  int   _signal_index;
+  //int   _signal_index;
   float _mean;
   float _std_dev;
   float _max;

@@ -10,7 +10,7 @@
 #include "lardataobj/RecoBase/Wire.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 
-#include "lardataobj/RecoBase/OpFlash.h"
+//#include "lardataobj/RecoBase/OpFlash.h"
 
 #include "TTree.h"
 #include "TH1F.h"
@@ -106,6 +106,7 @@ namespace dqm{
 		      const detinfo::DetectorClocks *,
 		      unsigned int,
 		      unsigned int,
+        TH1F *runnumber,
         TH1F *nhits_plane0, TH1F *nhits_plane1, TH1F *nhits_plane2,
         TH1F *meant_plane0, TH1F *meant_plane1, TH1F *meant_plane2,
         TH1F *vart_plane0 , TH1F *vart_plane1 , TH1F *vart_plane2 ,
@@ -114,8 +115,10 @@ namespace dqm{
         TH1F *varq_plane0 , TH1F *var1_plane1 , TH1F *varq_plane2,
         TH1F *skewq_plane0, TH1F *skewq_plane1, TH1F *skewq_plane2);
 
+    /*
     void AnalyzeFlashes(std::vector<recob::OpFlash> flashVector,
         TH1F *NFlashes, TH1F *MeanFlashLight);
+    */
 
     void LoadHitAssocPair( std::vector<recob::Hit> const&, 
 			   std::vector< std::vector<int> > const&,

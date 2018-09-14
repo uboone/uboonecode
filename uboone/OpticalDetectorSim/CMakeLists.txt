@@ -17,7 +17,7 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc OpticalDRAMReadout_module.cc
 			art_Persistency_Common canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_BASIC_LIB_LIST}
@@ -40,7 +40,7 @@ art_make( EXCLUDE UBOpticalChConfig_service.cc OpticalDRAMReadout_module.cc
 			art_Persistency_Common canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_BASIC_LIB_LIST}
@@ -55,7 +55,7 @@ simple_plugin(UBOpticalChConfig "service"
 #	      uboonecode_uboone_OpticalDetectorSim
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}
@@ -83,7 +83,7 @@ simple_plugin(OpticalDRAMReadout "module"
                   art_Persistency_Common canvas
                   art_Utilities canvas
                   ${MF_MESSAGELOGGER}
-                  ${MF_UTILITIES}
+                  
                   ${FHICLCPP}
                   cetlib cetlib_except
                   ${ROOT_BASIC_LIB_LIST}

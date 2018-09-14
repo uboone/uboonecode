@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <functional>
 
 namespace caldata
 {
@@ -18,7 +19,7 @@ namespace caldata
 ///
 RawDigitCharacterizationAlg::RawDigitCharacterizationAlg(fhicl::ParameterSet const & pset) :
                       fHistsInitialized(false),
-                      fFirstEvent(true),
+                      //fFirstEvent(true),
                       fChannelGroups(pset),
                       fPedestalRetrievalAlg(art::ServiceHandle<lariov::DetPedestalService>()->GetPedestalProvider())
 
@@ -156,7 +157,7 @@ void RawDigitCharacterizationAlg::getWaveformParams(const RawDigitVector& rawWav
     
     adcLessPedVec.resize(localTimeVec.size());
     
-    std::transform(localTimeVec.begin(),localTimeVec.end(),adcLessPedVec.begin(),std::bind2nd(std::minus<short>(),mean));
+    std::transform(localTimeVec.begin(),localTimeVec.end(),adcLessPedVec.begin(),std::bind(std::minus<short>(), std::placeholders::_1, mean));
     
     rms      = std::sqrt(std::inner_product(adcLessPedVec.begin(), adcLessPedVec.end(), adcLessPedVec.begin(), 0.) / float(adcLessPedVec.size()));
     skewness = 3. * float(mean - median) / rms;
@@ -216,13 +217,6 @@ void RawDigitCharacterizationAlg::getWaveformParams(const RawDigitVector& rawWav
         float  leastNeighborRatio = float(std::min(leftNeighbor,rightNeighbor)) / float(countMP);
         size_t wireIdx            = wire % fNumWiresToGroup[view];
         
-        if (skewness > 0. && leastNeighborRatio < 0.7)
-        {
-            short threshold(6);
-            
-            RawDigitVector::const_iterator stopChirpItr = std::find_if(rawWaveform.begin(),rawWaveform.end(),[mean,threshold](const short& elem){return abs(elem - mean) > threshold;});
-        }
-        
         if (fHistsInitialized)
         {
             fMinMaxProfiles[view]->Fill(double(wireIdx+0.5), double(minMax), 1.);
@@ -243,7 +237,7 @@ void RawDigitCharacterizationAlg::getTruncatedRMS(const RawDigitVector& rawWavef
     adcLessPedVec.resize(rawWaveform.size());
     
     // Fill the vector
-    std::transform(rawWaveform.begin(),rawWaveform.end(),adcLessPedVec.begin(),std::bind2nd(std::minus<short>(),pedestal));
+    std::transform(rawWaveform.begin(),rawWaveform.end(),adcLessPedVec.begin(),std::bind(std::minus<short>(), std::placeholders::_1, pedestal));
     
     // sort in ascending order so we can truncate the sume
     std::sort(adcLessPedVec.begin(), adcLessPedVec.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});
@@ -358,7 +352,7 @@ void RawDigitCharacterizationAlg::getMeanRmsAndMinMax(const RawDigitVector& rawW
     float meanWaveform = float(meanSum) / float(meanCnt);
     
     // Use this to do an initial zero suppression
-    std::transform(locWaveform.begin(),locWaveform.end(),locWaveform.begin(),std::bind2nd(std::minus<float>(),meanWaveform));
+    std::transform(locWaveform.begin(),locWaveform.end(),locWaveform.begin(),std::bind(std::minus<float>(), std::placeholders::_1, meanWaveform));
     
     // sort in ascending order so we can truncate before counting any possible signal
     std::sort(locWaveform.begin(), locWaveform.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});
@@ -379,7 +373,7 @@ void RawDigitCharacterizationAlg::getMeanRmsAndMinMax(const RawDigitVector& rawW
     float aveSum = std::accumulate(locWaveform.begin(), locWaveform.begin() + minNumBins, 0.);
     aveVal       = aveSum / minNumBins;
     
-    std::transform(locWaveform.begin(),locWaveform.begin() + minNumBins,locWaveform.begin(), std::bind2nd(std::minus<float>(),aveVal));
+    std::transform(locWaveform.begin(),locWaveform.begin() + minNumBins,locWaveform.begin(), std::bind(std::minus<float>(), std::placeholders::_1, aveVal));
     
     rmsVal = std::inner_product(locWaveform.begin(), locWaveform.begin() + minNumBins, locWaveform.begin(), 0.);
     rmsVal = std::sqrt(std::max(float(0.),rmsVal / float(minNumBins)));

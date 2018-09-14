@@ -15,7 +15,7 @@
 #define WFALGOBASE_H
 
 #include <vector>
-#include "lardata/DetectorInfo/ElecClock.h"
+#include "lardataalg/DetectorInfo/ElecClock.h"
 #include "UBOpticalException.h"
 
 namespace opdet {

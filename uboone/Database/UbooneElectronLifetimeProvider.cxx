@@ -5,7 +5,7 @@
 //#include "larevt/CalibrationDBI/Providers/WebError.h"
 
 // art/LArSoft libraries
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 //C/C++
 #include <fstream>

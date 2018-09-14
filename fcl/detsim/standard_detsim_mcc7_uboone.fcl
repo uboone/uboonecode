@@ -71,6 +71,7 @@ outputs:
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
    fastCloning: false
+   outputCommands: [ "keep *_*_*_*", "drop optdata::ChannelDataGroup_*_*_*" ]
  }
 }
 

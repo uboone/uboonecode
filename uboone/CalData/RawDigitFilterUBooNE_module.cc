@@ -348,7 +348,7 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                 
                 pedCorrectedVec.resize(rawadc.size(),0);
                 
-                std::transform(rawadc.begin(),rawadc.end(),pedCorrectedVec.begin(),std::bind2nd(std::minus<short>(),pedCorWireVec[wireIdx]));
+                std::transform(rawadc.begin(),rawadc.end(),pedCorrectedVec.begin(),std::bind(std::minus<short>(), std::placeholders::_1, pedCorWireVec[wireIdx]));
                 
                 saveRawDigits(filteredRawDigit, channel, pedCorrectedVec, truncMeanWireVec[wireIdx], truncRmsWireVec[wireIdx]);
                 
@@ -427,7 +427,7 @@ void RawDigitFilterUBooNE::produce(art::Event & event)
                     // The ultra high noise channels are simply zapped
                     if (minMax < fMaxMinMaxCut[view])
                     {
-                        std::transform(rawDataVec.begin(),rawDataVec.end(),rawDataVec.begin(),std::bind2nd(std::minus<short>(),pedCor));
+                        std::transform(rawDataVec.begin(),rawDataVec.end(),rawDataVec.begin(),std::bind(std::minus<short>(), std::placeholders::_1, pedCor));
                         
                         saveRawDigits(filteredRawDigit, channelWireVec[locWireIdx], rawDataVec, truncMean, truncRms);
                     }

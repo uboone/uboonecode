@@ -82,5 +82,6 @@ outputs:
    dataTier:    "detector-simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
+   outputCommands: [ "keep *_*_*_*", "drop optdata::ChannelDataGroup_*_*_*" ]
  }
 }

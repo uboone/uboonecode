@@ -16,10 +16,12 @@ litemc_reco2d.DataLookUpMap:
 
 litemc_reco2d.AssociationLookUpMap:
 {
-  hit:        []
+  hit:        ["gaushitTruthMatch","gaushit","pandoraCosmicHitRemoval"]
   cluster:    []
   vertex:     []
   endpoint2d: []
 }
+
+litemc_reco2d.AssLabelToSave:["gaushitTruthMatch"]
 
 END_PROLOG

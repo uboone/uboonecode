@@ -229,7 +229,7 @@ namespace trigger{
 
     for(size_t i=0; i<_prescale.size(); ++i)
 
-      msg << Form("  Prescale %zu : %d", i, _prescale[i]) << std::endl;
+      msg << Form("  Prescale %zu : %d", i, int(_prescale[i])) << std::endl;
 
     msg << std::endl;
 

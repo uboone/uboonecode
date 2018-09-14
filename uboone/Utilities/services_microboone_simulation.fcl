@@ -109,6 +109,8 @@ microboone_detsim_services.LArPropertiesService.ScintPreScale:        0.0093   #
 microboone_detsim_services.UBOpReadoutMap:                  @local::microboone_opreadoutmap_mc
 microboone_detsim_services.ExptGeoHelperInterface:          @local::microboone_geometry_helper
                                                                       # MUST match between g4 and detsim
+microboone_detsim_services.TPCEnergyCalibService: @local::microboone_tpcenergycalib_service
+microboone_detsim_services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcenergycalib_provider_data
 
 # Define microboone_simulation_services ... (all*) = (1*) + (2) + (2*)
 microboone_simulation_services:                                 @local::microboone_g4_services

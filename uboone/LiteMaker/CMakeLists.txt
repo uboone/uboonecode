@@ -21,6 +21,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   uboonecode_uboone_MuCS
 		   larcore_Geometry_Geometry_service
 	   	   larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
+		   larsim_MCCheater_ParticleInventoryService_service
 		   lardataobj_RecoBase
 		   nusimdata_SimulationBase
 		   lardataobj_MCBase
@@ -41,7 +42,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   art_Persistency_Provenance canvas
 		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -50,7 +51,8 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   ${ROOT_BASIC_LIB_LIST}
 
           MODULE_LIBRARIES 	  		   
-		   uboonecode_uboone_LiteMaker	   
+		   uboonecode_uboone_LiteMaker
+		   uboone_RawData
 	      	   TFileMetadataMicroBooNE_service
 	      	   FileCatalogMetadataMicroBooNE_service
 		   LLMetaMaker_service
@@ -83,7 +85,7 @@ art_make( EXCLUDE LLMetaMaker_service.cc
 		   art_Persistency_Provenance canvas
 		   art_Utilities canvas
 		   ${MF_MESSAGELOGGER}
-		   ${MF_UTILITIES}
+		   
 		   ${FHICLCPP}
 		   cetlib cetlib_except
 		   ${ROOT_GEOM}
@@ -98,7 +100,7 @@ simple_plugin(LLMetaMaker "service"
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}	      
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
 	      ${FHICLCPP}
 	      cetlib cetlib_except
 	      ${ROOT_BASIC_LIB_LIST}

@@ -64,10 +64,10 @@ microboone_reco_minimal_producers:
   linecluster:                  @local::microboone_linecluster
 
   ### pandora cosmic pass
-  pandoraCosmic:                @local::microboone_pandora
+  pandoraCosmic:                @local::microboone_pandoraAllHitsCR
 
   ### pandora neutrino pass
-  pandoraNu:                    @local::microboone_pandora
+  pandoraNu:                    @local::microboone_pandoraAllHitsSliceNu
 
   ### pandora cosmic kalmanhit
   pandoraCosmicKHit:            @local::microboone_track3Dkalmanhit
@@ -247,7 +247,7 @@ microboone_reco_minimal_producers.fuzzycluster.CalDataModuleLabel:              
 
 microboone_reco_minimal_producers.pandoraCosmic.GeantModuleLabel:                          "largeant"
 microboone_reco_minimal_producers.pandoraCosmic.HitFinderModuleLabel:                      "gaushit"
-microboone_reco_minimal_producers.pandoraCosmic.ConfigFile:                                "PandoraSettings_MicroBooNE_Cosmic.xml"
+
 # Fuzzy Cluster related
 microboone_reco_minimal_producers.trackkalmanhit.HitModuleLabel:                           "gaushit"
 microboone_reco_minimal_producers.trackkalmanhit.ClusterModuleLabel:                       "fuzzycluster"
@@ -361,7 +361,6 @@ microboone_reco_minimal_producers.pandoraCosmicKHitRemoval.TrackProducerLabel:  
 
 microboone_reco_minimal_producers.pandoraNu.GeantModuleLabel:                                "largeant"
 microboone_reco_minimal_producers.pandoraNu.HitFinderModuleLabel:                            "pandoraCosmicKHitRemoval"
-microboone_reco_minimal_producers.pandoraNu.ConfigFile:                                      "PandoraSettings_MicroBooNE_Neutrino.xml"
 
 microboone_reco_minimal_producers.pandoraNuKHit.HitModuleLabel:                              "pandoraCosmicKHitRemoval"
 microboone_reco_minimal_producers.pandoraNuKHit.UseClusterHits:                              false

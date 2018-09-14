@@ -9,6 +9,8 @@ art_make( BASENAME_ONLY
 			${ROOT_BASIC_LIB_LIST}
 	  MODULE_LIBRARIES larcorealg_Geometry
 	                CalData
+			uboone_CalData_DeconTools
+			ubooneobj
   	  		NoiseFilterAlgs
 	  		larcore_Geometry_Geometry_service
 	                lardata_Utilities
@@ -28,7 +30,7 @@ art_make( BASENAME_ONLY
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
                         ${ROOT_GEOM}

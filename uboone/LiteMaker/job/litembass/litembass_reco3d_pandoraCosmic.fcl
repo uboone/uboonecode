@@ -1,5 +1,7 @@
 #include "litemaker_base.fcl"
 
+BEGIN_PROLOG
+
 litembass_reco3d_pandoraCosmic: @local::litemaker_base
 litembass_reco3d_pandoraCosmic.out_filename: "larlite_mbass_reco3d_pandoraCosmic.root"
 litembass_reco3d_pandoraCosmic.DataLookUpMap:
@@ -64,4 +66,4 @@ litembass_reco3d_pandoraCosmic.AssociationLookUpMap:
   ]
 }
 
-
+END_PROLOG

@@ -15,6 +15,8 @@ services:
   RandomNumberGenerator:   {} #ART native random number generator
   message:                 @local::microboone_message_services_prod_debug
   FileCatalogMetadata:     @local::art_file_catalog_mc
+  #LLMetaMaker:             {Enable: false}
+  #LArCVMetaMaker:          {Enable: false}
   @table::microboone_reco_mcc8_services
 }
 
@@ -53,6 +55,11 @@ physics:
   @table::microboone_reco_mcc8_filters
  }
 
+ analyzers:
+ {
+  @table::microboone_reco_mcc8_analyzers
+ }
+
  #reco sequence and trigger_paths to be defined elsewhere
 
  stream1:  [ out1 ]
@@ -81,7 +88,7 @@ services.message.destinations :
   {
      type:      "cout"      #tells the message service to output this destination to cout
      threshold: "WARNING"   #tells the message service that this destination applies to WARNING and higher level messages
-     append:     true       #says to append all messages to the output
+     ##append:     false       #says to append all messages to the output
      categories:
      {
        ChannelFilter:

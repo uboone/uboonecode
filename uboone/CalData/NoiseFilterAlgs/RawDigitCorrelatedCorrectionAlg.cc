@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <functional>
 
 #include "RawDigitCorrelatedCorrectionAlg.h"
 
@@ -755,7 +756,7 @@ void RawDigitCorrelatedCorrectionAlg::getTruncatedMeanRMS(const RawDigitVector& 
     std::vector<float> locWaveform(waveform.size());
     
     // convert input waveform to real and zero suppress all at once...
-    std::transform(waveform.begin(), waveform.end(), locWaveform.begin(),std::bind2nd(std::minus<float>(),mean));
+    std::transform(waveform.begin(), waveform.end(), locWaveform.begin(),std::bind(std::minus<float>(), std::placeholders::_1, mean));
     
     // sort in ascending order so we can truncate the sume
     std::sort(locWaveform.begin(), locWaveform.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});
@@ -880,7 +881,7 @@ void RawDigitCorrelatedCorrectionAlg::getTruncatedMeanRMS(const std::vector<floa
     std::vector<float> locWaveform(waveform.size());
     
     // convert input waveform to real and zero suppress all at once...
-    std::transform(waveform.begin(), waveform.end(), locWaveform.begin(),std::bind2nd(std::minus<float>(),mean));
+    std::transform(waveform.begin(), waveform.end(), locWaveform.begin(),std::bind(std::minus<float>(), std::placeholders::_1, mean));
     
     // sort in ascending order so we can truncate the sume
     std::sort(locWaveform.begin(), locWaveform.end(),[](const auto& left, const auto& right){return std::fabs(left) < std::fabs(right);});

@@ -85,12 +85,9 @@ private:
   const std::vector<float> endPt2 = {-9999., -9999., -9999.};
 
   std::string _pfp_producer;
-  std::string _track_producer;
   std::string _opflash_producer_beam;
   std::string _opflash_producer_cosmic;
   std::string _trigger_producer;
-  std::string _beam_window_start_BNB;
-  std::string _beam_window_end_BNB;
   double _flash_trange_start;
   double _flash_trange_end;
   int    _min_trj_pts;
@@ -98,30 +95,32 @@ private:
   bool _debug;
   double fDriftVelocity;
 
+  bool _do_opdet_swap;                 ///< If true swaps reconstructed OpDets according to _opdet_swap_map
+  std::vector<int> _opdet_swap_map;    ///< The OpDet swap map for reco flashes
+
   TTree* _tree1;
-  int _run, _subrun, _event, _matchid;
+  //int _run, _subrun, _event, _matchid;
+  int _run, _subrun, _event;
   int _n_beam_flashes, _n_pfp;
   std::vector<std::vector<double>> _beam_flash_spec, _pfp_hypo_spec;
   std::vector<int> _pfp_id;
   std::vector<double> _beam_flash_time;
-  int _beam_flash_exists; // 0 == no;  1 == yes
 };
 
 
 CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
 {
-  _pfp_producer            = p.get<std::string>("PFParticleProducer");
-  _track_producer          = p.get<std::string>("TrackProducer");
+  _pfp_producer            = p.get<std::string>("PFPTrackAssProducer");
   _opflash_producer_beam   = p.get<std::string>("BeamOpFlashProducer");
   _opflash_producer_cosmic = p.get<std::string>("CosmicOpFlashProducer");
   _trigger_producer        = p.get<std::string>("TriggerProducer");
   _flash_trange_start      = p.get<double>     ("FlashVetoTimeStart");
   _flash_trange_end        = p.get<double>     ("FlashVetoTimeEnd");
   _min_trj_pts             = p.get<int>        ("MinimumNumberOfTrajectoryPoints");
-  _beam_window_start_BNB   = p.get<int>        ("BeamWindowStartBNB");
-  _beam_window_end_BNB     = p.get<int>        ("BeamWindowEndBNB");
   _min_track_length        = p.get<double>     ("MinimumTrackLength");
   _debug                   = p.get<bool>       ("DebugMode");
+  _do_opdet_swap           = p.get<bool>       ("DoOpDetSwap", false);
+  _opdet_swap_map          = p.get<std::vector<int> >("OpDetSwapMap");
 
   _mgr.Configure(p.get<flashana::Config_t>("FlashMatchConfig"));
   _incompChecker.Configure(p.get<fhicl::ParameterSet>("IncompCheckConfig"));
@@ -144,7 +143,6 @@ CosmicFlashTagger::CosmicFlashTagger(fhicl::ParameterSet const & p)
     _tree1->Branch("n_beam_flashes",&_n_beam_flashes,"n_beam_flashes/I");
     _tree1->Branch("beam_flash_spec","std::vector<std::vector<double>>",&_beam_flash_spec);
     _tree1->Branch("beam_flash_time","std::vector<double>",&_beam_flash_time);
-    _tree1->Branch("beam_flash_exists",&_beam_flash_exists,"beam_flash_exists/I");
     _tree1->Branch("n_pfp",&_n_pfp,"n_pfp/I");
     _tree1->Branch("pfp_hypo_spec","std::vector<std::vector<double>>",&_pfp_hypo_spec);
     _tree1->Branch("pfp_id","std::vector<int>",&_pfp_id);
@@ -164,6 +162,10 @@ void CosmicFlashTagger::produce(art::Event & e)
     _run    = e.id().run();
     _subrun = e.id().subRun();
     _event  = e.id().event();
+  }
+
+  if (_do_opdet_swap && e.isRealData()) {
+    mf::LogWarning("CosmicFlashTagger") << "Swapping OpDets. I hope you know what you are doing." << std::endl;
   }
 
   // Instantiate the output
@@ -192,28 +194,13 @@ void CosmicFlashTagger::produce(art::Event & e)
   lar_pandora::PFParticlesToTracks PFPtoTracks; 
   lar_pandora::LArPandoraHelper::CollectTracks(e, _pfp_producer, trackVector, PFPtoTracks);
 
-  // Get Tracks from the ART event
-  ::art::Handle<std::vector<recob::Track> > track_h;
-  e.getByLabel(_track_producer,track_h);
-  if( !track_h.isValid() || track_h->empty() )  {
-    mf::LogDebug("CosmicFlashTagger") << "Don't have tracks, or they are not valid." << std::endl;
-    e.put(std::move(cosmicTagTrackVector));
-    e.put(std::move(assnOutCosmicTagTrack));
-    e.put(std::move(assnOutCosmicTagPFParticle));
-    return;
-  }
-
   // Loop through beam flashes 
   _n_beam_flashes = 0;
-  _beam_flash_exists = 0;
   beam_flashes.clear();
   for (size_t n = 0; n < beamflash_h->size(); n++) {
 
     auto const& flash = (*beamflash_h)[n];
 
-    if(flash.Time() > _beam_window_start_BNB && flash.Time() < _beam_window_end_BNB){
-      _beam_flash_exists = 1;
-    }
     if(flash.Time() < _flash_trange_start || _flash_trange_end < flash.Time()) {
       mf::LogDebug("CosmicFlashTagger") << "Flash is in veto region (flash time is " << flash.Time() << "). Continue." << std::endl;
       continue;
@@ -234,17 +221,21 @@ void CosmicFlashTagger::produce(art::Event & e)
     // Construct a Flash_t
     ::flashana::Flash_t f;
     f.x = f.x_err = 0;
-    f.y = flash.YCenter();
-    f.z = flash.ZCenter();
-    f.y_err = flash.YWidth();
-    f.z_err = flash.ZWidth();
     f.pe_v.resize(geo->NOpDets());
     f.pe_err_v.resize(geo->NOpDets());
     for (unsigned int i = 0; i < f.pe_v.size(); i++) {
       unsigned int opdet = geo->OpDetFromOpChannel(i);
+      if (_do_opdet_swap && e.isRealData()) {
+        opdet = _opdet_swap_map.at(opdet);
+      }
       f.pe_v[opdet] = flash.PE(i);
       f.pe_err_v[opdet] = sqrt(flash.PE(i));
     }
+    AddFlashPosition(f);
+    //f.y = YCenter;
+    //f.z = ZCenter;
+    //f.y_err = YWidth;
+    //f.z_err = ZWidth; 
     f.time = flash.Time();
     beam_flashes.resize(_n_beam_flashes);
     beam_flashes[_n_beam_flashes-1] = f;

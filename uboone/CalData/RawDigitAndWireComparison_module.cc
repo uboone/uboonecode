@@ -41,7 +41,7 @@ namespace caldata{
     RawDigitAndWireComparison & operator = (RawDigitAndWireComparison &&) = delete;
     
     void analyze(art::Event const & e) override;
-    void beginJob();
+    void beginJob() override;
     
   private:
 

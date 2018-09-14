@@ -37,7 +37,7 @@
 #include "lardataobj/RawData/TriggerData.h"
 #include "lardataobj/OpticalDetectorData/PMTTrigger.h"
 #include "lardata/Utilities/AssociationUtil.h"
-#include "lardata/DetectorInfo/ElecClock.h"
+#include "lardataalg/DetectorInfo/ElecClock.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
 
 /// nutools
@@ -239,7 +239,7 @@ namespace trigger {
 	  //auto const elec_time = ts->G4ToElecTime(beam_ptr->Start());
 	  auto const elec_time = ts->G4ToElecTime(fNuMIFireTime);
 	  clock.SetTime(clock.Sample(elec_time),clock.Frame(elec_time));
-	  fAlg.AddTriggerBNB(clock);
+	  fAlg.AddTriggerNuMI(clock);
 	}
 	else
 	  throw UBTrigException(Form("Beam type %d not supported!",beam_ptr->BeamType()));

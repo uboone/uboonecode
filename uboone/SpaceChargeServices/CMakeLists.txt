@@ -11,7 +11,7 @@ simple_plugin(SpaceChargeServiceMicroBooNE "service"
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      ${MF_UTILITIES}
+	      
   	      cetlib cetlib_except
    	      ${ROOT_BASIC_LIB_LIST}
               

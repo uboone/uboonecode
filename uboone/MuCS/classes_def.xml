@@ -1,7 +1,7 @@
 
 <lcgdict>
-  <class name="MuCS::MuCSData 	  " ClassVersion="10"           >
-  <version ClassVersion="10" checksum="706961932"/>
+  <class name="MuCS::MuCSData 	  " ClassVersion="11"           >
+  <version ClassVersion="11" checksum="2027433884"/>
   </class>
   <class name="MuCS::MuCSRecoData 	  " ClassVersion="11"           >
   <version ClassVersion="11" checksum="2789969266"/>

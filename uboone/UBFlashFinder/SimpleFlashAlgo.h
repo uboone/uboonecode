@@ -63,7 +63,8 @@ namespace pmtana
     bool _debug;
 
     // list of opchannel to use
-    std::vector<int> _opch_v;
+    std::vector<int> _opch_to_index_v;
+    std::vector<int> _index_to_opch_v;
     
   };
 

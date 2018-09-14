@@ -34,7 +34,7 @@ art_make( BASENAME_ONLY
                         art_Persistency_Provenance canvas
                         art_Utilities canvas
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         cetlib cetlib_except
                         ${CLHEP}
@@ -74,3 +74,5 @@ art_make( BASENAME_ONLY
 install_headers()
 install_fhicl()
 install_source()
+
+add_subdirectory(TPCEnergyCalib)

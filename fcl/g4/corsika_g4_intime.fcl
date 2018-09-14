@@ -72,8 +72,8 @@ outputs:
    compressionLevel: 1
    outputCommands: [ "keep *_*_*_*",
                      "drop *_larg4intime_*_*",
-                     "drop *_larg4outtime_*_*",
-                     "drop *_GenInTimeSorter_*_*" ]
+                     "drop *_larg4outtime_*_*"]
+#                     "drop *_GenInTimeSorter_*_*" ]
    dropMetaDataForDroppedData: true
    saveMemoryObjectThreshold: 0
  }

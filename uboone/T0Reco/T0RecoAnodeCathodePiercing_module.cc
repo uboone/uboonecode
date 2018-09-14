@@ -264,7 +264,7 @@ void T0RecoAnodeCathodePiercing::produce(art::Event & e)
 	if (_debug) std::cout << "\t track exits front" << std::endl;
       }
       // tracks that exit the back
-      if ( (TrackExitsBack(sorted_trk) == true) and (TrackExitsBack(sorted_trk) == false) and (side2back == true) ) {
+      if ( (TrackExitsBack(sorted_trk) == true) and (TrackEntersBack(sorted_trk) == false) and (side2back == true) ) {
 	tagged = true;
 	if (_debug) std::cout << "\t track exits back" << std::endl;
       }

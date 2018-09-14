@@ -19,6 +19,9 @@ art_file_catalog_mc.fileType:  "mc"
 art_file_catalog_data:           @local::art_file_catalog
 art_file_catalog_data.fileType:  "data"
 
+art_file_catalog_overlay:           @local::art_file_catalog
+art_file_catalog_overlay.fileType:  "overlay"
+
 # Standard configurations for TFileMetadataMicroBooNE service.
 
 microboone_tfile_metadata:

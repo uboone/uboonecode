@@ -67,7 +67,7 @@ namespace caldata {
  
   private:
     
-    int          fDataSize;          ///< size of raw data on one wire
+    //int          fDataSize;          ///< size of raw data on one wire
     int          fPostsample;        ///< number of postsample bins
     int          fDoBaselineSub;        ///< do original baseline subtraction
     int          fDoSimpleBaselineSub;   ///< do simple baseline subtraction (M. Mooney)
@@ -245,7 +245,7 @@ namespace caldata {
       	  //Xin remove the time_offset
       	  int time_offset = 0;//sss->FieldResponseTOffset(channel);
       	  for(bin = 0; bin < dataSize; ++bin) {
-      	    if ( (bin-time_offset >= 0) and (bin-time_offset < holder.size())  ) {
+      	    if ( bin-time_offset < holder.size() ) {
       	      holder[bin-time_offset]=(rawadc[bin]-pdstl);
 	    }
       	  }
@@ -341,7 +341,7 @@ namespace caldata {
           //Xin remove the time_offset
           int time_offset = 0;//sss->FieldResponseTOffset(channel);
           for(bin = 0; bin < dataSize; ++bin) {
-            if ( (bin-time_offset >= 0) and (bin-time_offset < holder.size())  ) {
+            if ( bin-time_offset < holder.size() ) {
               holder[bin-time_offset]=(rawadc[bin]-pdstl);
             }
           }

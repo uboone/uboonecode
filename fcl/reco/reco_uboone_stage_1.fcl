@@ -97,7 +97,7 @@ physics:
   cluster3dpcatag:     @local::microboone_cosmicpcaxistagger
 
   ### pandora cosmic pass
-  pandoraCosmic:       @local::microboone_pandora
+  pandoraCosmic:       @local::microboone_pandoraAllHitsCR
 
   ### mc producers
   mchitfinder:         @local::standard_mchitfinder
@@ -178,7 +178,6 @@ physics.producers.cccluster.CCHitFinderAlg.CalDataModuleLabel:  "caldata"
 
 physics.producers.pandoraCosmic.GeantModuleLabel:               "largeant"
 physics.producers.pandoraCosmic.HitFinderModuleLabel:           "gaushit"
-physics.producers.pandoraCosmic.ConfigFile:                     "PandoraSettings_MicroBooNE_Cosmic.xml"
 
 physics.producers.cluster3dpcatag.PFParticleModuleLabel:        "cluster3d"
 physics.producers.cluster3dpcatag.PCAxisModuleLabel:            "cluster3d"

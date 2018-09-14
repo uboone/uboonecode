@@ -1,0 +1,11 @@
+BEGIN_PROLOG
+
+microboone_dqmflashes:
+{
+  module_type: DQMFlashModule 
+ 
+  OpFlashModuleLabel:        "opflash"
+  SimpFlashBeamModuleLabel:  "simpleFlashBeam"
+}
+
+END_PROLOG

@@ -69,7 +69,7 @@ physics:
   linemerger:          @local::standard_linemerger
 
   ### pandora
-  pandora:             @local::microboone_pandoraneutrino
+  pandora:             @local::microboone_pandoraAllHitsSliceNu
   
   ### track-finder producers
   trackkalmanhit:      @local::microboone_track3Dkalmanhit

@@ -50,8 +50,8 @@ physics:
   rns:                 { module_type: RandomNumberSaver }
 
   ### pandora core modules
-  pandoraCosmic: @local::microboone_pandora
-  pandoraNu:     @local::microboone_pandora
+  pandoraCosmic: @local::microboone_pandoraAllHitsCR
+  pandoraNu:     @local::microboone_pandoraAllHitsSliceNu
 
   ### pandora cosmic kalmanhit
   pandoraCosmicKHit: @local::microboone_track3Dkalmanhit
@@ -339,7 +339,6 @@ physics.producers.beamflashcompat.FlashModuleLabel:             "opflash"
 
 physics.producers.pandoraCosmic.GeantModuleLabel:               "largeant"
 physics.producers.pandoraCosmic.HitFinderModuleLabel:           "gaushit"
-physics.producers.pandoraCosmic.ConfigFile:                     "PandoraSettings_MicroBooNE_Cosmic.xml"
 
 physics.producers.pandoraCosmicKHit.UseClusterHits:             false
 physics.producers.pandoraCosmicKHit.UsePFParticleHits:          true
@@ -364,7 +363,6 @@ physics.producers.pandoraCosmicKHitRemoval.CosmicProducerLabels: ["pandoraCosmic
 
 physics.producers.pandoraNu.GeantModuleLabel:              "largeant"
 physics.producers.pandoraNu.HitFinderModuleLabel:          "pandoraCosmicKHitRemoval"
-physics.producers.pandoraNu.ConfigFile:                    "PandoraSettings_MicroBooNE_Neutrino.xml"
 
 physics.producers.pandoraNuKHit.UseClusterHits:           false
 physics.producers.pandoraNuKHit.UsePFParticleHits:        true

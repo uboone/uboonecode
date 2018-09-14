@@ -69,7 +69,7 @@ private:
     std::vector<TProfile*> fErosionVecHists;
     std::vector<TProfile*> fDilationVecHists;
     
-    bool                   fFirstEvent;
+    //bool                   fFirstEvent;
     bool                   fHistsInitialized;
     
     std::vector<std::set<size_t>> fBadWiresbyViewAndWire;

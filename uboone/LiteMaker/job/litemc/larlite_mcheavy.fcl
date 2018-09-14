@@ -1,6 +1,6 @@
 #include "services_microboone.fcl"
-#include "litemaker_mcpart.fcl"
-#include "litemaker_simch.fcl"
+#include "litemc_mcpart.fcl"
+#include "litemc_simch.fcl"
 
 process_name: MCHeavyLiteMaker
 
@@ -43,12 +43,12 @@ physics:
 
  analyzers:
  {
-   mcpart: @local::litemaker_mcpart
-   simch:  @local::litemaker_simch
+   mcpart: @local::litemc_mcpart
+   simch:  @local::litemc_simch
  }
 
  analyzeIt: [ mcpart,
-              simch,
+              simch
             ]
 
  end_paths:     [ analyzeIt ]

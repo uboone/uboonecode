@@ -41,8 +41,8 @@ public:
   explicit ShowWire(fhicl::ParameterSet const & p);
   virtual ~ShowWire();
 
-  void beginJob();
-  void endJob();
+  void beginJob() override;
+  void endJob() override;
 
   void analyze(art::Event const & e) override;
   void reconfigure(fhicl::ParameterSet const& p);

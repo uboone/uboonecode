@@ -1,5 +1,0 @@
-#include "standard_g4_uboone.fcl"
-
-process_name: G410msLt
-
-services.DetectorPropertiesService.Electronlifetime: 10.0e3 # in microseconds

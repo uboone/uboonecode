@@ -22,7 +22,7 @@
 
 
 namespace snassembler {
-  class SnRecordHolder; // Forward declaration
+  struct SnRecordHolder; // Forward declaration
 
   class SnFileSourceDriver {
     /// Class to fill the constraints on a template argument to the class,
@@ -46,7 +46,7 @@ namespace snassembler {
 
   private:
 
-    art::SourceHelper              fSourceHelper;
+    art::SourceHelper const&       fSourceHelper;
     art::SubRunID                  fCurrentSubRunID;
     std::unique_ptr<DaqFile>       fDaqFile;
     std::map< opdet::UBOpticalChannelCategory_t, std::string > fPMTdataProductNames;
@@ -54,7 +54,7 @@ namespace snassembler {
     std::shared_ptr<SnRecordHolder> fPrevRecord;
     std::shared_ptr<SnRecordHolder> fCurrRecord;
     std::shared_ptr<SnRecordHolder> fNextRecord;
-    
+        
     size_t fCurrentFrame;
     
 

@@ -88,6 +88,7 @@ void dqm::DQMHitAlg::LoadHitAssocPair( std::vector<recob::Hit> const& HitVector,
 void dqm::DQMHitAlg::AnalyzeWires(std::vector<recob::Wire> const& WireVector,
 				  const detinfo::DetectorClocks *ts,
 				  unsigned int event, unsigned int run,
+      TH1F *runnumber,
       TH1F *nhits_plane0, TH1F *nhits_plane1, TH1F *nhits_plane2,
       TH1F *meant_plane0, TH1F *meant_plane1, TH1F *meant_plane2,
       TH1F *vart_plane0 , TH1F *vart_plane1 , TH1F *vart_plane2 ,
@@ -119,6 +120,8 @@ void dqm::DQMHitAlg::AnalyzeWires(std::vector<recob::Wire> const& WireVector,
       FillWireInfo(WireVector[iwire], iwire, ts, plane2_hitno, plane2_charge, plane2_time);
   }
 
+  runnumber->Fill(run);
+
   nhits_plane0->Fill(plane0_hitno);
   nhits_plane1->Fill(plane1_hitno);
   nhits_plane2->Fill(plane2_hitno);
@@ -145,6 +148,7 @@ void dqm::DQMHitAlg::AnalyzeWires(std::vector<recob::Wire> const& WireVector,
 
 }
 
+/*
 void dqm::DQMHitAlg::AnalyzeFlashes(std::vector<recob::OpFlash> flashVector, TH1F *NFlashes, TH1F *MeanFlashLight)
 {
   std::cout << "number of flashes: " << flashVector.size() << std::endl;
@@ -161,6 +165,7 @@ void dqm::DQMHitAlg::AnalyzeFlashes(std::vector<recob::OpFlash> flashVector, TH1
   double meanflashlight = totflashlight/(double(flashVector.size()*num_pmts));
   MeanFlashLight->Fill(meanflashlight);
 }
+*/
 
 void dqm::DQMHitAlg::InitWireData(unsigned int event, unsigned int run){
 

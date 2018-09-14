@@ -4,7 +4,7 @@ art_make(
 	MODULE_LIBRARIES
 			uboone_PatternFilter_PMAlgs
 			larcorealg_Geometry
-			lardata_DetectorInfo
+			lardataalg_DetectorInfo
 			lardataobj_RecoBase
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_IO_ROOT}
@@ -32,5 +32,5 @@ install_fhicl()
 #			${ART_FRAMEWORK_IO_SOURCES}
 #                        art_Persistency_Provenance canvas
 #                        ${MF_MESSAGELOGGER}
-#                        ${MF_UTILITIES}
+#                        
 #                        ${ROOT_BASIC_LIB_LIST}

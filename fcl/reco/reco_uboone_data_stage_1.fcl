@@ -86,7 +86,7 @@ physics:
   cluster3dpcatag:     @local::microboone_cosmicpcaxistagger
 
   ### pandora cosmic pass
-  pandoraCosmic:       @local::microboone_pandora
+  pandoraCosmic:       @local::microboone_pandoraAllHitsCR
  }
 
  #define the producer and filter modules for this path, order matters, 
@@ -191,7 +191,6 @@ physics.producers.cctrack.VertexModuleLabel:                     "linecluster"
 
 physics.producers.pandoraCosmic.GeantModuleLabel:                "largeant"
 physics.producers.pandoraCosmic.HitFinderModuleLabel:            "cchit"
-physics.producers.pandoraCosmic.ConfigFile:                      "PandoraSettings_MicroBooNE_Cosmic.xml"
 
 physics.producers.cluster3dpcatag.PFParticleModuleLabel:         "cluster3d"
 physics.producers.cluster3dpcatag.PCAxisModuleLabel:             "cluster3d"

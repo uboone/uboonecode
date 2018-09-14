@@ -133,7 +133,7 @@ namespace MuCSReader
   private:
     
     std::string fMergerProducerLabel; 
-    Int_t group = 0;
+    //Int_t group = 0;
     Int_t trigID = 0;
     Int_t run0;
     Int_t srun0;

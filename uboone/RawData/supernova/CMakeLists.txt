@@ -15,8 +15,8 @@ art_make( NO_PLUGINS
                         lardataobj_RawData
                         larcoreobj_SummaryData
                         lardata_ArtDataHelper
-                        uboone_RawData
-                        LArRawInputSourceUBooNE_source
+                        # uboone_RawData
+                        # LArRawInputSourceUBooNE_source
                         ${UBDut}
                         ${PQ}
                         ${Boost_SERIALIZATION_LIBRARY}
@@ -30,7 +30,7 @@ art_make( NO_PLUGINS
                         art_Persistency_Provenance 
                         art_Utilities 
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         ${CETLIB}
                         ${ROOT_GEOM}
@@ -50,8 +50,8 @@ art_make( NO_PLUGINS
                         lardataobj_RecoBase
                         lardata_RecoBaseArt
                         larcoreobj_SummaryData
-                        uboone_RawData
-                        uboone_RawData_utils                        
+                        # uboone_RawData
+                        # uboone_RawData_utils
                         ${UBDut}
                         ${PQ}
                         ${Boost_SERIALIZATION_LIBRARY}
@@ -65,7 +65,7 @@ art_make( NO_PLUGINS
                         art_Persistency_Provenance
                         art_Utilities 
                         ${MF_MESSAGELOGGER}
-                        ${MF_UTILITIES}
+                        
                         ${FHICLCPP}
                         ${CETLIB}
                         ${ROOT_GEOM}

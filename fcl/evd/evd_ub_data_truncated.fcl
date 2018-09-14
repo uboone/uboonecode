@@ -63,7 +63,7 @@ services.DetectorClocksService.InheritClockConfig:                  false
 services.DetectorClocksService.TriggerOffsetTPC:                    -0.400e3
 services.RawDrawingOptions.TotalTicks:                    6400
 
-services.RawDrawingOptions.RawDataLabel:                  "digitfilter"
+services.RawDrawingOptions.RawDataLabel:                  "wcNoiseFilter"
 services.RawDrawingOptions.MinimumSignal:                 10
 services.RawDrawingOptions.DrawRawDataOrCalibWires:       2
 

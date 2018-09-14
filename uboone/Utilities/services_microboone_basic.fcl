@@ -7,7 +7,8 @@
 #include "signalservices_microboone.fcl"
 #include "magfield_larsoft.fcl"
 #include "databaseutil_microboone.fcl"
-#include "backtracker.fcl"
+#include "backtrackerservice.fcl"
+#include "particleinventoryservice.fcl"
 #include "photpropservices_microboone.fcl"
 #include "opticaldetectorservices_microboone.fcl"
 #include "sam_microboone.fcl"
@@ -37,6 +38,10 @@ microboone_basic_services:
  DetectorClocksService:                    @local::microboone_detectorclocks
  SpaceCharge:                    @local::microboone_spacecharge
  NuRandomService:                    @local::microboone_seedservice
+ PMTRemapService:
+ {
+   PMTRemapProvider: {}
+ }
 }
 
 microboone_basic_services.DetectorPropertiesService.Electronlifetime: 999999 #1 s lifetime

@@ -9,7 +9,7 @@ art_make( BASENAME_ONLY
 			${ART_FRAMEWORK_CORE}
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 			cetlib cetlib_except
       ${Boost_SYSTEM_LIBRARY}
 			${ROOT_BASIC_LIB_LIST}
@@ -19,9 +19,11 @@ art_make( BASENAME_ONLY
 			CalData
 			larcorealg_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_MCCheater_BackTracker_service
+			larsim_MCCheater_ParticleInventoryService_service
+      larsim_MCCheater_BackTrackerService_service
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 			lardataobj_RecoBase
+			lardataobj_AnalysisBase
 			lardata_RecoObjects larreco_Deprecated  
 			larreco_RecoAlg
                         larreco_Calorimetry
@@ -29,7 +31,8 @@ art_make( BASENAME_ONLY
 			larevt_Filters
                         lardata_Utilities_LArFFT_service
 			SignalShapingServiceMicroBooNE_service
-			nusimdata_SimulationBase
+            larevt_CalibrationDBI_Providers
+            nusimdata_SimulationBase
 			${LARRECO_LIB}
 			${LARDATA_LIB}
                         ${ART_FRAMEWORK_CORE}
@@ -42,7 +45,7 @@ art_make( BASENAME_ONLY
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
 			${CLHEP}

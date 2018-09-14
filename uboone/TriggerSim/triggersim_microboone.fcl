@@ -59,10 +59,27 @@ ubtrigger_ext.ExtTrigger: [-414.0625]
 ubtrigger_ext.Mask:       [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2]
 
 #
-# Beam trigger w/o optical simulation
+# BNB Beam trigger w/o optical simulation
 #
 ubtrigger_dark_bnb:       @local::ubtrigger_standard
 ubtrigger_dark_bnb.BNBTrigger: [-31.25]
 ubtrigger_dark_bnb.Mask:  [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10]
+
+#
+# NUMI Beam trigger w/o optical simulation
+#
+ubtrigger_dark_numi:       @local::ubtrigger_standard
+ubtrigger_dark_numi.NUMITrigger: [-54.8675]
+ubtrigger_dark_numi.Mask:  [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20]
+
+trigger_timing_standard:
+{
+  module_type: "TriggerTiming"
+
+  TriggerModuleLabel: "daq"
+  PMTModuleLabel:     "pmtreadout"
+  PMTModuleInstance:  "OpdetBeamLowGain"
+  PMTMinLength:       1500
+}
 
 END_PROLOG

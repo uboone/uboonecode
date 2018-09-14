@@ -62,7 +62,7 @@ physics:
    generator: @local::microboone_singlep
    largeant:  @local::microboone_largeant	  
    daq:       @local::microboone_simwire       
-   backtrack: @local::standard_backtrackerloader
+   backtrack:    @local::standard_backtrackerloader
    caldata:   @local::microboone_calwire
    gaushit:   @local::microboone_gaushitfinder
    fuzzy:     @local::microboone_fuzzycluster
@@ -132,10 +132,10 @@ physics:
 
  #define the producer and filter modules for this path, order matters, 
 
- #simulate: [ generator, largeant, daq, backtrack, caldata, gaushit, hitcheat, apahit, rns ] 
+ #simulate: [ generator, largeant, daq, backtrack,  caldata, gaushit, hitcheat, apahit, rns ] 
 
-  mode0: [ generator, largeant, daq, backtrack, caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns ] 
-  mode1: [ generator, largeant, daq, backtrack, caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns, selectMode1 ] # 
+  mode0: [ generator, largeant, daq, backtrack,  caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns ] 
+  mode1: [ generator, largeant, daq, backtrack,  caldata, gaushit, gaushit, fuzzy, spacepointfinder, trackkalsps, trackkalspscalo, rns, selectMode1 ] # 
  
  larana: [ largana, analysistree, analysisexample]
 

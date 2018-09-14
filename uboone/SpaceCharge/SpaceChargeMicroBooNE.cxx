@@ -9,13 +9,12 @@
 
 // C++ language includes
 #include <string>
-#include <cassert>
 
 // LArSoft includes
 #include "uboone/SpaceCharge/SpaceChargeMicroBooNE.h"
 
 // Framework includes
-#include "cetlib/exception.h"
+#include "cetlib_except/exception.h"
 
 // ROOT includes
 #include "TFile.h"
@@ -161,8 +160,7 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
         g5_Ex[6] = makeInterpolator(infile, "deltaExOverE/g5_6");
         break; // kParametric
       case SpaceChargeRepresentation_t::kUnknown:
-        assert(false); // logic error
-        break;
+	throw cet::exception("SpaceChargeMicroBooNE") << "Unknown space charge representation.";
     } // switch
 
     infile.Close();
@@ -171,6 +169,53 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
   if(fEnableCorrSCE == true)
   {
     // Grab other parameters from pset  
+  }
+
+
+  fSpatialOffsetScale = pset.get<double>("SpatialOffsetScale",1.0);
+  fEfieldOffsetScale  = pset.get<double>("EfieldOffsetScale",1.0);
+
+  fEnableDataSimSpatialCorrection = pset.get<bool>("EnableDataSimSpatialCorrection",false);
+  if(fEnableDataSimSpatialCorrection){
+
+    fDataSimCorrFunc_MinX = pset.get<double>("DataSimSpatialCorrection_MinX");
+    fDataSimCorrFunc_MaxX = pset.get<double>("DataSimSpatialCorrection_MaxX");
+
+    auto mctop_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_MCTop_Func");
+    fDataSimCorrFunc_MCTop = TF1("fDataSimCorrFunc_MCTop",(mctop_pset.get<std::string>("Form")).c_str(),
+				 fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto mctop_pars = mctop_pset.get<std::vector<double>>("Pars");
+    if(mctop_pars.size()!=(unsigned int)fDataSimCorrFunc_MCTop.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_MCTop_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<mctop_pars.size(); ++i_p)
+      fDataSimCorrFunc_MCTop.SetParameter(i_p,mctop_pars[i_p]);
+
+    auto mcbottom_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_MCBottom_Func");
+    fDataSimCorrFunc_MCBottom = TF1("fDataSimCorrFunc_MCBottom",(mcbottom_pset.get<std::string>("Form")).c_str(),
+				    fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto mcbottom_pars = mcbottom_pset.get<std::vector<double>>("Pars");
+    if(mcbottom_pars.size()!=(unsigned int)fDataSimCorrFunc_MCBottom.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_MCBottom_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<mcbottom_pars.size(); ++i_p)
+      fDataSimCorrFunc_MCBottom.SetParameter(i_p,mcbottom_pars[i_p]);
+
+    auto datatop_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_DataTop_Func");
+    fDataSimCorrFunc_DataTop = TF1("fDataSimCorrFunc_DataTop",(datatop_pset.get<std::string>("Form")).c_str(),
+				   fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto datatop_pars = datatop_pset.get<std::vector<double>>("Pars");
+    if(datatop_pars.size()!=(unsigned int)fDataSimCorrFunc_DataTop.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_DataTop_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<datatop_pars.size(); ++i_p)
+      fDataSimCorrFunc_DataTop.SetParameter(i_p,datatop_pars[i_p]);
+
+    auto databottom_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_DataBottom_Func");
+    fDataSimCorrFunc_DataBottom = TF1("fDataSimCorrFunc_DataBottom",(databottom_pset.get<std::string>("Form")).c_str(),
+				      fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto databottom_pars = databottom_pset.get<std::vector<double>>("Pars");
+    if(databottom_pars.size()!=(unsigned int)fDataSimCorrFunc_DataBottom.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_DataBottom_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<databottom_pars.size(); ++i_p)
+      fDataSimCorrFunc_DataBottom.SetParameter(i_p,databottom_pars[i_p]);
   }
 
   return true;
@@ -213,21 +258,31 @@ bool spacecharge::SpaceChargeMicroBooNE::EnableCorrSCE() const
 /// used in ionization electron drift
 geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(geo::Point_t const& point) const
 {
-  if (!EnableSimSpatialSCE()) return {}; // no correction, zero displacement
-  if(!IsInsideBoundaries(point)) return {}; // zero-initialised
+  geo::Vector_t thePosOffsets;
+  if (!EnableSimSpatialSCE()) return thePosOffsets;     // no correction, zero displacement
+  if(!IsInsideBoundaries(point)) return thePosOffsets;  // zero-initialised
   switch (fRepresentationType) {
     
     case SpaceChargeRepresentation_t::kParametric:
-      return GetPosOffsetsParametric(point);
+      thePosOffsets = GetPosOffsetsParametric(point);
+      break;
     
     case SpaceChargeRepresentation_t::kUnknown:
-      assert(false); // logic error: can't be unknown
-      return {}; // zero-initialised
+      throw cet::exception("SpaceChargeMicroBooNE") << "Unknown space charge representation.";
     
   } // switch
 
-  assert(false); // logic error: can't be here
-  return {};
+  double data_corr_scale=1.;
+  if(fEnableDataSimSpatialCorrection){
+    if(point.X()<fDataSimCorrFunc_MinX || point.X()>fDataSimCorrFunc_MaxX) {
+      thePosOffsets = geo::Vector_t();
+      data_corr_scale=1.;
+    }
+    else data_corr_scale = 0.5*(fDataSimCorrFunc_DataTop.Eval(point.X())/fDataSimCorrFunc_MCTop.Eval(point.X()) + 
+				fDataSimCorrFunc_DataBottom.Eval(point.X())/fDataSimCorrFunc_MCBottom.Eval(point.X()));
+  }
+  thePosOffsets *= data_corr_scale*fSpatialOffsetScale;
+  return thePosOffsets;
 }
 
 //----------------------------------------------------------------------------
@@ -378,22 +433,24 @@ double spacecharge::SpaceChargeMicroBooNE::GetOnePosOffsetParametricZ
 /// used in charge/light yield calculation (e.g.)
 geo::Vector_t spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(geo::Point_t const& point) const
 {
-  if (!EnableSimEfieldSCE()) return {}; // no correction, zero distortion
-  if(!IsInsideBoundaries(point)) return {}; // zero-initialised
+  geo::Vector_t theEfieldOffsets;
+  if (!EnableSimEfieldSCE()) return theEfieldOffsets;      // no correction, zero distortion
+  if(!IsInsideBoundaries(point)) return theEfieldOffsets;  // zero-initialised
   
   switch (fRepresentationType) {
     
     case SpaceChargeRepresentation_t::kParametric:
-      return -GetEfieldOffsetsParametric(point);
+      theEfieldOffsets = -GetEfieldOffsetsParametric(point);
+      break;
     
     case SpaceChargeRepresentation_t::kUnknown:
-      assert(false); // logic error: can't be unknown
-      return {};
+      throw cet::exception("SpaceChargeMicroBooNE") << "Unknown space charge representation.";
     
   } // switch
   
-  assert(false); // logic error: can't get here
-  return {};
+  theEfieldOffsets *= fEfieldOffsetScale;
+
+  return theEfieldOffsets;
 }
 
 //----------------------------------------------------------------------------

@@ -54,7 +54,7 @@ public:
   T0RecoAnodeCathodePiercingAna & operator = (T0RecoAnodeCathodePiercingAna const &) = delete;
   T0RecoAnodeCathodePiercingAna & operator = (T0RecoAnodeCathodePiercingAna &&) = delete;
 
-  void beginJob();
+  void beginJob() override;
 
   // Required functions.
   void analyze(art::Event const & e) override;
@@ -226,8 +226,6 @@ void T0RecoAnodeCathodePiercingAna::beginJob()
   _2dhit_tree->Branch("_rc_y_end",&_rc_y_end,"rc_y_end/D");
   _2dhit_tree->Branch("_rc_z_end",&_rc_z_end,"rc_z_end/D");
   _2dhit_tree->Branch("_t0",&_t0,"t0/D");
-
-  fResolution = 10; // cm
 
   // Use '_detp' to find 'efield' and 'temp'
   auto const* _detp = lar::providerFrom<detinfo::DetectorPropertiesService>();

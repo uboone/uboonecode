@@ -1,0 +1,4 @@
+services.ChannelStatusService.ChannelStatusProvider.UseDB: true
+services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
+services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.DBFolderName: "channelstatus_mcc8_altdeadchannels"
+services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.DBTag: "v1r0"

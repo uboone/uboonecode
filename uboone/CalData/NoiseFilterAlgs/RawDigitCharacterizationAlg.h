@@ -117,7 +117,7 @@ private:
     bool                 fFillHistograms;        ///< if true then will fill diagnostic hists
 
     // Statistics.
-    int                  fNumEvent;        ///< Number of events seen.
+    //int                  fNumEvent;        ///< Number of events seen.
     
     // Make sure hists for this instance are initialized
     bool                 fHistsInitialized;
@@ -136,7 +136,7 @@ private:
     std::vector<TProfile*>              fSkewnessProfiles;
     std::vector<TProfile*>              fModeRatioProfiles;
     
-    bool                                fFirstEvent;
+    //bool                                fFirstEvent;
 
     caldata::ChannelGroups              fChannelGroups;
     

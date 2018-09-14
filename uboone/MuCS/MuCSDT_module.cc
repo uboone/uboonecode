@@ -114,7 +114,7 @@ namespace MuCSDT
     std::string fetchedfile(fIFDH->fetchInput(fMuCSFile));
     mf::LogInfo("MuCSDT") << "Fetched; local path: "<<fetchedfile<<"\n";    
     
-    fTFMuCSData = new TFile( Form( fetchedfile.c_str() ), "read" );  
+    fTFMuCSData = new TFile( Form( "%s", fetchedfile.c_str() ), "read" );  
     
     if ( fTFMuCSData->IsZombie() ) {
       cout << " - mucs file not existing ! " << endl;

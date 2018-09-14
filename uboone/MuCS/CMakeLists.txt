@@ -14,7 +14,8 @@ art_make( BASENAME_ONLY
 			larcore_Geometry_Geometry_service
 			larcoreobj_SummaryData
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
-			larsim_MCCheater_BackTracker_service
+			larsim_MCCheater_ParticleInventoryService_service
+			larsim_MCCheater_BackTrackerService_service
       lardata_Utilities
 			larevt_Filters
 			lardataobj_RawData
@@ -36,7 +37,7 @@ art_make( BASENAME_ONLY
 			art_Persistency_Provenance canvas
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
       ${FHICLCPP}
 			cetlib cetlib_except
 			${CLHEP}

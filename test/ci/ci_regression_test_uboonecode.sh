@@ -20,6 +20,7 @@ function usage {
       --input-files-to-fetch     List of input files to be downloaded before to execute the data production
       --reference-files-to-fetch List of reference files to be downloaded before the product comparison
       --extra-function           Define and extra function to run with list of required arguments; the elements need to be comma separated
+      --extra-options            Define and extra options/arguments for the executable; the elements need to be comma separated
 EOF
 }
 
@@ -43,6 +44,7 @@ function initialize
     REFERENCE_FILES=""
     REFERENCE_FILES_TO_FETCH=""
     WORKSPACE=${WORKSPACE:-$PWD}
+    EXTRA_OPTIONS=""
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     #~~~~~~~~~~~~~~~~~~~~~~GET VALUE FROM THE CI_TESTS.CFG ARGS SECTION~~~~~~~~~~~~~~~
@@ -63,6 +65,7 @@ function initialize
       x--input-files-to-fetch)     INPUT_FILES_TO_FETCH="${2}";                                 shift; shift;;
       x--reference-files-to-fetch) REFERENCE_FILES_TO_FETCH="${2}";                             shift; shift;;
       x--extra-function)           EXTRA_FUNCTION="${2}";                                       shift; shift;;
+      x--extra-options)            EXTRA_OPTIONS="${2//,/ }";                                   shift; shift;;
       x)                                                                                break;;
       x*)            echo "Unknown argument $1"; usage; exit 1;;
       esac
@@ -76,7 +79,9 @@ function initialize
         echo "- existing reference files will not be used"
         echo -e "***************************************************\n"
         TESTMASK=""
-        NEVENTS=1
+        if [[ "$(basename ${0})" != *"lariatsoft"* ]]; then
+            NEVENTS=1
+        fi
         REFERENCE_FILES=""
         REFERENCE_FILES_TO_FETCH=""
     fi
@@ -126,12 +131,6 @@ function fetch_files
     maxretries_backup=$IFDH_CP_MAXRETRIES
     debug_backup=$IFDH_DEBUG
 
-    ### BEGIN temporary workaround for ifdhc v2_0_9 ###
-    ### source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups.sh
-    ### unsetup ifdhc_config
-    ### setup ifdhc_config v2_0_8a
-    ### END temporary workaround for ifdhc v2_0_9 ###
-
     export IFDH_DEBUG=1
     export IFDH_CP_MAXRETRIES=0
 
@@ -173,10 +172,24 @@ function data_production
         fi
 
         echo -e "\nNumber of events for ${STAGE_NAME} stage: $NEVENTS\n"
-        echo ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} -o ${OUTPUT_STREAM} --config ${FHiCL_FILE} ${INPUT_FILE}
+        echo ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} ${EXTRA_OPTIONS} ${OUTPUT_STREAM:+-o "$OUTPUT_STREAM"} --config ${FHiCL_FILE} ${INPUT_FILE}
         echo
 
-        ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} -o ${OUTPUT_STREAM} --config ${FHiCL_FILE} ${INPUT_FILE}
+        (
+            local counter=0
+            local expcode_exitcode=20
+            until [[ ${expcode_exitcode} -ne 20 || ${counter} -gt 5 ]]; do
+                ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} ${EXTRA_OPTIONS} ${OUTPUT_STREAM:+-o "$OUTPUT_STREAM"} --config ${FHiCL_FILE} ${INPUT_FILE}
+                expcode_exitcode=$?
+                if [[ ${expcode_exitcode} -eq 20 ]]; then
+                    let $((counter++))
+                    echo -e "\n\n*** ${EXECUTABLE_NAME} can not access the input file, wait 30 s, then retry #${counter}\n\n"
+                    sleep 30
+                fi
+            done
+ 	    exit $expcode_exitcode
+        )
+
     else
         echo -e "\nCI MSG BEGIN\n Stage: ${STAGE_NAME}\n Task: ${TASKSTRING}\n skipped\nCI MSG END\n"
     fi
@@ -208,28 +221,59 @@ function data_production
 function generate_data_dump
 {
     TASKSTRING="generate_data_dump for ${file_stream} output stream"
-    ERRORSTRING="F~Error during dump Generation~Check the log"
+    ERRORSTRING="W~Error during dump Generation~Check the log"
 
     trap 'LASTERR=$?; FUNCTION_NAME=${FUNCNAME[0]:-main};  exitstatus ${LASTERR} trap ${LINENO}; exit ${LASTERR}' ERR
 
-    local NEVENTS=1
+#     local NEVENTS=1
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PRINT THE COMMAND TO LOG AND THEN GENERATE THE DUMP FOR THE REFERENCE FILE ~~~~~~~~~~~~~~~~~~~
     echo -e "\nGenerating Dump for ${reference_file}"
     REF_DUMP_FILE=$(basename ${reference_file} | sed -e 's/.root/.dump/')
-    echo "${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl ${reference_file} > ${REF_DUMP_FILE}"
+    echo "${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl ${reference_file} 2>&1 | tee ${REF_DUMP_FILE}"
 
-    ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl "${reference_file}" > ${REF_DUMP_FILE}
+    (
+        set -o pipefail
+
+        local counter=0
+        local expcode_exitcode=20
+        until [[ ${expcode_exitcode} -ne 20 || ${counter} -gt 5 ]]; do
+            ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl "${reference_file}" 2>&1 | tee ${REF_DUMP_FILE}
+            expcode_exitcode=$?
+            if [[ ${expcode_exitcode} -eq 20 ]]; then
+                let $((counter++))
+                echo -e "\n\n*** ${EXECUTABLE_NAME} can not access the input file, wait 30 s, then retry #${counter}\n\n"
+                sleep 30
+            fi
+        done
+        exit ${expcode_exitcode}
+    )
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~SAVE IN A VARIABLE THE PARSED REFERENCE DUMP FILE ~~~~~~~~~~~~~~~~~~~~~~
-    OUTPUT_REFERENCE=$(cat "${REF_DUMP_FILE}" | sed -e  '/PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' )
+    OUTPUT_REFERENCE=$(cat "${REF_DUMP_FILE}" | sed -e  '/PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~PRINT THE COMMAND TO LOG AND THEN GENERATE THE DUMP FOR THE CURRENT FILE ~~~~~~~~~~~~~~~~~~~
     echo -e "\nGenerating Dump for ${current_file}"
-    echo "${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl ${current_file} > ${current_file//.root}.dump"
+    echo "${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl ${current_file} 2>&1 | tee ${current_file//.root}.dump"
 
-    ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl "${current_file}" > "${current_file//.root}".dump
+    (
+        set -o pipefail
+
+        local counter=0
+        local expcode_exitcode=20
+        until [[ ${expcode_exitcode} -ne 20 || ${counter} -gt 5 ]]; do
+            ${EXECUTABLE_NAME} --rethrow-all -n ${NEVENTS} --config eventdump.fcl "${current_file}" 2>&1 | tee "${current_file//.root}".dump
+            expcode_exitcode=$?
+            if [[ ${expcode_exitcode} -eq 20 ]]; then
+                let $((counter++))
+                echo -e "\n\n*** ${EXECUTABLE_NAME} can not access the input file, wait 30 s, then retry #${counter}\n\n"
+                sleep 30
+            fi
+        done
+        exit ${expcode_exitcode}
+    )
     #~~~~~~~~~~~~~~~~~~~~~~~~~SAVE IN A VARIABLE THE PARSED CURRENT DUMP FILE ~~~~~~~~~~~~~~~~~~~~~~
-    OUTPUT_CURRENT=$(cat "${current_file//.root}".dump | sed -e  '/PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' )
+    OUTPUT_CURRENT=$(cat "${current_file//.root}".dump | sed -e  '/PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' )
 
     echo -e "\nReference files for ${file_stream} output stream:"
     echo -e "\n${REF_DUMP_FILE}\n"
@@ -251,7 +295,7 @@ function compare_products_names
         REF_DUMP_FILE=$(basename ${reference_file} | sed -e 's/.root/.dump/')
         echo -e "\nCompare products names for ${file_stream} output stream."
         #~~~~~~~~~~~~~~~~CHECK IF THERE'S A DIFFERENCE BEETWEEN THE TWO DUMP FILES IN THE FIRST FOUR COLUMNS~~~~~~~~~~~~~~
-        DIFF=$(diff  <(sed 's/\.//g ; /PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' ${REF_DUMP_FILE} | cut -d "|" -f -4 ) <(sed 's/\.//g ; /PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' ${current_file//.root/.dump} | cut -d "|" -f -4 ) )
+        DIFF=$(diff  <(sed 's/\.//g ; /PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' ${REF_DUMP_FILE} | cut -d "|" -f -4 ) <(sed 's/\.//g ; /PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' ${current_file//.root/.dump} | cut -d "|" -f -4 ) )
         STATUS=$?
 
         echo -e "\nCheck for added/removed data products"
@@ -260,7 +304,7 @@ function compare_products_names
         if [[ "${STATUS}" -ne 0  ]]; then
             echo "${DIFF}"
             ERRORSTRING="W~Differences in products names~Request new reference files"
-            exitstatus 201
+            exitstatus 201 defer
         else
             echo -e "none\n\n"
         fi
@@ -273,7 +317,7 @@ function compare_products_names
 function compare_products_sizes
 {
     TASKSTRING="compare_products_sizes for ${file_stream} output stream"
-    ERRORSTRING="F~Error comparing product sizes~Check the log"
+    ERRORSTRING="W~Error comparing product sizes~Check the log"
 
 
     if [[ "${1}" -eq 1 ]]
@@ -282,7 +326,7 @@ function compare_products_sizes
         REF_DUMP_FILE=$(basename ${reference_file} | sed -e 's/.root/.dump/')
         echo -e "\nCompare products sizes for ${file_stream} output stream.\n"
         #~~~~~~~~~~~~~~~~CHECK IF THERE'S A DIFFERENCE BEETWEEN THE TWO DUMP FILES,IN ALL THE COLUMNS~~~~~~~~~~~~~~
-        DIFF=$(diff  <(sed 's/\.//g ; /PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' ${REF_DUMP_FILE}) <(sed 's/\.//g ; /PROCESS NAME/,/^\s*$/!d ; s/PROCESS NAME.*$// ; /^\s*$/d' ${current_file//.root/.dump}) )
+        DIFF=$(diff  <(sed 's/\.//g ; /PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' ${REF_DUMP_FILE}) <(sed 's/\.//g ; /PRINCIPAL TYPE:/,/^\s*$/!d ; s/PRINCIPAL TYPE:.*$// ; /^\s*$/d' ${current_file//.root/.dump}) )
         STATUS=$?
         echo -e "\nCheck for differences in the size of data products"
         echo -e "difference(s)\n"
@@ -316,7 +360,14 @@ function exitstatus
         if [[ -n "$ERRORSTRING" ]];then
             echo "`basename $PWD`~${EXITSTATUS}~$ERRORSTRING" >> $WORKSPACE/data_production_stats${ci_cur_exp_name}.log
         fi
-        exit "${EXITSTATUS}"
+        if [ "$2" == "defer" ];then
+            PREVSTATUS=${EXITSTATUS}
+        else
+            exit "${EXITSTATUS}"
+        fi
+    fi
+    if [[ -n "${PREVSTATUS}" && "$2" != "defer" ]]; then
+        exit "${PREVSTATUS}"
     fi
 }
 
@@ -388,7 +439,8 @@ do
         ###     reference_file=$(echo "${current_file}")
         ### fi
         ### reference_file="${reference_file//Current/Reference}"
-        reference_file=$(echo ${current_file//Current/Reference} | sed -e 's#'${build_identifier}'##' )
+        reference_file="${current_file//Current/Reference}"
+        [[ -n "$build_identifier" ]] && reference_file="$(sed -e 's#'${build_identifier}'##' <<< "$reference_file" )"
     fi
 
     if [[ "${check_compare_names}" -eq 1  || "${check_compare_size}" -eq 1 ]]; then
@@ -400,6 +452,10 @@ do
     compare_products_names "${check_compare_names}"
 
     compare_products_sizes "${check_compare_size}"
+
+    if [[ -n ${PREVSTATE} ]]; then
+        exit ${PREVSTATE}
+    fi
 
 done
 

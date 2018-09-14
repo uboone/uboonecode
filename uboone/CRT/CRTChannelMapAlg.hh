@@ -28,6 +28,7 @@
 #define CRTChannelMapAlg_hh_
 
 #include "uboone/CRT/CRTGeoObjectSorter.hh"
+
 #include "larcorealg/Geometry/GeoObjectSorterStandard.h"
 #include "larcorealg/Geometry/AuxDetChannelMapAlg.h"
 #include "larcorealg/Geometry/AuxDetGeo.h"
@@ -35,10 +36,17 @@
 #include "TVector3.h"
 #include <iostream>
 #include <vector>
-#include <set>
+
+class TVector3;
+
+namespace fhicl{
+  class ParameterSet;
+}
 
 
 namespace crt {
+
+  class CRTGeoObjectSorter;
 
   class CRTChannelMapAlg : public geo::AuxDetChannelMapAlg {
 

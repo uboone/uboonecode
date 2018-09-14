@@ -56,7 +56,7 @@ physics:
   rns:                          { module_type: RandomNumberSaver }
 
   ### pandora core modules
-  pandoraNu:                    @local::microboone_pandora
+  pandoraNu:                    @local::microboone_pandoraAllHitsSliceNu
 
   ### pandora cosmic kalmanhit
   pandoraCosmicKHit:            @local::microboone_track3Dkalmanhit
@@ -312,7 +312,6 @@ physics.producers.pandoraCosmicKHitRemoval.TrackProducerLabel:      "pandoraCosm
 
 physics.producers.pandoraNu.GeantModuleLabel:                       "largeant"
 physics.producers.pandoraNu.HitFinderModuleLabel:                   "pandoraCosmicKHitRemoval"
-physics.producers.pandoraNu.ConfigFile:                             "PandoraSettings_MicroBooNE_Neutrino.xml"
 
 physics.producers.pandoraNuKHit.UseClusterHits:                     false
 physics.producers.pandoraNuKHit.UsePFParticleHits:                  true

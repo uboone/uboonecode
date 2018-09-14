@@ -47,7 +47,7 @@ namespace lariov {
       UbooneElectronicsCalibProvider(fhicl::ParameterSet const& p);
       
       /// Reconfigure function called by fhicl constructor
-      void Reconfigure(fhicl::ParameterSet const& p);
+      void Reconfigure(fhicl::ParameterSet const& p) override;
       
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
       bool Update(DBTimeStamp_t ts);

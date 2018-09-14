@@ -5,7 +5,7 @@ art_make(
 			${ART_FRAMEWORK_CORE}
 			art_Utilities canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 			cetlib cetlib_except
                         ${Boost_SYSTEM_LIBRARY}
 			${ROOT_BASIC_LIB_LIST}
@@ -14,7 +14,8 @@ art_make(
 			uboone_SNStreamSim_Algo
 			larcorealg_Geometry
 			larcore_Geometry_Geometry_service
-			larsim_MCCheater_BackTracker_service
+			larsim_MCCheater_ParticleInventoryService_service
+			larsim_MCCheater_BackTrackerService_service
 			larsim_Simulation nutools_ParticleNavigation lardataobj_Simulation
 			lardataobj_RecoBase
 			lardataobj_AnalysisBase	
@@ -36,7 +37,7 @@ art_make(
 			art_Utilities
                         canvas
 			${MF_MESSAGELOGGER}
-			${MF_UTILITIES}
+			
 	                ${FHICLCPP}
 			cetlib cetlib_except
 			${CLHEP}
