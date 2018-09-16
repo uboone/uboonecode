@@ -2,7 +2,7 @@
 
 # The *parent* line must the first non-commented line and defines this product and version
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
-parent uboonecode v07_05_00_02
+parent uboonecode v07_05_00_03
 
 defaultqual e17
 
@@ -35,7 +35,7 @@ ubcv                    v07_05_00_02
 ubcrt                   v07_05_00
 ublite			v07_05_00_01
 ubutil                  v07_05_00
-uboonedata              v01_18_14
+uboonedata              v01_18_15
 genie_xsec              v2_12_10
 cetbuildtools	        v7_04_00	-	only_for_build
 end_product_list
