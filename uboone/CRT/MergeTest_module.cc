@@ -80,15 +80,11 @@ private:
   uint32_t fEvtNum; //Number of current event                       
   uint32_t frunNum;                //Run Number taken from event  
   uint32_t fsubRunNum;             //Subrun Number taken from event         
-  std::string  data_labeltrack_;
   std::string  data_labelhit_;
   std::string  data_label_flash_;
   std::string  data_label_DAQHeader_;
   int fHardDelay_;
   int verbose_;
-
-
-  //art::InputTag opFlashTag("opflashSat");
 
   //TTree*       fTree;
   TH1F* hFlashTimeDis;
@@ -107,8 +103,6 @@ private:
   TH2F* hPipe;
   TH2F* hTop;
 
-  TH1F* hYdiff;
-  TH1F* hZdiff;
 
   TH1F* hNHitperFla;
   TH1F* hNHitperFla0;
@@ -117,28 +111,12 @@ private:
   TH1F* hNHitperFla3;
   TH2F* hNHitperFla2D;
 
-  TH1F* hNTraperFla;
-
-  TH2F* hTra_tl_len;
-
-  
-  /* //for Tree
-  uint32_t fTriTim_sec;
-  uint32_t fTriTim_nsec;
-  double fY;
-  double fZ;
-  double fTimFla;
-  double fAbsTimFla;
-  
-  //for Tree*/
-
   
 };
 
 
 crt::MergeTest::MergeTest(fhicl::ParameterSet const & p)
   : EDAnalyzer(p),
-    data_labeltrack_(p.get<std::string>("data_labeltrack")),
     data_labelhit_(p.get<std::string>("data_labelhit")),
     data_label_flash_(p.get<std::string>("data_label_flash_")),
     data_label_DAQHeader_(p.get<std::string>("data_label_DAQHeader_")),
@@ -160,11 +138,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
   auto evt_time_sec = evtTime.timeHigh();
   auto evt_time_nsec = evtTime.timeLow();
 
-  //  double  evt_timeGPS_sec = evt_time_sec;
-  //double  evt_timeGPS_nsec = evt_time_nsec;
-  
   //get DAQ Header                                                                  
-  //Commentar para old swizzler, sin DAQ Header
   art::Handle< raw::DAQHeaderTimeUBooNE > rawHandle_DAQHeader;  
   evt.getByLabel(data_label_DAQHeader_, rawHandle_DAQHeader);
   
@@ -204,8 +178,6 @@ void crt::MergeTest::analyze(art::Event const & evt)
     //getchar();
   }  
   
-  //Comentar para old swizzle sin header
-
   
   //get Optical Flash
   art::Handle< std::vector<recob::OpFlash> > rawHandle_OpFlash;
@@ -242,30 +214,6 @@ void crt::MergeTest::analyze(art::Event const & evt)
   }
   //get CRTHits
 
-  /*  
-  //get CRTTracks
-  art::Handle< std::vector<crt::CRTTrack> > rawHandle_track;
-  evt.getByLabel(data_labeltrack_, rawHandle_track); 
-  
-  //check to make sure the data we asked for is valid
-  if(!rawHandle_track.isValid()){
-    std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
-              << ", event " << evt.event() << " has zero"
-              << " CRTTracks " << " in module " << data_labeltrack_ << std::endl;
-    std::cout << std::endl;
-    return;
-  }
-  
-  //get better access to the data    //CRTTrack collection on this event                                                
-  std::vector<crt::CRTTrack> const& CRTTrackCollection(*rawHandle_track);
-  
-  if(verbose_==1){ 
-    std::cout<<"  CRTTrackCollection.size()  "<<CRTTrackCollection.size()<<std::endl; 
-    getchar();   
-  }
-  //get CRTTracks
-  */
-
   
   if(CRTHitCollection.size()>0){//A
     
@@ -287,7 +235,6 @@ void crt::MergeTest::analyze(art::Event const & evt)
       auto Timeflash = my_OpFlash.Time(); //in us from trigger time
       auto Timeflash_ns = (Timeflash * 1000);
       auto Timeflash_ns_GPS = evt_timeGPS_nsec + (Timeflash * 1000);      
-      //int flash_time_GPS_ns = evt_timeGPS_nsec + (Timeflash * 1000);  //do not trust on this      
       int fbeam = my_OpFlash.OnBeamTime();
       uint32_t Flash_sec = evt_timeGPS_sec;
       
@@ -314,7 +261,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
       
       if(fbeam == 0){//C solo onbeam
 	int Hmatchcounter=0;
-
+	
 	hFlashTimeDis_b0->Fill(Timeflash);
 	
 	for(std::vector<int>::size_type j = 0; j != CRTHitCollection.size(); j++) {//D
@@ -336,13 +283,10 @@ void crt::MergeTest::analyze(art::Event const & evt)
           int diffT0_nsecABS = std::abs(diffT0_nsec);
 	  
 	 	 	  
-	  //if( (diff_secABS<3)  &&  (diffT1_nsecABS<1000 )  ){//E                                                                                        
-	  //if( (diff_secABS<1)  &&  (diffT1_nsecABS<600 ) &&  (diffT1_nsecABS>450 )  ){//E
-	  if( (diff_secABS<1)    ){//E
+	  if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E                                                                                      //if( (diff_secABS<1)    ){//E
 	    
 	    Hmatchcounter++;          
 	    
-
             hTFvsTH_t1->Fill(diffT1_nsec);
             hTFvsTH_t1_2d->Fill(diff_sec , diffT1_nsecABS);
 	    
@@ -387,76 +331,10 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	    
 	  }//E 
 	}//D
-	//std::cout<<"Hmatchcounter: "<<Hmatchcounter<<std::endl;
-	//getchar();
+	
 	hNHitperFla->Fill(Hmatchcounter);
 
-	/*
-	int Tmatchcounter=0;
-	for(std::vector<int>::size_type a = 0; a != CRTTrackCollection.size(); a++) {//T
-
-	  crt::CRTTrack my_CRTTrack = CRTTrackCollection[a];
-	  
-	  int Track_sec = my_CRTTrack.ts0_s;
-	  
-          int Track_T1_nsec = my_CRTTrack.ts1_ns + fHardDelay_;
-          int Track_T0_nsec = my_CRTTrack.ts0_ns;
-	  
-          int Tdiff_sec = Flash_sec - Track_sec;
-          int Tdiff_secABS = std::abs(Tdiff_sec);
-	  
-          int TdiffT1_nsec = Timeflash_ns - Track_T1_nsec;
-          int TdiffT1_nsecABS = std::abs(TdiffT1_nsec);
-	  
-          int TdiffT0_nsec = Timeflash_ns_GPS - Track_T0_nsec;
-          int TdiffT0_nsecABS = std::abs(TdiffT0_nsec);
-
-
-	  double Tlength = my_CRTTrack.length;
-	  double Tra_tl = my_CRTTrack.ts0_ns_h1 - my_CRTTrack.ts0_ns_h2;
-	  Tra_tl = std::abs(Tra_tl);
-	  hTra_tl_len->Fill(Tlength, Tra_tl);
-	  
-	  double TY = my_CRTTrack.y1_pos - my_CRTTrack.y2_pos; //correct by Y position in TPC
-	  double TZ = my_CRTTrack.z1_pos - my_CRTTrack.z2_pos; //correct by Z position in TPC	  
-
-	  double hY = TY - Yflash;
-	  double hZ = TZ - Zflash;
-
-	  //if( (Tdiff_secABS<3)  &&  (TdiffT1_nsecABS<1000 )  ){//V
-	  if( (Tdiff_secABS<1)  &&  (TdiffT1_nsecABS<600 ) &&  (TdiffT1_nsecABS>450 )  ){//C
-	    Tmatchcounter++;
-	   
-	    hZdiff->Fill(hZ);
-	    hYdiff->Fill(hY);
-
-
-            if(verbose_==1){
-	      std::cout.precision(19);
-	      std::cout<<"Flash_sec - Track_sec: "<<Tdiff_sec<<std::endl;
-	      std::cout<<"ABS( Flash_sec - Track_sec ): "<<Tdiff_secABS<<std::endl;
-	      std::cout<<" "<<std::endl;
-	      std::cout<<"Track_ns(T1): "<<Track_T1_nsec<<std::endl;
-	      std::cout<<"Flash_nsec(w.r.t. Trigger): "<<Timeflash_ns<<std::endl;
-	      std::cout<<"     Flash_nsec - Track_nsec(T1)  : "<<TdiffT1_nsec<<std::endl;
-	      std::cout<<"ABS( Flash_nsec - Track_nsec(T1) ): "<<TdiffT1_nsecABS<<std::endl;
-	      std::cout<<" "<<std::endl;
-	      std::cout<<"Track_ns(T0): "<<Track_T0_nsec<<std::endl;
-	      std::cout<<"Flash_nsec(GPS units): "<<Timeflash_ns_GPS<<std::endl;
-	      std::cout<<"     Flash_nsec - Track_nsec(T0)  : "<<TdiffT0_nsec<<std::endl;
-	      std::cout<<"ABS( Flash_nsec - Track_nsec(T0) ): "<<TdiffT0_nsecABS<<std::endl;
-	      getchar();
-	    }
-
-
-
-
-	  }//V
-
-	}//T
-	hNTraperFla->Fill(Tmatchcounter);
-	*/
-
+	
       }//C
     }//B  
 
@@ -499,21 +377,21 @@ void crt::MergeTest::beginJob()
   hTFvsTH_t1_2d->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
   hTFvsTH_t1_2d->SetOption("COLZ"); 
 
-  hTFvsTH_t0 = tfs->make<TH1F>("hGPSMatching","GPSMatching",2000,0,2000000);
+  hTFvsTH_t0 = tfs->make<TH1F>("hGPSMatching","GPSMatching",2000,0,100000);
   hTFvsTH_t0->GetXaxis()->SetTitle("Flash_Time_GPS - CRTHit_Time_T0 (ns)");
   hTFvsTH_t0->GetYaxis()->SetTitle("Entries/bin");
 
-  hTFvsTH_t0_2d = tfs->make<TH2F>("hGPSMatching2","hGPSMatching2",6,-3,3,2000,0,2000000);
+  hTFvsTH_t0_2d = tfs->make<TH2F>("hGPSMatching2","hGPSMatching2",6,-3,3,2000,0,100000);
   hTFvsTH_t0_2d->GetXaxis()->SetTitle("Flash Time - CRTHit Time (s)");
   hTFvsTH_t0_2d->GetYaxis()->SetTitle("Flasf_Time_GPS - CRTHit_Time_T0 (ns)");
   hTFvsTH_t0_2d->SetOption("COLZ"); 
 
-  hTFvsTH_t0_t1 = tfs->make<TH2F>("hGPSBeamMatching","hGPSBeamMatching",2000,0,2000000,500,0,1000);
+  hTFvsTH_t0_t1 = tfs->make<TH2F>("hGPSBeamMatching","hGPSBeamMatching",2000,0,100000,500,0,1000);
   hTFvsTH_t0_t1->GetXaxis()->SetTitle("Flash_Time_GPS - CRTHit_Time_T0 (ns)");
   hTFvsTH_t0_t1->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
   hTFvsTH_t0_t1->SetOption("COLZ"); 
 
-  hTFvsTH_plane_t0 = tfs->make<TH2F>("hGPSBeamMatchingPlane","hGPSBeamMatchingPlane",4,0,4, 4000,0,2000000);
+  hTFvsTH_plane_t0 = tfs->make<TH2F>("hGPSBeamMatchingPlane","hGPSBeamMatchingPlane",4,0,4, 2000,0,100000);
   hTFvsTH_plane_t0->GetXaxis()->SetTitle("CRT plane (0=bottom, 1=FT, 2=Pipe, 3=Top))");
   hTFvsTH_plane_t0->GetYaxis()->SetTitle("Flash Time_GPS - CRTHit Time_t0 (ns)");
   hTFvsTH_plane_t0->SetOption("COLZ"); 
@@ -529,46 +407,28 @@ void crt::MergeTest::beginJob()
   hNHitperFla->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash");
   hNHitperFla->GetYaxis()->SetTitle("Entries/bin");
 
-  hNHitperFla0 = tfs->make<TH1F>("hNHitperFlaBot","hNHitperFlaBot",205,-5,200);
+  hNHitperFla0 = tfs->make<TH1F>("hNHitperFlaBot","hNHitperFlaBot",205,-5,400);
   hNHitperFla0->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Bottom");
   hNHitperFla0->GetYaxis()->SetTitle("Entries/bin");
 
-  hNHitperFla1 = tfs->make<TH1F>("hNHitperFlaFT","hNHitperFlaFT",205,-5,200);
+  hNHitperFla1 = tfs->make<TH1F>("hNHitperFlaFT","hNHitperFlaFT",205,-5,400);
   hNHitperFla1->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in FT");
   hNHitperFla1->GetYaxis()->SetTitle("Entries/bin");
 
-  hNHitperFla2 = tfs->make<TH1F>("hNHitperFlaPipe","hNHitperFlaPipe",205,-5,200);
+  hNHitperFla2 = tfs->make<TH1F>("hNHitperFlaPipe","hNHitperFlaPipe",205,-5,400);
   hNHitperFla2->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Pipe");
   hNHitperFla2->GetYaxis()->SetTitle("Entries/bin");
 
-  hNHitperFla3 = tfs->make<TH1F>("hNHitperFlaTop","hNHitperFlaTop",205,-5,200);
+  hNHitperFla3 = tfs->make<TH1F>("hNHitperFlaTop","hNHitperFlaTop",205,-5,400);
   hNHitperFla3->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Top");
   hNHitperFla3->GetYaxis()->SetTitle("Entries/bin");
 	
-  hNHitperFla2D = tfs->make<TH2F>("hNHitperEvtPlane","hNHitperEvtPlane",4,0,4,205,-5,200);
+  hNHitperFla2D = tfs->make<TH2F>("hNHitperEvtPlane","hNHitperEvtPlane",4,0,4,205,-5,400);
   hNHitperFla2D->GetXaxis()->SetTitle("CRT plane (0=bottom, 1=FT, 2=Pipe, 3=Top))");
   hNHitperFla2D->GetYaxis()->SetTitle("N^{o} of CRTHits in event");
   hNHitperFla2D->SetOption("COLZ"); 
 
 
-  hNTraperFla = tfs->make<TH1F>("hNTrackperFla","hNTrackperFla",30,-5,25);
-  hNTraperFla->GetXaxis()->SetTitle("N^{o} of CRTTrack per Flash");
-  hNTraperFla->GetYaxis()->SetTitle("Entries/bin");
-
-  hTra_tl_len = tfs->make<TH2F>("hTra_tl_len","hTra_tl_len",120, 0, 1200, 120, 0, 120);
-  hTra_tl_len->GetXaxis()->SetTitle("Track lenght (cm)");
-  hTra_tl_len->GetYaxis()->SetTitle("Track time (ns)");
-  hTra_tl_len->SetOption("COLZ"); 
-
-  
-  hZdiff = tfs->make<TH1F>("hZdiff","hZdiff",100,-500,500);
-  hZdiff->GetXaxis()->SetTitle("ZTrack - ZFlash (cm)");
-  hZdiff->GetYaxis()->SetTitle("Entries/bin");
-
-  hYdiff = tfs->make<TH1F>("hYdiff","hYdiff",100,-500,500);
-  hYdiff->GetXaxis()->SetTitle("YTrack - YFlash (cm)");
-  hYdiff->GetYaxis()->SetTitle("Entries/bin");
- 
   double inch =2.54; //inch in cm
   hBot = tfs->make<TH2F>("hBottom","Bottom",125,-700+205*inch,-700+205*inch+125*10.89,60,-300+50.4*inch,-300+50.4*inch+60*10.89);
   hBot->GetXaxis()->SetTitle("Lenght along the beam (cm)");
@@ -594,64 +454,11 @@ void crt::MergeTest::beginJob()
   hTop->GetZaxis()->SetTitle("Entries/bin"); 
   hTop->SetOption("COLZ");
 
-
-  /*
-  hTFvsTT = tfs->make<TH1F>("hTFvsTT","hTFvsTT",1000000,0,10000000);//1ms max
-  hTFvsTT->GetXaxis()->SetTitle("Track time - Flash time (ns)");
-  hTFvsTT->GetYaxis()->SetTitle("Entries/bin");
-
-  hMulFT = tfs->make<TH1F>("hMulFT","hMulFT",50,0,50);//
-  hMulFT->GetXaxis()->SetTitle("Multiplicity (Tracks per Flash)");
-  hMulFT->GetYaxis()->SetTitle("Entries/bin");
-
-
-  hMulFTvsTdis = tfs->make<TH2F>("hMulFTvsTdis","hMulFTvsTdis",50,0,50,1000000,0,10000000);
-  hMulFTvsTdis->GetXaxis()->SetTitle("Multiplicity (Tracks per Flash)");
-  hMulFTvsTdis->GetYaxis()->SetTitle("Track time - Flash time (ns)");
-  hMulFTvsTdis->GetZaxis()->SetTitle("Entries/bin");
-  hMulFTvsTdis->SetOption("COLZ");
-  */
 }
 
 void crt::MergeTest::endJob()
 {
   // Implementation of optional member function here.
-  
-  
-  /*	  
-  //OLD
-  //uint32_t Hit_sec = my_CRTHit.ts0_s;
-  //uint32_t Flash_sec = evt_timeGPS_sec;
-  
-  uint32_t Hit_nsec = my_CRTHit.ts1_ns + fHardDelay_;
-  //uint32_t Flash_nsec = Timeflash * 1000;
-  
-  int dif_sec = Flash_sec - Hit_sec;
-  int dif_nsec = Flash_nsec - Hit_nsec;
-  int dif_secABS = std::abs(dif_sec);
-  int dif_nsecABS = std::abs(dif_nsec);
-  //OLD
-  
-  if( (dif_secABS<3)  &&  (dif_nsecABS<1000 )  ){//E
-  
-  hTFvsTH->Fill(dif_nsec);
-  hTFvsTH_2d->Fill(dif_sec , dif_nsecABS);
-  
-  hTFvsTH_t0->Fill(Timeflash_ns_GPS - my_CRTHit.ts0_ns);
-  hTFvsTH_t0_2d->Fill(Timeflash_ns_GPS - my_CRTHit.ts0_ns, dif_nsec);
-  hTFvsTH_t0_plane->Fill(my_CRTHit.plane, Timeflash_ns_GPS - my_CRTHit.ts0_ns);
-  
-  if(verbose_==1){
-  std::cout<<"Flash_sec - Hit_sec: "<<Flash_sec - Hit_sec<<std::endl;
-  std::cout<<"Flash_nsec - Hit_nsec: "<<Flash_nsec - Hit_nsec<<std::endl;
-  std::cout<<"Flash_nsec - Hit_nsec: "<<dif_secABS<<std::endl;
-  getchar();
-  }
-  
-  }//E
-  //OLD
-  
-  */
   
   
 }
