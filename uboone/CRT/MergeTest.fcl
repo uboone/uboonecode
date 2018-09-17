@@ -1,12 +1,21 @@
-# FHiCL document used to run the "driver" executable. To learn more
-#  about the FHiCL language, please look at
-#  cdcvs.fnal.gov/redmine/documents/327 , the "FHiCL Quick Start Guide"
+#include "services_microboone.fcl"
+#include "sam_microboone.fcl"
+
+##include "singles_microboone.fcl"
+##include "geometry_microboone.fcl"
+##include "detectorclocks_microboone.fcl"
+##include "pmtconfig_microboone.fcl"
+##include "databaseutil_microboone.fcl"
+##include "sam_microboone.fcl"
+##include "opticaldetectormodules_microboone.fcl"
+##include "flashfilter_microboone.fcl"
+##include "subevent_module.fcl"
 
 events_to_generate: 200
 run_number: 101
 
 services:{
-  TFileService: { fileName: "Merge_CHECK_v06_67_01.root" }
+	 TFileService: { fileName: "MergeTest.root" }
 }
 
 physics:	
@@ -16,12 +25,13 @@ physics:
     crt:		
     {			
       module_type: MergeTest
-      data_labeltrack: "crttrack"
-      ##data_labelhit: "crthit"
       data_labelhit: "merger"
-      data_label_flash_: "opflash"
+      ##data_label_flash_: "opflashBeam" ##original
+      data_label_flash_: "simpleFlashCosmic"   ##cosmic actvity
       data_label_DAQHeader_: "daq"
       fHardDelay: 40000
+      fShowerCut: 200
+      fPEsCut: 5
       verbose: 0
      }
   }
@@ -44,6 +54,7 @@ outputs:
     module_type: RootOutput
     fileName: "driver.root"
     compressionLevel: 0
+    dataTier        : "swizzled"
   }
 
   out1:
