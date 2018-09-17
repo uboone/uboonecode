@@ -1,5 +1,5 @@
 /**
- * \class ReinteractionWeightCalc
+ * \class evwgh::ReinteractionWeightCalc
  * \brief Hadron reinteraction event reweighting
  * \author A. Mastbaum <mastbaum@uchicago.edu>, 2018/07
  *
@@ -10,7 +10,7 @@
 #include <string>
 #include "TDirectory.h"
 #include "TFile.h"
-#include "TH1F.h"
+#include "TH1D.h"
 #include "Geant4/G4LossTableManager.hh"
 #include "Geant4/G4ParticleTable.hh"
 #include "Geant4/G4ParticleDefinition.hh"
@@ -46,22 +46,23 @@ public:
   class ParticleDef {
   public:
     ParticleDef() {}
-    ParticleDef(std::string _name, int _pdg, float _sigma, TFile* probFile)
+    ParticleDef(std::string _name, std::string objname,
+                int _pdg, float _sigma, TFile* probFile)
         : name(_name), pdg(_pdg), par_sigma(_sigma) {
-      pint = dynamic_cast<TH1F*>(probFile->Get(name.c_str()));
+      pint = dynamic_cast<TH1D*>(probFile->Get(objname.c_str()));
       assert(pint);
 
       // Reconstitute the cross section vs. KE
-      char name[100];
-      snprintf(name, 100, "_xs_%s", name);
-      xs = dynamic_cast<TH1F*>(pint->Clone(name));
+      char hname[100];
+      snprintf(hname, 100, "_xs_%s", name.c_str());
+      xs = dynamic_cast<TH1D*>(pint->Clone(hname));
+      assert(xs);
 
       for (int j=1; j<xs->GetNbinsX()+1; j++) {
         float p1 = pint->GetBinContent(j);
         float p2 = pint->GetBinContent(j-1);
         float v = 0;
 
-        // TODO: enforced monotonicity
         if (p1 > p2 && p1 < 1) {
           v = -1.0 * log((1.0 - p1) / (1.0 - p2));
         }
@@ -73,8 +74,8 @@ public:
     std::string name;  //!< String name
     int pdg;  //!< PDG code
     float par_sigma;  //!< Variation sigma set by user
-    TH1F* pint;  //!< Interaction probability as a function of KE
-    TH1F* xs;  //!< Derived effective cross section
+    TH1D* pint;  //!< Interaction probability as a function of KE
+    TH1D* xs;  //!< Derived effective cross section
     std::vector<double> sigmas;  //!< Sigmas for universes
   };
 
@@ -85,6 +86,7 @@ private:
   TFile* fProbFile;  //!< File with interaction probabilities, uncertainties
   std::map<int, ParticleDef> fParticles;  //!< Particles to reweight
   unsigned fNsims;  //!< Number of multisims
+  float fXSUncertainty;  //!< Flat cross section uncertainty
 
   DECLARE_WEIGHTCALC(ReinteractionWeightCalc)
 };
@@ -98,6 +100,7 @@ void ReinteractionWeightCalc::Configure(fhicl::ParameterSet const& p) {
   std::vector<std::string> pars = pset.get< std::vector<std::string> >("parameter_list");	
   std::vector<float> sigmas = pset.get<std::vector<float> >("parameter_sigma");	
   std::string mode = pset.get<std::string>("mode");
+  fXSUncertainty = pset.get<float>("xs_uncertainty", 0.3);
   std::string probFileName = pset.get<std::string>("ProbFileName", "systematics/reint/interaction_probabilities.root");
   fNsims = pset.get<int> ("number_of_multisims", 0);
 
@@ -114,20 +117,19 @@ void ReinteractionWeightCalc::Configure(fhicl::ParameterSet const& p) {
   // Build parameter list
   for (size_t i=0; i<pars.size(); i++) {
     if (pars[i] == "p") {
-      fParticles[2212] = ParticleDef("p",   2212, sigmas[i], fProbFile);
+      fParticles[2212] = ParticleDef("p",   "h_protonIntProb",  2212, sigmas[i], fProbFile);
     }
     else if (pars[i] == "pip") {
-      fParticles[211]  = ParticleDef("pip",  211, sigmas[i], fProbFile);
+      fParticles[211]  = ParticleDef("pip", "h_piplusIntProb",   211, sigmas[i], fProbFile);
     }
     else if (pars[i] == "pim") {
-      fParticles[-211] = ParticleDef("pim", -211, sigmas[i], fProbFile);
+      fParticles[-211] = ParticleDef("pim", "h_piminusIntProb", -211, sigmas[i], fProbFile);
     }
     else {
       std::cerr << "Unknown particle type: " << pars[i] << std::endl;
       assert(false);
     }
   };
-
 
   // Set up universes
   for (auto& it : fParticles) {
@@ -190,7 +192,7 @@ ReinteractionWeightCalc::GetWeight(art::Event& e) {
           // Integrate a modified cross section to find a survival probability
           float sprob = 1.0;
           for (int k=0; k<kebin; k++) {
-            float wbin = 1.0 - (1.0 - 0.3 /*def.huncert->GetBinContent(k)*/) * def.sigmas[j];
+            float wbin = 1.0 - (1.0 - fXSUncertainty) * def.sigmas[j];
             float xs = wbin * def.xs->GetBinContent(k);
             sprob *= exp(-1.0 * xs);
           }
