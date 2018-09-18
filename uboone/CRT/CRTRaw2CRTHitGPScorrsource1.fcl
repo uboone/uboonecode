@@ -43,7 +43,7 @@ source:
       	CRTgains_file: "CRTgains-V8.txt"
       	CRTpedestals_file: "CRTpedestals-V8.txt"
 	PartTop_file: "HalfTop-V2.txt"
-	FEB_MS_delay_file: "FEB_ms_delay_V2.txt"
+	FEB_MS_delay_file: "FEB_ms_delay_V3.txt"
 	CRT_GPS_correction: "correction_ts0.txt"
 }
 

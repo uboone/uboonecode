@@ -32,7 +32,9 @@
   <class name="std::map< unsigned char, std::vector< std::pair<int,float> > > "/>
   <class name="art::Wrapper< std::vector<crt::CRTHit> >"/>
   
-  <class name="crt::CRTTrack" ClassVersion="14">
+  <class name="crt::CRTTrack" ClassVersion="16">
+   <version ClassVersion="16" checksum="3705353140"/>
+   <version ClassVersion="15" checksum="317642251"/>
    <version ClassVersion="14" checksum="1784374890"/>
    <version ClassVersion="13" checksum="1459516781"/>
    <version ClassVersion="12" checksum="249137092"/>
@@ -42,6 +44,32 @@
   
   <class name="std::vector<crt::CRTTrack>"/>
   <class name="art::Wrapper< std::vector<crt::CRTTrack> >"/>
+
+  <class name="crt::CRTTzero" ClassVersion="13">
+   <version ClassVersion="13" checksum="145047750"/>
+   <version ClassVersion="12" checksum="3370378787"/>
+   <version ClassVersion="11" checksum="3017435182"/>
+   <version ClassVersion="10" checksum="4058773250"/>
+  </class>
+  
+  <class name="std::vector<crt::CRTTzero>"/>
+  <class name="art::Wrapper< std::vector<crt::CRTTzero> >"/>
+
+
+ <!-- associations  -->
+
+<!-- <class name="std::pair< art::Ptr<crt::CRTTzero>,
+ art::Ptr<crt::CRTHit>,    void>"           />  -->
+ <class name="art::Assns<crt::CRTTzero, crt::CRTHit,    void>"           />
+ <class name="art::Wrapper< art::Assns<crt::CRTTzero, crt::CRTHit, void> >"           />
+<!--  <class name="std::pair< art::Ptr<crt::CRTHit>,
+ art::Ptr<crt::CRTTzero>,    void>"           />  -->
+ <class name="art::Assns<crt::CRTHit, crt::CRTTzero,    void>"           />
+ <class name="art::Wrapper< art::Assns<crt::CRTHit, crt::CRTTzero, void> >"           />
+<!--
+ <class name="art::Assns<art::Ptr<crt::CRTTzero>, art::Ptr<crt::CRTHit>,    void>"           />
+
+-->
 
 <!--
   <class name="crt::MSetCRTFrag" ClassVersion="11">

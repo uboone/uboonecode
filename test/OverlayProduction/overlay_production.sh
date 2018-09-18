@@ -34,3 +34,7 @@ do
   fi
   input=$output
 done
+
+# Done (success).
+
+rm *.root   # Clean up.
