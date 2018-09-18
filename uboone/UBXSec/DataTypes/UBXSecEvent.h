@@ -154,6 +154,19 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_muoncandidate_perc_used_hits_in_cluster; ///< Number of used hits in the cluster to make the track
   vector<double>   slc_muoncandidate_maxscatteringangle; ///< Maximum scattering angle along track
 
+  vector<double>   slc_muoncandidate_truth_origin; ///< Origin (0=Unknown, 1=Neutrino, 2=CosmicRay, 3=SuperNova, 4=SingleParticle) of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pdg; ///< Pdg of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_time; ///< Start time of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startx; ///< Start position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_starty; ///< Start position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startz; ///< Start position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endx; ///< End position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endy; ///< End position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endz; ///< End position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_px; ///< Momentum along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_py; ///< Momentum along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pz; ///< Momentum along Z of the true MCParticle matched to the reconstructed candidate muon track
+
   Int_t            nbeamfls; ///< Number of beam flashes in the event
   vector<double>   beamfls_time; ///< Time of the beam flash
   vector<double>   beamfls_pe; ///< PE of the beam flash
@@ -183,10 +196,10 @@ class UBXSecEvent /*: public TObject*/{
   vector<int> evtwgt_genie_multisim_nweight; ///< Number of weights per function name used for GENIE reweighting (multisim)
   vector<vector<double>> evtwgt_genie_multisim_weight; ///< Weights per function name used for GENIE reweighting (multisim)
 
-  Int_t evtwgt_genie_models_multisim_nfunc; ///< Number of functions used for GENIE Models reweighting (multisim)
-  vector<std::string> evtwgt_genie_models_multisim_funcname; ///< Names of the functions used for GENIE Models reweighting (multisim)
-  vector<int> evtwgt_genie_models_multisim_nweight; ///< Number of weights per function name used for GENIE Models reweighting (multisim)
-  vector<vector<double>> evtwgt_genie_models_multisim_weight; ///< Weights per function name used for GENIE Models reweighting (multisim)
+  Int_t evtwgt_extra_syst_multisim_nfunc; ///< Number of functions used for extra syst reweighting (mec, qe, reinteraction, or others)(multisim)
+  vector<std::string> evtwgt_extra_syst_multisim_funcname; ///< Names of the functions used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
+  vector<int> evtwgt_extra_syst_multisim_nweight; ///< Number of weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
+  vector<vector<double>> evtwgt_extra_syst_multisim_weight; ///< Weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
  
   Int_t evtwgt_flux_multisim_nfunc; ///< Number of functions used for FLUX reweighting (multisim)
   vector<std::string> evtwgt_flux_multisim_funcname; ///< Names of the functions used for FLUX reweighting (multisim)
@@ -202,7 +215,7 @@ class UBXSecEvent /*: public TObject*/{
   void ResizeGenieTruthVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
-  void ResetGenieModelsEventWeightVectorsMultisim();
+  void ResetExtraSystEventWeightVectorsMultisim();
   void ResetFluxEventWeightVectorsMultisim();
 
 };

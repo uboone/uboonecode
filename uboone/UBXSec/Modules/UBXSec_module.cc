@@ -189,7 +189,7 @@ private:
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
   std::string _genie_eventweight_multisim_producer;
-  std::vector<std::string> _genie_models_eventweight_multisim_producers;
+  std::vector<std::string> _extrasyst_eventweight_multisim_producers;
   std::string _flux_eventweight_multisim_producer;
   std::string _file_type;
   bool _debug = true;                   ///< Debug mode
@@ -298,7 +298,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
-  _genie_models_eventweight_multisim_producers = p.get<std::vector<std::string>>("GenieModelsEventWeightMultisimProducer");
+  _extrasyst_eventweight_multisim_producers = p.get<std::vector<std::string>>("ExtraSystEventWeightMultisimProducers");
   _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
 
   _file_type                      = p.get<std::string>("FileType");
@@ -746,33 +746,33 @@ void UBXSec::produce(art::Event & e) {
     }
   }
 
-  // GENIE Models reweigthing (systematics - multisim)
-  ubxsec_event->ResetGenieModelsEventWeightVectorsMultisim();
-  for (auto producer_name : _genie_models_eventweight_multisim_producers) {
+  // Extra Syst reweigthing (CCQE, CCMEC, Reinteraction, or others) (systematics - multisim)
+  ubxsec_event->ResetExtraSystEventWeightVectorsMultisim();
+  int countFunc = 0;
+  for (auto producer_name : _extrasyst_eventweight_multisim_producers) {
     if (_is_mc) {
-      art::Handle<std::vector<evwgh::MCEventWeight>> geniemodelseventweight_h;
-      e.getByLabel(producer_name, geniemodelseventweight_h);
-      if(!geniemodelseventweight_h.isValid()){
-        std::cout << "[UBXSec] MCEventWeight for GENIE Models reweight multisim, product " << producer_name << " not found..." << std::endl;
+      art::Handle<std::vector<evwgh::MCEventWeight>> extrasysteventweight_h;
+      e.getByLabel(producer_name, extrasysteventweight_h);
+      if(!extrasysteventweight_h.isValid()){
+        std::cout << "[UBXSec] MCEventWeight for Extra Syst reweight multisim, product " << producer_name << " not found..." << std::endl;
         //throw std::exception();
       } else {
-        std::vector<art::Ptr<evwgh::MCEventWeight>> geniemodelseventweight_v;
-        art::fill_ptr_vector(geniemodelseventweight_v, geniemodelseventweight_h);
-        if (geniemodelseventweight_v.size() > 0) {
-          art::Ptr<evwgh::MCEventWeight> evt_wgt = geniemodelseventweight_v.at(0); // Just for the first nu interaction
+        std::vector<art::Ptr<evwgh::MCEventWeight>> extrasysteventweight_v;
+        art::fill_ptr_vector(extrasysteventweight_v, extrasysteventweight_h);
+        if (extrasysteventweight_v.size() > 0) {
+          art::Ptr<evwgh::MCEventWeight> evt_wgt = extrasysteventweight_v.at(0); // Just for the first nu interaction
           std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
-          int countFunc = 0;
           // loop over the map and save the name of the function and the vector of weights for each function
           for(auto it : evtwgt_map) {
             std::string func_name = it.first;
             std::vector<double> weight_v = it.second; 
             //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
-            ubxsec_event->evtwgt_genie_models_multisim_funcname.push_back(func_name);
-            ubxsec_event->evtwgt_genie_models_multisim_weight.push_back(weight_v);
-            ubxsec_event->evtwgt_genie_models_multisim_nweight.push_back(weight_v.size());
+            ubxsec_event->evtwgt_extra_syst_multisim_funcname.push_back(func_name);
+            ubxsec_event->evtwgt_extra_syst_multisim_weight.push_back(weight_v);
+            ubxsec_event->evtwgt_extra_syst_multisim_nweight.push_back(weight_v.size());
             countFunc++;
           }
-          ubxsec_event->evtwgt_genie_models_multisim_nfunc = countFunc;
+          ubxsec_event->evtwgt_extra_syst_multisim_nfunc = countFunc;
         }
       }
     }
