@@ -41,3 +41,5 @@ physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillEnds:   4.90
 
 physics.producers.UBXSec.BeamSpillStart:                 3.10
 physics.producers.UBXSec.BeamSpillEnd:                   4.90
+
+physics.producers.pandoraNu.BuildShowersAsTracks: false

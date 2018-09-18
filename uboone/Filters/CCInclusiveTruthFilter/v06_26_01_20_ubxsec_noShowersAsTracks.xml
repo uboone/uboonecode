@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<!-- project details -->
+<!DOCTYPE project [
+<!ENTITY release "v06_26_01_20">
+<!ENTITY name "noShowersAsTracks">
+<!ENTITY scratch_dir "/pnfs/uboone/scratch/users/alister1/TEST/noShowersAsTracks">
+<!ENTITY resilient_dir "/pnfs/uboone/resilient/users/alister1/TEST/noShowersAsTracks">
+<!ENTITY data_dir "/pnfs/uboone/scratch/users/alister1/TEST/noShowersAsTracks">
+]>
+
+<job>
+
+<project name="&name;">
+
+    <!-- project size -->
+    <numevents>100000</numevents>
+
+    <!-- batchOS -->
+    <os>SL6</os>
+
+    <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+    <!-- larsoft info -->
+    <larsoft>
+        <tag>&release;</tag>
+        <qual>e10:prof</qual>
+        <local>/pnfs/uboone/resilient/users/alister1/tars/ubcode_v06_26_01_20.tar</local>
+    </larsoft>
+
+    <!-- NuMu Selection Stage -->
+    <stage name="noShowersAsTracks">
+        <inputdef>alister1_mcc8.7_bnb_nu_cosmic_100files_test</inputdef>
+        <fcl>run_ubxsecfilter_ccinclusivetruthfilter_noshowersastracks.fcl</fcl>
+        <bookdir>&data_dir;</bookdir>
+        <workdir>&resilient_dir;</workdir>
+        <outdir>&scratch_dir;</outdir>
+        <logdir>&scratch_dir;</logdir>
+        <numjobs>100</numjobs>
+        <numevents>50</numevents>
+        <maxfilesperjob>1</maxfilesperjob>
+        <memory>6000</memory>
+        <datatier>sat</datatier>
+        <schema>root</schema>
+   </stage>
+
+</project>
+
+</job>
