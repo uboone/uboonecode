@@ -9,12 +9,12 @@
 #include "BooNEtoGSimple.h"
 #include "BooNENtuple.h"
 #include "BeamNtuple.h"
-#include "FluxDrivers/GNuMIFlux.h"
-#include "FluxDrivers/GSimpleNtpFlux.h"
+#include "Tools/Flux/GNuMIFlux.h"
+#include "Tools/Flux/GSimpleNtpFlux.h"
 
 //GEANT to PDG 
-#include "PDG/PDGCodes.h"
-#include "PDG/PDGCodeList.h"
+#include "Framework/ParticleData/PDGCodes.h"
+#include "Framework/ParticleData/PDGCodeList.h"
 
 //root stuff
 #include <TROOT.h>
