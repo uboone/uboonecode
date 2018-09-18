@@ -154,6 +154,19 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_muoncandidate_perc_used_hits_in_cluster; ///< Number of used hits in the cluster to make the track
   vector<double>   slc_muoncandidate_maxscatteringangle; ///< Maximum scattering angle along track
 
+  vector<double>   slc_muoncandidate_truth_origin; ///< Origin (0=Unknown, 1=Neutrino, 2=CosmicRay, 3=SuperNova, 4=SingleParticle) of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pdg; ///< Pdg of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_time; ///< Start time of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startx; ///< Start position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_starty; ///< Start position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startz; ///< Start position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endx; ///< End position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endy; ///< End position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endz; ///< End position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_px; ///< Momentum along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_py; ///< Momentum along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pz; ///< Momentum along Z of the true MCParticle matched to the reconstructed candidate muon track
+
   Int_t            nbeamfls; ///< Number of beam flashes in the event
   vector<double>   beamfls_time; ///< Time of the beam flash
   vector<double>   beamfls_pe; ///< PE of the beam flash

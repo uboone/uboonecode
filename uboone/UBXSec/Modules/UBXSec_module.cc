@@ -1829,7 +1829,7 @@ void UBXSec::produce(art::Event & e) {
 
     }
 
-    // Particle ID
+    // True track ass. to reo muon candidate and Particle ID
     auto pfps_from_tpcobj = tpcobjToPFPAssns.at(slice);
 
     for (auto pfp : pfps_from_tpcobj){
@@ -1852,6 +1852,27 @@ void UBXSec::produce(art::Event & e) {
         std::cerr << "[UBXSec] Problem with MCTruth pointer." << std::endl;
         continue;
       }
+  
+      auto these_tracks = tracks_from_pfp.at(pfp.key());
+      if (these_tracks.size() == 0) {
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice] = -8888;
+      }
+      else if (these_tracks.at(0) == candidate_track) {
+        ubxsec_event->slc_muoncandidate_truth_origin[slice] = mc_truth->Origin();
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
+        ubxsec_event->slc_muoncandidate_truth_time[slice]   = mcpars[0]->T();
+        ubxsec_event->slc_muoncandidate_truth_startx[slice] = mcpars[0]->Vx();
+        ubxsec_event->slc_muoncandidate_truth_starty[slice] = mcpars[0]->Vy();
+        ubxsec_event->slc_muoncandidate_truth_startz[slice] = mcpars[0]->Vz();
+        ubxsec_event->slc_muoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
+        ubxsec_event->slc_muoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
+        ubxsec_event->slc_muoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
+        ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
+        ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
+        ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
+      }
+  
+  
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
 
