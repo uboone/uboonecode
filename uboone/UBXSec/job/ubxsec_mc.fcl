@@ -7,7 +7,8 @@
 
 #include "genie_eventweight_microboone_ubxsec.fcl"
 #include "flux_eventweight_microboone_ubxsec.fcl"
-##include "eventweight_microboone_models.fcl"
+#include "eventweight_microboone_models_ubxsec.fcl"
+#include "eventweight_microboone_reinteractions_ubxsec.fcl"
 
 #include "tpcobjectmaker.fcl"
 #include "neutrinomcflash.fcl"
@@ -91,7 +92,8 @@ ubxsec_mc_flashmatch:
 
    genieeventweightpm1:            @local::genie_microboone_eventweight_ubxsec
    genieeventweightmultisim:       @local::genie_microboone_eventweight_ubxsec
-   #geniemodelseventweightmultisim: @local::microboone_eventweight
+   geniemodelseventweightmultisim: @local::microboone_eventweight_geniemodels
+   reinteventweightmultisim:       @local::microboone_eventweight_reint
    fluxeventweightmultisim:        @local::flux_microboone_eventweight_ubxsec
 
    UBXSec:                         @local::UBXSec_mc
@@ -135,9 +137,10 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        NeutrinoFlashMatch,
                        CandidateConsistency,
                        #genieeventweightpm1,
-                       genieeventweightmultisim,
-                       ##geniemodelseventweightmultisim,
-                       fluxeventweightmultisim,
+                       #genieeventweightmultisim,
+                       geniemodelseventweightmultisim,
+                       reinteventweightmultisim,
+                       #fluxeventweightmultisim,
                        UBXSec ] 
 
 ubxsec_mc_filters: [ tpcneutrinoidfilternumuccinc 

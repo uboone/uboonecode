@@ -189,7 +189,7 @@ private:
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
   std::string _genie_eventweight_multisim_producer;
-  std::string _genie_models_eventweight_multisim_producer;
+  std::vector<std::string> _genie_models_eventweight_multisim_producers;
   std::string _flux_eventweight_multisim_producer;
   std::string _file_type;
   bool _debug = true;                   ///< Debug mode
@@ -298,7 +298,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
-  _genie_models_eventweight_multisim_producer = p.get<std::string>("GenieModelsEventWeightMultisimProducer");
+  _genie_models_eventweight_multisim_producers = p.get<std::vector<std::string>>("GenieModelsEventWeightMultisimProducer");
   _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
 
   _file_type                      = p.get<std::string>("FileType");
@@ -748,30 +748,32 @@ void UBXSec::produce(art::Event & e) {
 
   // GENIE Models reweigthing (systematics - multisim)
   ubxsec_event->ResetGenieModelsEventWeightVectorsMultisim();
-  if (_is_mc) {
-    art::Handle<std::vector<evwgh::MCEventWeight>> geniemodelseventweight_h;
-    e.getByLabel(_genie_models_eventweight_multisim_producer, geniemodelseventweight_h);
-    if(!geniemodelseventweight_h.isValid()){
-      std::cout << "[UBXSec] MCEventWeight for GENIE Models reweight multisim, product " << _genie_models_eventweight_multisim_producer << " not found..." << std::endl;
-      //throw std::exception();
-    } else {
-      std::vector<art::Ptr<evwgh::MCEventWeight>> geniemodelseventweight_v;
-      art::fill_ptr_vector(geniemodelseventweight_v, geniemodelseventweight_h);
-      if (geniemodelseventweight_v.size() > 0) {
-        art::Ptr<evwgh::MCEventWeight> evt_wgt = geniemodelseventweight_v.at(0); // Just for the first nu interaction
-        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
-        int countFunc = 0;
-        // loop over the map and save the name of the function and the vector of weights for each function
-        for(auto it : evtwgt_map) {
-          std::string func_name = it.first;
-          std::vector<double> weight_v = it.second; 
-          //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
-          ubxsec_event->evtwgt_genie_models_multisim_funcname.push_back(func_name);
-          ubxsec_event->evtwgt_genie_models_multisim_weight.push_back(weight_v);
-          ubxsec_event->evtwgt_genie_models_multisim_nweight.push_back(weight_v.size());
-          countFunc++;
+  for (auto producer_name : _genie_models_eventweight_multisim_producers) {
+    if (_is_mc) {
+      art::Handle<std::vector<evwgh::MCEventWeight>> geniemodelseventweight_h;
+      e.getByLabel(producer_name, geniemodelseventweight_h);
+      if(!geniemodelseventweight_h.isValid()){
+        std::cout << "[UBXSec] MCEventWeight for GENIE Models reweight multisim, product " << producer_name << " not found..." << std::endl;
+        //throw std::exception();
+      } else {
+        std::vector<art::Ptr<evwgh::MCEventWeight>> geniemodelseventweight_v;
+        art::fill_ptr_vector(geniemodelseventweight_v, geniemodelseventweight_h);
+        if (geniemodelseventweight_v.size() > 0) {
+          art::Ptr<evwgh::MCEventWeight> evt_wgt = geniemodelseventweight_v.at(0); // Just for the first nu interaction
+          std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+          int countFunc = 0;
+          // loop over the map and save the name of the function and the vector of weights for each function
+          for(auto it : evtwgt_map) {
+            std::string func_name = it.first;
+            std::vector<double> weight_v = it.second; 
+            //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
+            ubxsec_event->evtwgt_genie_models_multisim_funcname.push_back(func_name);
+            ubxsec_event->evtwgt_genie_models_multisim_weight.push_back(weight_v);
+            ubxsec_event->evtwgt_genie_models_multisim_nweight.push_back(weight_v.size());
+            countFunc++;
+          }
+          ubxsec_event->evtwgt_genie_models_multisim_nfunc = countFunc;
         }
-        ubxsec_event->evtwgt_genie_models_multisim_nfunc = countFunc;
       }
     }
   }
@@ -1829,7 +1831,7 @@ void UBXSec::produce(art::Event & e) {
 
     }
 
-    // Particle ID
+    // True track ass. to reo muon candidate and Particle ID
     auto pfps_from_tpcobj = tpcobjToPFPAssns.at(slice);
 
     for (auto pfp : pfps_from_tpcobj){
@@ -1852,6 +1854,26 @@ void UBXSec::produce(art::Event & e) {
         std::cerr << "[UBXSec] Problem with MCTruth pointer." << std::endl;
         continue;
       }
+
+      auto these_tracks = tracks_from_pfp.at(pfp.key());
+      if (these_tracks.size() == 0) {
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice] = -8888;
+      }
+      else if (these_tracks.at(0) == candidate_track) {
+        ubxsec_event->slc_muoncandidate_truth_origin[slice] = mc_truth->Origin();
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
+        ubxsec_event->slc_muoncandidate_truth_time[slice]   = mcpars[0]->T();
+        ubxsec_event->slc_muoncandidate_truth_startx[slice] = mcpars[0]->Vx();
+        ubxsec_event->slc_muoncandidate_truth_starty[slice] = mcpars[0]->Vy();
+        ubxsec_event->slc_muoncandidate_truth_startz[slice] = mcpars[0]->Vz();
+        ubxsec_event->slc_muoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
+        ubxsec_event->slc_muoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
+        ubxsec_event->slc_muoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
+        ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
+        ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
+        ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
+      }
+
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
 
