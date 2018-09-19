@@ -1438,24 +1438,42 @@ void UBXSec::produce(art::Event & e) {
 
       // Save proton information to the output tree (to be inplemented)
       if (proton_cand_exists) {
-        // ubxsec_event->slc_protoncandidate_exists[slice]    = true;
-        // ubxsec_event->slc_protoncandidate_contained[slice] = fully_contained;
-        // ubxsec_event->slc_protoncandidate_length[slice]    = 
-        // ubxsec_event->slc_protoncandidate_phi[slice]       =  
-        // ubxsec_event->slc_protoncandidate_theta[slice]     = 
+
+      bool fully_contained = _fiducial_volume.InFV(candidate_track->Vertex(), candidate_track->End());
+
+        ubxsec_event->slc_protoncandidate_exists[slice]    = true;
+        ubxsec_event->slc_protoncandidate_contained[slice] = fully_contained;
+        ubxsec_event->slc_protoncandidate_length[slice]    = proton_candidate_track->Length(); 
+        ubxsec_event->slc_protoncandidate_phi[slice]       = proton_candidate_track->Phi(); 
+        ubxsec_event->slc_protoncandidate_theta[slice]     = proton_candidate_track->Theta();
+        ubxsec_event->slc_protoncandidate_mom_range[slice] = _trk_mom_calculator.GetTrackMomentum(proton_candidate_track->Length(), 13);
+        // ubxsec_event->slc_protoncandidate_mom_mcs[slice]   = _trk_mom_calculator.GetMomentumMultiScatterLLHD(proton_candidate_track);
+//      }
+
+        bool proton_track_direction_correct = (proton_candidate_track->Vertex() - temp).Mag() < (proton_candidate_track->End() - temp).Mag();
+      if (proton_track_direction_correct) {
+        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(proton_candidate_track.key())->fwdMomentum();
+//        ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(protoncandidate_track.key())->fwdLogLikelihood();
+//        ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->fwdMomentum();
+        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
+        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
       } else {
-        // ubxsec_event->slc_protoncandidate_exists[slice]    = false;
-        // ubxsec_event->slc_protoncandidate_contained[slice] = false;
-        // ubxsec_event->slc_protoncandidate_length[slice]    = 
-        // ubxsec_event->slc_protoncandidate_phi[slice]       = 
-        // ubxsec_event->slc_protoncandidate_theta[slice]     = 
+        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(proton_candidate_track.key())->bwdMomentum();
+//        ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
+//        ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->bwdMomentum();
+        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
+        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
       }
 
-
-
-
-
-
+      } else {
+        ubxsec_event->slc_protoncandidate_exists[slice]    = false;
+        ubxsec_event->slc_protoncandidate_contained[slice] = false;
+        ubxsec_event->slc_protoncandidate_length[slice]    = -9999;
+        ubxsec_event->slc_protoncandidate_phi[slice]       = -9999;
+        ubxsec_event->slc_protoncandidate_theta[slice]     = -9999;
+        ubxsec_event->slc_protoncandidate_mom_range[slice] = -9999;
+        ubxsec_event->slc_protoncandidate_mom_mcs[slice]   = -9999;
+      }
 
 
 

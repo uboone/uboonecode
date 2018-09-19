@@ -135,6 +135,15 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_muoncandidate_linearity.resize(vsize, _default_value);
   slc_muoncandidate_perc_used_hits_in_cluster.resize(vsize, _default_value);
   slc_muoncandidate_maxscatteringangle.resize(vsize, _default_value);
+
+  slc_protoncandidate_exists.resize(vsize, _default_value);
+  slc_protoncandidate_length.resize(vsize, _default_value);
+  slc_protoncandidate_phi.resize(vsize, _default_value);
+  slc_protoncandidate_theta.resize(vsize, _default_value);
+  slc_protoncandidate_contained.resize(vsize, _default_value);
+  slc_protoncandidate_mom_range.resize(vsize, _default_value);
+  slc_protoncandidate_mom_mcs.resize(vsize, _default_value);
+
   slc_acpt_outoftime.resize(vsize, _default_value);
   slc_crosses_top_boundary.resize(vsize, _default_value);
   slc_nuvtx_closetodeadregion_u.resize(vsize, _default_value);
