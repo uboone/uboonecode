@@ -97,7 +97,7 @@ private:
   bool fVerbose;
   bool fSaveDrawTree;
   bool fUseTruthDistanceMetric;
-  bool fTruthMatching;
+  //bool fTruthMatching;
 
   // Declare services
   geo::GeometryCore const* fGeometry; // Pointer to the Geometry service
@@ -108,7 +108,7 @@ private:
   TTree *eventTree;
   TTree *candidateTree;
   TTree *drawTree;
-  TTree *physicsTree;
+  //TTree *physicsTree;
 
   // Declare tree fillers
   AuxEvent::EventTreeFiller etf;
