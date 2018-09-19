@@ -49,3 +49,7 @@ done
 #    exit $stat
 #  fi
 #done
+
+# Done (success).
+
+rm *.root   # Clean up.

@@ -544,8 +544,8 @@ physics.producers.saturation.CalibrationCorr : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.
 
 microboone_reco_mcc8_producers.butcher.inRawTag:                                                               "simnfspl1:raw"
 microboone_reco_mcc8_producers.butcher.inSigTag:                                                               "simnfspl1:gauss:"
-microboone_reco_mcc8_producers.butcher.ndrop:                                                                  0
-microboone_reco_mcc8_producers.butcher.nkeep:                                                                  9595
+#microboone_reco_mcc8_producers.butcher.ndrop:                                                                  0
+#microboone_reco_mcc8_producers.butcher.nkeep:                                                                  9595
 
 microboone_reco_mcc8_producers.gaushit.CalDataModuleLabel:                                                     "butcher"
 microboone_reco_mcc8_producers.gaushit.LongMaxHits:                                                            [ 25, 25, 25]
