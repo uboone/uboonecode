@@ -17,7 +17,7 @@ public:
 private:
   // Declare trees
   TTree *tPotCount;
-  TTree *tEventCount;
+  //TTree *tEventCount;
   bool fVerbose;
   bool fIsOverlayData;
 
