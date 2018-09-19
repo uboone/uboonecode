@@ -1,0 +1,41 @@
+#include "services_microboone.fcl"
+
+process_name: minimalExample
+
+services:
+{
+  TFileService: {fileName: "findFileWithEvent.root"}
+  TimeTracker:            {}
+  MemoryTracker:          {}
+  RandomNumberGenerator:  {}
+  @table::microboone_services_reco
+  @table::microboone_simulation_services
+}
+
+source:
+{
+  module_type: RootInput
+  maxEvents:  -1
+}
+
+physics:
+{
+	analyzers:
+  {
+    FindFileWithEvent:
+    {
+      module_type:          "FindFileWithEvent"
+      queriedRun:           [1,1,1,1,1]
+      queriedSubrun:        [0,0,0,0,0]
+      queriedEvent:         [1,4,5,6,9]
+      queryAll:             true #if all==true, module ignores queriedEvent and creates database of all events
+    }
+  }
+  analysis: [FindFileWithEvent]
+  end_paths: [analysis]
+}
+
+services.DetectorClocksService.InheritClockConfig: false
+services.DetectorClocksService.TriggerOffsetTPC: -400
+services.DetectorPropertiesService.NumberTimeSamples: 6400
+services.DetectorPropertiesService.ReadOutWindowSize: 6400
