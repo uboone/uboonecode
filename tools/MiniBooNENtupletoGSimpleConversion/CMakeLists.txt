@@ -13,6 +13,11 @@ cet_make_exec(ConvertNtuple SOURCE ConvertNtuple.cxx BooNEtoGSimple.cxx
 				      ${GFWALG}
 				      ${GFWPARDAT}
 				      ${GPHDISXS}
+				      ${GPHPDF}
+				      ${GPHXSIG}
+				      ${GPHDISEG}
+				      ${GPHHADNZ}
+				      ${GPHDCY}
 				      ${GFWEG}
 				      ${GFWEG}
 	                              ${GTLFLX}
@@ -23,7 +28,10 @@ cet_make_exec(ConvertNtuple SOURCE ConvertNtuple.cxx BooNEtoGSimple.cxx
 				      ${GFWNUM}
 				      ${GFWPARDAT}
 				      ${GFWREG}
+				      ${GPHCMN}
 				      ${GFWUTL}
+				      ${GSL}
+				      ${GSLCBLAS}
 				      #more root stuff
 				      ${ROOT_EG}
 				      ${ROOT_EGPYTHIA6}
