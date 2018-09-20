@@ -70,6 +70,7 @@ ubxsec_mc_reco:
 
   pandoraNuMCSMu:                 @local::mcsfitproducer
   pandoraNuMCSPi:                 @local::mcsfitproducer
+  pandoraNuMCSP:                  @local::mcsfitproducer
 }
 
 ubxsec_mc_flashmatch:
@@ -125,6 +126,7 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        pandoraNucalipid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
+                       pandoraNuMCSP,
                        RecoTrueMatcher, 
                        TPCObjectMaker,
                        pandoraNuGeoCosmicTag,
@@ -202,6 +204,9 @@ ubxsec_mc_reco.pandoraNuMCSMu.inputs.inputLabel:                 "pandoraNu::UBX
 
 ubxsec_mc_reco.pandoraNuMCSPi.inputs.inputLabel:                 "pandoraNu::UBXSec"
 ubxsec_mc_reco.pandoraNuMCSPi.fitter.pIdHypothesis:              211
+
+ubxsec_mc_reco.pandoraNuMCSP.inputs.inputLabel:                  "pandoraNu::UBXSec"
+ubxsec_mc_reco.pandoraNuMCSP.fitter.pIdHypothesis:               2212
 
 # Set FlashMatching properties
 ubxsec_mc_flashmatch.NeutrinoFlashMatch.TrackModule:             "pandoraNu::UBXSec"

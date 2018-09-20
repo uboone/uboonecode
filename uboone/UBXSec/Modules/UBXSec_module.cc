@@ -185,6 +185,7 @@ private:
   std::string _candidateconsistency_producer;
   std::string _mcsfitresult_mu_producer;
   std::string _mcsfitresult_pi_producer;
+  std::string _mcsfitresult_p_producer;
   std::string _calorimetry_producer;
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
@@ -283,6 +284,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _candidateconsistency_producer        = p.get<std::string>("CandidateConsistencyProducer");
   _mcsfitresult_mu_producer             = p.get<std::string>("MCSFitResultMuProducer");
   _mcsfitresult_pi_producer             = p.get<std::string>("MCSFitResultPiProducer");
+  _mcsfitresult_p_producer              = p.get<std::string>("MCSFitResultPProducer");
   _calorimetry_producer                 = p.get<std::string>("CalorimetryProducer");
   _eventweight_producer                 = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer       = p.get<std::string>("GenieEventWeightPMOneProducer");
@@ -610,6 +612,16 @@ void UBXSec::produce(art::Event & e) {
   }
   std::vector<art::Ptr<recob::MCSFitResult>> mcsfitresult_pi_v;
   art::fill_ptr_vector(mcsfitresult_pi_v, mcsfitresult_pi_h);
+
+  // Get MCSFitResult - P
+  art::Handle<std::vector<recob::MCSFitResult> > mcsfitresult_p_h;
+  e.getByLabel(_mcsfitresult_p_producer,mcsfitresult_p_h);
+  if(!mcsfitresult_p_h.isValid()){
+    std::cout << "[UBXSec] MCSFitResult product " << _mcsfitresult_p_producer << " not found..." << std::endl;
+    //throw std::exception();
+  }
+  std::vector<art::Ptr<recob::MCSFitResult>> mcsfitresult_p_v;
+  art::fill_ptr_vector(mcsfitresult_p_v, mcsfitresult_p_h);
 
   /*
   std::cout << "mcsfitresult_mu_v.at(0)->fwdLogLikelihood(): " << mcsfitresult_mu_v.at(0)->fwdLogLikelihood() << std::endl;
@@ -1288,6 +1300,10 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
 
 
+    // Declare here proton variables
+    bool proton_cand_exists = false;
+    art::Ptr<recob::Track> proton_candidate_track;
+
     //
     // Muon Candidate
     //
@@ -1408,8 +1424,6 @@ void UBXSec::produce(art::Event & e) {
       // We have:
       // art::Ptr<recob::Track> candidate_track; <- The candidate muon track
       // track_v_v[slice] <- A vector of tracks for this interaction
-      bool proton_cand_exists = false;
-      art::Ptr<recob::Track> proton_candidate_track;
 
       std::vector<art::Ptr<recob::Track>> tracks = track_v_v[slice];
 
@@ -1439,7 +1453,7 @@ void UBXSec::produce(art::Event & e) {
       // Save proton information to the output tree (to be inplemented)
       if (proton_cand_exists) {
 
-      bool fully_contained = _fiducial_volume.InFV(candidate_track->Vertex(), candidate_track->End());
+      bool fully_contained = _fiducial_volume.InFV(proton_candidate_track->Vertex(), proton_candidate_track->End());
 
         ubxsec_event->slc_protoncandidate_exists[slice]    = true;
         ubxsec_event->slc_protoncandidate_contained[slice] = fully_contained;
@@ -1452,17 +1466,11 @@ void UBXSec::produce(art::Event & e) {
 
         bool proton_track_direction_correct = (proton_candidate_track->Vertex() - temp).Mag() < (proton_candidate_track->End() - temp).Mag();
       if (proton_track_direction_correct) {
-        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(proton_candidate_track.key())->fwdMomentum();
-//        ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(protoncandidate_track.key())->fwdLogLikelihood();
-//        ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->fwdMomentum();
-        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
-        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
+        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_p_v.at(proton_candidate_track.key())->fwdMomentum();
+        // std::cout << "Proton MCS LL: " << mcsfitresult_p_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
       } else {
-        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_mu_v.at(proton_candidate_track.key())->bwdMomentum();
-//        ubxsec_event->slc_muoncandidate_mcs_ll[slice]  = mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood();
-//        ubxsec_event->slc_muoncandidate_mom_mcs_pi[slice] = mcsfitresult_pi_v.at(candidate_track.key())->bwdMomentum();
-        // std::cout << "Muon MCS LL: " << mcsfitresult_mu_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
-        // std::cout << "Pion MCS LL: " << mcsfitresult_pi_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
+        ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_p_v.at(proton_candidate_track.key())->bwdMomentum();
+        // std::cout << "Proton MCS LL: " << mcsfitresult_p_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
       }
 
       } else {
@@ -1642,6 +1650,40 @@ void UBXSec::produce(art::Event & e) {
         std::cerr << "[UBXSec] Problem with MCTruth pointer." << std::endl;
         continue;
       }
+
+      auto these_tracks = tracks_from_pfp.at(pfp.key());
+      if (these_tracks.size() == 0) {
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice] = -8888;
+      }
+      else if (these_tracks.at(0) == candidate_track) {
+        ubxsec_event->slc_muoncandidate_truth_origin[slice] = mc_truth->Origin();
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
+        ubxsec_event->slc_muoncandidate_truth_time[slice]   = mcpars[0]->T();
+        ubxsec_event->slc_muoncandidate_truth_startx[slice] = mcpars[0]->Vx();
+        ubxsec_event->slc_muoncandidate_truth_starty[slice] = mcpars[0]->Vy();
+        ubxsec_event->slc_muoncandidate_truth_startz[slice] = mcpars[0]->Vz();
+        ubxsec_event->slc_muoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
+        ubxsec_event->slc_muoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
+        ubxsec_event->slc_muoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
+        ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
+        ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
+        ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
+      }
+      else if (these_tracks.at(0) == proton_candidate_track) {
+        ubxsec_event->slc_protoncandidate_truth_origin[slice] = mc_truth->Origin();
+        ubxsec_event->slc_protoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
+        ubxsec_event->slc_protoncandidate_truth_time[slice]   = mcpars[0]->T();
+        ubxsec_event->slc_protoncandidate_truth_startx[slice] = mcpars[0]->Vx();
+        ubxsec_event->slc_protoncandidate_truth_starty[slice] = mcpars[0]->Vy();
+        ubxsec_event->slc_protoncandidate_truth_startz[slice] = mcpars[0]->Vz();
+        ubxsec_event->slc_protoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
+        ubxsec_event->slc_protoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
+        ubxsec_event->slc_protoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
+        ubxsec_event->slc_protoncandidate_truth_px[slice]     = mcpars[0]->Px();
+        ubxsec_event->slc_protoncandidate_truth_py[slice]     = mcpars[0]->Py();
+        ubxsec_event->slc_protoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
+      }
+
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
 
