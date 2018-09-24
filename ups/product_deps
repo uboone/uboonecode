@@ -43,9 +43,8 @@ genie_xsec      v2_12_10
 larsoft         v06_80_00
 ubutil          v06_80_00
 uboonedata      v01_18_10
-#uboone_example_data v01_00_00
 
-uboonedaq_datatypes v6_20_02a
+uboonedaq_datatypes v6_22_05_offline
 
 gallery         v1_08_02
 artdaq_core 	v3_02_03

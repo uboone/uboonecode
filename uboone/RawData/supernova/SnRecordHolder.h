@@ -27,8 +27,8 @@ struct SnRecordHolder {
 
   std::shared_ptr<gov::fnal::uboone::datatypes::ub_EventRecord> fEvent;
   size_t                                      fNumWires;
-  size_t                                      fMinTdc;
-  size_t                                      fMaxTdc;
+  int32_t                                     fMinTdc;
+  int32_t                                     fMaxTdc;
   size_t                                      fNumFrames;
   uint32_t                                    fTpcFrame;
   bool                                        fEvaluated;
@@ -43,13 +43,14 @@ struct SnRecordHolder {
 
   bool addSupernovaTpcData( roimap_t& roi_map, // Array of data to add to. Will be turned into Wires.
                             int offset_tdc,                 // Offset data I retrieve by this much into the output 
-                            size_t from_tdc, size_t to_tdc, // insert this range of values from the eventRecord
+                            int32_t from_tdc, int32_t to_tdc, // insert this range of values from the eventRecord
                             size_t roi_size,                // size of the roi object on output
                             bool remove_pedestal );
                             
   typedef std::map< opdet::UBOpticalChannelCategory_t, std::unique_ptr< std::vector<raw::OpDetWaveform> > >  pmtmap_t;
                             
   bool addSupernovaPmtData( pmtmap_t& pmt_map );
+  
 
 };
   

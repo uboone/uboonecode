@@ -91,5 +91,5 @@ simple_plugin( SnFileSource
 
 install_headers()
 install_fhicl()
-# install_source()
-# install_scripts()
+install_source()
+install_scripts()

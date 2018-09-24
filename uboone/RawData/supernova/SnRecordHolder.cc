@@ -64,7 +64,7 @@ namespace snassembler {
     if(fEvaluated) return true;
     
     fNumWires = 0;
-    fMinTdc = std::numeric_limits<size_t>::max();
+    fMinTdc = std::numeric_limits<int32_t>::max();
     fMaxTdc = 0;
     
     std::vector<uint16_t> packet_data_buffer; // native data type for speed
@@ -86,7 +86,7 @@ namespace snassembler {
           if(channel_data.packets_.size()<1) continue;
 
           const auto& first_packet = channel_data.packets_.front();
-          size_t tdc_start = first_packet.header().getSampleNumber();
+          int32_t tdc_start = first_packet.header().getSampleNumber();
           fMinTdc = std::min(fMinTdc,tdc_start);
 
           const auto& last_packet = channel_data.packets_.back();
@@ -94,7 +94,7 @@ namespace snassembler {
             
             packet_data_buffer.resize(0);
             last_packet.decompress_into(packet_data_buffer,false);
-            size_t tdc_last = last_packet.header().getSampleNumber() + packet_data_buffer.size();
+            int32_t tdc_last = last_packet.header().getSampleNumber() + packet_data_buffer.size();
             fMaxTdc = std::max(fMaxTdc,tdc_last);
             
           } catch (const datatypes_exception& e) {  continue;  } // We will deal with these later; this is just a peek.
@@ -183,7 +183,7 @@ namespace snassembler {
           std::vector<float> packet;
           packet.reserve(3200);
           for(auto const& p: channel_data.packets_) {
-            size_t tdc = p.header().getSampleNumber();          
+            int32_t tdc = p.header().getSampleNumber();          
             if(p.data().size()==0) {
               // zero-sized packet. 
               if( ((tdc+1)%3200) ==0) {
@@ -249,7 +249,7 @@ namespace snassembler {
   }
 
 
-  bool SnRecordHolder::addSupernovaTpcData( SnRecordHolder::roimap_t& roi_map, int offset_tdc, size_t from_tdc, size_t to_tdc, size_t roi_size, bool remove_pedestal )
+  bool SnRecordHolder::addSupernovaTpcData( SnRecordHolder::roimap_t& roi_map, int offset_tdc, int32_t from_tdc, int32_t to_tdc, size_t roi_size, bool remove_pedestal )
   {
     if(!fEvaluated)  evaluateSupernovaTpcData(); // Quick scan
 
@@ -275,7 +275,12 @@ namespace snassembler {
           throw art::Exception(art::errors::DataCorruption,"CardHeaderFrameMismatch") << " Card header doesn't match frame on card " << card << " frame " << frame;
           
         }
-
+        if( card_data.header().getOverflowBit() ) {
+          // throw art::Exception(art::errors::DataCorruption,"CardOverflowBit") << " SN has Data-Overflow bit set on crate " << crate << " card " << card << " frame " << frame;
+        }
+        if( card_data.header().getFullBit() ) {
+          // throw art::Exception(art::errors::DataCorruption,"CardFullBit") << " SN has Data-Full bit set on crate " << crate << " card " << card << " frame " << frame;
+        }
 
 
         std::vector<tpc_sn_crate_data_t::card_t::card_channel_type> const& channels = card_data.getChannels();
@@ -320,12 +325,13 @@ namespace snassembler {
           recob::Wire::RegionsOfInterest_t& rois = roi_map[ch]; // FIXME: set max value?
           rois.resize(roi_size);
         
-          // size_t packets = channel_data.packets_.size();
-          std::vector<float> packet;
+          std::vector<uint16_t> packet;
+          std::vector<float>    fpacket;
           packet.reserve(200); // Temporary storage; reusable and exapandable
+          fpacket.reserve(200);
 
           for(auto const& p: channel_data.packets_) {
-            size_t tdc = p.header().getSampleNumber();
+            int32_t tdc = p.header().getSampleNumber();
             if(tdc > to_tdc) continue; // This packet is not wanted.
             if(p.data().size()==0) {
               // zero-sized packet. 
@@ -360,15 +366,39 @@ namespace snassembler {
               }
               if(tdc+packet.size()<from_tdc) continue; // Don't need this packet.
 
+              fpacket.resize(packet.size());
+              auto  it =  packet.begin();
+              auto fit = fpacket.begin();
+              for(; it!=packet.end(); it++, fit++) {
+                if(*it>0x4fff) {
+                  std::cout << "Bad encoding! " << "sample " << it-packet.begin() << " TDC " << tdc << std::endl;
+                  std::cout << channel_data.debugInfo() << std::endl;
+                } else 
+                  *fit = (*it);
+              }
               // std::cout << Form("wire %4d  tdc %5lu  compressed %4lu uncompressed %4lu\n",ch,tdc,p.data().size(),packet.size());
               if(remove_pedestal) {
-                float ped = *packet.begin();
-                for(auto it = packet.begin(); it!= packet.end(); it++) *it -= ped;
+                const size_t k_pedestal_length = 7;
+                const int    k_max_noise = 8;
+                // look at first 7 packets (email Jose Jun 2018)
+                // and find minimum. Then look at truncated mean near minimum.
+                size_t pedlength = k_pedestal_length;
+                if(fpacket.size()<pedlength) pedlength = fpacket.size(); 
+                auto pedend = fpacket.begin()+pedlength;
+                float min = *(std::min_element(fpacket.begin(),pedend));
+                float ped = 0;
+                float nped = 0;
+                for(auto it = fpacket.begin();it!=pedend;it++) {
+                  if((*it)-min < k_max_noise ) { nped+=1.0; ped += *it;}
+                }                
+                ped = ped/nped;
+                
+                for(auto it = fpacket.begin(); it!= fpacket.end(); it++) *it -= ped;
               }
               
-              size_t tdc_out = tdc;
-              auto begin_ = packet.begin();
-              auto end_ = packet.end();
+              int32_t tdc_out = tdc;
+              auto begin_ = fpacket.begin();
+              auto end_ = fpacket.end();
               
               if(tdc > to_tdc) continue; // Whole window is too late for use
               if(tdc+packet.size() < from_tdc) continue; // Whole window is too early for use
@@ -381,6 +411,7 @@ namespace snassembler {
               }
               if(begin_>=end_) continue; // No data to move.
               tdc_out += offset_tdc; // offset it.
+              assert(tdc_out>=0);
               rois.add_range(tdc_out,begin_,end_);            
               nrois ++;
             }
