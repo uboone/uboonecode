@@ -1,0 +1,2 @@
+physics.producers.daq.GenNoise: 3
+physics.producers.daq.NoiseAmpScaleFactor: 0.9

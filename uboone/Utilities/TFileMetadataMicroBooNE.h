@@ -52,6 +52,7 @@ namespace util{
       std::string fproject_name;
       std::string fproject_stage;
       std::string fproject_version;
+      double fTotPOT = 0;
     };
     
     metadata md;
@@ -65,6 +66,7 @@ namespace util{
     void postOpenFile(std::string const& fn);
     void postEvent(art::Event const& ev);
     void postBeginSubRun(art::SubRun const& subrun);
+    void postEndSubRun(art::SubRun const& subrun);
     void postEndJob();
 
     // Private member functions.
@@ -80,6 +82,7 @@ namespace util{
     std::vector<std::string> fJSONFileName;
     std::vector<std::string> fDataTier;
     std::vector<std::string> fFileFormat;
+    std::vector<std::string> fPOTSummary;
 
   }; // class TFileMetadataMicroBooNE
 

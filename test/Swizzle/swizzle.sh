@@ -19,6 +19,14 @@ if [ -f swizzle.skip ]; then
   exit
 fi
 
+# Exit if stash cache isn't mounted.
+
+UBOONE_EXAMPLE_DATA_DIR=/cvmfs/uboone.osgstorage.org/stash/uboone_example_data
+if [ ! -d $UBOONE_EXAMPLE_DATA_DIR ]; then
+  echo "Quittig because stash cache isn't available."
+  exit
+fi
+
 # This script runs the standard swizzle fcl file.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/ubdaq/PhysicsRun-2018_2_26_13_49_57-0015224-00007.ubdaq

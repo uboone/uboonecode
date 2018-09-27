@@ -27,6 +27,8 @@
 
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "uboone/Utilities/PMTRemapService.h"
+#include "uboone/Utilities/PMTRemapProvider.h"
 
 #include "DataOverlay/RawDigitMixer.h"
 #include "lardataobj/RawData/RawDigit.h"
@@ -81,6 +83,8 @@ class OverlayRawDataMicroBooNE : public art::EDProducer {
 
     bool MixOpDetWaveforms_HighGain( const art::Event& evt, std::vector<raw::OpDetWaveform> & output);
     bool MixOpDetWaveforms_LowGain( const art::Event& evt, std::vector<raw::OpDetWaveform> & output);
+
+    void remapPMT(const std::vector<raw::OpDetWaveform> & vODW, std::vector<raw::OpDetWaveform> & corrected_vODW);
   };
 }//end namespace mix
 
@@ -149,6 +153,7 @@ void mix::OverlayRawDataMicroBooNE::GenerateMCRawDigitScaleMap(std::vector<raw::
     else
       fMCRawDigitScaleMap[d.Channel()] = fDefaultMCRawDigitScale;
   }
+  
 }
 
 bool mix::OverlayRawDataMicroBooNE::MixRawDigits( const art::Event& event, std::vector<raw::RawDigit> & output) {
@@ -160,6 +165,7 @@ bool mix::OverlayRawDataMicroBooNE::MixRawDigits( const art::Event& event, std::
   
   art::Handle< std::vector<raw::RawDigit> > dataDigitHandle;
   event.getByLabel( fRawDigitDataModuleLabel,dataDigitHandle);
+
 
   GenerateMCRawDigitScaleMap(*dataDigitHandle);
   fRDMixer.DeclareData(*dataDigitHandle);
@@ -193,13 +199,17 @@ bool mix::OverlayRawDataMicroBooNE::MixOpDetWaveforms_HighGain( const art::Event
   
   art::Handle< std::vector<raw::OpDetWaveform> > mcOpDetHandle_HighGain;
   event.getByLabel(fOpDetMCModuleLabel,"OpdetBeamHighGain",mcOpDetHandle_HighGain);
+  //remapping MC PMTs to match those from data
+  std::unique_ptr<std::vector<raw::OpDetWaveform> > corr_mcOpDetHandle_HighGain(new std::vector<raw::OpDetWaveform>);
+  remapPMT(*mcOpDetHandle_HighGain, *corr_mcOpDetHandle_HighGain);
   
   art::Handle< std::vector<raw::OpDetWaveform> > dataOpDetHandle_HighGain;
   event.getByLabel(fOpDetDataModuleLabel,"OpdetBeamHighGain",dataOpDetHandle_HighGain);  
 
   GenerateMCOpDetHighGainScaleMap(*dataOpDetHandle_HighGain); 
   fODMixer.DeclareData(*dataOpDetHandle_HighGain,output);
-  fODMixer.Mix(*mcOpDetHandle_HighGain, fMCOpDetHighGainScaleMap, output);
+  //fODMixer.Mix(*mcOpDetHandle_HighGain, fMCOpDetHighGainScaleMap, output);
+  fODMixer.Mix(*corr_mcOpDetHandle_HighGain, fMCOpDetHighGainScaleMap, output);
   
   return true;
 }
@@ -210,13 +220,17 @@ bool mix::OverlayRawDataMicroBooNE::MixOpDetWaveforms_LowGain( const art::Event&
 
   art::Handle< std::vector<raw::OpDetWaveform> > mcOpDetHandle_LowGain;
   event.getByLabel(fOpDetMCModuleLabel,"OpdetBeamLowGain",mcOpDetHandle_LowGain);
-  
+  //remapping MC PMTs to match those from data
+  std::unique_ptr<std::vector<raw::OpDetWaveform> > corr_mcOpDetHandle_LowGain(new std::vector<raw::OpDetWaveform>); 
+  remapPMT(*mcOpDetHandle_LowGain, *corr_mcOpDetHandle_LowGain);
+ 
   art::Handle< std::vector<raw::OpDetWaveform> > dataOpDetHandle_LowGain;
   event.getByLabel(fOpDetDataModuleLabel,"OpdetBeamLowGain",dataOpDetHandle_LowGain);  
 
   GenerateMCOpDetLowGainScaleMap(*dataOpDetHandle_LowGain); 
   fODMixer.DeclareData(*dataOpDetHandle_LowGain,output);
-  fODMixer.Mix(*mcOpDetHandle_LowGain, fMCOpDetLowGainScaleMap, output);
+  //fODMixer.Mix(*mcOpDetHandle_LowGain, fMCOpDetLowGainScaleMap, output);
+  fODMixer.Mix(*corr_mcOpDetHandle_LowGain, fMCOpDetLowGainScaleMap, output);
   
   return true;
 }
@@ -241,5 +255,16 @@ bool mix::OverlayRawDataMicroBooNE::MixTriggerData( const art::Event& event, std
   return true;
 }
 
+void mix::OverlayRawDataMicroBooNE::remapPMT(const std::vector<raw::OpDetWaveform> & vODW, std::vector<raw::OpDetWaveform> & corrected_vODW) {
+  const util::PMTRemapProvider& pmtremap 
+	= art::ServiceHandle<util::PMTRemapService>()->GetProvider();
+  
+  for( unsigned int i = 0 ; i< vODW.size() ; i++) {
+      raw::OpDetWaveform odw = vODW[i];
+      raw::Channel_t correctedChannelNumber = pmtremap.OriginalOpChannel(odw.ChannelNumber ()); 
+      corrected_vODW.push_back(odw);
+      corrected_vODW[i].SetChannelNumber(correctedChannelNumber);
+  }
+}
 
 DEFINE_ART_MODULE(mix::OverlayRawDataMicroBooNE)

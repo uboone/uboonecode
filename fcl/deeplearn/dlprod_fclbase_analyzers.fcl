@@ -4,6 +4,7 @@
 #include "litemc_reco2d.fcl"
 #include "litemc_opreco.fcl"
 #include "litemc_opdigit.fcl"
+#include "litemc_backtracker.fcl"
 
 BEGIN_PROLOG
 
@@ -56,7 +57,7 @@ SuperaCCPi0Data.supera_params: "supera_basic_focused.fcl"
 SuperaCCPi0Data.CSVSuperaMetaMaker: "ccpi0_constraint.fcl"
 
 SuperaMCBasic: @local::SuperaWholeView
-SuperaMCBasic.supera_params: "supera_segment.fcl"
+SuperaMCBasic.supera_params: "supera_basic.fcl"
 
 SuperaMCTruthOnly: @local::SuperaWholeView
 SuperaMCTruthOnly.supera_params: "supera_mctruthonly.fcl"
@@ -71,6 +72,7 @@ dlprod_analyzers:
    opreco:  @local::litemc_opreco
 
    reco2d:  @local::litemc_reco2d
+   gaushitMCinfoBacktracker: @local::litemc_gaushitMCinfoBacktracker
 
    superaWholeView:   @local::SuperaBasic
    superaWholeViewMC: @local::SuperaMCBasic
@@ -84,6 +86,7 @@ dlprod_analyzers:
    superaMCLArFlow:   @local::SuperaMCLArFlow
    superaMCInstance:  @local::SuperaMCInstance
    superaMCFullSet:   @local::SuperaMCFullSet
+   superaMCBasic:     @local::SuperaMCBasic
    superaMCTruthOnly: @local::SuperaMCTruthOnly
 }
 
@@ -97,6 +100,7 @@ dlprod_analyzers.opdigit.stream:    "opdigit"
 dlprod_analyzers.opreco.stream:     "opreco"
 dlprod_analyzers.wire.stream:       "wire"
 dlprod_analyzers.reco2d.stream:     "reco2d"
+dlprod_analyzers.gaushitMCinfoBacktracker.stream: "gaushitMCinfoBacktracker"
 
 dlprod_analyzers.mcinfo.out_filename:     "larlite_mcinfo.root"
 dlprod_analyzers.simch.out_filename:      "larlite_simch.root"
@@ -104,6 +108,7 @@ dlprod_analyzers.opdigit.out_filename:    "larlite_opdigit.root"
 dlprod_analyzers.opreco.out_filename:     "larlite_opreco.root"
 dlprod_analyzers.wire.out_filename:       "larlite_wire.root"
 dlprod_analyzers.reco2d.out_filename:     "larlite_reco2d.root"
+dlprod_analyzers.gaushitMCinfoBacktracker.out_filename: "larlite_backtracker.root"
 
 dlprod_analyzers.wire.RawDigit4ChStatus: "wcNoiseFilter"
 

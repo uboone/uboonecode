@@ -21,6 +21,7 @@
 
 // ROOT includes
 #include "TGraph.h"
+#include "TF1.h"
 
 // C/C++ standard libraries
 #include <string>
@@ -188,6 +189,19 @@ namespace spacecharge {
       SpaceChargeRepresentation_t fRepresentationType;
       std::string fInputFilename;
       
+      //for doing a data-inspired correction
+      bool fEnableDataSimSpatialCorrection;
+      double fDataSimCorrFunc_MinX;
+      double fDataSimCorrFunc_MaxX;
+      TF1 fDataSimCorrFunc_MCTop;
+      TF1 fDataSimCorrFunc_MCBottom;
+      TF1 fDataSimCorrFunc_DataTop;
+      TF1 fDataSimCorrFunc_DataBottom;
+
+      //for doing simple scaling of offsets
+      double fSpatialOffsetScale;
+      double fEfieldOffsetScale;
+
       std::array<gsl::Interpolator, 7U> g1_x;
       std::array<gsl::Interpolator, 7U> g2_x;
       std::array<gsl::Interpolator, 7U> g3_x;

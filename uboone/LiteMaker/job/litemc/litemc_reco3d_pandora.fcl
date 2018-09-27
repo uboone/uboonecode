@@ -16,7 +16,7 @@ litemc_reco3d_pandora.DataLookUpMap:
   shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
   pfpart:     ["pandoraCosmic","pandoraNu"]
   cosmictag:  [] #"pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
-  calo:       ["pandoraNucalo"]
+  calo:       ["pandoraNucalo","pandoraNucali"]
   partid:     [] #"pandoraCosmicpid","pandoraNupid"]
 }
 
@@ -33,7 +33,7 @@ litemc_reco3d_pandora.AssociationLookUpMap:
   shower:     ["pandoraCosmic","showerrecopandora","pandoraNu"]
   pfpart:     ["pandoraCosmic","pandoraNu"]
   cosmictag:  [] #"pandoraCosmicContTag","pandoraCosmictag","pandoraNuContTag","pandoraNutag"]
-  calo:       ["pandoraNucalo"]
+  calo:       ["pandoraNucalo","pandoraNucali"]
   partid:     [] #"pandoraCosmicpid","pandoraNupid"]
 }
 

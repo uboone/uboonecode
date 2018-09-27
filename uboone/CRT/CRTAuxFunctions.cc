@@ -242,3 +242,128 @@ void crt::auxfunctions::FillPartTop(std::string fileTop, int mac_buffer[3][100])
   mac_buffer[1][99]=counter;
   mac_buffer[2][99]=counter;
 }
+
+void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION correctionpoints[50] , uint32_t start_s,uint32_t end_s){
+  for(int i=0;i<50;i++){
+    correctionpoints[i].sec=0;
+    correctionpoints[i].offset=0;
+    correctionpoints[i].scale=0;
+  }
+  
+  uint32_t sec;
+  double offset;
+  double scale;
+  int counter=0;
+  
+  std::cout<<"Reading GPS correstion for ts0 information"<<std::endl;
+
+  std::string fname;
+  cet::search_path sp("FW_SEARCH_PATH");
+  sp.find_file(filename,fname);
+  
+  std::ifstream in;
+  in.open(fname.c_str());
+
+  std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if(in.is_open()){
+    std::cout<<"File open: "<<fname.c_str()<<std::endl;
+  }
+    while (!in.eof()) {
+      in>>sec>>offset>>scale;
+      if(sec>=(start_s-10*3600) && sec<(end_s+10*3600)){
+        correctionpoints[counter].sec=sec;
+        correctionpoints[counter].offset=offset;
+        correctionpoints[counter].scale=scale;
+        counter++;
+      }
+    }      
+    in.close();
+  std::cout << "Found: " << counter << " points for the GPS correction (matched trigger)." << std::endl;
+  for(int i=0; i<counter;i++){
+    if(correctionpoints[i].sec>=(start_s) && correctionpoints[i].sec<(end_s)) printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+  }
+}
+
+void crt::auxfunctions::Init_mspoll_delay(std::string file_FEB_MS_delay, double Ms_delay[200]){
+   std::cout<<"Reading MS delay for polls information"<<std::endl;
+
+  std::string fname;
+  cet::search_path sp("FW_SEARCH_PATH");
+  sp.find_file(file_FEB_MS_delay,fname);
+  
+  std::ifstream in;
+  in.open(fname.c_str());
+
+  std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if(in.is_open()){
+    std::cout<<"File open: "<<fname.c_str()<<std::endl;
+  }
+  else
+   {
+    std::cout << "Error opening poll ms delay file";
+   }
+    int febnr;
+    double factor;
+    while (!in.eof()) {
+      in>>febnr>>factor;
+      Ms_delay[febnr]=factor;
+      //std::cout << "FEB: " << febnr << " with factor: " << factor << std::endl;
+    }      
+    in.close();
+   
+}
+
+double crt::auxfunctions::CRT_Only_Offset(uint32_t sec){
+   double offset=0;
+  offset=(3.43953e+09+634.757*(sec-1496e6));                                          //f1
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(2.60674e+09+717.633*(sec-1496e6)+1.02278e-05*(sec-1496e6)*(sec-1496e6));    //f2
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(1.63414e+09+741.45*(sec-1496e6)+1.57055e-05*(sec-1496e6)*(sec-1496e6));     //f3
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(1.52973e+09+773.749*(sec-1496e6)+2.14305e-05*(sec-1496e6)*(sec-1496e6));    //f4
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(5.14068e+08+746.236*(sec-1496e6)+1.18375e-05*(sec-1496e6)*(sec-1496e6));    //f5
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-4.85346e+08+743.584*(sec-1496e6)+1.57855e-05*(sec-1496e6)*(sec-1496e6));   //f6
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-1.54728e+09+803.891*(sec-1496e6)+7.86822e-07*(sec-1496e6)*(sec-1496e6));   //f7
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-2.49471e+09+755.792*(sec-1496e6)+1.09478e-05*(sec-1496e6)*(sec-1496e6));   //f8
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-3.34555e+09+692.4*(sec-1496e6)+1.80768e-05*(sec-1496e6)*(sec-1496e6));     //f9
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-1.27155e+09+833.209*(sec-1500e6)+1.43991e-05*(sec-1500e6)*(sec-1500e6));   //f10
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-2.32269e+09+871.886*(sec-1500e6)+7.55479e-06*(sec-1500e6)*(sec-1500e6));   //f11
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-2.83569e+09+617.373*(sec-1500e6)+4.10254e-05*(sec-1500e6)*(sec-1500e6));   //f12
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-3.19383e+09+945.459*(sec-1500e6)+0*(sec-1500e6)*(sec-1500e6));             //f13
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-4.14647e+09+910.346*(sec-1500e6)+5.5141e-06*(sec-1500e6)*(sec-1500e6));    //f14
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-7.83914e+09+1020.95*(sec-1500e6)+-1.00822e-06*(sec-1500e6)*(sec-1500e6));  //f15
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-9.35939e+09+1108.93*(sec-1500e6)-4.25095e-06*(sec-1500e6)*(sec-1500e6));   //f16
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-8.50541e+09+728.814*(sec-1500e6)+1.52889e-05*(sec-1500e6)*(sec-1500e6));   //f17
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-1.09097e+10+982.475*(sec-1500e6)+3.88011e-06*(sec-1500e6)*(sec-1500e6));   //f18
+  if(offset>=0 && offset<1e9) return offset;
+  offset=(-4.78612e+09-228.385*(sec-1500e6)+5.53339e-05*(sec-1500e6)*(sec-1500e6));   //f19
+  if(offset>=0 && offset<1e9) return offset;
+  
+  return -1;
+}
+
+
+
+
+
+
+
+
+
+
+

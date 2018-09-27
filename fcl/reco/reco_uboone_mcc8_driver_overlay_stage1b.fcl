@@ -7,6 +7,15 @@
 
 process_name: OverlayStage1b
 
+services.TFileService.fileName: "reco_stage_1b_hist.root"
+services.BackTracker:  @local::microboone_backtracker
+services.BackTracker.OverrideRealData: true
+services.DetectorClocksService.TrigModuleName: "daqnonoise"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
+services.DetectorPropertiesService.NumberTimeSamples:        6400
+services.DetectorPropertiesService.ReadOutWindowSize:        6400
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+services.FileCatalogMetadata.fileType: "overlay"
 
 physics.producers.eventweight:  @local::microboone_eventweight
 physics.producers.mchitfinder:  @local::standard_mchitfinder
@@ -30,9 +39,6 @@ physics.producers.trajclusterTruthMatch.HitParticleAssociations:                
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
 
-services.TFileService.fileName: "reco_stage_1b_hist.root"
-services.BackTracker:  @local::microboone_backtracker
-services.BackTracker.OverrideRealData: true
 physics.producers.btload:   { module_type: BackTrackerLoader }
 physics.producers.btload.OverrieRealData: true
 physics.reco: [ btload, gaushitTruthMatch ]
@@ -57,10 +63,4 @@ physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 #physics.producers.digitfilter.FFTAlg.TransformViewVec:              [true,false,false]
 #physics.producers.digitfilter.FFTAlg.ZigZagCorrectVec:              [true,true,false]
 
-services.DetectorClocksService.TrigModuleName: "daqnonoise"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
-services.DetectorPropertiesService.NumberTimeSamples:        6400
-services.DetectorPropertiesService.ReadOutWindowSize:        6400
-services.DetectorClocksService.InheritClockConfig:           false
-services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
-services.FileCatalogMetadata.fileType: "mc"
 

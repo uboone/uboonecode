@@ -51,7 +51,7 @@ outputs:
 		module_type	: RootOutput
 		fileName	: "CRTHits_%ifb_%tc_%#.root" 
 		compressionLevel: 1
-		dataTier	: "raw"
+		dataTier	: "crt_swizzled"
 	}
 }
 

@@ -7,11 +7,8 @@
 #include "flashfilter_microboone.fcl"
 #include "subevent_module.fcl"
 #include "seedservice_microboone.fcl"
-#include "beamdata_microboone.fcl"
 #include "triggerenforcement.fcl"
 #include "time_memory_tracker_microboone.fcl" 
-
-
 #include "reco_uboone_data_notpc.fcl"
 
 process_name: Swizzler
@@ -73,7 +70,7 @@ outputs:
    saveMemoryObjectThreshold: 0
    SelectEvents: [ path_ext_hsnc0 ]
    fileProperties: {
-     maxInputFiles: 1
+     maxSize: 2000000 # KiB = 2 GB
      granularity: "InputFile"
     }
   }

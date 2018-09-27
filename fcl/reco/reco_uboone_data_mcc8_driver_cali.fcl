@@ -13,7 +13,9 @@ physics.end_paths: [ stream1 ]
 outputs.out1.fileName: "%ifb_%tc_cali.root"
 outputs.out1.dataTier: "reconstructed"
 outputs.out1.SelectEvents: [ reco ]
-source.inputCommands: ["keep *_*_*_*"]
+source.inputCommands: ["keep *_*_*_*", 
+                       "drop *_*cali_*_*",
+                       "drop *_*calipid_*_*"]
 
 physics.producers.pandoraNucali.CaloAlg: @local::microboone_calorimetryalgmcc84data
 physics.producers.pandoraNuKHitcali.CaloAlg: @local::microboone_calorimetryalgmcc84data

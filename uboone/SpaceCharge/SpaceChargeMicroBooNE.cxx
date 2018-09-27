@@ -175,6 +175,53 @@ bool spacecharge::SpaceChargeMicroBooNE::Configure(fhicl::ParameterSet const& ps
     // Grab other parameters from pset  
   }
 
+
+  fSpatialOffsetScale = pset.get<double>("SpatialOffsetScale",1.0);
+  fEfieldOffsetScale  = pset.get<double>("EfieldOffsetScale",1.0);
+
+  fEnableDataSimSpatialCorrection = pset.get<bool>("EnableDataSimSpatialCorrection",false);
+  if(fEnableDataSimSpatialCorrection){
+
+    fDataSimCorrFunc_MinX = pset.get<double>("DataSimSpatialCorrection_MinX");
+    fDataSimCorrFunc_MaxX = pset.get<double>("DataSimSpatialCorrection_MaxX");
+
+    auto mctop_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_MCTop_Func");
+    fDataSimCorrFunc_MCTop = TF1("fDataSimCorrFunc_MCTop",(mctop_pset.get<std::string>("Form")).c_str(),
+				 fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto mctop_pars = mctop_pset.get<std::vector<double>>("Pars");
+    if(mctop_pars.size()!=(unsigned int)fDataSimCorrFunc_MCTop.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_MCTop_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<mctop_pars.size(); ++i_p)
+      fDataSimCorrFunc_MCTop.SetParameter(i_p,mctop_pars[i_p]);
+
+    auto mcbottom_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_MCBottom_Func");
+    fDataSimCorrFunc_MCBottom = TF1("fDataSimCorrFunc_MCBottom",(mcbottom_pset.get<std::string>("Form")).c_str(),
+				    fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto mcbottom_pars = mcbottom_pset.get<std::vector<double>>("Pars");
+    if(mcbottom_pars.size()!=(unsigned int)fDataSimCorrFunc_MCBottom.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_MCBottom_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<mcbottom_pars.size(); ++i_p)
+      fDataSimCorrFunc_MCBottom.SetParameter(i_p,mcbottom_pars[i_p]);
+
+    auto datatop_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_DataTop_Func");
+    fDataSimCorrFunc_DataTop = TF1("fDataSimCorrFunc_DataTop",(datatop_pset.get<std::string>("Form")).c_str(),
+				   fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto datatop_pars = datatop_pset.get<std::vector<double>>("Pars");
+    if(datatop_pars.size()!=(unsigned int)fDataSimCorrFunc_DataTop.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_DataTop_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<datatop_pars.size(); ++i_p)
+      fDataSimCorrFunc_DataTop.SetParameter(i_p,datatop_pars[i_p]);
+
+    auto databottom_pset = pset.get<fhicl::ParameterSet>("DataSimSpatialCorrection_DataBottom_Func");
+    fDataSimCorrFunc_DataBottom = TF1("fDataSimCorrFunc_DataBottom",(databottom_pset.get<std::string>("Form")).c_str(),
+				      fDataSimCorrFunc_MinX,fDataSimCorrFunc_MaxX);    
+    auto databottom_pars = databottom_pset.get<std::vector<double>>("Pars");
+    if(databottom_pars.size()!=(unsigned int)fDataSimCorrFunc_DataBottom.GetNpar())
+      throw cet::exception("SpaceChargeMicroBooNE") << "DataSpatialCorrection_DataBottom_FuncPars has wrong size";
+    for(size_t i_p=0; i_p<databottom_pars.size(); ++i_p)
+      fDataSimCorrFunc_DataBottom.SetParameter(i_p,databottom_pars[i_p]);
+  }
+
   return true;
 }
 
@@ -234,6 +281,18 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetPosOffsets(double xVa
     } // switch
   }
 
+  double data_corr_scale=1.;
+  if(fEnableDataSimSpatialCorrection){
+    if(xVal<fDataSimCorrFunc_MinX || xVal>fDataSimCorrFunc_MaxX) {
+      thePosOffsets[0] = 0.0; thePosOffsets[1] = 0.0; thePosOffsets[2] = 0.0;
+      data_corr_scale=1.;
+    }
+    else data_corr_scale = 0.5*(fDataSimCorrFunc_DataTop.Eval(xVal)/fDataSimCorrFunc_MCTop.Eval(xVal) + 
+				fDataSimCorrFunc_DataBottom.Eval(xVal)/fDataSimCorrFunc_MCBottom.Eval(xVal));
+  }
+  for(size_t i=0; i<3; i++){
+    thePosOffsets[i] = thePosOffsets[i]*data_corr_scale*fSpatialOffsetScale;
+  }
   return thePosOffsets;
 }
 
@@ -404,6 +463,8 @@ std::vector<double> spacecharge::SpaceChargeMicroBooNE::GetEfieldOffsets(double 
         break;
     } // switch
   }
+  for(size_t i=0; i<3; i++)
+    theEfieldOffsets[i] = theEfieldOffsets[i]*fEfieldOffsetScale;
 
   theEfieldOffsets.at(0) = -1.0*theEfieldOffsets.at(0);
   theEfieldOffsets.at(1) = -1.0*theEfieldOffsets.at(1);

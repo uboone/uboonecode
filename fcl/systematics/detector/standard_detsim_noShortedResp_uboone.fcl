@@ -1,9 +1,7 @@
-#include "standard_detsim_uboone.fcl"
+#include "standard_detsim_CV_prop_uboone.fcl"
 
 process_name: DetsimNoShortedResp
 
 outputs.out1.fileName: "%ifb_%tc_detsim_noShortedResp.root"
 
-source.inputCommands: ["keep *_*_*_*","drop *_*_*_McReco*","drop *_*_*_Detsim*", "drop sumdata::RunData_*_*_*" ]
-
-services.SignalShapingServiceMicroBooNE.FieldResponseFVersion:  [ "v3.12", "v3.12" ]
+#include "sys_var_noShortedResp_uboone.fcl"
