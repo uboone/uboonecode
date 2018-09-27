@@ -7,7 +7,7 @@ services:
 {
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   TimeTracker:  {}
-  MemoryTracker:     { ignoreTotal: 1 } # default is one
+  MemoryTracker:     {}
   message:      @local::microboone_message_services_prod_debug
   FileCatalogMetadata:  @local::art_file_catalog_data
   LLMetaMaker:       {Enable: false}
