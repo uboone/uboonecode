@@ -54,6 +54,9 @@ add_subdirectory(LEEPhotonAnalysis)
 add_subdirectory(UBXSec)
 add_subdirectory(Filters)
 
+add_subdirectory(XGBoost)
+add_subdirectory(NCElastic)
+
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
