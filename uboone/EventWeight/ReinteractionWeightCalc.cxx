@@ -57,8 +57,7 @@ public:
       snprintf(hname, 100, "_xs_%s", name.c_str());
       xs = dynamic_cast<TH1D*>(pint->Clone(hname));
       assert(xs);
-
-      for (int j=1; j<xs->GetNbinsX()+1; j++) {
+      for (int j = 1; j < xs->GetNbinsX()+1; j++) {
         float p1 = pint->GetBinContent(j);
         float p2 = pint->GetBinContent(j-1);
         float v = 0;
@@ -191,8 +190,8 @@ ReinteractionWeightCalc::GetWeight(art::Event& e) {
         for (size_t j=0; j<weight[0].size(); j++) {
           // Integrate a modified cross section to find a survival probability
           float sprob = 1.0;
-          for (int k=0; k<kebin; k++) {
-            float wbin = 1.0 - (1.0 - fXSUncertainty) * def.sigmas[j];
+          for (int k = 1; k <= kebin; k++) {
+            float wbin = 1 + fXSUncertainty * def.sigmas[j];
             float xs = wbin * def.xs->GetBinContent(k);
             sprob *= exp(-1.0 * xs);
           }
