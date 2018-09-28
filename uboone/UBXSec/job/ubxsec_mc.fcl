@@ -138,7 +138,7 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        CandidateConsistency,
                        #genieeventweightpm1,
                        #genieeventweightmultisim,
-                       geniemodelseventweightmultisim,
+                       #geniemodelseventweightmultisim,
                        reinteventweightmultisim,
                        #fluxeventweightmultisim,
                        UBXSec ] 
