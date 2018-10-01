@@ -364,7 +364,7 @@ namespace snassembler {
                 // mf::LogError("SnRecordHolder") << "Continuing anyway .... ";
                 throw e;
               }
-              if(tdc+packet.size()<from_tdc) continue; // Don't need this packet.
+              if(tdc+(int32_t)packet.size()<from_tdc) continue; // Don't need this packet.
 
               fpacket.resize(packet.size());
               auto  it =  packet.begin();
@@ -401,9 +401,9 @@ namespace snassembler {
               auto end_ = fpacket.end();
               
               if(tdc > to_tdc) continue; // Whole window is too late for use
-              if(tdc+packet.size() < from_tdc) continue; // Whole window is too early for use
+              if(tdc+(int32_t)packet.size() < from_tdc) continue; // Whole window is too early for use
               // Trim end:
-              if(tdc+packet.size() > to_tdc) end_-= (tdc+packet.size() - to_tdc); 
+              if(tdc+(int32_t)packet.size() > to_tdc) end_-= (tdc+packet.size() - to_tdc); 
               // Trim start:
               if(tdc < from_tdc) {
                 begin_ += (from_tdc-tdc);              
