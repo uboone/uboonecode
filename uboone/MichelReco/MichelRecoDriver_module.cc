@@ -98,7 +98,7 @@ MichelRecoDriver::MichelRecoDriver(fhicl::ParameterSet const & p)
   // get detector specific properties
   auto const* geom = lar::providerFrom<geo::Geometry>();
   auto const* detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  _w2cm = geom->WirePitch(0,1,0);
+  _w2cm = geom->WirePitch( geo::View_t::kW ); // collection plane
   _t2cm = detp->SamplingRate() / 1000.0 * detp->DriftVelocity( detp->Efield(), detp->Temperature() );
 
   std::cout << "**********************" << std::endl
