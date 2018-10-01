@@ -241,18 +241,25 @@ private:
   float _fTrueQSqr, _fTrueW;
   TLorentzVector *fHitNucP4;
 
+  std::vector<float> *genie_part_px;
+  std::vector<float> *genie_part_py;
+  std::vector<float> *genie_part_pz;
+  std::vector<float> *genie_part_energy;
+  std::vector<float> *genie_part_pdg;
+  std::vector<float> *genie_part_startx;
+  std::vector<float> *genie_part_starty;
+  std::vector<float> *genie_part_startz;
+
   std::vector<double> *trueProtonsTrueMomentum;
   std::vector<double> *trueProtonsTrueTheta;
   std::vector<double> *trueProtonsTruePhi;
   std::vector<double> *trueProtonsEndMomentum;
-  std::vector<std::string> *trueProtonsEndProcess;
 
-  std::vector<int> *geant_PdgCode;
-  std::vector<double> *geant_TrueMomentum;
-  std::vector<double> *geant_TrueTheta;
-  std::vector<double> *geant_TruePhi;
-  std::vector<double> *geant_EndMomentum;
-  std::vector<std::string> *geant_EndProcess;
+  std::vector<double> *genie_part_mom;
+  std::vector<double> *genie_part_theta;
+  std::vector<double> *genie_part_phi;
+  std::vector<double> *genie_part_endmomentum;
+  std::vector<std::string> *genie_part_endprocess;
 
  
   
@@ -276,6 +283,10 @@ private:
   std::vector<float> *fhg4parphi;
   std::vector<float> *fhg4parp;
   std::vector<string> *fhg4endprocess;
+  std::vector<float> *fhg4EndPointx; 
+  std::vector<float> *fhg4EndPointy; 
+  std::vector<float> *fhg4EndPointz; 
+
 
 
 
@@ -554,19 +565,27 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("_fTrueQSqr",      &_fTrueQSqr,        "_fTrueQSqr/F");
   _cc1unptree->Branch("_fTrueW",         &_fTrueW,           "_fTrueW/F");
 
+  _cc1unptree->Branch("genie_part_px", "std::vector<float>", &genie_part_px);
+  _cc1unptree->Branch("genie_part_py", "std::vector<float>", &genie_part_py);
+  _cc1unptree->Branch("genie_part_pz", "std::vector<float>", &genie_part_pz);
+  _cc1unptree->Branch("genie_part_energy", "std::vector<float>", &genie_part_energy);
+  _cc1unptree->Branch("genie_part_pdg", "std::vector<float>", &genie_part_pdg);
+
+  _cc1unptree->Branch("genie_part_startx", "std::vector<float>", &genie_part_startx);
+  _cc1unptree->Branch("genie_part_starty", "std::vector<float>", &genie_part_starty);
+  _cc1unptree->Branch("genie_part_startz", "std::vector<float>", &genie_part_startz);
+
 
   _cc1unptree->Branch("trueProtonsTrueMomentum","std::vector<double>",&trueProtonsTrueMomentum);
   _cc1unptree->Branch("trueProtonsTrueTheta","std::vector<double>",&trueProtonsTrueTheta);
   _cc1unptree->Branch("trueProtonsTruePhi","std::vector<double>",&trueProtonsTruePhi);
   _cc1unptree->Branch("trueProtonsEndMomentum","std::vector<double>",&trueProtonsEndMomentum);
-  _cc1unptree->Branch("trueProtonsEndProcess","std::vector<std::string>",&trueProtonsEndProcess);
 
-  _cc1unptree->Branch("geant_PdgCode",    "std::vector<int>",   &geant_PdgCode);
-  _cc1unptree->Branch("geant_TrueMomentum","std::vector<double>",&geant_TrueMomentum);
-  _cc1unptree->Branch("geant_TrueTheta","std::vector<double>",&geant_TrueTheta);
-  _cc1unptree->Branch("geant_TruePhi","std::vector<double>",&geant_TruePhi);
-  _cc1unptree->Branch("geant_EndMomentum","std::vector<double>",&geant_EndMomentum);
-  _cc1unptree->Branch("geant_EndProcess","std::vector<std::string>",&geant_EndProcess);
+  _cc1unptree->Branch("genie_part_mom","std::vector<double>",&genie_part_mom);
+  _cc1unptree->Branch("genie_part_theta","std::vector<double>",&genie_part_theta);
+  _cc1unptree->Branch("genie_part_phi","std::vector<double>",&genie_part_phi);
+  _cc1unptree->Branch("genie_part_endmomentum","std::vector<double>",&genie_part_endmomentum);
+  _cc1unptree->Branch("genie_part_endprocess","std::vector<std::string>",&genie_part_endprocess);
    // variables at G4 stage
   _cc1unptree->Branch("fhg4parpdg","std::vector<int>", &fhg4parpdg);
   _cc1unptree->Branch("fhg4parstatus",  "std::vector<int>",  &fhg4parstatus);
@@ -577,6 +596,11 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   _cc1unptree->Branch("fhg4parphi",  "std::vector<float>",  &fhg4parphi);
   _cc1unptree->Branch("fhg4parp",  "std::vector<float>",  &fhg4parp);
   _cc1unptree->Branch("fhg4endprocess", "std::vector<string>", &fhg4endprocess);
+  _cc1unptree->Branch("fhg4EndPointx", "std::vector<float>", &fhg4EndPointx); 
+  _cc1unptree->Branch("fhg4EndPointy", "std::vector<float>", &fhg4EndPointy); 
+  _cc1unptree->Branch("fhg4EndPointz", "std::vector<float>", &fhg4EndPointz); 
+
+
   _cc1unptree->Branch("OOFVflag", &OOFVflag,   "OOFVflag/O"); 
   //all the labels for cuts  
   _cc1unptree->Branch("ccinclflag",      &_ccinclflag,       "ccinclflag/O");
@@ -723,18 +747,27 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   //
 
   //====================================================
+  genie_part_px= new std::vector<float>;
+  genie_part_py= new std::vector<float>;
+  genie_part_pz= new std::vector<float>;
+  genie_part_energy= new std::vector<float>;
+  genie_part_pdg= new std::vector<float>;
+  genie_part_startx= new std::vector<float>;
+  genie_part_starty= new std::vector<float>;
+  genie_part_startz= new std::vector<float>;
+
+
+
   trueProtonsTrueMomentum=new std::vector<double>;
   trueProtonsTrueTheta=new std::vector<double>;
   trueProtonsTruePhi=new std::vector<double>;
   trueProtonsEndMomentum=new std::vector<double>;
-  trueProtonsEndProcess=new std::vector<std::string>;
 
-  geant_PdgCode=new std::vector<int>;
-  geant_TrueMomentum=new std::vector<double>;
-  geant_TrueTheta=new std::vector<double>;
-  geant_TruePhi=new std::vector<double>;
-  geant_EndMomentum=new std::vector<double>;
-  geant_EndProcess=new std::vector<std::string>;
+  genie_part_mom=new std::vector<double>;
+  genie_part_theta=new std::vector<double>;
+  genie_part_phi=new std::vector<double>;
+  genie_part_endmomentum=new std::vector<double>;
+  genie_part_endprocess=new std::vector<std::string>;
 
 
 
@@ -752,6 +785,10 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   fhg4parphi=new std::vector<float>;
   fhg4parp=new std::vector<float>;
   fhg4endprocess=new std::vector<string>;
+  fhg4EndPointx=new std::vector<float>; 
+  fhg4EndPointy=new std::vector<float>; 
+  fhg4EndPointz=new std::vector<float>; 
+
 
   _fg4processname=new std::vector<string>; //Physics process by which the particle was created
   _fg4TrackId=new std::vector<int>;
@@ -900,19 +937,26 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
 // Destructor
  SimpleAna::~ SimpleAna()
 {
+  delete genie_part_px;
+  delete genie_part_py;
+  delete genie_part_pz;
+  delete genie_part_energy;
+  delete genie_part_pdg;
+  delete genie_part_startx;
+  delete genie_part_starty;
+  delete genie_part_startz;
+
   delete fHitNucP4;
   delete trueProtonsTrueMomentum;
   delete trueProtonsTrueTheta;
   delete trueProtonsTruePhi;
   delete trueProtonsEndMomentum;
-  delete trueProtonsEndProcess;
 
-  delete geant_PdgCode;
-  delete geant_TrueMomentum;
-  delete geant_TrueTheta;
-  delete geant_TruePhi;
-  delete geant_EndMomentum;
-  delete geant_EndProcess;
+  delete genie_part_mom;
+  delete genie_part_theta;
+  delete genie_part_phi;
+  delete genie_part_endmomentum;
+  delete genie_part_endprocess;
 
 
   delete fhg4parpdg;
@@ -924,6 +968,10 @@ SimpleAna::SimpleAna(fhicl::ParameterSet const & p)
   delete fhg4parphi;
   delete fhg4parp;
   delete fhg4endprocess;
+  delete fhg4EndPointx; 
+  delete fhg4EndPointy; 
+  delete fhg4EndPointz; 
+
 
   delete _fg4processname; 
   delete _fg4TrackId;
@@ -1836,18 +1884,28 @@ void SimpleAna::analyze(art::Event const & e)
    Int_t nGeniePrimaries=0;
    if (mclist[iList]->NeutrinoSet()) nGeniePrimaries = mclist[iList]->NParticles();
 
+
+   genie_part_px->clear();
+   genie_part_py->clear();
+   genie_part_pz->clear();
+   genie_part_energy->clear();
+   genie_part_pdg->clear();
+   genie_part_startx->clear();
+   genie_part_starty->clear();
+   genie_part_startz->clear();
+
+
+
    trueProtonsTrueMomentum->clear();
    trueProtonsTrueTheta->clear();
    trueProtonsTruePhi->clear();
    trueProtonsEndMomentum->clear();
-   trueProtonsEndProcess->clear();
 
-   geant_PdgCode->clear();
-   geant_TrueMomentum->clear();
-   geant_TrueTheta->clear();
-   geant_TruePhi->clear();
-   geant_EndMomentum->clear();
-   geant_EndProcess->clear();
+   genie_part_mom->clear();
+   genie_part_theta->clear();
+   genie_part_phi->clear();
+   genie_part_endmomentum->clear();
+   genie_part_endprocess->clear();
 
    Nmuons_from_genie=0;
    Nelectrons_from_genie=0;
@@ -1870,12 +1928,20 @@ void SimpleAna::analyze(art::Event const & e)
 
 
       if(parisPrimary && part.StatusCode()==1 &&mclist[iList]->Origin()==simb::kBeamNeutrino){
-          geant_PdgCode->push_back(part.PdgCode());
-          geant_TrueMomentum->push_back(part.P());
-          geant_TrueTheta->push_back(part.Momentum().Theta());
-          geant_TruePhi->push_back(part.Momentum().Phi());
-          geant_EndMomentum->push_back(part.EndMomentum().P());
-          geant_EndProcess->push_back(part.EndProcess());
+          genie_part_pdg->push_back(part.PdgCode());
+          genie_part_px->push_back(part.Px());
+          genie_part_py->push_back(part.Py());
+          genie_part_pz->push_back(part.Pz());
+          genie_part_energy->push_back(part.E());
+          genie_part_startx->push_back(part.Vx());
+          genie_part_starty->push_back(part.Vy());
+          genie_part_startz->push_back(part.Vz());
+ 
+          genie_part_mom->push_back(part.P());
+          genie_part_theta->push_back(part.Momentum().Theta());
+          genie_part_phi->push_back(part.Momentum().Phi());
+          genie_part_endmomentum->push_back(part.EndMomentum().P());
+          genie_part_endprocess->push_back(part.EndProcess());
  
           //std::cout<<part.PdgCode()<<" libo test of the EndProcess string "<<part.EndProcess()<<std::endl;
 
@@ -1889,7 +1955,6 @@ void SimpleAna::analyze(art::Event const & e)
           trueProtonsTrueTheta->push_back(part.Momentum().Theta());
           trueProtonsTruePhi->push_back(part.Momentum().Phi());
           trueProtonsEndMomentum->push_back(part.EndMomentum().P());
-          trueProtonsEndProcess->push_back(part.EndProcess());
         }
           //check the proton's momentum here 
           //if(part.Momentum().Vect().Mag()>0.2){Nprotons_from_genie_200thresh=Nprotons_from_genie_200thresh+1;}
@@ -1958,6 +2023,10 @@ void SimpleAna::analyze(art::Event const & e)
   fhg4parphi->clear();
   fhg4parp->clear();
   fhg4endprocess->clear();
+  fhg4EndPointx->clear();
+  fhg4EndPointy->clear();
+  fhg4EndPointz->clear();
+
 
   _fg4processname->clear();
   _fg4Mother->clear();
@@ -2051,6 +2120,10 @@ void SimpleAna::analyze(art::Event const & e)
         fhg4parphi->push_back(mc_par.Momentum().Phi());
         fhg4parp->push_back(mc_par.Momentum().Vect().Mag());
         fhg4endprocess->push_back(mc_par.EndProcess());
+        fhg4EndPointx->push_back(mc_par.EndPosition()[0]);
+        fhg4EndPointy->push_back(mc_par.EndPosition()[1]);
+        fhg4EndPointz->push_back(mc_par.EndPosition()[2]);
+         
         // std::cout<<mc_par.PdgCode()<<" libo test of the EndProcess string "<<mc_par.EndProcess()<<std::endl;
 
 
