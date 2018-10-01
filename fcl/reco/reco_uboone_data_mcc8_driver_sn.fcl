@@ -11,6 +11,10 @@ physics.producers.gaushit.CalDataModuleLabel: "sndeco" # Use wires from SN calda
 microboone_reco_data_snseq: [ rns,
                               sndeco, # Defined above
                               gaushit,
+                              @sequence::microboone_reco_data_pandoraFull,
+                              pandoraCosmicPatRec,
+                              pandoraCosmicTrack,
+                              pandoraCosmicShower,
                               pandoraCosmic ]
 
 physics.reco: [@sequence::microboone_reco_data_snseq]
