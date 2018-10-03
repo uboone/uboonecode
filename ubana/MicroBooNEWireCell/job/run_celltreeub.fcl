@@ -39,8 +39,8 @@ physics:
   end_paths: [ analysis ]
 }
 
-services.DetectorPropertiesService.NumberTimeSamples:            6400
-services.DetectorClocksService.InheritClockConfig:                  false
-services.DetectorClocksService.TriggerOffsetTPC:                    -0.400e3
+services.DetectorPropertiesService.NumberTimeSamples:    6400
+services.DetectorClocksService.InheritClockConfig:       false
+services.DetectorClocksService.TriggerOffsetTPC:         -0.400e3
 
 #services.PMTGainService.PmtGainProvider.UseDB: false
