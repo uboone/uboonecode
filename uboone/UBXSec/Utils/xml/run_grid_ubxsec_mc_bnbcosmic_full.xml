@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+
+<!--
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__00000_07999
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__08000_15999
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__16000_23999
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__24000_31999
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__32000_39999
+mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__40000_47999
+-->
+
+<!-- Production Project -->
+
+<!DOCTYPE project [
+<!ENTITY release "v06_26_01_22">
+<!ENTITY releasetag "e10:prof">
+<!ENTITY name "ubxsec_mc_bnbcosmic_full_ubcodev06_26_01_22__v4">
+<!ENTITY outdefname "ubxsec_mc_bnbcosmic_full_ubcodev06_26_01_22__v4">
+<!ENTITY tag "ubxsec">
+<!ENTITY file_type "mc">
+<!ENTITY run_type "physics">
+<!ENTITY PNFSpath "/pnfs/uboone/resilient/users/mdeltutt/">
+<!ENTITY ubxsec_version "ubcodev06_26_01_22__v4">
+<!ENTITY first_file "00000">
+<!ENTITY last_file "07999">
+]>
+
+
+<project name="&name;">
+
+  <!-- Group -->
+  <group>uboone</group>
+
+  <!-- Project size -->
+  <numevents>50000</numevents>
+
+  <!-- Operating System -->
+  <os>SL5,SL6</os>
+
+  <!-- Batch resources -->
+  <resource>DEDICATED,OPPORTUNISTIC</resource>
+
+  <!-- Larsoft information -->
+  <larsoft>
+    <tag>&release;</tag>
+    <qual>&releasetag;</qual>
+    <local>&PNFSpath;Tarballs/uboonecode_ubxsec_ubcodev06_26_01_22__v4.tgz</local>
+  </larsoft>
+
+  <!-- Project stages -->
+
+  <stage name="ubxsec">
+    <fcl>run_ubxsec_mc_bnbcosmic_full.fcl</fcl>
+    <inputdef>mdeltutt_prodgenie_bnb_nu_cosmic_uboone_mcc8.7_reco2__&firt_file;_&last_file;</inputdef>
+    <schema>root</schema>
+    <!--<inputlist>&PNFSpath;bnb_cosmic_files_mcc8.3.list</inputlist>-->
+    <defname>mdeltutt_&name;_180323</defname>
+    <maxfilesperjob>20</maxfilesperjob>
+    <outdir>/pnfs/uboone/scratch/users/mdeltutt/&release;/ubxsec_&ubxsec_version;_mc_bnbcosmic_full_&firt_file;_&last_file;</outdir>
+    <workdir>&PNFSpath;grid_workdir/grid_workdir_ubxsec_&ubxsec_version;_mc_bnbcosmic_full_&firt_file;_&last_file;</workdir>
+    <bookdir>/uboone/data/users/mdeltutt/grid_bookdir/ubxsec_&ubxsec_version;_mc_bnbcosmic_full_&firt_file;_&last_file;</bookdir>
+    <numjobs>400</numjobs>
+    <datatier>reconstructed</datatier>
+    <memory>6000</memory> <!-- default: 3000, use 6000 if generating 100 genie universe -->
+    <jobsub>  --expected-lifetime=20h -q --generate-email-summary </jobsub>
+    <disk>60GB</disk>
+  </stage>
+
+  <!-- file type -->
+  <filetype>&file_type;</filetype>
+
+  <!-- run type -->
+  <runtype>&run_type;</runtype>
+
+</project>
