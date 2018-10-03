@@ -9,11 +9,11 @@ celltreeub_mc: {
  TPC_noiseFilteredLabel        : "raw"
  TPC_deconWienerProducer       : "simnfspl1"
  TPC_deconGaussianProducer     : "simnfspl1"
- TPC_deconWienerLabel          : "gauss" # "wiener"
+ TPC_deconWienerLabel          : "wiener"
  TPC_deconGaussianLabel        : "gauss"
  TPC_badChannelListProducer    : "simnfspl1"
  TPC_badChannelListLabel       : "badmasks"
- TPC_channelThresholdProducer  : "nfsp"
+ TPC_channelThresholdProducer  : "simnfspl1"
  TPC_channelThresholdLabel     : "threshold"
  PMT_HG_cosmicLabel            : "OpdetCosmicHighGain"
  PMT_LG_cosmicLabel            : "OpdetCosmicLowGain"
@@ -36,16 +36,16 @@ celltreeub_mc: {
  MuCS_recoDataLabel	       : "MuCSReco"
  SaveTPC_raw                   : false # short type  
  SaveTPC_noiseFiltered         : false # float converted to short through scale & shift
- SaveTPC_deconWiener           : false  
+ SaveTPC_deconWiener           : true  # default
  SaveTPC_deconGaussian         : true  # default
  SaveTPC_badChannelList        : true  # default
- SaveTPC_channelThreshold      : false # default
+ SaveTPC_channelThreshold      : true  # default
  SavePMT_raw                   : true  # default
  SavePMT_wfmSaturation         : false
  SavePMT_reco                  : false
- SavePMT_gain                  : false  # default
- SaveHWTrigger                 : false  # default
- SaveSWTrigger                 : false  # default
+ SavePMT_gain                  : false
+ SaveHWTrigger                 : false
+ SaveSWTrigger                 : false
  SaveBeam                      : false 
  SavePOT                       : false
  SaveMuCSData		       : false
@@ -54,7 +54,7 @@ celltreeub_mc: {
  UseLGBeamForHGCosmic          : true   # default
  FlashMultPEThreshold          : 5
  DeconRebin                    : 4	
- SaveVYshorted		       : true  # default
+ SaveVYshorted		       : true  
  ScaleRawdigit		       : 10 
  ShiftRawdigit		       : 14000
  mcOption		       : "all"
