@@ -545,7 +545,7 @@ microboone_reco_data_producers.gaushit.TryNplus1Fits:                           
 microboone_reco_data_producers.gaushit.Chi2NDF:                                                               50.
 
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     2.7
-microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     3.0
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     2.5
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     3.7
 
 # ClusterCrawler / Track Maker related
