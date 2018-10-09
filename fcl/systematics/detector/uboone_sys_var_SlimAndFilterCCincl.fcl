@@ -99,6 +99,8 @@ outputs:
                      "keep *_pandoraNuContTag_*_*",
                      "keep *_gaushitTruthMatch_*_*", 
                      "keep *_crHitRemovalTruthMatch_*_*",
+		     "keep *_pmtrack_*_*",
+		     "keep *_pmtrackcali_*_*",
                      "keep *_*_*_G4*",
                      "keep *_*_*_*Gen*",
                      "drop *_*_*_SlimAndFilterCCIncl"
