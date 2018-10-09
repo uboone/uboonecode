@@ -830,7 +830,7 @@ void crt::CRTRawInputDetail::receive_data(){
           
           evbuf_pro[febnr][first_newevent].ms=this_ms%1000;
           
-          if( abs( this_ms - (this_ts0/1000000) ) > 200 ){
+          if( my_abs( this_ms,  this_ts0/1000000 ) > 200 ){
             //looks like stucked poll events
             if( (first_newevent-1)>=0){
               if( (evbuf_pro[febnr][first_newevent-1].sec < evbuf_pro[febnr][first_newevent].sec) && 
