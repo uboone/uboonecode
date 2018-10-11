@@ -559,8 +559,9 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiT
 microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      3.5
 
 # ClusterCrawler / Track Maker related
-microboone_reco_mcc8_producers.trajcluster.TrajClusterAlg.HitFinderModuleLabel:                                "pandoraCosmicHitRemoval"
-                             
+microboone_reco_mcc8_producers.trajcluster.HitFinderModuleLabel:                                               "pandoraCosmicHitRemoval"
+microboone_reco_mcc8_producers.trajcluster.HitTruthModuleLabel:                                                "crHitRemovalTruthMatch"
+
 #microboone_reco_mcc8_producers.trackkalmanhitcc.HitModuleLabel:                                               "trajcluster"
 #microboone_reco_mcc8_producers.trackkalmanhitcc.ClusterModuleLabel:                                           "trajcluster"
                              
