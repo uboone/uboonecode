@@ -13,7 +13,7 @@ services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcene
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
 
-physics.producers.pandoraWriter.BackTrackerModuleLabel:  “gaushitTruthMatch”
+physics.producers.pandoraWriter.BackTrackerModuleLabel:  "gaushitTruthMatch"
 
 physics.reco: [ @sequence::microboone_reco_mcc8_stage2 ]
 physics.trigger_paths: [ reco ]
