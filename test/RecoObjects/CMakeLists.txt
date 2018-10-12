@@ -4,17 +4,18 @@ simple_plugin(KalmanFilterTest "module"
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_PRINCIPAL}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-	      art_Persistency_Common canvas
-	      art_Persistency_Provenance canvas
+              art_Persistency_Common
+              art_Persistency_Provenance
 	      ${ART_FRAMEWORK_SERVICES_BASIC}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-	      art_Utilities canvas
+              art_Utilities
+              canvas
 	      ${MF_MESSAGELOGGER}
-	      
 	      ${FHICLCPP}
-	      cetlib cetlib_except
+              cetlib
+              cetlib_except
 	      ${PQ}
               BASENAME_ONLY
              )
@@ -28,9 +29,10 @@ simple_plugin(PropTest "module"
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
 	      ${MF_MESSAGELOGGER}
 	      ${CLHEP}
-	      
+              art_Persistency_Provenance
 	      ${FHICLCPP}
-	      cetlib cetlib_except
+              cetlib
+              cetlib_except
 	      ${PQ}
               BASENAME_ONLY
              )
@@ -41,17 +43,17 @@ simple_plugin(InteractTest "module"
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_PRINCIPAL}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-	      art_Persistency_Common canvas
-	      art_Persistency_Provenance canvas
+              art_Persistency_Common
+              art_Persistency_Provenance
 	      ${ART_FRAMEWORK_SERVICES_BASIC}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art_Utilities canvas
 	      ${MF_MESSAGELOGGER}
-	      
 	      ${FHICLCPP}
-	      cetlib cetlib_except
+              cetlib
+              cetlib_except
 	      ${PQ}
               BASENAME_ONLY
              )
