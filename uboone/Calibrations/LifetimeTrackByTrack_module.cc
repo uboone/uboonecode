@@ -294,6 +294,13 @@ namespace microboone{
 	_trkmom	    = mom;
 	_trklen	    = tlen;  
 
+	_trk_t_v.clear();
+	_trk_x_v.clear();
+	_trk_y_v.clear();
+	_trk_z_v.clear();
+	_trk_dqds_v.clear();
+	
+
 	art::FindMany<anab::Calorimetry> fmcal(trackListHandle, evt, fCalorimetryModuleLabel);
 	if (fmcal.isValid()){
 	  std::vector<const anab::Calorimetry*> calos = fmcal.at(i);
