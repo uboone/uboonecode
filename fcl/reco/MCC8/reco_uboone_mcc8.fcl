@@ -48,8 +48,8 @@ microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:      
 microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:           false
 microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetU:               0.
-microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetV:               1.02
-microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetZ:               0.06
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetV:               -1.28
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetZ:               -1.52
 
 microboone_reco_mcc8_services_fullrawdigits:
 {
