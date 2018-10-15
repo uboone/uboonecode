@@ -47,8 +47,8 @@ microboone_reco_mcc8_services:
 microboone_reco_mcc8_services.DetectorPropertiesService.NumberTimeSamples:                6400
 microboone_reco_mcc8_services.DetectorPropertiesService.ReadOutWindowSize:                6400
 microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetU:                      0.
-microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetV:                      -4.539
-microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetZ:                      -7.782
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetV:                      -4.
+microboone_reco_mcc8_services.DetectorPropertiesService.TimeOffsetZ:                      -2.
 microboone_reco_mcc8_services.DetectorClocksService.InheritClockConfig:                   false
 microboone_reco_mcc8_services.DetectorClocksService.TriggerOffsetTPC:                     -0.400e3
 
@@ -559,9 +559,8 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiT
 microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      3.5
 
 # ClusterCrawler / Track Maker related
-microboone_reco_mcc8_producers.trajcluster.HitFinderModuleLabel:                                               "pandoraCosmicHitRemoval"
-microboone_reco_mcc8_producers.trajcluster.HitTruthModuleLabel:                                                "crHitRemovalTruthMatch"
-
+microboone_reco_mcc8_producers.trajcluster.TrajClusterAlg.HitFinderModuleLabel:                                "pandoraCosmicHitRemoval"
+                             
 #microboone_reco_mcc8_producers.trackkalmanhitcc.HitModuleLabel:                                               "trajcluster"
 #microboone_reco_mcc8_producers.trackkalmanhitcc.ClusterModuleLabel:                                           "trajcluster"
                              
