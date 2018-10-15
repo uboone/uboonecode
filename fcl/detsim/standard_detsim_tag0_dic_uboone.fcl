@@ -6,7 +6,7 @@
 services.SignalShapingServiceMicroBooNE.YZdependentResponse:  false
 services.SignalShapingServiceMicroBooNE.datadrivenResponse:   false
 services.SignalShapingServiceMicroBooNE.NResponses:       [5, 5, 5]
-services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [-4.9, -4.4, -2.5]
+services.SignalShapingServiceMicroBooNE.CalibResponseTOffset: [-1.12, -0.62, -1.15]
 services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: "v2.1"
 services.SignalShapingServiceMicroBooNE.DeconNorm:  200.
 services.SignalShapingServiceMicroBooNE.DefaultEField:       0.5
