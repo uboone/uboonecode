@@ -562,6 +562,8 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiT
 microboone_reco_mcc8_producers.trajcluster.HitFinderModuleLabel:                                               "pandoraCosmicHitRemoval"
 microboone_reco_mcc8_producers.trajcluster.HitTruthModuleLabel:                                                "crHitRemovalTruthMatch"
 
+microboone_reco_mcc8_producers.mchitfinder.LArG4ModuleName:                                                    "driftWC:simpleSC"
+
 #microboone_reco_mcc8_producers.trackkalmanhitcc.HitModuleLabel:                                               "trajcluster"
 #microboone_reco_mcc8_producers.trackkalmanhitcc.ClusterModuleLabel:                                           "trajcluster"
                              
@@ -588,6 +590,7 @@ microboone_reco_mcc8_producers.trajcluster.HitTruthModuleLabel:                 
                              
 # Pandora consolidated reconstruction                             
 microboone_reco_mcc8_producers.pandoraPatRec.HitFinderModuleLabel:                                             "gaushit"
+microboone_reco_mcc8_producers.pandoraPatRec.SimChannelModuleLabel:                                            "driftWC:simpleSC"
 microboone_reco_mcc8_producers.pandoraTrack.PFParticleLabel:                                                   "pandoraPatRec"
 microboone_reco_mcc8_producers.pandoraShower.PFParticleLabel:                                                  "pandoraPatRec"
 microboone_reco_mcc8_producers.pandora.InputProducerLabel:                                                     "pandoraPatRec"
@@ -597,6 +600,7 @@ microboone_reco_mcc8_producers.pandora.HitProducerLabel:                        
                              
 # Pandora cosmic pass related                             
 microboone_reco_mcc8_producers.pandoraCosmicPatRec.HitFinderModuleLabel:                                       "gaushit"
+microboone_reco_mcc8_producers.pandoraCosmicPatRec.SimChannelModuleLabel:                                      "driftWC:simpleSC"
 microboone_reco_mcc8_producers.pandoraCosmicTrack.PFParticleLabel:                                             "pandoraCosmicPatRec"
 microboone_reco_mcc8_producers.pandoraCosmicShower.PFParticleLabel:                                            "pandoraCosmicPatRec"
 microboone_reco_mcc8_producers.pandoraCosmic.InputProducerLabel:                                               "pandoraCosmicPatRec"
@@ -605,6 +609,7 @@ microboone_reco_mcc8_producers.pandoraCosmic.ShowerProducerLabel:               
 microboone_reco_mcc8_producers.pandoraCosmic.HitProducerLabel:                                                 "gaushit"
 
 microboone_reco_mcc8_producers.pandoraWriter.EnableMCParticles:                                                true
+microboone_reco_mcc8_producers.pandoraWriter.SimChannelModuleLabel:                                            "driftWC:simpleSC"
 
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UseClusterHits:                                               false
 microboone_reco_mcc8_producers.pandoraCosmicKHit.UsePFParticleHits:                                            true
@@ -671,6 +676,7 @@ microboone_reco_mcc8_producers.pandoraCosmicHitRemoval.EndTickPadding:          
                               
 # Pandora neutrino pass related                              
 microboone_reco_mcc8_producers.pandoraNuPatRec.HitFinderModuleLabel:                                           "pandoraCosmicHitRemoval"
+microboone_reco_mcc8_producers.pandoraNuPatRec.SimChannelModuleLabel:                                          "driftWC:simpleSC"
 microboone_reco_mcc8_producers.pandoraNuTrack.PFParticleLabel:                                                 "pandoraNuPatRec"
 microboone_reco_mcc8_producers.pandoraNuShower.PFParticleLabel:                                                "pandoraNuPatRec"
 microboone_reco_mcc8_producers.pandoraNu.InputProducerLabel:                                                   "pandoraNuPatRec"
