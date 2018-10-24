@@ -243,8 +243,8 @@ void crt::auxfunctions::FillPartTop(std::string fileTop, int mac_buffer[3][100])
   mac_buffer[2][99]=counter;
 }
 
-void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION correctionpoints[50] , uint32_t start_s,uint32_t end_s){
-  for(int i=0;i<50;i++){
+void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION correctionpoints[50000] , uint32_t start_s,uint32_t end_s){
+  for(int i=0;i<50000;i++){
     correctionpoints[i].sec=0;
     correctionpoints[i].offset=0;
     correctionpoints[i].scale=0;
@@ -268,7 +268,7 @@ void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION c
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
   }
-    while (!in.eof()) {
+    /*while (!in.eof()) {
       in>>sec>>offset>>scale;
       if(sec>=(start_s-10*3600) && sec<(end_s+10*3600)){
         correctionpoints[counter].sec=sec;
@@ -278,10 +278,69 @@ void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION c
       }
     }      
     in.close();
-  std::cout << "Found: " << counter << " points for the GPS correction (matched trigger)." << std::endl;
-  for(int i=0; i<counter;i++){
-    if(correctionpoints[i].sec>=(start_s) && correctionpoints[i].sec<(end_s)) printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+  in.open(fname.c_str());*/
+  while (!in.eof()) {
+    in>>sec>>offset>>scale;
+    if(sec>=(start_s-3600) && sec<(end_s+3600)){
+        correctionpoints[counter].sec=sec;
+        correctionpoints[counter].offset=offset;
+        correctionpoints[counter].scale=scale;
+        counter++;
+      }
   }
+  
+  if(counter>1){
+    std::cout << "Found: " << counter << " points for the GPS correction (matched trigger)." << std::endl;
+    for(int i=0; i<counter;i++){
+      //if(correctionpoints[i].sec>=(start_s) && correctionpoints[i].sec<(end_s)) printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+      printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+
+    }
+  }
+  else{
+    in.clear();
+    in.seekg(0, in.beg);
+    while (!in.eof()) {
+      in>>sec>>offset>>scale;
+      if(sec>=(start_s-5*3600) && sec<(end_s+5*3600)){
+          correctionpoints[counter].sec=sec;
+          correctionpoints[counter].offset=offset;
+          correctionpoints[counter].scale=scale;
+          counter++;
+        }
+    }
+    if(counter>1){
+      std::cout << "Found: " << counter << " points for the GPS correction (matched trigger)." << std::endl;
+      for(int i=0; i<counter;i++){
+        //if(correctionpoints[i].sec>=(start_s) && correctionpoints[i].sec<(end_s)) printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+        printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+
+      }
+    }
+    else{
+      in.clear();
+      in.seekg(0, in.beg);
+      while (!in.eof()) {
+        in>>sec>>offset>>scale;
+        if(sec>=(start_s-10*3600) && sec<(end_s+10*3600)){
+            correctionpoints[counter].sec=sec;
+            correctionpoints[counter].offset=offset;
+            correctionpoints[counter].scale=scale;
+            counter++;
+          }
+      }
+      if(counter>1){
+        std::cout << "Found: " << counter << " points for the GPS correction (matched trigger)." << std::endl;
+        for(int i=0; i<counter;i++){
+          //if(correctionpoints[i].sec>=(start_s) && correctionpoints[i].sec<(end_s)) printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+          printf("sec: %d, offset: %lf, scale: %lf\n",correctionpoints[i].sec, correctionpoints[i].offset, correctionpoints[i].scale);
+
+        }
+      }
+    }
+  }
+  
+    
 }
 
 void crt::auxfunctions::Init_mspoll_delay(std::string file_FEB_MS_delay, double Ms_delay[200]){
@@ -314,7 +373,7 @@ void crt::auxfunctions::Init_mspoll_delay(std::string file_FEB_MS_delay, double 
 }
 
 double crt::auxfunctions::CRT_Only_Offset(uint32_t sec){
-   double offset=0;
+  double offset=0;
   offset=(3.43953e+09+634.757*(sec-1496e6));                                          //f1
   if(offset>=0 && offset<1e9) return offset;
   offset=(2.60674e+09+717.633*(sec-1496e6)+1.02278e-05*(sec-1496e6)*(sec-1496e6));    //f2

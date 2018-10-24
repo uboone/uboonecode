@@ -247,6 +247,8 @@ private:
   int Split_;
   int WhichHalf_;
   int TopPart_;
+  int AddTs0Offset_;
+  //int AddTs1Offset_;
   //int GPSCorrection_; // =0 correction from matched triggers, =1 correction with CRT NTP deviation
   //pair_builder ends stuff here////////////////////////////////////////////////////////////////////
 
@@ -259,6 +261,7 @@ private:
   std::string  PartTop_;
   std::string  FEB_MS_delay_;
   std::string  CRT_GPS_correction_;
+  
   
 	int mac_part_top[3][100];
   
@@ -296,7 +299,7 @@ private:
   int total_hits=0;
   int EndOfFile;
   //variable for GPS/NTP correction
-  crt::TS0_CORRECTION correctionpoints[50];
+  crt::TS0_CORRECTION correctionpoints[50000];
   double scale_NTP=0;
   uint32_t start_NTP=0;
   uint32_t end_NTP=0;
@@ -322,6 +325,7 @@ private:
   
   TH1F* hPES;
   TH1F* hPEStot;
+  TH2F* hEvPerSec;
   //tree entries/////////////////////////////
   TTree*       my_tree_;
   int hit_mac_1=0;
@@ -372,6 +376,8 @@ crt::CRTRawInputDetail::CRTRawInputDetail(fhicl::ParameterSet const & ps,
   //GPSCorrection_ = ps.get<int>("GPSCorrection");
   //if(GPSCorrection_==0) CRT_GPS_correction_= ps.get<std::string>("CRT_GPS_correction");
   CRT_GPS_correction_= ps.get<std::string>("CRT_GPS_correction");
+  AddTs0Offset_ = ps.get<int>("AddTs0Offset");
+  //AddTs1Offset_ = ps.get<int>("AddTs1Offset");
 }
 
 
@@ -512,6 +518,12 @@ void crt::CRTRawInputDetail::readFile(std::string const & filename, art::FileBlo
   hPEStot = tfs->make<TH1F>("hPEStot","PEStot",500,0,500);
   hPEStot->GetXaxis()->SetTitle(" pestot");
   hPEStot->GetYaxis()->SetTitle("Entries/bin");
+  
+  hEvPerSec = tfs->make<TH2F>("hEvPerSec","Events per second",14400,0,14400,200,0,200);
+  hEvPerSec->GetXaxis()->SetTitle("Time [sec]");
+  hEvPerSec->GetYaxis()->SetTitle("FEB ID");
+  hEvPerSec->GetZaxis()->SetTitle("Entries/bin");
+  hEvPerSec->SetOption("COLZ");
   //end tree stuff /////////////////////////////////////////////////////////////////////////////////////////////
   
   fb = new art::FileBlock(art::FileFormatVersion(1, "RawEvent2011"), filename);
@@ -830,7 +842,7 @@ void crt::CRTRawInputDetail::receive_data(){
           
           evbuf_pro[febnr][first_newevent].ms=this_ms%1000;
           
-          if( my_abs( this_ms,  this_ts0/1000000 ) > 200 ){
+          if( abs( this_ms - (this_ts0/1000000) ) > 200 ){
             //looks like stucked poll events
             if( (first_newevent-1)>=0){
               if( (evbuf_pro[febnr][first_newevent-1].sec < evbuf_pro[febnr][first_newevent].sec) && 
@@ -967,16 +979,16 @@ void crt::CRTRawInputDetail::receive_data(){
       evbuf_pro[mac][ev_counter_mac[mac]].lostfpga=evbuf[i].lostfpga;
       evbuf_pro[mac][ev_counter_mac[mac]].nrtrigger_11=ts0ref_counter[mac];
       
-      for(int counter_corr=0; counter_corr<49; counter_corr++){
+      for(int counter_corr=0; counter_corr<49999; counter_corr++){
       if( correctionpoints[counter_corr].sec == 0 ){ // no correctionpoints available, if there are no points for correction: use NTP correction
         long ts0_corr = (int)evbuf_pro[mac][ev_counter_mac[mac]].ts0 + (int)crt::auxfunctions::CRT_Only_Offset(previous_s_start);
         while(ts0_corr>1e9) ts0_corr-=1e9;
         while(ts0_corr<0) ts0_corr+=1e9;
         evbuf_pro[mac][ev_counter_mac[mac]].ts0_corr=(unsigned int)ts0_corr;
         //printf("used crt only correction, %d \n", correctionpoints[counter_corr].sec);
-        counter_corr=50;
+        counter_corr=50000;
       }
-      if(correctionpoints[counter_corr].sec<=previous_s_start && correctionpoints[counter_corr+1].sec>=previous_s_start){ // right correctio points
+      else if(correctionpoints[counter_corr].sec<=previous_s_start && correctionpoints[counter_corr+1].sec>=previous_s_start){ // right correctio points
         long ts0_corr = (int)evbuf_pro[mac][ev_counter_mac[mac]].ts0 + (int)(correctionpoints[counter_corr].offset+
                         (correctionpoints[counter_corr+1].offset-correctionpoints[counter_corr].offset)/(correctionpoints[counter_corr+1].sec-correctionpoints[counter_corr].sec)*
                         (previous_s_start-correctionpoints[counter_corr].sec));
@@ -987,7 +999,7 @@ void crt::CRTRawInputDetail::receive_data(){
         //printf("used merged correction, both side, %d \n", correctionpoints[counter_corr].sec);
         //evbuf_pro[mac][ev_counter_mac[mac]].lostfpga=88;
         //printf("-------------------------------------------------------------------\n");
-        counter_corr=50;
+        counter_corr=50000;
       }
       else if(correctionpoints[counter_corr].sec!=0 && correctionpoints[counter_corr+1].sec==0){ // only correction point on one side.
         long ts0_corr = (int)evbuf_pro[mac][ev_counter_mac[mac]].ts0 + (int)(correctionpoints[counter_corr].offset+
@@ -999,7 +1011,7 @@ void crt::CRTRawInputDetail::receive_data(){
         //printf("used merged correction, one side, %d \n", correctionpoints[counter_corr].sec);
         //evbuf_pro[mac][ev_counter_mac[mac]].lostfpga=88;
         //printf("-------------------------------------------------------------------\n");
-        counter_corr=50;
+        counter_corr=50000;
       }
 
       //if(counter_corr!=50) printf(" %d - ",counter_corr);
@@ -1016,6 +1028,7 @@ void crt::CRTRawInputDetail::receive_data(){
 void crt::CRTRawInputDetail::scale_buffer(){
   //std::cout<<"scale data" <<std::endl;
   for(int j=0;j<MAXFEBNR;j++){ //loop over all planes
+    int found_ppsref = 0; //prevent buffer overflow
    for(int i=0;i<ev_counter_mac[j];i++){  
     if((evbuf_pro[j][i].flags==5 || evbuf_pro[j][i].flags==7) && evbuf_pro[j][i].sec!=0){ //search a time ref event
       if(ready_to_scan==SCANBUF_READY_TO_FILL){
@@ -1023,13 +1036,31 @@ void crt::CRTRawInputDetail::scale_buffer(){
         order_buffer[j].ref_nr=i;
         order_buffer[j].ts0_ref=evbuf_pro[j][i].ts0;
         order_buffer[j].flags=0;
+        found_ppsref = 1;
       }
       else {printf("Buffer not ready to scan!!\n"); 
            }
       i=ev_counter_mac[j];  //to go of the for loop
       break;
     }
-   }   
+   }
+    if( ev_counter_mac[j]>2*EVSPERFEB && found_ppsref == 0){
+      if(ready_to_scan==SCANBUF_READY_TO_FILL && 0){
+        order_buffer[j].sec=evbuf_pro[j][ev_counter_mac[j]-1].sec;
+        order_buffer[j].ref_nr=ev_counter_mac[j]-1;
+        order_buffer[j].ts0_ref=1e9;
+        order_buffer[j].flags=0;
+        //i=ev_counter_mac[j];  //to go of the for loop
+       printf("Process events of mac: %d, without PPS!\n", j);
+      }
+      else {
+        //printf("Buffer not ready to scan!!\n");  
+        //i=ev_counter_mac[j];  //to go of the for loop
+        printf("Flash events without processing of mac: %d, without PPS!\n", j);
+        ev_counter_mac[j] = 0;
+        break;
+      }
+    }
   }
   //the following part looks that the buffers with sec<sec_max is scaned first/////
   uint32_t sec_max=0;
@@ -1475,11 +1506,11 @@ void crt::CRTRawInputDetail::make2DHit(){
     dt_beam_raw = ts1_local1 - ts1_local2;
     beam_time_ns=(beam1_time_ns+beam2_time_ns)/2;
     
-    crt2Dhit.ts0_ns=hit_time_ns;
+    crt2Dhit.ts0_ns=hit_time_ns+AddTs0Offset_;
     crt2Dhit.ts0_ns_corr=hit_time_ns - hit_time_ns_uncorr;
     //crt2Dhit.pollms=hit_time_ms;
     //crt2Dhit.ts0_ns_err=std::abs((coincidence[0].ts0+coincidence[0].ts0)/2-crt2Dhit.ts0_ns);
-    crt2Dhit.ts1_ns=beam_time_ns;
+    crt2Dhit.ts1_ns=beam_time_ns;//+AddTs1Offset_;
     //crt2Dhit.ts1_ns_err=std::abs((ts1_local1+ts1_local2)/2-crt2Dhit.ts1_ns);
     
      crt2Dhit.ts0_s=coincidence[0].sec_corr;
@@ -1515,6 +1546,9 @@ void crt::CRTRawInputDetail::make2DHit(){
     hxtot->Fill(xtot);
     hytot->Fill(ytot);
     hztot->Fill(ztot);
+    
+    hEvPerSec->Fill(hit_time_s-start_NTP, hit_mac_1);
+    hEvPerSec->Fill(hit_time_s-start_NTP, hit_mac_2);
     //quality plot
     if(plane==0){HitDistBot->Fill(ztot,xtot);}                                               
     if(plane==1){HitDistFT->Fill(ztot, ytot);}

@@ -88,7 +88,8 @@ private:
 
   //TTree*       fTree;
   TH1F* hFlashTimeDis;
-  TH1F* hFlashTimeDis_b0;
+  TH1F* hFlashTimeDis_GPS;
+  TH1F* hFlashTimeDis_Beam;
   TH1F* hTFvsTH_t1;
   TH2F* hTFvsTH_t1_2d;
   TH1F* hTFvsTH_t0;
@@ -224,7 +225,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
     int Hmatchcounter2=0;
     int Hmatchcounter3=0;
     
-    
+
     for(std::vector<int>::size_type i = 0; i != OpFlashCollection.size(); i++) {//B
       
       recob::OpFlash my_OpFlash = OpFlashCollection[i];
@@ -259,10 +260,11 @@ void crt::MergeTest::analyze(art::Event const & evt)
       
             
       
-      if(fbeam == 0){//C solo onbeam
+      // if(fbeam == 0){//C solo onbeam
 	int Hmatchcounter=0;
 	
-	hFlashTimeDis_b0->Fill(Timeflash);
+	bool Bmatch=false;
+	bool GPSmatch=false;
 	
 	for(std::vector<int>::size_type j = 0; j != CRTHitCollection.size(); j++) {//D
 	  
@@ -282,8 +284,13 @@ void crt::MergeTest::analyze(art::Event const & evt)
           int diffT0_nsec = Timeflash_ns_GPS - Hit_T0_nsec;
           int diffT0_nsecABS = std::abs(diffT0_nsec);
 	  
-	 	 	  
-	  if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E                                                                                      //if( (diff_secABS<1)    ){//E
+	  //efficiency
+	  if(diffT1_nsecABS>350 && diffT1_nsecABS<700) Bmatch=true;
+	  if(diffT0_nsecABS>68800 && diffT0_nsecABS<70000) GPSmatch=true;
+	  //effiency	 
+	 	  
+	  //if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E                                                                                      //if( (diff_secABS<1)    ){//E
+	  if(diffT1_nsecABS<1000  ){//E
 	    
 	    Hmatchcounter++;          
 	    
@@ -313,6 +320,7 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	      hTop->Fill(my_CRTHit.z_pos, my_CRTHit.x_pos);  	    
 	    }
 
+
             if(verbose_==1){
 	      std::cout<<"Flash_sec - Hit_sec: "<<diff_sec<<std::endl;
 	      std::cout<<"ABS( Flash_sec - Hit_sec ): "<<diff_secABS<<std::endl;
@@ -334,8 +342,11 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	
 	hNHitperFla->Fill(Hmatchcounter);
 
+
+	if(Bmatch)hFlashTimeDis_Beam->Fill(Timeflash);
+	if(GPSmatch)hFlashTimeDis_GPS->Fill(Timeflash);
 	
-      }//C
+	// }//C
     }//B  
 
     hNHitperFla0->Fill(Hmatchcounter0);
@@ -360,13 +371,17 @@ void crt::MergeTest::beginJob()
   // Implementation of optional member function here.
 
   
-  hFlashTimeDis = tfs->make<TH1F>("hFlashTimDis","hFlashTimDis",2000,-5,25);
+  hFlashTimeDis = tfs->make<TH1F>("hFlashTimDis","hFlashTimDis",850,-3500,5000);
   hFlashTimeDis->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
   hFlashTimeDis->GetYaxis()->SetTitle("Entries/bin");  
 
-  hFlashTimeDis_b0 = tfs->make<TH1F>("hFlashTimDis_b0","hFlashTimDis_b0",2000,-5,25);
-  hFlashTimeDis_b0->GetXaxis()->SetTitle("Flash_bo Time w.r.t. trigger (us)");
-  hFlashTimeDis_b0->GetYaxis()->SetTitle("Entries/bin");
+  hFlashTimeDis_GPS = tfs->make<TH1F>("hFlashTimDis_GPS","hFlashTimDis_GPS",850,-3500,5000);
+  hFlashTimeDis_GPS->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+  hFlashTimeDis_GPS->GetYaxis()->SetTitle("Entries/bin");
+
+  hFlashTimeDis_Beam = tfs->make<TH1F>("hFlashTimDis_Beam","hFlashTimDis_Beam",850,-3500,5000);
+  hFlashTimeDis_Beam->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+  hFlashTimeDis_Beam->GetYaxis()->SetTitle("Entries/bin");
 
   hTFvsTH_t1 = tfs->make<TH1F>("hBeamMatching","hBeamMatching",500,-1000,1000);
   hTFvsTH_t1->GetXaxis()->SetTitle("Flash Time w.r.t. trigger - CRTHit Time_t1 (ns)");

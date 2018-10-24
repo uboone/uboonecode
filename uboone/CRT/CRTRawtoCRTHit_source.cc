@@ -280,6 +280,7 @@ private:
   crt::EOP_EVENT_t refevent;
   std::vector<crt::CRTHit>  allmyCRTHits;
   int total_hits=0;
+  long first_second = 0;
   int EndOfFile;
   ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -301,6 +302,7 @@ private:
   
   TH1F* hPES;
   TH1F* hPEStot;
+  TH2F* hEvPerSec;
   //tree entries/////////////////////////////
   TTree*       my_tree_;
   int hit_mac_1=0;
@@ -476,6 +478,12 @@ void crt::CRTRawInputDetail::readFile(std::string const & filename, art::FileBlo
   hPEStot = tfs->make<TH1F>("hPEStot","PEStot",500,0,500);
   hPEStot->GetXaxis()->SetTitle(" pestot");
   hPEStot->GetYaxis()->SetTitle("Entries/bin");
+  
+  hEvPerSec = tfs->make<TH2F>("hEvPerSec","Events per second",14400,0,14400,200,0,200);
+  hEvPerSec->GetXaxis()->SetTitle("Time [sec]");
+  hEvPerSec->GetYaxis()->SetTitle("FEB ID");
+  hEvPerSec->GetZaxis()->SetTitle("Entries/bin");
+  hEvPerSec->SetOption("COLZ");
   //end tree stuff /////////////////////////////////////////////////////////////////////////////////////////////
   
   fb = new art::FileBlock(art::FileFormatVersion(1, "RawEvent2011"), filename);
@@ -601,7 +609,7 @@ bool crt::CRTRawInputDetail::readNext(art::RunPrincipal const* const inR, art::S
         ev_counter_mac[i]=0;  //if one buffer is overload, it is scaled w/out scaling...
       }
       else if(ev_counter_mac[i]!=0){ //if everything if fine, print the number of events in the buffers
-        //printf("fill status of %d: %d - %d\n",i,ev_counter_mac[i], ev_counter_scan[i]);
+        printf("fill status of %d: %d - %d\n",i,ev_counter_mac[i], ev_counter_scan[i]);
       }
     }
     //receive new data
@@ -698,7 +706,13 @@ bool crt::CRTRawInputDetail::readNext(art::RunPrincipal const* const inR, art::S
     }
   outE = fSourceHelper.makeEventPrincipal(run_num, subrun_num, fEventNumber++, v_crt_time);
   event_counter++;
- 
+  if(first_second!=0) first_second = allCRTHits[0].ts0_s;
+  if(event_counter%1==0){
+    const time_t ctt = time(0);
+    std::cout<<"Wrote event Nr: "<< event_counter << " at: " << asctime(localtime(&ctt));
+    std::cout<<"Found total: " << total_hits << " in the second: "<< allCRTHits[0].ts0_s <<std::endl;
+    }
+  
   art::put_product_in_principal(std::move(CRTHiteventCol),*outE, fModuleLabel, fInstanceLabel);
   allCRTHits.erase(allCRTHits.begin(), allCRTHits.end());
   save_event=0;
@@ -935,6 +949,7 @@ void crt::CRTRawInputDetail::receive_data(){
 void crt::CRTRawInputDetail::scale_buffer(){
   //std::cout<<"scale data" <<std::endl;
   for(int j=0;j<MAXFEBNR;j++){ //loop over all planes
+    int found_ppsref = 0;
    for(int i=0;i<ev_counter_mac[j];i++){  
     if(evbuf_pro[j][i].flags==5 || evbuf_pro[j][i].flags==7){ //search a time ref event
       if(ready_to_scan==SCANBUF_READY_TO_FILL){
@@ -942,13 +957,33 @@ void crt::CRTRawInputDetail::scale_buffer(){
         order_buffer[j].ref_nr=i;
         order_buffer[j].ts0_ref=evbuf_pro[j][i].ts0;
         order_buffer[j].flags=0;
+        found_ppsref = 1;
       }
       else {printf("Buffer not ready to scan!!\n"); 
            }
       i=ev_counter_mac[j];  //to go of the for loop
       break;
     }
-   }   
+   
+   }
+    if( ev_counter_mac[j]>2*EVSPERFEB && found_ppsref == 0){
+      if(ready_to_scan==SCANBUF_READY_TO_FILL && 0){
+        order_buffer[j].sec=evbuf_pro[j][ev_counter_mac[j]-1].sec;
+        order_buffer[j].ref_nr=ev_counter_mac[j]-1;
+        order_buffer[j].ts0_ref=1e9;
+        order_buffer[j].flags=0;
+        //i=ev_counter_mac[j];  //to go of the for loop
+       printf("Process events of mac: %d, without PPS!\n", j);
+      }
+      else {
+        //printf("Buffer not ready to scan!!\n");  
+        //i=ev_counter_mac[j];  //to go of the for loop
+        printf("Flash events without processing of mac: %d, without PPS!\n", j);
+        ev_counter_mac[j] = 0;
+        break;
+      }
+      //ev_counter_mac[j] = 0;
+    }
   }
   //the following part looks that the buffers with sec<sec_max is scaned first/////
   uint32_t sec_max=0;
@@ -1375,6 +1410,9 @@ void crt::CRTRawInputDetail::make2DHit(){
     hxtot->Fill(xtot);
     hytot->Fill(ytot);
     hztot->Fill(ztot);
+    
+    hEvPerSec->Fill(hit_time_s-first_second, hit_mac_1);
+    hEvPerSec->Fill(hit_time_s-first_second, hit_mac_2);
     //quality plot
     if(plane==0){HitDistBot->Fill(ztot,xtot);}                                               
     if(plane==1){HitDistFT->Fill(ztot, ytot);}

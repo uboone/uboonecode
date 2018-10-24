@@ -33,18 +33,19 @@ source:
 	run_mode: 11   #3=beam, 11=all
 	Nr_Files: 0
 	Split: 0 # 0=off 1=on
-        WhichHalf: 1 # 1=first half , 2=secondhalf
-        TopPart: 0 # 0= upstream, 1= middle, 2= downstream
-        Offset: 40000
-        verbose:0
+  WhichHalf: 1 # 1=first half , 2=secondhalf
+  TopPart: 0 # 0= upstream, 1= middle, 2= downstream
+  Offset: 40000
+  verbose:0
 	GPSCorrection: 0
 	CRTpositions_file: "CRTpositionsSiPM-V8.txt"
 	FEBDelays_file: "FEB_CableDelay-V8.txt"
-      	CRTgains_file: "CRTgains-V8.txt"
-      	CRTpedestals_file: "CRTpedestals-V8.txt"
+  CRTgains_file: "CRTgains-V8.txt"
+  CRTpedestals_file: "CRTpedestals-V8.txt"
 	PartTop_file: "HalfTop-V2.txt"
 	FEB_MS_delay_file: "FEB_ms_delay_V3.txt"
-	CRT_GPS_correction: "correction_ts0.txt"
+	CRT_GPS_correction: "t_map_V2_scale.txt"
+  AddTs0Offset: -28000
 }
 
 outputs:
