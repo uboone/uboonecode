@@ -609,7 +609,7 @@ bool crt::CRTRawInputDetail::readNext(art::RunPrincipal const* const inR, art::S
         ev_counter_mac[i]=0;  //if one buffer is overload, it is scaled w/out scaling...
       }
       else if(ev_counter_mac[i]!=0){ //if everything if fine, print the number of events in the buffers
-        printf("fill status of %d: %d - %d\n",i,ev_counter_mac[i], ev_counter_scan[i]);
+        //printf("fill status of %d: %d - %d\n",i,ev_counter_mac[i], ev_counter_scan[i]);
       }
     }
     //receive new data
