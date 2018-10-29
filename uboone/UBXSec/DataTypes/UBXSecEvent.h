@@ -16,6 +16,9 @@
  *
  * Created on: Sunday, October 08, 2017 at 14:53:36
  *
+ * Modified for proton ID by: kirby@fnal.gov
+ *
+ * Modified on: Fri Oct 26, 2018 at 11:05:00 AM CDT
  */
 
 
@@ -206,6 +209,17 @@ class UBXSecEvent /*: public TObject*/{
   vector<int> evtwgt_flux_multisim_nweight; ///< Number of weights per function name used for FLUX reweighting (multisim)
   vector<vector<double>> evtwgt_flux_multisim_weight; ///< Weights per function name used for FLUX reweighting (multisim)
  
+
+  //Init area for CC1mNp/CC1m2p variables
+
+  //GENIE variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+
   int _default_value = -9999; ///< Default value 
 
   UBXSecEvent();

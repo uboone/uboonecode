@@ -24,6 +24,10 @@
  * Contact: marco.deltutto@physics.ox.ac.uk
  *
  * Created on: Friday, March 10, 2017 at 12:32:31
+ * 
+ * Modification for proton ID: kirby@fnal.gov
+ *
+ * Modified on: Fri Oct 26, 2018
  *
  */
 
@@ -208,6 +212,18 @@ private:
   bool _do_opdet_swap;                  ///< If true swaps reconstructed OpDets according to _opdet_swap_map
   std::vector<int> _opdet_swap_map;     ///< The OpDet swap map for reco flashes
 
+  //Init area for CC1mNp/CC1m2p fhicl parameters
+
+  //GENIE variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+  std::string _particle_id_summer_2018_producer; ///The name of the producer for the Summer 2018 particle ID data products
+
+
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
   const simb::Origin_t COSMIC_ORIGIN   = simb::kCosmicRay;
@@ -340,6 +356,17 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _event_selection.PrintConfig();
 
   _trk_mom_calculator.SetMinLength(_min_track_len);
+
+  //Init area for CC1mNp/CC1m2p fhicl parameters
+
+  //GENIE variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+  _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSec");
 
   _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
@@ -989,109 +1016,6 @@ void UBXSec::produce(art::Event & e) {
     }
   }
 
-
-
-
-
-  //   if (mclist[iList]->Origin() == NEUTRINO_ORIGIN) {
-
-  //     if (_debug) this->PrintMC(mclist); 
-
-  //     // Check if the true neutrino vertex is in the FV
-  //     double truth_nu_vtx[3] = {mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vz()};
-  //     if (_fiducial_volume.InFV(truth_nu_vtx)) ubxsec_event->fv = 1;
-  //     else ubxsec_event->fv = 0;
-
-  //     // Look at the space charge correction
-  //     std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vz());
-
-  //     double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
-  //                      + _detector_properties->GetXTicksOffset(0,0,0) 
-  //                      - _detector_properties->TriggerOffset();
-
-  //     // The following offsets to be summed to the original true vertex
-  //     double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
-  //     double yOffset = sce_corr.at(1);
-  //     double zOffset = sce_corr.at(2);
-
-  //     ubxsec_event->sce_corr_x = xOffset;
-  //     ubxsec_event->sce_corr_y = yOffset;
-  //     ubxsec_event->sce_corr_z = zOffset;
-
-  //     if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
-  //       ubxsec_event->fv_sce = 1;
-  //     } else {
-  //       ubxsec_event->fv_sce = 0;
-  //     }
-
-  //     int n_genie_particles = 0;
-  //     int n_genie_particles_charged = 0;
-  //     for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //       const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
-  //       if (mc_par.StatusCode() != 1) continue;
-  //       n_genie_particles ++;
-  //       const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
-  //       if (!par_pdg) continue;
-  //       if (par_pdg->Charge() == 0) continue;
-  //       n_genie_particles_charged ++;
-  //     }
-
-  //     ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
-  //     ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
-  //     ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
-  //     ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
-  //     ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
-  //     ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Py(),
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Pz()); 
-  //     ubxsec_event->genie_mult      = n_genie_particles;
-  //     ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-
-      
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_z.resize(1);
-  //     // for(size_t n = 0; n < mclist.size(); n++ ) {
-  //     ubxsec_event->tvtx_x.at(0) = mclist[iList]->GetNeutrino().Nu().Vx();
-  //     ubxsec_event->tvtx_y.at(0) = mclist[iList]->GetNeutrino().Nu().Vy();
-  //     ubxsec_event->tvtx_z.at(0) = mclist[iList]->GetNeutrino().Nu().Vz();
-  //     // }
-
-  //     ubxsec_event->nsignal = 0;
-  //     if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
-
-  //     // Also save muon momentum if is signal
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //     if (ubxsec_event->nsignal == 1) {
-  //       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //         auto const & mcp = mclist[iList]->GetParticle(p);
-  //         if (mcp.Mother() != 0) continue;
-  //         if (mcp.PdgCode() != 13) continue;
-  //         ubxsec_event->true_muon_mom = mcp.P();
-  //       }
-  //     }
-  //   } // neutrino origin
-  //   else {
-  //     ubxsec_event->ccnc = -1;
-  //     ubxsec_event->nupdg = -1;
-  //     ubxsec_event->nu_e = -1;
-  //     ubxsec_event->lep_costheta = -9999.;
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //   }
-  // } else {
-  //   ubxsec_event->ccnc = -1;
-  //   ubxsec_event->nupdg = -1;
-  //   ubxsec_event->nu_e = -1;
-  //   ubxsec_event->lep_costheta = -9999.;
-  //   ubxsec_event->true_muon_mom = -9999.;
-  // }
-
   ubxsec_event->is_signal = false;
   if (ubxsec_event->ccnc == 0 && ubxsec_event->nupdg == 14 && ubxsec_event->fv == 1) {
     ubxsec_event->is_signal = true;
@@ -1462,122 +1386,6 @@ void UBXSec::produce(art::Event & e) {
     } // end loop ophit
 
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
-
-    /*for (size_t oh = 0; oh < ophit_cosmic_h->size(); oh++) {
-      auto const & ophit = (*ophit_cosmic_h)[oh];
-      if (ophit.PeakTime() < -150 || ophit.PeakTime() > -50) continue;
-      size_t opdet = geo->OpDetFromOpChannel(ophit.OpChannel());
-      std::cout << "Cosmic Disc OpHit::  OpDet: " << opdet
-                << ", PeakTime: " << ophit.PeakTime()
-                << ", PE: " << _pecalib.CosmicPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
-    }*/
-
-    // Distance from recon nu vertex to thefar away track in TPCObject
-    //_slc_maxdistance_vtxtrack = UBXSecHelper::GetMaxTrackVertexDistance();
-
-    // Other showers in the event
-    /*
-    std::vector<art::Ptr<recob::Shower>> other_showers;
-    bool ignore_shower = false;
-    for (size_t s = 0; s < _shower_v.size(); s++) {
-
-      ignore_shower = false;
-
-      // Check this shower is not in this TPCObject
-      for (size_t this_s = 0; this_s < shower_v_v.at(slice).size(); this_s++) {
-        if (_shower_v.at(s).key() == shower_v_v.at(slice).at(this_s).key()) {
-          ignore_shower = true;
-          continue;
-        }
-      }
-
-      if (ignore_shower) continue;
-     
-      other_showers.push_back(_shower_v.at(s));
-    }
-
-    double max_length = -1, index_max_length = -1;
-    double max_costheta = -1e9, index_max_costheta = -1;
-    double min_flashvtxdistance = 1e9, index_min_flashvtxdistance = -1;
-
-    for (size_t s = 0; s < other_showers.size(); s++) {
-
-      if (other_showers.at(s)->Length() > max_length) {
-        max_length = other_showers.at(s)->Length();
-        index_max_length = s;
-      }
-
-      double costheta = UBXSecHelper::GetCosTheta(other_showers.at(s)->Direction());
-      if (costheta > max_costheta) {
-        costheta = max_costheta;
-        index_max_costheta = s;
-      }
-
-      double distance = std::abs(other_showers.at(s)->ShowerStart().Z() - ubxsec_event->candidate_flash_z);
-      if (distance < min_flashvtxdistance) {
-        min_flashvtxdistance = distance;
-        index_min_flashvtxdistance = s;
-      }
-    }
-
-    if (index_max_length != -1) {
-      auto shower = other_showers.at(index_max_length);
-      ubxsec_event->slc_othershowers_longest_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_longest_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_longest_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_longest_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_longest_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_longest_length[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;      
-    }
-    if (index_max_costheta != -1) {
-      auto shower = other_showers.at(index_max_costheta);
-      ubxsec_event->slc_othershowers_forward_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_forward_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_forward_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_forward_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_forward_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_forward_length[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = -1;
-    }
-    if (index_min_flashvtxdistance != -1) {
-      auto shower = other_showers.at(index_min_flashvtxdistance);
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;
-    }
-
-    std::cout << "[UBXSec] Shower info saved." << std::endl;
-    */
-
 
     // Muon Candidate
     _muon_finder.Reset();

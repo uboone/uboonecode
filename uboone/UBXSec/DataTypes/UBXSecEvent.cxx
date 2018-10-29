@@ -74,6 +74,16 @@ void UBXSecEvent::Init()
   tvtx_y.clear(); 
   tvtx_z.clear(); 
 
+  //Init area for CC1mNp/CC1m2p variables
+
+  //Genie variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+
   ResizeVectors(0);
 
 }
@@ -173,6 +183,13 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_geocosmictag.resize(vsize, false);
   slc_consistency.resize(vsize, true);
   slc_consistency_score.resize(vsize, 0.);
+
+  //Init area for CC1mNp/CC1m2p variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+
 }
 
 void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {
@@ -180,6 +197,13 @@ void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {
   tvtx_x.resize(vsize);
   tvtx_y.resize(vsize);
   tvtx_z.resize(vsize);
+
+  //Init area for CC1mNp/CC1m2p variables
+
+  //GENIE variables
+
+  //G4 variables
+
 
 }
 
