@@ -371,12 +371,14 @@ microboone_reco_mcc8_cctracks: [         pmtrack,
                                          pmtrackcalipid]
 
 microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_clustercrawler,
-                                         @sequence::microboone_reco_mcc8_cctracks,
-                                         trajclusterTruthMatch ]
-
-microboone_reco_mcc8_cctcshower: [       @sequence::microboone_reco_mcc8_clustercrawler,
+                                         @sequence::microboone_reco_mcc8_cctracks,                                         
+                                         trajclusterTruthMatch,
                                          trajclusterKalmanTrack,
-                                         tcshower ]
+                                         tcshower]
+
+#microboone_reco_mcc8_cctcshower: [       @sequence::microboone_reco_mcc8_clustercrawler,
+#                                         trajclusterKalmanTrack,
+#                                         tcshower ]
 
 microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPatRec,
