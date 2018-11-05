@@ -2,6 +2,7 @@
 #define UBOONETPCENERGYCALIBPROVIDER_CXX
 
 #include "UbooneTPCEnergyCalibProvider.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 // art/LArSoft libraries
 #include "cetlib/exception.h"
@@ -12,6 +13,8 @@ namespace lariov {
 
   //constructor
   UbooneTPCEnergyCalibProvider::UbooneTPCEnergyCalibProvider(fhicl::ParameterSet const& p) :
+    fEventTimeStamp(0),
+    fCurrentTimeStamp(0),
     fXNormProvider(p.get<fhicl::ParameterSet>("XNormCorrectionProvider")),
     fdEdxProvider(p.get<fhicl::ParameterSet>("dEdxCorrectionProvider")) {   
 
@@ -39,30 +42,64 @@ namespace lariov {
     fXNormProvider.Reconfigure(p.get<fhicl::ParameterSet>("XNormCorrectionProvider"));
     fdEdxProvider.Reconfigure(p.get<fhicl::ParameterSet>("dEdxCorrectionProvider"));
   }
+
+  // This method saves the time stamp of the latest event.
   
+  void UbooneTPCEnergyCalibProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("UbooneTPCEnergyCalibProvider") << "UbooneTPCEnergyCalibProvider::UpdateTimeStamp called.";
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool UbooneTPCEnergyCalibProvider::Update(DBTimeStamp_t ts) {
+    fEventTimeStamp = ts;
+    return DoUpdate(ts);
+  }
+
+  // Maybe update method cached data (private const version using current event time).
+
+  bool UbooneTPCEnergyCalibProvider::DoUpdate() const {
+    return DoUpdate(fEventTimeStamp);
+  }
+
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data.
+
+  bool UbooneTPCEnergyCalibProvider::DoUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if(ts != fCurrentTimeStamp) {
+
+      mf::LogInfo("UbooneTPCEnergyCalibProvider") << "UbooneTPCEnergyCalibProvider::DoUpdate called with new timestamp.";
+
+      fCurrentTimeStamp = ts;
     
-    //get around compiler optimization shenanigans by putting each update call in a separate line before returning
-    bool return_val1 = fXShapeProvider[0]->Update(ts);
-    bool return_val2 = fXShapeProvider[1]->Update(ts);
-    bool return_val3 = fXShapeProvider[2]->Update(ts);
-    bool return_val4 = fYZProvider[0]->Update(ts);
-    bool return_val5 = fYZProvider[1]->Update(ts);
-    bool return_val6 = fYZProvider[2]->Update(ts);
-    bool return_val7 = fXNormProvider.Update(ts);
-    bool return_val8 = fdEdxProvider.Update(ts);
+      //get around compiler optimization shenanigans by putting each update call in a separate line before returning
+      bool return_val1 = fXShapeProvider[0]->Update(ts);
+      bool return_val2 = fXShapeProvider[1]->Update(ts);
+      bool return_val3 = fXShapeProvider[2]->Update(ts);
+      bool return_val4 = fYZProvider[0]->Update(ts);
+      bool return_val5 = fYZProvider[1]->Update(ts);
+      bool return_val6 = fYZProvider[2]->Update(ts);
+      bool return_val7 = fXNormProvider.Update(ts);
+      bool return_val8 = fdEdxProvider.Update(ts);
     
-    return return_val1 || return_val2 || return_val3 || return_val4 || return_val5 || return_val6 || return_val7 || return_val8;
-    
+      result = return_val1 || return_val2 || return_val3 || return_val4 || return_val5 || return_val6 || return_val7 || return_val8;
+    }
+
+    return result;
   }
   
   float UbooneTPCEnergyCalibProvider::YZdqdxCorrection(int plane, float y, float z) const {
+    DoUpdate();
     std::vector<float> vec(2,y);
     vec[1] = z;
     return fYZProvider.at(plane)->Correction(vec);
   }
   
   float UbooneTPCEnergyCalibProvider::YZdqdxCorrectionErr(int plane, float y, float z) const {
+    DoUpdate();
     std::vector<float> vec(2,y);
     vec[1] = z;
     return fYZProvider.at(plane)->CorrectionErr(vec);
@@ -77,28 +114,34 @@ namespace lariov {
   }
 
   float UbooneTPCEnergyCalibProvider::XShapedqdxCorrection(int plane, float x) const {
+    DoUpdate();
     std::vector<float> vec(1, x);
     return fXShapeProvider.at(plane)->Correction(vec);
   }
   
   float UbooneTPCEnergyCalibProvider::XShapedqdxCorrectionErr(int plane, float x) const {
+    DoUpdate();
     std::vector<float> vec(1, x);
     return fXShapeProvider.at(plane)->CorrectionErr(vec);
   }
   
   float UbooneTPCEnergyCalibProvider::XNormdqdxCorrection(int plane) const {
+    DoUpdate();
     return fXNormProvider.Correction(plane);
   }
   
   float UbooneTPCEnergyCalibProvider::XNormdqdxCorrectionErr(int plane) const {
+    DoUpdate();
     return fXNormProvider.CorrectionErr(plane);
   }
   
   float UbooneTPCEnergyCalibProvider::XdqdxCorrection(int plane, float x) const {
+    DoUpdate();
     return (this->XShapedqdxCorrection(plane,x))*(this->XNormdqdxCorrection(plane));
   }
   
   float UbooneTPCEnergyCalibProvider::XdqdxCorrectionErr(int plane, float x) const {
+    DoUpdate();
     float norm_frac_err  = ( this->XNormdqdxCorrectionErr(plane) )     / (this->XNormdqdxCorrection(plane)     );
     float shape_frac_err = ( this->XShapedqdxCorrectionErr(plane, x) ) / (this->XShapedqdxCorrection(plane, x) );
     return (this->XdqdxCorrection(plane,x))*sqrt(norm_frac_err*norm_frac_err + shape_frac_err*shape_frac_err);
@@ -157,10 +200,12 @@ namespace lariov {
   }
   
   float UbooneTPCEnergyCalibProvider::dEdxCorrection(int plane) const {
+    DoUpdate();
     return fdEdxProvider.Correction(plane);
   }
   
   float UbooneTPCEnergyCalibProvider::dEdxCorrectionErr(int plane) const {
+    DoUpdate();
     return fdEdxProvider.CorrectionErr(plane);
   }
 

@@ -46,6 +46,9 @@ namespace lariov {
       /// Reconfigure function called by fhicl constructor
       void Reconfigure(fhicl::ParameterSet const& p);
       
+      // Update event time stamp.
+      void UpdateTimeStamp(DBTimeStamp_t ts);
+
       /// Update each source provider
       bool Update(DBTimeStamp_t ts);
       
@@ -82,13 +85,25 @@ namespace lariov {
       
       
     private:
+
+      /// Do actual updates.
+
+      bool DoUpdate() const;                    // Uses current event time.
+      bool DoUpdate(DBTimeStamp_t ts) const;
+
+      // Time stamps.
+
+      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
+      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
       
-      std::vector<std::shared_ptr<UboonedqdxCorrectionProvider> >     fXShapeProvider; 
-      std::vector<std::shared_ptr<UboonedqdxCorrectionProvider> >     fYZProvider;
+      // Providers.
+
+      mutable std::vector<std::shared_ptr<UboonedqdxCorrectionProvider> >     fXShapeProvider; 
+      mutable std::vector<std::shared_ptr<UboonedqdxCorrectionProvider> >     fYZProvider;
       
-      UboonePlaneCorrectionProvider fXNormProvider; 
+      mutable UboonePlaneCorrectionProvider fXNormProvider; 
       
-      UboonePlaneCorrectionProvider fdEdxProvider;
+      mutable UboonePlaneCorrectionProvider fdEdxProvider;
   };
 }//end namespace lariov
 
