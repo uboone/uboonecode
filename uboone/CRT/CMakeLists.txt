@@ -207,6 +207,16 @@ simple_plugin(TrackDump "module"
           art_Framework_Services_Optional_TFileService_service
           ${ROOT_BASIC_LIB_LIST} )
 
+simple_plugin(UBCRTCosmicFilter "module"
+            CRT
+	  bernfebdaq-core_Overlays
+	  lardataobj_RecoBase
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
+
+
 simple_plugin(CRTRawtoCRTHit "source"
             CRT
 	  bernfebdaq-core_Overlays
