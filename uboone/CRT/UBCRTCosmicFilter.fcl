@@ -1,0 +1,64 @@
+BEGIN_PROLOG
+UBCRTCosmicFilter: {
+ module_type              : "UBCRTCosmicFilter"  
+ BeamFlashProducer        : "simpleFlashBeam"
+ CRTHitProducer           : "merger"
+ DAQHeaderProducer        : "daq"
+ BeamStart                : 3.19  # us
+ BeamEnd                  : 4.87 # us
+ PEMin                    : 10.0   # PEs
+ DTOffset                 : 68600. # us
+ Resolution               : 1.0  # us
+ useAsFilter              : true
+ verbose                  : false
+ Top                      : true
+ Bottom                   : true
+ Anode                    : true
+ Cathode                  : true
+}
+
+# NuMI beam on
+UBCRTCosmicFilterNuMION: @local::UBCRTCosmicFilter
+UBCRTCosmicFilterNuMION.BeamStart: 5.70
+UBCRTCosmicFilterNuMION.BeamEnd:   15.50
+
+# NuMI beam off
+UBCRTCosmicFilterNuMIOFF: @local::UBCRTCosmicFilter
+UBCRTCosmicFilterNuMIOFF.BeamStart: 6.06
+UBCRTCosmicFilterNuMIOFF.BeamEnd:   15.86
+
+# BNB beam on
+UBCRTCosmicFilterBNBON: @local::UBCRTCosmicFilter
+UBCRTCosmicFilterBNBON.BeamStart: 3.19
+UBCRTCosmicFilterBNBON.BeamEnd:   4.87
+
+# BNB beam off
+UBCRTCosmicFilterBNBOFF: @local::UBCRTCosmicFilter
+UBCRTCosmicFilterBNBOFF.BeamStart: 3.57
+UBCRTCosmicFilterBNBOFF.BeamEnd:   5.25
+
+# BNB beam on top-only
+UBCRTCosmicFilterBNBONtop: @local::UBCRTCosmicFilterBNBON
+UBCRTCosmicFilterBNBONtop.Bottom:  false
+UBCRTCosmicFilterBNBONtop.Anode:   false
+UBCRTCosmicFilterBNBONtop.Cathode: false
+
+# BNB beam off top-only
+UBCRTCosmicFilterBNBOFFtop: @local::UBCRTCosmicFilterBNBOFF
+UBCRTCosmicFilterBNBOFFtop.Bottom:  false
+UBCRTCosmicFilterBNBOFFtop.Anode:   false
+UBCRTCosmicFilterBNBOFFtop.Cathode: false
+
+# NuMI beam on top-only
+UBCRTCosmicFilterNuMIONtop: @local::UBCRTCosmicFilterNuMION
+UBCRTCosmicFilterNuMIONtop.Bottom:  false
+UBCRTCosmicFilterNuMIONtop.Anode:   false
+UBCRTCosmicFilterNuMIONtop.Cathode: false
+
+# NuMI beam off top-only
+UBCRTCosmicFilterNuMIOFFtop: @local::UBCRTCosmicFilterNuMIOFF
+UBCRTCosmicFilterNuMIOFFtop.Bottom:  false
+UBCRTCosmicFilterNuMIOFFtop.Anode:   false
+UBCRTCosmicFilterNuMIOFFtop.Cathode: false
+
+END_PROLOG
