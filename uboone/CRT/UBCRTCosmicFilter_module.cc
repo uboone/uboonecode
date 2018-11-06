@@ -67,6 +67,8 @@ private:
   bool verbose;
   bool fAnode, fTop, fBottom, fCathode;
 
+  art::ServiceHandle<art::TFileService> tfs;
+
   // TTree Declaration.
   TTree *_tree;
 
