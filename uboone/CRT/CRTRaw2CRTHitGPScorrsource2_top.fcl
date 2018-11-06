@@ -23,6 +23,14 @@ services:
 	FileCatalogMetadata:    @local::art_file_catalog_data
 }
 
+microboone_tfile_metadata:
+{
+  JSONFileName:          "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}
+
 source:
 {
 	module_type	:CRTRawtoCRTHitGPScorr
@@ -44,8 +52,9 @@ source:
   CRTpedestals_file: "CRTpedestals-V8.txt"
 	PartTop_file: "HalfTop-V2.txt"
 	FEB_MS_delay_file: "FEB_ms_delay_V3.txt"
-	CRT_GPS_correction: "t_map_V2_scale.txt"
+	CRT_GPS_correction: "t_map_V2.txt"
   AddTs0Offset: -28000
+  saveTTree: 0
 }
 
 outputs:
