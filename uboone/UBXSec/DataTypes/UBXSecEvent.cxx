@@ -84,7 +84,10 @@ void UBXSecEvent::Init()
 
   //Tracks from PFP variables
 
+
   ResizeVectors(0);
+  
+  ResizeCC1mNpVectors(0);
 
 }
 
@@ -184,11 +187,56 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_consistency.resize(vsize, true);
   slc_consistency_score.resize(vsize, 0.);
 
+}
+
+void UBXSecEvent::ResizeCC1mNpVectors(int vsize) {
+
   //Init area for CC1mNp/CC1m2p variables
+
+  //General PFP variables
+  num_pfp.resize(vsize, _default_value);
+  num_pfp_tracks.resize(vsize, _default_value);
+  num_pfp_showers.resize(vsize, _default_value);
 
   //PFP Truth variables
 
   //Tracks from PFP variables
+  track_pfp_istrack.resize(vsize, _default_value); //boolean of whether Pandora thought it was a track
+  track_pfp_isshower.resize(vsize, _default_value); //boolean of whether Pandora thought it was a shower
+  track_pfp_upflag.resize(vsize, _default_value); //value returned by MIPConsistency() function for the track
+  track_pfp_Id.resize(vsize, _default_value); //the index of the track in the list of PFPs
+  track_pfp_length.resize(vsize, _default_value); //length (cm) of the track associated with the PFP in the collection
+  track_pfp_theta.resize(vsize, _default_value); //theta of the track associated with the PFP in the collection
+  track_pfp_costheta.resize(vsize, _default_value); //costheta of the track associated with the PFP in the collection
+  track_pfp_phi.resize(vsize, _default_value); //phi of the track associated with the PFP in the collection
+  track_pfp_startx.resize(vsize, _default_value); //start point in x (cm) of the track associated with the PFP in the collection
+  track_pfp_starty.resize(vsize, _default_value); //start point in y (cm) of the track associated with the PFP in the collection
+  track_pfp_startz.resize(vsize, _default_value); //start point in z (cm) of the track associated with the PFP in the collection
+  track_pfp_endx.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  track_pfp_endy.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  track_pfp_endz.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  track_pfp_Mom.resize(vsize, _default_value); //Vertex momentum of the track associated with the PFP in the collection
+  track_pfp_Mom_p.resize(vsize, _default_value); //length based momentum of the track associated with the PFP in the collection
+  track_pfp_Mom_MCS.resize(vsize, _default_value); //MCS based momentum of the track associated with the PFP in the collection
+  track_pfp_trunmeandqdx.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
+  track_pfp_trunmeandqdx_U.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
+  track_pfp_trunmeandqdx_V.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
+
+  track_pfp_pida.resize(vsize, _default_value); //pida value of the track associated with the PFP in the collection
+  track_pfp_newpid_pida.resize(vsize, _default_value); //pida from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_chi2_proton.resize(vsize, _default_value); //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_chi2_kaon.resize(vsize, _default_value); //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_chi2_muon.resize(vsize, _default_value); //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_chi2_pion.resize(vsize, _default_value); //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_bragg_ratio.resize(vsize, _default_value); //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_bragg_proton.resize(vsize, _default_value); //LL(p) from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_bragg_fwd_proton.resize(vsize, _default_value); //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_bragg_bwd_proton.resize(vsize, _default_value); //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_bragg_fwd_mip.resize(vsize, _default_value); //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  track_pfp_nhits.resize(vsize, _default_value); //number of hits on the track associated with the PFP in the collection
+  track_pfp_dEdx.resize(vsize); //hit by hit dEdx for the track associated with the PFP in the collection
+  track_pfp_dQdx.resize(vsize); //hit by hit dQdx for the track associated with the PFP in the collection
+  track_pfp_RR.resize(vsize); //hit by hit RR for the track associated with the PFP in the collection
 
 }
 

@@ -385,21 +385,6 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   int splitlevel = 99;
   _tree1->Branch("ubxsec_event_split", &ubxsec_event, bufsize, splitlevel);
 
-  /*
-  _tree2 = fs->make<TTree>("matchtree","");
-  _tree2->Branch("run",                &_run,                "run/I");
-  _tree2->Branch("subrun",             &_subrun,             "subrun/I");
-  _tree2->Branch("event",              &_event,              "event/I");
-  _tree2->Branch("total_matches",      &_total_matches,      "total_matches/I");
-  _tree2->Branch("nmatch",             &_nmatch,             "nmatch/I");
-  _tree2->Branch("score",              &_score,              "score/D");
-  _tree2->Branch("hypo_spec",          "std::vector<double>", &_hypo_spec);
-  _tree2->Branch("beam_spec",          "std::vector<double>", &_beam_spec);
-  _tree2->Branch("fixx_spec",          "std::vector<double>", &_fixx_spec);
-  _tree2->Branch("is_muon",            &_is_muon,            "is_muon/I");
-  _tree2->Branch("muon_is_reco",       &_muon_is_reco,       "muon_is_reco/I");
-  */
-
   _deadRegion2P = fs->make<TH2F>("deadRegion2P","deadRegion2P", 10350,0.0,1035.0,2300,-115.0,115.0);
   _deadRegion3P = fs->make<TH2F>("deadRegion3P","deadRegion3P", 10350,0.0,1035.0,2300,-115.0,115.0);
 
@@ -834,8 +819,6 @@ void UBXSec::produce(art::Event & e) {
       }
     }
   }
-
-
   
   
   // pandoraCosmic PFPs (for cosmic removal studies)
@@ -1924,6 +1907,10 @@ void UBXSec::produce(art::Event & e) {
     // For the TPCNeutrinoID Filter
     util::CreateAssn(*this, e, muon_candidate_track_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexTrackAssociations);
     util::CreateAssn(*this, e, muon_candidate_pfparticle_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexPFParticleAssociations);
+
+    //At this point, a NuMuCCEvent has been selected and the TPCObject slice has been determined. From this point, we can start filling the CC1mNp variables....
+
+    
 
   }
 

@@ -216,9 +216,50 @@ class UBXSecEvent /*: public TObject*/{
 
   //G4 variables
 
+  //General PFP variables
+  vector<int> num_pfp; //number of pfparticles in the slice
+  vector<int> num_pfp_tracks;//number of pfparticles labelled as tracks
+  vector<int> num_pfp_showers;//number of pfparticles labelled as showers
+
   //PFP Truth variables
 
   //Tracks from PFP variables
+  vector<bool> track_pfp_istrack; //boolean of whether Pandora thought it was a track
+  vector<bool> track_pfp_isshower; //boolean of whether Pandora thought it was a shower
+  vector<bool> track_pfp_upflag; //value returned by MIPConsistency() function for the track
+  vector<int> track_pfp_Id; //the index of the track in the list of PFPs
+  vector<float> track_pfp_length; //length (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_theta; //theta of the track associated with the PFP in the collection
+  vector<float> track_pfp_costheta; //costheta of the track associated with the PFP in the collection
+  vector<float> track_pfp_phi; //phi of the track associated with the PFP in the collection
+  vector<float> track_pfp_startx; //start point in x (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_starty; //start point in y (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_startz; //start point in z (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_endx;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_endy;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_endz;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> track_pfp_Mom; //Vertex momentum of the track associated with the PFP in the collection
+  vector<float> track_pfp_Mom_p; //length based momentum of the track associated with the PFP in the collection
+  vector<float> track_pfp_Mom_MCS; //MCS based momentum of the track associated with the PFP in the collection
+  vector<float> track_pfp_trunmeandqdx; //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
+  vector<float> track_pfp_trunmeandqdx_U; //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
+  vector<float> track_pfp_trunmeandqdx_V; //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
+
+  vector<float> track_pfp_pida; //pida value of the track associated with the PFP in the collection
+  vector<float> track_pfp_newpid_pida; //pida from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_chi2_proton; //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_chi2_kaon; //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_chi2_muon; //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_chi2_pion; //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_bragg_ratio; //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_bragg_proton; //LL(p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_bragg_fwd_proton; //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_bragg_bwd_proton; //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> track_pfp_bragg_fwd_mip; //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<int> track_pfp_nhits; //number of hits on the track associated with the PFP in the collection
+  vector<vector<double>> track_pfp_dEdx; //hit by hit dEdx for the track associated with the PFP in the collection
+  vector<vector<double>> track_pfp_dQdx; //hit by hit dQdx for the track associated with the PFP in the collection
+  vector<vector<double>> track_pfp_RR; //hit by hit RR for the track associated with the PFP in the collection
 
   int _default_value = -9999; ///< Default value 
 
@@ -226,6 +267,7 @@ class UBXSecEvent /*: public TObject*/{
   virtual ~UBXSecEvent();
   void Init();
   void ResizeVectors(int); 
+  void ResizeCC1mNpVectors(int); 
   void ResizeGenieTruthVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
