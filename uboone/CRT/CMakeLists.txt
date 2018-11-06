@@ -23,6 +23,7 @@ art_make( BASENAME_ONLY
 	CRTFlashAna_module.cc
 	TimeExtraction_module.cc
 	TrackDump_module.cc
+	UBCRTCosmicFilter_module.cc
 	MergeTest_module.cc
 	CRTRawtoCRTHit_source.cc
 	CRTRawtoCRTHitGPScorr_source.cc

@@ -1,5 +1,6 @@
 #include "reco_uboone_data_mcc8.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "UBCRTCosmicFilter.fcl"
 
 process_name: DataOpticalFilter
 
@@ -38,6 +39,7 @@ physics:
    filters:
    { 
        @table::microboone_reco_data_filters
+       crtfilteron: @local::UBCRTCosmicFilterBNBON
    }
 
    analyzers:
@@ -47,8 +49,9 @@ physics:
 
    #reco sequence and trigger_paths to be defined elsewhere
    filter:        [ rns, @sequence::microboone_reco_data_optical, opfiltercommonbnb ]
+   crtfilter:     [ rns, @sequence::microboone_reco_data_optical, opfiltercommonbnb, crtfilteron ]
    stream1:       [ out1    ]
-   trigger_paths: [ filter ]
+   trigger_paths: [ filter, crtfilter ]
    end_paths:     [ stream1 ]  
 }
 
