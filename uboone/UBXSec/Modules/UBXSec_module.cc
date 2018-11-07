@@ -214,7 +214,6 @@ private:
 
   //Init area for CC1mNp/CC1m2p fhicl parameters
 
-  //GENIE variables
 
   //G4 variables
 
@@ -974,12 +973,42 @@ void UBXSec::produce(art::Event & e) {
 
       int n_genie_particles = 0;
       int n_genie_particles_charged = 0;
+      //add the new GENIE variables here
+      int n_genie_muons=0;
+      int n_genie_protons=0;
+      int n_genie_electrons=0;
+      int n_genie_pipms=0;
+      int n_genie_pion0s=0;
+      int n_genie_protons_200=0;
+      int n_genie_protons_300=0;
+      int n_genie_protons_400=0;
+      //================================================
+
       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
         const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
         if (mc_par.StatusCode() != 1) continue;
         n_genie_particles ++;
         const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
         if (!par_pdg) continue;
+        //get the number of muons, protons .... in GENIE stage
+        ubxsec_event->genie_mcpar_pdgcode.emplace_back(mc_par.PdgCode());
+        ubxsec_event->genie_mcpar_energy.emplace_back(mc_par.E());
+        ubxsec_event->genie_mcpar_px.emplace_back(mc_par.Px());
+        ubxsec_event->genie_mcpar_py.emplace_back(mc_par.Py());
+        ubxsec_event->genie_mcpar_pz.emplace_back(mc_par.Pz());
+        ubxsec_event->genie_mcpar_startx.emplace_back(mc_par.Vx());
+        ubxsec_event->genie_mcpar_starty.emplace_back(mc_par.Vy());
+        ubxsec_event->genie_mcpar_startz.emplace_back(mc_par.Vz());
+        if(abs(mc_par.PdgCode())==13) {n_genie_muons=n_genie_muons+1;}
+        if(abs(mc_par.PdgCode())==211) {n_genie_pipms=n_genie_pipms+1;}
+        if(abs(mc_par.PdgCode())==111) {n_genie_pion0s=n_genie_pion0s+1;}
+        if(abs(mc_par.PdgCode())==11)  {n_genie_electrons=n_genie_electrons+1;}
+        if(abs(mc_par.PdgCode())==2212) {n_genie_protons=n_genie_protons+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.2){n_genie_protons_200=n_genie_protons_200+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.3){n_genie_protons_300=n_genie_protons_300+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.4){n_genie_protons_400=n_genie_protons_400+1;}
+
+        //==============================================================
         if (par_pdg->Charge() == 0) continue;
         n_genie_particles_charged ++;
       }
@@ -994,10 +1023,26 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
                                                            mclist[iList]->GetNeutrino().Lepton().Py(),
                                                            mclist[iList]->GetNeutrino().Lepton().Pz()); 
+
+        ubxsec_event->genie_mcpar_W   = mclist[iList]->GetNeutrino().W();
+        ubxsec_event->genie_mcpar_QSqr= mclist[iList]->GetNeutrino().QSqr();
+
+
         ubxsec_event->genie_mult      = n_genie_particles;
         ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-      }
 
+
+        ubxsec_event->ngenie_muons=n_genie_muons;
+        ubxsec_event->ngenie_pipms=n_genie_pipms;
+        ubxsec_event->ngenie_pion0s=n_genie_pion0s;
+        ubxsec_event->ngenie_electrons=n_genie_electrons;
+        ubxsec_event->ngenie_protons=n_genie_protons;
+        ubxsec_event->ngenie_protons_200=n_genie_protons_200;
+        ubxsec_event->ngenie_protons_300=n_genie_protons_300;
+        ubxsec_event->ngenie_protons_400=n_genie_protons_400;
+
+      }
+      
 
       ubxsec_event->nsignal = 0;
       if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
@@ -1012,7 +1057,32 @@ void UBXSec::produce(art::Event & e) {
           ubxsec_event->true_muon_mom = mcp.P();
         }
       }
+      //======================================================================
+      // now begin parsing the largeant4 objects.  
+      art::Handle<std::vector<simb::MCParticle>> mcparticleListHandle;
+      std::vector<art::Ptr<simb::MCParticle>> mcparticlelist;
 
+      if (e.getByLabel("largeant", mcparticleListHandle))
+        art::fill_ptr_vector(mcparticlelist, mcparticleListHandle);
+      std::string parpri("primary");
+   
+      for ( auto mc_geant : mcparticlelist ) {
+        if ( (mc_geant) && (mc_geant->Process()==parpri) && (mc_geant->StatusCode()==1) && (mc_geant->Mother()==0) ) {
+          const auto mc_truth = UBXSecHelper::TrackIDToMCTruth(e, "largeant", mc_geant->TrackId());
+          if (mc_truth->Origin() == simb::kBeamNeutrino) {
+            ubxsec_event->geant_mcpar_pdgcode.emplace_back(mc_geant->PdgCode());;
+            ubxsec_event->geant_mcpar_energy.emplace_back(mc_geant->E());;
+            ubxsec_event->geant_mcpar_px.emplace_back(mc_geant->Px());
+            ubxsec_event->geant_mcpar_py.emplace_back(mc_geant->Py());
+            ubxsec_event->geant_mcpar_pz.emplace_back(mc_geant->Pz());
+            ubxsec_event->geant_mcpar_startx.emplace_back(mc_geant->Vx());
+            ubxsec_event->geant_mcpar_starty.emplace_back(mc_geant->Vy());
+            ubxsec_event->geant_mcpar_startz.emplace_back(mc_geant->Vz());
+            ubxsec_event->geant_mcpar_end_process.emplace_back(mc_geant->EndProcess());
+          }
+        }
+      }
+      //=======================================================================
     }
   }
 

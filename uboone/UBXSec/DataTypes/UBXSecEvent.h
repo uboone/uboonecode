@@ -64,6 +64,43 @@ class UBXSecEvent /*: public TObject*/{
   Double_t        lep_phi; ///< Lepton true Phi angle at start
   Int_t           genie_mult; ///< Number of stable GENIE final state particles
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
+  //add the GENIE variable here
+  Int_t ngenie_muons;
+  Int_t ngenie_protons;
+  Int_t ngenie_electrons;
+  Int_t ngenie_pipms;
+  Int_t ngenie_pion0s;
+  Int_t ngenie_protons_200;
+  Int_t ngenie_protons_300;
+  Int_t ngenie_protons_400;
+  vector<double> genie_mcpar_pdgcode;
+  vector<double> genie_mcpar_energy;
+  vector<double> genie_mcpar_px;
+  vector<double> genie_mcpar_py;
+  vector<double> genie_mcpar_pz;
+  vector<double> genie_mcpar_startx;
+  vector<double> genie_mcpar_starty;
+  vector<double> genie_mcpar_startz;
+  double genie_mcpar_W;
+  double genie_mcpar_QSqr;
+
+  vector<double> geant_mcpar_pdgcode;
+  vector<double> geant_mcpar_energy;
+  vector<double> geant_mcpar_px;
+  vector<double> geant_mcpar_py;
+  vector<double> geant_mcpar_pz;
+  vector<double> geant_mcpar_startx;
+  vector<double> geant_mcpar_starty;
+  vector<double> geant_mcpar_startz;
+  vector<std::string> geant_mcpar_end_process;
+
+  
+
+
+  //add the GEANT4 variable here
+
+
+  
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
   Int_t           selected_slice; ///< The index of the selected slice
