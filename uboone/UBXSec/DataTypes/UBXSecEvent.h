@@ -217,9 +217,9 @@ class UBXSecEvent /*: public TObject*/{
   //G4 variables
 
   //General PFP variables
-  vector<int> num_pfp; //number of pfparticles in the slice
-  vector<int> num_pfp_tracks;//number of pfparticles labelled as tracks
-  vector<int> num_pfp_showers;//number of pfparticles labelled as showers
+  int num_pfp; //number of pfparticles in the slice
+  int num_pfp_tracks;//number of pfparticles labelled as tracks
+  int num_pfp_showers;//number of pfparticles labelled as showers
 
   //PFP Truth variables
 

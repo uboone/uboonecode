@@ -83,6 +83,11 @@ void UBXSecEvent::Init()
   //PFP Truth variables
 
   //Tracks from PFP variables
+  //General PFP variables
+  num_pfp = _default_value;
+  num_pfp_tracks = _default_value;
+  num_pfp_showers = _default_value;
+
 
 
   ResizeVectors(0);
@@ -192,11 +197,8 @@ void UBXSecEvent::ResizeVectors(int vsize) {
 void UBXSecEvent::ResizeCC1mNpVectors(int vsize) {
 
   //Init area for CC1mNp/CC1m2p variables
-
-  //General PFP variables
-  num_pfp.resize(vsize, _default_value);
-  num_pfp_tracks.resize(vsize, _default_value);
-  num_pfp_showers.resize(vsize, _default_value);
+  //Note that the CC1mNp/CC1m2p variables are only recorded for a single slice of the event (the tpcobject that contains the
+  //CC inclusive muon candidate) and only if the muon selection passes
 
   //PFP Truth variables
 

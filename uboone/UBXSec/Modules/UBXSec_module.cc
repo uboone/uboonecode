@@ -1882,6 +1882,8 @@ void UBXSec::produce(art::Event & e) {
     selectionResultVector->emplace_back(std::move(selection_result));
     //util::CreateAssn(*this, e, *selectionResultVector, tpcobj_v, *assnOutSelectionResultTPCObject);
 
+    ubxsec_event->ResizeCC1mNpVectors(0);
+
   } else {
 
     selection_result.SetSelectionStatus(true);
