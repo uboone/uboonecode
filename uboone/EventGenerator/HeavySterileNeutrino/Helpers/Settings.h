@@ -6,6 +6,7 @@ namespace hsngen {
 	typedef struct Settings{
 		bool printHepEvt;
 		double sterileMass;
+    int sterileType;
 		int decayChannel;
 		std::string fluxFile;
 		double distance;

@@ -29,19 +29,22 @@ physics:
   {
     generator:
     {
-      module_type:        "HSNGen"
-      PrintHepEvt:        true
-      SterileMass:        0.300
-      DecayChannel:       2
-      FluxFile:           "/pnfs/uboone/resilient/users/sporzio/HSN_FluxFiles/sterileFlux_m0.300.dat"
-      Distance:           470.
-      GlobalTimeOffset:   3125.
-      BeamWindow:         1600.
-      BoundariesX:        [10,246.35]
-      BoundariesY:        [-105.53,107.47]
-      BoundariesZ:        [10.1,1026.8]
-      GeneratedTimeWindow:  [0,1e10] # Useful if you want to generate HSN in a specific time window, by default every possible timing
-      # GeneratedTimeWindow:  [4725,1e10] # 3125+1600, generate only at the end of Beam window (HSNtrigger only)
+      module_type:                             "HSNGen"
+      PrintHepEvt:                             true
+      SterileMass:                             0.300
+      DecayChannel:                            2
+      FluxFile:                                "/pnfs/uboone/resilient/users/sporzio/HSN_FluxFiles/sterileFlux_m0.300.dat"
+      Distance:                                470.
+      GlobalTimeOffset:                        3125.
+      BeamWindow:                              1600.
+      BoundariesX:                             [10,246.35]
+      BoundariesY:                             [-105.53,107.47]
+      BoundariesZ:                             [10.1,1026.8]
+      MajoranaNeutrino:                        true # If neutrino is majorana, charge-conjugated decays are also generated (e.g. mu-pi+ and mu-pi+). 
+      NonMajorana_NeutrinoDecays:              false
+      NonMajorana_AntiNeutrinoDecays:          false
+      GeneratedTimeWindow:                     [0,1e10] # Useful if you want to generate HSN in a specific time window, by default every possible timing
+      # GeneratedTimeWindow:                   [4725,1e10] # 3125+1600, generate only at the end of Beam window (HSNtrigger only)
     }
 
     rns: { module_type: "RandomNumberSaver" }
