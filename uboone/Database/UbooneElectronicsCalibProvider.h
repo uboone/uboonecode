@@ -49,6 +49,9 @@ namespace lariov {
       /// Reconfigure function called by fhicl constructor
       void Reconfigure(fhicl::ParameterSet const& p);
       
+      /// Update event time stamp.
+      void UpdateTimeStamp(DBTimeStamp_t ts);
+
       /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
       bool Update(DBTimeStamp_t ts);
       
@@ -62,9 +65,19 @@ namespace lariov {
       
     private:
     
+      /// Do actual database updates.
+
+      bool DBUpdate() const;                    // Uses current event time.
+      bool DBUpdate(DBTimeStamp_t ts) const;
+
+      // Time stamps.
+
+      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
+      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
+
       DataSource::ds fDataSource;
           
-      Snapshot<ElectronicsCalib> fData;
+      mutable Snapshot<ElectronicsCalib> fData;
   };
 }//end namespace lariov
 

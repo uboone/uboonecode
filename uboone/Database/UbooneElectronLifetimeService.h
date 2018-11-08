@@ -24,7 +24,7 @@ namespace lariov{
       ~UbooneElectronLifetimeService(){}
       
       void PreProcessEvent(const art::Event& evt) {
-        fProvider.Update( (DBTimeStamp_t)evt.run() );
+        fProvider.UpdateTimeStamp( (DBTimeStamp_t)evt.run() );
       }
      
     private:
