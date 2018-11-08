@@ -88,8 +88,8 @@ namespace lariov {
 
       /// Do actual updates.
 
-      bool DoUpdate() const;                    // Uses current event time.
-      bool DoUpdate(DBTimeStamp_t ts) const;
+      bool DBUpdate() const;                    // Uses current event time.
+      bool DBUpdate(DBTimeStamp_t ts) const;
 
       // Time stamps.
 
