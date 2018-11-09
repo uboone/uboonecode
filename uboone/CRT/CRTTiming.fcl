@@ -1,0 +1,69 @@
+#include "services_microboone.fcl"
+#include "sam_microboone.fcl"
+
+##include "singles_microboone.fcl"
+##include "geometry_microboone.fcl"
+##include "detectorclocks_microboone.fcl"
+##include "pmtconfig_microboone.fcl"
+##include "databaseutil_microboone.fcl"
+##include "sam_microboone.fcl"
+##include "opticaldetectormodules_microboone.fcl"
+##include "flashfilter_microboone.fcl"
+##include "subevent_module.fcl"
+
+events_to_generate: 200
+run_number: 101
+
+services:{
+	 TFileService: { fileName: "CRTTimingPlots.root" }
+}
+
+physics:	
+{
+  analyzers:	
+  {
+    crt:		
+    {			
+      module_type: CRTTiming	
+      data_label_crthit: "crthit"
+      fHardDelay: 40000
+     }
+  }
+
+  producers:
+  {
+  }
+
+  a1: [ crt ]
+  p1: [ ]
+  e1: [ out1, rootout ]
+  end_paths: [ a1 ]
+}
+
+outputs:
+{
+
+ rootout:
+  {
+    module_type: RootOutput
+    fileName: "driver.root"
+    compressionLevel: 0
+    dataTier        : "swizzled"
+  }
+
+  out1:
+  {
+    module_type: FileDumperOutput
+    wantProductFriendlyClassName: true
+  }
+}
+
+source:
+{
+  module_type: RootInput
+}
+
+process_name: CRTTimingPlots
+
+
+

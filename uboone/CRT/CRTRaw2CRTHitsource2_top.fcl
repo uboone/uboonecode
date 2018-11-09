@@ -22,7 +22,13 @@ services:
 	RandomNumberGenerator	: {}
 	FileCatalogMetadata:    @local::art_file_catalog_data
 }
-
+microboone_tfile_metadata:
+{
+  JSONFileName:          "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}
 source:
 {
 	module_type	:CRTRawtoCRTHit
@@ -42,6 +48,7 @@ source:
       	CRTgains_file: "CRTgains-V8.txt"
       	CRTpedestals_file: "CRTpedestals-V8.txt"
 	PartTop_file: "HalfTop-V2.txt"
+  saveTTree: 0
 }
 
 outputs:

@@ -81,6 +81,8 @@ private:
   std::string data_label_hits_;
   std::string data_label_tracks_;
   
+  int saveTTree_;
+  
   //quallity plots for hits//////////////////////
   TH2F* HitDistBot;
   TH2F* HitDistFT;
@@ -95,6 +97,8 @@ private:
   TH2F* FEBvsFEB;
 
   TH1F* hPEShit;
+  TH2F* hEvPerSec;
+  
   //tree variables for hits///////////////////
   TTree*       my_hits_;
   double xtot=-10000., ytot=-10000., ztot=-10000.;
@@ -170,6 +174,8 @@ private:
   int plane1=-1;
   int plane2=-1;
   
+  long first_sec = 0;
+  
 
 };
 
@@ -183,6 +189,7 @@ crt::CRTAnalyser::CRTAnalyser(fhicl::ParameterSet const & p)
   //numberOfevents_ = p.get<int>("Number_of_Events");
   data_label_hits_ = p.get<std::string>("data_label_hits");
   data_label_tracks_ = p.get<std::string>("data_label_tracks");
+  saveTTree_ = p.get<int>("saveTTree");
 
 }
 
@@ -195,28 +202,29 @@ void crt::CRTAnalyser::analyze(art::Event const & evt)
   int hits_valid=1;
   //check to make sure the data we asked for is valid                                                                                                      
   if(!rawHandle_hits.isValid()){
-    std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
+    /*std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
               << ", event " << evt.event() << " has " << "\033[31m" << "zero" << "\033[0m"
               << " CRTHits " << " in module " << data_label_hits_ << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl;*/
     hits_valid=0;
     //return;
   }
   if(hits_valid!=0){
     //get better access to the data               
     std::vector<crt::CRTHit> const& CRTHitCollection(*rawHandle_hits);
-    if(rawHandle_hits.isValid()){
+    /*if(rawHandle_hits.isValid()){
       std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
                 << ", event " << evt.event() << " has " << "\033[32m" << CRTHitCollection.size() << "\033[0m"
                 << " CRTHits " << " in module " << data_label_hits_ << std::endl;
      // std::cout << std::endl;
      //return;
-    }
+    }*/
     for(std::vector<int>::size_type i = 0; i != CRTHitCollection.size(); i++) {//A 
 
       feb_id1=CRTHitCollection[i].feb_id[0];
       feb_id2=CRTHitCollection[i].feb_id[1];
       
+      if (first_sec < 1e6) first_sec = CRTHitCollection[i].ts0_s;
       //event_flag=CRTHitCollection[i].event_flag;
       
       //lostcpu1=CRTHitCollection[i].lostcpu_map.find(CRTHitCollection[i].feb_id[0])->second;
@@ -242,8 +250,11 @@ void crt::CRTAnalyser::analyze(art::Event const & evt)
       yerr = CRTHitCollection[i].y_err;
       ztot = CRTHitCollection[i].z_pos;
       zerr = CRTHitCollection[i].z_err;
-
-      my_hits_->Fill();
+      
+      hEvPerSec->Fill(hit_time_s-first_sec, feb_id1);
+      hEvPerSec->Fill(hit_time_s-first_sec, feb_id2);
+      
+      if(saveTTree_ == 1) my_hits_->Fill();
 
       hPEShit->Fill(peshit);
       FEBvsFEB->Fill(feb_id1,feb_id2);
@@ -264,23 +275,23 @@ void crt::CRTAnalyser::analyze(art::Event const & evt)
   int tracks_valid=1;
   //check to make sure the data we asked for is valid                                                                                                      
   if(!rawHandle_tracks.isValid()){
-    std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
-              << ", event " << evt.event() << " has " << "\033[31m" << "zero" << "\033[0m"
-              << " CRTTracks " << " in module " << data_label_tracks_ << std::endl;
-    std::cout << std::endl;
+    //std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
+    //          << ", event " << evt.event() << " has " << "\033[31m" << "zero" << "\033[0m"
+    //          << " CRTTracks " << " in module " << data_label_tracks_ << std::endl;
+    //std::cout << std::endl;
     tracks_valid=0;
     //return;
   }
   //get better access to the data   
   if(tracks_valid!=0){
     std::vector<crt::CRTTrack> const& CRTTrackCollection(*rawHandle_tracks);
-    if(rawHandle_tracks.isValid()){
+    /*if(rawHandle_tracks.isValid()){
       std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
                 << ", event " << evt.event() << " has " << "\033[32m" << CRTTrackCollection.size() << "\033[0m"
                 << " CRTTracks " << " in module " << data_label_tracks_ << std::endl;
       //std::cout << std::endl;
       //return;
-    }
+    }*/
     for(std::vector<int>::size_type i = 0; i != CRTTrackCollection.size(); i++) {//A 
       feb_id01 = CRTTrackCollection[i].feb_id[0];
       feb_id02 = CRTTrackCollection[i].feb_id[1];
@@ -361,7 +372,7 @@ void crt::CRTAnalyser::analyze(art::Event const & evt)
       //plane2;
       pestrack = CRTTrackCollection[i].peshit;
 
-      my_tracks_->Fill();
+      if(saveTTree_ == 1) my_tracks_->Fill();
 
     }
   }
@@ -446,6 +457,12 @@ void crt::CRTAnalyser::initialize_hits()
   hPEShit = tfs->make<TH1F>("hPEShit","PEShit",500,0,500);
   hPEShit->GetXaxis()->SetTitle(" peshit");
   hPEShit->GetYaxis()->SetTitle("Entries/bin");
+  
+  hEvPerSec = tfs->make<TH2F>("hEvPerSec","Events per second",14400,0,14400,200,0,200);
+  hEvPerSec->GetXaxis()->SetTitle("Time [sec]");
+  hEvPerSec->GetYaxis()->SetTitle("FEB ID");
+  hEvPerSec->GetZaxis()->SetTitle("Entries/bin");
+  hEvPerSec->SetOption("COLZ");
   // hit stuff ends here ////////////////////////////////////////////////////////////////////////
 }
 

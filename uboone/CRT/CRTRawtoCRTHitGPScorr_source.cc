@@ -248,6 +248,7 @@ private:
   int WhichHalf_;
   int TopPart_;
   int AddTs0Offset_;
+  int saveTTree_;
   //int AddTs1Offset_;
   //int GPSCorrection_; // =0 correction from matched triggers, =1 correction with CRT NTP deviation
   //pair_builder ends stuff here////////////////////////////////////////////////////////////////////
@@ -377,7 +378,7 @@ crt::CRTRawInputDetail::CRTRawInputDetail(fhicl::ParameterSet const & ps,
   //if(GPSCorrection_==0) CRT_GPS_correction_= ps.get<std::string>("CRT_GPS_correction");
   CRT_GPS_correction_= ps.get<std::string>("CRT_GPS_correction");
   AddTs0Offset_ = ps.get<int>("AddTs0Offset");
-  //AddTs1Offset_ = ps.get<int>("AddTs1Offset");
+  saveTTree_ = ps.get<int>("saveTTree");
 }
 
 
@@ -1554,7 +1555,7 @@ void crt::CRTRawInputDetail::make2DHit(){
     if(plane==1){HitDistFT->Fill(ztot, ytot);}
     if(plane==2){HitDistPipe->Fill(ztot, ytot);}
     if(plane==3){HitDistTop->Fill(ztot,xtot);}        
-     my_tree_->Fill();
+    if(saveTTree_ == 1) my_tree_->Fill();
     //quality plot
 
 		if(verbose_!=0){

@@ -27,6 +27,7 @@ art_make( BASENAME_ONLY
 	CRTRawtoCRTHit_source.cc
 	CRTRawtoCRTHitGPScorr_source.cc
 	CRTAnalyser_module.cc	
+	CRTTiming_module.cc
     LIBRARY_NAME  
         CRTData
     LIB_LIBRARIES
@@ -223,6 +224,14 @@ simple_plugin(CRTRawtoCRTHitGPScorr "source"
           ${ROOT_BASIC_LIB_LIST} )
 
 simple_plugin(CRTAnalyser "module"
+            CRT
+          bernfebdaq-core_Overlays
+          art_Framework_Services_Optional
+          art_Framework_Services_Registry
+          art_Framework_Services_Optional_TFileService_service
+          ${ROOT_BASIC_LIB_LIST} )
+
+simple_plugin(CRTTiming "module"
             CRT
           bernfebdaq-core_Overlays
           art_Framework_Services_Optional
