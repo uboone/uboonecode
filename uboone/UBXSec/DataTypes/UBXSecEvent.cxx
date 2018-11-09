@@ -124,7 +124,7 @@ void UBXSecEvent::Init()
 
   ResizeVectors(0);
   
-  ResizeCC1mNpVectors(0);
+  ResizeCC1mNpPFPTrackVectors(0);
 
 }
 
@@ -226,7 +226,7 @@ void UBXSecEvent::ResizeVectors(int vsize) {
 
 }
 
-void UBXSecEvent::ResizeCC1mNpVectors(int vsize) {
+void UBXSecEvent::ResizeCC1mNpPFPTrackVectors(int vsize) {
 
   //Init area for CC1mNp/CC1m2p variables
   //Note that the CC1mNp/CC1m2p variables are only recorded for a single slice of the event (the tpcobject that contains the
@@ -234,7 +234,31 @@ void UBXSecEvent::ResizeCC1mNpVectors(int vsize) {
 
   //PFP Truth variables
 
+  pfp_isShower.resize(vsize, _default_value);
+  pfp_isTrack.resize(vsize, _default_value);
+  pfp_isPrimary.resize(vsize, _default_value);
+  pfp_ndaughters.resize(vsize, _default_value);
+  pfp_pdg.resize(vsize, _default_value);
+  pfp_origin.resize(vsize, _default_value);
+  pfp_status.resize(vsize, _default_value);
+  pfp_parId.resize(vsize, _default_value);
+  pfp_theta.resize(vsize, _default_value);
+  pfp_costheta.resize(vsize, _default_value);
+  pfp_phi.resize(vsize, _default_value);
+  pfp_mom.resize(vsize, _default_value);
+  pfp_startx.resize(vsize, _default_value);
+  pfp_starty.resize(vsize, _default_value);
+  pfp_startz.resize(vsize, _default_value);
+  pfp_endx.resize(vsize, _default_value);
+  pfp_endy.resize(vsize, _default_value);
+  pfp_endz.resize(vsize, _default_value);
+  pfp_endE.resize(vsize, _default_value);
+  pfp_KE.resize(vsize, _default_value);
+  pfp_Mass.resize(vsize, _default_value);
+
+
   //Tracks from PFP variables
+  track_pfp_ismuoncandidate.resize(vsize, _default_value);
   track_pfp_istrack.resize(vsize, _default_value); //boolean of whether Pandora thought it was a track
   track_pfp_isshower.resize(vsize, _default_value); //boolean of whether Pandora thought it was a shower
   track_pfp_upflag.resize(vsize, _default_value); //value returned by MIPConsistency() function for the track
@@ -256,7 +280,7 @@ void UBXSecEvent::ResizeCC1mNpVectors(int vsize) {
   track_pfp_trunmeandqdx_U.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
   track_pfp_trunmeandqdx_V.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
 
-  track_pfp_pida.resize(vsize, _default_value); //pida value of the track associated with the PFP in the collection
+  //track_pfp_pida.resize(vsize, _default_value); //pida value of the track associated with the PFP in the collection
   track_pfp_newpid_pida.resize(vsize, _default_value); //pida from ParticleID module value of the track associated with the PFP in the collection
   track_pfp_chi2_proton.resize(vsize, _default_value); //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
   track_pfp_chi2_kaon.resize(vsize, _default_value); //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection

@@ -64,6 +64,7 @@ class UBXSecEvent /*: public TObject*/{
   Double_t        lep_phi; ///< Lepton true Phi angle at start
   Int_t           genie_mult; ///< Number of stable GENIE final state particles
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
+
   //add the GENIE variable here
   Int_t ngenie_muons;
   Int_t ngenie_protons;
@@ -84,6 +85,8 @@ class UBXSecEvent /*: public TObject*/{
   double genie_mcpar_W;
   double genie_mcpar_QSqr;
 
+  //add the GEANT4 variable here
+
   vector<double> geant_mcpar_pdgcode;
   vector<double> geant_mcpar_energy;
   vector<double> geant_mcpar_px;
@@ -93,12 +96,6 @@ class UBXSecEvent /*: public TObject*/{
   vector<double> geant_mcpar_starty;
   vector<double> geant_mcpar_startz;
   vector<std::string> geant_mcpar_end_process;
-
-  
-
-
-  //add the GEANT4 variable here
-
 
   
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
@@ -249,10 +246,6 @@ class UBXSecEvent /*: public TObject*/{
 
   //Init area for CC1mNp/CC1m2p variables
 
-  //GENIE variables
-
-  //G4 variables
-
   //General PFP variables
   int num_pfp; //number of pfparticles in the slice
   int num_pfp_tracks;//number of pfparticles labelled as tracks
@@ -260,7 +253,30 @@ class UBXSecEvent /*: public TObject*/{
 
   //PFP Truth variables
 
+  std::vector<bool> pfp_isShower;
+  std::vector<bool> pfp_isTrack;
+  std::vector<bool> pfp_isPrimary;
+  std::vector<int> pfp_ndaughters;
+  std::vector<int> pfp_pdg;
+  std::vector<int> pfp_origin;
+  std::vector<int> pfp_status;
+  std::vector<int> pfp_parId;
+  std::vector<float> pfp_theta;
+  std::vector<float> pfp_costheta;
+  std::vector<float> pfp_phi;
+  std::vector<float> pfp_mom;
+  std::vector<float> pfp_startx;
+  std::vector<float> pfp_starty;
+  std::vector<float> pfp_startz;
+  std::vector<float> pfp_endx;
+  std::vector<float> pfp_endy;
+  std::vector<float> pfp_endz;
+  std::vector<float> pfp_endE;
+  std::vector<float> pfp_KE;
+  std::vector<float> pfp_Mass;  
+
   //Tracks from PFP variables
+  vector<bool> track_pfp_ismuoncandidate;
   vector<bool> track_pfp_istrack; //boolean of whether Pandora thought it was a track
   vector<bool> track_pfp_isshower; //boolean of whether Pandora thought it was a shower
   vector<bool> track_pfp_upflag; //value returned by MIPConsistency() function for the track
@@ -282,7 +298,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<float> track_pfp_trunmeandqdx_U; //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
   vector<float> track_pfp_trunmeandqdx_V; //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
 
-  vector<float> track_pfp_pida; //pida value of the track associated with the PFP in the collection
+  //vector<float> track_pfp_pida; //pida value of the track associated with the PFP in the collection
   vector<float> track_pfp_newpid_pida; //pida from ParticleID module value of the track associated with the PFP in the collection
   vector<float> track_pfp_chi2_proton; //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
   vector<float> track_pfp_chi2_kaon; //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
@@ -304,7 +320,7 @@ class UBXSecEvent /*: public TObject*/{
   virtual ~UBXSecEvent();
   void Init();
   void ResizeVectors(int); 
-  void ResizeCC1mNpVectors(int); 
+  void ResizeCC1mNpPFPTrackVectors(int); 
   void ResizeGenieTruthVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
