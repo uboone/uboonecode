@@ -139,7 +139,7 @@ namespace lariov {
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
       
-      mf::LogInfo("SIOVElectronicsCalibProvider") << "SIOVElectronicsCalibProvider::DBUpdate called with new timestamp.";
+      mf::LogInfo("UbooneElectronLifetimeProvider") << "UbooneElectronLifetimeProvider::DBUpdate called with new timestamp.";
 
       fCurrentTimeStamp = ts;     
 
