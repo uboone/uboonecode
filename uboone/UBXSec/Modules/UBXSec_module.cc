@@ -105,6 +105,9 @@
 
 #include "larreco/RecoAlg/TrackMomentumCalculator.h"
 
+//this is included for some of the summer2018 PID functions
+//#include "uboone/ParticleID/Algorithms/uB_PlaneIDBitsetHelperFunctions.h"
+
 // Root include
 #include "TString.h"
 #include "TTree.h"
