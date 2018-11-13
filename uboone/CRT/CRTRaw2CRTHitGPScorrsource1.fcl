@@ -17,7 +17,7 @@ process_name: CRTRawtoCRTHitGPScorr
 
 services:
 {
-	TFileService		: { fileName: "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root" }
+	TFileService		: { fileName: "CRTRawtoCRTHit_QP.root" }
 	TimeTracker		: {}
 	RandomNumberGenerator	: {}
 	FileCatalogMetadata:    @local::art_file_catalog_data
@@ -25,7 +25,7 @@ services:
 
 microboone_tfile_metadata:
 {
-  JSONFileName:          "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root.json"
+  JSONFileName:          "CRTRawtoCRTHit_QP.root.json"
   GenerateTFileMetadata: true
   dataTier:              "root-tuple"
   fileFormat:            "root"

@@ -17,9 +17,17 @@ process_name: CRTRawtoCRTHit
 
 services:
 {
-	TFileService		: { fileName: "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root" }
+	TFileService		: { fileName: "CRTRawtoCRTHit_QP.root" }
 	TimeTracker		: {}
 	RandomNumberGenerator	: {}
+}
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "CRTRawtoCRTHit_QP.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
 }
 
 source:
