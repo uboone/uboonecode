@@ -7,7 +7,7 @@
 // art/LArSoft libraries
 #include "cetlib/exception.h"
 #include "larcore/Geometry/Geometry.h"
-
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include <fstream>
 
@@ -15,7 +15,9 @@ namespace lariov {
 
   //constructor      
   UbooneElectronicsCalibProvider::UbooneElectronicsCalibProvider(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {	
+    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
+    fEventTimeStamp(0),
+    fCurrentTimeStamp(0) {
     
     this->Reconfigure(p);
   }
@@ -110,45 +112,79 @@ namespace lariov {
     }
   }
 
+  // This method saves the time stamp of the latest event.
+
+  void UbooneElectronicsCalibProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("UbooneElectronicsCalibProvider") << "UbooneElectronicsCalibProvider::UpdateTimeStamp called.";
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool UbooneElectronicsCalibProvider::Update(DBTimeStamp_t ts) {
     
-    if (fDataSource != DataSource::Database) return false;
+    fEventTimeStamp = ts;
+    return DBUpdate(ts);
+  }
+
+  // Maybe update method cached data (private const version using current event time).
+
+  bool UbooneElectronicsCalibProvider::DBUpdate() const {
+    return DBUpdate(fEventTimeStamp);
+  }
+
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data from database.
+
+  bool UbooneElectronicsCalibProvider::DBUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
+
+      mf::LogInfo("UbooneElectronicsCalibProvider") << "UbooneElectronicsCalibProvider::DBUpdate called with new timestamp.";
+
+      fCurrentTimeStamp = ts;     
+
+      // Call non-const base class method.
+
+      result = const_cast<UbooneElectronicsCalibProvider*>(this)->UpdateFolder(ts);
+      if(result) {
+	//DBFolder was updated, so now update the Snapshot
+	fData.Clear();
+	fData.SetIoV(this->Begin(), this->End());
+
+	std::vector<DBChannelID_t> channels;
+	fFolder->GetChannelList(channels);
+	for (auto it = channels.begin(); it != channels.end(); ++it) {
+
+	  double gain, gain_err, shaping_time, shaping_time_err;
+	  bool is_misconfigured;
+	  fFolder->GetNamedChannelData(*it, "gain",     gain);
+	  fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
+	  fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
+	  fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
+	  fFolder->GetNamedChannelData(*it, "is_misconfigured", is_misconfigured);
       
-    if (!this->UpdateFolder(ts)) return false;
-
-    //DBFolder was updated, so now update the Snapshot
-    fData.Clear();
-    fData.SetIoV(this->Begin(), this->End());
-
-    std::vector<DBChannelID_t> channels;
-    fFolder->GetChannelList(channels);
-    for (auto it = channels.begin(); it != channels.end(); ++it) {
-
-      double gain, gain_err, shaping_time, shaping_time_err;
-      bool is_misconfigured;
-      fFolder->GetNamedChannelData(*it, "gain",     gain);
-      fFolder->GetNamedChannelData(*it, "gain_err", gain_err); 
-      fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
-      fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err); 
-      fFolder->GetNamedChannelData(*it, "is_misconfigured", is_misconfigured);
+	  ElectronicsCalib pg(*it);
+	  CalibrationExtraInfo extra_info("ElectronicsCalib");
+	  extra_info.AddOrReplaceBoolData("is_misconfigured", is_misconfigured);
       
-      ElectronicsCalib pg(*it);
-      CalibrationExtraInfo extra_info("ElectronicsCalib");
-      extra_info.AddOrReplaceBoolData("is_misconfigured", is_misconfigured);
-      
-      pg.SetGain( (float)gain );
-      pg.SetGainErr( (float)gain_err );
-      pg.SetShapingTime( (float)shaping_time );
-      pg.SetShapingTimeErr( (float)shaping_time_err );
-      pg.SetExtraInfo(extra_info);
+	  pg.SetGain( (float)gain );
+	  pg.SetGainErr( (float)gain_err );
+	  pg.SetShapingTime( (float)shaping_time );
+	  pg.SetShapingTimeErr( (float)shaping_time_err );
+	  pg.SetExtraInfo(extra_info);
 
-      fData.AddOrReplaceRow(pg);
+	  fData.AddOrReplaceRow(pg);
+	}
+      }
     }
 
-    return true;
+    return result;
   }
   
   const ElectronicsCalib& UbooneElectronicsCalibProvider::ElectronicsCalibObject(DBChannelID_t ch) const { 
+    DBUpdate();
     return fData.GetRow(ch);
   }
       

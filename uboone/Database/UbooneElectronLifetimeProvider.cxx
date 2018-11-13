@@ -6,6 +6,7 @@
 
 // art/LArSoft libraries
 #include "cetlib/exception.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 //C/C++
 #include <fstream>
@@ -17,6 +18,8 @@ namespace lariov {
       			      			   const std::string& url, 
 			      			   const std::string& tag /*=""*/) : 
     DatabaseRetrievalAlg(foldername, url, tag),
+    fEventTimeStamp(0),
+    fCurrentTimeStamp(0),
     fDataSource(DataSource::Database) {
     
     fData.Clear();
@@ -107,35 +110,68 @@ namespace lariov {
   }
 
 
+  // This method saves the time stamp of the latest event.
+
+  void UbooneElectronLifetimeProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+    mf::LogInfo("UbooneElectronLifetimeProvider") << "UbooneElectronLifetimeProvider::UpdateTimeStamp called.";
+    fEventTimeStamp = ts;
+  }
+
+  // Maybe update method cached data (public non-const version).
+
   bool UbooneElectronLifetimeProvider::Update(DBTimeStamp_t ts) {
     
-    if (fDataSource != DataSource::Database) return false;
+    fEventTimeStamp = ts;
+    return DBUpdate(ts);
+  }
+
+  // Maybe update method cached data (private const version using current event time).
+
+  bool UbooneElectronLifetimeProvider::DBUpdate() const {
+    return DBUpdate(fEventTimeStamp);
+  }
+
+  // Maybe update method cached data (private const version).
+  // This is the function that does the actual work of updating data from database.
+
+  bool UbooneElectronLifetimeProvider::DBUpdate(DBTimeStamp_t ts) const {
+
+    bool result = false;
+    if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
       
-    if (!this->UpdateFolder(ts)) return false;
+      mf::LogInfo("UbooneElectronLifetimeProvider") << "UbooneElectronLifetimeProvider::DBUpdate called with new timestamp.";
 
-    //DBFolder was updated, so now update the Snapshot
-    fData.Clear();
-    fData.SetIoV(this->Begin(), this->End());
+      fCurrentTimeStamp = ts;     
 
-    double exp_offset, exp_offset_err, time_constant, time_constant_err;
-    fFolder->GetNamedChannelData(fLifetimeChannel, "exponential_offset",     exp_offset);
-    fFolder->GetNamedChannelData(fLifetimeChannel, "time_constant",          time_constant);
-    fFolder->GetNamedChannelData(fLifetimeChannel, "err_exponential_offset", exp_offset_err);
-    fFolder->GetNamedChannelData(fLifetimeChannel, "err_time_constant",      time_constant_err);
+      // Call non-const base class method.
 
-    ElectronLifetimeContainer pd(fLifetimeChannel);
-    pd.SetExpOffset( (float)exp_offset );
-    pd.SetTimeConstant( (float)time_constant );
-    pd.SetExpOffsetErr( (float)exp_offset_err );
-    pd.SetTimeConstantErr( (float)time_constant_err );
+      result = const_cast<UbooneElectronLifetimeProvider*>(this)->UpdateFolder(ts);
+      if(result) {
+	//DBFolder was updated, so now update the Snapshot
+	fData.Clear();
+	fData.SetIoV(this->Begin(), this->End());
 
-    fData.AddOrReplaceRow(pd);
+	double exp_offset, exp_offset_err, time_constant, time_constant_err;
+	fFolder->GetNamedChannelData(fLifetimeChannel, "exponential_offset",     exp_offset);
+	fFolder->GetNamedChannelData(fLifetimeChannel, "time_constant",          time_constant);
+	fFolder->GetNamedChannelData(fLifetimeChannel, "err_exponential_offset", exp_offset_err);
+	fFolder->GetNamedChannelData(fLifetimeChannel, "err_time_constant",      time_constant_err);
 
-    return true;
+	ElectronLifetimeContainer pd(fLifetimeChannel);
+	pd.SetExpOffset( (float)exp_offset );
+	pd.SetTimeConstant( (float)time_constant );
+	pd.SetExpOffsetErr( (float)exp_offset_err );
+	pd.SetTimeConstantErr( (float)time_constant_err );
 
+	fData.AddOrReplaceRow(pd);
+      }
+    }
+
+    return result;
   }
   
   const ElectronLifetimeContainer& UbooneElectronLifetimeProvider::LifetimeContainer() const {     
+    DBUpdate();
     return fData.GetRow(fLifetimeChannel);
   }
   

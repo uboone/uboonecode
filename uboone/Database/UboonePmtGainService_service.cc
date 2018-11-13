@@ -57,7 +57,7 @@ namespace lariov{
   
   void UboonePmtGainService::PreProcessEvent(const art::Event& evt) {
     
-    fProvider.Update( fHelper.GetTimeStamp(evt, "PMT Gain") );
+    fProvider.UpdateTimeStamp( fHelper.GetTimeStamp(evt, "PMT Gain") );
   } 
   
 }//end namespace lariov

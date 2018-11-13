@@ -55,9 +55,9 @@ namespace lariov{
   void UbooneDetPedestalService::PreProcessEvent(const art::Event& evt) {
     
     if (evt.isRealData() && evt.run() < 183) {
-      fProvider.Update(1430000000000000000);
+      fProvider.UpdateTimeStamp(1430000000000000000);
     }
-    else fProvider.Update(fHelper.GetTimeStamp(evt, "Detector Pedestals"));
+    else fProvider.UpdateTimeStamp(fHelper.GetTimeStamp(evt, "Detector Pedestals"));
   }
     
 }//end namespace lariov

@@ -8,6 +8,8 @@ art_make( BASENAME_ONLY
 			larevt_CalibrationDBI_Providers
 			larcore_Geometry
 			${LIBWDA}
+                        ${MF_MESSAGELOGGER}
+                        ${MF_UTILITIES}
 	                ${FHICLCPP}
 			${CETLIB}
                         ${Boost_SYSTEM_LIBRARY}

@@ -56,7 +56,7 @@ namespace lariov{
   
   void UbooneElectronicsCalibService::PreProcessEvent(const art::Event& evt) {
     
-    fProvider.Update( fHelper.GetTimeStamp(evt, "ASIC Calibrations") );
+    fProvider.UpdateTimeStamp( fHelper.GetTimeStamp(evt, "ASIC Calibrations") );
   } 
 
 }//end namespace lariov

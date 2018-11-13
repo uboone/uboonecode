@@ -56,7 +56,7 @@ namespace lariov{
   
   void UbooneTPCEnergyCalibService::PreProcessEvent(const art::Event& evt) {
     
-    fProvider.Update( fHelper.GetTimeStamp(evt, "TPC Energy Calibrations") );
+    fProvider.UpdateTimeStamp( fHelper.GetTimeStamp(evt, "TPC Energy Calibrations") );
   } 
 
 }//end namespace lariov
