@@ -840,7 +840,7 @@ microboone_reco_mcc8_producers.pandoracalipid.CalorimetryModuleLabel:           
 microboone_reco_mcc8_producers.pandoracalipid.Chi2PIDAlg.UseMedian:                                            true
 
 microboone_reco_mcc8_producers.pandoraTrackcalo.TrackModuleLabel:                                              "pandoraTrack"
-microboone_reco_mcc8_producers.pandoraTrackcalo.SpacePointModuleLabel:                                         "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraTrackcalo.SpacePointModuleLabel:                                         "pandora"
 
 microboone_reco_mcc8_producers.pandoraTrackpid.CalorimetryModuleLabel:                                         "pandoraTrackcalo"
 microboone_reco_mcc8_producers.pandoraTrackpid.TrackModuleLabel:                                               "pandoraTrack"
