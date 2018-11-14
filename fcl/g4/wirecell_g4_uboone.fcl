@@ -1,6 +1,5 @@
 #include "services_microboone.fcl"
 #include "largeantmodules_microboone.fcl"
-#include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
 process_name: G4EDep
@@ -43,13 +42,12 @@ physics:
                  EDepTag:     "largeant:TPCActive"
                  MakeAnaTree: false
                }
-    mcreco:    @local::standard_mcreco
     rns:       { module_type: "RandomNumberSaver" }
  }
 
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, largeant, ionization, mcreco ] #drift, mcreco ]
+ simulate: [ rns, largeant, ionization ] #drift, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -83,13 +81,10 @@ services.LArG4Parameters.FillSimEnergyDeposits:       true
 #services.LArG4Parameters.NoElectronPropagation:       true
 services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 
-# Switching to the "drift" for SimChannels
-#physics.producers.mcreco.G4ModName:                   "drift"
+
 
 physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
-physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
-                                                      1000010020,1000010030,1000020030,1000020040]
-physics.producers.mcreco.G4ModName: "driftWC:simpleSC"
+
 
 services.SpaceCharge.EnableSimSpatialSCE:          true
 services.SpaceCharge.EnableSimEfieldSCE:           true

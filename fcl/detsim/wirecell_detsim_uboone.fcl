@@ -4,6 +4,7 @@
 #include "opticaldetectorsim_microboone.fcl"
 #include "time_memory_tracker_microboone.fcl"
 #include "swtrigger_microboone.fcl"
+#include "mcreco.fcl"
 #include "wcls.fcl"
 
 process_name: Detsim
@@ -44,6 +45,7 @@ physics:
    pmtreadout:     @local::microboone_optical_dram_readout_sim
    #daq:            @local::microboone_simwire
    driftWC:        @local::wcls.driftsim
+    mcreco:    @local::standard_mcreco
    rns:            { module_type: "RandomNumberSaver" }
  }
 
@@ -52,7 +54,7 @@ physics:
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
  #simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, daq, driftWC, swtrigger ]
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, driftWC, swtrigger ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, driftWC, mcreco, swtrigger ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -89,3 +91,8 @@ services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
 
+# Switching to the "drift" for SimChannels
+#physics.producers.mcreco.G4ModName:                   "drift"
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
+                                                      1000010020,1000010030,1000020030,1000020040]
+physics.producers.mcreco.G4ModName: "driftWC:simpleSC"
