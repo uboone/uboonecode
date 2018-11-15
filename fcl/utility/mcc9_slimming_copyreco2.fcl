@@ -1,6 +1,6 @@
 #include "services_microboone.fcl"
 
-process_name: SlimAndCopy
+process_name: SlimCopy
 
 services:
 {
@@ -31,6 +31,7 @@ outputs:
  {
    module_type: RootOutput
    fileName:    "%ifb_%tc_slimmed.root" #default file name, can override from command line with -o or --output
+   streamName: "slim"
    dataTier:    "reconstructed"
    outputCommands: ["keep *_*_*_*",  
                     "drop recob::Wires_*nfspl1_*_*",
@@ -53,7 +54,8 @@ outputs:
  out2:
  {
    module_type: RootOutput
-   fileName:    "%ifb.root" #default file name, can override from command line with -o or --output
+   streamName: "fat"
+   fileName:    "%ifb_%tc.root" #default file name, can override from command line with -o or --output
    dataTier:    "reconstructed"
    outputCommands: ["keep *_*_*_*"]
    compressionLevel: 1
