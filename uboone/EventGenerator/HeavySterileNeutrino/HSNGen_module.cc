@@ -106,6 +106,8 @@ namespace hsngen
     bool fMajoranaNeutrino;
     bool fNonMajorana_NeutrinoDecays;
     bool fNonMajorana_AntiNeutrinoDecays;
+    bool fGenerateSingleParticle;
+    int fSingleParticlePdgCode;
 
     // Analysis variables
     Settings gSett;
@@ -139,7 +141,9 @@ namespace hsngen
     fGeneratedTimeWindow(p.get<std::vector<double>>("GeneratedTimeWindow")),
     fMajoranaNeutrino(p.get<bool>("MajoranaNeutrino")),
     fNonMajorana_NeutrinoDecays(p.get<bool>("NonMajorana_NeutrinoDecays")),
-    fNonMajorana_AntiNeutrinoDecays(p.get<bool>("NonMajorana_AntiNeutrinoDecays"))
+    fNonMajorana_AntiNeutrinoDecays(p.get<bool>("NonMajorana_AntiNeutrinoDecays")),
+    fGenerateSingleParticle(p.get<bool>("GenerateSingleParticle")),
+    fSingleParticlePdgCode(p.get<int>("SingleParticlePdgCode"))
   {
     // Create a default random engine; obtain the random seed from NuRandomService,
     // Unless overridden in configuration with key "Seed"
@@ -293,8 +297,16 @@ namespace hsngen
     TLorentzVector mom2(obs.P2[0],obs.P2[1],obs.P2[2],obs.E2);
     p1.AddTrajectoryPoint(pos,mom1);
     p2.AddTrajectoryPoint(pos,mom2);
-    truth.Add(p1);
-    truth.Add(p2);
+    if(!fGenerateSingleParticle)
+    {
+      truth.Add(p1);
+      truth.Add(p2);
+    }
+    else
+    {
+      if(p1.PdgCode()==fSingleParticlePdgCode) truth.Add(p1);
+      if(p2.PdgCode()==fSingleParticlePdgCode) truth.Add(p2);
+    }
     truthcol->push_back(truth);
     evt.put(std::move(truthcol));
 
