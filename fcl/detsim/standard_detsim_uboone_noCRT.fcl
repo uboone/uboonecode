@@ -4,9 +4,6 @@
 #include "opticaldetectorsim_microboone.fcl"
 #include "time_memory_tracker_microboone.fcl"
 #include "swtrigger_microboone.fcl"
-#include "wcls.fcl"
-#include "microboone_crt_detsim.fcl"
-#include "crtsimhitproducer.fcl"
 
 process_name: Detsim
 
@@ -44,10 +41,7 @@ physics:
    optfem:         @local::microboone_optical_fem_sim
    triggersim:     @local::ubtrigger_dark_bnb
    pmtreadout:     @local::microboone_optical_dram_readout_sim
-   #daq:            @local::microboone_simwire
-   driftWC:        @local::wcls.driftsim
-   crtdetsim:    @local::microboone_crtdetsim_binary
-   crthitsim:    @local::crtsimhitproducer_binary
+   daq:            @local::microboone_simwire
    rns:            { module_type: "RandomNumberSaver" }
  }
 
@@ -55,8 +49,7 @@ physics:
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- #simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, daq, driftWC, swtrigger ]
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, driftWC, swtrigger, crtdetsim, crthitsim ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, daq, swtrigger ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
