@@ -50,3 +50,6 @@ do
   fi
 done
 
+# Done (success).
+
+rm *.root   # Clean up.

@@ -1,6 +1,6 @@
-#include "reco_uboone_data_mcc9_driver_common.fcl"
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
-process_name: DataRecoStage1
+process_name: DataRecoStage1Test
 
 services.TFileService.fileName: "reco_stage_1_hist.root"
 physics.reco:                   [ @sequence::microboone_reco_data_stage1 ]
@@ -16,7 +16,6 @@ source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*Reco*" ]
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
-
 
 microboone_tfile_metadata:
 {

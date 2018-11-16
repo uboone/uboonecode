@@ -5,9 +5,10 @@ process_name: DLprod
 
 services:
 {
+  TFileService: { fileName: "larcv_hist.root" }
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   TimeTracker:  {}
-  MemoryTracker:     {}
+  MemoryTracker:     {} # default is one
   message:      @local::microboone_message_services_prod_debug
   FileCatalogMetadata:  @local::art_file_catalog_data
   LLMetaMaker:       {Enable: false}
@@ -25,11 +26,29 @@ source:
   maxEvents:  10        # Number of events to create
 }
 
+#output the artroot file
+outputs:
+{
+    out:
+        {
+        module_type: RootOutput
+        fileName:    "%ifb_postdlmc.root"
+        dataTier:    "reconstructed"
+        compressionLevel: 1
+        }
+}
+
 # Add larcv analyzer modules.
 
-physics.analyzers:  {
-		    @table::dlprod_analyzers
-		    }
+physics:{
+
+    analyzers:{
+        @table::dlprod_analyzers
+         }
+
+    stream1: [out]
+
+    }
 physics.analyzers.superaWholeView.out_filename: "larcv_wholeview.root"
 
 # Define larcv analyzer sequence.
@@ -38,7 +57,7 @@ physics.larcv: [ opreco, gaushitMCinfoBacktracker, superaWholeView ]
 
 # Add larcv sequence to end_paths.
 
-physics.end_paths: [ larcv ]
+physics.end_paths: [ larcv, stream1]
 
 # Configuration for TFileMetadataMicroBooNE service.
 

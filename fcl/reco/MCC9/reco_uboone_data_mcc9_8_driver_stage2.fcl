@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_driver_common.fcl"
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
 process_name: DataRecoStage2
 
@@ -11,13 +11,10 @@ outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
 
-
 microboone_tfile_metadata:
 {
-  JSONFileName:          "reco_stage_2_hist.root.json"
-  GenerateTFileMetadata: true
-  dataTier:              "root-tuple"
-  fileFormat:            "root"
+  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
+  GenerateTFileMetadata: [true, true]
+  dataTier:              ["root-tuple", "pandora_debug"]
+  fileFormat:            ["root", "pndr"]
 }
-
-

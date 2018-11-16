@@ -5,9 +5,10 @@ process_name: DLprod
 
 services:
 {
+  TFileService: { fileName: "larcv_hist.root" }
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   TimeTracker:  {}
-  MemoryTracker:     {}
+  MemoryTracker:     {} # default is one
   message:      @local::microboone_message_services_prod_debug
   FileCatalogMetadata:  @local::art_file_catalog_data
   LLMetaMaker:       {Enable: false}
@@ -16,38 +17,58 @@ services:
 }
 services.DetectorClocksService.InheritClockConfig:           false
 services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
-services.SpaceCharge.EnableSimSpatialSCE:                    true
+services.SpaceCharge.EnableSimSpatialSCE: true
 
 #source is now a root file
 source:
 {
   module_type: RootInput
-  maxEvents:  10        # Number of events to create
+  maxEvents:  -1        # Number of events to create
 }
 
+#output the artroot file
+outputs:
+{
+    out:
+        {
+        module_type: RootOutput
+        fileName:    "%ifb_postdl.root"
+        dataTier:    "reconstructed"
+        compressionLevel: 1          
+        }
+}
 # Add larcv analyzer modules.
 
-physics.analyzers:  {
-		    @table::dlprod_analyzers
-		    }
+physics:{
+    
+    analyzers:{
+        @table::dlprod_analyzers
+         }      
+
+    stream1: [out]
+    
+    }
 physics.analyzers.superaWholeView.out_filename: "larcv_wholeview.root"
+physics.analyzers.opreco.DataLookUpMap.trigger: ["daq"]
 
 # Define larcv analyzer sequence.
 
-physics.larcv: [ opreco, gaushitMCinfoBacktracker, superaWholeView ]
+physics.larcv: [ opreco, reco2d, superaWholeView ]
 
 # Add larcv sequence to end_paths.
 
-physics.end_paths: [ larcv ]
+
+
+physics.end_paths: [ larcv, stream1 ]
 
 # Configuration for TFileMetadataMicroBooNE service.
 
 microboone_tfile_metadata:
 {
   JSONFileName:	[ "larlite_opreco.root.json",
-                  "larlite_backtracker.root.json",
+                  "larlite_reco2d.root.json",
                   "larcv_wholeview.root.json" ]
   GenerateTFileMetadata: [ true, true, true ]
-  dataTier:              [ "larlite_opreco", "larlite_backtracker", "larcv_wholeview" ]
+  dataTier:              [ "larlite_opreco", "larlite_reco2d", "larcv_wholeview" ]
   fileFormat:            [ "root", "root", "root" ]
 }
