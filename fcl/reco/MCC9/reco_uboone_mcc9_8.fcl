@@ -171,36 +171,36 @@ microboone_reco_mcc8_producers:
 
   ### pandora analysis
   pandoraCosmicKHittag:             @local::microboone_cosmictracktagger
-  pandoraCosmicKHitcalo:            @local::microboone_calodata
+  pandoraCosmicKHitcalo:            @local::microboone_calomc
   pandoraCosmicKHitpid:             @local::microboone_chi2pid
   pandoraCosmicKHitFlashMatch:      @local::microboone_beamflashtrackmatchtagger
-  pandoraCosmicKalmanTrackcalo:     @local::microboone_calodata
+  pandoraCosmicKalmanTrackcalo:     @local::microboone_calomc
   pandoraCosmicKalmanTrackpid:      @local::microboone_chi2pid
   pandoraTrackPFPartMatch:          @local::microboone_trackpfparticlematch
   pandoraCosmicHitRemoval:          @local::microboone_crhitremoval # Remove hits, based on PFP geometry and flashes
   pandoraCosmictag:                 @local::microboone_cosmictracktagger
-  pandoraCosmiccalo:                @local::microboone_calodata
+  pandoraCosmiccalo:                @local::microboone_calomc
   pandoraCosmicpid:                 @local::microboone_chi2pid
   pandoraNutag:                     @local::microboone_cosmictracktagger
-  pandoraNucalo:                    @local::microboone_calodata
+  pandoraNucalo:                    @local::microboone_calomc
   pandoraNupid:                     @local::microboone_chi2pid
   pandoraNucali:                    @local::microboone_calibrationdedx
   pandoraNucalipid:                 @local::microboone_chi2pid
   pandoraNuKHittag:                 @local::microboone_cosmictracktagger
-  pandoraNuKHitcalo:                @local::microboone_calodata
+  pandoraNuKHitcalo:                @local::microboone_calomc
   pandoraNuKHitpid:                 @local::microboone_chi2pid
   pandoraNuKHitcali:                @local::microboone_calibrationdedx
   pandoraNuKHitcalipid:             @local::microboone_chi2pid
   pandoraNuKalmanTracktag:          @local::microboone_cosmictracktagger
-  pandoraNuKalmanTrackcalo:         @local::microboone_calodata
+  pandoraNuKalmanTrackcalo:         @local::microboone_calomc
   pandoraNuKalmanTrackpid:          @local::microboone_chi2pid
   pandoraNuKalmanTrackcali:         @local::microboone_calibrationdedx
   pandoraNuKalmanTrackcalipid:      @local::microboone_chi2pid
   pandoraNuKalmanShowertag:         @local::microboone_cosmictracktagger
-  pandoraNuKalmanShowercalo:        @local::microboone_calodata
+  pandoraNuKalmanShowercalo:        @local::microboone_calomc
   pandoraNuKalmanShowerpid:         @local::microboone_chi2pid
   pandoraNuPMAtag:                  @local::microboone_cosmictracktagger
-  pandoraNuPMAcalo:                 @local::microboone_calodata
+  pandoraNuPMAcalo:                 @local::microboone_calomc
   pandoraNuPMApid:                  @local::microboone_chi2pid
   pandoraNuPMAcali:                 @local::microboone_calibrationdedx
   pandoraNuPMAcalipid:              @local::microboone_chi2pid
@@ -208,29 +208,29 @@ microboone_reco_mcc8_producers:
   pandoraNuKalmanTrackFlashMatch:   @local::microboone_beamflashtrackmatchtagger
   pandoraNuKalmanShowerFlashMatch:  @local::microboone_beamflashtrackmatchtagger
   pandoratag:                       @local::microboone_cosmictracktagger
-  pandoracalo:                      @local::microboone_calodata
+  pandoracalo:                      @local::microboone_calomc
   pandorapid:                       @local::microboone_chi2pid
   pandoracali:                      @local::microboone_calibrationdedx
   pandoracalipid:                   @local::microboone_chi2pid
-  pandoraTrackcalo:                 @local::microboone_calodata
+  pandoraTrackcalo:                 @local::microboone_calomc
   pandoraTrackpid:                  @local::microboone_chi2pid
   pandoraTrackcali:                 @local::microboone_calibrationdedx
   pandoraTrackcalipid:              @local::microboone_chi2pid
   pandoraKHittag:                   @local::microboone_cosmictracktagger
-  pandoraKHitcalo:                  @local::microboone_calodata
+  pandoraKHitcalo:                  @local::microboone_calomc
   pandoraKHitpid:                   @local::microboone_chi2pid
   pandoraKHitcali:                  @local::microboone_calibrationdedx
   pandoraKHitcalipid:               @local::microboone_chi2pid
   pandoraKalmanTracktag:            @local::microboone_cosmictracktagger
-  pandoraKalmanTrackcalo:           @local::microboone_calodata
+  pandoraKalmanTrackcalo:           @local::microboone_calomc
   pandoraKalmanTrackpid:            @local::microboone_chi2pid
   pandoraKalmanTrackcali:           @local::microboone_calibrationdedx
   pandoraKalmanTrackcalipid:        @local::microboone_chi2pid
   pandoraKalmanShowertag:           @local::microboone_cosmictracktagger
-  pandoraKalmanShowercalo:          @local::microboone_calodata
+  pandoraKalmanShowercalo:          @local::microboone_calomc
   pandoraKalmanShowerpid:           @local::microboone_chi2pid
   pandoraPMAtag:                    @local::microboone_cosmictracktagger
-  pandoraPMAcalo:                   @local::microboone_calodata
+  pandoraPMAcalo:                   @local::microboone_calomc
   pandoraPMApid:                    @local::microboone_chi2pid
   pandoraPMAcali:                   @local::microboone_calibrationdedx
   pandoraPMAcalipid:                @local::microboone_chi2pid
