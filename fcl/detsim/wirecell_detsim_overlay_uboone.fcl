@@ -83,8 +83,11 @@ outputs:
  }
 }
 
-physics.producers.daqnonoise.overlay: true
-physics.producers.daqnonoise.GenNoise: 0
+#physics.producers.daqnonoise.overlay: true
+#physics.producers.daqnonoise.GenNoise: 0
+physics.producers.driftWC.overlay: true
+physics.producers.driftWC.GenNoise: 0
+
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
 services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true

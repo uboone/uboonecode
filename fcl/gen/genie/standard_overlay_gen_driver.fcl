@@ -15,14 +15,15 @@ services:
   MemoryTracker:           @local::microboone_memory_tracker
   RandomNumberGenerator: {} #ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
-  @table::microboone_g4_services
+  @table::microboone_gen_services
+  IFDH:         {}
 }
 
 source:
 {
   module_type: RootInput
   saveMemoryObjectThreshold: 0
-  maxEvents: 10
+  maxEvents: 50
 }
 
 physics:
