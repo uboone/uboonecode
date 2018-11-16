@@ -92,4 +92,6 @@ physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,31
 
 services.SpaceCharge.EnableSimSpatialSCE:          true
 services.SpaceCharge.EnableSimEfieldSCE:           true
+services.SpaceCharge.RepresentationType:	       Voxelized
+services.SpaceCharge.InputFilename:		           "SpaceCharge/dispOutput_MicroBooNE_E273.root"
 services.DetectorClocksService.InheritClockConfig: false
