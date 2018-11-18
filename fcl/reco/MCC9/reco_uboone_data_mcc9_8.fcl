@@ -36,6 +36,7 @@
 #include "wcls.fcl"
 #include "calibration_microboone.fcl"
 #include "ophitremapproducer.fcl"
+#include "shrreco3d.fcl"
 
 BEGIN_PROLOG
 
@@ -293,9 +294,12 @@ microboone_reco_data_producers:
     pmtrackT0RecoBeam:                @local::T0RecoAnodeCathodePiercing_data_beamgate
 
     #MuCS Track Taggers
+    MuCSTrackTaggerpandora:           @local::microboone_MuCSTrackTagger
     MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
     MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
     MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
+
+    shrreco3d:                        @local::ShrReco3DPandora
   
 }
 
@@ -497,7 +501,8 @@ microboone_reco_data_stage1:           [ rns,
 
 microboone_reco_data_stage2:           [ rns,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_ccpath 
+                                         @sequence::microboone_reco_data_ccpath, 
+                                         shrreco3d
                                        ]
 
 microboone_reco_data_core:             [ rns,
@@ -515,7 +520,8 @@ microboone_reco_data_3D:               [ rns,
                                          @sequence::microboone_reco_data_pandora 
                                        ]
 
-microboone_reco_data_MucSTags:         [ MuCSTrackTaggerpandoraCosmic, 
+microboone_reco_data_MucSTags:         [ MuCSTrackTaggerpandora,
+                                         MuCSTrackTaggerpandoraCosmic, 
                                          MuCSTrackTaggerpandoraCosmicKHit, 
                                          MuCSTrackTaggerpmtrack 
                                        ]
@@ -963,6 +969,8 @@ microboone_reco_data_producers.pandoraPMAcalo.CaloAlg.CalAreaConstants:         
 microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.746e-3, 4.7e-3, 4.688e-3]
 
 #Setup MuCS track taggers with extra 20 cm buffer which increases acceptance and accounts for scattering
+microboone_reco_data_producers.MuCSTrackTaggerpandora.BoxExtension:                                     20
+microboone_reco_data_producers.MuCSTrackTaggerpandora.TrackModuleLabel:                                 "pandora"
 microboone_reco_data_producers.MuCSTrackTaggerpandoraCosmic.BoxExtension:                                     20
 microboone_reco_data_producers.MuCSTrackTaggerpandoraCosmic.TrackModuleLabel:                                 "pandoraCosmic"
 microboone_reco_data_producers.MuCSTrackTaggerpandoraCosmicKHit.BoxExtension:                                 20

@@ -35,6 +35,8 @@
 #include "dlprod_fclbase_analyzers.fcl"
 #include "calibration_microboone.fcl"
 
+#include "shrreco3d.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_mcc8_services:
@@ -295,9 +297,12 @@ microboone_reco_mcc8_producers:
   pmtrackT0RecoBeam:                @local::T0RecoAnodeCathodePiercing_data_beamgate
 
   #MuCS Track Taggers
+  MuCSTrackTaggerpandora:           @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
+
+  shrreco3d:                        @local::ShrReco3DPandora
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
@@ -523,7 +528,9 @@ microboone_reco_mcc8_stage1: [           rns,
 
 microboone_reco_mcc8_stage2: [           rns,
                                          @sequence::microboone_reco_mcc8_pandora,
-                                         @sequence::microboone_reco_mcc8_ccpath ]
+                                         @sequence::microboone_reco_mcc8_ccpath,
+                                         shrreco3d
+                                         ]
 
 microboone_reco_mcc8_core: [             rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
