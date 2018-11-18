@@ -29,13 +29,13 @@ UBCRTCosmicFilterNuMIOFF.BeamEnd:   15.86
 
 # BNB beam on
 UBCRTCosmicFilterBNBON: @local::UBCRTCosmicFilter
-UBCRTCosmicFilterBNBON.BeamStart: 3.19
-UBCRTCosmicFilterBNBON.BeamEnd:   4.87
+UBCRTCosmicFilterBNBON.BeamStart: 3.20
+UBCRTCosmicFilterBNBON.BeamEnd:   5.00
 
 # BNB beam off
 UBCRTCosmicFilterBNBOFF: @local::UBCRTCosmicFilter
-UBCRTCosmicFilterBNBOFF.BeamStart: 3.57
-UBCRTCosmicFilterBNBOFF.BeamEnd:   5.25
+UBCRTCosmicFilterBNBOFF.BeamStart: 3.60
+UBCRTCosmicFilterBNBOFF.BeamEnd:   5.40
 
 # BNB beam on top-only
 UBCRTCosmicFilterBNBONtop: @local::UBCRTCosmicFilterBNBON
