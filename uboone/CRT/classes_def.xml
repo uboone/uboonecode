@@ -3,4 +3,8 @@
   <class name="art::Wrapper<crt::CRTData>"/>
   <class name="std::vector<crt::CRTData>"/>
   <class name="art::Wrapper< std::vector<crt::CRTData> >"/>
+  <class name="art::Assns<art::Assns<crt::CRTHit,recob::OpFlash,void> >"/>
+  <class name="art::Wrapper<art::Assns<crt::CRTHit,recob::OpFlash,void> >"/>
+  <class name="art::Assns<art::Assns<recob::OpFlash,crt::CRTHit,void> >"/>
+  <class name="art::Wrapper<art::Assns<recob::OpFlash,crt::CRTHit,void> >"/>
 </lcgdict>
