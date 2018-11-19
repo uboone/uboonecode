@@ -250,8 +250,6 @@ bool UBCRTCosmicFilter::filter(art::Event &e)
       _beam_flash_PE = beamflash_h->at(i).TotalPE();
       flash_idx = size_t(i);
 
-      std::cout << "beamflash_h->at( i ).TotalPE() = " << beamflash_h->at(i).TotalPE() << " PEs." << std::endl;
-      std::cout << "beamflash_h->at( i ).Time() = " << beamflash_h->at(i).Time() << " us." << std::endl;
     }
 
   } // End of the loop over the beam flashes.
