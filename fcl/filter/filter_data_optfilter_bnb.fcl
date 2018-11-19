@@ -48,10 +48,9 @@ physics:
    }
 
    #reco sequence and trigger_paths to be defined elsewhere
-   filter:        [ rns, @sequence::microboone_reco_data_optical, opfiltercommonbnb ]
-   crtfilter:     [ rns, @sequence::microboone_reco_data_optical, opfiltercommonbnb, crtfilteron ]
-   stream1:       [ out1    ]
-   trigger_paths: [ filter, crtfilter ]
+   filter:        [ rns, @sequence::microboone_reco_data_optical, opfiltercommonbnb, crtfilteron ]
+   stream1:       [ out1 ]
+   trigger_paths: [ filter ]
    end_paths:     [ stream1 ]  
 }
 

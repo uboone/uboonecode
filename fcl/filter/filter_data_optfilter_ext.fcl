@@ -48,12 +48,13 @@ physics:
    }
 
    #reco sequence and trigger_paths to be defined elsewhere
-   filter:        [ rns, @sequence::microboone_reco_data_optical, opfiltercommonext ]
-   crtfilter:     [ rns, @sequence::microboone_reco_data_optical, opfiltercommonext, crtfilteroff ]
+   filter:        [ rns, @sequence::microboone_reco_data_optical, opfiltercommonext, crtfilteroff ]
    stream1:       [ out1    ]
-   trigger_paths: [ filter, crtfilter ]
+   trigger_paths: [ filter ]
    end_paths:     [ stream1 ]  
 }
+
+physics.filters.crtfilteroff.useAsFilter: false
 
 #block to define where the output goes.  if you defined a filter in the physics
 #block and put it in the trigger_paths then you need to put a SelectEvents: {SelectEvents: [XXX]}
