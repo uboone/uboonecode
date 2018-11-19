@@ -318,8 +318,8 @@ void ACPTTagger::produce(art::Event & e)
   if (_debug) { std::cout << "Initially we have " << flash_h->size() << " flashes." << std::endl; }
 
   // make sure flash look good
-  if(!flash_h.isValid()) {
-    std::cerr<<"\033[93m[ERROR]\033[00m ... could not locate Flash!"<<std::endl;
+  if(!flash_h.isValid() || flash_h->empty()) {
+    std::cerr<<"\033[93m[ERROR]\033[00m ... could not locate Flash (Or there are zero flashes)!"<<std::endl;
     e.put(std::move(cosmicTagTrackVector));
     e.put(std::move(assnOutCosmicTagTrack));
     e.put(std::move(assnOutCosmicTagPFParticle));
