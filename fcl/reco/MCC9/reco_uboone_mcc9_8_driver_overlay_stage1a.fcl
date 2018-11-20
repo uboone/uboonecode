@@ -17,9 +17,11 @@ services.TFileService.fileName: "reco_stage_1a_hist.root"
 
 #physics.producers.eventweight:  @local::microboone_eventweight
 physics.producers.mchitfinder:  @local::standard_mchitfinder
+physics.producers.mchitfinder.LArG4ModuleName: "driftWC:simpleSC"
 
 #physics.reco:                   [ mchitfinder, eventweight, @sequence::microboone_reco_data_stage1 ]
 physics.reco:                   [ mchitfinder, @sequence::microboone_reco_data_stage1 ]
+#physics.reco:                   [ @sequence::microboone_reco_data_optical, nfspl1, butcher, gaushit ]
 #physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.trigger_paths:          [ reco ]
 #physics.end_paths:              [ ana, stream1 ]
@@ -36,6 +38,8 @@ physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+
+physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
 
 #microboone_tfile_metadata:
 #{
