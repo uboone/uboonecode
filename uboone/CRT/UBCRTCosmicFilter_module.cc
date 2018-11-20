@@ -179,6 +179,10 @@ bool UBCRTCosmicFilter::filter(art::Event &e)
   // Declare an object for the GPS timestamp of the event so that you can offset the cosmic t0 times.
   art::Handle<raw::DAQHeaderTimeUBooNE> rawHandle_DAQHeader;
   e.getByLabel(fDAQHeaderProducer, rawHandle_DAQHeader);
+  if(!rawHandle_DAQHeader.isValid()) {
+    e.put(std::move(crthit_flash_assn_v));
+    return !fuseAsFilter;
+  }
 
   raw::DAQHeaderTimeUBooNE const &my_DAQHeader(*rawHandle_DAQHeader);
   art::Timestamp evtTimeGPS = my_DAQHeader.gps_time();
@@ -189,10 +193,9 @@ bool UBCRTCosmicFilter::filter(art::Event &e)
   e.getByLabel(fCRTHitProducer, crthit_h);
 
   // make sure CRT hits look good.
-  if (!crthit_h.isValid())
-  {
-    std::cerr << "\033[93m[ERROR]\033[00m ... could not locate CRT Hit!" << std::endl;
-    throw std::exception();
+  if (!crthit_h.isValid()) {
+    e.put(std::move(crthit_flash_assn_v));
+    return !fuseAsFilter;
   }
 
   // load beam flashes here.
