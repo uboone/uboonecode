@@ -6,7 +6,7 @@
 #include "swtrigger_microboone.fcl"
 #include "wcls.fcl"
 
-process_name: NFforBadChannels 
+process_name: overlaydetsim 
 
 services:
 {
@@ -51,7 +51,6 @@ physics:
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- #simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadoutnonoise, daqnonoise, driftWC, swtriggernonoise ]
  simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, swtriggernonoise ]
  
  #define the output stream, there could be more than one if using filters 
@@ -85,12 +84,12 @@ outputs:
 
 #physics.producers.daqnonoise.overlay: true
 #physics.producers.daqnonoise.GenNoise: 0
-physics.producers.driftWC.overlay: true
-physics.producers.driftWC.GenNoise: 0
+#physics.producers.driftWC.overlay: true
+#physics.producers.driftWC.GenNoise: 0
 
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+#services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

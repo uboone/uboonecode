@@ -5,8 +5,8 @@
 
 process_name: NFforBadChannles 
 
-physics.producers.nfbadchannel.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp-nonwcsim.jsonnet" ]
-physics.producers.nfbadchannel.wcls_main.params.raw_input_label: "daq"
+#physics.producers.nfbadchannel.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp-nonwcsim.jsonnet" ]
+#physics.producers.nfbadchannel.wcls_main.params.raw_input_label: "daq"
 
 services:
 {
