@@ -19,7 +19,7 @@ export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wir
 # This script runs the full overlay chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2016_3_14_9_22_21-0005432-00021_20160322T065603_ext_bnb_20160323T041757_merged.root
-for fcl in standard_overlay_single_mu_driver.fcl standard_g4_overlay_uboone.fcl wirecell_detsim_nonoise_overlay_uboone.fcl standard_overlay_uboone.fcl reco_uboone_mcc9_8_driver_overlay_stage1a.fcl reco_uboone_mcc9_8_driver_overlay_stage1b.fcl reco_uboone_mcc9_8_driver_overlay_stage1c.fcl reco_uboone_mcc9_8_driver_overlay_stage2.fcl
+for fcl in standard_overlay_single_mu_driver.fcl wirecell_g4_uboone.fcl wirecell_detsim_nonoise_overlay_uboone.fcl wirecell_nfForBadChannels_overlay_uboone.fcl standard_overlay_uboone.fcl reco_uboone_mcc9_8_driver_overlay_stage1a.fcl reco_uboone_mcc9_8_driver_overlay_stage1b.fcl reco_uboone_mcc9_8_driver_overlay_stage1c.fcl reco_uboone_mcc9_8_driver_overlay_stage2.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
