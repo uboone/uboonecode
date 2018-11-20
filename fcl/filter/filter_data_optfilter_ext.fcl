@@ -39,7 +39,7 @@ physics:
    filters:
    { 
        @table::microboone_reco_data_filters
-       ubcrtoff: @local::UBCRTCosmicFilterBNBOFF
+       crtfilteroff: @local::UBCRTCosmicFilterBNBOFF
    }
 
    analyzers:
