@@ -13,8 +13,7 @@ services.BackTrackerService:  @local::microboone_backtrackerservice
 services.BackTrackerService.BackTracker.G4ModuleLabel:  "driftWC:simpleSC"
 services.ParticleInventoryService:  @local::standard_particleinventoryservice
 services.BackTrackerService.OverrideRealData: true
-#services.DetectorClocksService.TrigModuleName: "daqnonoise"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
-services.DetectorClocksService.TrigModuleName: "driftWC:orig"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
+services.DetectorClocksService.TrigModuleName: "triggersim"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
 services.DetectorPropertiesService.NumberTimeSamples:        6400
 services.DetectorPropertiesService.ReadOutWindowSize:        6400
 services.DetectorClocksService.InheritClockConfig:           false
