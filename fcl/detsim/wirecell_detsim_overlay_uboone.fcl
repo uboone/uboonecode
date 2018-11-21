@@ -98,7 +98,7 @@ physics.producers.driftWC.GenNoise: 0
 
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
-services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
+#services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
