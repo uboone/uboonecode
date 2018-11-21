@@ -1,4 +1,5 @@
 simple_plugin(SparseRawDigitTest "module"
+	      ubobj_RawData
               ${ART_FRAMEWORK_CORE}
               ${ART_FRAMEWORK_PRINCIPAL}
               ${ART_FRAMEWORK_SERVICES_REGISTRY}
