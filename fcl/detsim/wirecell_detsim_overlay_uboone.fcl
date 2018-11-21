@@ -160,4 +160,5 @@ physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,31
 
 
 
-
+#reduce file name length
+outputs.out1.fileName: "%ifb_detsim.root"

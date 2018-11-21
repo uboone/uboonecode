@@ -48,3 +48,6 @@ physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer"
 #    dataTier:              "root-tuple"
 #    fileFormat:            "root"
 #}
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_r1a.root"

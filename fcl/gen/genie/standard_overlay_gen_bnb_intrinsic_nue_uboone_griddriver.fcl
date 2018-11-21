@@ -65,3 +65,6 @@ physics.producers.generator.GenFlavors: [12,-12]
 physics.producers.generator.BeamName: "booster"
 
 physics.producers.generator.FluxCopyMethod: "IFDH"
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_gen.root"

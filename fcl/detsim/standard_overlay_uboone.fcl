@@ -63,3 +63,6 @@ physics.filters.swtrigger.OpDataModule: "mixer"
 physics.filters.swtrigger.DAQHeaderModule: "mixer"
 
 services.DetectorClocksService.InheritClockConfig: false
+
+#make smaller file name length
+outputs.out1.fileName: "%ifb_mix.root"

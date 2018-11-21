@@ -51,3 +51,6 @@ microboone_tfile_metadata:
     dataTier:              "root-tuple"
     fileFormat:            "root"
 }
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_r1c.root"
