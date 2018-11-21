@@ -56,7 +56,7 @@ physics:
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, swtriggernonoise ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, swtriggernonoise, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
