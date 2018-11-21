@@ -304,8 +304,8 @@ namespace hsngen
     }
     else
     {
-      if(p1.PdgCode()==fSingleParticlePdgCode) truth.Add(p1);
-      if(p2.PdgCode()==fSingleParticlePdgCode) truth.Add(p2);
+      if((p1.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode)) truth.Add(p1);
+      if((p2.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode)) truth.Add(p2);
     }
     truthcol->push_back(truth);
     evt.put(std::move(truthcol));
