@@ -149,6 +149,7 @@ services.UBOpticalChConfig.DarkRate:       [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # channels 300-335
 
+
 # Adjust the window/offset for the reduced total frame size (9600 -> 6400 ticks)
 services.DetectorPropertiesService.NumberTimeSamples: 9600
 services.DetectorPropertiesService.ReadOutWindowSize: 9600
