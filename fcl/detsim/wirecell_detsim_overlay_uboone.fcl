@@ -5,6 +5,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "swtrigger_microboone.fcl"
 #include "wcls.fcl"
+#include "mcreco.fcl"
 
 process_name: OverlayDetsim 
 
