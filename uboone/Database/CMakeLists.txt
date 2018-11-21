@@ -9,6 +9,8 @@ art_make( BASENAME_ONLY
 			larcore_Geometry
 			${LIBWDA}
 	                ${FHICLCPP}
+                        ${MF_MESSAGELOGGER}
+                        ${MF_UTILITIES}
 			${CETLIB}
                         ${Boost_SYSTEM_LIBRARY}
 			${ART_FRAMEWORK_SERVICES_REGISTRY}
