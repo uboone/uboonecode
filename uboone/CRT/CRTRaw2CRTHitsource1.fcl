@@ -17,7 +17,7 @@ process_name: CRTRawtoCRTHit
 
 services:
 {
-	TFileService		: { fileName: "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root" }
+	TFileService		: { fileName: "CRTRawtoCRTHit_QP.root" }
 	TimeTracker		: {}
 	RandomNumberGenerator	: {}
 	FileCatalogMetadata:    @local::art_file_catalog_data
