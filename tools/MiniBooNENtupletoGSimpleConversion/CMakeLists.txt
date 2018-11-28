@@ -8,24 +8,34 @@ include_directories( $ENV{ROOT_INC}
 cet_make_exec(ConvertNtuple SOURCE ConvertNtuple.cxx BooNEtoGSimple.cxx 
 			    LIBRARIES ${ROOT_BASIC_LIB_LIST} 
 			    	      xml2
-				      ${GPDG}
+                                      ${GFWPARDAT}
 				      ${LOG4CPP} 
-				      ${GALGORITHM}
-				      ${GBARYONRESONANCE}
-				      ${GBASE}
-				      ${GEVGCORE}
-				      ${GEVGDRIVERS}
-	                              ${GFLUXDRIVERS}
-				      ${GHEP}
-				      ${GINTERACTION}
-				      ${GMESSENGER}
-				      ${GNUCLEAR}
-				      ${GNUMERICAL}
-				      ${GPDG}
-				      ${GREGISTRY}
-				      ${GUTILS}
+				      ${GFWALG}
+				      ${GFWPARDAT}
+				      ${GPHDISXS}
+				      ${GPHPDF}
+				      ${GPHXSIG}
+				      ${GPHDISEG}
+				      ${GPHHADNZ}
+				      ${GPHDCY}
+				      ${GFWEG}
+				      ${GFWEG}
+	                              ${GTLFLX}
+				      ${GFWGHEP}
+				      ${GFWINT}
+				      ${GFWMSG}
+				      ${GPHNUCLST}
+				      ${GFWNUM}
+				      ${GFWPARDAT}
+				      ${GFWREG}
+				      ${GPHCMN}
+				      ${GFWUTL}
+				      ${GSL}
+				      ${GSLCBLAS}
 				      #more root stuff
 				      ${ROOT_EG}
 				      ${ROOT_EGPYTHIA6}
 				      )
+
+
 
