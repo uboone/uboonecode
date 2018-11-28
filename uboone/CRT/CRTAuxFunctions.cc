@@ -19,6 +19,10 @@ void crt::auxfunctions::FillPos(std::string filePos,   std::map <int, std::vecto
   std::ifstream in;
   in.open(fname.c_str());
   std::cout <<"File "<< fname << "open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file with SiPM position could not been found!";
+  }
 
 
 
@@ -65,6 +69,10 @@ void crt::auxfunctions::FillFEBDel(std::string fileFEBDel,   std::map <int,doubl
   std::ifstream in;
   in.open(fname.c_str());
   std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file with FEB cable delay could not been found!";
+  }
 
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
@@ -102,6 +110,10 @@ void crt::auxfunctions::FillGain(std::string fileGain,   std::map <int, std::pai
   in.open(fname.c_str());
 
   std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file with SiPM gain calibration could not been found!";
+  }
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
   }
@@ -222,6 +234,10 @@ void crt::auxfunctions::FillPartTop(std::string fileTop, int mac_buffer[3][100])
   in.open(fname.c_str());
 
   std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file for Top splitting could not been found!";
+  }
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
   }
@@ -265,6 +281,10 @@ void crt::auxfunctions::Init_TS0_corr(std::string filename,crt::TS0_CORRECTION c
   in.open(fname.c_str());
 
   std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file with the correction map could not been found!";
+  }
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
   }
@@ -354,6 +374,10 @@ void crt::auxfunctions::Init_mspoll_delay(std::string file_FEB_MS_delay, double 
   in.open(fname.c_str());
 
   std::cout <<"File open? "<<in.is_open()<<std::endl;
+  if (!in.is_open())
+  {
+      throw cet::exception("crt_auxfunction") << "  The file with MS delay of poll could not been found!";
+  }
   if(in.is_open()){
     std::cout<<"File open: "<<fname.c_str()<<std::endl;
   }
