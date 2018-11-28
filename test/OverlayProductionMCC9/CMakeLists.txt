@@ -1,1 +1,1 @@
-cet_test( overlay_production.sh PREBUILT )
+cet_test( overlay_production_mcc9.sh PREBUILT )
