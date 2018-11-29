@@ -288,7 +288,7 @@ namespace trkf
 	for(int i=0; i<n; ++i) {
 	  assert(std::abs(vec1(i) - vec2(i)) <= 1.e-8);
 	  for(int j=0; j<n; ++j) {
-	    assert(std::abs(err1(i,j) - err2(i,j)) <= 1.e-4*std::max(std::abs(err1(i,j)), 1.));
+	    assert(std::abs(err1(i,j) - err2(i,j)) <= 1.e-3*std::max(std::abs(err1(i,j)), 1.));
 	  }
 	}
       }
