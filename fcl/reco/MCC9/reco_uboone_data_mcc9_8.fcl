@@ -25,6 +25,7 @@
 #include "MuCSTrackTagger_module.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "ubflashfinder.fcl"
+#include "ubwcflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
 #include "microboone_dlpmtprecuts.fcl"
 #include "microboone_dqmhits.fcl"
@@ -58,6 +59,7 @@ microboone_reco_data_services.DetectorClocksService.InheritClockConfig:         
 microboone_reco_data_services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 microboone_reco_data_services.DetectorClocksService.TrigModuleName:               "daq"
 microboone_reco_data_services.SignalShapingServiceMicroBooNE.IgnoreMisconfigStatus: true
+microboone_reco_data_services.PmtGainService.PmtGainProvider.UseDB:           	    true
 
 # If you want to run without the above overrides use the following services definition
 microboone_reco_data_services_fullrawdigits:
@@ -113,6 +115,7 @@ microboone_reco_data_producers:
     simpleFlashCosmic:                @local::UBFlashCosmic
     opflashBeam:                      @local::microboone_opflash_saturation_beam
     opflashCosmic:                    @local::microboone_opflash_saturation_cosmic
+    wcopflash:                        @local::UBWCFlashFinder
 
     ### noise filtering and signal processing from the wirecell toolkit
     nfspl1:                           @local::wcls.nfspl1
@@ -496,6 +499,7 @@ microboone_reco_data_stage1:           [ rns,
                                        ]
 
 microboone_reco_data_stage2:           [ rns,
+				       	 wcopflash,
                                          @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_ccpath 
                                        ]
@@ -975,6 +979,8 @@ microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:     
 microboone_reco_data_producers.ophitBeam.OpHitsInputTag:                                                      "ophitBeamNoRemap"
 microboone_reco_data_producers.ophitCosmic.OpHitsInputTag:                                                    "ophitCosmicNoRemap"
 microboone_reco_data_producers.ophitCosmic.MapOffset:                                                         200
+
+microboone_reco_data_producers.wcopflash.usePmtGainDB:                                   		      true
 
 microboone_reco_data_filters.flashfilter.OpFlashTag:                                                          "simpleFlashBeam"
 microboone_reco_data_filters.dlpmtprecuts.OpHitProducer:                                                      "ophitBeam"
