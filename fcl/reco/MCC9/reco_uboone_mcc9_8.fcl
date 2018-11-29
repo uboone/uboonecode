@@ -808,10 +808,8 @@ microboone_reco_mcc8_producers.pandoraKHit.ClusterModuleLabel:                  
 microboone_reco_mcc8_producers.pandoraKHit.HitFinderModuleLabel:                                               "gaushit"
 
 microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandora"
-#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
-#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        false
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             ""
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoratag"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
 microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
