@@ -794,7 +794,7 @@ microboone_reco_data_producers.pandoraKHit.HitFinderModuleLabel:                
 
 microboone_reco_data_producers.pandoraKalmanTrack.inputCollection:                                            "pandora"
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                       true
-microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                            "pandoraContTag"
+microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                            "pandoratag"
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                        35.0
 microboone_reco_data_producers.pandoraKalmanTrack.trackFromPF:                                                true
 microboone_reco_data_producers.pandoraKalmanTrack.showerFromPF:                                               false
