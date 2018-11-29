@@ -49,13 +49,14 @@ cet_make_exec(
     ${GTLGEO}
     ${GTLFLX}
     ${GPHMEL}
-    ${GTLREW}
     ${GPHNDCY}
     ${GPHNNBAROSC}
     ${GFWMSG}
+    ${GRWFWK}
+    ${GRWIO}
+    ${GRWCLC}
     ${GSL}
     ${GSLCBLAS}
-    #more root stuff
     ${ROOT_BASIC_LIB_LIST}
     ${ROOT_GENVECTOR}
     ${ROOT_EGPYTHIA6}
