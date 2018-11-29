@@ -61,5 +61,6 @@ cet_make_exec(
     ${ROOT_GENVECTOR}
     ${ROOT_EGPYTHIA6}
     ${ROOT_EG}
+    ${GENIE_LIB_LIST}
 )
 
