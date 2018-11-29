@@ -11,7 +11,6 @@
 #include "time_memory_tracker_microboone.fcl" 
 #include "reco_uboone_data_notpc.fcl"
 #include "microboone_crt_merger.fcl"
-#include "microboone_crt_merger_extra.fcl"
 
 process_name: Swizzler
 services:
@@ -83,13 +82,12 @@ physics:
  producers: {
   @table::microboone_reco_notpc_producers
   merger : @local::microboone_crt_merger
-  merger_extra : @local::microboone_crt_merger_extra
  }
  filters: {
   @table::microboone_reco_notpc_filters
  }
 
- path_notpc:         [ merger, merger_extra, @sequence::microboone_reco_notpc ]
+ path_notpc:         [ merger, @sequence::microboone_reco_notpc ]
  path_ext_hsnc0:     [ swtrigexthsnc0 ]
 
  stream_ext_hsnc0:     [ outexthsnc0 ]
@@ -110,9 +108,6 @@ services.DetectorClocksService.TrigModuleName: "daq"
 
 physics.producers.merger.debug: false
 physics.producers.merger.ubversion_CRTHits: prod_v06_26_01_13
-
-physics.producers.merger_extra.debug: false
-physics.producers.merger_extra.ubversion_CRTHits: prod_v06_26_01_13
 
 ### Here we try to suppress known and pointless messages
 services.message.destinations :
