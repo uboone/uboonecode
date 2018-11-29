@@ -25,7 +25,7 @@ services:
 
 microboone_tfile_metadata:
 {
-  JSONFileName:          "CRTRawtoCRTHit_QP.root.json"
+  JSONFileName:          "CRTRawtoCRTHit_QP_%ifb_%tc_%#.root.json"
   GenerateTFileMetadata: true
   dataTier:              "root-tuple"
   fileFormat:            "root"
