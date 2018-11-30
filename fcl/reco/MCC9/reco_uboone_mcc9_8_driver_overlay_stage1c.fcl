@@ -34,8 +34,8 @@ physics.producers.saturation.HGProducer: "mixer"
 physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 
 outputs.out1.outputCommands: [ "keep *_*_*_*",
-                               "drop sim::SimChannels_*_*_*",
-                               "drop sim::SimEnergyDeposits_*_*_*",
+                               #"drop sim::SimChannels_*_*_*",
+                               #"drop sim::SimEnergyDeposits_*_*_*",
                                "drop raw::RawDigits_*_*_*",
                                "drop optdata::ChannelDataGroup_*_*_*" ]
 
@@ -51,3 +51,6 @@ microboone_tfile_metadata:
     dataTier:              "root-tuple"
     fileFormat:            "root"
 }
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_r1c.root"
