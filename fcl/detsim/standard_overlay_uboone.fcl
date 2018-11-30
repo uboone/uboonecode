@@ -52,7 +52,7 @@ physics: {
 }
 
 physics.producers.mixer.RawDigitDataModuleLabel: "daq"
-physics.producers.mixer.RawDigitMCModuleLabel:   "daqnonoise"
+physics.producers.mixer.RawDigitMCModuleLabel:   "zeroedoutchannels"
 physics.producers.mixer.OpDetDataModuleLabel:    "pmtreadout"
 physics.producers.mixer.OpDetMCModuleLabel:      "pmtreadoutnonoise"
 physics.producers.mixer.TriggerDataModuleLabel:  "daq"
@@ -62,3 +62,6 @@ physics.filters.swtrigger.OpDataModule: "mixer"
 physics.filters.swtrigger.DAQHeaderModule: "mixer"
 
 services.DetectorClocksService.InheritClockConfig: false
+
+#make smaller file name length
+outputs.out.fileName: "%ifb_mix.root"
