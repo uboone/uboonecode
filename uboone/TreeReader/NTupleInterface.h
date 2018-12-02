@@ -95,7 +95,8 @@ public:
   bool FillGTruth(Long64_t ientry, simb::GTruth& gtruth);
 
 private:
-  static const unsigned kMaxParticles = 50;  //!< Max. MCParticles in MCTruth
+
+  enum Max { kMaxParticles = 50};  //!< Max. MCParticles in MCTruth
 
   TTree* fTree;  //!< Input TTree
   int fRun;
