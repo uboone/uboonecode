@@ -213,6 +213,10 @@ microboone_reco_data_producers:
     pandorapid:                       @local::microboone_chi2pid
     pandoracali:                      @local::microboone_calibrationdedx
     pandoracalipid:                   @local::microboone_chi2pid
+    pandoraTrackcalo:                 @local::microboone_calodata
+    pandoraTrackpid:                  @local::microboone_chi2pid
+    pandoraTrackcali:                 @local::microboone_calibrationdedx
+    pandoraTrackcalipid:              @local::microboone_chi2pid
     pandoraKHittag:                   @local::microboone_cosmictracktagger
     pandoraKHitcalo:                  @local::microboone_calodata
     pandoraKHitpid:                   @local::microboone_chi2pid
@@ -370,6 +374,10 @@ microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandorapid,
 					                     pandoracali,
                                          pandoracalipid,
+                                         pandoraTrackcalo,
+                                         pandoraTrackpid,
+                                         pandoraTrackcali,
+                                         pandoraTrackcalipid,
                                          pandoraKHit,
                                          pandoraKalmanTrack,
                                          pandoraKalmanShower,
@@ -544,9 +552,9 @@ microboone_reco_data_producers.gaushit.MaxMultiHit:                             
 microboone_reco_data_producers.gaushit.TryNplus1Fits:                                                         false
 microboone_reco_data_producers.gaushit.Chi2NDF:                                                               50.
 
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     2.6
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     3.4
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     3.4
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     2.7
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     2.5
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     3.7
 
 # ClusterCrawler / Track Maker related
 microboone_reco_data_producers.trajcluster.HitModuleLabel:                                                    "pandoraCosmicHitRemoval"
@@ -815,6 +823,19 @@ microboone_reco_data_producers.pandoracali.CalorimetryModuleLabel:              
 microboone_reco_data_producers.pandoracalipid.TrackModuleLabel:                                             "pandora"
 microboone_reco_data_producers.pandoracalipid.CalorimetryModuleLabel:                                       "pandoracali"
 microboone_reco_data_producers.pandoracalipid.Chi2PIDAlg.UseMedian:                                         true
+
+microboone_reco_data_producers.pandoraTrackcalo.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcalo.SpacePointModuleLabel:                                      "pandora"
+
+microboone_reco_data_producers.pandoraTrackpid.CalorimetryModuleLabel:                                      "pandoraTrackcalo"
+microboone_reco_data_producers.pandoraTrackpid.TrackModuleLabel:                                            "pandoraTrack"
+
+microboone_reco_data_producers.pandoraTrackcali.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcali.CalorimetryModuleLabel:                                     "pandoraTrackcalo"
+
+microboone_reco_data_producers.pandoraTrackcalipid.TrackModuleLabel:                                        "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcalipid.CalorimetryModuleLabel:                                  "pandoraTrackcali"
+microboone_reco_data_producers.pandoraTrackcalipid.Chi2PIDAlg.UseMedian:                                    true
 
 microboone_reco_data_producers.pandoraKHittag.TrackModuleLabel:                                             "pandoraKHit"
 

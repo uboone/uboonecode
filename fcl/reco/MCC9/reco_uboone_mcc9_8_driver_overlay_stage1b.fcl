@@ -1,0 +1,36 @@
+#include "reco_uboone_mcc9_8_driver_common.fcl"
+
+process_name: OverlayRecoStage1b
+
+services.TFileService.fileName: "reco_stage_1b_hist.root"
+services.BackTrackerService:  @local::microboone_backtrackerservice
+services.BackTrackerService.BackTracker.G4ModuleLabel:  "driftWC:simpleSC"
+services.ParticleInventoryService:  @local::standard_particleinventoryservice
+services.BackTrackerService.BackTracker.OverrideRealData: true
+services.DetectorClocksService.TrigModuleName: "triggersim"  # note that the clock time needed for the backtracking hit matching is set using the MC trigger and not Data / Mix 
+services.DetectorPropertiesService.NumberTimeSamples:        6400
+services.DetectorPropertiesService.ReadOutWindowSize:        6400
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+services.FileCatalogMetadata.fileType: "overlay"
+
+physics.producers.gaushitTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.gaushitTruthMatch.OverrideRealData: true
+physics.producers.gaushitTruthMatch.HitParticleAssociations:                        @local::DirectHitParticleAssnsTool
+physics.producers.gaushitTruthMatch.HitParticleAssociations.HitModuleLabel:         "gaushit"
+physics.producers.gaushitTruthMatch.HitParticleAssociations.MCParticleModuleLabel:  "largeant"
+
+physics.reco: [ gaushitTruthMatch ]
+physics.trigger_paths: [ reco ]
+outputs.out1.fileName: "%ifb_%tc_reco1b.root"
+outputs.out1.dataTier: "reconstructed-2d"
+#physics.end_paths:              [ ana, stream1 ]
+source.inputCommands:           ["keep *_*_*_*" ]
+
+#temporary since new RawDigits are baseline corrected
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_r1b.root"

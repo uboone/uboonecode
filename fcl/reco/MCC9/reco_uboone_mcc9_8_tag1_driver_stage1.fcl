@@ -1,13 +1,6 @@
-#include "reco_uboone_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_tag1_driver_common.fcl"
 
 process_name: McRecoStage1
-
-physics.producers.simnfspl1.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp-nonwcsim.jsonnet" ]
-physics.producers.simnfspl1.wcls_main.params.raw_input_label: "daq"
-
-physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold: 1.5
-physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold: 1.1
-physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold: 3.3
 
 services.TFileService.fileName: "reco_stage_1_hist.root"
 services.BackTrackerService:  @local::microboone_backtrackerservice
@@ -19,3 +12,11 @@ physics.end_paths: [ ana, stream1 ]
 outputs.out1.fileName: "%ifb_%tc_reco1.root"
 outputs.out1.dataTier: "reconstructed"
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "reco_stage_1_hist.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}

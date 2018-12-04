@@ -4,6 +4,7 @@ services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234
 services.NuRandomService.daq.noise: 1234
 services.NuRandomService.daq.pedestal: 1234
+services.NuRandomService.crtdetsim.crt: 1234
 
 services.RandomNumberGenerator.restoreFrom: "DetSimRandomSeeds_Ref.dat"
 services.RandomNumberGenerator.saveTo: "DetSimRandomSeeds.dat"

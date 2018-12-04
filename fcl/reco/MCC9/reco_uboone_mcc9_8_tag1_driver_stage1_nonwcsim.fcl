@@ -1,4 +1,4 @@
-#include "reco_uboone_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_tag1_driver_common.fcl"
 
 process_name: McRecoStage1
 
