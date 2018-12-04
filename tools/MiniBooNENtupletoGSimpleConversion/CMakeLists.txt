@@ -52,9 +52,6 @@ cet_make_exec(
     ${GPHNDCY}
     ${GPHNNBAROSC}
     ${GFWMSG}
-    ${GRWFWK}
-    ${GRWIO}
-    ${GRWCLC}
     ${GSL}
     ${GSLCBLAS}
     ${ROOT_BASIC_LIB_LIST}
