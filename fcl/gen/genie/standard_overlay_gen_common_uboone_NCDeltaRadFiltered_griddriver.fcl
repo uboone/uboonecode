@@ -56,13 +56,12 @@ outputs:
 #do not inherit clock configuration from the data
 services.DetectorClocksService.InheritClockConfig: false
 
-#use generator settings from prodgenie_bnb_nu_uboone.fcl
+#use generator settings from common_uboone_NCDeltaRadFiltered 
 physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
-physics.producers.generator.TopVolume: "volCryostat"
+physics.producers.generator.TopVolume: "volTPC"
 physics.producers.generator.BeamName: "booster"
+physics.producers.generator.EventGeneratorList: "NCRES"
+physics.producers.generator.GeomScan:     "flux: 10000 1.3 1"
 
 physics.producers.generator.FluxCopyMethod: "IFDH"
-
-#reduce file name length
-outputs.out1.fileName: "%ifb_gen.root"

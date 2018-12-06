@@ -5,9 +5,6 @@
 
 process_name: NFforBadChannles 
 
-physics.producers.nfbadchannel.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp-nonwcsim.jsonnet" ]
-physics.producers.nfbadchannel.wcls_main.params.raw_input_label: "daq"
-
 services:
 {
   scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
@@ -92,3 +89,6 @@ outputs:
 #services.DetectorPropertiesService.ReadOutWindowSize: 9600
 #services.DetectorClocksService.InheritClockConfig:    false
 #services.DetectorClocksService.TriggerOffsetTPC:      -1600
+
+#reduce file name legnth
+outputs.out1.fileName: "%ifb_nfbc.root"
