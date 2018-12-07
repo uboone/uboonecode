@@ -14,5 +14,3 @@ physics.analyzers.analysistree.SaveMCTrackInfo: false
 physics.analyzers.analysistree.SaveShowerInfo:  true
 physics.analyzers.analysistree.SaveCaloCosmics: true
 physics.analyzers.analysistree.SaveSWTriggerInfo: false
-#physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraCosmiccalo","pandoraCosmicKHitcalo","pandoraCosmicKalmanTrackcalo","pandoraNucalo","pandoraNuKHitcalo","pandoraNuKalmanTrackcalo","pandoraNuKalmanShowercalo","pandoraNuPMAcalo","pmtrackcalo","pandoracalo"]
-#physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandoraCosmicpid","pandoraCosmicKHitpid","pandoraCosmicKalmanTrackpid","pandoraNupid","pandoraNuKHitpid","pandoraNuKalmanTrackpid","pandoraNuKalmanShowerpid","pandoraNuPMApid","pmtrackpid","pandorapid"]
