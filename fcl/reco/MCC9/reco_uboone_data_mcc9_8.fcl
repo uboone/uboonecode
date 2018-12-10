@@ -574,14 +574,13 @@ microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiT
 microboone_reco_data_producers.trajcluster.HitModuleLabel:                                                    "gaushit"
 microboone_reco_data_producers.trajcluster.SliceModuleLabel:                                                  "dbcluster3d"
 microboone_reco_data_producers.trajcluster.HitTruthModuleLabel:                                               "NA"
-microboone_reco_data_producers.trajcluster.CaloAlg:                                                           "pmtrackcalo"
-microboone_reco_data_producers.trajcluster.TCAlg.CaloAlg:                                                     "pmtrackcalo"
-microboone_reco_data_producers.tcshower.CaloAlg:                                                              "pmtrackcalo"
-microboone_reco_mcc8_producers.tcshower.TrackModuleLabel:                                                     "trajclusterKalmanTrack"
-microboone_reco_mcc8_producers.trajclusterKalmanTrack.inputCollection:                                         "trajcluster"
-microboone_reco_mcc8_producers.trajclusterKalmanTrack.trackFromPF:                                             false
-microboone_reco_mcc8_producers.trajclusterKalmanTrack.showerFromPF:                                            false
-microboone_reco_mcc8_producers.trajclusterKalmanTrack.seedFromPF:                                              true
+microboone_reco_data_producers.trajcluster.CalorimetryModuleLabel:                                            "pmtrackcalo"
+microboone_reco_data_producers.tcshower.CalorimetryModuleLabel:                                               "pmtrackcalo"
+microboone_reco_data_producers.tcshower.TrackModuleLabel:                                                     "trajclusterKalmanTrack"
+microboone_reco_data_producers.trajclusterKalmanTrack.inputCollection:                                         "trajcluster"
+microboone_reco_data_producers.trajclusterKalmanTrack.trackFromPF:                                             false
+microboone_reco_data_producers.trajclusterKalmanTrack.showerFromPF:                                            false
+microboone_reco_data_producers.trajclusterKalmanTrack.seedFromPF:                                              true
 
 #microboone_reco_data_producers.trackkalmanhitcc.HitModuleLabel:                                              "trajcluster"
 #microboone_reco_data_producers.trackkalmanhitcc.ClusterModuleLabel:                                          "trajcluster"
