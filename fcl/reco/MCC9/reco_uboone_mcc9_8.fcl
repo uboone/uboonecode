@@ -7,6 +7,7 @@
 #include "hitfindermodules_microboone.fcl"
 #include "cluster_microboone.fcl"
 #include "trackfindermodules_microboone.fcl"
+#include "showerfindermodules_microboone.fcl"
 #include "kalmanfilterfinaltrackfitter.fcl"
 #include "trackproducerfrompfparticle.fcl"
 #include "vertexfitter.fcl"
@@ -22,6 +23,7 @@
 #include "correct_saturation.fcl"
 #include "MuCSTrackTagger_module.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
+#include "SpacePointSolver.fcl"
 #include "ubflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
 #include "mctrutht0matching.fcl"
@@ -121,7 +123,11 @@ microboone_reco_mcc8_producers:
   gaushit:                          @local::microboone_gaushitfinder
 
   ### cluster-finder producers  
+  sps3d:                            @local::microboone_spacepointsolver
+  dbcluster3d:                      @local::microboone_dbcluster3d
   trajcluster:                      @local::microboone_trajcluster
+  trajclusterKalmanTrack:           @local::trackproducerfrompfparticle
+  tcshower:                         @local::microboone_tcshower
 
   ### mc producers
   mchitfinder:                      @local::standard_mchitfinder
@@ -352,12 +358,14 @@ microboone_reco_mcc8_signalprocessing: [ simnfspl1,
                                          butcher,
                                          gaushit ]
 
-microboone_reco_mcc8_clustercrawler: [   trajcluster ]
+microboone_reco_mcc8_clustercrawler: [   sps3d, 
+                                         dbcluster3d,
+                                         trajcluster ]
 
 microboone_reco_mcc8_cctracks: [         pmtrack,
                                          pmtracktag,
                                          pmtrackContTag,
-					                               pmtrackMCSMu,
+                                         pmtrackMCSMu,
                                          pmtrackT0Reco,
                                          pmtrackT0RecoLoose,
                                          pmtrackT0RecoBeam,
@@ -367,8 +375,14 @@ microboone_reco_mcc8_cctracks: [         pmtrack,
                                          pmtrackcalipid]
 
 microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_clustercrawler,
-                                         @sequence::microboone_reco_mcc8_cctracks,
-                                         trajclusterTruthMatch ]
+                                         @sequence::microboone_reco_mcc8_cctracks,                                         
+                                         trajclusterTruthMatch,
+                                         trajclusterKalmanTrack,
+                                         tcshower]
+
+#microboone_reco_mcc8_cctcshower: [       @sequence::microboone_reco_mcc8_clustercrawler,
+#                                         trajclusterKalmanTrack,
+#                                         tcshower ]
 
 microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPatRec,
@@ -567,8 +581,18 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiT
 microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      3.5
 
 # ClusterCrawler / Track Maker related
-microboone_reco_mcc8_producers.trajcluster.HitFinderModuleLabel:                                               "pandoraCosmicHitRemoval"
+#microboone_reco_mcc8_producers.trajcluster.HitFinderModuleLabel:                                               "gaushit"
+microboone_reco_mcc8_producers.trajcluster.HitModuleLabel:                                                     "gaushit"
+microboone_reco_mcc8_producers.trajcluster.SliceModuleLabel:                                                   "dbcluster3d"
 microboone_reco_mcc8_producers.trajcluster.HitTruthModuleLabel:                                                "crHitRemovalTruthMatch"
+microboone_reco_data_producers.trajcluster.CaloAlg:                                                            "pmtrackcalo"
+microboone_reco_data_producers.trajcluster.TCAlg.CaloAlg:                                                      "pmtrackcalo"
+microboone_reco_data_producers.tcshower.CaloAlg:                                                               "pmtrackcalo"
+microboone_reco_mcc8_producers.tcshower.TrackModuleLabel:                                                      "trajclusterKalmanTrack"
+microboone_reco_mcc8_producers.trajclusterKalmanTrack.inputCollection:                                         "trajcluster"
+microboone_reco_mcc8_producers.trajclusterKalmanTrack.trackFromPF:                                             false
+microboone_reco_mcc8_producers.trajclusterKalmanTrack.showerFromPF:                                            false
+microboone_reco_mcc8_producers.trajclusterKalmanTrack.seedFromPF:                                              true
 
 microboone_reco_mcc8_producers.mchitfinder.LArG4ModuleName:                                                    "driftWC:simpleSC"
 
