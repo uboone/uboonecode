@@ -304,8 +304,18 @@ namespace hsngen
     }
     else
     {
-      if((p1.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode)) truth.Add(p1);
-      if((p2.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode)) truth.Add(p2);
+      printf("p1 PDG: %i\n", int(p1.PdgCode()));
+      if((p1.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode))
+      {
+        printf("sradding p1!\n");
+        truth.Add(p1);
+      } 
+      printf("p2 PDG: %i\n", int(p2.PdgCode()));
+      if((p2.PdgCode()==fSingleParticlePdgCode) || (p2.PdgCode()== -1*fSingleParticlePdgCode))
+      {
+        printf("sradding p2!\n");
+        truth.Add(p2);
+      }
     }
     truthcol->push_back(truth);
     evt.put(std::move(truthcol));
