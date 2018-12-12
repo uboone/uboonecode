@@ -1,18 +1,19 @@
-////////////////////////////////////////////////////////////////////////
-/// \file  HSNGen_module.cc
-/// \brief Generator for heavy sterile neutrinos based on pre-generated HSN fluxes.
-///
-/// Generator for heavy sterile neutrino decays inside the MicroBooNE detector.
-/// The code is largely based on InFlight generator, an event generator for sterile decays at
-/// SBL facilities independent of LArSoft, written by Mark Ross-Lonergan and Peter Ballett.
-/// Credit for the code goes to the two original authors.
-///
-/// Any malfunction, instability or bug is to be attributed solely to
-/// Salvatore Davide Porzio, responsible for re-writing the code in its current form
-/// and porting it to the LArSoft code.
-///
-/// \author  salvatore.porzio@postgrad.manchester.ac.uk
-////////////////////////////////////////////////////////////////////////
+// +----------------------------------------------------------------------------+
+// |                              HSNGen_module.cc                              |
+// +----------------------------------------------------------------------------+
+// | Generator for heavy sterile neutrinos decays in MicroBooNE on              |
+// | pre-generated HSN fluxes. The code is largely based on InFlight generator, |
+// | an event generator for sterile decays at SBN facilities independent of     |
+// | LArSoft, written by Mark Ross-Lonergan and Peter Ballett.                  |
+// | Credit for the code goes to the two original authors.                      |
+// |                                                                            |
+// | Any malfunction, instability or bug is to be attributed solely to          |
+// | Salvatore Davide Porzio, responsible for re-writing the code in its        |
+// | current form and porting it to the LArSoft code.                           |
+// +----------------------------------------------------------------------------+
+// | Author:  salvatore.porzio@postgrad.manchester.ac.uk                        |
+// +----------------------------------------------------------------------------+
+
 #ifndef EVGEN_HSNGen_H
 #define EVGEN_HSNGen_H
 
@@ -307,13 +308,11 @@ namespace hsngen
       printf("p1 PDG: %i\n", int(p1.PdgCode()));
       if((p1.PdgCode()==fSingleParticlePdgCode) || (p1.PdgCode()== -1*fSingleParticlePdgCode))
       {
-        printf("sradding p1!\n");
         truth.Add(p1);
       } 
       printf("p2 PDG: %i\n", int(p2.PdgCode()));
       if((p2.PdgCode()==fSingleParticlePdgCode) || (p2.PdgCode()== -1*fSingleParticlePdgCode))
       {
-        printf("sradding p2!\n");
         truth.Add(p2);
       }
     }
