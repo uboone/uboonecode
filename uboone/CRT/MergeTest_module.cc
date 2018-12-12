@@ -81,20 +81,29 @@ private:
   uint32_t frunNum;                //Run Number taken from event  
   uint32_t fsubRunNum;             //Subrun Number taken from event         
   std::string  data_labelhit_;
+  std::string  data_labelhitextra_;
   std::string  data_label_flash_;
   std::string  data_label_DAQHeader_;
   int fHardDelay_;
+  int fBmin_;
+  int fBmax_;
+  int fGPSmin_;
+  int fGPSmax_;
+  int extrasecond_;
   int verbose_;
 
+  //---second
   //TTree*       fTree;
   TH1F* hFlashTimeDis;
   TH1F* hFlashTimeDis_GPS;
   TH1F* hFlashTimeDis_Beam;
   TH1F* hTFvsTH_t1;
   TH2F* hTFvsTH_t1_2d;
+  TH2F* hTFvsBM_2d;
   TH1F* hTFvsTH_t0;
   TH2F* hTFvsTH_t0_2d;
   TH2F* hTFvsTH_t0_t1;
+  TH2F* hTFvsGPSM_2d;
   TH2F* hTFvsTH_plane_t0;
 
   TH2F* hNFlavsNHit;
@@ -111,6 +120,37 @@ private:
   TH1F* hNHitperFla2;
   TH1F* hNHitperFla3;
   TH2F* hNHitperFla2D;
+  //---second
+
+  //-- extra second
+  //TTree*       fTree;
+  TH1F* hFlashTimeDis_extra;
+  TH1F* hFlashTimeDis_GPS_extra;
+  TH1F* hFlashTimeDis_Beam_extra;
+  TH1F* hTFvsTH_t1_extra;
+  TH2F* hTFvsTH_t1_2d_extra;
+  TH2F* hTFvsBM_2d_extra;
+  TH1F* hTFvsTH_t0_extra;
+  TH2F* hTFvsTH_t0_2d_extra;
+  TH2F* hTFvsTH_t0_t1_extra;
+  TH2F* hTFvsGPSM_2d_extra;
+  TH2F* hTFvsTH_plane_t0_extra;
+
+  TH2F* hNFlavsNHit_extra;
+
+  TH2F* hBot_extra;
+  TH2F* hFT_extra;
+  TH2F* hPipe_extra;
+  TH2F* hTop_extra;
+
+
+  TH1F* hNHitperFla_extra;
+  TH1F* hNHitperFla0_extra;
+  TH1F* hNHitperFla1_extra;
+  TH1F* hNHitperFla2_extra;
+  TH1F* hNHitperFla3_extra;
+  TH2F* hNHitperFla2D_extra;
+  //-- extra second
 
   
 };
@@ -119,9 +159,15 @@ private:
 crt::MergeTest::MergeTest(fhicl::ParameterSet const & p)
   : EDAnalyzer(p),
     data_labelhit_(p.get<std::string>("data_labelhit")),
+    data_labelhitextra_(p.get<std::string>("data_labelhitextra")),
     data_label_flash_(p.get<std::string>("data_label_flash_")),
     data_label_DAQHeader_(p.get<std::string>("data_label_DAQHeader_")),
     fHardDelay_(p.get<int>("fHardDelay",40000)),
+    fBmin_(p.get<int>("fBmin",220)),
+    fBmax_(p.get<int>("fBmax",620)),
+    fGPSmin_(p.get<int>("fGPSmin",66000)),
+    fGPSmax_(p.get<int>("fGPSmax",78000)),
+    extrasecond_(p.get<int>("extrasecond",0)),
     verbose_(p.get<int>("verbose"))
     // More initializers here.
 {
@@ -215,6 +261,31 @@ void crt::MergeTest::analyze(art::Event const & evt)
   }
   //get CRTHits
 
+
+  //get CRTHits extra second
+  art::Handle< std::vector<crt::CRTHit> > rawHandle_hitextra;
+  evt.getByLabel(data_labelhitextra_, rawHandle_hitextra); //
+  
+  //check to make sure the data we asked for is valid
+  if(!rawHandle_hitextra.isValid()){
+    std::cout << "Run " << evt.run() << ", subrun " << evt.subRun()
+              << ", event " << evt.event() << " has zero"
+              << " CRTHits " << " in module " << data_labelhitextra_ << std::endl;
+    std::cout << std::endl;
+    return;
+  }
+  
+  //get better access to the data    //CRTHit collection on this event                                                
+  std::vector<crt::CRTHit> const& CRTHitCollectionExtra(*rawHandle_hitextra);
+  
+  if(verbose_==1){ 
+    std::cout<<"  CRTHitCollectionExtra.size()  "<<CRTHitCollectionExtra.size()<<std::endl; 
+    //  getchar();   
+  }
+  //get CRTHits
+
+
+
   
   if(CRTHitCollection.size()>0){//A
     
@@ -258,8 +329,6 @@ void crt::MergeTest::analyze(art::Event const & evt)
       }
       
       
-            
-      
       // if(fbeam == 0){//C solo onbeam
 	int Hmatchcounter=0;
 	
@@ -285,12 +354,15 @@ void crt::MergeTest::analyze(art::Event const & evt)
           int diffT0_nsecABS = std::abs(diffT0_nsec);
 	  
 	  //efficiency
-	  if(diffT1_nsecABS>350 && diffT1_nsecABS<700) Bmatch=true;
-	  if(diffT0_nsecABS>68800 && diffT0_nsecABS<70000) GPSmatch=true;
+	  if(diffT1_nsecABS>fBmin_ && diffT1_nsecABS<fBmax_) Bmatch=true;
+	  if(diffT0_nsecABS>fGPSmin_ && diffT0_nsecABS<fGPSmax_) GPSmatch=true; //for data before Dec1
 	  //effiency	 
 	 	  
-	  //if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E                                                                                      //if( (diff_secABS<1)    ){//E
-	  if(diffT1_nsecABS<1000  ){//E
+	  //if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E
+	  //if( (diff_secABS<1)    ){//E
+	  
+	  //comment for data before Dec 1st 2017
+	  // if(diffT1_nsecABS<1000  ){//E
 	    
 	    Hmatchcounter++;          
 	    
@@ -303,6 +375,9 @@ void crt::MergeTest::analyze(art::Event const & evt)
 	    hTFvsTH_t0_t1->Fill(diffT0_nsecABS, diffT1_nsecABS);
             hTFvsTH_plane_t0->Fill(my_CRTHit.plane, diffT0_nsecABS);
 	    
+	    hTFvsBM_2d->Fill(Timeflash,diffT1_nsecABS);
+	    hTFvsGPSM_2d->Fill(Timeflash,diffT0_nsecABS);
+
 	    if(my_CRTHit.plane == 0){
 	      Hmatchcounter0++;
 	      hBot->Fill(my_CRTHit.z_pos, my_CRTHit.x_pos);
@@ -337,7 +412,8 @@ void crt::MergeTest::analyze(art::Event const & evt)
               getchar();
             }
 	    
-	  }//E 
+	    //comment for data before Dec 1st 2017 
+	    //}//E 
 	}//D
 	
 	hNHitperFla->Fill(Hmatchcounter);
@@ -361,6 +437,162 @@ void crt::MergeTest::analyze(art::Event const & evt)
     
     
   }//A
+
+
+  //extra second
+  if(extrasecond_==1){
+    if(CRTHitCollectionExtra.size()>0){//A
+      
+      hNFlavsNHit->Fill(OpFlashCollection.size(),CRTHitCollectionExtra.size());
+      
+      int Hmatchcounter0_extra=0;
+      int Hmatchcounter1_extra=0;
+      int Hmatchcounter2_extra=0;
+      int Hmatchcounter3_extra=0;
+      
+      
+      for(std::vector<int>::size_type i = 0; i != OpFlashCollection.size(); i++) {//B
+	
+	recob::OpFlash my_OpFlash = OpFlashCollection[i];
+	
+	auto Yflash = my_OpFlash.YCenter();
+	auto Zflash = my_OpFlash.ZCenter();
+	auto PEflash = my_OpFlash.TotalPE();
+	auto Timeflash = my_OpFlash.Time(); //in us from trigger time
+	auto Timeflash_ns = (Timeflash * 1000);
+	auto Timeflash_ns_GPS = evt_timeGPS_nsec + (Timeflash * 1000);      
+	int fbeam = my_OpFlash.OnBeamTime();
+	uint32_t Flash_sec = evt_timeGPS_sec;
+	
+	hFlashTimeDis_extra->Fill(Timeflash);
+	
+	if(verbose_==1){ 
+	  std::cout<<"event: "<<fEvtNum<<std::endl;
+	  std::cout<<"Flash: "<<i<<std::endl;
+	  std::cout<<"Beam: "<<fbeam<<std::endl;
+	  std::cout<<"Zflash: "<<Zflash<<std::endl;
+	  std::cout<<"Yflash: "<<Yflash<<std::endl;
+	  std::cout<<"PEflash: "<<PEflash<<std::endl;
+	  std::cout.precision(19);
+	  std::cout<<" "<<std::endl;
+	  std::cout<<"Flash time: "<<Flash_sec<< " seconds"<<std::endl;
+	  std::cout<<"Flash time: "<<Timeflash<< "  us w.r.t to trigger"<<std::endl;
+	  std::cout<<"Flash time: "<<Timeflash_ns<< "  ns w.r.t to trigger"<<std::endl;
+	  std::cout<<"Flash time: "<<Timeflash_ns_GPS<< "  ns in GPS"<<std::endl;
+	  std::cout<<" "<<std::endl;
+	}
+	
+	
+	// if(fbeam == 0){//C solo onbeam
+	int Hmatchcounter_extra=0;
+	
+	bool Bmatch_extra=false;
+	bool GPSmatch_extra=false;
+	
+	for(std::vector<int>::size_type j = 0; j != CRTHitCollectionExtra.size(); j++) {//D
+	  
+	  crt::CRTHit my_CRTHit = CRTHitCollectionExtra[j];
+	  
+          int Hit_sec_extra = my_CRTHit.ts0_s;
+          
+          int Hit_T1_nsec_extra = my_CRTHit.ts1_ns + fHardDelay_;
+          int Hit_T0_nsec_extra = my_CRTHit.ts0_ns;
+	  
+          int diff_sec_extra = Flash_sec - Hit_sec_extra;
+          int diff_secABS_extra = std::abs(diff_sec_extra);
+	  
+          int diffT1_nsec_extra = Timeflash_ns - Hit_T1_nsec_extra;
+          int diffT1_nsecABS_extra = std::abs(diffT1_nsec_extra);
+	  
+          int diffT0_nsec_extra = Timeflash_ns_GPS - Hit_T0_nsec_extra;
+          int diffT0_nsecABS_extra = std::abs(diffT0_nsec_extra);
+	  
+	  //efficiency
+	  if(diffT1_nsecABS_extra>fBmin_ && diffT1_nsecABS_extra<fBmax_) Bmatch_extra=true;
+	  if(diffT0_nsecABS_extra>fGPSmin_ && diffT0_nsecABS_extra<fGPSmax_) GPSmatch_extra=true; //for data before Dec1
+	  //effiency	 
+	 	  
+	  //if( (diff_secABS<1)  &&  (diffT1_nsecABS<1000 )  ){//E
+	  //if( (diff_secABS<1)    ){//E
+	  
+	  //comment for data before Dec 1st 2017
+	  // if(diffT1_nsecABS<1000  ){//E
+	  
+	  Hmatchcounter_extra++;          
+	    
+	  hTFvsTH_t1_extra->Fill(diffT1_nsec_extra);
+	  hTFvsTH_t1_2d_extra->Fill(diff_sec_extra , diffT1_nsecABS_extra);
+	  
+	  hTFvsTH_t0_extra->Fill(diffT0_nsec_extra);
+	  hTFvsTH_t0_2d_extra->Fill(diff_sec_extra , diffT0_nsecABS_extra);	                
+	  
+	  hTFvsTH_t0_t1_extra->Fill(diffT0_nsecABS_extra, diffT1_nsecABS_extra);
+	  hTFvsTH_plane_t0_extra->Fill(my_CRTHit.plane, diffT0_nsecABS_extra);
+	  
+	  hTFvsBM_2d_extra->Fill(Timeflash,diffT1_nsecABS_extra);
+	  hTFvsGPSM_2d_extra->Fill(Timeflash,diffT0_nsecABS_extra);
+	  
+	  if(my_CRTHit.plane == 0){
+	    Hmatchcounter0_extra++;
+	    hBot_extra->Fill(my_CRTHit.z_pos, my_CRTHit.x_pos);
+	  }
+	  if(my_CRTHit.plane == 1){
+	    Hmatchcounter1_extra++;
+	    hFT_extra->Fill(my_CRTHit.z_pos, my_CRTHit.y_pos);
+	  }
+	  if(my_CRTHit.plane == 2){
+	    Hmatchcounter2_extra++;
+	    hPipe_extra->Fill(my_CRTHit.z_pos, my_CRTHit.y_pos);
+	  }
+	  if(my_CRTHit.plane == 3){
+	    Hmatchcounter3_extra++;
+	    hTop_extra->Fill(my_CRTHit.z_pos, my_CRTHit.x_pos);  	    
+	  }
+	  
+	  
+	  if(verbose_==1){
+	    std::cout<<"Flash_sec - Hit_sec: "<<diff_sec_extra<<std::endl;
+	    std::cout<<"ABS( Flash_sec - Hit_sec ): "<<diff_secABS_extra<<std::endl;
+	    std::cout<<" "<<std::endl;
+	    std::cout<<"Hit_ns(T1): "<<Hit_T1_nsec_extra<<std::endl;
+	    std::cout<<"Flash_nsec(w.r.t. Trigger): "<<Timeflash_ns<<std::endl;
+	    std::cout<<"     Flash_nsec - Hit_nsec(T1)  : "<<diffT1_nsec_extra<<std::endl;
+	    std::cout<<"ABS( Flash_nsec - Hit_nsec(T1) ): "<<diffT1_nsecABS_extra<<std::endl;
+	    std::cout<<" "<<std::endl;
+	    std::cout<<"Hit_ns(T0): "<<Hit_T0_nsec_extra<<std::endl;
+	    std::cout<<"Flash_nsec(GPS units): "<<Timeflash_ns_GPS<<std::endl;
+	    std::cout<<"     Flash_nsec - Hit_nsec(T0)  : "<<diffT0_nsec_extra<<std::endl;
+	    std::cout<<"ABS( Flash_nsec - Hit_nsec(T0) ): "<<diffT0_nsecABS_extra<<std::endl;
+	    getchar();
+	  }
+	  
+	  //comment for data before Dec 1st 2017 
+	  //}//E 
+	}//D
+	
+	hNHitperFla->Fill(Hmatchcounter_extra);
+	
+	
+	if(Bmatch_extra)hFlashTimeDis_Beam_extra->Fill(Timeflash);
+	if(GPSmatch_extra)hFlashTimeDis_GPS_extra->Fill(Timeflash);
+	
+	// }//C
+      }//B  
+      
+      hNHitperFla0_extra->Fill(Hmatchcounter0_extra);
+      hNHitperFla1_extra->Fill(Hmatchcounter1_extra);
+      hNHitperFla2_extra->Fill(Hmatchcounter2_extra);
+      hNHitperFla3_extra->Fill(Hmatchcounter3_extra);
+      
+      hNHitperFla2D_extra->Fill(0.,Hmatchcounter0_extra);
+      hNHitperFla2D_extra->Fill(1.,Hmatchcounter1_extra);
+      hNHitperFla2D_extra->Fill(2.,Hmatchcounter2_extra);
+      hNHitperFla2D_extra->Fill(3.,Hmatchcounter3_extra);
+      
+      
+    }//A
+  }
+  //end extra second
   
   
   
@@ -383,7 +615,7 @@ void crt::MergeTest::beginJob()
   hFlashTimeDis_Beam->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
   hFlashTimeDis_Beam->GetYaxis()->SetTitle("Entries/bin");
 
-  hTFvsTH_t1 = tfs->make<TH1F>("hBeamMatching","hBeamMatching",500,-1000,1000);
+  hTFvsTH_t1 = tfs->make<TH1F>("hBeamMatching","hBeamMatching",500,0,1000);
   hTFvsTH_t1->GetXaxis()->SetTitle("Flash Time w.r.t. trigger - CRTHit Time_t1 (ns)");
   hTFvsTH_t1->GetYaxis()->SetTitle("Entries/bin");
 
@@ -391,6 +623,11 @@ void crt::MergeTest::beginJob()
   hTFvsTH_t1_2d->GetXaxis()->SetTitle("Flash Time - CRTHit Time (s)");
   hTFvsTH_t1_2d->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
   hTFvsTH_t1_2d->SetOption("COLZ"); 
+
+  hTFvsBM_2d = tfs->make<TH2F>("hTFvsBM_2d","hTFvsBM_2d",850,-3500,5000,500,0,1000);
+  hTFvsBM_2d->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+  hTFvsBM_2d->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
+  hTFvsBM_2d->SetOption("COLZ"); 
 
   hTFvsTH_t0 = tfs->make<TH1F>("hGPSMatching","GPSMatching",2000,0,100000);
   hTFvsTH_t0->GetXaxis()->SetTitle("Flash_Time_GPS - CRTHit_Time_T0 (ns)");
@@ -406,13 +643,19 @@ void crt::MergeTest::beginJob()
   hTFvsTH_t0_t1->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
   hTFvsTH_t0_t1->SetOption("COLZ"); 
 
+  hTFvsGPSM_2d = tfs->make<TH2F>("hTFvsGPSM_2d","hTFvsGPSM_2d",850,-3500,5000,2000,0,100000);
+  hTFvsGPSM_2d->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+  hTFvsGPSM_2d->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_T0 (ns)");
+  hTFvsGPSM_2d->SetOption("COLZ"); 
+
+
   hTFvsTH_plane_t0 = tfs->make<TH2F>("hGPSBeamMatchingPlane","hGPSBeamMatchingPlane",4,0,4, 2000,0,100000);
   hTFvsTH_plane_t0->GetXaxis()->SetTitle("CRT plane (0=bottom, 1=FT, 2=Pipe, 3=Top))");
   hTFvsTH_plane_t0->GetYaxis()->SetTitle("Flash Time_GPS - CRTHit Time_t0 (ns)");
   hTFvsTH_plane_t0->SetOption("COLZ"); 
 
 
-  hNFlavsNHit = tfs->make<TH2F>("hNFlavsNHit","hNFlavsNHit",30,0,30,100,0,300);
+  hNFlavsNHit = tfs->make<TH2F>("hNFlavsNHit","hNFlavsNHit",60,0,60,100,0,300);
   hNFlavsNHit->GetXaxis()->SetTitle("Number of Flashes per event");
   hNFlavsNHit->GetYaxis()->SetTitle("Number of CRT Hits per event");
   hNFlavsNHit->GetZaxis()->SetTitle("Entries/bin");
@@ -446,28 +689,150 @@ void crt::MergeTest::beginJob()
 
   double inch =2.54; //inch in cm
   hBot = tfs->make<TH2F>("hBottom","Bottom",125,-700+205*inch,-700+205*inch+125*10.89,60,-300+50.4*inch,-300+50.4*inch+60*10.89);
-  hBot->GetXaxis()->SetTitle("Lenght along the beam (cm)");
-  hBot->GetYaxis()->SetTitle("Lenght along the drift (cm)");
+  hBot->GetXaxis()->SetTitle("Length along the beam (cm)");
+  hBot->GetYaxis()->SetTitle("Length along the drift (cm)");
   hBot->GetZaxis()->SetTitle("Entries/bin");
   hBot->SetOption("COLZ");
 
   hFT = tfs->make<TH2F>("hFeedthroughSide","Feedthrough Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-308-19.1*inch,-308-19.1*inch+60*10.89);
-  hFT->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  hFT->GetXaxis()->SetTitle("Length along the beam (cm)");
   hFT->GetYaxis()->SetTitle("Height (cm)");
   hFT->GetZaxis()->SetTitle("Entries/bin");
   hFT->SetOption("COLZ");
 
   hPipe = tfs->make<TH2F>("hPipeSide","Pipe Side",125,-704+205*inch,-704+205*inch+125*10.89,60,-294-19.1*inch,-294-19.1*inch+60*10.89);
-  hPipe->GetXaxis()->SetTitle("Lenght along the beam (cm)");
+  hPipe->GetXaxis()->SetTitle("Length along the beam (cm)");
   hPipe->GetYaxis()->SetTitle("Height (cm)");
   hPipe->GetZaxis()->SetTitle("Entries/bin");
   hPipe->SetOption("COLZ");
 
   hTop = tfs->make<TH2F>("hTop","Top",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
-  hTop->GetXaxis()->SetTitle("Lenght along the beam (cm)");
-  hTop->GetYaxis()->SetTitle("Lenght along the drift (cm)"); 
+  hTop->GetXaxis()->SetTitle("Length along the beam (cm)");
+  hTop->GetYaxis()->SetTitle("Length along the drift (cm)"); 
   hTop->GetZaxis()->SetTitle("Entries/bin"); 
   hTop->SetOption("COLZ");
+
+
+
+  //--- extra second
+  if(extrasecond_==1){
+    
+    
+    hFlashTimeDis_extra = tfs->make<TH1F>("hFlashTimDis_extra","hFlashTimDis_extra",850,-3500,5000);
+    hFlashTimeDis_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+    hFlashTimeDis_extra->GetYaxis()->SetTitle("Entries/bin");  
+    
+    hFlashTimeDis_GPS_extra = tfs->make<TH1F>("hFlashTimDis_GPS_extra","hFlashTimDis_GPS_extra",850,-3500,5000);
+    hFlashTimeDis_GPS_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+    hFlashTimeDis_GPS_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hFlashTimeDis_Beam_extra = tfs->make<TH1F>("hFlashTimDis_Beam_extra","hFlashTimDis_Beam_extra",850,-3500,5000);
+    hFlashTimeDis_Beam_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+    hFlashTimeDis_Beam_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hTFvsTH_t1_extra = tfs->make<TH1F>("hBeamMatching_extra","hBeamMatching_extra",500,0,1000);
+    hTFvsTH_t1_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger - CRTHit Time_t1 (ns)");
+    hTFvsTH_t1_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hTFvsTH_t1_2d_extra = tfs->make<TH2F>("hBeamMatching2_extra","hBeamMatching2_extra",6,-3,3,500,0,1000);
+    hTFvsTH_t1_2d_extra->GetXaxis()->SetTitle("Flash Time - CRTHit Time (s)");
+    hTFvsTH_t1_2d_extra->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
+    hTFvsTH_t1_2d_extra->SetOption("COLZ"); 
+    
+    hTFvsBM_2d_extra = tfs->make<TH2F>("hTFvsBM_2d_extra","hTFvsBM_2d_extra",850,-3500,5000,500,0,1000);
+    hTFvsBM_2d_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+    hTFvsBM_2d_extra->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
+    hTFvsBM_2d_extra->SetOption("COLZ"); 
+    
+    hTFvsTH_t0_extra = tfs->make<TH1F>("hGPSMatching_extra","GPSMatching_extra",2000,0,100000);
+    hTFvsTH_t0_extra->GetXaxis()->SetTitle("Flash_Time_GPS - CRTHit_Time_T0 (ns)");
+    hTFvsTH_t0_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hTFvsTH_t0_2d_extra = tfs->make<TH2F>("hGPSMatching2_extra","hGPSMatching2_extra",6,-3,3,2000,0,100000);
+    hTFvsTH_t0_2d_extra->GetXaxis()->SetTitle("Flash Time - CRTHit Time (s)");
+    hTFvsTH_t0_2d_extra->GetYaxis()->SetTitle("Flasf_Time_GPS - CRTHit_Time_T0 (ns)");
+    hTFvsTH_t0_2d_extra->SetOption("COLZ"); 
+    
+    hTFvsTH_t0_t1_extra = tfs->make<TH2F>("hGPSBeamMatching_extra","hGPSBeamMatching_extra",2000,0,100000,500,0,1000);
+    hTFvsTH_t0_t1_extra->GetXaxis()->SetTitle("Flash_Time_GPS - CRTHit_Time_T0 (ns)");
+    hTFvsTH_t0_t1_extra->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_t1 (ns)");
+    hTFvsTH_t0_t1_extra->SetOption("COLZ"); 
+    
+    hTFvsGPSM_2d_extra = tfs->make<TH2F>("hTFvsGPSM_2d_extra","hTFvsGPSM_2d_extra",850,-3500,5000,2000,0,100000);
+    hTFvsGPSM_2d_extra->GetXaxis()->SetTitle("Flash Time w.r.t. trigger (us)");
+    hTFvsGPSM_2d_extra->GetYaxis()->SetTitle("Flash Time w.r.t Trigger - CRTHit_Time_T0 (ns)");
+    hTFvsGPSM_2d_extra->SetOption("COLZ"); 
+    
+    
+    hTFvsTH_plane_t0_extra = tfs->make<TH2F>("hGPSBeamMatchingPlane_extra","hGPSBeamMatchingPlane_extra",4,0,4, 2000,0,100000);
+    hTFvsTH_plane_t0_extra->GetXaxis()->SetTitle("CRT plane (0=bottom, 1=FT, 2=Pipe, 3=Top))");
+    hTFvsTH_plane_t0_extra->GetYaxis()->SetTitle("Flash Time_GPS - CRTHit Time_t0 (ns)");
+    hTFvsTH_plane_t0_extra->SetOption("COLZ"); 
+    
+    
+    hNFlavsNHit_extra = tfs->make<TH2F>("hNFlavsNHit_extra","hNFlavsNHit_extra",60,0,60,100,0,300);
+    hNFlavsNHit_extra->GetXaxis()->SetTitle("Number of Flashes per event");
+    hNFlavsNHit_extra->GetYaxis()->SetTitle("Number of CRT Hits per event");
+    hNFlavsNHit_extra->GetZaxis()->SetTitle("Entries/bin");
+    hNFlavsNHit_extra->SetOption("COLZ");
+    
+    hNHitperFla_extra = tfs->make<TH1F>("hNHitperFla_extra","hNHitperFla_extra",205,-5,200);
+    hNHitperFla_extra->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash");
+    hNHitperFla_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hNHitperFla0_extra = tfs->make<TH1F>("hNHitperFlaBot_extra","hNHitperFlaBot_extra",205,-5,400);
+    hNHitperFla0_extra->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Bottom");
+    hNHitperFla0_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hNHitperFla1_extra = tfs->make<TH1F>("hNHitperFlaFT_extra","hNHitperFlaFT_extra",205,-5,400);
+    hNHitperFla1_extra->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in FT");
+    hNHitperFla1_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hNHitperFla2_extra = tfs->make<TH1F>("hNHitperFlaPipe_extra","hNHitperFlaPipe_extra",205,-5,400);
+    hNHitperFla2_extra->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Pipe");
+    hNHitperFla2_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hNHitperFla3_extra = tfs->make<TH1F>("hNHitperFlaTop_extra","hNHitperFlaTop_extra",205,-5,400);
+    hNHitperFla3_extra->GetXaxis()->SetTitle("N^{o} of CRTHits per Flash in Top");
+    hNHitperFla3_extra->GetYaxis()->SetTitle("Entries/bin");
+    
+    hNHitperFla2D_extra = tfs->make<TH2F>("hNHitperEvtPlane_extra","hNHitperEvtPlane_extra",4,0,4,205,-5,400);
+    hNHitperFla2D_extra->GetXaxis()->SetTitle("CRT plane (0=bottom, 1=FT, 2=Pipe, 3=Top))");
+    hNHitperFla2D_extra->GetYaxis()->SetTitle("N^{o} of CRTHits in event");
+    hNHitperFla2D_extra->SetOption("COLZ"); 
+    
+    
+    //  double inch =2.54; //inch in cm
+    hBot_extra = tfs->make<TH2F>("hBottom_extra","Bottom_extra",125,-700+205*inch,-700+205*inch+125*10.89,60,-300+50.4*inch,-300+50.4*inch+60*10.89);
+    hBot_extra->GetXaxis()->SetTitle("Length along the beam (cm)");
+    hBot_extra->GetYaxis()->SetTitle("Length along the drift (cm)");
+    hBot_extra->GetZaxis()->SetTitle("Entries/bin");
+    hBot_extra->SetOption("COLZ");
+    
+    hFT_extra = tfs->make<TH2F>("hFeedthroughSide_extra","Feedthrough Side_extra",125,-704+205*inch,-704+205*inch+125*10.89,60,-308-19.1*inch,-308-19.1*inch+60*10.89);
+    hFT_extra->GetXaxis()->SetTitle("Length along the beam (cm)");
+    hFT_extra->GetYaxis()->SetTitle("Height (cm)");
+    hFT_extra->GetZaxis()->SetTitle("Entries/bin");
+    hFT_extra->SetOption("COLZ");
+    
+    hPipe_extra = tfs->make<TH2F>("hPipeSide_extra","Pipe Side_extra",125,-704+205*inch,-704+205*inch+125*10.89,60,-294-19.1*inch,-294-19.1*inch+60*10.89);
+    hPipe_extra->GetXaxis()->SetTitle("Length along the beam (cm)");
+    hPipe_extra->GetYaxis()->SetTitle("Height (cm)");
+    hPipe_extra->GetZaxis()->SetTitle("Entries/bin");
+    hPipe_extra->SetOption("COLZ");
+    
+    hTop_extra = tfs->make<TH2F>("hTop_extra","Top_extra",125,-701+205*inch,-701+205*inch+125*11.38,80,2-170-300+50.4*inch,2-170-300+50.4*inch+80*11.38);
+    hTop_extra->GetXaxis()->SetTitle("Length along the beam (cm)");
+    hTop_extra->GetYaxis()->SetTitle("Length along the drift (cm)"); 
+    hTop_extra->GetZaxis()->SetTitle("Entries/bin"); 
+    hTop_extra->SetOption("COLZ");
+        
+  }
+  //---extra second
+
+
+
+
 
 }
 

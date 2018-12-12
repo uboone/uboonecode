@@ -26,12 +26,14 @@ physics:
     {			
       module_type: MergeTest
       data_labelhit: "merger"
+      data_labelhitextra: "mergerextra"
       ##data_label_flash_: "opflashBeam" ##original
       data_label_flash_: "simpleFlashCosmic"   ##cosmic actvity
       data_label_DAQHeader_: "daq"
       fHardDelay: 40000
       fShowerCut: 200
       fPEsCut: 5
+      extrasecond: 0 ## 1=add
       verbose: 0
      }
   }
