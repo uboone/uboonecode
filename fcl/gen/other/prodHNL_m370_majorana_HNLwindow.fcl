@@ -1,11 +1,12 @@
-###############################################################################
-#
-# Generate majorana heavy neutral lepton in a timing window surrounding
-# the HNL (veto BNB) swtrigger.
-# Flux file with correct mass value needs to be provided
-# (by default in same directory).
-#
-###############################################################################
+# +-----------------------------------------------------------------------+
+# |                            HSN Generator                              |
+# +=======================================================================+
+# | Generates Majorana Heavy Sterile Neutrino decays to mu-pi in a timing |
+# | window surrounding the HSNvetoBNB swtrigger.                          |
+# |                                                                       |
+# | It takes a flux files as input corresponding to the mass generated.   |
+# | Flux files goes by default in same directory.                         |
+# +-----------------------------------------------------------------------+
 
 #include "services_microboone.fcl"
 process_name: HSNGen

@@ -1,3 +1,10 @@
+# +----------------------------------------------------+
+# |           Software trigger filter (HSN)            |
+# +----------------------------------------------------+
+# | Filter events that pass the HSN swtrigger but that |
+# | DO NOT pass the BNB swtrigger (HSN candidates)     |
+# +----------------------------------------------------+
+
 #include "services_microboone.fcl"
 
 process_name: SwTriggerFilterHSNvetoBNB

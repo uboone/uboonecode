@@ -1,3 +1,10 @@
+# +-----------------------------------------------------------------+
+# |                      Dirt generator (HSN)                       |
+# +-----------------------------------------------------------------+
+# | Generate dirt events in timing window after the BNB beam spill, |
+# | to simulate dirt events captures by HSNvetoBNB swtrigger        |
+# +-----------------------------------------------------------------+
+
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
 #include "largeantmodules_microboone.fcl"
