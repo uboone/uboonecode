@@ -1,0 +1,64 @@
+#include "services_microboone.fcl"
+
+process_name: SwTriggerFilterHSNvetoBNB
+services:
+{
+  TFileService: { fileName: "triggerFilter_hist.root" }
+  FileCatalogMetadata:    @local::art_file_catalog_mc
+  TimeTracker:  {}
+  @table::microboone_services_reco
+}
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "triggerFilter_hist.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}
+
+services.DetectorClocksService.InheritClockConfig: false
+
+source:
+{
+  module_type: RootInput
+  maxEvents:  -1
+  inputCommands: [ "keep *_*_*_*", "drop sumdata::RunData_*_*_*" ]
+}
+
+physics:
+{
+   producers: {}
+   analyzers: {}
+   filters:
+   {
+      triggerEnforcement:
+      {
+         module_type: "TriggerEnforcement"
+         ExcludeBits: []
+         HardwareTriggerProducer: "triggersim"
+         IncludeBits: [ "TriggerBNB" ]
+         SoftwareTriggerProducer: "swtrigger"
+         Verbose: true
+         excludeSoftwareTriggers: [ "BNB_FEMBeamTriggerAlgo", "BNB_2017Dec_SWTrigger5PE_FEMBeamTriggerAlgo" ]
+         includeSoftwareTriggers: [ "BNB_HSN_c0_FEMBeamTriggerAlgo" ]         
+      }
+   }
+
+   filter: [ triggerEnforcement ]
+   stream1: [ out1 ]
+
+   trigger_paths: [ filter ]
+   end_paths:     [ stream1 ]
+}
+
+outputs:
+{
+ out1:
+  {
+   module_type: RootOutput
+   fileName: "%ifb_%tc_filtered.root"
+   SelectEvents: [ filter ]
+   dataTier: "detector-simulated"
+  }
+}
