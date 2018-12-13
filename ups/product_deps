@@ -35,7 +35,7 @@ ubcv                    v08_00_00
 ubcrt                   v08_00_00
 ublite			v08_00_00
 ubutil                  v08_00_00
-uboonedata              v08_00_00
+uboonedata              v01_18_21
 genie_xsec              v2_12_10
 cetbuildtools	        v7_04_00	-	only_for_build
 end_product_list
