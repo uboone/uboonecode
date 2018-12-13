@@ -278,6 +278,7 @@ microboone_reco_mcc8_producers:
   #trackkalmanhitccContTag:          @local::microboone_containment_tag
   #stitchkalmanhitccContTag:         @local::microboone_containment_tag
   pmtrackContTag:                   @local::microboone_containment_tag
+  pandoraContTag:                   @local::microboone_containment_tag
 
   ### MCS Momentum
   pandoraNuMCSMu:                   @local::mcsfitproducer
@@ -390,7 +391,7 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraShower,
                                          pandora,
                                          pandoratag,
-                                         #pandoraContTag,
+                                         pandoraContTag,
                                          pandoraMCSMu,
                                          pandoracalo,
                                          pandorapid,
@@ -830,10 +831,8 @@ microboone_reco_mcc8_producers.pandoraKHit.ClusterModuleLabel:                  
 microboone_reco_mcc8_producers.pandoraKHit.HitFinderModuleLabel:                                               "gaushit"
 
 microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandora"
-#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
-#microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        false
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             ""
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
 microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
@@ -962,6 +961,8 @@ microboone_reco_mcc8_producers.pandoraNuPMAContTag.TrackModuleLabels:           
 microboone_reco_mcc8_producers.pandoraNuPMAContTag.ApplyTags:                                                   [false,true]
 microboone_reco_mcc8_producers.pmtrackContTag.TrackModuleLabels:                                                ["pmtrack"]
 microboone_reco_mcc8_producers.pmtrackContTag.ApplyTags:                                                        [true]
+microboone_reco_mcc8_producers.pandoraContTag.TrackModuleLabels:                                                ["pandora"]
+microboone_reco_mcc8_producers.pandoraContTag.ApplyTags:                                                        [true]
 
 microboone_reco_mcc8_producers.pandoraNuMCSMu.inputs.inputLabel:                                                "pandoraNu"
 microboone_reco_mcc8_producers.pandoraMCSMu.inputs.inputLabel:                                                  "pandora"
