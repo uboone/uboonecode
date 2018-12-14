@@ -64,7 +64,8 @@ namespace trkf
     
     // Prepare the random stream
     CLHEP::RandFlat rndm
-      (art::ServiceHandle<art::RandomNumberGenerator>()->getEngine());
+      (art::ServiceHandle<art::RandomNumberGenerator>()->getEngine(art::ScheduleID::first(),
+                                                                   moduleDescription().moduleLabel()));
     
     // Make a PropAny propagate to test.
 
