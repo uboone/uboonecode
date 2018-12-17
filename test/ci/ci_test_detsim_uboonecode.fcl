@@ -1,4 +1,4 @@
-#include "standard_detsim_uboone.fcl"
+#include "wirecell_detsim_uboone.fcl"
 
 services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234
