@@ -1,0 +1,90 @@
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
+
+process_name: DataRecoStage2Lite
+
+services.TFileService.fileName: "reco_stage_2_hist.root"
+
+physics.reco: [ 
+                pandoraCosmicPatRec,
+                pandoraCosmicTrack,
+                pandoraCosmicShower,
+                pandoraCosmic,
+                pandoraCosmicKalmanTrack,
+                pandoraCosmicPFPart,
+                pandoraCosmicFlashTag,
+                pandoraCosmicHitRemoval,
+                pandoraCosmicT0Reco,
+                pandoraNuPatRec,
+                pandoraNuTrack,
+                pandoraNuShower,
+                pandoraNu,
+                pandoraNuPMA,
+                trajcluster,
+                pmtrack,
+                pandoraPatRec,
+                pandoraTrack,
+                pandoraShower,
+                pandora
+              ]
+
+outputs:
+{
+    out1:
+    {
+        module_type:               RootOutput
+        dataTier:                  "reconstructed"
+        streamName: "reco1"
+        fileName: "%ifb_%tc.root"
+        compressionLevel:          1
+        saveMemoryObjectThreshold: 0
+        outputCommands: [ "keep *_*_*_*",
+                          "drop raw::RawDigits_*_*_*",
+                          "drop *_*_*_DataRecoStage2Lite"  ]
+    }
+    out2:
+    {
+        module_type:               RootOutput
+        dataTier:                  "reconstructed"
+        streamName: "reco2_lite"
+        fileName: "%ifb_%tc_reco2_lite.root"
+        compressionLevel:          1
+        saveMemoryObjectThreshold: 0
+        outputCommands: [ "keep *_*_*_*",
+                          "drop sim::SimChannels_*_*_*",
+                          "drop sim::SimEnergyDeposits_*_*_*",
+                          "drop raw::RawDigits_*_*_*",
+                          "drop optdata::ChannelDataGroup_*_*_*",
+                          "drop *_*pandoraNu*_*_*",
+                          "drop *_*trajcluster*_*_*",
+                          "drop *_*dbcluster3d*_*_*",
+                          "drop *_*pmtrack*_*_*",
+                          "drop recob::Wires_*_*_*",
+                          "drop recob::TrackFitHitInfoss_*_*_*",
+                          "drop *PMA*_*_*_*",
+                          "drop *KHit*_*_*_*",
+                          "drop *_*PMA*_*_*",
+                          "drop *_*KHit*_*_*",
+                          "drop *opflash*_*_*_*",
+                          "drop *_*opflash*_*_*",
+                          "drop *_*cali*_*_*",
+                          "drop *_pandoraPatRec_*_*"]
+    }
+
+}
+
+
+physics.stream1: [ out1, out2 ]
+
+physics.producers.trajcluster.HitModuleLabel:                                                    "pandoraCosmicHitRemoval"
+physics.producers.trajcluster.SliceModuleLabel:                                                  "NA"
+physics.producers.trajcluster.HitTruthModuleLabel:                                               "NA"
+physics.producers.trajcluster.CalorimetryModuleLabel:                                            "NA"
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "reco_stage_2_hist.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}
+
