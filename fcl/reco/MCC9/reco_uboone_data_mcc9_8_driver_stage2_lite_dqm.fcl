@@ -67,7 +67,10 @@ outputs:
                           "drop *opflash*_*_*_*",
                           "drop *_*opflash*_*_*",
                           "drop *_*cali*_*_*",
-                          "drop *_pandoraPatRec_*_*"]
+                          "drop *_pandoraPatRec_*_*",
+                          "drop *Shower*_*_*_*",
+                          "drop *_*Shower*_*_*"
+                          ]
     }
 
 }
