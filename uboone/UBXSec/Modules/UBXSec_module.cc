@@ -103,10 +103,10 @@
 #include "uboone/UBXSec/Algorithms/NuMuCCEventSelection.h"
 #include "uboone/UBXSec/Algorithms/TrackQuality.h"
 
-#include "larreco/RecoAlg/TrackMomentumCalculator.h"
-
 //this is included for some of the summer2018 PID functions
-//#include "uboone/ParticleID/Algorithms/uB_PlaneIDBitsetHelperFunctions.h"
+#include "uboone/ParticleID/Algorithms/uB_PlaneIDBitsetHelperFunctions.h"
+
+#include "larreco/RecoAlg/TrackMomentumCalculator.h"
 
 // Root include
 #include "TString.h"
@@ -161,6 +161,12 @@ private:
   std::vector<double> GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos);
   std::vector<double> GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
   std::vector<double> GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
+
+  /// Fill the CC1uNp variables with default values
+  //  void FillPFPTruthDefaults(UBXSecEvent *ubxsec_event);
+  void FillPFPTruthDefaults();
+  void FillPFPRecoTrackDefaults();
+  void FillPFPRecoDefaults();
 
   FindDeadRegions deadRegionsFinder;
   //ubxsec::McPfpMatch mcpfpMatcher;
@@ -373,7 +379,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   //PFP Truth variables
 
   //Tracks from PFP variables
-  _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSec");
+  _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSecAnaOnly");
 
   _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
@@ -606,15 +612,17 @@ void UBXSec::produce(art::Event & e) {
   std::vector<art::Ptr<recob::PFParticle>> pfp_v;
   art::fill_ptr_vector(pfp_v, pfp_h);
   art::FindManyP<recob::Track> tracks_from_pfp(pfp_h, e, _pfp_producer);
+  art::FindManyP<recob::Hit> hits_from_tracks(track_h, e, _pfp_producer);
 
   //Get showers and particle ID fro the CC1mNp analysis variables
   art::FindManyP<recob::Shower> showers_from_pfp(pfp_h, e, _pfp_producer);
-  //std::cout << "[SimpleAna] Getting Particle ID Summer 2018 vector from this producer label: " << _particle_id_summer_2018_producer << std::endl;
+
+  //std::cout << "[UBXSec] Getting Particle ID Summer 2018 vector from this producer label: " << _particle_id_summer_2018_producer << std::endl;
   art::FindManyP<anab::ParticleID> particleids_summer2018_from_track(track_h, e, _particle_id_summer_2018_producer);
   if (!particleids_summer2018_from_track.isValid()) {
-    std::cout << "[SimpleAna] anab::ParticleID_summer2018_from_track is not valid." << std::endl;
+    std::cout << "[UBXSec] anab::ParticleID_summer2018_from_track is not valid." << std::endl;
   }
-  //std::cout << "[SimpleAna] Number of particleids_summer2018_from_track " << particleids_summer2018_from_track.size() << std::endl;
+  std::cout << "[UBXSec] Number of particleids_summer2018_from_track " << particleids_summer2018_from_track.size() << std::endl;
   
   ubxsec_event->n_pfp = ubxsec_event->n_pfp_primary = 0;
   for (size_t i = 0; i < pfp_h->size(); i++) {
@@ -2004,212 +2012,283 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->num_pfp_tracks=0;
     ubxsec_event->num_pfp_showers=0;
     
-    //ubxsec_event->ResizeCC1mNpPFPTrackVectors(pfp_v_v[slice_index].size();
+    //ubxsec_event->ResizeCC1mNpPFPTrackVectors(pfp_v_v[slice_index].size());
 
     for (auto pfp : pfp_v_v[slice_index]) {
 
+      std::cout << "[UBXSecCC1mNp] \t This is PFP " << pfp->Self()  << std::endl;      
       bool pfp_is_muon_candidate=false;
       if (muon_candidate_pfparticle_per_slice_v.at(slice_index).key()==pfp.key()) {
-	//std::cout<<"[UBXSec] This pfp is the muon candidate!!!"<<std::endl;
+	//std::cout<<"[UBXSecCC1mNp] This pfp is the muon candidate!!!"<<std::endl;
 	pfp_is_muon_candidate=true;
       }
 
       ubxsec_event->num_pfp++;
       if(lar_pandora::LArPandoraHelper::IsTrack(pfp)) {ubxsec_event->num_pfp_tracks++;}
       if(lar_pandora::LArPandoraHelper::IsShower(pfp)) {ubxsec_event->num_pfp_showers++;}
-
-      ubxsec_event->pfp_isTrack.emplace_back(lar_pandora::LArPandoraHelper::IsTrack(pfp));
-      ubxsec_event->pfp_isShower.emplace_back(lar_pandora::LArPandoraHelper::IsShower(pfp));
-      ubxsec_event->pfp_isPrimary.emplace_back(pfp->IsPrimary());
-
+      ubxsec_event->pfp_reco_ismuoncandidate.emplace_back(int(pfp_is_muon_candidate));
+      ubxsec_event->pfp_reco_istrack.emplace_back(int(lar_pandora::LArPandoraHelper::IsTrack(pfp)));
+      ubxsec_event->pfp_reco_isshower.emplace_back(int(lar_pandora::LArPandoraHelper::IsShower(pfp)));
+      ubxsec_event->pfp_reco_isprimary.emplace_back(int(pfp->IsPrimary()));
       const std::vector<size_t> &daughterIDs=pfp->Daughters();
-      ubxsec_event->pfp_ndaughters.emplace_back(int(daughterIDs.size()));
-            
-      if(lar_pandora::LArPandoraHelper::IsShower(pfp)) continue;
-            
+      ubxsec_event->pfp_reco_ndaughters.emplace_back(int(daughterIDs.size()));
+      ubxsec_event->pfp_reco_numtracks.emplace_back((tracks_from_pfp.at(pfp.key())).size());
+      ubxsec_event->pfp_reco_numshowers.emplace_back((showers_from_pfp.at(pfp.key())).size());
+      //std::cout << "[UBXSecModule] Number of tracks associated to pfparticle with pdg code " << pfp->PdgCode() <<" is : " << (tracks_from_pfp.at(pfp.key())).size() << std::endl;
+
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //if(lar_pandora::LArPandoraHelper::IsShower(pfp)) continue; //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+
       if(_is_mc){
 	std::vector<art::Ptr<ubana::MCGhost>> mcghosts=mcghost_from_pfp.at(pfp.key());
 	std::vector<art::Ptr<simb::MCParticle>> mcpars;	
-	
-	if(mcghosts.size()==0 ||mcghosts.size()>1){
-	  std::cout<<"[UBXSec] \t\t mcghosts is either 0 or >1"<<std::endl;
+	if(mcghosts.size()==0 || mcghosts.size()>1){
+	  std::cout<<"[UBXSecCC1mNp] \t\t mcghosts is either 0 or >1 so skipping filling pfp truth!"<<std::endl;
+	  //FillPFPTruthDefaults(ubxsec_event);
+	  FillPFPTruthDefaults();
 	  continue;
 	}
 	mcpars=mcpar_from_mcghost.at(mcghosts[0].key());
 	const auto mc_truth=UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpars[0]->TrackId());
 	if(!mc_truth) {
-	  std::cerr<<"[UBXSec] Problem with MCTruth pointer.  "<<std::endl;
+	  std::cerr<<"[UBXSecCC1mNp] Problem with MCTruth pointer so skipping filling pfp truth! "<<std::endl;
+	  //FillPFPTruthDefaults(ubxsec_event);
+	  FillPFPTruthDefaults();
+	  continue;
 	}
-	ubxsec_event->pfp_pdg.emplace_back(mcpars[0]->PdgCode());
-	ubxsec_event->pfp_origin.emplace_back(mc_truth->Origin());
-	ubxsec_event->pfp_status.emplace_back(mcpars[0]->StatusCode());
-	ubxsec_event->pfp_parId.emplace_back(mcpars[0]->TrackId());
-	ubxsec_event->pfp_theta.emplace_back(mcpars[0]->Momentum().Theta());
-	ubxsec_event->pfp_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
-	ubxsec_event->pfp_phi.emplace_back(mcpars[0]->Momentum().Phi());
-	ubxsec_event->pfp_mom.emplace_back(mcpars[0]->P());   
-	ubxsec_event->pfp_startx.emplace_back(mcpars[0]->Vx());
-	ubxsec_event->pfp_starty.emplace_back(mcpars[0]->Vy());
-	ubxsec_event->pfp_startz.emplace_back(mcpars[0]->Vz());
-	ubxsec_event->pfp_endx.emplace_back(mcpars[0]->EndX());
-	ubxsec_event->pfp_endy.emplace_back(mcpars[0]->EndY());
-	ubxsec_event->pfp_endz.emplace_back(mcpars[0]->EndZ());
-	ubxsec_event->pfp_endE.emplace_back(mcpars[0]->EndE());
-	ubxsec_event->pfp_KE.emplace_back(mcpars[0]->E()-mcpars[0]->Mass());
-	ubxsec_event->pfp_Mass.emplace_back(mcpars[0]->Mass());
-      } //end of the isMC conditional
-    
-      std::cout << "[UBXSecModule] Number of tracks associated to pfparticle with pdg code " << pfp->PdgCode() <<" is : " << (tracks_from_pfp.at(pfp->Self())).size() << std::endl;
-      std::cout << "[UBXSecModule] Number of showers associated to pfparticle with pdg code " << pfp->PdgCode() <<" is : " << (showers_from_pfp.at(pfp->Self())).size() << std::endl;
+	std::cout<<"[UBXSecCC1mNp] \t\t Filling pfp truth info for PFP " << pfp->Self() <<std::endl;
+	ubxsec_event->pfp_truth_pdg.emplace_back(mcpars[0]->PdgCode());
+	ubxsec_event->pfp_truth_origin.emplace_back(mc_truth->Origin());
+	ubxsec_event->pfp_truth_status.emplace_back(mcpars[0]->StatusCode());
+	ubxsec_event->pfp_truth_parId.emplace_back(mcpars[0]->TrackId());
+	ubxsec_event->pfp_truth_theta.emplace_back(mcpars[0]->Momentum().Theta());
+	ubxsec_event->pfp_truth_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
+	ubxsec_event->pfp_truth_phi.emplace_back(mcpars[0]->Momentum().Phi());
+	ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());   
+	ubxsec_event->pfp_truth_startx.emplace_back(mcpars[0]->Vx());
+	ubxsec_event->pfp_truth_starty.emplace_back(mcpars[0]->Vy());
+	ubxsec_event->pfp_truth_startz.emplace_back(mcpars[0]->Vz());
+	ubxsec_event->pfp_truth_endx.emplace_back(mcpars[0]->EndX());
+	ubxsec_event->pfp_truth_endy.emplace_back(mcpars[0]->EndY());
+	ubxsec_event->pfp_truth_endz.emplace_back(mcpars[0]->EndZ());
+	ubxsec_event->pfp_truth_endProcess.emplace_back(mcpars[0]->EndProcess());
+	ubxsec_event->pfp_truth_endE.emplace_back((mcpars[0]->Momentum(mcpars[0]->NumberTrajectoryPoints()-1)).E());
+	ubxsec_event->pfp_truth_KE.emplace_back(mcpars[0]->E()-mcpars[0]->Mass());
+	ubxsec_event->pfp_truth_Mass.emplace_back(mcpars[0]->Mass());
+      } else { //end of the isMC conditional
+	FillPFPTruthDefaults();
+	//FillPFPTruthDefaults(ubxsec_event);
+      }
+
+      if ( !(lar_pandora::LArPandoraHelper::IsTrack(pfp)) && !(lar_pandora::LArPandoraHelper::IsShower(pfp)) ) { //check if the PFParticle is considered neither a shower or a track
+	std::cout<<"[UBXSecCC1mNp] PFParticle: " << pfp->Self() << " is considered neither a track and a shower. WTF???" <<std::endl;
+	std::cout << "[UBXSecCC1mNp] PFParticle that is neither track nor shower has pdg code " << pfp->PdgCode() << std::endl;
+	std::cout<<"[UBXSecCC1mNp] That's crazy and gonna just fill CC1mNp ntuples varialbes with default values." <<std::endl;
+	FillPFPRecoTrackDefaults();
+	FillPFPRecoDefaults();
+      }
+          
+      if (lar_pandora::LArPandoraHelper::IsTrack(pfp) && lar_pandora::LArPandoraHelper::IsShower(pfp)) { //check if the PFParticle is considered both a track and a shower
+	std::cout<<"[UBXSecCC1mNp] PFP: " << pfp->Self() << " is considered both a track and a shower. WTF???" <<std::endl;
+	throw std::exception();
+      }
+
+      if (lar_pandora::LArPandoraHelper::IsShower(pfp)) { //if the Pandora thinks this is a shower, then fill the track variables with default
+	FillPFPRecoTrackDefaults();
+	if ( (showers_from_pfp.at(pfp.key())).size()==0) {
+	  std::cout<<"[UBXSecCC1mNp] Filling the default Reco info to for PFP " << pfp->Self() << " because no showers associated with PFP" <<std::endl;
+	  FillPFPRecoDefaults();
+	} else {
+	  //std::vector<art::Ptr<recob::Shower>> = shower
+	  art::Ptr<recob::Shower> shower_pfp = showers_from_pfp.at(pfp.key())[0];
+	  //for (auto shower_pfp : showers_from_pfp.at(pfp.key()) ) {
+	  //if (shower_pfp != showers_from_pfp.at(pfp.key())[0]) continue; //only take the first shower associated to the PFParticle
+	  TVector3 showerPos_pfp=shower_pfp->ShowerStart();
+	  TVector3 showerDirection_pfp=shower_pfp->Direction();
+	  ubxsec_event->pfp_reco_length.emplace_back(shower_pfp->Length());
+	  ubxsec_event->pfp_reco_theta.emplace_back(showerDirection_pfp.Theta());
+	  ubxsec_event->pfp_reco_costheta.emplace_back(TMath::Cos(showerDirection_pfp.Theta()));
+	  ubxsec_event->pfp_reco_phi.emplace_back(showerDirection_pfp.Phi());
+	  ubxsec_event->pfp_reco_startx.emplace_back(showerPos_pfp.X());
+	  ubxsec_event->pfp_reco_starty.emplace_back(showerPos_pfp.Y());
+	  ubxsec_event->pfp_reco_startz.emplace_back(showerPos_pfp.Z());
+	  ubxsec_event->pfp_reco_endx.emplace_back(showerPos_pfp.X()+TMath::Sin(showerDirection_pfp.Theta())*TMath::Sin(showerDirection_pfp.Phi())*shower_pfp->Length());
+	  ubxsec_event->pfp_reco_endy.emplace_back(showerPos_pfp.Y()+TMath::Sin(showerDirection_pfp.Theta())*TMath::Cos(showerDirection_pfp.Phi())*shower_pfp->Length());
+	  ubxsec_event->pfp_reco_endz.emplace_back(showerPos_pfp.Z()+TMath::Cos(showerDirection_pfp.Theta())*shower_pfp->Length());
+	}
+      }
       
-      for (auto track_pfp : tracks_from_pfp.at(pfp->Self()) ) {
+      if (lar_pandora::LArPandoraHelper::IsTrack(pfp)) { //if the Pandora thinks this is a track, then fill the track variables
 
-	ubxsec_event->track_pfp_ismuoncandidate.emplace_back(pfp_is_muon_candidate);
-	ubxsec_event->track_pfp_istrack.emplace_back(lar_pandora::LArPandoraHelper::IsTrack(pfp));
-	ubxsec_event->track_pfp_isshower.emplace_back(lar_pandora::LArPandoraHelper::IsShower(pfp));
-	TVector3  trackPos_pfp=track_pfp->Vertex();
-	TVector3  trackEnd_pfp=track_pfp->End();
-	ubxsec_event->track_pfp_Id.emplace_back(track_pfp->ID());
-	ubxsec_event->track_pfp_length.emplace_back(track_pfp->Length());
-	ubxsec_event->track_pfp_theta.emplace_back(track_pfp->Theta());
-	ubxsec_event->track_pfp_costheta.emplace_back(TMath::Cos(track_pfp->Theta()));
-	ubxsec_event->track_pfp_phi.emplace_back(track_pfp->Phi());
-	ubxsec_event->track_pfp_startx.emplace_back(trackPos_pfp.X());
-	ubxsec_event->track_pfp_starty.emplace_back(trackPos_pfp.Y());
-	ubxsec_event->track_pfp_startz.emplace_back(trackPos_pfp.Z());
-	ubxsec_event->track_pfp_endx.emplace_back(trackEnd_pfp.X());
-	ubxsec_event->track_pfp_endy.emplace_back(trackEnd_pfp.Y());
-	ubxsec_event->track_pfp_endz.emplace_back(trackEnd_pfp.Z());
-	ubxsec_event->track_pfp_Mom.emplace_back(track_pfp->VertexMomentum());
-	trkf::TrackMomentumCalculator trkm_pfp;
-	ubxsec_event->track_pfp_Mom_p.emplace_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),2212));
-	ubxsec_event->track_pfp_Mom_MCS.emplace_back(mcsfitresult_mu_v[track_pfp->ID()]->bestMomentum());
-	std::vector<art::Ptr<anab::Calorimetry>> calos_track_pfp=calos_from_track.at(track_pfp.key());
-	
-	ubxsec_event->track_pfp_trunmeandqdx.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp));
-	ubxsec_event->track_pfp_trunmeandqdx_U.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 0));
-	ubxsec_event->track_pfp_trunmeandqdx_V.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));  
-	ubxsec_event->track_pfp_upflag.emplace_back(_muon_finder.MIPConsistency(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp), track_pfp->Length()));
-	ubxsec_event->track_pfp_dEdx.emplace_back(GetdEdx(calos_track_pfp));
-	ubxsec_event->track_pfp_dQdx.emplace_back(GetdQdx(calos_track_pfp));
-	ubxsec_event->track_pfp_RR.emplace_back(GetRR(calos_track_pfp));
-
-    // 	std::vector<art::Ptr<anab::ParticleID>> pids_summer2018 = particleids_summer2018_from_track.at(track_pfp.key());
-    // 	//std::cout << "[UBXSec] The size of the vector of ParticleID is " << pids_summer2018.size() << " taken from particleids_Bragg_from_track for track pfp key " << track_pfp.key() << std::endl;
-    // 	if (pids_summer2018.size()==0) std::cout << "[UBXSec] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
-    //     if (pids_summer2018.size()>0) { std::cout<<"[UBXSec] Particle ID Bragg Vector is bigger than 0. Will loop over " << pids_summer2018.size() << " particle IDs."<<std::endl; }
-    // 	for (auto pid : pids_summer2018 ) {
-    // 	  float newpid_pida=-999.;
-    // 	  float chi2_proton=-999.;
-    // 	  float chi2_kaon=-999.;
-    // 	  float chi2_muon=-999.;
-    // 	  float chi2_pion=-999.;
-    // 	  float llh_fwd_proton=-999.;
-    // 	  float llh_bwd_proton=-999.;
-    // 	  float llh_fwd_mip=-999.; //mip assumption only has the forward direction option
-    // 	  float final_value=-999.;
-
-    // 	  std::vector<anab::sParticleIDAlgScores> fAlgScoresVec = pid->ParticleIDAlgScores();
-    // 	  //std::cout << "[UBXSec] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
-    // 	  for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
-    // 	    //std::cout << "[UBXSec] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
-    // 	    anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
-    // 	    //std::cout << "[UBXSec] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
-    // 	    //std::cout << "[UBXSec] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
-    // 	    //std::cout << "[UBXSec] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
-    // 	    //std::cout << "[UBXSec] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
-    // 	    //std::cout << "[UBXSec] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
-    // 	    //std::cout << "[UBXSec] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	if ( (tracks_from_pfp.at(pfp.key())).size()==0) { //first check to make sure that there is a non-zero list of tracks associated with the PFP
+	  std::cout<<"[UBXSecCC1mNp] Filling the default track info to for PFP " << pfp->Self() << " because no tracks associated with PFP" <<std::endl;
+	  FillPFPRecoTrackDefaults();
+	  FillPFPRecoDefaults();
+	  continue; //should kick out of the isTrack conditional and fail the isShower conditional moving on to the next PFParticle
+	} else {
+	  art::Ptr<recob::Track> track_pfp = tracks_from_pfp.at(pfp.key())[0];
+	  //for (auto track_pfp : tracks_from_pfp.at(pfp.key()) ) {
+	  // if (track_pfp != tracks_from_pfp.at(pfp.key())[0]) continue; //only take the first track associated to the PFParticle
+	  std::cout<<"[UBXSecCC1mNp] Filling the track info from track " << track_pfp->ID() << " for PFP " << pfp->Self() <<std::endl;
+	  TVector3  trackPos_pfp=track_pfp->Vertex();
+	  TVector3  trackEnd_pfp=track_pfp->End();
+	  ubxsec_event->pfp_reco_length.emplace_back(track_pfp->Length());
+	  ubxsec_event->pfp_reco_theta.emplace_back(track_pfp->Theta());
+	  ubxsec_event->pfp_reco_costheta.emplace_back(TMath::Cos(track_pfp->Theta()));
+	  ubxsec_event->pfp_reco_phi.emplace_back(track_pfp->Phi());
+	  ubxsec_event->pfp_reco_startx.emplace_back(trackPos_pfp.X());
+	  ubxsec_event->pfp_reco_starty.emplace_back(trackPos_pfp.Y());
+	  ubxsec_event->pfp_reco_startz.emplace_back(trackPos_pfp.Z());
+	  ubxsec_event->pfp_reco_endx.emplace_back(trackEnd_pfp.X());
+	  ubxsec_event->pfp_reco_endy.emplace_back(trackEnd_pfp.Y());
+	  ubxsec_event->pfp_reco_endz.emplace_back(trackEnd_pfp.Z());
+	  
+	  ubxsec_event->pfp_reco_Id.emplace_back(track_pfp->ID());
+	  ubxsec_event->pfp_reco_Mom.emplace_back(track_pfp->VertexMomentum());
+	  trkf::TrackMomentumCalculator trkm_pfp;
+	  ubxsec_event->pfp_reco_Mom_proton.emplace_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),2212));
+	  ubxsec_event->pfp_reco_Mom_muon.emplace_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),13));
+	  ubxsec_event->pfp_reco_Mom_MCS.emplace_back(mcsfitresult_mu_v[track_pfp->ID()]->bestMomentum());
+	  std::vector<art::Ptr<anab::Calorimetry>> calos_track_pfp=calos_from_track.at(track_pfp.key());
+	  ubxsec_event->pfp_reco_trunmeandqdx.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp));
+	  ubxsec_event->pfp_reco_trunmeandqdx_U.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 0));
+	  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));  
+	  ubxsec_event->pfp_reco_upflag.emplace_back(_muon_finder.MIPConsistency(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp), track_pfp->Length()));
+	  ubxsec_event->pfp_reco_dEdx.emplace_back(GetdEdx(calos_track_pfp));
+	  ubxsec_event->pfp_reco_dQdx.emplace_back(GetdQdx(calos_track_pfp));
+	  ubxsec_event->pfp_reco_RR.emplace_back(GetRR(calos_track_pfp));
+	  std::vector<art::Ptr<recob::Hit>> allKHits_pfp = hits_from_tracks.at(track_pfp.key());
+	  ubxsec_event->pfp_reco_nhits.emplace_back(allKHits_pfp.size()); 
+	  std::vector<art::Ptr<anab::ParticleID>> pids_summer2018 = particleids_summer2018_from_track.at(track_pfp.key());
+	  std::cout << "[UBXSecCC1mNp] The size of the vector of ParticleID is " << pids_summer2018.size() << " taken from particleids_summer2018_from_track for track pfp key " << track_pfp.key() << std::endl;
+	  if (pids_summer2018.size()==0) std::cout << "[UBXSecCC1mNp] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
+	  if (pids_summer2018.size()>0) { std::cout<<"[UBXSecCC1mNp] Particle ID Summer 2018 Vector is bigger than 0. Will loop over " << pids_summer2018.size() << " particle IDs."<<std::endl; }
+	  std::vector<anab::sParticleIDAlgScores> fAlgScoresVec;
+	  for (auto pid_summer2018 : pids_summer2018) {
+	    //fAlgScoresVec.clear();
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 pointer value is " << pid_summer2018 << "." << std::endl;
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 PDG value is " << pid_summer2018->Pdg() << "." << std::endl;
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 name is " << pid_summer2018->Name() << "." << std::endl;
+	    //fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
+	    //std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
 	    
-    // 	    if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
+	    float newpid_pida=-999.;
+	    float chi2_proton=-999.;
+	    float chi2_kaon=-999.;
+	    float chi2_muon=-999.;
+	    float chi2_pion=-999.;
+	    float llh_fwd_proton=-999.;
+	    float llh_bwd_proton=-999.;
+	    float llh_fwd_mip=-999.; //mip assumption only has the forward direction option
+	    float final_value=-999.;
+	    
+	    fAlgScoresVec.clear();
+	    fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
+	    std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
+	    for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
+	      std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
+	      anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
+	      std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	      
+	      if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
+		
+		if(fAlgScore.fAlgName == "Chi2"){
+		  if((anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      chi2_proton=fAlgScore.fValue;
+		    }//proton chi2
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 211) {
+		      chi2_pion=fAlgScore.fValue;
+		    }
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 13) {
+		      chi2_muon=fAlgScore.fValue;
+		    }
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 321) {
+		      chi2_kaon=fAlgScore.fValue;
+		    }
+		  }//requirement that it's forward
+		}//algorithm is chi2
+		
+		if(fAlgScore.fAlgName == "PIDA_median"){
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kPIDA) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		    newpid_pida=fAlgScore.fValue;
+		  }
+		}
+		
+		if(fAlgScore.fAlgName == "BraggPeakLLH"){
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_fwd_proton=fAlgScore.fValue;
+		    }
+		  }
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kBackward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_bwd_proton=fAlgScore.fValue;
+		    }
+		  }
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 0) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_fwd_mip=fAlgScore.fValue;
+		    }
+		  }
+		}//requirement that it's bragg peak calculation
+	      }//requirement that this is Plane==2
+	    }//loop over AlgScores
+	    fAlgScoresVec.clear();
+	    
+	    ubxsec_event->pfp_reco_newpid_pida.emplace_back(newpid_pida);
+	    ubxsec_event->pfp_reco_chi2_proton.emplace_back(chi2_proton);
+	    ubxsec_event->pfp_reco_chi2_muon.emplace_back(chi2_muon);
+	    ubxsec_event->pfp_reco_chi2_pion.emplace_back(chi2_pion);
+	    ubxsec_event->pfp_reco_chi2_kaon.emplace_back(chi2_kaon);
+	    ubxsec_event->pfp_reco_bragg_fwd_proton.emplace_back(llh_fwd_proton);
+	    ubxsec_event->pfp_reco_bragg_bwd_proton.emplace_back(llh_bwd_proton);
+	    ubxsec_event->pfp_reco_bragg_proton.emplace_back(llh_fwd_proton>llh_bwd_proton ? llh_fwd_proton : llh_bwd_proton);
+	    ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(llh_fwd_mip);
+	    
+	    if (llh_fwd_proton>llh_bwd_proton) {
+	      final_value=llh_fwd_proton;
+	    } else {
+	      final_value=llh_bwd_proton;
+	    }
+	    if ((final_value!=-999.) and (llh_fwd_mip!=-999.)) {
+	      if (TMath::Abs(final_value)!=0.0) {
+		std::cout << "[UBXSecCC1mNp] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
+		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
+		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip/final_value)); 
+	      } else {
+		std::cout << "[UBXSecCC1mNp] Crap, we're about to divide by zero ( max(BraggPeakLLH fwd|bwd)==0 ).... Do not do that!" << std::endl;
+		std::cout << "[UBXSecCC1mNp] Pushing back llh_fwd_mip value." << std::endl;
+		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip) << std::endl;
+		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip));
+	      }
+	    } else {
+	      ubxsec_event->pfp_reco_bragg_ratio.emplace_back(final_value);
+	    }
+	    
+	  } //end loop over pids_summer2018
 
-    // 	      if(fAlgScore.fAlgName == "Chi2"){
-    // 	    	if((anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
-    // 	    	    //std::cout << "[UBXSec] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
-    // 	    	    chi2_proton=fAlgScore.fValue;
-    // 	    	  }//proton chi2
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 211) {
-    // 	    	    chi2_pion=fAlgScore.fValue;
-    // 		  }
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 13) {
-    // 	    	    chi2_muon=fAlgScore.fValue;
-    // 		  }
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 321) {
-    // 	    	    chi2_kaon=fAlgScore.fValue;
-    // 		  }
-    // 	    	}//requirement that it's forward
-    // 	      }//algorithm is chi2
+	} //end loop over tracks from pfp
 
-    // 	      if(fAlgScore.fAlgName == "PIDA_median"){
-    // 	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kPIDA) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
-    // 		  //std::cout << "[UBXSec] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
-    // 		  newpid_pida=fAlgScore.fValue;
-    // 	    	}
-    // 	      }
-
-    // 	      if(fAlgScore.fAlgName == "BraggPeakLLH"){
-    // 	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
-    // 		    //std::cout << "[UBXSec] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
-    // 	    	    llh_fwd_proton=fAlgScore.fValue;
-    // 	    	  }
-    // 	    	}
-    // 	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kBackward ) ){
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
-    // 		    //std::cout << "[UBXSec] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
-    // 	    	    llh_bwd_proton=fAlgScore.fValue;
-    // 	    	  }
-    // 	    	}
-    // 	    	if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
-    // 	    	  if(TMath::Abs(fAlgScore.fAssumedPdg) == 0) {
-    // 		    //std::cout << "[UBXSec] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
-    // 	    	    llh_fwd_mip=fAlgScore.fValue;
-    // 	    	  }
-    // 	    	}
-    // 	      }//requirement that it's bragg peak calculation
-    // 	    }//requirement that this is Plane==2
-    // 	  }//loop over AlgScores
-    // 	  fAlgScoresVec.clear();
-	  
-    // 	  ubxsec_event->track_pfp_newpid_pida.emplace_back(newpid_pida);
-    // 	  ubxsec_event->track_pfp_chi2_proton.emplace_back(chi2_proton);
-    // 	  ubxsec_event->track_pfp_chi2_muon.emplace_back(chi2_muon);
-    // 	  ubxsec_event->track_pfp_chi2_pion.emplace_back(chi2_pion);
-    // 	  ubxsec_event->track_pfp_chi2_kaon.emplace_back(chi2_kaon);
-    // 	  ubxsec_event->track_pfp_bragg_fwd_proton.emplace_back(llh_fwd_proton);
-    // 	  ubxsec_event->track_pfp_bragg_bwd_proton.emplace_back(llh_bwd_proton);
-    // 	  ubxsec_event->track_pfp_bragg_proton.emplace_back(llh_fwd_proton>llh_bwd_proton ? llh_fwd_proton : llh_bwd_proton);
-    // 	  ubxsec_event->track_pfp_bragg_fwd_mip.emplace_back(llh_fwd_mip);
-	  
-    // 	  if (llh_fwd_proton>llh_bwd_proton) {
-    // 	    final_value=llh_fwd_proton;
-    // 	  } else {
-    // 	    final_value=llh_bwd_proton;
-    // 	  }
-    // 	  if ((final_value!=-999.) and (llh_fwd_mip!=-999.)) {
-    // 	    if (TMath::Abs(final_value)!=0.0) {
-    // 	      std::cout << "[UBXSec] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
-    // 	      std::cout << "[UBXSec] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
-    // 	      ubxsec_event->track_pfp_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip/final_value)); 
-    // 	    } else {
-    // 	      std::cout << "[UBXSec] Crap, we're about to divide by zero ( max(BraggPeakLLH fwd|bwd)==0 ).... Do not do that!" << std::endl;
-    // 	      std::cout << "[UBXSec] Pushing back llh_fwd_mip value." << std::endl;
-    // 	      std::cout << "[UBXSec] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip) << std::endl;
-    // 	      ubxsec_event->track_pfp_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip));
-    // 	    }
-    // 	  } else {
-    // 	    ubxsec_event->track_pfp_bragg_ratio.emplace_back(final_value);
-    // 	  }
-	  
-    // 	} //end loop over pids_summer2018
-
-      } //end loop over tracks from pfp
+      } //end conditional of iftrack
 	
     } //end loop over pfparticles  
     
   } // end conditional over muon selection
-
+  
   if(_debug) std::cout << "[UBXSec] Filling tree now." << std::endl;
   _tree1->Fill();
 
@@ -2314,6 +2393,74 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
   std::cout << "[UBXSec] ================= MC Information ================= [UBXSec]" << std::endl;
 }
 
+//_______________________________________________________________________________________
+void UBXSec::FillPFPRecoDefaults()
+{ 
+  ubxsec_event->pfp_reco_length.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_theta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_costheta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_phi.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_startx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_starty.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_startz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endy.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endz.emplace_back(ubxsec_event->_default_value);
+}
+
+//_______________________________________________________________________________________
+void UBXSec::FillPFPRecoTrackDefaults()
+{ 
+  ubxsec_event->pfp_reco_Id.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_muon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_MCS.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx_U.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_upflag.emplace_back(ubxsec_event->_default_value);
+  std::vector<double> tmp;
+  tmp.resize(0);
+  ubxsec_event->pfp_reco_dEdx.emplace_back(tmp);
+  ubxsec_event->pfp_reco_dQdx.emplace_back(tmp);
+  ubxsec_event->pfp_reco_RR.emplace_back(tmp);
+  ubxsec_event->pfp_reco_nhits.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_newpid_pida.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_muon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_pion.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_kaon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_fwd_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_bwd_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_ratio.emplace_back(ubxsec_event->_default_value);
+}
+
+//_______________________________________________________________________________________
+//void UBXSec::FillPFPTruthDefaults(UBXSecEvent *ubxsec_event)
+void UBXSec::FillPFPTruthDefaults()
+{
+  ubxsec_event->pfp_truth_pdg.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_origin.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_status.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_parId.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_theta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_costheta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_phi.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_mom.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_startx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_starty.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_startz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endy.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endE.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endProcess.emplace_back("");
+  ubxsec_event->pfp_truth_KE.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_Mass.emplace_back(ubxsec_event->_default_value);
+}
 
 //_______________________________________________________________________________________
 void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet, 

@@ -72,6 +72,11 @@ ubxsec_mc_reco:
 
   pandoraNuMCSMu:                 @local::mcsfitproducer
   pandoraNuMCSPi:                 @local::mcsfitproducer
+
+  #pidcalibration: @local::microboone_calibrationdedx
+  dedxcalibration: @local::simulation_calibration
+  pid: @local::particleidconfig
+
 }
 
 ubxsec_mc_flashmatch:
@@ -125,8 +130,8 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        #pandoraNuAll,
                        pandoraNucalo,
                        pandoraNupid,
-                       #pandoraNucali,
-                       #pandoraNucalipid,
+                       pandoraNucali,
+                       pandoraNucalipid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
                        RecoTrueMatcher, 
@@ -140,7 +145,10 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        genieeventweightmultisim,
                        geniemodelseventweightmultisim,
                        reinteventweightmultisim,
-                       fluxeventweightmultisim,
+                       fluxeventweightmultisim,		       
+#		       pidcalibration,
+		       dedxcalibration,
+		       pid,
                        UBXSec ] 
 
 ubxsec_mc_filters: [ tpcneutrinoidfilternumuccinc 

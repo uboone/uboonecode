@@ -12,6 +12,13 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "photpropservices_microboone.fcl"
 
+#include "config_particle_identification.fcl"
+#include "config_particle_identification_validation.fcl"
+#include "config_dedx_calibration.fcl"
+#include "calibration_microboone.fcl"
+#include "caldata_microboone.fcl"
+#include "particleid_microboone.fcl"
+
 #include "ubxsec_data.fcl"
 
 process_name : UBXSec      #The process name must NOT contain any underscores
@@ -76,6 +83,8 @@ physics:
  {
    @table::ubxsec_data_reco
    @table::ubxsec_data_flashmatch
+   dedxcalibration: @local::data_newboxrecomb
+   pid: @local::particleidconfig
  }
 
  filters:

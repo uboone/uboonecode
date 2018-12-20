@@ -253,66 +253,68 @@ class UBXSecEvent /*: public TObject*/{
 
   //PFP Truth variables
 
-  std::vector<bool> pfp_isShower;
-  std::vector<bool> pfp_isTrack;
-  std::vector<bool> pfp_isPrimary;
-  std::vector<int> pfp_ndaughters;
-  std::vector<int> pfp_pdg;
-  std::vector<int> pfp_origin;
-  std::vector<int> pfp_status;
-  std::vector<int> pfp_parId;
-  std::vector<float> pfp_theta;
-  std::vector<float> pfp_costheta;
-  std::vector<float> pfp_phi;
-  std::vector<float> pfp_mom;
-  std::vector<float> pfp_startx;
-  std::vector<float> pfp_starty;
-  std::vector<float> pfp_startz;
-  std::vector<float> pfp_endx;
-  std::vector<float> pfp_endy;
-  std::vector<float> pfp_endz;
-  std::vector<float> pfp_endE;
-  std::vector<float> pfp_KE;
-  std::vector<float> pfp_Mass;  
+  std::vector<int> pfp_truth_pdg;
+  std::vector<int> pfp_truth_origin;
+  std::vector<int> pfp_truth_status;
+  std::vector<int> pfp_truth_parId;
+  std::vector<float> pfp_truth_theta;
+  std::vector<float> pfp_truth_costheta;
+  std::vector<float> pfp_truth_phi;
+  std::vector<float> pfp_truth_mom;
+  std::vector<float> pfp_truth_startx;
+  std::vector<float> pfp_truth_starty;
+  std::vector<float> pfp_truth_startz;
+  std::vector<float> pfp_truth_endx;
+  std::vector<float> pfp_truth_endy;
+  std::vector<float> pfp_truth_endz;
+  std::vector<float> pfp_truth_endE;
+  std::vector<string> pfp_truth_endProcess;
+  std::vector<float> pfp_truth_KE;
+  std::vector<float> pfp_truth_Mass;  
 
   //Tracks from PFP variables
-  vector<bool> track_pfp_ismuoncandidate;
-  vector<bool> track_pfp_istrack; //boolean of whether Pandora thought it was a track
-  vector<bool> track_pfp_isshower; //boolean of whether Pandora thought it was a shower
-  vector<bool> track_pfp_upflag; //value returned by MIPConsistency() function for the track
-  vector<int> track_pfp_Id; //the index of the track in the list of PFPs
-  vector<float> track_pfp_length; //length (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_theta; //theta of the track associated with the PFP in the collection
-  vector<float> track_pfp_costheta; //costheta of the track associated with the PFP in the collection
-  vector<float> track_pfp_phi; //phi of the track associated with the PFP in the collection
-  vector<float> track_pfp_startx; //start point in x (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_starty; //start point in y (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_startz; //start point in z (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_endx;  //end point in x (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_endy;  //end point in x (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_endz;  //end point in x (cm) of the track associated with the PFP in the collection
-  vector<float> track_pfp_Mom; //Vertex momentum of the track associated with the PFP in the collection
-  vector<float> track_pfp_Mom_p; //length based momentum of the track associated with the PFP in the collection
-  vector<float> track_pfp_Mom_MCS; //MCS based momentum of the track associated with the PFP in the collection
-  vector<float> track_pfp_trunmeandqdx; //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
-  vector<float> track_pfp_trunmeandqdx_U; //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
-  vector<float> track_pfp_trunmeandqdx_V; //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
+  std::vector<int> pfp_reco_isprimary; //1 is true, 0 is false
+  std::vector<int> pfp_reco_ndaughters;
+  vector<int> pfp_reco_ismuoncandidate; //1 is true, 0 is false
+  vector<int> pfp_reco_istrack; //int of whether Pandora thought it was a track 1 is true, 0 is false
+  vector<int> pfp_reco_numtracks; //int of associated tracks from Pandora 
+  vector<int> pfp_reco_isshower; //int of whether Pandora thought it was a shower 1 is true, 0 is false
+  vector<int> pfp_reco_numshowers; //int of associated showers from Pandora 
+  vector<int> pfp_reco_upflag; //value returned by MIPConsistency() function for the track
+  vector<int> pfp_reco_Id; //the index of the track in the list of PFPs
+  vector<float> pfp_reco_length; //length (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_theta; //theta of the track associated with the PFP in the collection
+  vector<float> pfp_reco_costheta; //costheta of the track associated with the PFP in the collection
+  vector<float> pfp_reco_phi; //phi of the track associated with the PFP in the collection
+  vector<float> pfp_reco_startx; //start point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_starty; //start point in y (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_startz; //start point in z (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endx;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endy;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endz;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_Mom; //Vertex momentum of the track associated with the PFP in the collection
+  vector<float> pfp_reco_Mom_proton; //length based momentum of the track associated with the PFP in the collection with proton hypothesis
+  vector<float> pfp_reco_Mom_muon; //length based momentum of the track associated with the PFP in the collection with muon hypothesis
+  vector<float> pfp_reco_Mom_MCS; //MCS based momentum of the track associated with the PFP in the collection
+  vector<float> pfp_reco_trunmeandqdx; //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
+  vector<float> pfp_reco_trunmeandqdx_U; //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
+  vector<float> pfp_reco_trunmeandqdx_V; //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
 
-  //vector<float> track_pfp_pida; //pida value of the track associated with the PFP in the collection
-  vector<float> track_pfp_newpid_pida; //pida from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_chi2_proton; //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_chi2_kaon; //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_chi2_muon; //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_chi2_pion; //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_bragg_ratio; //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_bragg_proton; //LL(p) from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_bragg_fwd_proton; //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_bragg_bwd_proton; //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
-  vector<float> track_pfp_bragg_fwd_mip; //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
-  vector<int> track_pfp_nhits; //number of hits on the track associated with the PFP in the collection
-  vector<vector<double>> track_pfp_dEdx; //hit by hit dEdx for the track associated with the PFP in the collection
-  vector<vector<double>> track_pfp_dQdx; //hit by hit dQdx for the track associated with the PFP in the collection
-  vector<vector<double>> track_pfp_RR; //hit by hit RR for the track associated with the PFP in the collection
+  //vector<float> pfp_reco_pida; //pida value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_newpid_pida; //pida from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_proton; //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_kaon; //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_muon; //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_pion; //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_ratio; //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_proton; //LL(p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_fwd_proton; //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_bwd_proton; //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_fwd_mip; //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<int> pfp_reco_nhits; //number of hits on the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_dEdx; //hit by hit dEdx for the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_dQdx; //hit by hit dQdx for the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_RR; //hit by hit RR for the track associated with the PFP in the collection
 
   int _default_value = -9999; ///< Default value 
 
