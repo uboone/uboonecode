@@ -13,14 +13,25 @@
  * If this test needs to be extended to get parameters from the FHiCL
  * configuration, please contact the author for directions.
  * 
+ * @note This is *not* a good example on how to set up MicroBooNE geometry;
+ *       I am getting away with using the standard mapping
+ *       (`geo::ChannelMapStandardAlg`) instead of MicroBooNE's specific one
+ *       and it happens to work _correctly_ as long as no specific feature of
+ *       MicroBooNE's mapping is used. If instead those features are used, the
+ *       results will be _silently_ wrong.
+ * 
  */
 
 // LArSoft libraries
 #include "ubevt/SpaceCharge/SpaceChargeMicroBooNETestHelpers.h"
 #include "ubevt/SpaceCharge/SpaceChargeMicroBooNE.h"
-#include "larcorealg/TestUtils/unit_test_base.h"
+#include "lardataalg/DetectorInfo/DetectorPropertiesStandardTestHelpers.h"
+#include "lardataalg/DetectorInfo/LArPropertiesStandardTestHelpers.h"
+#include "lardataalg/DetectorInfo/DetectorClocksStandardTestHelpers.h"
+#include "larcorealg/Geometry/ChannelMapStandardAlg.h"
 #include "larcorealg/Geometry/geo_vectors_fhicl.h"
 #include "larcoreobj/SimpleTypesAndConstants/geo_vectors.h" // geo::Point_t
+#include "test/Geometry/geometry_unit_test_base.h"
 
 // framework libraries
 #include "fhiclcpp/types/Table.h" 
@@ -129,14 +140,19 @@ void SCEtestAlgo::PrintPoint(Stream&& out, geo::Point_t const& point) {
 //---
 
 /*
- * TesterEnvironment, configured with a "standard" configuration object, is used
- * in a non-Boost-unit-test context.
- * It provides:
- * - `spacecharge::SpaceCharge const* Provider<spacecharge::SpaceCharge>()`
+ * GeometryTesterEnvironment, configured with a geometry-aware configuration
+ * object, is used in a non-Boost-unit-test context.
+ * After proper setup it will provide:
+ * - `geo::GeometryCore`
+ * - all the other services configured as dependencies
  * 
+ * BUG: again, MicroBooNE geometry requires a custom mapping: using
+ * `geo::ChannelMapStandardAlg` may (and should be expected to) yield wrong
+ * results.
  */
-using TestEnvironment
-  = testing::TesterEnvironment<testing::BasicEnvironmentConfiguration>;
+using TesterConfiguration
+  = testing::BasicGeometryEnvironmentConfiguration<geo::ChannelMapStandardAlg>;
+using TestEnvironment = testing::GeometryTesterEnvironment<TesterConfiguration>;
 
 
 //------------------------------------------------------------------------------
@@ -182,7 +198,7 @@ int main(int argc, char const** argv) {
   // ***
   // *** test environment setup
   // ***
-  testing::BasicEnvironmentConfiguration config("spacecharge_uboone_test");
+  TesterConfiguration config("spacecharge_uboone_test");
   config.SetMainTesterParameterSetName("scetest");
   
   //
@@ -212,6 +228,18 @@ int main(int argc, char const** argv) {
   // testing environment setup
   //
   TestEnvironment testEnv(config);
+  
+  // SpaceChargeMicroBooNE requires `DetectorProperties`.
+  // Note that we must choose a specific implementation of each of those service
+  // providers, e.g. `detinfo::DetectorPropertiesStandard` rather than just
+  // `detinfo::DetectorProperties`. We go with the current MicroBooNE defaults.
+  // DetectorPropertiesStandard and all its dependencies support the simple set
+  // up (see testing::TesterEnvironment::SimpleProviderSetup()), except for
+  // Geometry, that has been configured already in the geometry-aware
+  // environment. So we invoke a simple set up for each of the dependencies
+  testEnv.SimpleProviderSetup<detinfo::LArPropertiesStandard>();
+  testEnv.SimpleProviderSetup<detinfo::DetectorClocksStandard>();
+  testEnv.SimpleProviderSetup<detinfo::DetectorPropertiesStandard>();
   
   // SpaceChargeMicroBooNE supports the simple set up; so we invoke it
   testEnv.SimpleProviderSetup<spacecharge::SpaceChargeMicroBooNE>();
