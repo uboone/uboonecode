@@ -11,6 +11,7 @@ art_make( BASENAME_ONLY
     EXCLUDE 
         CRTChannelMapAlg.cc 
         CRTGeometryHelper_service.cc
+        CRTFileManager_service.cc
         CRTDetSim_module.cc
         CRTDaqSim_module.cc
         CRTHitProducer_module.cc
@@ -82,6 +83,27 @@ simple_plugin( CRTGeometryHelper service
         canvas_Persistency_Provenance
         art_Utilities 
         canvas_Utilities
+        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+        ${MF_MESSAGELOGGER}
+        ${MF_UTILITIES}
+        ${ROOT_BASIC_LIB_LIST}
+        ${CETLIB}
+    BASENAME_ONLY
+)
+
+simple_plugin( CRTFileManager service
+        ${ART_FRAMEWORK_CORE}
+        ${ART_FRAMEWORK_IO_SOURCES}
+        ${ART_FRAMEWORK_PRINCIPAL}
+	gallery
+        art_Persistency_Common 
+        canvas_Persistency_Common
+        art_Persistency_Provenance 
+        canvas_Persistency_Provenance
+        art_Utilities 
+        canvas_Utilities
+	ifdh
+	boost_date_time
         ${ART_FRAMEWORK_SERVICES_REGISTRY}
         ${MF_MESSAGELOGGER}
         ${MF_UTILITIES}
@@ -254,7 +276,8 @@ simple_plugin(CRTTiming "module"
 simple_plugin( CRTMerger "module"
   CRT
   bernfebdaq-core_Overlays
-   lardataobj_RecoBase
+  lardataobj_RecoBase
+  CRTFileManager_service
   ${CETLIB}	
   ${ROOT_BASIC_LIB_LIST}
   ${ART_UTILITIES}
@@ -267,16 +290,15 @@ simple_plugin( CRTMerger "module"
   ${CETLIB}
   ${GALLERY}
   CRTProducts
-  ifdh
   gallery
-  boost_date_time
   cetlib #cetlib_except	
 )
 
 simple_plugin( CRTMergerExtra "module"
   CRT
   bernfebdaq-core_Overlays
-   lardataobj_RecoBase
+  lardataobj_RecoBase
+  CRTFileManager_service
   ${CETLIB}	
   ${ROOT_BASIC_LIB_LIST}
   ${ART_UTILITIES}
@@ -289,9 +311,7 @@ simple_plugin( CRTMergerExtra "module"
   ${CETLIB}
   ${GALLERY}
   CRTProducts
-  ifdh
   gallery
-  boost_date_time
   cetlib #cetlib_except	
 )
 

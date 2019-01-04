@@ -1,0 +1,10 @@
+BEGIN_PROLOG
+  
+microboone_crt_file_manager: {
+  debug:       false
+  maxFiles:    6
+  CRTHitLabel: "crthit"
+  ubversion_CRTHits:  "NoVersion"
+}
+
+END_PROLOG

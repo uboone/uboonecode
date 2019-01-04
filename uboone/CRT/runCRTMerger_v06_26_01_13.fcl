@@ -1,4 +1,5 @@
 #include "services_microboone.fcl"
+#include "microboone_crt_file_manager.fcl"
 #include "microboone_crt_merger.fcl"
 #include "time_memory_tracker_microboone.fcl"
 #
@@ -21,6 +22,7 @@ services:
 	DetectorClocksService	:	@local::microboone_detectorclocks
 	message			:	@local::standard_info
 	FileCatalogMetadata	:	@local::art_file_catalog_mc
+	CRTFileManager          :       @local::microboone_crt_file_manager
 }
 physics:
 {
@@ -68,5 +70,7 @@ services.message.destinations:
 		}
 	}
 }
+
+services.CRTFileManager.ubversion_CRTHits: prod_v06_26_01_13
+
 physics.producers.merger.debug: false
-physics.producers.merger.ubversion_CRTHits: prod_v06_26_01_13
