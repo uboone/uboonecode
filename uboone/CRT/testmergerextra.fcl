@@ -1,8 +1,8 @@
 #include "services_microboone.fcl"
 #include "microboone_crt_file_manager.fcl"
-#include "microboone_crt_merger_extra.fcl"
+#include "microboone_crt_merger.fcl"
 #include "time_memory_tracker_microboone.fcl"
-#
+
 process_name: CRTMergerExtra
 
 source:

@@ -21,7 +21,6 @@ art_make( BASENAME_ONLY
 	FlashExt_module.cc	
 	CRTAuxFunctions.cc
   	CRTMerger_module.cc
-  	CRTMergerExtra_module.cc
 	CRTFlashAna_module.cc
 	TimeExtraction_module.cc
 	TrackDump_module.cc
@@ -274,27 +273,6 @@ simple_plugin(CRTTiming "module"
           ${ROOT_BASIC_LIB_LIST} )
 
 simple_plugin( CRTMerger "module"
-  CRT
-  bernfebdaq-core_Overlays
-  lardataobj_RecoBase
-  CRTFileManager_service
-  ${CETLIB}	
-  ${ROOT_BASIC_LIB_LIST}
-  ${ART_UTILITIES}
-  ${ART_FRAMEWORK_SERVICES_REGISTRY}
-  ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-  ${ARTDAQ_CORE}
-  ${FHICLCPP}
-  ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
-  ${CETLIB}
-  ${GALLERY}
-  CRTProducts
-  gallery
-  cetlib #cetlib_except	
-)
-
-simple_plugin( CRTMergerExtra "module"
   CRT
   bernfebdaq-core_Overlays
   lardataobj_RecoBase

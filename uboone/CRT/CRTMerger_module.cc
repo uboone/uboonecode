@@ -14,7 +14,8 @@
 crt::CRTMerger::CRTMerger(const fhicl::ParameterSet& pset) :
   fDebug(pset.get<bool>("debug")),
   fDAQHeaderTimeUBooNELabel(pset.get<std::string>("DAQHeaderTimeUBooNELabel")),
-  fCRTHitLabel(pset.get<std::string>("CRTHitLabel"))
+  fCRTHitLabel(pset.get<std::string>("CRTHitLabel")),
+  fTimeOffset(pset.get<double>("TimeOffset"))
 {
   std::cout << "CRTMerger module constructed." << std::endl;
   produces< std::vector<crt::CRTHit> >();
@@ -136,7 +137,7 @@ void crt::CRTMerger::produce(art::Event& event)
 	std::cout << "Last event time = " << last_sec << std::endl;
       }
       for(auto const& CRTHitevent : CRTHitCollection) {
-	long double CRTtime = CRTHitevent.ts0_s + 1.e-9L * CRTHitevent.ts0_ns;
+	long double CRTtime = CRTHitevent.ts0_s - fTimeOffset + 1.e-9L * CRTHitevent.ts0_ns;
 	if (CRTtime >= MergingWindow_start && CRTtime <= MergingWindow_end) {
 	  if (fDebug)
 	    std::cout<<"found match"<<std::endl;

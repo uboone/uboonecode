@@ -6,5 +6,10 @@ microboone_crt_merger:{
  DAQHeaderTimeUBooNELabel : "daq"
  CRTHitLabel              : "crthit"
  debug                    : true
+ TimeOffset               : 0       # Seconds.
 }
+
+microboone_crt_merger_extra: @local::microboone_crt_merger
+microboone_crt_merger_extra.TimeOffset: 1
+
 END_PROLOG

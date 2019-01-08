@@ -30,6 +30,7 @@ namespace crt
     bool fDebug;
     std::string fDAQHeaderTimeUBooNELabel;
     std::string fCRTHitLabel;
+    double fTimeOffset;
 
     // CRT files that we have seen (for sam metadata).
 
