@@ -37,7 +37,7 @@ ProcessDriver: {
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
-      LArSimChProducer:    "largeant"
+      LArSimChProducer:    "driftWC simpleSC"
       Origin: 1
       TimeOffset:       2400
     }
@@ -53,7 +53,7 @@ ProcessDriver: {
       LArMCTruthProducer:   "generator"
       LArMCTrackProducer:   "mcreco"
       LArMCShowerProducer:  "mcreco"
-      LArSimChProducer:     "largeant"
+      LArSimChProducer:     "driftWC simpleSC"
       ChStatusProducer:     "wiremc"
       Origin: 0
       TimeOffset:       2400
@@ -64,7 +64,7 @@ ProcessDriver: {
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
-      LArSimChProducer:    "largeant"
+      LArSimChProducer:    "driftWC simpleSC"
       TimeOffset:       2400
       Origin: 0
       StoreG4SecondaryROI:  false
