@@ -348,145 +348,78 @@ gallery::Event& crt::CRTFileManager::openFile(std::string file_name)
   return *(fCRTEvents.back().second);
 }
 
-// Reposiiton gallery event to approximate time in seconds.
+// Rewind gallery file to first event.
 // Return true if success, false if fail.
 
-bool crt::CRTFileManager::reposition(gallery::Event& event, unsigned long evt_time_sec, int delta_t)
+bool crt::CRTFileManager::rewind(gallery::Event& event) const
 {
-  // Result.
+  // Make several attempts to rewind/reopen file.
 
-  bool ok = false;
+  int mtry = 5;
+  int wait = 0;
+  bool rewind_ok = false;
 
-  // On first try, read file from current position.
-  // On second try, read file from beginning.
-
-  int ntry = 2;
-  while(ntry-- > 0 && !ok) {
+  while(mtry-- > 0 && !rewind_ok) {
+    if(wait != 0) {
+      std::cout << "Waiting " << wait << " seconds." << std::endl;
+      sleep(wait);
+      wait *= 2;
+    }
+    else
+      wait = 1;
 
     try {
-
-      // Loop over events until we get a non-empty CRT his collection or an exception.
-
-      for(;;event.next()) {
-
-	// Look for a non-empty CRT hit collection.
-
-	gallery::ValidHandle<std::vector<crt::CRTHit> > h =
-	  event.getValidHandle< std::vector<crt::CRTHit> >(fCRTHitLabel);
-	std::vector< crt::CRTHit > CRTHitCollection;
-	filter_crt_hits(*h, CRTHitCollection);
-	if(fDebug)
-	  std::cout << "Number of CRT hits in event = " << CRTHitCollection.size() << std::endl;
-	if(CRTHitCollection.size() > 0) {
-
-	  // Got a non-empty CRT hit collection.
-
-	  uint32_t first_sec = CRTHitCollection.front().ts0_s;
-	  uint32_t last_sec = CRTHitCollection.back().ts0_s;
-	  if(fDebug) {
-	    std::cout << "TPC event time = " << evt_time_sec << std::endl;
-	    std::cout << "First event time = " << first_sec << std::endl;
-	    std::cout << "Last event time = " << last_sec << std::endl;
-	  }
-
-	  // Compare TPC and CRT times.
-
-	  if(evt_time_sec > last_sec + delta_t) {
-
-	    // TPC event is in the future relative to CRT event.
-	    // Skip events assuming each CRT event is exactly one second.
-	    // Return success.
-
-	    int jump = evt_time_sec - last_sec - delta_t;
-	    if(fDebug)
-	      std::cout << "Skipping ahead " << jump << " CRT events." << std::endl;
-	    for(; jump>0; --jump)
-	      event.next();
-	    ok = true;
-	    break;  // Break out of loop over events.
-	  }
-	  else if(evt_time_sec < first_sec) {
-
-	    // TPC event is in the past relative to CRT event.
-	    // Return failure, which may signal the calling program to rewind
-	    // the file and try again.
-
-	    ok = false;
-	    break;  // Break out of loop over events.
-	  }
-	  else {
-
-	    // TPC event is close to CRT event.
-	    // Stay at the current position and return success.
-
-	    ok = true;
-	    break;  // Break out of loop over events.
-	  }
-	}
-      }
+      std::cout << "Rewinding file." << std::endl;
+      event.toBegin();
+      rewind_ok = true;
     }
     catch(...) {
-      ok = false;
+      rewind_ok = false;
     }
 
-    if(!ok) {
-
-      // Make several attempts to rewind/reopen file.
-
-      int mtry = 5;
-      int wait = 0;
-      bool rewind_ok = false;
-
-      while(mtry-- > 0 && !rewind_ok) {
-	if(wait != 0) {
-	  std::cout << "Waiting " << wait << " seconds." << std::endl;
-	  sleep(wait);
-	  wait *= 2;
-	}
-	else
-	  wait = 1;
-
-	try {
-	  std::cout << "Rewinding file." << std::endl;
-	  event.toBegin();
-	  rewind_ok = true;
-	}
-	catch(...) {
-	  rewind_ok = false;
-	}
-
-	if(rewind_ok)
-	  std::cout << "Rewind succeeded." << std::endl;
-	else
-	  std::cout << "Rewind failed." << std::endl;
-      }
-
-      // If rewind failed, break out of overall retry loop.  Reposition has failed.
-
-      if(!rewind_ok)
-	break;
-    }
+    if(rewind_ok)
+      std::cout << "Rewind succeeded." << std::endl;
+    else
+      std::cout << "Rewind failed." << std::endl;
   }
-  return ok;
+
+  // Done.
+
+  return rewind_ok;
 }
 
-// Filter CRT hit collection.
-// Remove bad CRT hits.
-// Sort CRT hits into increasing time order.
+// Get next nonempty filtered and sorted CRT hit collection starting from 
+// current gallery event.
+// Return empty collection if end of file is reached.
 
-void crt::CRTFileManager::filter_crt_hits(const std::vector<crt::CRTHit>& input_hits, 
-					  std::vector<crt::CRTHit>& output_hits) const
+void crt::CRTFileManager::get_crt_hits(gallery::Event& event,
+				       std::vector<crt::CRTHit>& output_hits) const
 {
-  // Copy hits from input collectio to output collection, removing bad hits.
+  // Make sure output hit container is initially empty.
 
-  output_hits.reserve(input_hits.size());
+  output_hits.erase(output_hits.begin(), output_hits.end());
 
-  for(const auto& crthit : input_hits) {
+  // Event loop.
 
-    // Filter out hits with bad times.
+  for(; !event.atEnd() && output_hits.size() == 0; event.next()) {
 
-    if(crthit.ts0_s > 1300000000)
-      output_hits.push_back(crthit);
+    // Get crt hit handle for the current event..
+
+    gallery::ValidHandle<std::vector<crt::CRTHit> > h =
+      event.getValidHandle< std::vector<crt::CRTHit> >(fCRTHitLabel);
+
+    // Copy and filter hits into output hits collection.
+
+    output_hits.reserve(h->size());
+    for(const auto& crthit : *h) {
+
+      // Filter out hits with bad times.
+
+      if(crthit.ts0_s > 1300000000)
+	output_hits.push_back(crthit);
+    }
+    if(output_hits.size() != 0)
+      break;
   }
 
   // Sort hits into increaseing time order.

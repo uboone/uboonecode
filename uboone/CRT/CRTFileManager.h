@@ -82,14 +82,15 @@ public:
 
   gallery::Event& openFile(std::string file_name);
 
-  // Reposition a gallery file to the specified second, within the requested precision.
+  // Rewind gallery file.
 
-  bool reposition(gallery::Event& event, unsigned long evt_time_sec, int delta_t);
+  bool rewind(gallery::Event&) const;
 
-    // Filter CRT hit collection.
+  // Get next nonempty filtered and sorted CRT hit collection starting from 
+  // current gallery event.
+  // Return empty collection if end of file is reached.
 
-    void filter_crt_hits(const std::vector<crt::CRTHit>& input_hits, 
-			 std::vector<crt::CRTHit>& output_hits) const;
+  void get_crt_hits(gallery::Event&, std::vector<crt::CRTHit>& output_hits) const;
 
 private:
 
