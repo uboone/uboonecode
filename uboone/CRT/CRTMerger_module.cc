@@ -233,8 +233,8 @@ void crt::CRTMerger::produce(art::Event& event)
       // without reading the hits.  Keep doing this until we get close to the merging
       // window.
 
-      while(MergingWindow_start - CRTtime > 4.) {
-	long double nskip = 0.5 * (MergingWindow_start - CRTtime - 4.);
+      while(MergingWindow_start - CRTtime > 2.) {
+	long double nskip = 0.8 * (MergingWindow_start - CRTtime - 2.);
 	if(nskip > 1.e6) {
 
 	  // Something wrong...
@@ -265,6 +265,7 @@ void crt::CRTMerger::produce(art::Event& event)
 	CRTtime = CRTHitCollection[0].ts0_s + 1.e-9L * CRTHitCollection[0].ts0_ns;
       }
       std::cout << "CRT event entry after reposition = " << crt_event.eventEntry() << std::endl;
+      CRTHitCollection.erase(CRTHitCollection.begin(), CRTHitCollection.end());
 
       // Now we are ready for a detailed look at CRT hits starting from the current collection.
       // Loop over entries starting from the current position and populate the hit cache.
@@ -280,15 +281,20 @@ void crt::CRTMerger::produce(art::Event& event)
 	if(crt_hits.size() == 0)
 	  break;
 
-	// Get the time of the last hit in this entry.
+	// Get the time of the first and last hit in this entry.
 
+	long double first_time = crt_hits.front().ts0_s + 1.e-9L * crt_hits.front().ts0_ns;	
 	long double last_time = crt_hits.back().ts0_s + 1.e-9L * crt_hits.back().ts0_ns;	
 
-	// Add this nonempty collection to the cache.
+	// If this entry's time range overlaps with the merging window, add it to the cache.
 
 	long long entry = crt_event.eventEntry();
-	std::cout << "Adding entry " << entry << " to hit cache." << std::endl;
-	file_cache.emplace(entry, std::move(crt_hits));
+	if(first_time <= MergingWindow_end && last_time >= MergingWindow_start) {
+	  std::cout << "Adding entry " << entry << " to hit cache." << std::endl;
+	  file_cache.emplace(entry, std::move(crt_hits));
+	}
+	else
+	  std::cout << "Skipping entry " << entry << std::endl;
 
 	// If the last hit time is after the end of the merging window,
 	// the merging window is covered.  We can quit.
