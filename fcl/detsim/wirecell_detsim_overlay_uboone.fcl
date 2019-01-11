@@ -7,6 +7,8 @@
 #include "wcls.fcl"
 #include "ZeroingOutBadChannels.fcl"
 #include "mcreco.fcl"
+#include "microboone_crt_detsim.fcl"
+#include "crtsimhitproducer.fcl"
 
 process_name: OverlayDetsim 
 
@@ -47,6 +49,8 @@ physics:
    pmtreadoutnonoise:	@local::microboone_optical_dram_readout_sim
    driftWC:        	@local::wcls.driftsim_overlay #no noise
    zeroedoutchannels:   @local::ZeroingOutBadChannels
+   crtdetsim:    @local::microboone_crtdetsim_binary
+   crthitsim:    @local::crtsimhitproducer_binary
    rns:            	{ module_type: "RandomNumberSaver" }
    mcreco:              @local::standard_mcreco
 
@@ -57,7 +61,7 @@ physics:
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, nfbadchannel, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, swtriggernonoise, mcreco ]
+ simulate: [ rns, nfbadchannel, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, crtdetsim, crthitsim, swtriggernonoise, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
