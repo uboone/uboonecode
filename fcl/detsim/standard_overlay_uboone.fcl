@@ -51,6 +51,8 @@ physics: {
 
 }
 
+services.PmtGainService.PmtGainProvider.UseDB:               true
+
 physics.producers.mixer.RawDigitDataModuleLabel: "daq"
 physics.producers.mixer.RawDigitMCModuleLabel:   "zeroedoutchannels"
 physics.producers.mixer.OpDetDataModuleLabel:    "pmtreadout"
