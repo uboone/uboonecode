@@ -1,0 +1,42 @@
+#include "prodgenie_common_uboone.fcl"
+
+process_name: GenieGen
+
+outputs.out1.fileName: "prodgenie_bnb_nu_uboone_tweaked_%tc_gen.root"
+
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName: "booster"
+
+# For GENIE v3, we can get MEC from the tune, so just
+# use the default event generator list
+generator.EventGeneratorList: "Default"
+
+physics.filters:
+{
+  tweaker:
+  {
+    module_type: "GENIETweaker"
+    # No need to specify the tune explicitly if the genie_xsec ups product is set up
+    #tune_name: "G00_00a_00_000
+ 
+    # Tweak dial names match those used by grwght1p (or, equivalently, genie::rew::GSyst::AsString())
+    tweak_dial_names: [ "MaNCEL", "EtaNCEL", "MaCCQE", "MaCCRES", "MvCCRES", "MaNCRES", "MvNCRES", "MaCOHpi", "R0COHpi",
+      "NonRESBGvpCC1pi", "NonRESBGvpCC2pi", "NonRESBGvpNC1pi", "NonRESBGvpNC2pi", "NonRESBGvnCC1pi", "NonRESBGvnCC2pi",
+      "NonRESBGvnNC1pi", "NonRESBGvnNC2pi", "NonRESBGvbarpCC1pi", "NonRESBGvbarpCC2pi", "NonRESBGvbarpNC1pi", "NonRESBGvbarpNC2pi",
+      "NonRESBGvbarnCC1pi", "NonRESBGvbarnCC2pi", "NonRESBGvbarnNC1pi", "NonRESBGvbarnNC2pi", "MFP_N", "FrCEx_N", "FrInel_N",
+      "FrAbs_N", "FrPiProd_N", "MFP_pi", "FrCEx_pi", "FrInel_pi", "FrAbs_pi", "FrPiProd_pi", "AhtBY", "BhtBY", "CV1uBY",
+      "CV2uBY" ]
+
+    # These are values for the reweighting tweak dial knobs (0 = no change, 1 = increase by one sigma, -1 = decrease by one sigma, etc.)
+    tweak_dial_values: [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1 ]
+
+    # Verify that the tweaks are still good during processing of each event
+    check_on_filter: true
+  }
+}
+
+physics.simulate: [ rns, tweaker, generator ]

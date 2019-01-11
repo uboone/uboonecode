@@ -59,6 +59,7 @@ find_ups_boost( v1_53_0 )
 find_ups_product( canvas )
 find_ups_product( nutools )
 find_ups_product( genie )
+find_ups_product( log4cpp )
 
 cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 
@@ -75,7 +76,8 @@ include(BuildPlugins)
 # The top-level nutools CMakeLists.txt does this as well, but I don't think that
 # we can access the result of that version check in the uboonecode build.
 
-include_directories ( $ENV{GENIE_INC}/GENIE )
+include_directories ( $ENV{GENIE_INC}/GENIE $ENV{LOG4CPP_INC} )
+add_compile_definitions(HIDE_GENIE_MSG_LOG_MACROS)
 parse_ups_version( ${GENIE_VERSION} )
 
 # the GENIE libraries are already defined, but we need the lib list
