@@ -24,6 +24,10 @@
 // TODO: add GENIE v2 includes
 //#else
 // Use these includes for GENIE v3
+
+// BEGIN PURE EVIL
+// TODO: is there a better workaround?
+#define private public
 #include "Framework/Algorithm/AlgConfigPool.h"
 #include "Framework/Algorithm/AlgFactory.h"
 #include "Framework/Algorithm/Algorithm.h"
@@ -40,6 +44,8 @@
 #include "Framework/Utils/XSecSplineList.h"
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GSystUncertainty.h"
+#undef private
+// END PURE EVIL
 //#endif
 
 // Helper functions local to this source file
@@ -103,6 +109,8 @@ public:
   bool beginRun(art::Run& run) override;
   //void beginJob() override;
 
+  bool check_tweaks();
+
 protected:
 
   genie::Registry* get_registry_for_tweak_dial(genie::rew::GSyst_t dial_label);
@@ -118,6 +126,10 @@ protected:
   std::vector<double> fTweakDialValues;
   std::vector<double> fUntweakedParameterValues;
   std::vector<double> fTweakedParameterValues;
+
+  // Cache that stores information about previously modified registry entries.
+  // Used to avoid accidental duplicate tweaks.
+  std::vector< std::pair<genie::Registry*, std::string> > fTweakedParamCache;
 
   static const std::map<genie::rew::GSyst_t, std::string> fDialLabelToParamName;
 };
@@ -158,44 +170,49 @@ bool sim::GENIETweaker::filter(art::Event& /*evt*/) {
 
   // Don't actually do anything to the event, we just need the tweaking
   // to be done in beginRun() to get GENIE adjusted properly.
+  if ( fCheckTweaksOnFilter ) return this->check_tweaks();
+  return true;
+}
 
-  if ( fCheckTweaksOnFilter ) {
-
-    LOG_INFO("sim::GENIETweaker") << "Checking the " << fTweakDialLabels.size()
+bool sim::GENIETweaker::check_tweaks()
+{
+  bool all_ok = true;
+  LOG_INFO("sim::GENIETweaker") << "Checking the " << fTweakDialLabels.size()
       << " parameters that were tweaked.";
 
-    for (size_t d = 0; d < fTweakDialLabels.size(); ++d) {
-      genie::rew::GSyst_t dial_label = fTweakDialLabels.at( d );
-      genie::Registry* reg = get_registry_for_tweak_dial( dial_label );
-      std::string param_name = fDialLabelToParamName.at( dial_label );
-      double param_value = reg->GetDouble( param_name );
+  for (size_t d = 0; d < fTweakDialLabels.size(); ++d) {
+    genie::rew::GSyst_t dial_label = fTweakDialLabels.at( d );
+    genie::Registry* reg = get_registry_for_tweak_dial( dial_label );
+    std::string param_name = fDialLabelToParamName.at( dial_label );
+    double param_value = reg->GetDouble( param_name );
 
-      // If the tweaks made by this module have been reverted or otherwise altered,
-      // then reject the current event by returning false, and print an error message.
-      double untweaked_value = fUntweakedParameterValues.at( d );
-      if ( fTweakDialValues.at( d ) != 0. && param_value == untweaked_value ) {
-        LOG_ERROR("sim::GENIETweaker") << "The parameter " << param_name << " controlled by"
-        << " the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
-        << " was reset to its untweaked value " << untweaked_value << '\n';
-        return false;
-      }
+    // If the tweaks made by this module have been reverted or otherwise altered,
+    // then reject the current event by returning false, and print an error message.
+    double untweaked_value = fUntweakedParameterValues.at( d );
+    double tweaked_value = fTweakedParameterValues.at( d );
 
-      double tweaked_value = fTweakedParameterValues.at( d );
-      if ( param_value != tweaked_value ) {
-        LOG_ERROR("sim::GENIETweaker") << "The parameter " << param_name << " controlled by"
-        << " the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
-        << " differs from its tweaked value " << tweaked_value << '\n';
-        return false;
-      }
-
-      LOG_INFO("sim::GENIETweaker") << "The parameter " << param_name << " controlled"
-        << " by the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
-        << " currently has the value " << param_value << " (changed from its original"
-        << " value of " << untweaked_value << ')';
+    if ( fTweakDialValues.at( d ) != 0. && param_value == untweaked_value ) {
+      LOG_ERROR("sim::GENIETweaker") << "The parameter " << param_name << " controlled by"
+      << " the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
+      << " was reset to its untweaked value " << untweaked_value << '\n';
+      all_ok = false;
     }
+    else if ( param_value != tweaked_value ) {
+      LOG_ERROR("sim::GENIETweaker") << "The parameter " << param_name << " controlled by"
+      << " the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
+      << " has current value " << param_value << ", which differs from its tweaked value "
+      << tweaked_value << '\n';
+      all_ok = false;
+    }
+    else LOG_DEBUG("sim::GENIETweaker") << "The parameter " << param_name << " controlled"
+      << " by the reweight tweak dial " << genie::rew::GSyst::AsString( dial_label )
+      << " OK";
   }
 
-  return true;
+  if ( all_ok ) LOG_INFO("sim::GENIETweaker") << "All "
+    << fTweakDialLabels.size() << " parameters OK";
+
+  return all_ok;
 }
 
 // The manual tweaking is done here
@@ -203,7 +220,7 @@ bool sim::GENIETweaker::beginRun(art::Run& /*run*/) {
 
   static bool already_tweaked = false;
   if ( already_tweaked ) {
-    LOG_INFO("sim::GENIETweaker") << "Values have already been"
+    LOG_WARNING("sim::GENIETweaker") << "Values have already been"
       << "tweaked. GENIETweaker is being inappropriately run multiple times.\n";
     return true;
   }
@@ -226,6 +243,34 @@ bool sim::GENIETweaker::beginRun(art::Run& /*run*/) {
   }
 
   already_tweaked = true;
+
+  // Ensure that all of the GENIE algorithms are re-initialized with the
+  // tweaked settings
+  //
+  // fAlgPool is a private member of genie::AlgFactory, so the
+  // dangerous "#define private public" above is used to access it here.
+  // Horrible idea, but it appears to be the only way to get a list
+  // of all of the registry keys for all enabled algorithms.
+  // We need to reconfigure *all* of them to ensure that our tweaks
+  // (including CommonParameters) are propagated throughout GENIE.
+  //
+  // TODO: surely there's a better way that I haven't thought of
+  LOG_INFO("sim::GENIETweaker") << "Forcing reconfiguration"
+    << " of all GENIE algorithms";
+  for (const auto& pair : genie::AlgFactory::Instance()->fAlgPool) {
+    std::string alg_name = pair.first;
+    genie::Algorithm* alg = pair.second;
+    LOG_DEBUG("sim::GENIETweaker") << "Forcing reconfiguration of "
+      << alg_name << '\n';
+
+    // Reconfigure this algorithm using the tweaked configuration
+    // (already owned by the algorithm, but it needs to adjust class members
+    // based on the new values in the registry)
+    alg->Configure( alg->GetConfig() );
+
+  }
+
+  this->check_tweaks();
 
   return true;
 }
@@ -297,8 +342,34 @@ void sim::GENIETweaker::tweak_parameter(genie::Registry& reg,
   const std::string& parameter_name, genie::rew::GSyst_t twk_dial_label,
   double twk_dial_value, double& untweaked_value, double& tweaked_value)
 {
+  std::pair<genie::Registry*, std::string> cache_pair( &reg, parameter_name );
+
+  // If we've already modified this registry + parameter name combination,
+  // then refuse to do so again (avoids duplicate tweaks)
+  const auto iter = std::find(fTweakedParamCache.cbegin(), fTweakedParamCache.cend(),
+    cache_pair);
+  if ( iter != fTweakedParamCache.cend() )
+  {
+    LOG_WARNING("sim::GENIETweaker") << "Already tweaked the parameter \""
+      << parameter_name << "\" in the registry " << reg.Name()
+      << ". The duplicate request will be ignored.";
+    // Find the index to use to look up information about the previous
+    // tweak based on the position of the entry in fTweakedParamCache
+    // TODO: maybe do this in a better way
+    int old_index = std::distance(fTweakedParamCache.cbegin(), iter);
+    tweaked_value = fTweakedParameterValues.at( old_index );
+    untweaked_value = fUntweakedParameterValues.at( old_index );
+
+    // Push a copy to keep the vector size the same as the others
+    // (e.g., fTweakDialLabels)
+    fTweakedParamCache.push_back( *iter );
+    return;
+  }
+  else fTweakedParamCache.push_back( cache_pair );
+
   untweaked_value = reg.GetDouble( parameter_name );
 
+  // Determine whether the parameter should be increased or decreased
   int tweak_sign = 1;
   if ( twk_dial_value < 0. ) tweak_sign = -1;
 
@@ -308,11 +379,24 @@ void sim::GENIETweaker::tweak_parameter(genie::Registry& reg,
   double sigma = gsu->OneSigmaErr(twk_dial_label, tweak_sign);
   tweaked_value = untweaked_value + twk_dial_value*sigma;
 
+  // Check that the registry and the item to be tweaked
+  // aren't locked. If they are, unlock them.
+  bool registry_was_locked = reg.IsLocked();
+  bool item_was_locked = reg.ItemIsLocked( parameter_name );
+
+  if ( registry_was_locked ) reg.UnLock();
+  if ( item_was_locked ) reg.UnLockItem( parameter_name );
+
+  // Set the parameter to its tweaked value in the registry
   reg.Set( parameter_name, tweaked_value );
 
-  LOG_INFO("sim::GENIETweaker") << "Changed " << parameter_name << " from "
-    << untweaked_value << " to " << tweaked_value << " (" << (twk_dial_value < 0 ? "" : "+")
-    << twk_dial_value << " sigma)";
+  // Restore the previous locks if needed
+  if ( registry_was_locked ) reg.Lock();
+  if ( item_was_locked ) reg.LockItem( parameter_name );
+
+  LOG_INFO("sim::GENIETweaker") << "Changed " << parameter_name << " in the registry "
+    << reg.Name() << " from " << untweaked_value << " to " << tweaked_value << " ("
+    << (twk_dial_value < 0 ? "" : "+") << twk_dial_value << " sigma)";
 }
 
 
