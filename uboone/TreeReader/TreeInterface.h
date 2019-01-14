@@ -53,8 +53,14 @@ public:
   /** Get the number of entries in the tree. */
   virtual const Long64_t GetEntries() = 0;
 
-  /** Get the run number (for the first entry in the tree). */
-  virtual const int GetRun() = 0;
+  /** Get the run number. */
+  virtual const int GetRun(Long64_t ientry) { return -1; }
+
+  /** Get the subrun number. */
+  virtual const int GetSubRun(Long64_t ientry) { return -1; }
+
+  /** Get the event number. */
+  virtual const int GetEventID(Long64_t ientry) { return -1; }
 
   /** Get the neutrino position for the current entry. */
   virtual const TLorentzVector GetNuPosition() = 0;

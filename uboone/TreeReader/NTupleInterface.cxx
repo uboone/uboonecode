@@ -17,6 +17,24 @@ NTupleInterface::NTupleInterface() : fVerbose(false), fDLMode(false) {}
 NTupleInterface::~NTupleInterface() {}
 
 
+const int NTupleInterface::GetRun(Long64_t ientry) {
+  fTree->GetEntry(ientry);
+  return run;
+}
+
+
+const int NTupleInterface::GetSubRun(Long64_t ientry) {
+  fTree->GetEntry(ientry);
+  return subrun;
+}
+
+
+const int NTupleInterface::GetEventID(Long64_t ientry) {
+  fTree->GetEntry(ientry);
+  return event;
+}
+
+
 void NTupleInterface::SetRootFile(TFile* inputFile, TString treeName, fhicl::ParameterSet& branchDef) {
   std::cout << "[NTUPLEINTERFACE] TREE NAME: " << treeName << std::endl;
 

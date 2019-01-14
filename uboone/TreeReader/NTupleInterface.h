@@ -35,7 +35,13 @@ public:
   const Long64_t GetEntries() { return fNEntries; }
 
   /** Get the current run number. */
-  const int GetRun() { return fRun; }
+  const int GetRun(Long64_t ientry);
+
+  /** Get the current subrun number. */
+  const int GetSubRun(Long64_t ientry);
+
+  /** Get the current event number. */
+  const int GetEventID(Long64_t ientry);
 
   /** Get the POT count. */
   const float GetPOT() { return fPOT; }

@@ -107,7 +107,6 @@ void TreeReader::readFile(std::string const &name, art::FileBlock* &fb) {
 
   std::cout << "File has " << fInterface->GetEntries() << " entries" << std::endl;
   std::cout << "POT = " << fInterface->GetPOT() << std::endl;
-  std::cout << "Run = " << fInterface->GetRun() << std::endl;
   fPOT += fInterface->GetPOT();
 }
 
@@ -168,20 +167,21 @@ bool TreeReader::readNext(art::RunPrincipal* const&,
       << "Ntuple format " << fInputType << " not supported" << std::endl;
   }
 
-  fEventCounter++;
-  fEntry++;
-
-  art::RunNumber_t rn = fInterface->GetRun();
+  art::RunNumber_t rn = fInterface->GetRun(fEntry);
   if (rn==0) rn=999999;
   art::Timestamp tstamp(time(0));
 
-  art::SubRunID newID(rn, 0);
+  int subrunID = fInterface->GetSubRun(fEntry);
+  if (subrunID == -1) {
+    subrunID = 0;
+  }
+  art::SubRunID newID(rn, subrunID);
   if (fCurrentSubRunID.runID() != newID.runID()) {
     outR = fSourceHelper.makeRunPrincipal(rn, tstamp);
   }
 
   if (fCurrentSubRunID != newID) {
-    outSR = fSourceHelper.makeSubRunPrincipal(rn,0,tstamp);
+    outSR = fSourceHelper.makeSubRunPrincipal(rn, subrunID, tstamp);
     std::unique_ptr<sumdata::POTSummary> pot(new sumdata::POTSummary);    
     pot->totpot = fPOT;
     pot->totgoodpot = fPOT;
@@ -194,8 +194,13 @@ bool TreeReader::readNext(art::RunPrincipal* const&,
     fCurrentSubRunID = newID;
   }
 
+  int eventID = fInterface->GetEventID(fEntry);
+  if (eventID == -1) {
+    eventID = fEventCounter;
+  }
+
   outE = fSourceHelper.makeEventPrincipal(
-    fCurrentSubRunID.run(), fCurrentSubRunID.subRun(), fEventCounter, tstamp);
+    fCurrentSubRunID.run(), fCurrentSubRunID.subRun(), eventID, tstamp);
 
   // Put products in the event.
   if (fInputType == "gsimple") {
@@ -211,6 +216,9 @@ bool TreeReader::readNext(art::RunPrincipal* const&,
     throw cet::exception(__PRETTY_FUNCTION__)
       << "Ntuple format " << fInputType << " not supported" << std::endl;
   }
+
+  fEventCounter++;
+  fEntry++;
 
   return true;
 }

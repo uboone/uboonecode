@@ -32,7 +32,7 @@ public:
   const Long64_t GetEntries() { return fNEntries; }
 
   /** Get the run number (for the first entry in the tree). */
-  const int GetRun() { return fRun; }
+  const int GetRun(Long64_t /*ientry*/) { return fRun; }
 
   /** Get the POT from the tree. */
   const float GetPOT() { return fPOT; }
