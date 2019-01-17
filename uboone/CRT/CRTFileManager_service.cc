@@ -38,7 +38,7 @@ crt::CRTFileManager::CRTFileManager(fhicl::ParameterSet const & p, art::Activity
   fCRTHitLabel(p.get<std::string>("CRTHitLabel")),
   fCRTVersion(p.get<std::string>("ubversion_CRTHits"))
 {
-  setenv("TZ", "CST+6CDT", 1);  // Fermilab time zone.
+  setenv("TZ", "CST6CDT", 1);  // Fermilab time zone.
   tzset();
 }
 
@@ -69,7 +69,7 @@ std::vector<std::string> crt::CRTFileManager::findMatchingCRTFiles(art::Timestam
   
   if(tz != 0 && *tz != 0) {
     std::string tzs(tz);
-    if(tzs != std::string("CST+6CDT")) {
+    if(tzs != std::string("CST6CDT")) {
       // Timezone is wrong, throw exception.
       throw cet::exception("CRTFileManager") << "Wrong timezone: " << tzs;
     }
