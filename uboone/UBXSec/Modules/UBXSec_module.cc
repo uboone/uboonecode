@@ -2012,8 +2012,6 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->num_pfp_tracks=0;
     ubxsec_event->num_pfp_showers=0;
     
-    //ubxsec_event->ResizeCC1mNpPFPTrackVectors(pfp_v_v[slice_index].size());
-
     for (auto pfp : pfp_v_v[slice_index]) {
 
       std::cout << "[UBXSecCC1mNp] \t This is PFP " << pfp->Self()  << std::endl;      
@@ -2046,41 +2044,41 @@ void UBXSec::produce(art::Event & e) {
 	std::vector<art::Ptr<ubana::MCGhost>> mcghosts=mcghost_from_pfp.at(pfp.key());
 	std::vector<art::Ptr<simb::MCParticle>> mcpars;	
 	if(mcghosts.size()==0 || mcghosts.size()>1){
-	  std::cout<<"[UBXSecCC1mNp] \t\t mcghosts is either 0 or >1 so skipping filling pfp truth!"<<std::endl;
+	  std::cout<<"[UBXSecCC1mNp] \t\t mcghosts is either 0 or >1 so filling pfp truth with defaults!"<<std::endl;
 	  //FillPFPTruthDefaults(ubxsec_event);
 	  FillPFPTruthDefaults();
-	  continue;
+	} else {
+	  mcpars=mcpar_from_mcghost.at(mcghosts[0].key());
+	  const auto mc_truth=UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpars[0]->TrackId());
+	  if(!mc_truth) {
+	    std::cerr<<"[UBXSecCC1mNp] Problem with MCTruth pointer so filling pfp truth with defaults! "<<std::endl;
+	    //FillPFPTruthDefaults(ubxsec_event);
+	    FillPFPTruthDefaults();
+	  } else {
+	    std::cout<<"[UBXSecCC1mNp] \t\t Filling pfp truth info for PFP " << pfp->Self() <<std::endl;
+	    ubxsec_event->pfp_truth_pdg.emplace_back(mcpars[0]->PdgCode());
+	    ubxsec_event->pfp_truth_origin.emplace_back(mc_truth->Origin());
+	    ubxsec_event->pfp_truth_status.emplace_back(mcpars[0]->StatusCode());
+	    ubxsec_event->pfp_truth_parId.emplace_back(mcpars[0]->TrackId());
+	    ubxsec_event->pfp_truth_theta.emplace_back(mcpars[0]->Momentum().Theta());
+	    ubxsec_event->pfp_truth_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
+	    ubxsec_event->pfp_truth_phi.emplace_back(mcpars[0]->Momentum().Phi());
+	    ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());   
+	    ubxsec_event->pfp_truth_startx.emplace_back(mcpars[0]->Vx());
+	    ubxsec_event->pfp_truth_starty.emplace_back(mcpars[0]->Vy());
+	    ubxsec_event->pfp_truth_startz.emplace_back(mcpars[0]->Vz());
+	    ubxsec_event->pfp_truth_endx.emplace_back(mcpars[0]->EndX());
+	    ubxsec_event->pfp_truth_endy.emplace_back(mcpars[0]->EndY());
+	    ubxsec_event->pfp_truth_endz.emplace_back(mcpars[0]->EndZ());
+	    ubxsec_event->pfp_truth_endProcess.emplace_back(mcpars[0]->EndProcess());
+	    ubxsec_event->pfp_truth_endE.emplace_back((mcpars[0]->Momentum(mcpars[0]->NumberTrajectoryPoints()-1)).E());
+	    ubxsec_event->pfp_truth_KE.emplace_back(mcpars[0]->E()-mcpars[0]->Mass());
+	    ubxsec_event->pfp_truth_Mass.emplace_back(mcpars[0]->Mass());
+	  }
 	}
-	mcpars=mcpar_from_mcghost.at(mcghosts[0].key());
-	const auto mc_truth=UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpars[0]->TrackId());
-	if(!mc_truth) {
-	  std::cerr<<"[UBXSecCC1mNp] Problem with MCTruth pointer so skipping filling pfp truth! "<<std::endl;
-	  //FillPFPTruthDefaults(ubxsec_event);
-	  FillPFPTruthDefaults();
-	  continue;
-	}
-	std::cout<<"[UBXSecCC1mNp] \t\t Filling pfp truth info for PFP " << pfp->Self() <<std::endl;
-	ubxsec_event->pfp_truth_pdg.emplace_back(mcpars[0]->PdgCode());
-	ubxsec_event->pfp_truth_origin.emplace_back(mc_truth->Origin());
-	ubxsec_event->pfp_truth_status.emplace_back(mcpars[0]->StatusCode());
-	ubxsec_event->pfp_truth_parId.emplace_back(mcpars[0]->TrackId());
-	ubxsec_event->pfp_truth_theta.emplace_back(mcpars[0]->Momentum().Theta());
-	ubxsec_event->pfp_truth_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
-	ubxsec_event->pfp_truth_phi.emplace_back(mcpars[0]->Momentum().Phi());
-	ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());   
-	ubxsec_event->pfp_truth_startx.emplace_back(mcpars[0]->Vx());
-	ubxsec_event->pfp_truth_starty.emplace_back(mcpars[0]->Vy());
-	ubxsec_event->pfp_truth_startz.emplace_back(mcpars[0]->Vz());
-	ubxsec_event->pfp_truth_endx.emplace_back(mcpars[0]->EndX());
-	ubxsec_event->pfp_truth_endy.emplace_back(mcpars[0]->EndY());
-	ubxsec_event->pfp_truth_endz.emplace_back(mcpars[0]->EndZ());
-	ubxsec_event->pfp_truth_endProcess.emplace_back(mcpars[0]->EndProcess());
-	ubxsec_event->pfp_truth_endE.emplace_back((mcpars[0]->Momentum(mcpars[0]->NumberTrajectoryPoints()-1)).E());
-	ubxsec_event->pfp_truth_KE.emplace_back(mcpars[0]->E()-mcpars[0]->Mass());
-	ubxsec_event->pfp_truth_Mass.emplace_back(mcpars[0]->Mass());
       } else { //end of the isMC conditional
-	FillPFPTruthDefaults();
-	//FillPFPTruthDefaults(ubxsec_event);
+	  FillPFPTruthDefaults();
+	  //FillPFPTruthDefaults(ubxsec_event);
       }
 
       if ( !(lar_pandora::LArPandoraHelper::IsTrack(pfp)) && !(lar_pandora::LArPandoraHelper::IsShower(pfp)) ) { //check if the PFParticle is considered neither a shower or a track
