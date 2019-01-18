@@ -72,7 +72,7 @@ physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
 physics.analyzers.analysistree.TrackModuleLabel:                ["pandora", "pandoraKalmanTrack", "pmtrack", "pandoraKalmanShower", "pandoraTrack"]
 physics.analyzers.analysistree.VertexModuleLabel:               ["pandora", "pmtrack", "trajcluster", "pandoraTrack"]
 physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandora", "pandoraTrack"]
-physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraTrackcalo", "pandoraKalmanTrackcalo", "pmtrackcalo", "pandoraKalmanShowercalo", pandoraTrackcalo"]
+physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraTrackcalo", "pandoraKalmanTrackcalo", "pmtrackcalo", "pandoraKalmanShowercalo", "pandoraTrackcalo"]
 physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandorapid", "pandoraKalmanTrackpid", "pmtrackpid", "pandoraKalmanShowerpid", "pandoraTrackpid"]
 physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["pandoratag", "pandoraKamanTracktag", "pmtracktag", "pandoraKalmanShowertag", "pandoraTracktag"]
 physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["pandoratag", "pandoraKalmanTracktag", "pmtrackContTag", "pandoraKalmanShowertag", "pandoraTracktag"]
@@ -86,7 +86,7 @@ physics.analyzers.analysistree.CosmicScoreThresholds:           [0.0]
 physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
 physics.analyzers.analysistree.POTModuleLabel:                  "generator"
 physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
-physics.analyzers.analysistree.ShowerModuleLabel:               ["pandora", "trajcluster", "pandoraTrack"]
+physics.analyzers.analysistree.ShowerModuleLabel:               ["pandora", "trajcluster", "pandoraShower"]
 physics.analyzers.analysistree.SWTriggerModuleLabel:            "swtrigger"
 physics.analyzers.analysistree.OpticalFilterLabel:              "opfiltercommon"
 
