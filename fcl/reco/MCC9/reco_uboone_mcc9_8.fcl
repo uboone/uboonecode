@@ -309,7 +309,7 @@ microboone_reco_mcc8_producers:
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
 
   # Shower Reco module
-  showerreco3d:                     @local::ShrReco3DPandora
+  shrreco3d:                     @local::ShrReco3DPandora
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
@@ -507,7 +507,7 @@ microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandora
                                          @sequence::microboone_reco_mcc8_pandoraCosmic,
 					                               crHitRemovalTruthMatch,
                                          @sequence::microboone_reco_mcc8_pandoraNu,
-                                         showerreco3d  ]
+                                         shrreco3d  ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -1085,8 +1085,8 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
 
-microboone_reco_data_producers.showerreco3d.BacktrackTag: ""
-microboone_reco_data_producers.showerreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
-microboone_reco_data_producers.showerreco3d.NeutrinoEvent: false
+microboone_reco_mcc8_producers.shrreco3d.BacktrackTag: ""
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
