@@ -69,24 +69,24 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 #physics.analyzers.analysistree:  @local::microboone_analysistree
 physics.analyzers.analysistree.OpFlashModuleLabel:              [ "simpleFlashBeam", "simpleFlashCosmic", "simpleFlashBeamLowPE" ]
 physics.analyzers.analysistree.HitsModuleLabel:                 "gaushit"
-physics.analyzers.analysistree.TrackModuleLabel:                ["pandora", "pandoraKalmanTrack", "pmtrack", "pandoraKalmanShower"]
-physics.analyzers.analysistree.VertexModuleLabel:               ["pandora", "pmtrack", "trajcluster"]
-physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandora"]
-physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraTrackcalo", "pandoraKalmanTrackcalo", "pmtrackcalo", "pandoraKalmanShowercalo"]
-physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandorapid", "pandoraKalmanTrackpid", "pmtrackpid", "pandoraKalmanShowerpid"]
-physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["pandoratag", "pandoraKamanTracktag", "pmtracktag", "pandoraKalmanShowertag"]
-physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["pandoratag", "pandoraKalmanTracktag", "pmtrackContTag", "pandoraKalmanShowertag"]
-physics.analyzers.analysistree.FlashMatchAssocLabel:            ["dummy", "pandoraKalmanTrackFlashMatch", "dummy", "pandoraKalmanShowerFlashMatch"]
-physics.analyzers.analysistree.PFParticleModuleLabel:           "pandora"
-physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0"]
-physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0"]
-physics.analyzers.analysistree.TrackMCSFitLabel:                ["pandoraMCSMu", "dummy", "pmtrackMCSMu", "dummy"]
-physics.analyzers.analysistree.T0RecoAnodeCathodePiercingLabel: ["t0reco","t0reco","t0reco","t0reco"]
+physics.analyzers.analysistree.TrackModuleLabel:                ["pandora", "pandoraKalmanTrack", "pmtrack", "pandoraKalmanShower", "pandoraTrack"]
+physics.analyzers.analysistree.VertexModuleLabel:               ["pandora", "pmtrack", "trajcluster", "pandoraTrack"]
+physics.analyzers.analysistree.PandoraNuVertexModuleLabel:      ["pandora", "pandoraTrack"]
+physics.analyzers.analysistree.CalorimetryModuleLabel:          ["pandoraTrackcalo", "pandoraKalmanTrackcalo", "pmtrackcalo", "pandoraKalmanShowercalo", pandoraTrackcalo"]
+physics.analyzers.analysistree.ParticleIDModuleLabel:           ["pandorapid", "pandoraKalmanTrackpid", "pmtrackpid", "pandoraKalmanShowerpid", "pandoraTrackpid"]
+physics.analyzers.analysistree.CosmicTaggerAssocLabel:          ["pandoratag", "pandoraKamanTracktag", "pmtracktag", "pandoraKalmanShowertag", "pandoraTracktag"]
+physics.analyzers.analysistree.ContainmentTaggerAssocLabel:     ["pandoratag", "pandoraKalmanTracktag", "pmtrackContTag", "pandoraKalmanShowertag", "pandoraTracktag"]
+physics.analyzers.analysistree.FlashMatchAssocLabel:            ["dummy", "pandoraKalmanTrackFlashMatch", "dummy", "pandoraKalmanShowerFlashMatch", "dummy"]
+physics.analyzers.analysistree.PFParticleModuleLabel:           "pandoraTrack"
+physics.analyzers.analysistree.FlashT0FinderLabel:              ["t0","t0","t0","t0", "t0"]
+physics.analyzers.analysistree.MCT0FinderLabel:                 ["mct0","mct0","mct0","mct0", "mct0"]
+physics.analyzers.analysistree.TrackMCSFitLabel:                ["pandoraMCSMu", "dummy", "pmtrackMCSMu", "dummy", "pandoraTrackMCSMu"]
+physics.analyzers.analysistree.T0RecoAnodeCathodePiercingLabel: ["t0reco","t0reco","t0reco","t0reco","t0reco"]
 physics.analyzers.analysistree.CosmicScoreThresholds:           [0.0]
 physics.analyzers.analysistree.GenieGenModuleLabel:             "generator"
 physics.analyzers.analysistree.POTModuleLabel:                  "generator"
 physics.analyzers.analysistree.CryGenModuleLabel:               "cry"
-physics.analyzers.analysistree.ShowerModuleLabel:               ["pandora", "trajcluster"]
+physics.analyzers.analysistree.ShowerModuleLabel:               ["pandora", "trajcluster", "pandoraTrack"]
 physics.analyzers.analysistree.SWTriggerModuleLabel:            "swtrigger"
 physics.analyzers.analysistree.OpticalFilterLabel:              "opfiltercommon"
 
