@@ -62,4 +62,4 @@ physics.filters.generator.GTruthInputModuleLabels: ["generator::GenieGenFiltered
 physics.filters.generator.BeamGateInputModuleLabels: ["generator::GenieGenFiltered"]
 physics.filters.generator.MCTruthMCFluxAssnsInputModuleLabels: ["generator::GenieGenFiltered"]
 physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::GenieGenFiltered"]
-physics.filters.generator.POTSummaryTag: "potinevent"
+physics.filters.generator.POTSummaryTag: "potinevent:SubRunPOT"
