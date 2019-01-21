@@ -55,4 +55,4 @@ physics: {
 
 }
 
-physics.producers.InputTag: "generator"
+physics.producers.potinevent.InputTag: "generator"
