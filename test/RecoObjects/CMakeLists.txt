@@ -58,10 +58,10 @@ simple_plugin(InteractTest "module"
               BASENAME_ONLY
              )
 
-cet_test( PropTest HANDBUILT 
-  	  TEST_EXEC lar
-	  TEST_ARGS -c PropTest.fcl
-	  DATAFILES PropTest.fcl )
+#cet_test( PropTest HANDBUILT 
+#  	  TEST_EXEC lar
+#	  TEST_ARGS -c PropTest.fcl
+#	  DATAFILES PropTest.fcl )
 
 cet_test( InteractTest HANDBUILT 
   	  TEST_EXEC lar
