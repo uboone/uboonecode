@@ -305,7 +305,7 @@ microboone_reco_data_producers:
     MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
 
     # Shower Reco module
-    showerreco3d:                     @local::ShrReco3DPandora
+    shrreco3d:                     @local::ShrReco3DPandora
   
 }
 
@@ -498,7 +498,7 @@ microboone_reco_data_pandoraNu:        [ pandoraNuPatRec,
 microboone_reco_data_pandora:          [ @sequence::microboone_reco_data_pandoraFull,
                                          @sequence::microboone_reco_data_pandoraCosmic,
                                          @sequence::microboone_reco_data_pandoraNu,
-                                         showerreco3d 
+                                         shrreco3d 
                                        ]
 
 microboone_reco_data:                  [ rns,
@@ -1011,8 +1011,8 @@ microboone_reco_data_filters.opfiltercommonext.OpHitProducer:                   
 microboone_reco_data_analyzers.DQMFlashes.OpFlashModuleLabel:                                                 "simpleFlashCosmic"
 microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel:                                                "simpleFlashCosmic"
 
-microboone_reco_data_producers.showerreco3d.BacktrackTag: ""
-microboone_reco_data_producers.showerreco3d.ADCtoE: [238.4,238.4,238.4] # e-/ADC
-microboone_reco_data_producers.showerreco3d.NeutrinoEvent: false
+microboone_reco_data_producers.shrreco3d.BacktrackTag: ""
+microboone_reco_data_producers.shrreco3d.ADCtoE: [238.4,238.4,238.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
