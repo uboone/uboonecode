@@ -11,9 +11,14 @@
 # The configuration contains the test points which will be printed.
 # 
 # Dependencies:
-#   -official MicroBooNE space charge configuration
+#   - official MicroBooNE detector properties service
+#   - official MicroBooNE space charge configuration
 #
 
+#include "geometry_microboone.fcl"
+#include "larproperties_microboone.fcl"
+#include "detectorclocks_microboone.fcl"
+#include "detectorproperties_microboone.fcl"
 #include "spacecharge_microboone.fcl"
 
 process_name: SCEUbooneTest
@@ -41,7 +46,12 @@ services: {
     }
   } # messages
   
-  SpaceChargeService: @local::microboone_spacecharge
+  ExptGeoHelperInterface:    @local::microboone_geometry_helper
+  Geometry:                  @local::microboone_geo
+  LArPropertiesService:      @local::microboone_properties
+  DetectorClocksService:     @local::microboone_detectorclocks
+  DetectorPropertiesService: @local::microboone_detproperties
+  SpaceChargeService:        @local::microboone_spacecharge
   
 } # services
 
@@ -60,3 +70,8 @@ physics: {
     }
   }
 }
+
+
+# uncomment these to force activation of space charge effects
+# services.SpaceChargeService.EnableSimSpatialSCE: true
+# services.SpaceChargeService.EnableSimEfieldSCE: true
