@@ -1,6 +1,8 @@
 cet_test( SpaceChargeMicroBooNE_test
   LIBRARIES
     ubevt_SpaceCharge
+    lardataalg_DetectorInfo
+    larcorealg_Geometry
     mf_MessageLogger
     fhiclcpp
     cetlib cetlib_except
