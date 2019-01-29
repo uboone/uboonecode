@@ -31,11 +31,11 @@ table_fragment_end
 
 product                 version
 larsoft                 v08_06_00
-ubcv                    v08_05_00
+ubcv                    v08_06_00
 ubcrt                   v08_06_00
 ublite			v08_06_00
 ubutil                  v08_05_00
-uboonedata              v01_18_22
+uboonedata              v01_18_23
 genie_xsec              v2_12_10
 cetbuildtools	        v7_06_04	-	only_for_build
 end_product_list
