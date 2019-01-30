@@ -839,9 +839,24 @@ microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTa
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
 microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxChi2:                                   10
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxResidue:                                1.5
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.negDistTolerance:                          -0.01
+
 microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandora"
 microboone_reco_mcc8_producers.pandoraKalmanShower.trackFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               true
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.options.defaultPdgId:                            11
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.skipNegProp:                              true
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxChi2:                                  10
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxDist:                                  5.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxResidue:                               3.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxResidueFirstHit:                       6.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.sortHitsByWire:                           true
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.tryNoSkipWhenFails:                       false
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.negDistTolerance:                         -0.01
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.pickBestHitOnWire:                        true
+
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputPFParticleLabel:                               "pandora"
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputTracksLabel:                                   "pandoraKalmanTrack"
 
