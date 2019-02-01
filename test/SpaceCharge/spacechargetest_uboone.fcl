@@ -55,6 +55,8 @@ services: {
   
 } # services
 
+services.SpaceChargeService.EnableCalEfieldSCE: true
+services.SpaceChargeService.EnableCalSpatialSCE: true
 
 physics: {
   analyzers: {
