@@ -14,7 +14,7 @@ EOF
   return ${status}
 fi
 
-ensure_cetbuildtools v7_06_04
+ensure_cetbuildtools v7_03_02
 
 #pull_product uboone_photon_propagation @UBOONE_PHOTON_PROPAGATION_VERSION@ uboone_photon_propagation-@UBOONE_PHOTON_PROPAGATION_DOT_VERSION@-noarch.tar.bz2
 build_noarch uboone_photon_propagation @UBOONE_PHOTON_PROPAGATION_VERSION@
