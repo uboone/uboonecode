@@ -20,7 +20,6 @@
 #include "lardata/RecoObjects/PropAny.h"
 
 #include "nutools/RandomUtils/NuRandomService.h"
-#include "art/Framework/Services/Optional/RandomNumberGenerator.h"
 #include "CLHEP/Random/RandFlat.h"
 
 #include "TMath.h"
@@ -31,41 +30,31 @@ namespace trkf
   {
   public:
 
-    // Constructor, destructor.
-
     explicit PropTest(fhicl::ParameterSet const& pset);
-    ~PropTest();
 
-    // Overrides.
+  private:
+    void beginJob() override;
+    void analyze(art::Event const&) override {}
 
-    void beginJob();
-    void analyze(const art::Event& evt);
-
+    CLHEP::RandFlat fRndm;
   };
 
   DEFINE_ART_MODULE(PropTest)
 
   PropTest::PropTest(const fhicl::ParameterSet& pset)
-  : EDAnalyzer(pset)
-  {
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
-  }
+    : EDAnalyzer{pset}
+    , fRndm{art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this)}
+  {}
 
   void PropTest::beginJob()
   {
     // Make sure assert is enabled.
-
     bool assert_flag = false;
     assert((assert_flag = true, assert_flag));
     if ( ! assert_flag ) {
       std::cerr << "Assert is disabled" << std::endl;
       abort();
     }
-    
-    // Prepare the random stream
-    CLHEP::RandFlat rndm
-      (art::ServiceHandle<art::RandomNumberGenerator>()->getEngine(art::ScheduleID::first(),
-                                                                   moduleDescription().moduleLabel()));
     
     // Make a PropAny propagate to test.
 
@@ -84,38 +73,38 @@ namespace trkf
 
       std::shared_ptr<const trkf::Surface> psurf;
       if(isurf < 10) {
-	double x0 = 10.* rndm() - 5.;  // (-5,5)
-	double y0 = 10.*rndm() - 5.;  // (-5,5)
-	double z0 = 10.*rndm() - 5.;  // (-5,5)
-	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
+        double x0 = 10.* fRndm() - 5.;  // (-5,5)
+        double y0 = 10.*fRndm() - 5.;  // (-5,5)
+        double z0 = 10.*fRndm() - 5.;  // (-5,5)
+        double phi = TMath::TwoPi() * fRndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfYZLine(x0, y0, z0, phi));
 	surfaces.push_back(psurf);
       }
       else if(isurf < 20) {
-	double x0 = 10.*rndm() - 5.;  // (-5,5)
-	double y0 = 10.*rndm() - 5.;  // (-5,5)
-	double z0 = 10.*rndm() - 5.;  // (-5,5)
-	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
+        double x0 = 10.*fRndm() - 5.;  // (-5,5)
+        double y0 = 10.*fRndm() - 5.;  // (-5,5)
+        double z0 = 10.*fRndm() - 5.;  // (-5,5)
+        double phi = TMath::TwoPi() * fRndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfYZPlane(x0, y0, z0, phi));
 	surfaces.push_back(psurf);
       }
       else {
-	double x0 = 10.*rndm() - 5.;  // (-5,5)
-	double y0 = 10.*rndm() - 5.;  // (-5,5)
-	double z0 = 10.*rndm() - 5.;  // (-5,5)
-	double theta = std::acos(2. * rndm() - 1.);  // (0, pi)
-	double phi = TMath::TwoPi() * rndm() - TMath::Pi();  // (-pi,pi)
+        double x0 = 10.*fRndm() - 5.;  // (-5,5)
+        double y0 = 10.*fRndm() - 5.;  // (-5,5)
+        double z0 = 10.*fRndm() - 5.;  // (-5,5)
+        double theta = std::acos(2. * fRndm() - 1.);  // (0, pi)
+        double phi = TMath::TwoPi() * fRndm() - TMath::Pi();  // (-pi,pi)
 	psurf = std::shared_ptr<const trkf::Surface>(new trkf::SurfXYZPlane(x0, y0, z0, theta, phi));
 	surfaces.push_back(psurf);
       }
 
       // Make random track vector.
 
-      double u = 100.*rndm();  // (0,100)
-      double v = 100.*rndm() - 50.;  // (-50, 50)
-      double dudw = 2.*rndm() - 1.;  // (-1, 1)
-      double dvdw = 2.*rndm() - 1.;  // (-1, 1)
-      double pinv = 0.9*rndm() + 0.1;  // (0.1, 1.0)
+      double u = 100.*fRndm();  // (0,100)
+      double v = 100.*fRndm() - 50.;  // (-50, 50)
+      double dudw = 2.*fRndm() - 1.;  // (-1, 1)
+      double dvdw = 2.*fRndm() - 1.;  // (-1, 1)
+      double pinv = 0.9*fRndm() + 0.1;  // (0.1, 1.0)
       trkf::TrackVector vec(5);
       vec(0) = u;
       vec(1) = v;
@@ -136,7 +125,7 @@ namespace trkf
       // Make random track direction.
 
       trkf::Surface::TrackDirection dir = trkf::Surface::FORWARD;
-      if(rndm() > 0.5)
+      if(fRndm() > 0.5)
 	dir = trkf::Surface::BACKWARD;
 
       // Make KETrack.
@@ -370,10 +359,4 @@ namespace trkf
 
     std::cout << "PropTest: All tests passed." << std::endl;
   }
-
-  PropTest::~PropTest()
-  {}
-
-  void PropTest::analyze(const art::Event& /* evt */)
-  {}
 }
