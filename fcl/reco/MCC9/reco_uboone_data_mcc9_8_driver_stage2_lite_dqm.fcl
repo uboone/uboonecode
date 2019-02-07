@@ -44,7 +44,7 @@ outputs:
     out2:
     {
         module_type:               RootOutput
-        dataTier:                  "reconstructed"
+        dataTier:                  "recolite"
         streamName: "reco2_lite"
         fileName: "%ifb_%tc_reco2_lite.root"
         compressionLevel:          1
