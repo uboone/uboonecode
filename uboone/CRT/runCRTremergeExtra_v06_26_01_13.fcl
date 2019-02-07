@@ -75,8 +75,8 @@ services.message.destinations:
 services.CRTFileManager.ubversion_CRTHits: prod_v06_26_01_13
 
 physics.producers.remerge.debug: false
-physics.producers.remerge.TimeStart: -0.0052
-physics.producers.remerge.TimeEnd: 0.0035
+physics.producers.remerge.TimeStart: -0.0042
+physics.producers.remerge.TimeEnd: 0.0050
 physics.producers.remergeextra.debug: false
-physics.producers.remergeextra.TimeStart: -0.0052
-physics.producers.remergeextra.TimeEnd: 0.0035
+physics.producers.remergeextra.TimeStart: -0.0042
+physics.producers.remergeextra.TimeEnd: 0.0050

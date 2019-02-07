@@ -6,9 +6,9 @@ microboone_crt_merger:{
  DAQHeaderTimeUBooNELabel : "daq"
  CRTHitLabel              : "crthit"
  debug                    : true
- TimeStart                : -0.002  # Start of matching interval (seconds).
- TimeEnd                  : 0.004   # End of matching interval (seconds).
- TimeOffset               : 0       # Offset of matching interval (Seconds).
+ TimeStart                : -0.0042  # Start of matching interval (seconds).
+ TimeEnd                  : 0.0050   # End of matching interval (seconds).
+ TimeOffset               : 0        # Offset of matching interval (Seconds).
 }
 
 microboone_crt_merger_extra: @local::microboone_crt_merger
