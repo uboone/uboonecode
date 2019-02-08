@@ -38,6 +38,8 @@
 #include "dlprod_fclbase_analyzers.fcl"
 #include "calibration_microboone.fcl"
 
+#include "shrreco3d.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_mcc8_services:
@@ -308,6 +310,9 @@ microboone_reco_mcc8_producers:
   MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
 
+  # Shower Reco module
+  shrreco3d:                     @local::ShrReco3DPandora
+
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
   pandoraCosmicKalmanTrackTruthMatch:     @local::standard_mctrutht0matching
@@ -503,7 +508,8 @@ microboone_reco_mcc8_pandoraNu: [        pandoraNuPatRec,
 microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandoraFull,
                                          @sequence::microboone_reco_mcc8_pandoraCosmic,
 					                               crHitRemovalTruthMatch,
-                                         @sequence::microboone_reco_mcc8_pandoraNu ]
+                                         @sequence::microboone_reco_mcc8_pandoraNu,
+                                         shrreco3d  ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -1081,5 +1087,9 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 #filters
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
+
+microboone_reco_mcc8_producers.shrreco3d.BacktrackTag: ""
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG

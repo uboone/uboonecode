@@ -39,6 +39,7 @@
 #include "wcls.fcl"
 #include "calibration_microboone.fcl"
 #include "ophitremapproducer.fcl"
+#include "shrreco3d.fcl"
 
 BEGIN_PROLOG
 
@@ -305,6 +306,9 @@ microboone_reco_data_producers:
     MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
     MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
     MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
+
+    # Shower Reco module
+    shrreco3d:                     @local::ShrReco3DPandora
   
 }
 
@@ -496,7 +500,8 @@ microboone_reco_data_pandoraNu:        [ pandoraNuPatRec,
 
 microboone_reco_data_pandora:          [ @sequence::microboone_reco_data_pandoraFull,
                                          @sequence::microboone_reco_data_pandoraCosmic,
-                                         @sequence::microboone_reco_data_pandoraNu 
+                                         @sequence::microboone_reco_data_pandoraNu,
+                                         shrreco3d 
                                        ]
 
 microboone_reco_data:                  [ rns,
@@ -1011,5 +1016,9 @@ microboone_reco_data_filters.opfiltercommonext.OpHitProducer:                   
 
 microboone_reco_data_analyzers.DQMFlashes.OpFlashModuleLabel:                                                 "simpleFlashCosmic"
 microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel:                                                "simpleFlashCosmic"
+
+microboone_reco_data_producers.shrreco3d.BacktrackTag: ""
+microboone_reco_data_producers.shrreco3d.ADCtoE: [238.4,238.4,238.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
