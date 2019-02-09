@@ -59,7 +59,6 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc Tri
                         lardataobj_RawData
                         larcoreobj_SummaryData
 			${UBDut}
-                        ${PQ}
 			${Boost_SERIALIZATION_LIBRARY}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_IO_SOURCES}
@@ -70,6 +69,7 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc Tri
                         art_Persistency_Common canvas_Persistency_Common
                         art_Persistency_Provenance canvas_Persistency_Provenance
                         art_Utilities canvas_Utilities
+			libwda
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}
@@ -91,7 +91,6 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc Tri
                         larcoreobj_SummaryData
 			uboone_RawData
 			${UBDut}
-                        ${PQ}
 			${Boost_SERIALIZATION_LIBRARY}
                         ${ART_FRAMEWORK_CORE}
 			${ART_FRAMEWORK_IO_SOURCES}
