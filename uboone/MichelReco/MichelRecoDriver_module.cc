@@ -69,6 +69,9 @@ private:
   // minimum cluster size
   size_t fMinClusSize;
 
+  // use clusters from this plane (0, 1, 2)
+  geo::PlaneID::PlaneID_t fUsePlane;
+
   // constants used [detector properties]
   double _w2cm, _t2cm;
 
@@ -94,11 +97,12 @@ MichelRecoDriver::MichelRecoDriver(fhicl::ParameterSet const & p)
   fClusterProducer  = p.get<std::string>("ClusterProducer");
   fHitProducer      = p.get<std::string>("HitProducer");
   fMinClusSize      = p.get<size_t>     ("MinClusSize");
-  
+  fUsePlane     = p.get<geo::PlaneID::PlaneID_t>( "UsePlane", 2 ); // default: collection plane
+
   // get detector specific properties
   auto const* geom = lar::providerFrom<geo::Geometry>();
   auto const* detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
-  _w2cm = geom->WirePitch( geo::View_t::kW ); // collection plane
+  _w2cm = geom->WirePitch( static_cast<geo::View_t>( fUsePlane ) );
   _t2cm = detp->SamplingRate() / 1000.0 * detp->DriftVelocity( detp->Efield(), detp->Temperature() );
 
   std::cout << "**********************" << std::endl
@@ -179,9 +183,9 @@ void MichelRecoDriver::produce(art::Event & e)
     //std::vector<const recob::Hit*> hit_v = cluster_hit_assn_v.at(i);
     const std::vector<art::Ptr<recob::Hit> >& hit_v = cluster_hit_assn_v.at(i);
 
-    // if hits not from collection-plane -> skip
+    // if hits not from desired plane -> skip
     if (hit_v.size() == 0) continue;
-    if (hit_v.at(0)->WireID().Plane != 2) continue;
+    if (hit_v.at(0)->WireID().Plane != fUsePlane) continue;
 
     // prepare hit-list for this cluster
     std::vector< ::michel::HitPt > michel_cluster = PrepareClusterHits(hit_v);
@@ -195,7 +199,7 @@ void MichelRecoDriver::produce(art::Event & e)
   _mgr->Process();
 
   // grab the results
-  auto const& michels = _mgr->GetResult();
+  auto const& michels = _mgr->GetResult(); // vector of michel::MichelClusters
 
   // cluster ptr maker which will be used to fill associations
   art::PtrMaker<recob::Cluster> makeClusterPtrElectron(e, *this, "electron");
@@ -204,48 +208,57 @@ void MichelRecoDriver::produce(art::Event & e)
   // save the output
   for (auto const& michelClus : michels){
 
-    // grab michel hits
-    auto const& michel = michelClus._michel; // vector of HitPt
+    auto const& michel = michelClus._michel; // michel::Michel object
     
     // if no michel hits -> don't continue saving the cluster
     if ( michel._electron_hit_idx_v.empty() ) continue;
 
     // create a new cluster for the electron
-    float start_wire   = michelClus._michel._start._w / _w2cm;
-    float end_wire     = michelClus._michel._start._t / _t2cm;
-    unsigned int nhits = michelClus._michel._electron_hit_idx_v.size();
 
+    // michel::Michel start used for both the electron and the photon(s)
+    float start_wire   = michel._start._w / _w2cm; 
+    float start_tick   = michel._start._t / _t2cm;
+    unsigned int nhits = michel._electron_hit_idx_v.size();
+    // Loop over hits from electron cluster to compute this cluster's total charge
+    float Qelectron = 0;
+    for (auto const& michel_elec_hit_idx : michel._electron_hit_idx_v){
+      Qelectron += michel.at( michel_elec_hit_idx )._q;
+    }
+    std::cout << "Charge from e hits " << Qelectron << std::endl; 
+    //std::cout << "Charge from Michel " << michel._charge << std::endl; 
+
+    // Just filling the minimal set of variables
     recob::Cluster electron_clus( start_wire,  // start_wire
-				  1.,          // sigma_start_wire
-				  end_wire,    // end_wire
-				  1.,          // sigma_start_tick
+				  0.,          // sigma_start_wire
+				  start_tick,  // start tick
+				  0.,          // sigma_start_tick
 				  0.,          // start_charge
 				  0.,          // start_angle
 				  0.,          // start_opening
 				  0.,          // end_wire
-				  1.,          // sigma_end_wire
+				  0.,          // sigma_end_wire
 				  0.,          // end_tick
-				  1.,          // sigma_end_tick
+				  0.,          // sigma_end_tick
 				  0.,          // end_charge
 				  0.,          // end_angle
 				  0.,          // end_opening
-				  1.,          // integral
-				  1.,          // integral_stddev
-				  1.,          // summedADC
-				  1.,          // summedADC_stddev
+				  Qelectron,   // integral
+				  0.,          // integral_stddev
+				  0.,          // summedADC
+				  0.,          // summedADC_stddev
 				  nhits,       // n_hits
 				  0.,          // multiple_hit_density
 				  0.,          // width
-				  1.,          // ID_t
-				  geo::View_t::kW, // view
-				  geo::PlaneID(0,0,2));
+				  0.,          // ID_t
+				  static_cast<geo::View_t>( fUsePlane ), // view
+				  geo::PlaneID(0, 0, fUsePlane) );
 
     electron_v->emplace_back( electron_clus );
 
     const art::Ptr<recob::Cluster> cluster_ptr = makeClusterPtrElectron( electron_v->size() - 1 );
 
     // loop through all tagged electron hits, store in vector of Art pointers
-    std::vector< art::Ptr<recob::Hit > > electron_hit_ptr_v;
+    // std::vector< art::Ptr<recob::Hit > > electron_hit_ptr_v;
 
     for (auto const& michel_elec_hit_idx : michel._electron_hit_idx_v){
       size_t idx = michel.at( michel_elec_hit_idx )._id;
@@ -253,7 +266,7 @@ void MichelRecoDriver::produce(art::Event & e)
       elec_clus_hit_assn_v->addSingle( cluster_ptr, hit_ptr);
     }
 
-    std::cout << "\tSaved new Michel with " << electron_hit_ptr_v.size() << " hits!" << std::endl;
+    // std::cout << "\tSaved new Michel with " << electron_hit_ptr_v.size() << " hits!" << std::endl;
 
     // grab photon hits
     for (auto const& photon_hit_v : michel._photon_clus_v){
@@ -261,16 +274,25 @@ void MichelRecoDriver::produce(art::Event & e)
       if ( photon_hit_v.empty() ) continue;
       
       // loop through all tagged photon hits, store in vector of Art pointers
-      std::vector< art::Ptr<recob::Hit > > photon_hit_ptr_v;
+      // std::vector< art::Ptr<recob::Hit > > photon_hit_ptr_v;
+
+      // Loop over hits from photon cluster to compute this cluster's total charge
+      float Qphoton =  0;
+      for (auto const& photon_hit_idx : photon_hit_v){
+	Qphoton += michel[ photon_hit_idx ]._q;
+      }
+      std::cout << "Charge from g hits " << Qphoton << std::endl; 
+      //std::cout << "Charge from Michel " << michel._charge << std::endl; 
       
       // create a new cluster for the photon hits
-      recob::Cluster photon_clus( start_wire, 1., end_wire, 1., // start/end wire and errors
-				  0., 0., 0.,                   // start charge/angle/opening
-				  0., 1., 0., 1.,               // start/end tick and errors
-				  0., 0., 0.,                   // end charge/angle/opening
-				  1., 1., 1., 1.,               // integral / summedADC
-				  nhits, 0., 0., 1.,
-				  geo::View_t::kW, geo::PlaneID(0,0,2));
+      recob::Cluster photon_clus( start_wire, 0., start_tick, 0., // start wire/wire stddev/tick/tick stddev
+				  0., 0., 0.,                     // start charge/angle/opening
+				  0., 0., 0., 0.,                 // end wire/wire stddev/tick/tick stddev
+				  0., 0., 0.,                     // end charge/angle/opening
+				  Qphoton, 0., 0., 0.,                 // integral, integral stddev, summedADC, summedADC stddev
+				  nhits, 0., 0., 0.,              // n_hits, multiple_hit_density, width, ID
+				  static_cast<geo::View_t>( fUsePlane ), // view
+				  geo::PlaneID(0, 0, fUsePlane) );
 
       photon_v->emplace_back( photon_clus );
 
