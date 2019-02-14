@@ -36,7 +36,7 @@ add_subdirectory(LLBasicTool)
 add_subdirectory(LLApp)
 add_subdirectory(CosmicTagging)
 #add_subdirectory(SNStreamSim)
-#add_subdirectory(MichelReco)
+add_subdirectory(MichelReco)
 add_subdirectory(QuietEventFilter)
 add_subdirectory(DLFilters)
 
@@ -57,6 +57,8 @@ add_subdirectory(ChargedTrackMultiplicity/DataOFF)
 add_subdirectory(LEEPhotonAnalysis)
 
 add_subdirectory(UBXSec)
+
+add_subdirectory(SNAnalysis)
 
 # Respect the order specified in lar_build, which is:
 #
