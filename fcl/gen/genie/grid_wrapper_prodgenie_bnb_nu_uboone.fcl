@@ -1,0 +1,10 @@
+###############################################################################
+#
+# This file includes prodgenie_bnb_nu_uboone.fcl and overrides GENIEGen
+# configuration to use ifdh flux file access, which is necessary for grid jobs.
+# It has been added to uboonecode for the CI validation.
+#
+###############################################################################
+#include "prodgenie_bnb_nu_uboone.fcl"
+physics.producers.generator.FluxCopyMethod: "IFDH"
+physics.producers.generator.MaxFluxFileMB: 500
