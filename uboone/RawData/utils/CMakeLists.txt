@@ -1,4 +1,4 @@
-
+cet_find_library( LIBWDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH )
 #
 simple_plugin( LArRawInputSourceUBooNE
                "source"
@@ -69,7 +69,7 @@ art_make( EXCLUDE LArRawInputSourceUBooNE_source.cc RawDigitWriter_module.cc Tri
                         art_Persistency_Common canvas_Persistency_Common
                         art_Persistency_Provenance canvas_Persistency_Provenance
                         art_Utilities canvas_Utilities
-			libwda
+			${LIBWDA}
                         ${MF_MESSAGELOGGER}
                         ${MF_UTILITIES}
                         ${FHICLCPP}
