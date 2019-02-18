@@ -25,7 +25,6 @@
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "SpacePointSolver.fcl"
 #include "ubflashfinder.fcl"
-#include "ubwcflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
 #include "mctrutht0matching.fcl"
 #include "mcsfitproducer.fcl"
@@ -37,8 +36,6 @@
 #include "microboone_dlpmtprecuts.fcl"
 #include "dlprod_fclbase_analyzers.fcl"
 #include "calibration_microboone.fcl"
-
-#include "shrreco3d.fcl"
 
 BEGIN_PROLOG
 
@@ -113,7 +110,6 @@ microboone_reco_mcc8_producers:
   simpleFlashCosmic    :            @local::UBFlashCosmicMC
   opflashBeam          :            @local::microboone_opflash_saturation_beam
   opflashCosmic        :            @local::microboone_opflash_saturation_cosmic
-  wcopflash            :            @local::UBWCFlashFinder
 
   ### noise filtering (if needed)
   simnfspl1:                        @local::wcls.simnfspl1
@@ -225,6 +221,10 @@ microboone_reco_mcc8_producers:
   pandoraTrackcalo:                 @local::microboone_calomc
   pandoraTrackpid:                  @local::microboone_chi2pid
   pandoraTrackcali:                 @local::microboone_calibrationdedx
+  pandoraTrackcaloSCE:              @local::microboone_calomc
+  pandoraTrackpidSCE:               @local::microboone_chi2pid
+  pandoraTrackcaliSCE:              @local::microboone_calibrationdedx
+  pandoraTrackcalipidSCE:           @local::microboone_chi2pid
   pandoraTrackcalipid:              @local::microboone_chi2pid
   pandoraKHittag:                   @local::microboone_cosmictracktagger
   pandoraKHitcalo:                  @local::microboone_calomc
@@ -309,9 +309,6 @@ microboone_reco_mcc8_producers:
   MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
-
-  # Shower Reco module
-  shrreco3d:                     @local::ShrReco3DPandora
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
@@ -405,9 +402,12 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoracali,
                                          pandoracalipid,
                                          pandoraTrackcalo,
+                                         pandoraTrackcaloSCE,
                                          pandoraTrackpid,
                                          pandoraTrackcali,
+                                         pandoraTrackcaliSCE,
                                          pandoraTrackcalipid,
+                                         pandoraTrackcalipidSCE,
                                          pandoraKHit,
                                          pandoraKalmanTrack,
                                          pandoraKalmanShower,
@@ -508,8 +508,7 @@ microboone_reco_mcc8_pandoraNu: [        pandoraNuPatRec,
 microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandoraFull,
                                          @sequence::microboone_reco_mcc8_pandoraCosmic,
 					                               crHitRemovalTruthMatch,
-                                         @sequence::microboone_reco_mcc8_pandoraNu,
-                                         shrreco3d  ]
+                                         @sequence::microboone_reco_mcc8_pandoraNu ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -545,7 +544,6 @@ microboone_reco_mcc8_stage1: [           rns,
 					                               gaushitTruthMatch ]
 
 microboone_reco_mcc8_stage2: [           rns,
-			     		 wcopflash,
                                          @sequence::microboone_reco_mcc8_pandora,
                                          @sequence::microboone_reco_mcc8_ccpath ]
 
@@ -872,6 +870,22 @@ microboone_reco_mcc8_producers.pandoracalipid.Chi2PIDAlg.UseMedian:             
 microboone_reco_mcc8_producers.pandoraTrackcalo.TrackModuleLabel:                                              "pandoraTrack"
 microboone_reco_mcc8_producers.pandoraTrackcalo.SpacePointModuleLabel:                                         "pandora"
 
+
+microboone_reco_mcc8_producers.pandoraTrackcaloSCE.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraTrackcaloSCE.SpacePointModuleLabel:                                      "pandora"
+microboone_reco_mcc8_producers.pandoraTrackcaloSCE.CorrectSCE: true
+
+microboone_reco_mcc8_producers.pandoraTrackpidSCE.CalorimetryModuleLabel:                                      "pandoraTrackcaloSCE"
+microboone_reco_mcc8_producers.pandoraTrackpidSCE.TrackModuleLabel:                                            "pandoraTrack"
+
+microboone_reco_mcc8_producers.pandoraTrackcaliSCE.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraTrackcaliSCE.CalorimetryModuleLabel:                                     "pandoraTrackcaloSCE"
+microboone_reco_mcc8_producers.pandoraTrackcaliSCE.CorrectSCE: true
+
+microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.TrackModuleLabel:                                        "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.CalorimetryModuleLabel:                                  "pandoraTrackcaliSCE"
+microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.Chi2PIDAlg.UseMedian:                                    true
+
 microboone_reco_mcc8_producers.pandoraTrackpid.CalorimetryModuleLabel:                                         "pandoraTrackcalo"
 microboone_reco_mcc8_producers.pandoraTrackpid.TrackModuleLabel:                                               "pandoraTrack"
 
@@ -1087,9 +1101,5 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 #filters
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
-
-microboone_reco_mcc8_producers.shrreco3d.BacktrackTag: ""
-microboone_reco_mcc8_producers.shrreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
-microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
