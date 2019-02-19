@@ -25,7 +25,7 @@
 #include "correct_saturation.fcl"
 #include "MuCSTrackTagger_module.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
-#include "SpacePointSolver.fcl"  
+#include "SpacePointSolver_microboone.fcl"
 #include "ubflashfinder.fcl"
 #include "ubwcflashfinder.fcl"
 #include "cosmicflashtagger.fcl"
