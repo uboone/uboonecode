@@ -21,6 +21,8 @@
 #include "showerreco3d_microboone.fcl"
 #include "showerquality_microboone.fcl"
 #include "pandoramodules_microboone.fcl"
+#include "external_event_building.fcl"
+#include "flash_neutrino_id.fcl"
 #include "photpropservices_microboone.fcl"
 #include "correct_saturation.fcl"
 #include "MuCSTrackTagger_module.fcl"
@@ -139,9 +141,9 @@ microboone_reco_data_producers:
 
     ### pandora consolidated pass
     pandoraPatRec:                    @local::microboone_pandoraFull
-    pandoraTrack:                     @local::microboone_pandoraTrackCreation
-    pandoraShower:                    @local::microboone_pandoraShowerCreation
-    pandora:                          @local::microboone_pandoraSplitting
+    pandoraAllOutcomesTrack:          @local::microboone_pandoraTrackCreation
+    pandoraAllOutcomesShower:         @local::microboone_pandoraShowerCreation
+    pandora:                          @local::pandora_event_building
 
     ### kalman track stuff on pandora consolidated pass
     pandoraKalmanTrack:               @local::trackproducerfrompfparticle
@@ -387,8 +389,8 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
 
 microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandoraPatRec,
-                                         pandoraTrack,
-                                         pandoraShower,
+                                         pandoraAllOutcomesTrack,
+                                         pandoraAllOutcomesShower,
                                          pandora,
                                          pandoratag,
                                          pandoraContTag,
@@ -621,12 +623,15 @@ microboone_reco_data_producers.trajclusterKalmanTrack.seedFromPF:               
 
 # Pandora consolidated reconstruction
 microboone_reco_data_producers.pandoraPatRec.HitFinderModuleLabel:                                            "gaushit"
-microboone_reco_data_producers.pandoraTrack.PFParticleLabel:                                                  "pandoraPatRec"
-microboone_reco_data_producers.pandoraShower.PFParticleLabel:                                                 "pandoraPatRec"
-microboone_reco_data_producers.pandora.InputProducerLabel:                                                    "pandoraPatRec"
-microboone_reco_data_producers.pandora.TrackProducerLabel:                                                    "pandoraTrack"
-microboone_reco_data_producers.pandora.ShowerProducerLabel:                                                   "pandoraShower"
+microboone_reco_data_producers.pandoraAllOutcomesTrack.PFParticleLabel:                                       "pandoraPatRec:allOutcomes"
+microboone_reco_data_producers.pandoraAllOutcomesShower.PFParticleLabel:                                      "pandoraPatRec:allOutcomes"
+
+microboone_reco_data_producers.pandora.InputProducerLabel:                                                    "pandoraPatRec:allOutcomes"
+microboone_reco_data_producers.pandora.TrackProducerLabel:                                                    "pandoraAllOutcomesTrack"
+microboone_reco_data_producers.pandora.ShowerProducerLabel:                                                   "pandoraAllOutcomesShower"
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
+microboone_reco_mcc8_producers.pandora.ShouldProduceT0s:                                                       false
+microboone_reco_mcc8_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
 
 # Pandora cosmic pass related
 microboone_reco_data_producers.pandoraCosmicPatRec.HitFinderModuleLabel:                                      "gaushit"
@@ -827,10 +832,10 @@ microboone_reco_data_producers.pandoraKHit.PFParticleModuleLabel:               
 microboone_reco_data_producers.pandoraKHit.ClusterModuleLabel:                                              "pandora"
 microboone_reco_data_producers.pandoraKHit.HitFinderModuleLabel:                                            "gaushit"
 
-microboone_reco_data_producers.pandoraKalmanTrack.inputCollection:                                            "pandoraPatRec"
+microboone_reco_data_producers.pandoraKalmanTrack.inputCollection:                                            "pandora"
 microboone_reco_data_producers.pandoraKalmanTrack.trackFromPF:                                                true
 microboone_reco_data_producers.pandoraKalmanTrack.showerFromPF:                                               false
-microboone_reco_data_producers.pandoraKalmanTrack.trackInputTag:                                              "pandoraTrack"
+microboone_reco_data_producers.pandoraKalmanTrack.trackInputTag:                                              "pandora"
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                       true
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                            "pandoraContTag"
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                        35.0
@@ -838,10 +843,10 @@ microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.fitter.maxChi2:    
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.fitter.maxResidue:                               1.5
 microboone_reco_data_producers.pandoraKalmanTrack.trackMaker.fitter.negDistTolerance:                         -0.01
 
-microboone_reco_data_producers.pandoraKalmanShower.inputCollection:                                           "pandoraPatRec"
+microboone_reco_data_producers.pandoraKalmanShower.inputCollection:                                           "pandora"
 microboone_reco_data_producers.pandoraKalmanShower.trackFromPF:                                               false
 microboone_reco_data_producers.pandoraKalmanShower.showerFromPF:                                              true
-microboone_reco_data_producers.pandoraKalmanShower.showerInputTag:                                            "pandoraShower"
+microboone_reco_data_producers.pandoraKalmanShower.showerInputTag:                                            "pandora"
 microboone_reco_data_producers.pandoraKalmanShower.trackMaker.options.defaultPdgId:                           11
 microboone_reco_data_producers.pandoraKalmanShower.trackMaker.fitter.skipNegProp:                             true
 microboone_reco_data_producers.pandoraKalmanShower.trackMaker.fitter.maxChi2:                                 10
@@ -874,16 +879,16 @@ microboone_reco_data_producers.pandoracalipid.TrackModuleLabel:                 
 microboone_reco_data_producers.pandoracalipid.CalorimetryModuleLabel:                                       "pandoracali"
 microboone_reco_data_producers.pandoracalipid.Chi2PIDAlg.UseMedian:                                         true
 
-microboone_reco_data_producers.pandoraTrackcalo.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcalo.TrackModuleLabel:                                           "pandora"
 microboone_reco_data_producers.pandoraTrackcalo.SpacePointModuleLabel:                                      "pandora"
 
 microboone_reco_data_producers.pandoraTrackpid.CalorimetryModuleLabel:                                      "pandoraTrackcalo"
-microboone_reco_data_producers.pandoraTrackpid.TrackModuleLabel:                                            "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackpid.TrackModuleLabel:                                            "pandora"
 
-microboone_reco_data_producers.pandoraTrackcali.TrackModuleLabel:                                           "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcali.TrackModuleLabel:                                           "pandora"
 microboone_reco_data_producers.pandoraTrackcali.CalorimetryModuleLabel:                                     "pandoraTrackcalo"
 
-microboone_reco_data_producers.pandoraTrackcalipid.TrackModuleLabel:                                        "pandoraTrack"
+microboone_reco_data_producers.pandoraTrackcalipid.TrackModuleLabel:                                        "pandora"
 microboone_reco_data_producers.pandoraTrackcalipid.CalorimetryModuleLabel:                                  "pandoraTrackcali"
 microboone_reco_data_producers.pandoraTrackcalipid.Chi2PIDAlg.UseMedian:                                    true
 
