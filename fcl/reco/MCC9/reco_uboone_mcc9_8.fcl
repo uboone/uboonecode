@@ -19,6 +19,8 @@
 #include "showerreco3d_microboone.fcl"
 #include "showerquality_microboone.fcl"
 #include "pandoramodules_microboone.fcl"
+#include "external_event_building.fcl"
+#include "flash_neutrino_id.fcl"
 #include "photpropservices_microboone.fcl"
 #include "correct_saturation.fcl"
 #include "MuCSTrackTagger_module.fcl"
@@ -134,9 +136,9 @@ microboone_reco_mcc8_producers:
 
   ### pandora consolidated pass
   pandoraPatRec:                    @local::microboone_pandoraFull
-  pandoraTrack:                     @local::microboone_pandoraTrackCreation
-  pandoraShower:                    @local::microboone_pandoraShowerCreation
-  pandora:                          @local::microboone_pandoraSplitting
+  pandoraAllOutcomesTrack:          @local::microboone_pandoraTrackCreation
+  pandoraAllOutcomesShower:         @local::microboone_pandoraShowerCreation
+  pandora:                          @local::pandora_event_building
 
   ### kalman track stuff on pandora consolidated pass
   pandoraKalmanTrack:               @local::trackproducerfrompfparticle
@@ -393,8 +395,8 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
 
 microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPatRec,
-                                         pandoraTrack,
-                                         pandoraShower,
+                                         pandoraAllOutcomesTrack,
+                                         pandoraAllOutcomesShower,
                                          pandora,
                                          pandoratag,
                                          pandoraContTag,
@@ -438,8 +440,8 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPMAcalipid,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
-                                         pandoraKalmanShowerFlashMatch,
-                                         pandoraGeomVertexFit
+                                         pandoraKalmanShowerFlashMatch #,
+                                         #pandoraGeomVertexFit  # ATTN commented out by asmith for testing only!
                                        ]
 
 microboone_reco_mcc8_pandoraCosmic: [    pandoraCosmicPatRec,
@@ -634,13 +636,18 @@ microboone_reco_mcc8_producers.mchitfinder.LArG4ModuleName:                     
 # Pandora consolidated reconstruction                             
 microboone_reco_mcc8_producers.pandoraPatRec.HitFinderModuleLabel:                                             "gaushit"
 microboone_reco_mcc8_producers.pandoraPatRec.SimChannelModuleLabel:                                            "driftWC:simpleSC"
-microboone_reco_mcc8_producers.pandoraTrack.PFParticleLabel:                                                   "pandoraPatRec"
-microboone_reco_mcc8_producers.pandoraShower.PFParticleLabel:                                                  "pandoraPatRec"
-microboone_reco_mcc8_producers.pandora.InputProducerLabel:                                                     "pandoraPatRec"
-microboone_reco_mcc8_producers.pandora.TrackProducerLabel:                                                     "pandoraTrack"
-microboone_reco_mcc8_producers.pandora.ShowerProducerLabel:                                                    "pandoraShower"
+microboone_reco_mcc8_producers.pandoraAllOutcomesTrack.PFParticleLabel:                                        "pandoraPatRec:allOutcomes"
+microboone_reco_mcc8_producers.pandoraAllOutcomesShower.PFParticleLabel:                                       "pandoraPatRec:allOutcomes"
+
+microboone_reco_mcc8_producers.pandora.InputProducerLabel:                                                     "pandoraPatRec:allOutcomes"
+microboone_reco_mcc8_producers.pandora.TrackProducerLabel:                                                     "pandoraAllOutcomesTrack"
+microboone_reco_mcc8_producers.pandora.ShowerProducerLabel:                                                    "pandoraAllOutcomesShower"
 microboone_reco_mcc8_producers.pandora.HitProducerLabel:                                                       "gaushit"
-                             
+microboone_reco_mcc8_producers.pandora.ShouldProduceT0s:                                                       false
+microboone_reco_mcc8_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
+microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowStartTime:                                        3.16
+microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowEndTime:                                          4.84
+
 # Pandora cosmic pass related                             
 microboone_reco_mcc8_producers.pandoraCosmicPatRec.HitFinderModuleLabel:                                       "gaushit"
 microboone_reco_mcc8_producers.pandoraCosmicPatRec.SimChannelModuleLabel:                                      "driftWC:simpleSC"
@@ -842,7 +849,7 @@ microboone_reco_mcc8_producers.pandoraKHit.PFParticleModuleLabel:               
 microboone_reco_mcc8_producers.pandoraKHit.ClusterModuleLabel:                                                 "pandora"
 microboone_reco_mcc8_producers.pandoraKHit.HitFinderModuleLabel:                                               "gaushit"
 
-microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandoraPatRec"
+microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandora"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
 microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackInputTag:                                              "pandora"
@@ -853,7 +860,7 @@ microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxChi2:    
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxResidue:                                1.5
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.negDistTolerance:                          -0.01
 
-microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandoraPatRec"
+microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandora"
 microboone_reco_mcc8_producers.pandoraKalmanShower.trackFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               true
 microboone_reco_mcc8_producers.pandoraKalmanShower.showerInputTag:                                             "pandora"
