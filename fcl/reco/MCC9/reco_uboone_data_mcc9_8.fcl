@@ -430,8 +430,8 @@ microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandoraPMAcalipid,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
-                                         pandoraKalmanShowerFlashMatch,
-                                         pandoraGeomVertexFit
+                                         pandoraKalmanShowerFlashMatch #,
+                                         #pandoraGeomVertexFit
                                        ]
 
 microboone_reco_data_pandoraCosmic:    [ pandoraCosmicPatRec,

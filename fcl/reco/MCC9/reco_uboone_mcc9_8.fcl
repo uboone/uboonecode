@@ -440,7 +440,7 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
                                          pandoraKalmanShowerFlashMatch #,
-                                         #pandoraGeomVertexFit  # ATTN commented out by asmith for testing only!
+                                         #pandoraGeomVertexFit
                                        ]
 
 microboone_reco_mcc8_pandoraCosmic: [    pandoraCosmicPatRec,
