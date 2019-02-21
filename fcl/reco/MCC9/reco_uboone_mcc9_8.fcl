@@ -646,6 +646,7 @@ microboone_reco_mcc8_producers.pandora.ShowerProducerLabel:                     
 microboone_reco_mcc8_producers.pandora.HitProducerLabel:                                                       "gaushit"
 microboone_reco_mcc8_producers.pandora.ShouldProduceT0s:                                                       false
 microboone_reco_mcc8_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
+microboone_reco_mcc8_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          false
 microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowStartTime:                                        3.16
 microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowEndTime:                                          4.84
 
