@@ -430,8 +430,8 @@ microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandoraPMAcalipid,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
-                                         pandoraKalmanShowerFlashMatch #,
-                                         #pandoraGeomVertexFit
+                                         pandoraKalmanShowerFlashMatch,
+                                         pandoraGeomVertexFit
                                        ]
 
 microboone_reco_data_pandoraCosmic:    [ pandoraCosmicPatRec,
@@ -630,8 +630,8 @@ microboone_reco_data_producers.pandora.InputProducerLabel:                      
 microboone_reco_data_producers.pandora.TrackProducerLabel:                                                    "pandoraAllOutcomesTrack"
 microboone_reco_data_producers.pandora.ShowerProducerLabel:                                                   "pandoraAllOutcomesShower"
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
-microboone_reco_mcc8_producers.pandora.ShouldProduceT0s:                                                       false
-microboone_reco_mcc8_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
+microboone_reco_data_producers.pandora.ShouldProduceT0s:                                                       false
+microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
 
 # Pandora cosmic pass related
 microboone_reco_data_producers.pandoraCosmicPatRec.HitFinderModuleLabel:                                      "gaushit"
