@@ -9,7 +9,7 @@
 #include "mcreco.fcl"
 #include "microboone_crt_detsim.fcl"
 #include "crtsimhitproducer.fcl"
-#include "MaskingOutUnavailableCRT.fcl"
+#include "CRTpreOverlay.fcl"       ##MaskingOutUnavailableCRT.fcl"
 
 process_name: OverlayDetsim 
 
@@ -52,7 +52,7 @@ physics:
    zeroedoutchannels:   @local::ZeroingOutBadChannels
    crtdetsim:    	@local::microboone_crtdetsim_binary
    crthitsim:    	@local::crtsimhitproducer_binary
-   maskedcrthitsim:    	@local::MaskingOutUnavailableCRT
+   maskedcrthitsim:    	@local::CRTpreOverlay ##MaskingOutUnavailableCRT
    rns:            	{ module_type: "RandomNumberSaver" }
    mcreco:              @local::standard_mcreco
 
