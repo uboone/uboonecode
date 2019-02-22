@@ -440,8 +440,8 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPMAcalipid,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
-                                         pandoraKalmanShowerFlashMatch,
-                                         pandoraGeomVertexFit
+                                         pandoraKalmanShowerFlashMatch #,
+                                         #pandoraGeomVertexFit
                                        ]
 
 microboone_reco_mcc8_pandoraCosmic: [    pandoraCosmicPatRec,
