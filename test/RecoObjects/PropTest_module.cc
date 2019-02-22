@@ -48,7 +48,7 @@ namespace trkf
   PropTest::PropTest(const fhicl::ParameterSet& pset)
   : EDAnalyzer(pset)
   {
-    art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
+    (void)art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this);
   }
 
   void PropTest::beginJob()
