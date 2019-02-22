@@ -42,6 +42,9 @@
 
 #include "shrreco3d.fcl"
 
+#include "microboone_crtreco.fcl"
+#include "crtsimhit_corr.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_mcc8_services:
@@ -315,7 +318,12 @@ microboone_reco_mcc8_producers:
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
 
   # Shower Reco module
-  shrreco3d:                     @local::ShrReco3DPandora
+  shrreco3d:                        @local::ShrReco3DPandora
+
+  # CRT reco
+  crthitcorr:                       @local::crthitcorr_filter
+  crttzero:                         @local::crttzero_sim
+  pandoraCrtHitMatch:               @local::t0recocrthit_sim
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
@@ -396,6 +404,9 @@ microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_cluster
 #                                         trajclusterKalmanTrack,
 #                                         tcshower ]
 
+microboone_reco_mcc8_crt: [              crthitcorr,
+                                         crttzero ]
+
 microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraPatRec,
                                          pandoraAllOutcomesTrack,
@@ -440,7 +451,8 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
                                          pandoraKalmanShowerFlashMatch,
-                                         pandoraGeomVertexFit
+                                         pandoraGeomVertexFit,
+                                         pandoraCrtHitMatch
                                        ]
 
 microboone_reco_mcc8_pandoraCosmic: [    pandoraCosmicPatRec,
@@ -536,10 +548,11 @@ microboone_reco_mcc8_truthmatch: [       pandoraCosmicKHitTruthMatch,
 
 microboone_reco_mcc8: [                  rns,
                                          #@sequence::microboone_reco_mcc8_mcreco,
-					                               @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_optical,
+                                         @sequence::microboone_reco_mcc8_crt,
                                          @sequence::microboone_reco_mcc8_signalprocessing,
                                          gaushitTruthMatch,
-					                               #@sequence::microboone_reco_mcc8_fuzzypath,
+			                 #@sequence::microboone_reco_mcc8_fuzzypath,
                                          @sequence::microboone_reco_mcc8_pandora,
                                          @sequence::microboone_reco_mcc8_ccpath ]
 #                                         @sequence::microboone_reco_mcc8_truthmatch]
@@ -551,6 +564,7 @@ microboone_reco_mcc8_stage1: [           rns,
 					                               gaushitTruthMatch ]
 
 microboone_reco_mcc8_stage2: [           rns,
+                                         @sequence::microboone_reco_mcc8_crt,
 			     		 wcopflash,
                                          @sequence::microboone_reco_mcc8_pandora,
                                          @sequence::microboone_reco_mcc8_ccpath ]
@@ -1026,7 +1040,21 @@ microboone_reco_mcc8_producers.pandoraCosmicKHitT0RecoBeam.TrackProducer:       
 microboone_reco_mcc8_producers.pandoraCosmicT0RecoBeam.TrackProducer:                                           "pandoraCosmic"
 microboone_reco_mcc8_producers.pmtrackT0RecoBeam.TrackProducer:                                                 "pmtrack"
 
-microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold: 6
+microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                     6
+
+microboone_reco_mcc8_producers.shrreco3d.BacktrackTag:                                                          ""
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [248.2,248.2,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent:                                                         false
+
+microboone_reco_mcc8_producers.crttzero.data_label:                                                             "crthitcorr"
+microboone_reco_mcc8_producers.crthitcorr.CrtHitsIn_Label:                                                      "crthitsim"
+microboone_reco_mcc8_producers.crthitcorr.HitThreshold:                                                         0.0
+microboone_reco_mcc8_producers.crthitcorr.StripThreshold:                                                       5.0
+microboone_reco_mcc8_producers.crthitcorr.SiPMThreshold:                                                        0.0
+microboone_reco_mcc8_producers.pandoraCrtHitMatch.IsMC:                                                    "true"
+microboone_reco_mcc8_producers.pandoraCrtHitMatch.data_label_TPCtrack:                                     "pandoraTrack"
+microboone_reco_mcc8_producers.pandoraCrtHitMatch.data_label_CRThit:                                       "crthitcorr"
+microboone_reco_mcc8_producers.pandoraCrtHitMatch.data_label_flash:                                        "simpleFlashCosmic"
 
 ## Truth matching configuration
 # General (tracks, possibly plus showers and/or pfparticles)
@@ -1123,9 +1151,5 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 #filters
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
-
-microboone_reco_mcc8_producers.shrreco3d.BacktrackTag: ""
-microboone_reco_mcc8_producers.shrreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
-microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
