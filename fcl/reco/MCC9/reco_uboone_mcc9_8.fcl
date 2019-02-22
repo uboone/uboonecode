@@ -38,6 +38,8 @@
 #include "dlprod_fclbase_analyzers.fcl"
 #include "calibration_microboone.fcl"
 
+#include "shrreco3d.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_mcc8_services:
@@ -237,6 +239,8 @@ microboone_reco_mcc8_producers:
   pandoraKalmanShowertag:           @local::microboone_cosmictracktagger
   pandoraKalmanShowercalo:          @local::microboone_calomc
   pandoraKalmanShowerpid:           @local::microboone_chi2pid
+  pandoraKalmanShowercali:          @local::microboone_calibrationdedx
+  pandoraKalmanShowercalipid:       @local::microboone_chi2pid
   pandoraPMAtag:                    @local::microboone_cosmictracktagger
   pandoraPMAcalo:                   @local::microboone_calomc
   pandoraPMApid:                    @local::microboone_chi2pid
@@ -307,6 +311,9 @@ microboone_reco_mcc8_producers:
   MuCSTrackTaggerpandoraCosmic:     @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpandoraCosmicKHit: @local::microboone_MuCSTrackTagger
   MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
+
+  # Shower Reco module
+  shrreco3d:                     @local::ShrReco3DPandora
 
   ### MCTruthMatching - matches recob::Track, recob::Shower, and recob::PFParticle to MCParticles
   pandoraCosmicKHitTruthMatch:            @local::standard_mctrutht0matching
@@ -420,6 +427,8 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandoraKalmanShowertag,
                                          pandoraKalmanShowercalo,
                                          pandoraKalmanShowerpid,
+                                         pandoraKalmanShowercali,
+                                         pandoraKalmanShowercalipid,
                                          pandoraPMAtag,
                                          #pandoraPMAContTag,
                                          pandoraPMAcalo,
@@ -503,7 +512,8 @@ microboone_reco_mcc8_pandoraNu: [        pandoraNuPatRec,
 microboone_reco_mcc8_pandora: [          @sequence::microboone_reco_mcc8_pandoraFull,
                                          @sequence::microboone_reco_mcc8_pandoraCosmic,
 					                               crHitRemovalTruthMatch,
-                                         @sequence::microboone_reco_mcc8_pandoraNu ]
+                                         @sequence::microboone_reco_mcc8_pandoraNu,
+                                         shrreco3d  ]
 
 microboone_reco_mcc8_mcreco: [           mchitfinder ]
 
@@ -833,15 +843,32 @@ microboone_reco_mcc8_producers.pandoraKHit.PFParticleModuleLabel:               
 microboone_reco_mcc8_producers.pandoraKHit.ClusterModuleLabel:                                                 "pandora"
 microboone_reco_mcc8_producers.pandoraKHit.HitFinderModuleLabel:                                               "gaushit"
 
-microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandora"
+microboone_reco_mcc8_producers.pandoraKalmanTrack.inputCollection:                                             "pandoraPatRec"
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
+microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackInputTag:                                              "pandoraTrack"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.momFromCombAndPid:                        true
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.contInputTag:                             "pandoraContTag"
 microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.options.pidFromLengthCut:                         35.0
-microboone_reco_mcc8_producers.pandoraKalmanTrack.trackFromPF:                                                 true
-microboone_reco_mcc8_producers.pandoraKalmanTrack.showerFromPF:                                                false
-microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandora"
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxChi2:                                   10
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.maxResidue:                                1.5
+microboone_reco_mcc8_producers.pandoraKalmanTrack.trackMaker.fitter.negDistTolerance:                          -0.01
+
+microboone_reco_mcc8_producers.pandoraKalmanShower.inputCollection:                                            "pandoraPatRec"
 microboone_reco_mcc8_producers.pandoraKalmanShower.trackFromPF:                                                false
 microboone_reco_mcc8_producers.pandoraKalmanShower.showerFromPF:                                               true
+microboone_reco_mcc8_producers.pandoraKalmanShower.showerInputTag:                                             "pandoraShower"
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.options.defaultPdgId:                            11
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.skipNegProp:                              true
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxChi2:                                  10
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxDist:                                  5.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxResidue:                               3.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.maxResidueFirstHit:                       6.0
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.sortHitsByWire:                           true
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.tryNoSkipWhenFails:                       false
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.negDistTolerance:                         -0.01
+microboone_reco_mcc8_producers.pandoraKalmanShower.trackMaker.fitter.pickBestHitOnWire:                        true
+
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputPFParticleLabel:                               "pandora"
 microboone_reco_mcc8_producers.pandoraGeomVertexFit.inputs.inputTracksLabel:                                   "pandoraKalmanTrack"
 
@@ -913,6 +940,13 @@ microboone_reco_mcc8_producers.pandoraKalmanShowercalo.SpacePointModuleLabel:   
 
 microboone_reco_mcc8_producers.pandoraKalmanShowerpid.CalorimetryModuleLabel:                                  "pandoraKalmanShowercalo"
 microboone_reco_mcc8_producers.pandoraKalmanShowerpid.TrackModuleLabel:                                        "pandoraKalmanShower"
+
+microboone_reco_mcc8_producers.pandoraKalmanShowercali.TrackModuleLabel:                                       "pandoraKalmanShower"
+microboone_reco_mcc8_producers.pandoraKalmanShowercali.CalorimetryModuleLabel:                                 "pandoraKalmanShowercalo"
+
+microboone_reco_mcc8_producers.pandoraKalmanShowercalipid.TrackModuleLabel:                                    "pandoraKalmanShower"
+microboone_reco_mcc8_producers.pandoraKalmanShowercalipid.CalorimetryModuleLabel:                              "pandoraKalmanShowercali"
+microboone_reco_mcc8_producers.pandoraKalmanShowercalipid.Chi2PIDAlg.UseMedian:                                true
 
 microboone_reco_mcc8_producers.pandoraPMAtag.TrackModuleLabel:                                                 "pandoraPMA"
 
@@ -1081,5 +1115,9 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 #filters
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
+
+microboone_reco_mcc8_producers.shrreco3d.BacktrackTag: ""
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE: [248.2,248.2,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent: false
 
 END_PROLOG
