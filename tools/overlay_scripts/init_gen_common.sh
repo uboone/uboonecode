@@ -10,6 +10,11 @@ echo "#include \"$MY_FCL_FILE\"" > local_gen.fcl
 echo "physics.producers.generator.FluxCopyMethod: \"IFDH\"" >> local_gen.fcl
 echo "physics.producers.generator.MaxFluxFileMB: 500" >> local_gen.fcl
 
+echo "#include \"$MY_FCL_FILE\"" > local_gen_include.fcl
+echo "physics.producers.generator.FluxCopyMethod: \"IFDH\"" >> local_gen_include.fcl
+echo "physics.producers.generator.MaxFluxFileMB: 500" >> local_gen_include.fcl
+echo "gen_detail: { physics: {@table::physics} services: {@table::services} outputs: {@table::outputs} source: {@table::source} process_name: @local::process_name }" >> local_gen_include.fcl
+
 if [ -f $MY_OUTPUT_FILE ]; then
     echo "File $MY_OUTPUT_FILE exists, so not generating again."
 else
