@@ -40,6 +40,7 @@
 #include "calibration_microboone.fcl"
 #include "ophitremapproducer.fcl"
 #include "shrreco3d.fcl"
+#include "microboone_crtreco.fcl"
 
 BEGIN_PROLOG
 
@@ -310,8 +311,12 @@ microboone_reco_data_producers:
     MuCSTrackTaggerpmtrack:           @local::microboone_MuCSTrackTagger
 
     # Shower Reco module
-    shrreco3d:                     @local::ShrReco3DPandora
-  
+    shrreco3d:                        @local::ShrReco3DPandora
+
+    # CRT reco
+    pandoraCrtHitMatch:               @local::t0recocrthit_data
+    crttzero:                         @local::crttzero
+
 }
 
 microboone_reco_data_analyzers:
@@ -385,6 +390,8 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
 #                                         trajclusterKalmanTrack,
 #                                         tcshower ]
 
+microboone_reco_data_crt: [              crttzero ]
+
 microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandoraPatRec,
                                          pandoraTrack,
@@ -429,7 +436,8 @@ microboone_reco_data_pandoraFull:      [ pandoraWriter,
                                          pandoraKHitFlashMatch,
                                          pandoraKalmanTrackFlashMatch,
                                          pandoraKalmanShowerFlashMatch,
-                                         pandoraGeomVertexFit
+                                         pandoraGeomVertexFit,
+                                         pandoraCrtHitMatch
                                        ]
 
 microboone_reco_data_pandoraCosmic:    [ pandoraCosmicPatRec,
@@ -510,6 +518,7 @@ microboone_reco_data_pandora:          [ @sequence::microboone_reco_data_pandora
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
+                                         @sequence::microboone_reco_data_crt,
                                          @sequence::microboone_reco_data_signalprocessing,
                                          #@sequence::microboone_reco_data_fuzzypath,
                                          @sequence::microboone_reco_data_pandora,
@@ -522,6 +531,7 @@ microboone_reco_data_stage1:           [ rns,
                                        ]
 
 microboone_reco_data_stage2:           [ rns,
+                                         @sequence::microboone_reco_data_crt,
 				       	 wcopflash,
                                          @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_ccpath 
@@ -1043,8 +1053,13 @@ microboone_reco_data_filters.opfiltercommonext.OpHitProducer:                   
 microboone_reco_data_analyzers.DQMFlashes.OpFlashModuleLabel:                                                 "simpleFlashCosmic"
 microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel:                                                "simpleFlashCosmic"
 
-microboone_reco_data_producers.shrreco3d.BacktrackTag: ""
-microboone_reco_data_producers.shrreco3d.ADCtoE: [238.4,238.4,238.4] # e-/ADC
-microboone_reco_data_producers.shrreco3d.NeutrinoEvent: false
+microboone_reco_data_producers.shrreco3d.BacktrackTag:                                                        ""
+microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [238.4,238.4,238.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.NeutrinoEvent:                                                       false
+
+microboone_reco_data_producers.pandoraCrtHitMatch.data_label_TPCtrack:                                        "pandoraTrack"
+microboone_reco_data_producers.pandoraCrtHitMatch.data_label_CRThit:                                          "remerge"
+microboone_reco_data_producers.pandoraCrtHitMatch.data_label_flash:                                           "simpleFlashCosmic"
+microboone_reco_data_producers.crttzero.data_label:                                                           "remerge"
 
 END_PROLOG
