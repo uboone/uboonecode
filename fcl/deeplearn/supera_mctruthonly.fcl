@@ -2,8 +2,8 @@ ProcessDriver: {
   Verbosity: 2
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMask","MaskImage"]
-  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMaskSegment","MaskSegment"]
+  ProcessType:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMask","MaskImage","SuperaWire","WireMask","SuperaLArFlow"]
+  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMaskSegment","MaskSegment","SuperaWire","WireMask","SuperaLArFlow"]
 
   IOManager: {
     Verbosity: 2
@@ -21,11 +21,9 @@ ProcessDriver: {
       MetaConfig: {
         MinTime:          2400
         MinWire:          0
-        #EventImageRows:   [6048,6048,6048]
         EventImageRows:   [1008,1008,1008]
         EventImageCols:   [3456,3456,3456]
         EventCompRows:    [6,6,6]
-        #EventCompRows:    [1,1,1]
         EventCompCols:    [1,1,1]
       }
     }
@@ -38,7 +36,7 @@ ProcessDriver: {
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "driftWC simpleSC"
       Origin: 1
-      TimeOffset:       2400
+      TimeOffset: 2400
     }
     SuperaChStatus: {
       Verbosity: 2
@@ -65,7 +63,7 @@ ProcessDriver: {
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "driftWC simpleSC"
-      TimeOffset:       2400
+      TimeOffset: 2400
       Origin: 0
       StoreG4SecondaryROI:  false
       StoreG4PrimaryROI:    true
@@ -104,6 +102,25 @@ ProcessDriver: {
       MaskValue: 0
       ReferenceProducer: "instance"
       TargetProducer: "segment"
+    }
+    SuperaWire: {
+      Verbosity: 2
+      OutImageLabel:    "wiremc"
+      LArWireProducer:  "butcher"
+      TimeOffset:        2400
+    }
+    WireMask: {
+      Verbosity: 2
+      ChStatusProducer: "wiremc"
+      ImageProducer:    "wiremc"
+    }
+    SuperaLArFlow: {
+      Verbosity: 0
+      OutImageLabel:      "larflow"
+      LArMCTruthProducer: "generator"
+      WireProducer:       "wiremc"
+      ChStatusProducer:   "wiremc"
+      LArSimEdepProducer: "ionization"
     }
   }
 }
