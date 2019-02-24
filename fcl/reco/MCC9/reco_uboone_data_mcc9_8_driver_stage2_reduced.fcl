@@ -4,4 +4,6 @@ outputs.out1.outputCommands: [ "keep *_*_*_*",
                                "drop sim::SimChannels_*_*_*",
                                "drop sim::SimEnergyDeposits_*_*_*",
                                "drop raw::RawDigits_*_*_*",
-                               "drop optdata::ChannelDataGroup_*_*_*" ]
+                               "drop optdata::ChannelDataGroup_*_*_*",
+                               "drop *_*_pandoraAllOutcomesTrack_*",
+                               "drop *_*_pandoraAllOutcomesShower_*" ]
