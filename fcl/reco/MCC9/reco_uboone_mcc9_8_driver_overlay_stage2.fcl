@@ -46,6 +46,8 @@ microboone_tfile_metadata:
   fileFormat:            ["root", "pndr"]
 }
 
+services.DetectorClocksService.G4RefCorrTrigModuleName: "triggersim"
+
 physics.producers.pandoraNucali.CaloAlg: @local::microboone_calorimetryalgmcc84data
 physics.producers.pandoraNuKHitcali.CaloAlg: @local::microboone_calorimetryalgmcc84data
 physics.producers.pandoraNuKalmanTrackcali.CaloAlg: @local::microboone_calorimetryalgmcc84data
