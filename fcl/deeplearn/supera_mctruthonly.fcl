@@ -3,7 +3,7 @@ ProcessDriver: {
   EnableFilter: false
   RandomAccess: false
   ProcessType:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMask","MaskImage","SuperaWire","WireMask","SuperaLArFlow"]
-  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMaskSegment","MaskSegment","SuperaWire","WireMask","SuperaLArFlow"]
+  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMaskSegment","MaskSegment","SuperaWire","WireMaskWire","SuperaLArFlow"]
 
   IOManager: {
     Verbosity: 2
@@ -109,7 +109,7 @@ ProcessDriver: {
       LArWireProducer:  "butcher"
       TimeOffset:        2400
     }
-    WireMask: {
+    WireMaskWire: {
       Verbosity: 2
       ChStatusProducer: "wiremc"
       ImageProducer:    "wiremc"
