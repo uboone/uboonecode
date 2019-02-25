@@ -1,10 +1,10 @@
 ProcessDriver: {
 
-  Verbosity:    2
+  Verbosity:    1
   EnableFilter: false
   RandomAccess: false
-  ProcessType:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMask","MaskImage"]
-  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaChStatus","SuperaInstanceImage","SuperaMCROI","WireMaskSegment","MaskSegment"]
+  ProcessType:  ["SuperaMetaMaker","SuperaSimCh","SuperaInstanceImage","SuperaMCROI","SuperaWire","SuperaChStatus","SuperaLArFlow"]
+  ProcessName:  ["SuperaMetaMaker","SuperaSimCh","SuperaInstanceImage","SuperaMCROI","SuperaWire","SuperaChStatus","SuperaLArFlow"]
 
   IOManager: {
     Verbosity:   2
@@ -19,16 +19,25 @@ ProcessDriver: {
 
   ProcessList: {
     SuperaMetaMaker: {
+      Verbosity: 1
       MetaConfig: {
         MinTime:          2400
         MinWire:          0
-        #EventImageRows:   [6048,6048,6048]
         EventImageRows:   [1008,1008,1008]
         EventImageCols:   [3456,3456,3456]
         EventCompRows:    [6,6,6]
-        #EventCompRows:    [1,1,1]
         EventCompCols:    [1,1,1]
       }
+    }
+    WireMask: {
+      Verbosity: 2
+      ChStatusProducer: "wiremc"
+      ImageProducer:    "wiremc"
+    }
+    SuperaChStatus: {
+      Verbosity: 2
+      LArChStatusProducer: "chstatus"
+      OutChStatusLabel:    "wiremc"
     }
     SuperaSimCh: {
       Verbosity: 2
@@ -37,13 +46,29 @@ ProcessDriver: {
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
-      LArSimChProducer:    "largeant"
+      LArSimChProducer:    "driftWC simpleSC"
       Origin: 1
       TimeOffset:       2400
+      TickBackward: true
     }
-    SuperaChStatus: {
-      LArChStatusProducer: "chstatus"
-      OutChStatusLabel: "wiremc"
+    SuperaWire: {
+      Verbosity: 2
+      OutImageLabel:    "wiremc"
+      LArWireProducer:  "butcher"
+      TimeOffset:       2400
+      TickBackward: true
+    }
+    SuperaLArFlow: {
+      Verbosity: 0
+      OutImageLabel:       "larflow"
+      LArMCTruthProducer:  "generator"
+      LArMCTrackProducer:  "mcreco"
+      LArMCShowerProducer: "mcreco"
+      WireProducer:        "wiremc"
+      ChStatusProducer:    "wiremc"
+      LArSimChProducer: "driftWC simpleSC"
+      EdepAtAnode: true
+      TickBackward: true
     }
     SuperaInstanceImage: {
       Verbosity: 0
@@ -64,7 +89,7 @@ ProcessDriver: {
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
-      LArSimChProducer:    "largeant"
+      LArSimChProducer:    "driftWC simpleSC"
       TimeOffset:       2400
       Origin: 0
       StoreG4SecondaryROI:  false
@@ -92,17 +117,6 @@ ProcessDriver: {
         MinHeight:    2
 	ApplySCE:     true
       }
-    }
-    WireMaskSegment: {
-      ChStatusProducer: "wiremc"
-      ImageProducer: "segment"
-    }
-    MaskSegment: {
-      Verbosity: 2
-      MinPIThreshold: 0
-      MaskValue: 0
-      ReferenceProducer: "instance"
-      TargetProducer: "segment"
     }
   }
 }
