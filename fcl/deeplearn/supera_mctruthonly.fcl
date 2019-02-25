@@ -47,7 +47,7 @@ ProcessDriver: {
       TickBackward: true
     }
     SuperaInstanceImage: {
-      Verbosity: 2
+      Verbosity: 0
       OutImageLabel:        "instance"
       AncestorImageLabel:   "ancestor"
       OutROILabel:          "segment"
