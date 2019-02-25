@@ -520,7 +520,7 @@ microboone_reco_data_filters.opfiltercommonext.OpHitProducer:                   
 microboone_reco_data_analyzers.DQMFlashes.OpFlashModuleLabel:                                                 "simpleFlashCosmic"
 microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel:                                                "simpleFlashCosmic"
 
-microboone_reco_data_producers.pandoraCrtHitMatch.data_label_TPCtrack:                                        "pandoraTrack"
+microboone_reco_data_producers.pandoraCrtHitMatch.data_label_TPCtrack:                                        "pandora"
 microboone_reco_data_producers.pandoraCrtHitMatch.data_label_CRThit:                                          "remerge"
 microboone_reco_data_producers.pandoraCrtHitMatch.data_label_flash:                                           "simpleFlashCosmic"
 microboone_reco_data_producers.crttzero.data_label:                                                           "remerge"
