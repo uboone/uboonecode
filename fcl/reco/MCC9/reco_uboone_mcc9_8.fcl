@@ -220,14 +220,10 @@ microboone_reco_mcc8_producers:
   pandorapid:                       @local::microboone_chi2pid
   pandoracali:                      @local::microboone_calibrationdedx
   pandoracalipid:                   @local::microboone_chi2pid
-  pandoraTrackcalo:                 @local::microboone_calomc
-  pandoraTrackpid:                  @local::microboone_chi2pid
-  pandoraTrackcali:                 @local::microboone_calibrationdedx
-  pandoraTrackcaloSCE:              @local::microboone_calomc
-  pandoraTrackpidSCE:               @local::microboone_chi2pid
-  pandoraTrackcaliSCE:              @local::microboone_calibrationdedx
-  pandoraTrackcalipidSCE:           @local::microboone_chi2pid
-  pandoraTrackcalipid:              @local::microboone_chi2pid
+  pandoracaloSCE:                   @local::microboone_calomc
+  pandorapidSCE:                    @local::microboone_chi2pid
+  pandoracaliSCE:                   @local::microboone_calibrationdedx
+  pandoracalipidSCE:                @local::microboone_chi2pid
   pandoraKHittag:                   @local::microboone_cosmictracktagger
   pandoraKHitcalo:                  @local::microboone_calomc
   pandoraKHitpid:                   @local::microboone_chi2pid
@@ -405,14 +401,10 @@ microboone_reco_mcc8_pandoraFull: [      pandoraWriter,
                                          pandorapid,
                                          pandoracali,
                                          pandoracalipid,
-                                         pandoraTrackcalo,
-                                         pandoraTrackpid,
-                                         pandoraTrackcali,
-                                         pandoraTrackcalipid,
-                                         pandoraTrackcaloSCE,
-                                         pandoraTrackpidSCE,
-                                         pandoraTrackcaliSCE,
-                                         pandoraTrackcalipidSCE,
+                                         pandoracaloSCE,
+                                         pandorapidSCE,
+                                         pandoracaliSCE,
+                                         pandoracalipidSCE,
                                          pandoraKHit,
                                          pandoraKalmanTrack,
                                          pandoraKalmanShower,
@@ -897,34 +889,20 @@ microboone_reco_mcc8_producers.pandoracalipid.TrackModuleLabel:                 
 microboone_reco_mcc8_producers.pandoracalipid.CalorimetryModuleLabel:                                          "pandoracali"
 microboone_reco_mcc8_producers.pandoracalipid.Chi2PIDAlg.UseMedian:                                            true
 
-microboone_reco_mcc8_producers.pandoraTrackcalo.TrackModuleLabel:                                              "pandora"
-microboone_reco_mcc8_producers.pandoraTrackcalo.SpacePointModuleLabel:                                         "pandora"
+microboone_reco_mcc8_producers.pandoracaloSCE.TrackModuleLabel:                                                "pandora"
+microboone_reco_mcc8_producers.pandoracaloSCE.SpacePointModuleLabel:                                           "pandora"
+microboone_reco_mcc8_producers.pandoracaloSCE.CorrectSCE: true
 
+microboone_reco_mcc8_producers.pandorapidSCE.CalorimetryModuleLabel:                                           "pandoracaloSCE"
+microboone_reco_mcc8_producers.pandorapidSCE.TrackModuleLabel:                                                 "pandora"
 
-microboone_reco_mcc8_producers.pandoraTrackcaloSCE.TrackModuleLabel:                                           "pandoraTrack"
-microboone_reco_mcc8_producers.pandoraTrackcaloSCE.SpacePointModuleLabel:                                      "pandora"
-microboone_reco_mcc8_producers.pandoraTrackcaloSCE.CorrectSCE: true
+microboone_reco_mcc8_producers.pandoracaliSCE.TrackModuleLabel:                                                "pandora"
+microboone_reco_mcc8_producers.pandoracaliSCE.CalorimetryModuleLabel:                                          "pandoracaloSCE"
+microboone_reco_mcc8_producers.pandoracaliSCE.CorrectSCE: true
 
-microboone_reco_mcc8_producers.pandoraTrackpidSCE.CalorimetryModuleLabel:                                      "pandoraTrackcaloSCE"
-microboone_reco_mcc8_producers.pandoraTrackpidSCE.TrackModuleLabel:                                            "pandoraTrack"
-
-microboone_reco_mcc8_producers.pandoraTrackcaliSCE.TrackModuleLabel:                                           "pandoraTrack"
-microboone_reco_mcc8_producers.pandoraTrackcaliSCE.CalorimetryModuleLabel:                                     "pandoraTrackcaloSCE"
-microboone_reco_mcc8_producers.pandoraTrackcaliSCE.CorrectSCE: true
-
-microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.TrackModuleLabel:                                        "pandoraTrack"
-microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.CalorimetryModuleLabel:                                  "pandoraTrackcaliSCE"
-microboone_reco_mcc8_producers.pandoraTrackcalipidSCE.Chi2PIDAlg.UseMedian:                                    true
-
-microboone_reco_mcc8_producers.pandoraTrackpid.CalorimetryModuleLabel:                                         "pandoraTrackcalo"
-microboone_reco_mcc8_producers.pandoraTrackpid.TrackModuleLabel:                                               "pandora"
-
-microboone_reco_mcc8_producers.pandoraTrackcali.TrackModuleLabel:                                              "pandora"
-microboone_reco_mcc8_producers.pandoraTrackcali.CalorimetryModuleLabel:                                        "pandoraTrackcalo"
-
-microboone_reco_mcc8_producers.pandoraTrackcalipid.TrackModuleLabel:                                           "pandora"
-microboone_reco_mcc8_producers.pandoraTrackcalipid.CalorimetryModuleLabel:                                     "pandoraTrackcali"
-microboone_reco_mcc8_producers.pandoraTrackcalipid.Chi2PIDAlg.UseMedian:                                       true
+microboone_reco_mcc8_producers.pandoracalipidSCE.TrackModuleLabel:                                             "pandora"
+microboone_reco_mcc8_producers.pandoracalipidSCE.CalorimetryModuleLabel:                                       "pandoracaliSCE"
+microboone_reco_mcc8_producers.pandoracalipidSCE.Chi2PIDAlg.UseMedian:                                         true
 
 microboone_reco_mcc8_producers.pandoraKHittag.TrackModuleLabel:                                                "pandoraKHit"
 
