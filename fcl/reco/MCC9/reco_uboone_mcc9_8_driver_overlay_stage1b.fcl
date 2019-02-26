@@ -32,6 +32,5 @@ services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
-#services.DetectorClocksService.G4RefCorrTrigModuleName: "triggersim"
 #reduce file name length
 outputs.out1.fileName: "%ifb_r1b.root"
