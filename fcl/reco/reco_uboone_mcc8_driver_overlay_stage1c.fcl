@@ -23,7 +23,7 @@ physics.producers.mchitfinder:  @local::standard_mchitfinder
 
 physics.reco: [ opfiltercommon ]
 physics.trigger_paths: [ reco ]
-outputs.out1.fileName: "%ifb_%tc_reco1c.root"
+outputs.out1.fileName: "%ifb_reco1c.root"
 outputs.out1.dataTier: "reconstructed-2d"
 #source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
 source.inputCommands: ["keep *_*_*_*" ]

@@ -21,7 +21,7 @@ physics.producers.mchitfinder:  @local::standard_mchitfinder
 
 physics.reco: [ mchitfinder, eventweight, @sequence::microboone_reco_data_stage1 ] 
 physics.trigger_paths: [ reco ]
-outputs.out1.fileName: "%ifb_%tc_reco1a.root"
+outputs.out1.fileName: "%ifb_reco1a.root"
 outputs.out1.dataTier: "reconstructed-2d"
 source.inputCommands: ["keep *_*_*_*" ]
 

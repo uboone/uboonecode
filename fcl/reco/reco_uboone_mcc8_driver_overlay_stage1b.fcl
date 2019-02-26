@@ -43,7 +43,7 @@ physics.producers.btload:   { module_type: BackTrackerLoader }
 physics.producers.btload.OverrieRealData: true
 physics.reco: [ btload, gaushitTruthMatch ]
 physics.trigger_paths: [ reco ]
-outputs.out1.fileName: "%ifb_%tc_reco1b.root"
+outputs.out1.fileName: "%ifb_reco1b.root"
 outputs.out1.dataTier: "reconstructed-2d"
 #source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
 source.inputCommands: ["keep *_*_*_*" ]
