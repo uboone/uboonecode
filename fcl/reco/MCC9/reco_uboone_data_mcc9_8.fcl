@@ -311,6 +311,7 @@ microboone_reco_data_pandora: [          pandoraWriter,
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
+                                         @sequence::microboone_reco_data_crt,
                                          @sequence::microboone_reco_data_signalprocessing,
                                          @sequence::microboone_reco_data_crt,
                                          wcopflash,
