@@ -1,0 +1,6 @@
+#include "standard_propagate_overlay_uboone.fcl"
+
+process_name: SimPropagateEnhancedExtraTPCVis
+outputs.out1.fileName: "%ifb_prop_EnhancedExtraTPCVis.root"
+
+#include "sys_var_EnhancedExtraTPCVis_uboone.fcl"
