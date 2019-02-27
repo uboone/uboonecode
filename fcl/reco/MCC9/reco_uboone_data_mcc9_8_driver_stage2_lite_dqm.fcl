@@ -1,8 +1,29 @@
+#include "cosmicflashtagger.fcl"
 #include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
 
 process_name: DataRecoStage2Lite
 
 services.TFileService.fileName: "reco_stage_2_hist.root"
+
+### Module definitions
+pandoraCosmicPatRec:              @local::microboone_pandoraAllHitsCR
+pandoraCosmicTrack:               @local::microboone_pandoraTrackCreation
+pandoraCosmicShower:              @local::microboone_pandoraShowerCreation
+pandoraCosmic:                    @local::microboone_pandoraSplitting
+pandoraCosmicKalmanTrack:         @local::trackproducerfrompfparticle
+pandoraCosmicPFPart:              @local::microboone_cosmicpfparticletagger
+pandoraCosmicFlashTag:            @local::microboone_cosmicpfpflashtagger
+pandoraCosmicHitRemoval:          @local::microboone_crhitremoval # Remove hits, based on PFP geometry and flashes
+pandoraCosmicT0Reco:              @local::T0RecoAnodeCathodePiercing_data
+pandoraNuPatRec:                  @local::microboone_pandoraAllHitsSliceNu
+pandoraNuTrack:                   @local::microboone_pandoraTrackCreation
+pandoraNuShower:                  @local::microboone_pandoraShowerCreation
+pandoraNu:                        @local::microboone_pandoraSplitting
+pandoraNuPMA:                     @local::microboone_pmalgtrajfitter
+trajcluster:                      @local::microboone_trajcluster
+pmtrack:                          @local::microboone_pmalgtrajfitter
+pandoraTrack:                     @local::microboone_pandoraTrackCreation
+pandoraShower:                    @local::microboone_pandoraShowerCreation
 
 physics.reco: [ 
                 pandoraCosmicPatRec,
@@ -78,10 +99,57 @@ outputs:
 
 physics.stream1: [ out1, out2 ]
 
-physics.producers.trajcluster.HitModuleLabel:                                                    "pandoraCosmicHitRemoval"
-physics.producers.trajcluster.SliceModuleLabel:                                                  "NA"
-physics.producers.trajcluster.HitTruthModuleLabel:                                               "NA"
-physics.producers.trajcluster.CalorimetryModuleLabel:                                            "NA"
+### Parameter overrides
+physics.producers.pandoraCosmicPatRec.HitFinderModuleLabel:                    "gaushit"
+physics.producers.pandoraCosmicTrack.PFParticleLabel:                          "pandoraCosmicPatRec"
+physics.producers.pandoraCosmicShower.PFParticleLabel:                         "pandoraCosmicPatRec"
+physics.producers.pandoraCosmic.InputProducerLabel:                            "pandoraCosmicPatRec"
+physics.producers.pandoraCosmic.TrackProducerLabel:                            "pandoraCosmicTrack"
+physics.producers.pandoraCosmic.ShowerProducerLabel:                           "pandoraCosmicShower"
+physics.producers.pandoraCosmic.HitProducerLabel:                              "gaushit"
+
+physics.producers.pandoraCosmicKalmanTrack.inputCollection:                    "pandoraCosmic"
+physics.producers.pandoraCosmicKalmanTrack.trackFromPF:                        true
+physics.producers.pandoraCosmicKalmanTrack.showerFromPF:                       false
+physics.producers.pandoraCosmicKalmanTrack.trackInputTag:                      "pandoraCosmic"
+
+physics.producers.pandoraCosmicPFPart.PFParticleModuleLabel:                   "pandoraCosmic"
+physics.producers.pandoraCosmicPFPart.TrackModuleLabel:                        "pandoraCosmic"
+physics.producers.pandoraCosmicPFPart.EndTickPadding:                          75
+physics.producers.pandoraCosmicPFPart.TPCYBoundary:                            20
+physics.producers.pandoraCosmicPFPart.TPCZBoundary:                            5
+
+physics.producers.pandoraCosmicHitRemoval.CosmicProducerLabels:                ["pandoraCosmicPFPart", "pandoraCosmicFlashTag" ]
+physics.producers.pandoraCosmicHitRemoval.TrackProducerLabels:                 ["pandoraCosmic",       "pandoraCosmic"         ]
+physics.producers.pandoraCosmicHitRemoval.AssnProducerLabels:                  ["pandoraCosmic",       "pandoraCosmic"         ]
+physics.producers.pandoraCosmicHitRemoval.CosmicTagThresholds:                 [0.6,                   0.99                    ]
+physics.producers.pandoraCosmicHitRemoval.PFParticleProducerLabel:             "pandoraCosmic"
+physics.producers.pandoraCosmicHitRemoval.EndTickPadding:                      75
+
+physics.producers.pandoraCosmicT0Reco.TrackProducer:                           "pandoraCosmic"
+
+physics.producers.pandoraNuPatRec.HitFinderModuleLabel:                        "pandoraCosmicHitRemoval"
+physics.producers.pandoraNuTrack.PFParticleLabel:                              "pandoraNuPatRec"
+physics.producers.pandoraNuShower.PFParticleLabel:                             "pandoraNuPatRec"
+physics.producers.pandoraNu.InputProducerLabel:                                "pandoraNuPatRec"
+physics.producers.pandoraNu.TrackProducerLabel:                                "pandoraNuTrack"
+physics.producers.pandoraNu.ShowerProducerLabel:                               "pandoraNuShower"
+physics.producers.pandoraNu.HitProducerLabel:                                  "pandoraCosmicHitRemoval"
+
+physics.producers.pandoraNuPMA.HitModuleLabel:                                 "pandoraCosmicHitRemoval"
+physics.producers.pandoraNuPMA.PfpModuleLabel:                                 "pandoraNu"
+
+physics.producers.trajcluster.HitModuleLabel:                                  "pandoraCosmicHitRemoval"
+physics.producers.trajcluster.SliceModuleLabel:                                "NA"
+physics.producers.trajcluster.HitTruthModuleLabel:                             "NA"
+physics.producers.trajcluster.CalorimetryModuleLabel:                          "NA"
+
+physics.producers.pmtrack.PfpModuleLabel:                                      "trajcluster"
+physics.producers.pmtrack.HitModuleLabel:                                      "trajcluster"
+physics.producers.pmtrack.PMAlgFitting.RunVertexing:                           true
+
+physics.producers.pandoraTrack.PFParticleLabel:                                "pandoraPatRec"
+physics.producers.pandoraShower.PFParticleLabel:                               "pandoraPatRec"
 
 microboone_tfile_metadata:
 {

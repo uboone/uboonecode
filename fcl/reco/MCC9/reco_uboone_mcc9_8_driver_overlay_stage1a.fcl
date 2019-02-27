@@ -41,7 +41,6 @@ services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
 physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
 
-services.DetectorClocksService.G4RefCorrTrigModuleName: "triggersim"
 #microboone_tfile_metadata:
 #{
 #    JSONFileName:          "reco_stage_1_hist.root.json"

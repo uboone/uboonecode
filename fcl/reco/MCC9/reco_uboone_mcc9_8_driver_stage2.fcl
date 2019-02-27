@@ -8,9 +8,6 @@ services.TFileService.fileName: "reco_stage_2_hist.root"
 services.BackTrackerService:  @local::microboone_backtrackerservice
 services.ParticleInventoryService: @local::standard_particleinventoryservice
 
-services.SpaceCharge.EnableCalEfieldSCE: true
-services.SpaceCharge.EnableCalSpatialSCE: true
-
 services.TPCEnergyCalibService.TPCEnergyCalibProvider: @local::microboone_tpcenergycalib_provider_mc
 
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
