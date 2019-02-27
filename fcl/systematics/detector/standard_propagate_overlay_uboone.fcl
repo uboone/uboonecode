@@ -81,7 +81,7 @@ outputs:
 
 }
 
-services.LArG4Parameters.MCC80Compat: true
+services.LArG4Parameters.MCC80Compat: false
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true
 
