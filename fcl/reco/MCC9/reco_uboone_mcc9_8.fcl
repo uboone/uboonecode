@@ -290,8 +290,6 @@ microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraKalmanShowerpid,
                                      pandoraKalmanShowercali,
                                      pandoraKalmanShowercalipid,
-                                     pandoraKalmanTrackFlashMatch,
-                                     pandoraKalmanShowerFlashMatch,
                                      shrreco3d,
                                      #pandoraGeomVertexFit,
                                      pandoraCrtHitMatch
@@ -461,10 +459,6 @@ microboone_reco_mcc8_producers.pandoraKalmanTrackFlashMatch.BeamFlashTrackMatchA
 microboone_reco_mcc8_producers.pandoraKalmanShowerFlashMatch.TrackModuleLabel:                                  "pandoraKalmanShower"
 microboone_reco_mcc8_producers.pandoraKalmanShowerFlashMatch.FlashModuleLabel:                                  "simpleFlashBeam"
 microboone_reco_mcc8_producers.pandoraKalmanShowerFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
-
-microboone_reco_mcc8_producers.shrreco3d.BacktrackTag:                                                          ""
-microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [248.2,248.2,248.2] # e-/ADC
-microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent:                                                         false
 
 microboone_reco_mcc8_producers.pmtrack.PfpModuleLabel:                                                          "trajcluster"
 microboone_reco_mcc8_producers.pmtrack.HitModuleLabel:                                                          "trajcluster"
