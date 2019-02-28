@@ -303,7 +303,6 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraKalmanShowerpid,
                                          pandoraKalmanShowercali,
                                          pandoraKalmanShowercalipid,
-                                         pandoraKalmanTrackFlashMatch,
                                          shrreco3d,
                                          #pandoraGeomVertexFit,
                                          pandoraCrtHitMatch
