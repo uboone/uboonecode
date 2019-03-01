@@ -1,0 +1,4 @@
+#include "reco_uboone_data_mcc9_8_driver_stage2.fcl"
+
+microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowStartTime: 3.57
+microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowEndTime:   5.25
