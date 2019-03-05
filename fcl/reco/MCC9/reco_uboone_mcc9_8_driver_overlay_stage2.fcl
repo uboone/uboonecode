@@ -1,6 +1,7 @@
 #include "mchitmodules.fcl"
 #include "mctrutht0matching.fcl"
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
 
 process_name: OverlayRecoStage2
 
@@ -23,6 +24,7 @@ physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
+outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
 
 microboone_tfile_metadata:

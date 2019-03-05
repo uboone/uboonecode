@@ -1,0 +1,14 @@
+stage2ReducedOutputCommands: [ "keep *_*_*_*" #15.00
+                              ,"drop recob::Wires_*nfspl1_*_*" #11.61 (3.39)
+                              ,"drop *_pandoraAllOutcomesTrack_*_*","drop *_pandoraAllOutcomesShower_*_*" #11.16 (0.45)
+                              ,"drop sim::SimChannels_*_*_*" #10.37 (0.79)
+                              ,"drop sim::SimEnergyDeposits_largeant_*_*" #10.15 (0.22)
+                              ,"drop *_sps3d_noreg_*","drop *_sps3d_pre_*" #9.78 (0.37)
+                              ,"drop *_*calo*_*_*" #8.52 (1.26)
+                              ,"drop recob::SpacePoints_*Kalman*_*_*","drop *recob::SpacePoint*_*pmtrack*_*_*" #8.09 (0.43)
+                              ,"drop *_pandoraPatRec__*" #7.73 (0.36)
+                              ,"drop *_pmtrack*_*_*" #7.11 (0.62)
+                              ,"drop sim::MCHitCollections_*_*_*" #6.69 (0.42)
+                              ,"drop raw::RawDigit*_*_*_*"
+                              ,"drop optdata::ChannelDataGroup_*_*_*"
+                             ]
