@@ -268,7 +268,7 @@ microboone_reco_data_cctracks:         [ pmtrack,
                                        ]
 
 microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_clustercrawler,
-                                         @sequence::microboone_reco_data_cctracks,
+                                         #@sequence::microboone_reco_data_cctracks,
                                          trajclusterKalmanTrack,
                                          tcshower
                                        ]
@@ -304,7 +304,7 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraKalmanShowercali,
                                          pandoraKalmanShowercalipid,
                                          shrreco3d,
-                                         #pandoraGeomVertexFit,
+                                         pandoraGeomVertexFit,
                                          pandoraCrtHitMatch
                                          ]
 
