@@ -304,7 +304,7 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraKalmanShowercali,
                                          pandoraKalmanShowercalipid,
                                          shrreco3d,
-                                         pandoraGeomVertexFit,
+                                         #pandoraGeomVertexFit,
                                          pandoraCrtHitMatch
                                          ]
 
