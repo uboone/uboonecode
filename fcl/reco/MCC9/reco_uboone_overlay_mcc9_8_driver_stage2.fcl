@@ -17,6 +17,8 @@ physics.producers.trajclusterTruthMatch.HitParticleAssociations:                
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
 
+physics.producers.wcopflash.OpDataProducerBeam:					    "mixer"
+
 physics.reco:                   [ @sequence::microboone_reco_data_stage2,trajclusterTruthMatch ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
