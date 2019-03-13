@@ -337,6 +337,14 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiT
 microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                      2.6
 microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      3.5
 
+
+# calorimetry constants
+microboone_reco_mcc8_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+
 # ClusterCrawler / Track Maker related
 microboone_reco_mcc8_producers.trajcluster.HitModuleLabel:                                                     "gaushit"
 microboone_reco_mcc8_producers.trajcluster.SliceModuleLabel:                                                   "dbcluster3d"
