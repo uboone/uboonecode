@@ -33,5 +33,5 @@ microboone_tfile_metadata:
   fileFormat:            ["root", "pndr"]
 }
 
-microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowStartTime: 3.57
-microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowEndTime:   5.25
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.57
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   5.25
