@@ -494,7 +494,7 @@ microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.FlashModuleLabel:  
 microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
 
 microboone_reco_data_producers.shrreco3d.BacktrackTag:                                                        ""
-microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [238.4,238.4,238.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [232,249,238.4] # e-/ADC
 microboone_reco_data_producers.shrreco3d.NeutrinoEvent:                                                       false
 
 microboone_reco_data_producers.pmtrack.PfpModuleLabel:                                                        "trajcluster"

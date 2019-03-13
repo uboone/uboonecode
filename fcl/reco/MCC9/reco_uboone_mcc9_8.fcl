@@ -497,7 +497,7 @@ microboone_reco_mcc8_producers.pmtrackT0RecoBeam.TrackProducer:                 
 microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                     6
 
 microboone_reco_mcc8_producers.shrreco3d.BacktrackTag:                                                          ""
-microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [248.2,248.2,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [245,252,248.2] # e-/ADC
 microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent:                                                         false
 
 microboone_reco_mcc8_producers.crttzero.data_label:                                                             "crthitcorr"
