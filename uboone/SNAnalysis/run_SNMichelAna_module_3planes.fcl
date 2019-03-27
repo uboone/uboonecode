@@ -6,7 +6,7 @@ services:
 {
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
-  TFileService:            { fileName: "SNMichelAna_hist.root" }
+  TFileService:            { fileName: "%ifb_SNMichelAna_hist.root" }
   TimeTracker:             {}
   ExptGeoHelperInterface:         @local::microboone_geometry_helper
   Geometry:                       @local::microboone_geo
@@ -40,13 +40,15 @@ physics:
 
     analyzers:
         {
-        snmichel: { module_type: SNMichelAna }
+        snmichel2: { module_type: SNMichelAna }
+        snmichel1: { module_type: SNMichelAna }
+        snmichel0: { module_type: SNMichelAna }
         }
 
 
     reco: [ rns ]
 
-    ana: [ snmichel ]
+    ana: [ snmichel2, snmichel1, snmichel0 ]
 
     #end_paths is a keyword and contains the paths that do not modify the art::Event, 
     #ie analyzers and output streams.  these all run simultaneously
@@ -72,4 +74,6 @@ services.DetectorProperties.ReadOutWindowSize:                             6400
 services.DetectorClocksService.InheritClockConfig:                         false
 services.DetectorClocksService.TriggerOffsetTPC:                          -0.400e3
 #physics.analyzers.snmichel.YourVariable: 2
-physics.analyzers.snmichel.MichelProducer: "michel2" # Analyze Michels on collection plane
+physics.analyzers.snmichel2.MichelProducer: "michel2" # Analyze Michels on collection plane
+physics.analyzers.snmichel1.MichelProducer: "michel1" # Analyze Michels on second induction plane
+physics.analyzers.snmichel0.MichelProducer: "michel0" # Analyze Michels on first induction plane

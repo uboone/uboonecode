@@ -54,6 +54,9 @@ private:
 
   // Declare member data here.
 
+  // std::string fMichelProcess; // Process name that created the Michel clusters
+  std::string fMichelProducer; // Module label that created the Michel clusters
+
   TH1F* fheSpectrum;
   TH1F* fhgSpectrum;
   TH1F* fhtotSpectrum;
@@ -66,6 +69,8 @@ SNMichelAna::SNMichelAna(fhicl::ParameterSet const & p)
   EDAnalyzer(p)  // ,
  // More initializers here.
 {
+  // fMichelProcess = p.get<std::string>("MichelProcess");
+  fMichelProducer = p.get<std::string>("MichelProducer");
 }
 
 void SNMichelAna::beginJob()
@@ -84,13 +89,15 @@ void SNMichelAna::analyze(art::Event const & e)
 {
   // Implementation of required member function here.
 
-  float fADC2MeV = 7.69e-3;
+  float fADC2MeV = 7.69e-3; // from the Michel paper
   int fSamplesOverlapPre = 1600;
   int fSamplesOverlapPost = 1600;
   int fTotalSamplesPerRecord = 6400;
 
-  art::InputTag ecluster_tag { "michel", "electron", "MichelReco" };
-  art::InputTag gcluster_tag { "michel", "photon", "MichelReco" };
+  //art::InputTag ecluster_tag { fMichelProducer, "electron", fMichelProcess };
+  art::InputTag ecluster_tag { fMichelProducer, "electron" };
+  //art::InputTag gcluster_tag { fMichelProducer, "photon", fMichelProcess };
+  art::InputTag gcluster_tag { fMichelProducer, "photon" };
 
   auto const& ecluster_handle = e.getValidHandle< std::vector<recob::Cluster> >(ecluster_tag);
   auto const& gcluster_handle = e.getValidHandle< std::vector<recob::Cluster> >(gcluster_tag);
