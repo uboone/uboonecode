@@ -19,15 +19,29 @@
 #include "canvas/Utilities/InputTag.h"
 #include "fhiclcpp/ParameterSet.h"
 
-// GENIE includes (v3 only for now)
-//#ifdef GENIE_PRE_R3
-// TODO: add GENIE v2 includes
-//#else
-// Use these includes for GENIE v3
-
 // BEGIN PURE EVIL
 // TODO: is there a better workaround?
 #define private public
+// GENIE includes (v3 only for now)
+#ifdef GENIE_PRE_R3
+#include "Algorithm/AlgConfigPool.h"
+#include "Algorithm/AlgFactory.h"
+#include "Algorithm/Algorithm.h"
+#include "EVGCore/EventGeneratorI.h"
+#include "EVGCore/EventGeneratorList.h"
+#include "EVGDrivers/GEVGDriver.h"
+#include "EVGCore/InteractionList.h"
+#include "EVGCore/InteractionListGeneratorI.h"
+#include "Interaction/InitialState.h"
+#include "Interaction/Interaction.h"
+#include "Registry/Registry.h"
+#include "Registry/RegistryItemTypeDef.h"
+#include "Utils/RunOpt.h"
+#include "Utils/XSecSplineList.h"
+#include "ReWeight/GSyst.h"
+#include "ReWeight/GSystUncertainty.h"
+#else
+// Use these includes for GENIE v3
 #include "Framework/Algorithm/AlgConfigPool.h"
 #include "Framework/Algorithm/AlgFactory.h"
 #include "Framework/Algorithm/Algorithm.h"
@@ -44,9 +58,9 @@
 #include "Framework/Utils/XSecSplineList.h"
 #include "RwFramework/GSyst.h"
 #include "RwFramework/GSystUncertainty.h"
+#endif
 #undef private
 // END PURE EVIL
-//#endif
 
 // Helper functions local to this source file
 namespace {
@@ -138,10 +152,10 @@ protected:
 sim::GENIETweaker::GENIETweaker(const fhicl::ParameterSet& pset)
   : art::EDFilter(pset)
 {
-  //#ifndef GENIE_PRE_R3
+  #ifndef GENIE_PRE_R3
   // Check that the GENIE tune is configured (v3+ only)
   this->CheckTune( pset.get<std::string>("tune_name", "${GENIE_XSEC_TUNE}") );
-  //#endif
+  #endif
 
   fCheckTweaksOnFilter = pset.get<bool>("check_on_filter", false);
 
@@ -278,8 +292,8 @@ bool sim::GENIETweaker::beginRun(art::Run& /*run*/) {
 // Copied from larsim's EventWeight module
 // TODO: reduce code duplication here
 void sim::GENIETweaker::CheckTune(const std::string& tune_name) {
-//// The tune configuration only needs to be checked for GENIE v3+
-//#ifndef GENIE_PRE_R3
+// The tune configuration only needs to be checked for GENIE v3+
+#ifndef GENIE_PRE_R3
 
   std::string fhicl_tune_name = tune_name;
 
@@ -335,7 +349,7 @@ void sim::GENIETweaker::CheckTune(const std::string& tune_name) {
     }
   }
 
-//#endif
+#endif
 }
 
 void sim::GENIETweaker::tweak_parameter(genie::Registry& reg,
@@ -498,7 +512,11 @@ genie::Registry* sim::GENIETweaker::get_registry_for_tweak_dial(
     break;
 
     // Intranuke hA parameters
-    // TODO: add elastic fate fractions for GENIE v2
+    #ifdef GENIE_PRE_R3
+    // Elastic fate fractions are only used in GENIE v2
+    case genie::rew::kINukeTwkDial_FrElas_N:
+    case genie::rew::kINukeTwkDial_FrElas_pi:
+    #endif
     case genie::rew::kINukeTwkDial_MFP_N:
     case genie::rew::kINukeTwkDial_FrCEx_N:
     case genie::rew::kINukeTwkDial_FrInel_N:
