@@ -268,13 +268,15 @@ void MichelRecoDriver::produce(art::Event & e)
 
     // std::cout << "\tSaved new Michel with " << electron_hit_ptr_v.size() << " hits!" << std::endl;
 
-    // grab photon hits
+    // loop over the photon clusters associated to this michel
     for (auto const& photon_hit_v : michel._photon_clus_v){
 
       if ( photon_hit_v.empty() ) continue;
       
       // loop through all tagged photon hits, store in vector of Art pointers
       // std::vector< art::Ptr<recob::Hit > > photon_hit_ptr_v;
+
+      unsigned int nhits_photon = photon_hit_v.size();
 
       // Loop over hits from photon cluster to compute this cluster's total charge
       float Qphoton =  0;
@@ -285,12 +287,14 @@ void MichelRecoDriver::produce(art::Event & e)
       //std::cout << "Charge from Michel " << michel._charge << std::endl; 
       
       // create a new cluster for the photon hits
+      // The start_wire and start_tick are actually coming from the michel::Michel above
+      // (It can be understood as a common vertex for electron and photon clusters, and allows to match them)
       recob::Cluster photon_clus( start_wire, 0., start_tick, 0., // start wire/wire stddev/tick/tick stddev
 				  0., 0., 0.,                     // start charge/angle/opening
 				  0., 0., 0., 0.,                 // end wire/wire stddev/tick/tick stddev
 				  0., 0., 0.,                     // end charge/angle/opening
 				  Qphoton, 0., 0., 0.,                 // integral, integral stddev, summedADC, summedADC stddev
-				  nhits, 0., 0., 0.,              // n_hits, multiple_hit_density, width, ID
+				  nhits_photon, 0., 0., 0.,              // n_hits, multiple_hit_density, width, ID
 				  static_cast<geo::View_t>( fUsePlane ), // view
 				  geo::PlaneID(0, 0, fUsePlane) );
 
