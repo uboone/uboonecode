@@ -72,4 +72,6 @@ services.DetectorProperties.ReadOutWindowSize:                             6400
 services.DetectorClocksService.InheritClockConfig:                         false
 services.DetectorClocksService.TriggerOffsetTPC:                          -0.400e3
 #physics.analyzers.snmichel.YourVariable: 2
+physics.analyzers.snmichel.HitProducer: "gaushit"
 physics.analyzers.snmichel.MichelProducer: "michel2" # Analyze Michels on collection plane
+physics.analyzers.snmichel.ADC2MeV: 7.69e-3 # From Michel e paper

@@ -83,6 +83,6 @@ physics.analyzers.snmichel0.MichelProducer: "michel0" # Analyze Michels on first
 physics.analyzers.snmichel2.ADC2MeV: 7.69e-3 # From Michel e paper
 physics.analyzers.snmichel1.ADC2MeV: 7.69e-3 # From Michel e paper
 physics.analyzers.snmichel0.ADC2MeV: 7.69e-3 # From Michel e paper
-physics.analyzers.snmichel2.SamplesOverlapPre: 1600. # From sn swizzler
-physics.analyzers.snmichel2.SamplesOverlapPost: 1600. # From sn swizzler
-physics.analyzers.snmichel2.TotalSamplesPerRecord: 6400. # From sn swizzler
+physics.analyzers.snmichel2.SamplesOverlapPre: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel2.SamplesOverlapPost: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel2.TotalSamplesPerRecord: 6400. # Truncated window
