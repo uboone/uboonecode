@@ -291,7 +291,7 @@ microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraKalmanShowercali,
                                      pandoraKalmanShowercalipid,
                                      shrreco3d,
-                                     #pandoraGeomVertexFit,
+                                     pandoraGeomVertexFit,
                                      pandoraCrtHitMatch
                                      ]
 
@@ -495,6 +495,11 @@ microboone_reco_mcc8_producers.pmtrackT0RecoLoose.TrackProducer:                
 microboone_reco_mcc8_producers.pmtrackT0RecoBeam.TrackProducer:                                                 "pmtrack"
 
 microboone_reco_mcc8_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                     6
+
+microboone_reco_mcc8_producers.wcopflash.RemapCh:								false
+microboone_reco_mcc8_producers.wcopflash.LGHGGainScale:								[10.,10.,10.,10.,10.,10.,10.,10.,10.,10.,10.,
+														10.,10.,10.,10.,10.,10.,10.,10.,10.,10.,10.,
+														10.,10.,10.,10.,10.,10.,10.,10.,10.,10.]
 
 microboone_reco_mcc8_producers.shrreco3d.BacktrackTag:                                                          ""
 microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [245,252,248.2] # e-/ADC
