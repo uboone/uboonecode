@@ -339,8 +339,12 @@ gallery::Event& crt::CRTFileManager::openFile(std::string file_name)
   }
   else {
     std::cout << "Failed to open CRT root file xrootd URL." << std::endl;
-    throw cet::exception("CRTFileManager") << "Could not open CRT file: " 
-					   << file_name << "\n";
+    //throw cet::exception("CRTFileManager") << "Could not open CRT file: " 
+    //				   << file_name << "\n";
+
+    // Don't give art the chance to clean up.
+
+    abort();
   }
 
   // Done.
