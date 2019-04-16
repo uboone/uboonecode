@@ -160,39 +160,63 @@ void crt::CRTFlashAna::analyze(art::Event const & evt)
 
   // Recalculated GPS time (no PPS rounding or frequency tuning).
 
-  long double gps0 = htime->pps_sec() +
-                    1.e-6L * htime->pps_micro() +
+  long double gps0_high = htime->pps_sec();
+  long double gps0_low = 1.e-6L * htime->pps_micro() +
                     1.e-9L * htime->pps_nano() +
                     1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
                     0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
                     0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
-  uint64_t gps0_sec = gps0;
-  uint64_t gps0_nsec = 1.e9L * (gps0 - gps0_sec);
+  while(gps0_low < 0.L) {
+    gps0_low += 1.L;
+    gps0_high -= 1.L;
+  }
+  while(gps0_low >= 1.L) {
+    gps0_low -= 1.L;
+    gps0_high += 1.L;
+  }
+  uint64_t gps0_sec = gps0_high;
+  uint64_t gps0_nsec = 1.e9L * gps0_low;
   time_t gps0_time = (gps0_sec << 32) | gps0_nsec;
   times.push_back(gps0_time);
 
   // Recalculated GPS time (with PPS rounding, no frequency tuning).
 
-  long double gps1 = htime->pps_sec() +
-                    (htime->pps_micro() > 500000 ? 1.L : 0.L) +
+  long double gps1_high = htime->pps_sec();
+  long double gps1_low = (htime->pps_micro() > 500000 ? 1.L : 0.L) +
                     1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
                     0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
                     0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div()));
-  uint64_t gps1_sec = gps1;
-  uint64_t gps1_nsec = 1.e9L * (gps1 - gps1_sec);
+  while(gps1_low < 0.L) {
+    gps1_low += 1.L;
+    gps1_high -= 1.L;
+  }
+  while(gps1_low >= 1.L) {
+    gps1_low -= 1.L;
+    gps1_high += 1.L;
+  }
+  uint64_t gps1_sec = gps1_high;
+  uint64_t gps1_nsec = 1.e9L * gps1_low;
   time_t gps1_time = (gps1_sec << 32) | gps1_nsec;
   times.push_back(gps1_time);
 
   // Recalculated GPS time (with PPS rounding and frequency tuning).
 
   long double tunefac = 1.000006882L;
-  long double gps2 = htime->pps_sec() +
-                    (htime->pps_micro() > 500000 ? 1.L : 0.L) +
+  long double gps2_high = htime->pps_sec();
+  long double gps2_low = (htime->pps_micro() > 500000 ? 1.L : 0.L) +
                     tunefac * (1.6e-3L * (int(htime->trig_frame()) - int(htime->trig_pps_frame())) +
 			       0.5e-6L * (int(htime->trig_sample()) - int(htime->trig_pps_sample())) +
 			       0.0625e-6L * (int(htime->trig_div()) - int(htime->trig_pps_div())));
-  uint64_t gps2_sec = gps2;
-  uint64_t gps2_nsec = 1.e9L * (gps2 - gps2_sec);
+  while(gps2_low < 0.L) {
+    gps2_low += 1.L;
+    gps2_high -= 1.L;
+  }
+  while(gps2_low >= 1.L) {
+    gps2_low -= 1.L;
+    gps2_high += 1.L;
+  }
+  uint64_t gps2_sec = gps2_high;
+  uint64_t gps2_nsec = 1.e9L * gps2_low;
   time_t gps2_time = (gps2_sec << 32) | gps2_nsec;
   times.push_back(gps2_time);
 
