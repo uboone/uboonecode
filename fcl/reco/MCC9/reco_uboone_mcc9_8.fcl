@@ -254,7 +254,7 @@ microboone_reco_mcc8_cctracks: [         pmtrack,
                                          pmtrackcalipid]
 
 microboone_reco_mcc8_ccpath: [           @sequence::microboone_reco_mcc8_clustercrawler,
-                                         @sequence::microboone_reco_mcc8_cctracks,                                         
+                                         #@sequence::microboone_reco_mcc8_cctracks,
                                          trajclusterTruthMatch,
                                          trajclusterKalmanTrack,
                                          tcshower]
