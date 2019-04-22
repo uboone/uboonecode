@@ -11,4 +11,4 @@ outputs.out1.dataTier: "reconstructed"
 source.inputCommands: ["keep *_*_*_*", "drop *_*_*_McReco*" ]
 outputs.out1.fileName: "%ifb_reco1_deadSaturatChans.root"
 
-#include "sys_var_deadSaturatedChannels_uboone.fcl"
+#include "sys_var_mcc8_deadSaturatedChannels_uboone.fcl"
