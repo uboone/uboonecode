@@ -37,18 +37,19 @@ ublite			v08_00_00_01a
 ubutil                  v08_00_00_01a
 uboonedata              v01_18_22
 genie_xsec              v2_12_10
+uboone_oslibs           v1_0_0
 cetbuildtools	        v7_06_03	-	only_for_build
 end_product_list
 
-qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec     
-c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           DefaultPlusMECWithNC
-c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC
-c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC
-c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC
-e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           DefaultPlusMECWithNC
-e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           DefaultPlusMECWithNC
-e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           DefaultPlusMECWithNC
-e17:prof:fg    e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           LocalFGNievesQEAndMEC
+qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
+c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           DefaultPlusMECWithNC    -nq-
+c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC    -nq-
+c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC    -nq-
+c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC   -nq-
+e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           DefaultPlusMECWithNC    -nq-
+e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           DefaultPlusMECWithNC    -nq-
+e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           DefaultPlusMECWithNC    -nq-
+e17:prof:fg    e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           LocalFGNievesQEAndMEC   -nq-
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
