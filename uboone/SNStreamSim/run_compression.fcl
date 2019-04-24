@@ -9,7 +9,7 @@ services:
 {
   scheduler:               { defaultExceptions: false }    # Make all uncaught exceptions fatal.
   # Load the service that manages root files for histograms.
-  TFileService:            { fileName: "compression_ana.root" }
+  TFileService:            { fileName: "/pnfs/uboone/persistent/users/iponce/%ifb_%tc_compression__ana.root" }
   TimeTracker:             {}
   ExptGeoHelperInterface:         @local::microboone_geometry_helper
   Geometry:                       @local::microboone_geo
@@ -72,12 +72,12 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "sncompression.root"
+   fileName:    "/pnfs/uboone/persistent/users/iponce/SNStreamRun19021CollectionPlaneCorrection/%ifb_%tc_Flips_sncompression.root"
    dataTier:    "reco"
    compressionLevel: 1
    }
 }
-
+source.inputCommands: ["keep *_*_*_*" ]
 services.DetectorProperties.NumberTimeSamples:                             6400
 services.DetectorProperties.ReadOutWindowSize:                             6400
 services.DetectorClocksService.InheritClockConfig:                         false
@@ -92,7 +92,7 @@ services.message.destinations :
   {
      type:      "cout"      #tells the message service to output this destination to cout
      threshold: "WARNING"   #tells the message service that this destination applies to WARNING and higher level messages
-     append:     true       #says to append all messages to the output
+     ###append:     true       #says to append all messages to the output
      categories:
      {
        ChannelFilter:

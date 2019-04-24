@@ -29,9 +29,9 @@ namespace compress {
     //_OutWFStartTick.push_back(0);
 
     // make a pair that contains the entire vector
-    _timeRange.push_back(std::make_pair(waveform.begin(),waveform.end()));
-    _begin = waveform.begin();
-    _end   = waveform.end();
+    _timeRange.push_back(std::make_pair(waveform.cbegin(),waveform.cend()));
+    _begin = waveform.cbegin();
+    _end   = waveform.cend();
 
     return;
   }

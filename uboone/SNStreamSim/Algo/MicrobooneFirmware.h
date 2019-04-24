@@ -16,6 +16,10 @@
 
 #include "uboone/SNStreamSim/Fmwk/CompressionAlgoBase.h"
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include "TFile.h"
+#include "TH1D.h"
 
 namespace compress {
 
@@ -43,7 +47,12 @@ namespace compress {
     bool PassThreshold(double thisADC, double base);
 
     // setter function for algo specifications
-    void SetCompressThresh(int tU, int tV, int tY) { _thresh[0] = tU; _thresh[1] = tV; _thresh[2] = tY; }
+
+    //this is the old compression thresholds
+   // void SetCompressThresh(int tU, int tV, int tY) { _thresh[0] = tU; _thresh[1] = tV; _thresh[2] = tY; }
+
+    //channel-wise thresholds
+    void SetCompressThresh(std::ifstream& tPlanes, double plane, double ts, int loop, bool statBas, double pedestalBaseLine) { while(tPlanes >> plane>> pedestalBaseLine >> ts) {_thresh[loop] = ts; if (statBas){_baseln[loop] = pedestalBaseLine;} loop++; } }
     void SetPolarity(int polu, int polv, int poly) {_pol[0] = polu; _pol[1] = polv; _pol[2] = poly; }
     void SetUVYplaneBuffer(int upre, int upost, int vpre, int vpost, int ypre, int ypost);
 
@@ -54,7 +63,12 @@ namespace compress {
     double _deltaV; // max difference for Variance tolerated
     std::vector<int> _thresh;
     std::vector<int> _pol;
-    
+    double _plane;
+    double _ts;
+    double _pedestalBaseline;
+    std::ifstream _stream;
+    int _channel;
+    std::vector<int> _baseln;
 
 
     // Buffer Tick number for various planes
@@ -79,6 +93,7 @@ namespace compress {
     double _max;
     int _interesting;
     int _save;
+    int _loop;
   };
 
 }
