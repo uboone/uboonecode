@@ -80,9 +80,9 @@ physics.analyzers.snmichel0.HitProducer: "gaushit"
 physics.analyzers.snmichel2.MichelProducer: "michel2" # Analyze Michels on collection plane
 physics.analyzers.snmichel1.MichelProducer: "michel1" # Analyze Michels on second induction plane
 physics.analyzers.snmichel0.MichelProducer: "michel0" # Analyze Michels on first induction plane
-physics.analyzers.snmichel2.ADC2MeV: 7.69e-3 # From Michel e paper
-physics.analyzers.snmichel1.ADC2MeV: 7.69e-3 # From Michel e paper
-physics.analyzers.snmichel0.ADC2MeV: 7.69e-3 # From Michel e paper
+physics.analyzers.snmichel2.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+physics.analyzers.snmichel1.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+physics.analyzers.snmichel0.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
 physics.analyzers.snmichel2.SamplesOverlapPre: 0. # TRIGGER STREAM!
 physics.analyzers.snmichel2.SamplesOverlapPost: 0. # TRIGGER STREAM!
 physics.analyzers.snmichel2.TotalSamplesPerRecord: 6400. # Truncated window

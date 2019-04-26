@@ -29,6 +29,7 @@
 
 // ROOT
 #include "TH1F.h"
+#include "TH2F.h"
 
 class SNMichelAna;
 
@@ -80,11 +81,16 @@ private:
   TH1F* fhgHitSpectrum;
   TH1F* fhtotHitSpectrum;
 
+  // Michel cluster vertex
+  TH2F* fheVtx;
+
   // Event-wide hit multiplicity
   TH1F* fhEventHitMult;
 
   // Event-wide hit spectrum
   TH1F* fhEventHitSpectrum;
+
+  // To do: create a TTree holding: run, event, cluster start_wire, cluster start_time, e cluster charge, e cluster hit mult, vector of g cluster charges, vector for g cluster hit mult, vector of e hit wire, vector of e hit peak time, vector of e hit integral, vector of g hit wire, vector of g hit peak time, vector of g hit integral
 
   geo::View_t fPlane; // Wire plane analyzed
 };
@@ -125,6 +131,8 @@ void SNMichelAna::beginJob()
   fhtotHitSpectrum = tfs->make<TH1F>("htotHitSpectrum","Total clusters hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000); 
   // remove? it is fheHitSpectrum + fhgHitSpectrum
 
+  fheVtx = tfs->make<TH2F>("heVtx","e cluster vertex; Wire; Tick; Entries/32 wires/200 ticks", 108, 0., 3456., 32, 0., 6400.);
+
   fhEventHitMult = tfs->make<TH1F>("hEventHitMult","Event hit mult.; Hit mult.; Entries/200 hits", 100, 0, 2e4);
 
   fhEventHitSpectrum = tfs->make<TH1F>("hEventHitSpectrum","Event hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000);
@@ -155,6 +163,9 @@ void SNMichelAna::analyze(art::Event const & e)
     fhEventHitSpectrum->Fill( hit.Integral() );
     evtHits++;
   }
+  // To do: switch to hit density (hits per unit of time) to make it independent of event length?
+  // fhEventHitMult->Fill( (float)evtHits/(fTotalSamplesPerRecord - fSamplesOverlapPost - fSamplesOverlapPre) );
+  // Then change histogram binning too
   fhEventHitMult->Fill( (float)evtHits );
 
   ///// Michel section /////
@@ -207,11 +218,13 @@ void SNMichelAna::analyze(art::Event const & e)
 
     const std::vector<art::Ptr<recob::Hit> >& ghit_v = gcluster_hit_assn_v.at(igc);
     radHits += ghit_v.size();
+    
     // Loop over photon hits
     for( auto const& hit : ghit_v ){
       fhgHitSpectrum->Fill( hit->Integral() );
       fhtotHitSpectrum->Fill( hit->Integral() );
     }
+  
   }
   std::cout << "Total gamma energy: " << radCharge << " ADC = " << fADC2MeV*radCharge << " MeV" << std::endl;
   // Fill histos only if there were in-time clusters
@@ -234,14 +247,18 @@ void SNMichelAna::analyze(art::Event const & e)
     fhtotSpectrum->Fill( fADC2MeV*radCharge + fADC2MeV*cluster.Integral() );
     std::cout << "Total energy: " << cluster.Integral() + radCharge << " ADC = " << fADC2MeV*(radCharge + cluster.Integral()) << " MeV" << std::endl;
 
+    fheVtx->Fill( cluster.StartWire(), cluster.StartTick() );
+
     const std::vector<art::Ptr<recob::Hit> >& ehit_v = ecluster_hit_assn_v.at(iec);
     fheHitMult->Fill( (float)ehit_v.size() );
     fhtotHitMult->Fill( (float)(ehit_v.size() + radHits) );
+
     // Loop over electron hits
     for( auto const& hit : ehit_v ){
       fheHitSpectrum->Fill( hit->Integral() );
       fhtotHitSpectrum->Fill( hit->Integral() );
     }
+
   }
 
 }
