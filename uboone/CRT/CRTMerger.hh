@@ -44,6 +44,11 @@ namespace crt
     // _crthit_cache[file_name][entry][hit_number].
 
     std::map<std::string, std::map<long long, std::vector<crt::CRTHit> > > fCRTHitCache;
+
+    // CRT hit time bounds.
+
+    std::map<std::string, long double> fCRTEarly;
+    std::map<std::string, long double> fCRTLate;
   };
 }
 #endif // CRT_MERGER_HH
