@@ -100,6 +100,14 @@ void crt::CRTMerger::produce(art::Event& event)
   for(auto const& crtrootfile : crtrootfiles) {
     std::cout << "\nThe child artroot file is " << crtrootfile << std::endl;
 
+    // Check time bounds.
+
+    if((fCRTEarly.count(crtrootfile) > 0 && fCRTEarly[crtrootfile] > MergingWindow_end) ||
+       (fCRTLate.count(crtrootfile) > 0 && fCRTLate[crtrootfile] < MergingWindow_start)) {
+      std::cout << "Skipping file because of time bounds." << std::endl;
+      continue;
+    }
+
     // Add this file to set of seen CRT files for sam metadata.
 
     if(fCRTSwizzledFiles.count(crtrootfile) == 0) {
@@ -224,6 +232,16 @@ void crt::CRTMerger::produce(art::Event& event)
       // are no mergable hits in this file.  Skip file.
 
       if(CRTtime > MergingWindow_end) {
+
+	// Update early time bound.
+
+	if(fCRTEarly.count(crtrootfile) == 0)
+	  fCRTEarly[crtrootfile] = MergingWindow_end;
+	else {
+	  if(MergingWindow_end > fCRTEarly[crtrootfile])
+	    fCRTEarly[crtrootfile] = MergingWindow_end;
+	}
+
 	std::cout << "No mergable hits in file." << std::endl;
 	continue;
       }
@@ -256,6 +274,16 @@ void crt::CRTMerger::produce(art::Event& event)
 	// Skip further processing on this file.
 
 	if(CRTHitCollection.size() == 0) {
+
+	  // Update late time bound.
+
+	  if(fCRTLate.count(crtrootfile) == 0)
+	    fCRTLate[crtrootfile] = MergingWindow_start;
+	  else {
+	    if(MergingWindow_start < fCRTLate[crtrootfile])
+	      fCRTLate[crtrootfile] = MergingWindow_start;
+	  }
+
 	  std::cout << "No mergable hits in file." << std::endl;
 	  break;
 	}
