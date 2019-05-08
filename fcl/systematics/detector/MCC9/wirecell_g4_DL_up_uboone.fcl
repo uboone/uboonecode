@@ -1,6 +1,0 @@
-#include "wirecell_g4_uboone.fcl"
-
-process_name: SimPropagateDLup
-outputs.out1.fileName: "%ifb_%tc_prop_DLup.root"
-
-#include "sys_var_mcc9_DL_up_uboone.fcl"
