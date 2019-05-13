@@ -24,6 +24,8 @@
 // Debug      - Debug flag.
 // MaxFiles   - Maximum number of open gallery files to cache.
 // ubversion_CRTHits - Swizzled CRT version.
+// ubversion_CRTHits_top - Swizzled CRT version for top panel CRT hits (stream 1).
+//                         Optional, default same as ubversion_CRTHits.
 // 
 //
 ////////////////////////////////////////////////////////////////////////
@@ -100,6 +102,7 @@ private:
   unsigned int fMaxFiles;    // Maximum number of open files to cache.
   std::string fCRTHitLabel;  // CRT hit module label.
   std::string fCRTVersion;   // Swizzled CRT version (ub_project.version).
+  std::string fCRTVersionTop;// Swizzled CRT version for top CRT panels (ub_project.version).
 
   // This data structure contains information that is known from sam metadata about
   // CRT binary and swizzled files.

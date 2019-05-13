@@ -36,10 +36,19 @@ crt::CRTFileManager::CRTFileManager(fhicl::ParameterSet const & p, art::Activity
   fDebug(p.get<bool>("debug")),
   fMaxFiles(p.get<unsigned int>("maxFiles")),
   fCRTHitLabel(p.get<std::string>("CRTHitLabel")),
-  fCRTVersion(p.get<std::string>("ubversion_CRTHits"))
+  fCRTVersion(p.get<std::string>("ubversion_CRTHits")),
+  fCRTVersionTop(p.get<std::string>("ubversion_CRTHits_top", fCRTVersion))
 {
   setenv("TZ", "CST6CDT", 1);  // Fermilab time zone.
   tzset();
+
+  // Message.
+
+  std::cout << "CRTFileManager service configured.\n"
+	    << "  Max files = " << fMaxFiles  << "\n"
+	    << "  CRT Hit Label = " << fCRTHitLabel  << "\n"
+	    << "  CRT Version = " << fCRTVersion << "\n"
+	    << "  CRT Top Version = " << fCRTVersionTop << std::endl;
 }
 
 // Use sam to find swizzled CRT files that match the event time stamp.
@@ -184,9 +193,12 @@ std::vector<std::string> crt::CRTFileManager::findMatchingCRTFiles(art::Timestam
 
       std::ostringstream dim1;
       dim1 << "file_format " << "artroot"
-	   <<" and ub_project.version " << fCRTVersion
+	   <<" and ((ub_project.version " << fCRTVersionTop
+	   << " and ub_project.stage crt_swizzle1a,crt_swizzle1b,crt_swizzle1c)"
+	   << " or (ub_project.version " << fCRTVersion
+	   << " and ub_project.stage crt_swizzle2,crt_swizzle3,crt_swizzle4))"
 	   << " and ischildof: (file_name " << crtfile
-	   <<" with availability physical )";
+	   << " with availability physical )";
 
       if (fDebug)
 	std::cout << "dim1 = " << dim1.str() << std::endl;
@@ -223,9 +235,7 @@ std::vector<std::string> crt::CRTFileManager::findMatchingCRTFiles(art::Timestam
       std::cout << crt_swizzled << std::endl;
   }
   if (!crtrootfiles.size())
-    std::cout << "\n\t CRTFileManager_module: No child CRT files found that conform to constraints: "
-	      << "file_format " << "artroot" << " and ub_project.version "
-	      << fCRTVersion << std::endl;
+    std::cout << "\n\t CRTFileManager_module: No child CRT files found" << std::endl;
 
   // Throw exception if there are fewer than six CRT files.
 
