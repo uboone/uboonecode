@@ -349,9 +349,9 @@ microboone_dqm_ana:                    [ @sequence::microboone_dqm_ana_stage1,
 # Cal data is no longer used, below is historic
 microboone_reco_data_producers.caldata.DigitModuleLabel:                                                      "butcher"
 microboone_reco_data_producers.caldata.Threshold:                                                             [0, 0, 0]  # Not what you think...
-microboone_reco_data_producers.caldata.NumSigma:                                                              [9, 9, 9]  # Closer to what you think...
+microboone_reco_data_producers.caldata.NumSigma:                                                              [3, 3, 3]  # Closer to what you think...
 microboone_reco_data_producers.caldata.ROIFinder.Threshold:                                                   [0, 0, 0]
-microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                                                    [6, 6, 6] # were [9, 9, 9]
+microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                                                    [3, 3, 3] # were [9, 9, 9]
 microboone_reco_data_producers.caldata.Deconvolution:                                                         @local::microboone_mcc7deconvolution
 microboone_reco_data_producers.caldata.DodQdxCalib:                                                           false
 microboone_reco_data_producers.caldata.MakeSparseRawDigits:                                                   true
@@ -362,9 +362,9 @@ microboone_reco_data_producers.gaushit.MaxMultiHit:                             
 microboone_reco_data_producers.gaushit.TryNplus1Fits:                                                         false
 microboone_reco_data_producers.gaushit.Chi2NDF:                                                               50.
 
-microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     2.7
-microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     2.5
-microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     3.7
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     1.5
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     1.5
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     1.0
 
 # ClusterCrawler / Track Maker related
 microboone_reco_data_producers.trajcluster.HitModuleLabel:                                                    "gaushit"
