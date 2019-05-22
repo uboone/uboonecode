@@ -69,6 +69,11 @@ microboone_roideconvolution:
     Baseline:                   @local::microboone_baselinemostprobave
 }
 
+microboone_nodeconvolution:
+{
+    tool_type: NoDeconvolution
+}
+
 microboone_mcc7deconvolution:
 {
     tool_type:                  MCC7Deconvolution
