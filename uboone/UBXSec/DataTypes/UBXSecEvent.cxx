@@ -49,6 +49,38 @@ void UBXSecEvent::Init()
   lep_phi = _default_value;
   genie_mult = _default_value;
   genie_mult_ch = _default_value;
+  // add additinal GENIE variables here 
+  ngenie_muons = _default_value;
+  ngenie_protons = _default_value;
+  ngenie_electrons = _default_value;
+  ngenie_pipms = _default_value;
+  ngenie_pion0s = _default_value;
+  ngenie_protons_200 = _default_value;
+  ngenie_protons_300 = _default_value;
+  ngenie_protons_400 = _default_value;
+  genie_mcpar_pdgcode.resize(0,_default_value);
+  genie_mcpar_energy.resize(0,_default_value);
+  genie_mcpar_px.resize(0,_default_value);
+  genie_mcpar_py.resize(0,_default_value);
+  genie_mcpar_pz.resize(0,_default_value);
+  genie_mcpar_startx.resize(0,_default_value);
+  genie_mcpar_starty.resize(0,_default_value);
+  genie_mcpar_startz.resize(0,_default_value);
+  genie_mcpar_W = _default_value;
+  genie_mcpar_QSqr = _default_value;
+
+  geant_mcpar_pdgcode.resize(0,_default_value);
+  geant_mcpar_energy.resize(0,_default_value);
+  geant_mcpar_px.resize(0,_default_value);
+  geant_mcpar_py.resize(0,_default_value);
+  geant_mcpar_pz.resize(0,_default_value);
+  geant_mcpar_startx.resize(0,_default_value);
+  geant_mcpar_starty.resize(0,_default_value);
+  geant_mcpar_startz.resize(0,_default_value);
+  geant_mcpar_end_process.resize(0,std::string(""));
+
+
+  //========================================================================
   bnb_weight = _default_value;
   is_selected = false;
   selected_slice = _default_value;
@@ -74,7 +106,25 @@ void UBXSecEvent::Init()
   tvtx_y.clear(); 
   tvtx_z.clear(); 
 
+  //Init area for CC1mNp/CC1m2p variables
+
+  //Genie variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+  //General PFP variables
+  num_pfp = _default_value;
+  num_pfp_tracks = _default_value;
+  num_pfp_showers = _default_value;
+
+
+
   ResizeVectors(0);
+  
+  ResizeCC1mNpPFPTrackVectors(0);
 
 }
 
@@ -137,6 +187,20 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_muoncandidate_linearity.resize(vsize, _default_value);
   slc_muoncandidate_perc_used_hits_in_cluster.resize(vsize, _default_value);
   slc_muoncandidate_maxscatteringangle.resize(vsize, _default_value);
+
+  slc_muoncandidate_truth_origin.resize(vsize, _default_value);
+  slc_muoncandidate_truth_pdg.resize(vsize, _default_value);
+  slc_muoncandidate_truth_time.resize(vsize, _default_value);
+  slc_muoncandidate_truth_startx.resize(vsize, _default_value);
+  slc_muoncandidate_truth_starty.resize(vsize, _default_value);
+  slc_muoncandidate_truth_startz.resize(vsize, _default_value);
+  slc_muoncandidate_truth_endx.resize(vsize, _default_value);
+  slc_muoncandidate_truth_endy.resize(vsize, _default_value);
+  slc_muoncandidate_truth_endz.resize(vsize, _default_value);
+  slc_muoncandidate_truth_px.resize(vsize, _default_value);
+  slc_muoncandidate_truth_py.resize(vsize, _default_value);
+  slc_muoncandidate_truth_pz.resize(vsize, _default_value);
+
   slc_acpt_outoftime.resize(vsize, _default_value);
   slc_crosses_top_boundary.resize(vsize, _default_value);
   slc_nuvtx_closetodeadregion_u.resize(vsize, _default_value);
@@ -159,6 +223,81 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_geocosmictag.resize(vsize, false);
   slc_consistency.resize(vsize, true);
   slc_consistency_score.resize(vsize, 0.);
+
+}
+
+void UBXSecEvent::ResizeCC1mNpPFPTrackVectors(int vsize) {
+
+  //Init area for CC1mNp/CC1m2p variables
+  //Note that the CC1mNp/CC1m2p variables are only recorded for a single slice of the event (the tpcobject that contains the
+  //CC inclusive muon candidate) and only if the muon selection passes
+
+  //PFP Truth variables
+
+  pfp_truth_pdg.resize(vsize, _default_value);
+  pfp_truth_origin.resize(vsize, _default_value);
+  pfp_truth_status.resize(vsize, _default_value);
+  pfp_truth_parId.resize(vsize, _default_value);
+  pfp_truth_theta.resize(vsize, _default_value);
+  pfp_truth_costheta.resize(vsize, _default_value);
+  pfp_truth_phi.resize(vsize, _default_value);
+  pfp_truth_mom.resize(vsize, _default_value);
+  pfp_truth_startx.resize(vsize, _default_value);
+  pfp_truth_starty.resize(vsize, _default_value);
+  pfp_truth_startz.resize(vsize, _default_value);
+  pfp_truth_endx.resize(vsize, _default_value);
+  pfp_truth_endy.resize(vsize, _default_value);
+  pfp_truth_endz.resize(vsize, _default_value);
+  pfp_truth_endE.resize(vsize, _default_value);
+  pfp_truth_endProcess.resize(vsize, "");
+  pfp_truth_KE.resize(vsize, _default_value);
+  pfp_truth_Mass.resize(vsize, _default_value);
+
+
+  //Tracks from PFP variables
+  pfp_reco_ismuoncandidate.resize(vsize, _default_value);
+  pfp_reco_isprimary.resize(vsize, _default_value);
+  pfp_reco_ndaughters.resize(vsize, _default_value);
+  pfp_reco_istrack.resize(vsize, _default_value); //int of whether Pandora thought it was a track
+  pfp_reco_isshower.resize(vsize, _default_value); //int of whether Pandora thought it was a shower
+  pfp_reco_numtracks.resize(vsize, _default_value); //int of associated tracks from Pandora
+  pfp_reco_numshowers.resize(vsize, _default_value); //int of associated showers from Pandora
+  pfp_reco_upflag.resize(vsize, _default_value); //value returned by MIPConsistency() function for the track
+  pfp_reco_Id.resize(vsize, _default_value); //the index of the track in the list of PFPs
+  pfp_reco_length.resize(vsize, _default_value); //length (cm) of the track associated with the PFP in the collection
+  pfp_reco_theta.resize(vsize, _default_value); //theta of the track associated with the PFP in the collection
+  pfp_reco_costheta.resize(vsize, _default_value); //costheta of the track associated with the PFP in the collection
+  pfp_reco_phi.resize(vsize, _default_value); //phi of the track associated with the PFP in the collection
+  pfp_reco_startx.resize(vsize, _default_value); //start point in x (cm) of the track associated with the PFP in the collection
+  pfp_reco_starty.resize(vsize, _default_value); //start point in y (cm) of the track associated with the PFP in the collection
+  pfp_reco_startz.resize(vsize, _default_value); //start point in z (cm) of the track associated with the PFP in the collection
+  pfp_reco_endx.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  pfp_reco_endy.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  pfp_reco_endz.resize(vsize, _default_value);  //end point in x (cm) of the track associated with the PFP in the collection
+  pfp_reco_Mom.resize(vsize, _default_value); //Vertex momentum of the track associated with the PFP in the collection
+  pfp_reco_Mom_proton.resize(vsize, _default_value); //length based momentum of the track associated with the PFP in the collection
+  pfp_reco_Mom_muon.resize(vsize, _default_value); //length based momentum of the track associated with the PFP in the collection
+  pfp_reco_Mom_MCS.resize(vsize, _default_value); //MCS based momentum of the track associated with the PFP in the collection
+  pfp_reco_trunmeandqdx.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
+  pfp_reco_trunmeandqdx_U.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
+  pfp_reco_trunmeandqdx_V.resize(vsize, _default_value); //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
+
+  //pfp_reco_pida.resize(vsize, _default_value); //pida value of the track associated with the PFP in the collection
+  pfp_reco_newpid_pida.resize(vsize, _default_value); //pida from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_chi2_proton.resize(vsize, _default_value); //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_chi2_kaon.resize(vsize, _default_value); //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_chi2_muon.resize(vsize, _default_value); //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_chi2_pion.resize(vsize, _default_value); //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_bragg_ratio.resize(vsize, _default_value); //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_bragg_proton.resize(vsize, _default_value); //LL(p) from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_bragg_fwd_proton.resize(vsize, _default_value); //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_bragg_bwd_proton.resize(vsize, _default_value); //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_bragg_fwd_mip.resize(vsize, _default_value); //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  pfp_reco_nhits.resize(vsize, _default_value); //number of hits on the track associated with the PFP in the collection
+  pfp_reco_dEdx.resize(vsize); //hit by hit dEdx for the track associated with the PFP in the collection
+  pfp_reco_dQdx.resize(vsize); //hit by hit dQdx for the track associated with the PFP in the collection
+  pfp_reco_RR.resize(vsize); //hit by hit RR for the track associated with the PFP in the collection
+
 }
 
 void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {
@@ -166,6 +305,13 @@ void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {
   tvtx_x.resize(vsize);
   tvtx_y.resize(vsize);
   tvtx_z.resize(vsize);
+
+  //Init area for CC1mNp/CC1m2p variables
+
+  //GENIE variables
+
+  //G4 variables
+
 
 }
 
@@ -186,11 +332,11 @@ void UBXSecEvent::ResetGenieEventWeightVectorsMultisim() {
 
 }
 
-void UBXSecEvent::ResetGenieModelsEventWeightVectorsMultisim() {
+void UBXSecEvent::ResetExtraSystEventWeightVectorsMultisim() {
 
-  evtwgt_genie_models_multisim_funcname.clear();
-  evtwgt_genie_models_multisim_weight.clear();
-  evtwgt_genie_models_multisim_nweight.clear();
+  evtwgt_extra_syst_multisim_funcname.clear();
+  evtwgt_extra_syst_multisim_weight.clear();
+  evtwgt_extra_syst_multisim_nweight.clear();
 
 }
 

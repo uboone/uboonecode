@@ -16,6 +16,9 @@
  *
  * Created on: Sunday, October 08, 2017 at 14:53:36
  *
+ * Modified for proton ID by: kirby@fnal.gov
+ *
+ * Modified on: Fri Oct 26, 2018 at 11:05:00 AM CDT
  */
 
 
@@ -61,6 +64,40 @@ class UBXSecEvent /*: public TObject*/{
   Double_t        lep_phi; ///< Lepton true Phi angle at start
   Int_t           genie_mult; ///< Number of stable GENIE final state particles
   Int_t           genie_mult_ch; ///< Number of stable charged GENIE final state particles
+
+  //add the GENIE variable here
+  Int_t ngenie_muons;
+  Int_t ngenie_protons;
+  Int_t ngenie_electrons;
+  Int_t ngenie_pipms;
+  Int_t ngenie_pion0s;
+  Int_t ngenie_protons_200;
+  Int_t ngenie_protons_300;
+  Int_t ngenie_protons_400;
+  vector<double> genie_mcpar_pdgcode;
+  vector<double> genie_mcpar_energy;
+  vector<double> genie_mcpar_px;
+  vector<double> genie_mcpar_py;
+  vector<double> genie_mcpar_pz;
+  vector<double> genie_mcpar_startx;
+  vector<double> genie_mcpar_starty;
+  vector<double> genie_mcpar_startz;
+  double genie_mcpar_W;
+  double genie_mcpar_QSqr;
+
+  //add the GEANT4 variable here
+
+  vector<double> geant_mcpar_pdgcode;
+  vector<double> geant_mcpar_energy;
+  vector<double> geant_mcpar_px;
+  vector<double> geant_mcpar_py;
+  vector<double> geant_mcpar_pz;
+  vector<double> geant_mcpar_startx;
+  vector<double> geant_mcpar_starty;
+  vector<double> geant_mcpar_startz;
+  vector<std::string> geant_mcpar_end_process;
+
+  
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
   Int_t           selected_slice; ///< The index of the selected slice
@@ -154,6 +191,19 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_muoncandidate_perc_used_hits_in_cluster; ///< Number of used hits in the cluster to make the track
   vector<double>   slc_muoncandidate_maxscatteringangle; ///< Maximum scattering angle along track
 
+  vector<double>   slc_muoncandidate_truth_origin; ///< Origin (0=Unknown, 1=Neutrino, 2=CosmicRay, 3=SuperNova, 4=SingleParticle) of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pdg; ///< Pdg of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_time; ///< Start time of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startx; ///< Start position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_starty; ///< Start position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_startz; ///< Start position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endx; ///< End position along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endy; ///< End position along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_endz; ///< End position along Z of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_px; ///< Momentum along X of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_py; ///< Momentum along Y of the true MCParticle matched to the reconstructed candidate muon track
+  vector<double>   slc_muoncandidate_truth_pz; ///< Momentum along Z of the true MCParticle matched to the reconstructed candidate muon track
+
   Int_t            nbeamfls; ///< Number of beam flashes in the event
   vector<double>   beamfls_time; ///< Time of the beam flash
   vector<double>   beamfls_pe; ///< PE of the beam flash
@@ -183,26 +233,100 @@ class UBXSecEvent /*: public TObject*/{
   vector<int> evtwgt_genie_multisim_nweight; ///< Number of weights per function name used for GENIE reweighting (multisim)
   vector<vector<double>> evtwgt_genie_multisim_weight; ///< Weights per function name used for GENIE reweighting (multisim)
 
-  Int_t evtwgt_genie_models_multisim_nfunc; ///< Number of functions used for GENIE Models reweighting (multisim)
-  vector<std::string> evtwgt_genie_models_multisim_funcname; ///< Names of the functions used for GENIE Models reweighting (multisim)
-  vector<int> evtwgt_genie_models_multisim_nweight; ///< Number of weights per function name used for GENIE Models reweighting (multisim)
-  vector<vector<double>> evtwgt_genie_models_multisim_weight; ///< Weights per function name used for GENIE Models reweighting (multisim)
+  Int_t evtwgt_extra_syst_multisim_nfunc; ///< Number of functions used for extra syst reweighting (mec, qe, reinteraction, or others)(multisim)
+  vector<std::string> evtwgt_extra_syst_multisim_funcname; ///< Names of the functions used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
+  vector<int> evtwgt_extra_syst_multisim_nweight; ///< Number of weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
+  vector<vector<double>> evtwgt_extra_syst_multisim_weight; ///< Weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
  
   Int_t evtwgt_flux_multisim_nfunc; ///< Number of functions used for FLUX reweighting (multisim)
   vector<std::string> evtwgt_flux_multisim_funcname; ///< Names of the functions used for FLUX reweighting (multisim)
   vector<int> evtwgt_flux_multisim_nweight; ///< Number of weights per function name used for FLUX reweighting (multisim)
   vector<vector<double>> evtwgt_flux_multisim_weight; ///< Weights per function name used for FLUX reweighting (multisim)
  
+
+  //Init area for CC1mNp/CC1m2p variables
+
+  //General PFP variables
+  int num_pfp; //number of pfparticles in the slice
+  int num_pfp_tracks;//number of pfparticles labelled as tracks
+  int num_pfp_showers;//number of pfparticles labelled as showers
+
+  //PFP Truth variables
+
+  std::vector<int> pfp_truth_pdg;
+  std::vector<int> pfp_truth_origin;
+  std::vector<int> pfp_truth_status;
+  std::vector<int> pfp_truth_parId;
+  std::vector<float> pfp_truth_theta;
+  std::vector<float> pfp_truth_costheta;
+  std::vector<float> pfp_truth_phi;
+  std::vector<float> pfp_truth_mom;
+  std::vector<float> pfp_truth_startx;
+  std::vector<float> pfp_truth_starty;
+  std::vector<float> pfp_truth_startz;
+  std::vector<float> pfp_truth_endx;
+  std::vector<float> pfp_truth_endy;
+  std::vector<float> pfp_truth_endz;
+  std::vector<float> pfp_truth_endE;
+  std::vector<string> pfp_truth_endProcess;
+  std::vector<float> pfp_truth_KE;
+  std::vector<float> pfp_truth_Mass;  
+
+  //Tracks from PFP variables
+  std::vector<int> pfp_reco_isprimary; //1 is true, 0 is false
+  std::vector<int> pfp_reco_ndaughters;
+  vector<int> pfp_reco_ismuoncandidate; //1 is true, 0 is false
+  vector<int> pfp_reco_istrack; //int of whether Pandora thought it was a track 1 is true, 0 is false
+  vector<int> pfp_reco_numtracks; //int of associated tracks from Pandora 
+  vector<int> pfp_reco_isshower; //int of whether Pandora thought it was a shower 1 is true, 0 is false
+  vector<int> pfp_reco_numshowers; //int of associated showers from Pandora 
+  vector<int> pfp_reco_upflag; //value returned by MIPConsistency() function for the track
+  vector<int> pfp_reco_Id; //the index of the track in the list of PFPs
+  vector<float> pfp_reco_length; //length (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_theta; //theta of the track associated with the PFP in the collection
+  vector<float> pfp_reco_costheta; //costheta of the track associated with the PFP in the collection
+  vector<float> pfp_reco_phi; //phi of the track associated with the PFP in the collection
+  vector<float> pfp_reco_startx; //start point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_starty; //start point in y (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_startz; //start point in z (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endx;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endy;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_endz;  //end point in x (cm) of the track associated with the PFP in the collection
+  vector<float> pfp_reco_Mom; //Vertex momentum of the track associated with the PFP in the collection
+  vector<float> pfp_reco_Mom_proton; //length based momentum of the track associated with the PFP in the collection with proton hypothesis
+  vector<float> pfp_reco_Mom_muon; //length based momentum of the track associated with the PFP in the collection with muon hypothesis
+  vector<float> pfp_reco_Mom_MCS; //MCS based momentum of the track associated with the PFP in the collection
+  vector<float> pfp_reco_trunmeandqdx; //truncated mean dqdx momentum of the track associated with the PFP in the collection in Y plane
+  vector<float> pfp_reco_trunmeandqdx_U; //truncated mean dqdx momentum of the track associated with the PFP in the collection in U plane
+  vector<float> pfp_reco_trunmeandqdx_V; //truncated mean dqdx momentum of the track associated with the PFP in the collection in V plane
+
+  //vector<float> pfp_reco_pida; //pida value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_newpid_pida; //pida from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_proton; //chi2 proton from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_kaon; //chi2 kaon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_muon; //chi2 muon from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_chi2_pion; //chi2 pion from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_ratio; //ratio LL(p)/LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_proton; //LL(p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_fwd_proton; //LL(fwd p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_bwd_proton; //LL(backward p) from ParticleID module value of the track associated with the PFP in the collection
+  vector<float> pfp_reco_bragg_fwd_mip; //LL(MIP) from ParticleID module value of the track associated with the PFP in the collection
+  vector<int> pfp_reco_nhits; //number of hits on the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_dEdx; //hit by hit dEdx for the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_dQdx; //hit by hit dQdx for the track associated with the PFP in the collection
+  vector<vector<double>> pfp_reco_RR; //hit by hit RR for the track associated with the PFP in the collection
+
   int _default_value = -9999; ///< Default value 
 
   UBXSecEvent();
   virtual ~UBXSecEvent();
   void Init();
   void ResizeVectors(int); 
+  void ResizeCC1mNpPFPTrackVectors(int); 
   void ResizeGenieTruthVectors(int); 
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
-  void ResetGenieModelsEventWeightVectorsMultisim();
+  void ResetExtraSystEventWeightVectorsMultisim();
   void ResetFluxEventWeightVectorsMultisim();
 
 };
