@@ -57,6 +57,7 @@ add_subdirectory(Filters)
 
 add_subdirectory(XGBoost)
 add_subdirectory(NCElastic)
+add_subdirectory(ParticleID)
 
 # Respect the order specified in lar_build, which is:
 #

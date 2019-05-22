@@ -24,6 +24,10 @@
  * Contact: marco.deltutto@physics.ox.ac.uk
  *
  * Created on: Friday, March 10, 2017 at 12:32:31
+ * 
+ * Modification for proton ID: kirby@fnal.gov
+ *
+ * Modified on: Fri Oct 26, 2018
  *
  */
 
@@ -99,6 +103,9 @@
 #include "uboone/UBXSec/Algorithms/NuMuCCEventSelection.h"
 #include "uboone/UBXSec/Algorithms/TrackQuality.h"
 
+//this is included for some of the summer2018 PID functions
+#include "uboone/ParticleID/Algorithms/uB_PlaneIDBitsetHelperFunctions.h"
+
 #include "larreco/RecoAlg/TrackMomentumCalculator.h"
 
 // Root include
@@ -150,6 +157,17 @@ private:
   /// Calculates flash position
   void GetFlashLocation(std::vector<double>, double&, double&, double&, double&);
 
+  /// get the residual range from a calo object
+  std::vector<double> GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos);
+  std::vector<double> GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
+  std::vector<double> GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> calos);
+
+  /// Fill the CC1uNp variables with default values
+  //  void FillPFPTruthDefaults(UBXSecEvent *ubxsec_event);
+  void FillPFPTruthDefaults();
+  void FillPFPRecoTrackDefaults();
+  void FillPFPRecoDefaults();
+
   FindDeadRegions deadRegionsFinder;
   //ubxsec::McPfpMatch mcpfpMatcher;
   ::ubana::FiducialVolume _fiducial_volume;
@@ -189,7 +207,7 @@ private:
   std::string _eventweight_producer;
   std::string _genie_eventweight_pm1_producer;
   std::string _genie_eventweight_multisim_producer;
-  std::string _genie_models_eventweight_multisim_producer;
+  std::vector<std::string> _extrasyst_eventweight_multisim_producers;
   std::string _flux_eventweight_multisim_producer;
   std::string _file_type;
   bool _debug = true;                   ///< Debug mode
@@ -207,6 +225,17 @@ private:
 
   bool _do_opdet_swap;                  ///< If true swaps reconstructed OpDets according to _opdet_swap_map
   std::vector<int> _opdet_swap_map;     ///< The OpDet swap map for reco flashes
+
+  //Init area for CC1mNp/CC1m2p fhicl parameters
+
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+  std::string _particle_id_summer_2018_producer; ///The name of the producer for the Summer 2018 particle ID data products
+
 
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
@@ -298,7 +327,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _eventweight_producer           = p.get<std::string>("EventWeightProducer");
   _genie_eventweight_pm1_producer = p.get<std::string>("GenieEventWeightPMOneProducer");
   _genie_eventweight_multisim_producer = p.get<std::string>("GenieEventWeightMultisimProducer");
-  _genie_models_eventweight_multisim_producer = p.get<std::string>("GenieModelsEventWeightMultisimProducer");
+  _extrasyst_eventweight_multisim_producers = p.get<std::vector<std::string>>("ExtraSystEventWeightMultisimProducers");
   _flux_eventweight_multisim_producer = p.get<std::string>("FluxEventWeightMultisimProducer");
 
   _file_type                      = p.get<std::string>("FileType");
@@ -341,6 +370,17 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   _trk_mom_calculator.SetMinLength(_min_track_len);
 
+  //Init area for CC1mNp/CC1m2p fhicl parameters
+
+  //GENIE variables
+
+  //G4 variables
+
+  //PFP Truth variables
+
+  //Tracks from PFP variables
+  _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSecAnaOnly");
+
   _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
   _SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
@@ -357,21 +397,6 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   int bufsize    = 16000;
   int splitlevel = 99;
   _tree1->Branch("ubxsec_event_split", &ubxsec_event, bufsize, splitlevel);
-
-  /*
-  _tree2 = fs->make<TTree>("matchtree","");
-  _tree2->Branch("run",                &_run,                "run/I");
-  _tree2->Branch("subrun",             &_subrun,             "subrun/I");
-  _tree2->Branch("event",              &_event,              "event/I");
-  _tree2->Branch("total_matches",      &_total_matches,      "total_matches/I");
-  _tree2->Branch("nmatch",             &_nmatch,             "nmatch/I");
-  _tree2->Branch("score",              &_score,              "score/D");
-  _tree2->Branch("hypo_spec",          "std::vector<double>", &_hypo_spec);
-  _tree2->Branch("beam_spec",          "std::vector<double>", &_beam_spec);
-  _tree2->Branch("fixx_spec",          "std::vector<double>", &_fixx_spec);
-  _tree2->Branch("is_muon",            &_is_muon,            "is_muon/I");
-  _tree2->Branch("muon_is_reco",       &_muon_is_reco,       "muon_is_reco/I");
-  */
 
   _deadRegion2P = fs->make<TH2F>("deadRegion2P","deadRegion2P", 10350,0.0,1035.0,2300,-115.0,115.0);
   _deadRegion3P = fs->make<TH2F>("deadRegion3P","deadRegion3P", 10350,0.0,1035.0,2300,-115.0,115.0);
@@ -587,7 +612,18 @@ void UBXSec::produce(art::Event & e) {
   std::vector<art::Ptr<recob::PFParticle>> pfp_v;
   art::fill_ptr_vector(pfp_v, pfp_h);
   art::FindManyP<recob::Track> tracks_from_pfp(pfp_h, e, _pfp_producer);
+  art::FindManyP<recob::Hit> hits_from_tracks(track_h, e, _pfp_producer);
 
+  //Get showers and particle ID fro the CC1mNp analysis variables
+  art::FindManyP<recob::Shower> showers_from_pfp(pfp_h, e, _pfp_producer);
+
+  //std::cout << "[UBXSec] Getting Particle ID Summer 2018 vector from this producer label: " << _particle_id_summer_2018_producer << std::endl;
+  art::FindManyP<anab::ParticleID> particleids_summer2018_from_track(track_h, e, _particle_id_summer_2018_producer);
+  if (!particleids_summer2018_from_track.isValid()) {
+    std::cout << "[UBXSec] anab::ParticleID_summer2018_from_track is not valid." << std::endl;
+  }
+  std::cout << "[UBXSec] Number of particleids_summer2018_from_track " << particleids_summer2018_from_track.size() << std::endl;
+  
   ubxsec_event->n_pfp = ubxsec_event->n_pfp_primary = 0;
   for (size_t i = 0; i < pfp_h->size(); i++) {
     ubxsec_event->n_pfp++;
@@ -746,32 +782,34 @@ void UBXSec::produce(art::Event & e) {
     }
   }
 
-  // GENIE Models reweigthing (systematics - multisim)
-  ubxsec_event->ResetGenieModelsEventWeightVectorsMultisim();
-  if (_is_mc) {
-    art::Handle<std::vector<evwgh::MCEventWeight>> geniemodelseventweight_h;
-    e.getByLabel(_genie_models_eventweight_multisim_producer, geniemodelseventweight_h);
-    if(!geniemodelseventweight_h.isValid()){
-      std::cout << "[UBXSec] MCEventWeight for GENIE Models reweight multisim, product " << _genie_models_eventweight_multisim_producer << " not found..." << std::endl;
-      //throw std::exception();
-    } else {
-      std::vector<art::Ptr<evwgh::MCEventWeight>> geniemodelseventweight_v;
-      art::fill_ptr_vector(geniemodelseventweight_v, geniemodelseventweight_h);
-      if (geniemodelseventweight_v.size() > 0) {
-        art::Ptr<evwgh::MCEventWeight> evt_wgt = geniemodelseventweight_v.at(0); // Just for the first nu interaction
-        std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
-        int countFunc = 0;
-        // loop over the map and save the name of the function and the vector of weights for each function
-        for(auto it : evtwgt_map) {
-          std::string func_name = it.first;
-          std::vector<double> weight_v = it.second; 
-          //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
-          ubxsec_event->evtwgt_genie_models_multisim_funcname.push_back(func_name);
-          ubxsec_event->evtwgt_genie_models_multisim_weight.push_back(weight_v);
-          ubxsec_event->evtwgt_genie_models_multisim_nweight.push_back(weight_v.size());
-          countFunc++;
+  // Extra Syst reweigthing (CCQE, CCMEC, Reinteraction, or others) (systematics - multisim)
+  ubxsec_event->ResetExtraSystEventWeightVectorsMultisim();
+  int countFunc = 0;
+  for (auto producer_name : _extrasyst_eventweight_multisim_producers) {
+    if (_is_mc) {
+      art::Handle<std::vector<evwgh::MCEventWeight>> extrasysteventweight_h;
+      e.getByLabel(producer_name, extrasysteventweight_h);
+      if(!extrasysteventweight_h.isValid()){
+        std::cout << "[UBXSec] MCEventWeight for Extra Syst reweight multisim, product " << producer_name << " not found..." << std::endl;
+        //throw std::exception();
+      } else {
+        std::vector<art::Ptr<evwgh::MCEventWeight>> extrasysteventweight_v;
+        art::fill_ptr_vector(extrasysteventweight_v, extrasysteventweight_h);
+        if (extrasysteventweight_v.size() > 0) {
+          art::Ptr<evwgh::MCEventWeight> evt_wgt = extrasysteventweight_v.at(0); // Just for the first nu interaction
+          std::map<std::string, std::vector<double>> evtwgt_map = evt_wgt->fWeight;
+          // loop over the map and save the name of the function and the vector of weights for each function
+          for(auto it : evtwgt_map) {
+            std::string func_name = it.first;
+            std::vector<double> weight_v = it.second; 
+            //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
+            ubxsec_event->evtwgt_extra_syst_multisim_funcname.push_back(func_name);
+            ubxsec_event->evtwgt_extra_syst_multisim_weight.push_back(weight_v);
+            ubxsec_event->evtwgt_extra_syst_multisim_nweight.push_back(weight_v.size());
+            countFunc++;
+          }
+          ubxsec_event->evtwgt_extra_syst_multisim_nfunc = countFunc;
         }
-        ubxsec_event->evtwgt_genie_models_multisim_nfunc = countFunc;
       }
     }
   }
@@ -805,8 +843,6 @@ void UBXSec::produce(art::Event & e) {
       }
     }
   }
-
-
   
   
   // pandoraCosmic PFPs (for cosmic removal studies)
@@ -945,12 +981,42 @@ void UBXSec::produce(art::Event & e) {
 
       int n_genie_particles = 0;
       int n_genie_particles_charged = 0;
+      //add the new GENIE variables here
+      int n_genie_muons=0;
+      int n_genie_protons=0;
+      int n_genie_electrons=0;
+      int n_genie_pipms=0;
+      int n_genie_pion0s=0;
+      int n_genie_protons_200=0;
+      int n_genie_protons_300=0;
+      int n_genie_protons_400=0;
+      //================================================
+
       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
         const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
         if (mc_par.StatusCode() != 1) continue;
         n_genie_particles ++;
         const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
         if (!par_pdg) continue;
+        //get the number of muons, protons .... in GENIE stage
+        ubxsec_event->genie_mcpar_pdgcode.emplace_back(mc_par.PdgCode());
+        ubxsec_event->genie_mcpar_energy.emplace_back(mc_par.E());
+        ubxsec_event->genie_mcpar_px.emplace_back(mc_par.Px());
+        ubxsec_event->genie_mcpar_py.emplace_back(mc_par.Py());
+        ubxsec_event->genie_mcpar_pz.emplace_back(mc_par.Pz());
+        ubxsec_event->genie_mcpar_startx.emplace_back(mc_par.Vx());
+        ubxsec_event->genie_mcpar_starty.emplace_back(mc_par.Vy());
+        ubxsec_event->genie_mcpar_startz.emplace_back(mc_par.Vz());
+        if(abs(mc_par.PdgCode())==13) {n_genie_muons=n_genie_muons+1;}
+        if(abs(mc_par.PdgCode())==211) {n_genie_pipms=n_genie_pipms+1;}
+        if(abs(mc_par.PdgCode())==111) {n_genie_pion0s=n_genie_pion0s+1;}
+        if(abs(mc_par.PdgCode())==11)  {n_genie_electrons=n_genie_electrons+1;}
+        if(abs(mc_par.PdgCode())==2212) {n_genie_protons=n_genie_protons+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.2){n_genie_protons_200=n_genie_protons_200+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.3){n_genie_protons_300=n_genie_protons_300+1;}
+        if(abs(mc_par.PdgCode())==2212 && mc_par.P()>0.4){n_genie_protons_400=n_genie_protons_400+1;}
+
+        //==============================================================
         if (par_pdg->Charge() == 0) continue;
         n_genie_particles_charged ++;
       }
@@ -965,10 +1031,26 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
                                                            mclist[iList]->GetNeutrino().Lepton().Py(),
                                                            mclist[iList]->GetNeutrino().Lepton().Pz()); 
+
+        ubxsec_event->genie_mcpar_W   = mclist[iList]->GetNeutrino().W();
+        ubxsec_event->genie_mcpar_QSqr= mclist[iList]->GetNeutrino().QSqr();
+
+
         ubxsec_event->genie_mult      = n_genie_particles;
         ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-      }
 
+
+        ubxsec_event->ngenie_muons=n_genie_muons;
+        ubxsec_event->ngenie_pipms=n_genie_pipms;
+        ubxsec_event->ngenie_pion0s=n_genie_pion0s;
+        ubxsec_event->ngenie_electrons=n_genie_electrons;
+        ubxsec_event->ngenie_protons=n_genie_protons;
+        ubxsec_event->ngenie_protons_200=n_genie_protons_200;
+        ubxsec_event->ngenie_protons_300=n_genie_protons_300;
+        ubxsec_event->ngenie_protons_400=n_genie_protons_400;
+
+      }
+      
 
       ubxsec_event->nsignal = 0;
       if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
@@ -983,112 +1065,34 @@ void UBXSec::produce(art::Event & e) {
           ubxsec_event->true_muon_mom = mcp.P();
         }
       }
+      //======================================================================
+      // now begin parsing the largeant4 objects.  
+      art::Handle<std::vector<simb::MCParticle>> mcparticleListHandle;
+      std::vector<art::Ptr<simb::MCParticle>> mcparticlelist;
 
+      if (e.getByLabel("largeant", mcparticleListHandle))
+        art::fill_ptr_vector(mcparticlelist, mcparticleListHandle);
+      std::string parpri("primary");
+   
+      for ( auto mc_geant : mcparticlelist ) {
+        if ( (mc_geant) && (mc_geant->Process()==parpri) && (mc_geant->StatusCode()==1) && (mc_geant->Mother()==0) ) {
+          const auto mc_truth = UBXSecHelper::TrackIDToMCTruth(e, "largeant", mc_geant->TrackId());
+          if (mc_truth->Origin() == simb::kBeamNeutrino) {
+            ubxsec_event->geant_mcpar_pdgcode.emplace_back(mc_geant->PdgCode());;
+            ubxsec_event->geant_mcpar_energy.emplace_back(mc_geant->E());;
+            ubxsec_event->geant_mcpar_px.emplace_back(mc_geant->Px());
+            ubxsec_event->geant_mcpar_py.emplace_back(mc_geant->Py());
+            ubxsec_event->geant_mcpar_pz.emplace_back(mc_geant->Pz());
+            ubxsec_event->geant_mcpar_startx.emplace_back(mc_geant->Vx());
+            ubxsec_event->geant_mcpar_starty.emplace_back(mc_geant->Vy());
+            ubxsec_event->geant_mcpar_startz.emplace_back(mc_geant->Vz());
+            ubxsec_event->geant_mcpar_end_process.emplace_back(mc_geant->EndProcess());
+          }
+        }
+      }
+      //=======================================================================
     }
   }
-
-
-
-
-
-  //   if (mclist[iList]->Origin() == NEUTRINO_ORIGIN) {
-
-  //     if (_debug) this->PrintMC(mclist); 
-
-  //     // Check if the true neutrino vertex is in the FV
-  //     double truth_nu_vtx[3] = {mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                               mclist[iList]->GetNeutrino().Nu().Vz()};
-  //     if (_fiducial_volume.InFV(truth_nu_vtx)) ubxsec_event->fv = 1;
-  //     else ubxsec_event->fv = 0;
-
-  //     // Look at the space charge correction
-  //     std::vector<double> sce_corr = _SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vy(),
-  //                                                        mclist[iList]->GetNeutrino().Nu().Vz());
-
-  //     double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
-  //                      + _detector_properties->GetXTicksOffset(0,0,0) 
-  //                      - _detector_properties->TriggerOffset();
-
-  //     // The following offsets to be summed to the original true vertex
-  //     double xOffset = _detector_properties->ConvertTicksToX(g4Ticks, 0, 0, 0) - sce_corr.at(0);
-  //     double yOffset = sce_corr.at(1);
-  //     double zOffset = sce_corr.at(2);
-
-  //     ubxsec_event->sce_corr_x = xOffset;
-  //     ubxsec_event->sce_corr_y = yOffset;
-  //     ubxsec_event->sce_corr_z = zOffset;
-
-  //     if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
-  //                               mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
-  //       ubxsec_event->fv_sce = 1;
-  //     } else {
-  //       ubxsec_event->fv_sce = 0;
-  //     }
-
-  //     int n_genie_particles = 0;
-  //     int n_genie_particles_charged = 0;
-  //     for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //       const simb::MCParticle mc_par = mclist[iList]->GetParticle(p);
-  //       if (mc_par.StatusCode() != 1) continue;
-  //       n_genie_particles ++;
-  //       const TParticlePDG* par_pdg = _database_pdg->GetParticle(mc_par.PdgCode());
-  //       if (!par_pdg) continue;
-  //       if (par_pdg->Charge() == 0) continue;
-  //       n_genie_particles_charged ++;
-  //     }
-
-  //     ubxsec_event->ccnc            = mclist[iList]->GetNeutrino().CCNC();
-  //     ubxsec_event->mode            = mclist[iList]->GetNeutrino().Mode();
-  //     ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
-  //     ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
-  //     ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
-  //     ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Py(),
-  //                                                          mclist[iList]->GetNeutrino().Lepton().Pz()); 
-  //     ubxsec_event->genie_mult      = n_genie_particles;
-  //     ubxsec_event->genie_mult_ch   = n_genie_particles_charged;
-
-      
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_x.resize(1); 
-  //     // ubxsec_event->tvtx_z.resize(1);
-  //     // for(size_t n = 0; n < mclist.size(); n++ ) {
-  //     ubxsec_event->tvtx_x.at(0) = mclist[iList]->GetNeutrino().Nu().Vx();
-  //     ubxsec_event->tvtx_y.at(0) = mclist[iList]->GetNeutrino().Nu().Vy();
-  //     ubxsec_event->tvtx_z.at(0) = mclist[iList]->GetNeutrino().Nu().Vz();
-  //     // }
-
-  //     ubxsec_event->nsignal = 0;
-  //     if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
-
-  //     // Also save muon momentum if is signal
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //     if (ubxsec_event->nsignal == 1) {
-  //       for (int p = 0; p < mclist[iList]->NParticles(); p++) {
-  //         auto const & mcp = mclist[iList]->GetParticle(p);
-  //         if (mcp.Mother() != 0) continue;
-  //         if (mcp.PdgCode() != 13) continue;
-  //         ubxsec_event->true_muon_mom = mcp.P();
-  //       }
-  //     }
-  //   } // neutrino origin
-  //   else {
-  //     ubxsec_event->ccnc = -1;
-  //     ubxsec_event->nupdg = -1;
-  //     ubxsec_event->nu_e = -1;
-  //     ubxsec_event->lep_costheta = -9999.;
-  //     ubxsec_event->true_muon_mom = -9999.;
-  //   }
-  // } else {
-  //   ubxsec_event->ccnc = -1;
-  //   ubxsec_event->nupdg = -1;
-  //   ubxsec_event->nu_e = -1;
-  //   ubxsec_event->lep_costheta = -9999.;
-  //   ubxsec_event->true_muon_mom = -9999.;
-  // }
 
   ubxsec_event->is_signal = false;
   if (ubxsec_event->ccnc == 0 && ubxsec_event->nupdg == 14 && ubxsec_event->fv == 1) {
@@ -1461,122 +1465,6 @@ void UBXSec::produce(art::Event & e) {
 
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
 
-    /*for (size_t oh = 0; oh < ophit_cosmic_h->size(); oh++) {
-      auto const & ophit = (*ophit_cosmic_h)[oh];
-      if (ophit.PeakTime() < -150 || ophit.PeakTime() > -50) continue;
-      size_t opdet = geo->OpDetFromOpChannel(ophit.OpChannel());
-      std::cout << "Cosmic Disc OpHit::  OpDet: " << opdet
-                << ", PeakTime: " << ophit.PeakTime()
-                << ", PE: " << _pecalib.CosmicPE(opdet,ophit.Area(),ophit.Amplitude()) << std::endl;
-    }*/
-
-    // Distance from recon nu vertex to thefar away track in TPCObject
-    //_slc_maxdistance_vtxtrack = UBXSecHelper::GetMaxTrackVertexDistance();
-
-    // Other showers in the event
-    /*
-    std::vector<art::Ptr<recob::Shower>> other_showers;
-    bool ignore_shower = false;
-    for (size_t s = 0; s < _shower_v.size(); s++) {
-
-      ignore_shower = false;
-
-      // Check this shower is not in this TPCObject
-      for (size_t this_s = 0; this_s < shower_v_v.at(slice).size(); this_s++) {
-        if (_shower_v.at(s).key() == shower_v_v.at(slice).at(this_s).key()) {
-          ignore_shower = true;
-          continue;
-        }
-      }
-
-      if (ignore_shower) continue;
-     
-      other_showers.push_back(_shower_v.at(s));
-    }
-
-    double max_length = -1, index_max_length = -1;
-    double max_costheta = -1e9, index_max_costheta = -1;
-    double min_flashvtxdistance = 1e9, index_min_flashvtxdistance = -1;
-
-    for (size_t s = 0; s < other_showers.size(); s++) {
-
-      if (other_showers.at(s)->Length() > max_length) {
-        max_length = other_showers.at(s)->Length();
-        index_max_length = s;
-      }
-
-      double costheta = UBXSecHelper::GetCosTheta(other_showers.at(s)->Direction());
-      if (costheta > max_costheta) {
-        costheta = max_costheta;
-        index_max_costheta = s;
-      }
-
-      double distance = std::abs(other_showers.at(s)->ShowerStart().Z() - ubxsec_event->candidate_flash_z);
-      if (distance < min_flashvtxdistance) {
-        min_flashvtxdistance = distance;
-        index_min_flashvtxdistance = s;
-      }
-    }
-
-    if (index_max_length != -1) {
-      auto shower = other_showers.at(index_max_length);
-      ubxsec_event->slc_othershowers_longest_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_longest_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_longest_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_longest_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_longest_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_longest_length[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;      
-    }
-    if (index_max_costheta != -1) {
-      auto shower = other_showers.at(index_max_costheta);
-      ubxsec_event->slc_othershowers_forward_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_forward_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_forward_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_forward_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_forward_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_forward_length[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_forward_openangle[slice] = -1;
-    }
-    if (index_min_flashvtxdistance != -1) {
-      auto shower = other_showers.at(index_min_flashvtxdistance);
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = shower->Length();
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = shower->ShowerStart().X();
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = shower->ShowerStart().Y();
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = shower->ShowerStart().Z();
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = UBXSecHelper::GetPhi(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = UBXSecHelper::GetCosTheta(shower->Direction());
-      ubxsec_event->slc_othershowers_flashmatch_openangle[slice] = shower->OpenAngle();
-    } else {
-      ubxsec_event->slc_othershowers_flashmatch_length[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startx[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_starty[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_startz[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_phi[slice] = -1;
-      ubxsec_event->slc_othershowers_flashmatch_theta[slice] = -1;
-      ubxsec_event->slc_othershowers_longest_openangle[slice] = -1;
-    }
-
-    std::cout << "[UBXSec] Shower info saved." << std::endl;
-    */
-
-
     // Muon Candidate
     _muon_finder.Reset();
     _muon_finder.SetTracks(track_v_v[slice]);
@@ -1829,7 +1717,7 @@ void UBXSec::produce(art::Event & e) {
 
     }
 
-    // Particle ID
+    // True track ass. to reo muon candidate and Particle ID
     auto pfps_from_tpcobj = tpcobjToPFPAssns.at(slice);
 
     for (auto pfp : pfps_from_tpcobj){
@@ -1852,6 +1740,26 @@ void UBXSec::produce(art::Event & e) {
         std::cerr << "[UBXSec] Problem with MCTruth pointer." << std::endl;
         continue;
       }
+
+      auto these_tracks = tracks_from_pfp.at(pfp.key());
+      if (these_tracks.size() == 0) {
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice] = -8888;
+      }
+      else if (these_tracks.at(0) == candidate_track) {
+        ubxsec_event->slc_muoncandidate_truth_origin[slice] = mc_truth->Origin();
+        ubxsec_event->slc_muoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
+        ubxsec_event->slc_muoncandidate_truth_time[slice]   = mcpars[0]->T();
+        ubxsec_event->slc_muoncandidate_truth_startx[slice] = mcpars[0]->Vx();
+        ubxsec_event->slc_muoncandidate_truth_starty[slice] = mcpars[0]->Vy();
+        ubxsec_event->slc_muoncandidate_truth_startz[slice] = mcpars[0]->Vz();
+        ubxsec_event->slc_muoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
+        ubxsec_event->slc_muoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
+        ubxsec_event->slc_muoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
+        ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
+        ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
+        ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
+      }
+
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
 
@@ -2069,6 +1977,8 @@ void UBXSec::produce(art::Event & e) {
     selectionResultVector->emplace_back(std::move(selection_result));
     //util::CreateAssn(*this, e, *selectionResultVector, tpcobj_v, *assnOutSelectionResultTPCObject);
 
+    ubxsec_event->ResizeCC1mNpPFPTrackVectors(0);
+
   } else {
 
     selection_result.SetSelectionStatus(true);
@@ -2095,8 +2005,288 @@ void UBXSec::produce(art::Event & e) {
     util::CreateAssn(*this, e, muon_candidate_track_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexTrackAssociations);
     util::CreateAssn(*this, e, muon_candidate_pfparticle_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexPFParticleAssociations);
 
-  }
+    //At this point, a NuMuCCEvent has been selected and the TPCObject slice has been determined. From this point, we can start filling the CC1mNp variables....
+    //First we get the pfparticles associated with that slice set to *tpcobj
 
+    ubxsec_event->num_pfp=0;
+    ubxsec_event->num_pfp_tracks=0;
+    ubxsec_event->num_pfp_showers=0;
+    
+    for (auto pfp : pfp_v_v[slice_index]) {
+
+      std::cout << "[UBXSecCC1mNp] \t This is PFP " << pfp->Self()  << std::endl;      
+      bool pfp_is_muon_candidate=false;
+      if (muon_candidate_pfparticle_per_slice_v.at(slice_index).key()==pfp.key()) {
+	//std::cout<<"[UBXSecCC1mNp] This pfp is the muon candidate!!!"<<std::endl;
+	pfp_is_muon_candidate=true;
+      }
+
+      ubxsec_event->num_pfp++;
+      if(lar_pandora::LArPandoraHelper::IsTrack(pfp)) {ubxsec_event->num_pfp_tracks++;}
+      if(lar_pandora::LArPandoraHelper::IsShower(pfp)) {ubxsec_event->num_pfp_showers++;}
+      ubxsec_event->pfp_reco_ismuoncandidate.emplace_back(int(pfp_is_muon_candidate));
+      ubxsec_event->pfp_reco_istrack.emplace_back(int(lar_pandora::LArPandoraHelper::IsTrack(pfp)));
+      ubxsec_event->pfp_reco_isshower.emplace_back(int(lar_pandora::LArPandoraHelper::IsShower(pfp)));
+      ubxsec_event->pfp_reco_isprimary.emplace_back(int(pfp->IsPrimary()));
+      const std::vector<size_t> &daughterIDs=pfp->Daughters();
+      ubxsec_event->pfp_reco_ndaughters.emplace_back(int(daughterIDs.size()));
+      ubxsec_event->pfp_reco_numtracks.emplace_back((tracks_from_pfp.at(pfp.key())).size());
+      ubxsec_event->pfp_reco_numshowers.emplace_back((showers_from_pfp.at(pfp.key())).size());
+      //std::cout << "[UBXSecModule] Number of tracks associated to pfparticle with pdg code " << pfp->PdgCode() <<" is : " << (tracks_from_pfp.at(pfp.key())).size() << std::endl;
+
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //if(lar_pandora::LArPandoraHelper::IsShower(pfp)) continue; //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+      //THIS WILL NEED TO BE CHANGED WHEN SHOWERS ARE BUILT AS TRACKS #KIRBY #AF
+
+      if(_is_mc){
+	std::vector<art::Ptr<ubana::MCGhost>> mcghosts=mcghost_from_pfp.at(pfp.key());
+	std::vector<art::Ptr<simb::MCParticle>> mcpars;	
+	if(mcghosts.size()==0 || mcghosts.size()>1){
+	  std::cout<<"[UBXSecCC1mNp] \t\t mcghosts is either 0 or >1 so filling pfp truth with defaults!"<<std::endl;
+	  //FillPFPTruthDefaults(ubxsec_event);
+	  FillPFPTruthDefaults();
+	} else {
+	  mcpars=mcpar_from_mcghost.at(mcghosts[0].key());
+	  const auto mc_truth=UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpars[0]->TrackId());
+	  if(!mc_truth) {
+	    std::cerr<<"[UBXSecCC1mNp] Problem with MCTruth pointer so filling pfp truth with defaults! "<<std::endl;
+	    //FillPFPTruthDefaults(ubxsec_event);
+	    FillPFPTruthDefaults();
+	  } else {
+	    std::cout<<"[UBXSecCC1mNp] \t\t Filling pfp truth info for PFP " << pfp->Self() <<std::endl;
+	    ubxsec_event->pfp_truth_pdg.emplace_back(mcpars[0]->PdgCode());
+	    ubxsec_event->pfp_truth_origin.emplace_back(mc_truth->Origin());
+	    ubxsec_event->pfp_truth_status.emplace_back(mcpars[0]->StatusCode());
+	    ubxsec_event->pfp_truth_parId.emplace_back(mcpars[0]->TrackId());
+	    ubxsec_event->pfp_truth_theta.emplace_back(mcpars[0]->Momentum().Theta());
+	    ubxsec_event->pfp_truth_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
+	    ubxsec_event->pfp_truth_phi.emplace_back(mcpars[0]->Momentum().Phi());
+	    ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());   
+	    ubxsec_event->pfp_truth_startx.emplace_back(mcpars[0]->Vx());
+	    ubxsec_event->pfp_truth_starty.emplace_back(mcpars[0]->Vy());
+	    ubxsec_event->pfp_truth_startz.emplace_back(mcpars[0]->Vz());
+	    ubxsec_event->pfp_truth_endx.emplace_back(mcpars[0]->EndX());
+	    ubxsec_event->pfp_truth_endy.emplace_back(mcpars[0]->EndY());
+	    ubxsec_event->pfp_truth_endz.emplace_back(mcpars[0]->EndZ());
+	    ubxsec_event->pfp_truth_endProcess.emplace_back(mcpars[0]->EndProcess());
+	    ubxsec_event->pfp_truth_endE.emplace_back((mcpars[0]->Momentum(mcpars[0]->NumberTrajectoryPoints()-1)).E());
+	    ubxsec_event->pfp_truth_KE.emplace_back(mcpars[0]->E()-mcpars[0]->Mass());
+	    ubxsec_event->pfp_truth_Mass.emplace_back(mcpars[0]->Mass());
+	  }
+	}
+      } else { //end of the isMC conditional
+	  FillPFPTruthDefaults();
+	  //FillPFPTruthDefaults(ubxsec_event);
+      }
+
+      if ( !(lar_pandora::LArPandoraHelper::IsTrack(pfp)) && !(lar_pandora::LArPandoraHelper::IsShower(pfp)) ) { //check if the PFParticle is considered neither a shower or a track
+	std::cout<<"[UBXSecCC1mNp] PFParticle: " << pfp->Self() << " is considered neither a track and a shower. WTF???" <<std::endl;
+	std::cout << "[UBXSecCC1mNp] PFParticle that is neither track nor shower has pdg code " << pfp->PdgCode() << std::endl;
+	std::cout<<"[UBXSecCC1mNp] That's crazy and gonna just fill CC1mNp ntuples varialbes with default values." <<std::endl;
+	FillPFPRecoTrackDefaults();
+	FillPFPRecoDefaults();
+      }
+          
+      if (lar_pandora::LArPandoraHelper::IsTrack(pfp) && lar_pandora::LArPandoraHelper::IsShower(pfp)) { //check if the PFParticle is considered both a track and a shower
+	std::cout<<"[UBXSecCC1mNp] PFP: " << pfp->Self() << " is considered both a track and a shower. WTF???" <<std::endl;
+	throw std::exception();
+      }
+
+      if (lar_pandora::LArPandoraHelper::IsShower(pfp)) { //if the Pandora thinks this is a shower, then fill the track variables with default
+	FillPFPRecoTrackDefaults();
+	if ( (showers_from_pfp.at(pfp.key())).size()==0) {
+	  std::cout<<"[UBXSecCC1mNp] Filling the default Reco info to for PFP " << pfp->Self() << " because no showers associated with PFP" <<std::endl;
+	  FillPFPRecoDefaults();
+	} else {
+	  //std::vector<art::Ptr<recob::Shower>> = shower
+	  art::Ptr<recob::Shower> shower_pfp = showers_from_pfp.at(pfp.key())[0];
+	  //for (auto shower_pfp : showers_from_pfp.at(pfp.key()) ) {
+	  //if (shower_pfp != showers_from_pfp.at(pfp.key())[0]) continue; //only take the first shower associated to the PFParticle
+	  TVector3 showerPos_pfp=shower_pfp->ShowerStart();
+	  TVector3 showerDirection_pfp=shower_pfp->Direction();
+	  ubxsec_event->pfp_reco_length.emplace_back(shower_pfp->Length());
+	  ubxsec_event->pfp_reco_theta.emplace_back(showerDirection_pfp.Theta());
+	  ubxsec_event->pfp_reco_costheta.emplace_back(TMath::Cos(showerDirection_pfp.Theta()));
+	  ubxsec_event->pfp_reco_phi.emplace_back(showerDirection_pfp.Phi());
+	  ubxsec_event->pfp_reco_startx.emplace_back(showerPos_pfp.X());
+	  ubxsec_event->pfp_reco_starty.emplace_back(showerPos_pfp.Y());
+	  ubxsec_event->pfp_reco_startz.emplace_back(showerPos_pfp.Z());
+	  ubxsec_event->pfp_reco_endx.emplace_back(showerPos_pfp.X()+TMath::Sin(showerDirection_pfp.Theta())*TMath::Sin(showerDirection_pfp.Phi())*shower_pfp->Length());
+	  ubxsec_event->pfp_reco_endy.emplace_back(showerPos_pfp.Y()+TMath::Sin(showerDirection_pfp.Theta())*TMath::Cos(showerDirection_pfp.Phi())*shower_pfp->Length());
+	  ubxsec_event->pfp_reco_endz.emplace_back(showerPos_pfp.Z()+TMath::Cos(showerDirection_pfp.Theta())*shower_pfp->Length());
+	}
+      }
+      
+      if (lar_pandora::LArPandoraHelper::IsTrack(pfp)) { //if the Pandora thinks this is a track, then fill the track variables
+
+	if ( (tracks_from_pfp.at(pfp.key())).size()==0) { //first check to make sure that there is a non-zero list of tracks associated with the PFP
+	  std::cout<<"[UBXSecCC1mNp] Filling the default track info to for PFP " << pfp->Self() << " because no tracks associated with PFP" <<std::endl;
+	  FillPFPRecoTrackDefaults();
+	  FillPFPRecoDefaults();
+	  continue; //should kick out of the isTrack conditional and fail the isShower conditional moving on to the next PFParticle
+	} else {
+	  art::Ptr<recob::Track> track_pfp = tracks_from_pfp.at(pfp.key())[0];
+	  //for (auto track_pfp : tracks_from_pfp.at(pfp.key()) ) {
+	  // if (track_pfp != tracks_from_pfp.at(pfp.key())[0]) continue; //only take the first track associated to the PFParticle
+	  std::cout<<"[UBXSecCC1mNp] Filling the track info from track " << track_pfp->ID() << " for PFP " << pfp->Self() <<std::endl;
+	  TVector3  trackPos_pfp=track_pfp->Vertex();
+	  TVector3  trackEnd_pfp=track_pfp->End();
+	  ubxsec_event->pfp_reco_length.emplace_back(track_pfp->Length());
+	  ubxsec_event->pfp_reco_theta.emplace_back(track_pfp->Theta());
+	  ubxsec_event->pfp_reco_costheta.emplace_back(TMath::Cos(track_pfp->Theta()));
+	  ubxsec_event->pfp_reco_phi.emplace_back(track_pfp->Phi());
+	  ubxsec_event->pfp_reco_startx.emplace_back(trackPos_pfp.X());
+	  ubxsec_event->pfp_reco_starty.emplace_back(trackPos_pfp.Y());
+	  ubxsec_event->pfp_reco_startz.emplace_back(trackPos_pfp.Z());
+	  ubxsec_event->pfp_reco_endx.emplace_back(trackEnd_pfp.X());
+	  ubxsec_event->pfp_reco_endy.emplace_back(trackEnd_pfp.Y());
+	  ubxsec_event->pfp_reco_endz.emplace_back(trackEnd_pfp.Z());
+	  
+	  ubxsec_event->pfp_reco_Id.emplace_back(track_pfp->ID());
+	  ubxsec_event->pfp_reco_Mom.emplace_back(track_pfp->VertexMomentum());
+	  trkf::TrackMomentumCalculator trkm_pfp;
+	  ubxsec_event->pfp_reco_Mom_proton.emplace_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),2212));
+	  ubxsec_event->pfp_reco_Mom_muon.emplace_back(trkm_pfp.GetTrackMomentum(track_pfp->Length(),13));
+	  ubxsec_event->pfp_reco_Mom_MCS.emplace_back(mcsfitresult_mu_v[track_pfp->ID()]->bestMomentum());
+	  std::vector<art::Ptr<anab::Calorimetry>> calos_track_pfp=calos_from_track.at(track_pfp.key());
+	  ubxsec_event->pfp_reco_trunmeandqdx.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp));
+	  ubxsec_event->pfp_reco_trunmeandqdx_U.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 0));
+	  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));  
+	  ubxsec_event->pfp_reco_upflag.emplace_back(_muon_finder.MIPConsistency(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp), track_pfp->Length()));
+	  ubxsec_event->pfp_reco_dEdx.emplace_back(GetdEdx(calos_track_pfp));
+	  ubxsec_event->pfp_reco_dQdx.emplace_back(GetdQdx(calos_track_pfp));
+	  ubxsec_event->pfp_reco_RR.emplace_back(GetRR(calos_track_pfp));
+	  std::vector<art::Ptr<recob::Hit>> allKHits_pfp = hits_from_tracks.at(track_pfp.key());
+	  ubxsec_event->pfp_reco_nhits.emplace_back(allKHits_pfp.size()); 
+	  std::vector<art::Ptr<anab::ParticleID>> pids_summer2018 = particleids_summer2018_from_track.at(track_pfp.key());
+	  std::cout << "[UBXSecCC1mNp] The size of the vector of ParticleID is " << pids_summer2018.size() << " taken from particleids_summer2018_from_track for track pfp key " << track_pfp.key() << std::endl;
+	  if (pids_summer2018.size()==0) std::cout << "[UBXSecCC1mNp] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
+	  if (pids_summer2018.size()>0) { std::cout<<"[UBXSecCC1mNp] Particle ID Summer 2018 Vector is bigger than 0. Will loop over " << pids_summer2018.size() << " particle IDs."<<std::endl; }
+	  std::vector<anab::sParticleIDAlgScores> fAlgScoresVec;
+	  for (auto pid_summer2018 : pids_summer2018) {
+	    //fAlgScoresVec.clear();
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 pointer value is " << pid_summer2018 << "." << std::endl;
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 PDG value is " << pid_summer2018->Pdg() << "." << std::endl;
+	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 name is " << pid_summer2018->Name() << "." << std::endl;
+	    //fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
+	    //std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
+	    
+	    float newpid_pida=-999.;
+	    float chi2_proton=-999.;
+	    float chi2_kaon=-999.;
+	    float chi2_muon=-999.;
+	    float chi2_pion=-999.;
+	    float llh_fwd_proton=-999.;
+	    float llh_bwd_proton=-999.;
+	    float llh_fwd_mip=-999.; //mip assumption only has the forward direction option
+	    float final_value=-999.;
+	    
+	    fAlgScoresVec.clear();
+	    fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
+	    std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
+	    for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
+	      std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
+	      anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
+	      std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	      
+	      if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
+		
+		if(fAlgScore.fAlgName == "Chi2"){
+		  if((anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      chi2_proton=fAlgScore.fValue;
+		    }//proton chi2
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 211) {
+		      chi2_pion=fAlgScore.fValue;
+		    }
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 13) {
+		      chi2_muon=fAlgScore.fValue;
+		    }
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 321) {
+		      chi2_kaon=fAlgScore.fValue;
+		    }
+		  }//requirement that it's forward
+		}//algorithm is chi2
+		
+		if(fAlgScore.fAlgName == "PIDA_median"){
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kPIDA) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		    newpid_pida=fAlgScore.fValue;
+		  }
+		}
+		
+		if(fAlgScore.fAlgName == "BraggPeakLLH"){
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_fwd_proton=fAlgScore.fValue;
+		    }
+		  }
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kBackward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_bwd_proton=fAlgScore.fValue;
+		    }
+		  }
+		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
+		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 0) {
+		      //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
+		      llh_fwd_mip=fAlgScore.fValue;
+		    }
+		  }
+		}//requirement that it's bragg peak calculation
+	      }//requirement that this is Plane==2
+	    }//loop over AlgScores
+	    fAlgScoresVec.clear();
+	    
+	    ubxsec_event->pfp_reco_newpid_pida.emplace_back(newpid_pida);
+	    ubxsec_event->pfp_reco_chi2_proton.emplace_back(chi2_proton);
+	    ubxsec_event->pfp_reco_chi2_muon.emplace_back(chi2_muon);
+	    ubxsec_event->pfp_reco_chi2_pion.emplace_back(chi2_pion);
+	    ubxsec_event->pfp_reco_chi2_kaon.emplace_back(chi2_kaon);
+	    ubxsec_event->pfp_reco_bragg_fwd_proton.emplace_back(llh_fwd_proton);
+	    ubxsec_event->pfp_reco_bragg_bwd_proton.emplace_back(llh_bwd_proton);
+	    ubxsec_event->pfp_reco_bragg_proton.emplace_back(llh_fwd_proton>llh_bwd_proton ? llh_fwd_proton : llh_bwd_proton);
+	    ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(llh_fwd_mip);
+	    
+	    if (llh_fwd_proton>llh_bwd_proton) {
+	      final_value=llh_fwd_proton;
+	    } else {
+	      final_value=llh_bwd_proton;
+	    }
+	    if ((final_value!=-999.) and (llh_fwd_mip!=-999.)) {
+	      if (TMath::Abs(final_value)!=0.0) {
+		std::cout << "[UBXSecCC1mNp] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
+		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
+		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip/final_value)); 
+	      } else {
+		std::cout << "[UBXSecCC1mNp] Crap, we're about to divide by zero ( max(BraggPeakLLH fwd|bwd)==0 ).... Do not do that!" << std::endl;
+		std::cout << "[UBXSecCC1mNp] Pushing back llh_fwd_mip value." << std::endl;
+		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip) << std::endl;
+		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip));
+	      }
+	    } else {
+	      ubxsec_event->pfp_reco_bragg_ratio.emplace_back(final_value);
+	    }
+	    
+	  } //end loop over pids_summer2018
+
+	} //end loop over tracks from pfp
+
+      } //end conditional of iftrack
+	
+    } //end loop over pfparticles  
+    
+  } // end conditional over muon selection
+  
   if(_debug) std::cout << "[UBXSec] Filling tree now." << std::endl;
   _tree1->Fill();
 
@@ -2111,7 +2301,6 @@ void UBXSec::produce(art::Event & e) {
 
   return;
 }
-
 
 
 void UBXSec::endSubRun(art::SubRun& sr) {
@@ -2202,6 +2391,74 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
   std::cout << "[UBXSec] ================= MC Information ================= [UBXSec]" << std::endl;
 }
 
+//_______________________________________________________________________________________
+void UBXSec::FillPFPRecoDefaults()
+{ 
+  ubxsec_event->pfp_reco_length.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_theta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_costheta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_phi.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_startx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_starty.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_startz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endy.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_endz.emplace_back(ubxsec_event->_default_value);
+}
+
+//_______________________________________________________________________________________
+void UBXSec::FillPFPRecoTrackDefaults()
+{ 
+  ubxsec_event->pfp_reco_Id.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_muon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_MCS.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx_U.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_upflag.emplace_back(ubxsec_event->_default_value);
+  std::vector<double> tmp;
+  tmp.resize(0);
+  ubxsec_event->pfp_reco_dEdx.emplace_back(tmp);
+  ubxsec_event->pfp_reco_dQdx.emplace_back(tmp);
+  ubxsec_event->pfp_reco_RR.emplace_back(tmp);
+  ubxsec_event->pfp_reco_nhits.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_newpid_pida.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_muon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_pion.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_chi2_kaon.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_fwd_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_bwd_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_proton.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_bragg_ratio.emplace_back(ubxsec_event->_default_value);
+}
+
+//_______________________________________________________________________________________
+//void UBXSec::FillPFPTruthDefaults(UBXSecEvent *ubxsec_event)
+void UBXSec::FillPFPTruthDefaults()
+{
+  ubxsec_event->pfp_truth_pdg.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_origin.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_status.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_parId.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_theta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_costheta.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_phi.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_mom.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_startx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_starty.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_startz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endx.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endy.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endz.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endE.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_endProcess.emplace_back("");
+  ubxsec_event->pfp_truth_KE.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_truth_Mass.emplace_back(ubxsec_event->_default_value);
+}
 
 //_______________________________________________________________________________________
 void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet, 
@@ -2242,6 +2499,53 @@ void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet,
   
   if ( (sumz2*totalPE - sumz*sumz) > 0. ) 
     Zwidth = std::sqrt(sumz2*totalPE - sumz*sumz)/totalPE;
+}
+
+std::vector<double> UBXSec::GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> dQdx_v = c->dQdx(); 
+    return dQdx_v;
+  }
+  return result;
+}
+
+
+std::vector<double> UBXSec::GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> RR_v = c->ResidualRange(); 
+    return RR_v;
+  }
+  return result;
+}
+
+
+std::vector<double> UBXSec::GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> calos) {
+  std::vector<double> result;
+  for (auto c : calos) {
+    if (!c) continue;
+    if (!c->PlaneID().isValid) continue;
+    int planenum = c->PlaneID().Plane;
+    if (planenum != 2) continue;
+   
+    std::vector<double> dEdx_v = c->dEdx(); 
+//    if (dEdx_v.size() == 0){
+//      return 0;
+//    }
+    return dEdx_v;
+  }
+  return result;
 }
 
 DEFINE_ART_MODULE(UBXSec)
