@@ -1,0 +1,22 @@
+BEGIN_PROLOG
+
+NuMuCCNpSelectionSettings: {
+
+  # Cut out the detector borders
+  FVborderx:             10
+  FVbordery:             20
+  FVborderz:             10
+
+  #Consider showers as tracks
+  ShowerAsTrack:	 true
+
+  # CC1muNp cuts
+  Ntracks:		 2
+  MinCollectionHits:     5
+  ProtonPThreshold:	 0.3
+  Chi2Cut:		 88
+   
+  Verbose:               true
+}
+
+END_PROLOG

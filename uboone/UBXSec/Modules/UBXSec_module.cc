@@ -101,6 +101,7 @@
 #include "uboone/UBXSec/Algorithms/MuonCandidateFinder.h"
 #include "uboone/UBXSec/Algorithms/FiducialVolume.h"
 #include "uboone/UBXSec/Algorithms/NuMuCCEventSelection.h"
+#include "uboone/UBXSec/Algorithms/NuMuCCNpEventSelection.h"
 #include "uboone/UBXSec/Algorithms/TrackQuality.h"
 
 //this is included for some of the summer2018 PID functions
@@ -173,6 +174,7 @@ private:
   ::ubana::FiducialVolume _fiducial_volume;
   ::ubana::MuonCandidateFinder _muon_finder;
   ::ubana::NuMuCCEventSelection _event_selection;
+  ::ubana::NuMuCCNpEventSelection _event_selection_np;
   ::pmtana::PECalib _pecalib;
   ::trkf::TrackMomentumCalculator _trk_mom_calculator;
 
@@ -291,6 +293,7 @@ private:
   double _mom_cosmic_mcs_downforced;
   double _mom_cosmic_range;
   bool _mom_cosmic_down;
+  bool _np_selection;
 
   TTree* _sr_tree;
   int _sr_run, _sr_subrun; 
@@ -351,6 +354,9 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _make_ophit_csv                 = p.get<bool>("MakeOpHitCSV", false);
   _make_pida_csv                  = p.get<bool>("MakePIDACSV", false);
 
+  //run CC1muNp selection
+  _np_selection                   = p.get<bool>("CC1muNpSelection", false);
+  
   _pecalib.Configure(p.get<fhicl::ParameterSet>("PECalib"));
 
   _fiducial_volume.Configure(p.get<fhicl::ParameterSet>("FiducialVolumeSettings"), 
@@ -366,6 +372,10 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   _event_selection.Configure(p.get<fhicl::ParameterSet>("NuMuCCSelectionSettings"));
 
+
+  _event_selection_np.Configure(p.get<fhicl::ParameterSet>("NuMuCCNpSelectionSettings"));
+
+  _event_selection.PrintConfig();
   _event_selection.PrintConfig();
 
   _trk_mom_calculator.SetMinLength(_min_track_len);
@@ -1962,6 +1972,42 @@ void UBXSec::produce(art::Event & e) {
   selection_result.SetSelectionType("numu_cc_inclusive");
   selection_result.SetFailureReason(reason);
   selection_result.SetCutFlowStatus(failure_map);
+
+
+  // *********************
+  // Event Selection Np
+  // *********************
+  
+  int slice_index_np;
+  bool is_selected_np = false;
+
+  if ( _np_selection ) {
+  _event_selection_np.SetEvent(ubxsec_event);
+
+  reason = "no_failure";
+  std::map<std::string,bool> failure_map_np;
+  bool is_selected = _event_selection_np.IsSelected(slice_index, failure_map_np);
+  if (_debug) std::cout << "[UBXSec] >>>>>>>>>>>>>>>>>>>>>> CC1muNp: Is Selected? " << (is_selected_np ? "YES" : "NO") << std::endl;
+  first = true;
+  if (_debug) {
+    for (auto iter : failure_map_np) {
+      std::cout << "[UBXSec] CC1muNp: Cut: " << iter.first << "  >>>  " << (iter.second ? "PASSED" : "NOT PASSED") << std::endl;
+      if (first && !iter.second) {
+        reason = "fail_" + iter.first;
+        first = false;
+      } 
+    }
+  }
+  
+  } //end if _np_selection
+
+  std::cout << "[UBXSec] CC1muNp Selection Failed at Cut: " << reason << std::endl;
+
+  ::ubana::SelectionResult selection_result_np;
+  selection_result.SetSelectionType("numu_cc_np");
+  selection_result.SetFailureReason(reason);
+  selection_result.SetCutFlowStatus(failure_map_np);
+
 
   // *********************
   // Save Event Selection Output in the Event
