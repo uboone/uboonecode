@@ -372,11 +372,11 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   _event_selection.Configure(p.get<fhicl::ParameterSet>("NuMuCCSelectionSettings"));
 
-
   _event_selection_np.Configure(p.get<fhicl::ParameterSet>("NuMuCCNpSelectionSettings"));
 
   _event_selection.PrintConfig();
-  _event_selection.PrintConfig();
+
+  _event_selection_np.PrintConfig();
 
   _trk_mom_calculator.SetMinLength(_min_track_len);
 
@@ -1940,10 +1940,6 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->pot = 0.;
 
  
-
-
-
-
   // *********************
   // Event Selection
   // *********************
@@ -1974,39 +1970,6 @@ void UBXSec::produce(art::Event & e) {
   selection_result.SetCutFlowStatus(failure_map);
 
 
-  // *********************
-  // Event Selection Np
-  // *********************
-  
-  int slice_index_np;
-  bool is_selected_np = false;
-  std::map<std::string,bool> failure_map_np;
-
-  if ( _np_selection ) {
-  _event_selection_np.SetEvent(ubxsec_event);
-
-  reason = "no_failure";
-  is_selected_np = _event_selection_np.IsSelected(slice_index_np, failure_map_np);
-  if (_debug) std::cout << "[UBXSec] >>>>>>>>>>>>>>>>>>>>>> CC1muNp: Is Selected? " << (is_selected_np ? "YES" : "NO") << std::endl;
-  first = true;
-  if (_debug) {
-    for (auto iter : failure_map_np) {
-      std::cout << "[UBXSec] CC1muNp: Cut: " << iter.first << "  >>>  " << (iter.second ? "PASSED" : "NOT PASSED") << std::endl;
-      if (first && !iter.second) {
-        reason = "fail_" + iter.first;
-        first = false;
-      } 
-    }
-  }
-  
-  } //end if _np_selection
-
-  std::cout << "[UBXSec] CC1muNp Selection Failed at Cut: " << reason << std::endl;
-
-  ::ubana::SelectionResult selection_result_np;
-  selection_result.SetSelectionType("numu_cc_np");
-  selection_result.SetFailureReason(reason);
-  selection_result.SetCutFlowStatus(failure_map_np);
 
 
   // *********************
@@ -2054,11 +2017,6 @@ void UBXSec::produce(art::Event & e) {
     //At this point, a NuMuCCEvent has been selected and the TPCObject slice has been determined. From this point, we can start filling the CC1mNp variables....
     //First we get the pfparticles associated with that slice set to *tpcobj
     
-    //save selection output
-    selection_result_np.SetSelectionStatus(true);
-
-    ubxsec_event->is_selected_np = true;
-    ubxsec_event->selected_slice_np = slice_index_np;
 
     ubxsec_event->num_pfp=0;
     ubxsec_event->num_pfp_tracks=0;
@@ -2337,6 +2295,47 @@ void UBXSec::produce(art::Event & e) {
 	
     } //end loop over pfparticles  
     
+
+  // *********************
+  // Event Selection Np
+  // *********************
+  
+  int slice_index_np = -999;
+  bool is_selected_np = false;
+  std::map<std::string,bool> failure_map_np;
+  std::string reason_np = "no_failure";
+
+  if ( _np_selection ) {
+  _event_selection_np.SetEvent(ubxsec_event);
+  is_selected_np = _event_selection_np.IsSelected(slice_index_np, failure_map_np);
+  if (_debug) std::cout << "[UBXSec] >>>>>>>>>>>>>>>>>>>>>> CC1muNp: Is Selected? " << (is_selected_np ? "YES" : "NO") << std::endl;
+  first = true;
+  if (_debug) {
+    for (auto iter : failure_map_np) {
+      std::cout << "[UBXSec] CC1muNp: Cut: " << iter.first << "  >>>  " << (iter.second ? "PASSED" : "NOT PASSED") << std::endl;
+      if (first && !iter.second) {
+        reason_np = "fail_" + iter.first;
+        first = false;
+      } 
+    }
+  }
+  
+
+  std::cout << "[UBXSec] CC1muNp Selection Failed at Cut: " << reason_np << std::endl;
+
+  ::ubana::SelectionResult selection_result_np;
+  selection_result_np.SetSelectionType("numu_cc_np");
+  selection_result_np.SetFailureReason(reason_np);
+  selection_result_np.SetCutFlowStatus(failure_map_np);
+    
+  //save selection output
+  selection_result_np.SetSelectionStatus(is_selected_np);
+  ubxsec_event->is_selected_np = is_selected_np;
+  ubxsec_event->selected_slice_np = slice_index_np;
+
+  selectionResultVector->emplace_back(std::move(selection_result_np));
+  } //end if _np_selection
+  
   } // end conditional over muon selection
   
   if(_debug) std::cout << "[UBXSec] Filling tree now." << std::endl;

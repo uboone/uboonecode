@@ -85,18 +85,16 @@ namespace ubana {
     // ************
 
     bool return_value = true;
-    if(_showerastrack){
-       		if( _ubxsec_event->num_pfp < _ntracks )  
-	        return_value = false;
-    	} else {
-       		if( _ubxsec_event->num_pfp_tracks < _ntracks)  
-	        return_value = false;
-    	}
+    int number = 0;
+    if(_showerastrack) number =  _ubxsec_event->num_pfp;
+    else number = _ubxsec_event->num_pfp_tracks;
+
+    if (number < _ntracks) return_value = false;
 
     if ( !return_value ) {
 	    reason = "n_tracks";
       
-      if (_verbose) std::cout << "[NuMuCCNpEventSelection] Selection FAILED. Number of tracks < " << _ntracks << "." << std::endl;
+      if (_verbose) std::cout << "[NuMuCCNpEventSelection] Selection FAILED. Number of tracks is " << number << "<" << _ntracks << "." << std::endl;
       	return return_value;
     
     } else {
