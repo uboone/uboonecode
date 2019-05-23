@@ -84,6 +84,10 @@ void UBXSecEvent::Init()
   bnb_weight = _default_value;
   is_selected = false;
   selected_slice = _default_value;
+  
+  is_selected_np = false;
+  selected_slice_np = _default_value;
+
 
   sce_corr_x = _default_value;
   sce_corr_y = _default_value;

@@ -100,7 +100,9 @@ class UBXSecEvent /*: public TObject*/{
   
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
-  Int_t           selected_slice; ///< The index of the selected slice
+  Int_t           selected_slice; ///< The index of the selected slice for the numu cc inclusive selection
+  Bool_t          is_selected_np; ///< True if event passed numu cc Np selection
+  Int_t           selected_slice_np; ///< The index of the selected slice for the numu cc Np selection
 
   Double_t        sce_corr_x; ///< Space charge correction to be applied to the true nu vertex (to be summed on x)
   Double_t        sce_corr_y; ///< Space charge correction to be applied to the true nu vertex (to be summed on y)

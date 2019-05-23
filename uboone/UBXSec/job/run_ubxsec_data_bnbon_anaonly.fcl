@@ -34,3 +34,5 @@ physics.producers.UBXSec.UseGENIEInfo:                   false
 
 physics.producers.UBXSec.FileType: "bnbon"
 
+physics.producers.UBXSec.CC1muNpSelection: true
+
