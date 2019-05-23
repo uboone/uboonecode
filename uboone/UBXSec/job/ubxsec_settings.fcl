@@ -32,7 +32,7 @@ UBXSec: {
   EventWeightProducer:          "eventweight"
   GenieEventWeightPMOneProducer: "genieeventweightpm1::UBXSec"
   GenieEventWeightMultisimProducer: "genieeventweightmultisim::UBXSec"
-  GenieModelsEventWeightMultisimProducer: "geniemodelseventweightmultisim::UBXSec"
+  ExtraSystEventWeightMultisimProducers:   ["geniemodelseventweightmultisim::UBXSec", "reinteventweightmultisim::UBXSec"]
   FluxEventWeightMultisimProducer: "fluxeventweightmultisim::UBXSec"
 
   FileType:                     "not_set"

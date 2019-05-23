@@ -4,7 +4,7 @@ process_name: UBXSecAnaOnly
 
 services.TFileService.fileName: "ubxsec_output_data_bnbon.root"
 
-physics.reco:          [ @sequence::ubxsec_data_producers_anaonly ]
+physics.reco:          [ dedxcalibration, pid, @sequence::ubxsec_data_producers_anaonly ]
 physics.trigger_paths: [ reco ]
 physics.ana:           [ @sequence::ubxsec_data_analyzers ]
 physics.stream1:       [ out1 ]
@@ -33,6 +33,15 @@ physics.producers.UBXSec.NuMuCCSelectionSettings.BeamSpillEnds:   @local::beam_e
 physics.producers.UBXSec.UseGENIEInfo:                   false
 
 physics.producers.UBXSec.FileType: "bnbon"
+physics.producers.UBXSec.ParticleIDSummer2018Producer: "pid::UBXSecAnaOnly"
+
+physics.producers.dedxcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_UBXSec_calib_dedxcalib_data
+physics.producers.dedxcalibration.IsSimulationSmearing: false
+physics.producers.dedxcalibration.IsDataNewRecombination: true
+
+physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_UBXSec_dedxcalib_data
+physics.producers.pid.ProducerLabels.CalorimetryLabel: "dedxcalibration::UBXSecAnaOnly"
+physics.producers.pid.BraggAlgo: @local::braggalgo_mcc8_data
 
 physics.producers.UBXSec.CC1muNpSelection: true
 

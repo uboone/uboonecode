@@ -1980,13 +1980,13 @@ void UBXSec::produce(art::Event & e) {
   
   int slice_index_np;
   bool is_selected_np = false;
+  std::map<std::string,bool> failure_map_np;
 
   if ( _np_selection ) {
   _event_selection_np.SetEvent(ubxsec_event);
 
   reason = "no_failure";
-  std::map<std::string,bool> failure_map_np;
-  is_selected_np = _event_selection_np.IsSelected(slice_index, failure_map_np);
+  is_selected_np = _event_selection_np.IsSelected(slice_index_np, failure_map_np);
   if (_debug) std::cout << "[UBXSec] >>>>>>>>>>>>>>>>>>>>>> CC1muNp: Is Selected? " << (is_selected_np ? "YES" : "NO") << std::endl;
   first = true;
   if (_debug) {
@@ -2058,7 +2058,7 @@ void UBXSec::produce(art::Event & e) {
     selection_result_np.SetSelectionStatus(true);
 
     ubxsec_event->is_selected_np = true;
-    ubxsec_event->selected_slice_np = slice_index;
+    ubxsec_event->selected_slice_np = slice_index_np;
 
     ubxsec_event->num_pfp=0;
     ubxsec_event->num_pfp_tracks=0;

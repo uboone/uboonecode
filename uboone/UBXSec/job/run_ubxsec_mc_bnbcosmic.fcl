@@ -31,3 +31,20 @@ physics.producers.UBXSec.BeamSpillStart:                 @local::beam_start
 physics.producers.UBXSec.BeamSpillEnd:                   @local::beam_end
 
 physics.producers.UBXSec.FileType: "bnbcosmic"
+
+physics.producers.UBXSec.ParticleIDSummer2018Producer: "pid::UBXSec"
+
+#don't need calibration for the MCC8.7 sample, it's already there
+#physics.producers.pidcalibration.TrackModuleLabel:       "pandoraNu::McRecoStage2"
+#physisc.producers.pidcalibration.CalorimetryModuleLabel: "pandoraNuCalo::McRecoStage2"
+
+physics.producers.dedxcalibration.ProducerLabels: @local::cs_producerlabels_mcc8_uncalib_dedxcalib
+physics.producers.dedxcalibration.ProducerLabels.CalorimetryLabel: "pandoraNucali::UBXSec"
+physics.producers.dedxcalibration.ProducerLabels.TrackLabel: "pandoraNu::UBXSec"
+
+physics.producers.pid.ProducerLabels: @local::producerlabels_mcc8_dedxcalib
+physics.producers.pid.ProducerLabels.CalorimetryLabel: "dedxcalibration::UBXSec"
+physics.producers.pid.ProducerLabels.TrackLabel: "pandoraNu::UBXSec"
+physics.producers.pid.BraggAlgo: @local::braggalgo_mcc8_dedxcalib
+
+physics.producers.UBXSec.CC1muNpSelection: true

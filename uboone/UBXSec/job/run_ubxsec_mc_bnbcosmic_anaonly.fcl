@@ -31,5 +31,3 @@ physics.producers.UBXSec.BeamSpillStart:                 @local::beam_start
 physics.producers.UBXSec.BeamSpillEnd:                   @local::beam_end
 
 physics.producers.UBXSec.FileType: "bnbcosmic"
-
-physics.producers.UBXSec.CC1muNpSelection: true

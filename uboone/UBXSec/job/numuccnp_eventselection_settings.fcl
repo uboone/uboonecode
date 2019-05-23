@@ -11,7 +11,7 @@ NuMuCCNpSelectionSettings: {
   ShowerAsTrack:	 true
 
   # CC1muNp cuts
-  Ntracks:		 2
+  NTracks:		 2
   MinCollectionHits:     5
   ProtonPThreshold:	 0.3
   Chi2Cut:		 88
