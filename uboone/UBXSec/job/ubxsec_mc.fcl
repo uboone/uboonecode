@@ -8,6 +8,8 @@
 #include "genie_eventweight_microboone_ubxsec.fcl"
 #include "flux_eventweight_microboone_ubxsec.fcl"
 ##include "eventweight_microboone_models.fcl"
+#include "eventweight_microboone_models_ubxsec.fcl"
+#include "eventweight_microboone_reinteractions_ubxsec.fcl"
 
 #include "tpcobjectmaker.fcl"
 #include "neutrinomcflash.fcl"
@@ -73,6 +75,11 @@ ubxsec_mc_reco:
   pandoraNuMCSMu:                 @local::mcsfitproducer
   pandoraNuMCSPi:                 @local::mcsfitproducer
   pandoraNuMCSP:                 @local::mcsfitproducer
+
+  #pidcalibration: @local::microboone_calibrationdedx
+  dedxcalibration: @local::simulation_calibration
+  pid: @local::particleidconfig
+
 }
 
 ubxsec_mc_flashmatch:
@@ -93,8 +100,10 @@ ubxsec_mc_flashmatch:
 
    genieeventweightpm1:            @local::genie_microboone_eventweight_ubxsec
    genieeventweightmultisim:       @local::genie_microboone_eventweight_ubxsec
-   #geniemodelseventweightmultisim: @local::microboone_eventweight
    fluxeventweightmultisim:        @local::flux_microboone_eventweight_ubxsec
+   #geniemodelseventweightmultisim: @local::microboone_eventweight
+   geniemodelseventweightmultisim: @local::microboone_eventweight_geniemodels
+   reinteventweightmultisim:       @local::microboone_eventweight_reint
 
    UBXSec:                         @local::UBXSec_mc
 
@@ -125,8 +134,8 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        #pandoraNuAll,
                        pandoraNucalo,
                        pandoraNupid,
-                       #pandoraNucali,
-                       #pandoraNucalipid,
+                       pandoraNucali,
+                       pandoraNucalipid,
                        pandoraNuMCSMu,
                        pandoraNuMCSPi,
 		       pandoraNuMCSP,
@@ -140,7 +149,12 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
                        #genieeventweightpm1,
                        genieeventweightmultisim,
                        ##geniemodelseventweightmultisim,
-                       fluxeventweightmultisim,
+                       geniemodelseventweightmultisim,
+                       reinteventweightmultisim,
+                       fluxeventweightmultisim,		       
+		       #pidcalibration,
+		       dedxcalibration,
+		       pid,
                        UBXSec ] 
 
 ubxsec_mc_filters: [ tpcneutrinoidfilternumuccinc 
