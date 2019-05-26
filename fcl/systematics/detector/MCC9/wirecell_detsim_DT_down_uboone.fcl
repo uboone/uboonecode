@@ -1,4 +1,4 @@
-#include "wirecell_detsim_uboone.fcl"
+#include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimDTdown
 outputs.out1.fileName: "%ifb_%tc_detsim_DTdown.root"

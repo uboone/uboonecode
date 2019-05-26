@@ -1,4 +1,4 @@
-#include "wirecell_detsim_uboone.fcl"
+#include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimLifetime20ms
 outputs.out1.fileName: "%ifb_%tc_detsim_Lt20ms.root"
