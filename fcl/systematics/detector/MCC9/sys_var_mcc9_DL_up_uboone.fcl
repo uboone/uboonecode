@@ -1,1 +1,2 @@
 physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 9.725
+services.LArG4Parameters.LongitudinalDiffusion: 9.725e-9
