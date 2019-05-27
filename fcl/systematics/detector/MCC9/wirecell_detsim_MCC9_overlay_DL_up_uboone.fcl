@@ -1,6 +1,6 @@
-#include "wirecell_detsim_uboone.fcl"
+#include "wirecell_detsim_overlay_uboone.fcl"
 
-process_name: DetsimDLup
+process_name: DetsimOverlayDLup
 outputs.out1.fileName: "%ifb_%tc_detsim_DLup.root"
 
 #include "sys_var_mcc9_DL_up_uboone.fcl"

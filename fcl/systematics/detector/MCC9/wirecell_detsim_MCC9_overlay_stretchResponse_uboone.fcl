@@ -1,6 +1,6 @@
-#include "wirecell_detsim_uboone.fcl"
+#include "wirecell_detsim_overlay_uboone.fcl"
 
-process_name: DetsimStretch
+process_name: DetsimOverlayStretch
 outputs.out1.fileName: "%ifb_%tc_detsim_Stretch.root"
 
 physics.producers.driftWC.wcls_main.structs.sys_resp: true
