@@ -205,27 +205,12 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_muoncandidate_truth_py.resize(vsize, _default_value);
   slc_muoncandidate_truth_pz.resize(vsize, _default_value);
   
-  slc_protoncandidate_exists.resize(vsize, _default_value);
-  slc_protoncandidate_length.resize(vsize, _default_value);
-  slc_protoncandidate_phi.resize(vsize, _default_value);
-  slc_protoncandidate_theta.resize(vsize, _default_value);
-  slc_protoncandidate_contained.resize(vsize, _default_value);
-  slc_protoncandidate_mom_range.resize(vsize, _default_value);
-  slc_protoncandidate_mom_mcs.resize(vsize, _default_value);
-	    
-  slc_protoncandidate_truth_origin.resize(vsize, _default_value);
-  slc_protoncandidate_truth_pdg.resize(vsize, _default_value);
-  slc_protoncandidate_truth_time.resize(vsize, _default_value);
-  slc_protoncandidate_truth_startx.resize(vsize, _default_value);
-  slc_protoncandidate_truth_starty.resize(vsize, _default_value);
-  slc_protoncandidate_truth_startz.resize(vsize, _default_value);
-  slc_protoncandidate_truth_endx.resize(vsize, _default_value);
-  slc_protoncandidate_truth_endy.resize(vsize, _default_value);
-  slc_protoncandidate_truth_endz.resize(vsize, _default_value);
-  slc_protoncandidate_truth_px.resize(vsize, _default_value);
-  slc_protoncandidate_truth_py.resize(vsize, _default_value);
-  slc_protoncandidate_truth_pz.resize(vsize, _default_value);
-
+  pfp_is_proton_svm.resize(vsize, _default_value);
+  pfp_is_proton_chi2.resize(vsize, _default_value);
+  pfp_reco_contained.resize(vsize, _default_value);
+  pfp_reco_Mom_MCS_dir_corrected.resize(vsize, _default_value);
+  proton_indexes.resize(vsize, _default_value);
+  
   slc_acpt_outoftime.resize(vsize, _default_value);
   slc_crosses_top_boundary.resize(vsize, _default_value);
   slc_nuvtx_closetodeadregion_u.resize(vsize, _default_value);

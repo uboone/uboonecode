@@ -36,6 +36,8 @@ UBXSec: {
   ExtraSystEventWeightMultisimProducers:   ["geniemodelseventweightmultisim::UBXSec", "reinteventweightmultisim::UBXSec"]
   FluxEventWeightMultisimProducer: "fluxeventweightmultisim::UBXSec"
 
+  Chi2ProtonCut:	88
+
   FileType:                     "not_set"
 
   UseGENIEInfo:                 true

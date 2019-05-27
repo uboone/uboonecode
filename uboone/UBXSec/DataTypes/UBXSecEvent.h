@@ -206,26 +206,6 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   slc_muoncandidate_truth_py; ///< Momentum along Y of the true MCParticle matched to the reconstructed candidate muon track
   vector<double>   slc_muoncandidate_truth_pz; ///< Momentum along Z of the true MCParticle matched to the reconstructed candidate muon track
 
- vector<bool>     slc_protoncandidate_exists; ///< Is true if we found a proton candidate for the TPCObject
- vector<double>   slc_protoncandidate_length; ///< Track length for the proton candidate in the TPCObject
- vector<double>   slc_protoncandidate_phi; ///< Phi angle for the proton candidate in the TPCObject
- vector<double>   slc_protoncandidate_theta; ///< Cos(theta) for the proton candidate in the TPCObject
- vector<bool>     slc_protoncandidate_contained; ///< Is true if the proton candidate in the TPCObject is fully contained
- vector<double>   slc_protoncandidate_mom_range; ///< Momentum (by range) of the proton candidate in the TPCObject
- vector<double>   slc_protoncandidate_mom_mcs; ///< Momentum (by MCS) of the proton candidate in the TPCObject
- vector<double>   slc_protoncandidate_truth_origin; ///< Origin (0=Unknown, 1=Neutrino, 2=CosmicRay, 3=SuperNova, 4=SingleParticle) of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_pdg; ///< Pdg of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_time; ///< Start time of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_startx; ///< Start position along X of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_starty; ///< Start position along Y of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_startz; ///< Start position along Z of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_endx; ///< End position along X of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_endy; ///< End position along Y of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_endz; ///< End position along Z of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_px; ///< Momentum along X of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_py; ///< Momentum along Y of the true MCParticle matched to the reconstructed candidate proton track
- vector<double>   slc_protoncandidate_truth_pz; ///< Momentum along Z of the true MCParticle matched to the reconstructed candidate proton track
- 
  Int_t            nbeamfls; ///< Number of beam flashes in the event
   vector<double>   beamfls_time; ///< Time of the beam flash
   vector<double>   beamfls_pe; ///< PE of the beam flash
@@ -295,12 +275,12 @@ class UBXSecEvent /*: public TObject*/{
   std::vector<float> pfp_truth_Mass;  
 
   //Tracks from PFP variables
-  std::vector<int> pfp_reco_isprimary; //1 is true, 0 is false
+  std::vector<bool> pfp_reco_isprimary; //1 is true, 0 is false
   std::vector<int> pfp_reco_ndaughters;
-  vector<int> pfp_reco_ismuoncandidate; //1 is true, 0 is false
-  vector<int> pfp_reco_istrack; //int of whether Pandora thought it was a track 1 is true, 0 is false
+  vector<bool> pfp_reco_ismuoncandidate; //1 is true, 0 is false
+  vector<bool> pfp_reco_istrack; //int of whether Pandora thought it was a track 1 is true, 0 is false
   vector<int> pfp_reco_numtracks; //int of associated tracks from Pandora 
-  vector<int> pfp_reco_isshower; //int of whether Pandora thought it was a shower 1 is true, 0 is false
+  vector<bool> pfp_reco_isshower; //int of whether Pandora thought it was a shower 1 is true, 0 is false
   vector<int> pfp_reco_numshowers; //int of associated showers from Pandora 
   vector<int> pfp_reco_upflag; //value returned by MIPConsistency() function for the track
   vector<int> pfp_reco_Id; //the index of the track in the list of PFPs
@@ -337,6 +317,15 @@ class UBXSecEvent /*: public TObject*/{
   vector<vector<double>> pfp_reco_dEdx; //hit by hit dEdx for the track associated with the PFP in the collection
   vector<vector<double>> pfp_reco_dQdx; //hit by hit dQdx for the track associated with the PFP in the collection
   vector<vector<double>> pfp_reco_RR; //hit by hit RR for the track associated with the PFP in the collection
+
+  vector<bool> pfp_is_proton_svm; //is the track a proton based on SVM
+  vector<bool> pfp_is_proton_chi2; // is the track  a proton based on the chi2 cut
+  vector<bool> pfp_reco_contained; // is the track fully containted in the FV?
+  vector<double> pfp_reco_Mom_MCS_dir_corrected; // MCS evaluation of the momentum after the track direction is checked for correctness
+  vector<int> proton_indexes; //ordered indexes of the protons based on their measured momentum (0=leading proton, 1=second leading proton, 2=third leading proton...)
+  
+  int n_svm_protons = 0; //number of protons identified in the event based on the SVM cut
+  int n_chi2_protons = 0; //number of protons identified in the event based on the chi2 cut
 
   int _default_value = -9999; ///< Default value 
 

@@ -119,6 +119,7 @@
 #include <TParticlePDG.h>
 
 #include <fstream>
+#include <utility>
 
 
 namespace ubxsec {
@@ -128,6 +129,8 @@ namespace ubxsec {
     double z;
     double q;
   };
+
+  typedef std::pair<int, double> proton_pair;
 }
 
 
@@ -238,7 +241,7 @@ private:
 
   //Tracks from PFP variables
   std::string _particle_id_summer_2018_producer; ///The name of the producer for the Summer 2018 particle ID data products
-
+  double _chi2_proton_cut;
 
   // Constants
   const simb::Origin_t NEUTRINO_ORIGIN = simb::kBeamNeutrino;
@@ -392,6 +395,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   //Tracks from PFP variables
   _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSecAnaOnly");
+  _chi2_proton_cut                     = p.get<double>("Chi2ProtonCut", 88);
 
   _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
@@ -1488,10 +1492,6 @@ void UBXSec::produce(art::Event & e) {
 
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
 
-    // Declare here proton variables
-    bool proton_cand_exists = false;
-    art::Ptr<recob::Track> proton_candidate_track;
-
 
     // Muon Candidate
     _muon_finder.Reset();
@@ -1603,63 +1603,6 @@ void UBXSec::produce(art::Event & e) {
       if (_debug) std::cout << "[UBXSec] \t \t Mom by MCS:      " << ubxsec_event->slc_muoncandidate_mom_mcs[slice] << std::endl;
       if (_debug) std::cout << "[UBXSec] \t \t Fully Contained? " << (ubxsec_event->slc_muoncandidate_contained[slice] ? "YES" : "NO") << std::endl;
 
-      // Check if there is a proton candidate
-      // art::Ptr<recob::Track> candidate_track; 
-      // track_v_[slice] <- A vector of tracks for this interaction
-      
-      std::vector<art::Ptr<recob::Track>> tracks = track_v_v[slice];
-      // Require 2 tracks
-      if (tracks.size() == 2) {
-      
-	      // Loop over the tracks        
-      		for (auto t : tracks) {
-        
-			// Exclude the muon track, we want the other one
-                        if (t == candidate_track) continue;
-			// Get the calorimetry for the second track     
-                        std::vector<art::Ptr<anab::Calorimetry>> calos = calos_from_track.at(t.key());
-                        double dqdx_mean_secondtrack = UBXSecHelper::GetDqDxTruncatedMean(calos);
-      
-			// Now check the dQdx values are compatible with the proton hypothesis
-                         bool not_muon = !_muon_finder.MIPConsistency(dqdx_mean_secondtrack, t->Length());
-      
-			 if (not_muon) {
-      	                   proton_cand_exists = true;
-                           proton_candidate_track = t;
-			 }
-		}
-      }
-
- // Save proton information to the output tree
-        if (proton_cand_exists) {
-              bool fully_contained = _fiducial_volume.InFV(proton_candidate_track->Vertex(), proton_candidate_track->End());
-              ubxsec_event->slc_protoncandidate_exists[slice]    = true;
-              ubxsec_event->slc_protoncandidate_contained[slice] = fully_contained;
-              ubxsec_event->slc_protoncandidate_length[slice]    = proton_candidate_track->Length();
-              ubxsec_event->slc_protoncandidate_phi[slice]       = proton_candidate_track->Phi();
-              ubxsec_event->slc_protoncandidate_theta[slice]     = proton_candidate_track->Theta();
-              ubxsec_event->slc_protoncandidate_mom_range[slice] = _trk_mom_calculator.GetTrackMomentum(proton_candidate_track->Length(), 13);
-           // ubxsec_event->slc_protoncandidate_mom_mcs[slice]   = _trk_mom_calculator.GetMomentumMultiScatterLLHD(proton_candidate_track);
-	    
-              bool proton_track_direction_correct = (proton_candidate_track->Vertex() - temp).Mag() < (proton_candidate_track->End() - temp).Mag();
-              if (proton_track_direction_correct) {
- 	             ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_p_v.at(proton_candidate_track.key())->fwdMomentum();
-                  // std::cout << "Proton MCS LL: " << mcsfitresult_p_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
-              } else {
-                    ubxsec_event->slc_protoncandidate_mom_mcs[slice] = mcsfitresult_p_v.at(proton_candidate_track.key())->bwdMomentum();
-                 // std::cout << "Proton MCS LL: " << mcsfitresult_p_v.at(candidate_track.key())->bwdLogLikelihood() << std::endl;
-		 }
- 
-	} else {
-              ubxsec_event->slc_protoncandidate_exists[slice]    = false;
-              ubxsec_event->slc_protoncandidate_contained[slice] = false;
-              ubxsec_event->slc_protoncandidate_length[slice]    = -9999;
-              ubxsec_event->slc_protoncandidate_phi[slice]       = -9999;
-              ubxsec_event->slc_protoncandidate_theta[slice]     = -9999;
-              ubxsec_event->slc_protoncandidate_mom_range[slice] = -9999;
-              ubxsec_event->slc_protoncandidate_mom_mcs[slice]   = -9999;
-	}
-	
 
       // Try look at MCS for stopping muons
       bool down_track = candidate_track->Vertex().Y() > candidate_track->End().Y();
@@ -1844,20 +1787,7 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
         ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
         ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
-      } else if (these_tracks.at(0) == proton_candidate_track) {
-	ubxsec_event->slc_protoncandidate_truth_origin[slice] = mc_truth->Origin();
-	ubxsec_event->slc_protoncandidate_truth_pdg[slice]    = mcpars[0]->PdgCode();
-	ubxsec_event->slc_protoncandidate_truth_time[slice]   = mcpars[0]->T();
-	ubxsec_event->slc_protoncandidate_truth_startx[slice] = mcpars[0]->Vx();
-	ubxsec_event->slc_protoncandidate_truth_starty[slice] = mcpars[0]->Vy();
-	ubxsec_event->slc_protoncandidate_truth_startz[slice] = mcpars[0]->Vz();
-	ubxsec_event->slc_protoncandidate_truth_endx[slice]   = mcpars[0]->EndX();
-	ubxsec_event->slc_protoncandidate_truth_endy[slice]   = mcpars[0]->EndY();
-	ubxsec_event->slc_protoncandidate_truth_endz[slice]   = mcpars[0]->EndZ();
-	ubxsec_event->slc_protoncandidate_truth_px[slice]     = mcpars[0]->Px();
-	ubxsec_event->slc_protoncandidate_truth_py[slice]     = mcpars[0]->Py();
-	ubxsec_event->slc_protoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
-      }
+      } 
 
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
@@ -2110,6 +2040,10 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->num_pfp=0;
     ubxsec_event->num_pfp_tracks=0;
     ubxsec_event->num_pfp_showers=0;
+      
+    int n_svm_protons = 0;
+    int n_chi2_protons = 0;
+    std::map<int,double> ordered_protons;
     
     for (auto pfp : pfp_v_v[slice_index]) {
 
@@ -2123,10 +2057,10 @@ void UBXSec::produce(art::Event & e) {
       ubxsec_event->num_pfp++;
       if(lar_pandora::LArPandoraHelper::IsTrack(pfp)) {ubxsec_event->num_pfp_tracks++;}
       if(lar_pandora::LArPandoraHelper::IsShower(pfp)) {ubxsec_event->num_pfp_showers++;}
-      ubxsec_event->pfp_reco_ismuoncandidate.emplace_back(int(pfp_is_muon_candidate));
-      ubxsec_event->pfp_reco_istrack.emplace_back(int(lar_pandora::LArPandoraHelper::IsTrack(pfp)));
-      ubxsec_event->pfp_reco_isshower.emplace_back(int(lar_pandora::LArPandoraHelper::IsShower(pfp)));
-      ubxsec_event->pfp_reco_isprimary.emplace_back(int(pfp->IsPrimary()));
+      ubxsec_event->pfp_reco_ismuoncandidate.emplace_back(bool(pfp_is_muon_candidate));
+      ubxsec_event->pfp_reco_istrack.emplace_back(bool(lar_pandora::LArPandoraHelper::IsTrack(pfp)));
+      ubxsec_event->pfp_reco_isshower.emplace_back(bool(lar_pandora::LArPandoraHelper::IsShower(pfp)));
+      ubxsec_event->pfp_reco_isprimary.emplace_back(bool(pfp->IsPrimary()));
       const std::vector<size_t> &daughterIDs=pfp->Daughters();
       ubxsec_event->pfp_reco_ndaughters.emplace_back(int(daughterIDs.size()));
       ubxsec_event->pfp_reco_numtracks.emplace_back((tracks_from_pfp.at(pfp.key())).size());
@@ -2180,7 +2114,7 @@ void UBXSec::produce(art::Event & e) {
 	  //FillPFPTruthDefaults(ubxsec_event);
       }
 
-      if ( !(lar_pandora::LArPandoraHelper::IsTrack(pfp)) && !(lar_pandora::LArPandoraHelper::IsShower(pfp)) ) { //check if the PFParticle is considered neither a shower or a track
+      if ( !(lar_pandora::LArPandoraHelper::IsTrack(pfp)) && !(lar_pandora::LArPandoraHelper::IsShower(pfp)) && !(lar_pandora::LArPandoraHelper::IsNeutrino(pfp)) ) { //check if the PFParticle is considered neither a shower or a track
 	std::cout<<"[UBXSecCC1mNp] PFParticle: " << pfp->Self() << " is considered neither a track and a shower. WTF???" <<std::endl;
 	std::cout << "[UBXSecCC1mNp] PFParticle that is neither track nor shower has pdg code " << pfp->PdgCode() << std::endl;
 	std::cout<<"[UBXSecCC1mNp] That's crazy and gonna just fill CC1mNp ntuples varialbes with default values." <<std::endl;
@@ -2217,7 +2151,8 @@ void UBXSec::produce(art::Event & e) {
 	  ubxsec_event->pfp_reco_endz.emplace_back(showerPos_pfp.Z()+TMath::Cos(showerDirection_pfp.Theta())*shower_pfp->Length());
 	}
       }
-      
+     
+
       if (lar_pandora::LArPandoraHelper::IsTrack(pfp)) { //if the Pandora thinks this is a track, then fill the track variables
 
 	if ( (tracks_from_pfp.at(pfp.key())).size()==0) { //first check to make sure that there is a non-zero list of tracks associated with the PFP
@@ -2378,11 +2313,66 @@ void UBXSec::produce(art::Event & e) {
 	    
 	  } //end loop over pids_summer2018
 
+      /*check if candidate track is a proton according to SVM)*/
+ 	// Get the calorimetry for the second track     
+        std::vector<art::Ptr<anab::Calorimetry>> calos = calos_from_track.at(track_pfp.key());
+        double dqdx_mean_secondtrack = UBXSecHelper::GetDqDxTruncatedMean(calos);
+      
+	// Now check the dQdx values are compatible with the proton hypothesis
+        bool not_muon = !_muon_finder.MIPConsistency(dqdx_mean_secondtrack, track_pfp->Length());
+	ubxsec_event->pfp_is_proton_svm.emplace_back( not_muon );
+	if (not_muon) n_svm_protons++;
+
+      /*check if candidate track is a proton according to chi2)*/
+	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut) ;
+	ubxsec_event->pfp_is_proton_chi2.emplace_back( is_proton );
+
+        bool fully_contained = _fiducial_volume.InFV(track_pfp->Vertex(), track_pfp->End());
+        ubxsec_event->pfp_reco_contained.emplace_back(fully_contained);
+
+        TVector3 temp2( ubxsec_event->slc_nuvtx_x[slice_index], ubxsec_event->slc_nuvtx_y[slice_index], ubxsec_event->slc_nuvtx_z[slice_index]);
+        bool track_direction_correct = (track_pfp->Vertex() - temp2).Mag() < (track_pfp->End() - temp2).Mag();
+              if (track_direction_correct) {
+ 	             ubxsec_event->pfp_reco_Mom_MCS_dir_corrected.emplace_back(mcsfitresult_p_v.at(track_pfp.key())->fwdMomentum() );
+                  // std::cout << "Proton MCS LL: " << mcsfitresult_p_v.at(candidate_track.key())->fwdLogLikelihood() << std::endl;
+              } else {
+                    ubxsec_event->pfp_reco_Mom_MCS_dir_corrected.emplace_back(mcsfitresult_p_v.at(track_pfp.key())->bwdMomentum());
+	      }
+
+	if (is_proton) {
+		n_chi2_protons++;
+		if (fully_contained)
+			ordered_protons[ ubxsec_event->pfp_reco_chi2_proton.size()-1 ] = ubxsec_event->pfp_reco_Mom_proton.at( ubxsec_event->pfp_reco_chi2_proton.size()-1 );
+		else
+			ordered_protons[ ubxsec_event->pfp_reco_chi2_proton.size()-1 ] = ubxsec_event->pfp_reco_Mom_MCS_dir_corrected.at ( ubxsec_event->pfp_reco_chi2_proton.size()-1 );
+	}
+	
 	} //end loop over tracks from pfp
 
       } //end conditional of iftrack
 	
     } //end loop over pfparticles  
+
+	ubxsec_event->n_svm_protons = n_svm_protons;
+	ubxsec_event->n_chi2_protons = n_chi2_protons;
+
+	//order the proton map based on the momentum (value rather than key)
+	//create a empty vector of pairs
+	std::vector<::ubxsec::proton_pair> vec;
+	// copy key-value pairs from the map to the vector
+	std::copy( ordered_protons.begin(), ordered_protons.end(), std::back_inserter<std::vector<::ubxsec::proton_pair>>(vec));
+	
+	// sort the vector by decreasing order of its pair's second value
+	// if second value are equal, order by the pair's first value
+	std::sort(vec.begin(), vec.end(), [](const ::ubxsec::proton_pair& l, const ::ubxsec::proton_pair& r) {
+	  if (l.second != r.second)
+	  	return l.second > r.second;
+
+	return l.first < r.first;
+	} );
+
+	for ( unsigned jj=0; jj<vec.size(); jj++)
+		ubxsec_event->proton_indexes.emplace_back( vec.at(jj).first );
     
 
   // *********************
