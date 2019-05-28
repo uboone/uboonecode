@@ -228,6 +228,11 @@ microboone_reco_data_filters:
     opfiltercommonbnb:                @local::microboone_common_op_precut_bnb
     opfiltercommonext:                @local::microboone_common_op_precut_ext
 
+    #here are the numi common filters
+    dlpmtprecutsnumi:                  @local::microboone_common_op_precut_numi_mc
+    opfiltercommonnumi:                @local::microboone_common_op_precut_numi
+    opfiltercommonextnumi:             @local::microboone_common_op_precut_numi_ext
+
     # Beam data quality filter.
     beamdataquality:                  @local::beam_data_quality
 }
