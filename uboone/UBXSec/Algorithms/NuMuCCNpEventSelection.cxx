@@ -102,8 +102,6 @@ namespace ubana {
     }
     
     
-      if (_verbose) std::cout << "[NuMuCCNpEventSelection] Number of tracks in the event is " << number << "." << std::endl;
-    
     // ************ 
     // All protons contained in FV
     // ************
@@ -112,12 +110,12 @@ namespace ubana {
     
     // loop over all the proton candidates and select the events with all the proton candidates 
     for( size_t n_trk_pfp=0; n_trk_pfp<_ubxsec_event->pfp_reco_startx.size(); n_trk_pfp++){
-       if (_ubxsec_event->pfp_reco_ismuoncandidate[n_trk_pfp] == 1) continue;
+       if ( _ubxsec_event->pfp_reco_ismuoncandidate[n_trk_pfp] ) continue;
        
        if(_showerastrack){
          if( _ubxsec_event->pfp_reco_numtracks[n_trk_pfp] !=1 ) continue;
        } else{
-         if( _ubxsec_event->pfp_reco_istrack[n_trk_pfp] !=1 ) continue;  
+         if( !_ubxsec_event->pfp_reco_istrack[n_trk_pfp] ) continue;  
        }
        if(!inCV(_ubxsec_event->pfp_reco_startx[n_trk_pfp], _ubxsec_event->pfp_reco_starty[n_trk_pfp], _ubxsec_event->pfp_reco_startz[n_trk_pfp]) ||
            !inCV(_ubxsec_event->pfp_reco_endx[n_trk_pfp],   _ubxsec_event->pfp_reco_endy[n_trk_pfp],   _ubxsec_event->pfp_reco_endz[n_trk_pfp]))   {
@@ -173,7 +171,7 @@ namespace ubana {
       	return false;
     
     } else {
-	    failure_map["uncontained_protons"] = true;
+	    failure_map["low_collection_hits"] = true;
     }
    
     
