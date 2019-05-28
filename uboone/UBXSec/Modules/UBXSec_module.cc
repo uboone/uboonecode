@@ -2222,14 +2222,14 @@ void UBXSec::produce(art::Event & e) {
 	    fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
 	    std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
 	    for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
-	      std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
 	      anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
-	      std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
-	      std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
-	      std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
-	      std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
-	      std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
-	      std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	   //   std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
+	    //  std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
 	      
 	      if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
 		
@@ -2565,6 +2565,12 @@ void UBXSec::FillPFPRecoTrackDefaults()
   ubxsec_event->pfp_reco_bragg_proton.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_bragg_ratio.emplace_back(ubxsec_event->_default_value);
+  
+  ubxsec_event->pfp_is_proton_svm.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_is_proton_chi2.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_contained.emplace_back(ubxsec_event->_default_value);
+  ubxsec_event->pfp_reco_Mom_MCS_dir_corrected.emplace_back(ubxsec_event->_default_value);
+
 }
 
 //_______________________________________________________________________________________
