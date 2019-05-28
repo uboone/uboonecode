@@ -98,6 +98,7 @@
       <point coord="det"> -5, 2, -35 </point>
       <point coord="det"> 5, -5, 20  </point>
     </window>
-    <enumax> 18. 1.05 </enumax> 
+    <enumax> 18. 1.05 </enumax>
+    <reuse> 10 </reuse>
   </param_set>
 </gnumi_config>

@@ -29,7 +29,7 @@ physics:
 {
   producers:
   {   
-    generator: @local::microboone_genie_simple_numi
+    #generator: @local::microboone_genie_simple_numi
     rns: { module_type: "RandomNumberSaver" }
   }
 
@@ -56,11 +56,19 @@ outputs:
 #do not inherit clock configuration from the data
 services.DetectorClocksService.InheritClockConfig: false
 
-#use generator settings from prodgenie_bnb_nu_uboone.fcl
-physics.producers.generator.GlobalTimeOffset: 4687.5
-physics.producers.generator.RandomTimeOffset: 9600.
-physics.producers.generator.TopVolume: "volCryostat"
-physics.producers.generator.BeamName: "numi"
+# dk2nu flux generation config
+physics.producers.generator:                    @local::standard_genie
+physics.producers.generator.POTPerSpill:        3e13
+physics.producers.generator.EventsPerSpill:     0
+physics.producers.generator.GlobalTimeOffset:   4687.5
+physics.producers.generator.RandomTimeOffset:   9600.
+physics.producers.generator.TopVolume:          "volCryostat"
+physics.producers.generator.BeamName:           "numi"
+physics.producers.generator.EventGeneratorList: "Default+CCMEC+NCMEC"
+physics.producers.generator.FluxType:           "dk2nu"
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
+physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
+physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 
 physics.producers.generator.FluxCopyMethod: "IFDH"
 

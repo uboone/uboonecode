@@ -6,7 +6,7 @@ process_name: OverlayRecoStage2
 
 services.DetectorClocksService.InheritClockConfig:  false
 services.TFileService.fileName: "reco_stage_2_hist.root"
-services.DetectorClocksService.InheritClockConfig:  false
+services.FileCatalogMetadata.fileType: "overlay"
 
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
@@ -23,7 +23,10 @@ physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2_numi.root"
 outputs.out1.dataTier:          "reconstructed"
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
+outputs.out1.outputCommands:    [ "keep *_*_*_*",
+                                  "drop *_*_pandoraAllOutcomesTrack_*",
+                                  "drop *_*_pandoraAllOutcomesShower_*" ]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
 
 microboone_tfile_metadata:
 {
@@ -32,6 +35,9 @@ microboone_tfile_metadata:
   dataTier:              ["root-tuple", "pandora_debug"]
   fileFormat:            ["root", "pndr"]
 }
+
+physics.producers.pandoraCrtHitMatch.data_label_CRThit: "mixer"
+physics.producers.crttzero.data_label:                  "mixer"
 
 # in bnb gen: 3125. + 1600
 # in bnb reco: 3.57 -- 5.25 
