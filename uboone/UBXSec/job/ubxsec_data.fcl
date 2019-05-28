@@ -125,11 +125,7 @@ ubxsec_data_producers: [ #simpleFlashBeam,
                          pandoraNucalipid,
                          pandoraNuMCSMu,
                          pandoraNuMCSPi,
-<<<<<<< HEAD
-                         pandoraNuMCSP,
-=======
                          pandoraNuMCSP, 
->>>>>>> 5b938606f59a99861f5eb623ce46729a3dfb5278
                          RecoTrueMatcher,
                          TPCObjectMaker,
                          pandoraNuGeoCosmicTag,
@@ -195,13 +191,8 @@ ubxsec_data_reco.pandoraNuMCSMu.inputs.inputLabel:                 "pandoraNu::U
 ubxsec_data_reco.pandoraNuMCSPi.inputs.inputLabel:                 "pandoraNu::UBXSec"
 ubxsec_data_reco.pandoraNuMCSPi.fitter.pIdHypothesis:              211
 
-<<<<<<< HEAD
-ubxsec_data_reco.pandoraNuMCSP.inputs.inputLabel:                 "pandoraNu::UBXSec"
-ubxsec_data_reco.pandoraNuMCSP.fitter.pIdHypothesis:              2212
-=======
 ubxsec_data_reco.pandoraNuMCSP.inputs.inputLabel:                  "pandoraNu::UBXSec"
 ubxsec_data_reco.pandoraNuMCSP.fitter.pIdHypothesis:               2212
->>>>>>> 5b938606f59a99861f5eb623ce46729a3dfb5278
 
 # Set FlashMatching properties
 ubxsec_data_flashmatch.NeutrinoFlashMatch.TrackModule:             "pandoraNu::UBXSec"
