@@ -102,6 +102,8 @@ namespace ubana {
     }
     
     
+      if (_verbose) std::cout << "[NuMuCCNpEventSelection] Number of tracks in the event is " << number << "." << std::endl;
+    
     // ************ 
     // All protons contained in FV
     // ************
@@ -140,15 +142,15 @@ namespace ubana {
     float temp_length=-999.0;
     
     for(size_t np=0; np<_ubxsec_event->pfp_reco_length.size(); np++){
-        if(_ubxsec_event->pfp_reco_ismuoncandidate[np]==1)  continue;
-        if(_ubxsec_event->pfp_reco_istrack[np]==0 && _ubxsec_event->pfp_reco_isshower[np] ==0) continue;      
+        if( _ubxsec_event->pfp_reco_ismuoncandidate[np] )  continue;
+        if( !_ubxsec_event->pfp_reco_istrack[np] && !_ubxsec_event->pfp_reco_isshower[np] ) continue;      
         
         if(_showerastrack){
            if(_ubxsec_event->pfp_reco_numtracks[np] !=1) continue;
         } else {
-           if(_ubxsec_event->pfp_reco_istrack[np]==0) continue; 
+           if( !_ubxsec_event->pfp_reco_istrack[np] ) continue; 
         }
-        if(_ubxsec_event->pfp_reco_length[np]> temp_length) {
+        if(_ubxsec_event->pfp_reco_length[np] > temp_length) {
            temp_length=_ubxsec_event->pfp_reco_length[np];
            pind=np;
         }
@@ -164,7 +166,7 @@ namespace ubana {
 	    failure_map["no_protons"] = true;
     }
    
-    if( pind>-999 && _ubxsec_event->pfp_reco_dEdx[pind].size()< _collection_hits ) { //_collection_hits = 5
+    if( _ubxsec_event->pfp_reco_dEdx[pind].size()< _collection_hits ) { //_collection_hits = 5
 	    reason = "low_collection_hits";
       
       if (_verbose) std::cout << "[NuMuCCNpEventSelection] Selection FAILED. Number of collection hits is " << _ubxsec_event->pfp_reco_dEdx[pind].size()  << " < " << _collection_hits << std::endl;
@@ -197,18 +199,20 @@ namespace ubana {
      
     Int_t npcand_fail_chi2=0;
     for(size_t ntrk=0; ntrk<_ubxsec_event->pfp_reco_chi2_proton.size(); ntrk++){
-        if(_ubxsec_event->pfp_reco_ismuoncandidate[ntrk]==1) continue;
-        if(_ubxsec_event->pfp_reco_istrack[ntrk]==0 && _ubxsec_event->pfp_reco_isshower[ntrk]==0) continue;
+        if( _ubxsec_event->pfp_reco_ismuoncandidate[ntrk] ) continue;
+        if( !_ubxsec_event->pfp_reco_istrack[ntrk] && !_ubxsec_event->pfp_reco_isshower[ntrk]) continue;
         
 	if(_showerastrack){
           if(_ubxsec_event->pfp_reco_numtracks[ntrk] !=1) continue;
         } else {
-          if(_ubxsec_event->pfp_reco_istrack[ntrk]==0) continue;
+          if( !_ubxsec_event->pfp_reco_istrack[ntrk] ) continue;
         }
         
-	if(_ubxsec_event->pfp_reco_dEdx[ntrk].size()>=_collection_hits && _ubxsec_event->pfp_reco_chi2_proton[ntrk]>_chi2_cut) {npcand_fail_chi2++;} //chi2_cut=88
+	if(_ubxsec_event->pfp_reco_dEdx[ntrk].size()>=_collection_hits && _ubxsec_event->pfp_reco_chi2_proton[ntrk]>_chi2_cut) {
+		npcand_fail_chi2++;
+	 	if (_verbose) std::cout << "[NuMuCCNpEventSelection] Chi2 is " << _ubxsec_event->pfp_reco_chi2_proton[ntrk] << std::endl;
+	} //chi2_cut=88
     }
-	    failure_map["low_collection_hits"] = false;
     
     if( npcand_fail_chi2>0 ) { 
 	    reason = "fail_chi2";

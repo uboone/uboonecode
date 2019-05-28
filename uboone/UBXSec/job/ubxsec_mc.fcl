@@ -160,7 +160,10 @@ ubxsec_mc_producers: [ pandoraCosmicTPCObj,
 ubxsec_mc_filters: [ tpcneutrinoidfilternumuccinc 
                    ]
 
-ubxsec_mc_producers_anaonly: [ UBXSec
+ubxsec_mc_producers_anaonly: [ 
+		       dedxcalibration,
+		       pid,
+		       UBXSec
                              ]
 
 ubxsec_mc_analyzers: [ SimpleAna, 

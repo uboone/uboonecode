@@ -124,8 +124,6 @@ void UBXSecEvent::Init()
   num_pfp_tracks = _default_value;
   num_pfp_showers = _default_value;
 
-
-
   ResizeVectors(0);
   
   ResizeCC1mNpPFPTrackVectors(0);
@@ -204,12 +202,6 @@ void UBXSecEvent::ResizeVectors(int vsize) {
   slc_muoncandidate_truth_px.resize(vsize, _default_value);
   slc_muoncandidate_truth_py.resize(vsize, _default_value);
   slc_muoncandidate_truth_pz.resize(vsize, _default_value);
-  
-  pfp_is_proton_svm.resize(vsize, _default_value);
-  pfp_is_proton_chi2.resize(vsize, _default_value);
-  pfp_reco_contained.resize(vsize, _default_value);
-  pfp_reco_Mom_MCS_dir_corrected.resize(vsize, _default_value);
-  proton_indexes.resize(vsize, _default_value);
   
   slc_acpt_outoftime.resize(vsize, _default_value);
   slc_crosses_top_boundary.resize(vsize, _default_value);
@@ -307,7 +299,12 @@ void UBXSecEvent::ResizeCC1mNpPFPTrackVectors(int vsize) {
   pfp_reco_dEdx.resize(vsize); //hit by hit dEdx for the track associated with the PFP in the collection
   pfp_reco_dQdx.resize(vsize); //hit by hit dQdx for the track associated with the PFP in the collection
   pfp_reco_RR.resize(vsize); //hit by hit RR for the track associated with the PFP in the collection
-
+ 
+  pfp_is_proton_svm.resize(vsize, _default_value);
+  pfp_is_proton_chi2.resize(vsize, _default_value);
+  pfp_reco_contained.resize(vsize, _default_value);
+  pfp_reco_Mom_MCS_dir_corrected.resize(vsize, _default_value);
+  proton_indexes.resize(vsize, _default_value);
 }
 
 void UBXSecEvent::ResizeGenieTruthVectors(int vsize) {

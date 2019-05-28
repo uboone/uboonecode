@@ -2044,6 +2044,7 @@ void UBXSec::produce(art::Event & e) {
     int n_svm_protons = 0;
     int n_chi2_protons = 0;
     std::map<int,double> ordered_protons;
+    ordered_protons.clear();
     
     for (auto pfp : pfp_v_v[slice_index]) {
 
