@@ -324,8 +324,8 @@ class UBXSecEvent /*: public TObject*/{
   vector<double> pfp_reco_Mom_MCS_dir_corrected; // MCS evaluation of the momentum after the track direction is checked for correctness
   vector<int> proton_indexes; //ordered indexes of the protons based on their measured momentum (0=leading proton, 1=second leading proton, 2=third leading proton...)
   
-  int n_svm_protons = 0; //number of protons identified in the event based on the SVM cut
-  int n_chi2_protons = 0; //number of protons identified in the event based on the chi2 cut
+  int n_svm_protons; //number of protons identified in the event based on the SVM cut
+  int n_chi2_protons; //number of protons identified in the event based on the chi2 cut
 
   int _default_value = -9999; ///< Default value 
 

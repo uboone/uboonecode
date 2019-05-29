@@ -2374,7 +2374,7 @@ void UBXSec::produce(art::Event & e) {
 
 	for ( unsigned jj=0; jj<vec.size(); jj++)
 		ubxsec_event->proton_indexes.emplace_back( vec.at(jj).first );
-    
+
 
   // *********************
   // Event Selection Np

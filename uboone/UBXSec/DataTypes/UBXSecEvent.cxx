@@ -88,6 +88,8 @@ void UBXSecEvent::Init()
   is_selected_np = false;
   selected_slice_np = _default_value;
 
+  n_svm_protons = _default_value;
+  n_chi2_protons = _default_value;
 
   sce_corr_x = _default_value;
   sce_corr_y = _default_value;
