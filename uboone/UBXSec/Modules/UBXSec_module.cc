@@ -2380,7 +2380,7 @@ void UBXSec::produce(art::Event & e) {
   // Event Selection Np
   // *********************
   
-  int slice_index_np = -999;
+  int slice_index_np = -9999;
   bool is_selected_np = false;
   std::map<std::string,bool> failure_map_np;
   std::string reason_np = "no_failure";

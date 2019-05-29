@@ -77,7 +77,7 @@ namespace ubana {
       throw std::exception();
     }
 
-    slice_index = -1;
+    slice_index = _ubxsec_event->selected_slice;
     std::string reason = "no_failure";
 
     // ************ 
