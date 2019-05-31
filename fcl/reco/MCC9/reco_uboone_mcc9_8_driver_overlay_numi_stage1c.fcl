@@ -15,6 +15,7 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 services.FileCatalogMetadata.fileType: "overlay"
 
 physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonextnumi
+physics.filters.opfiltercommon.OpHitProducer: "ophitBeam"
 
 physics.producers.mchitfinder:  @local::standard_mchitfinder
 

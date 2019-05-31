@@ -30,7 +30,7 @@ physics:
 {
   producers:
   {   
-    #generator: @local::microboone_genie_simple_numi
+    generator: @local::standard_genie
     #generator: @local::microboone_genie_uniform_flux_cc
     rns: { module_type: "RandomNumberSaver" }
   }
