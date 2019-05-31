@@ -245,9 +245,12 @@ void ExecuteCompression::produce(art::Event & e)
     }
     int badROIs = 0;
 
+    //now for this is retrieving the data from the RawDigits for the give endTick and
+    //start Ticks
     for (unsigned int waveformROI = 0; waveformROI<outTicks.size(); waveformROI++)
     {
-        std::vector<short> wvform;
+        std::vector<short> wvform;//where we store our ADC
+	//troubleshooting
         if ((outTicks[waveformROI].second - outTicks[waveformROI].first)<0) {
           std::cout << "waveform difference is < 0" << std::endl;
           assert(0);
@@ -258,16 +261,18 @@ void ExecuteCompression::produce(art::Event & e)
           std::cout << "waveformROI sz=" << outTicks.size() << std::endl;
           assert(0);
         }
-
+	
         wvform.reserve(outTicks[waveformROI].second - outTicks[waveformROI].first);
 
 
         
-
+	//
 	 for (short iROI = outTicks[waveformROI].first; iROI<outTicks[waveformROI].second; iROI++)
         {
+	   //make sure that we don't have a 1tick waveform!
            if (outTicks[waveformROI].second-outTicks[waveformROI].first > 0)
            {
+		//making sure our time ticks are within the correct bounds
                 if ((int)iROI >= (int)adc.size())
                  {
                   std::cout << "access invalid element @" << iROI << std::endl;
@@ -275,11 +280,13 @@ void ExecuteCompression::produce(art::Event & e)
                   assert(0);
                  }
                 int signal = adc[iROI];
-                if(_flipBit)
+		//injecting flipping bits to our ROIs if needed 
+               if(_flipBit)
                 {
                   InjectFlipBit(chan,signal);
 		  if (_debug)
 		  {
+		    //this will allow you to keep track of the flipping bits that were injected if needed
                     if (signal!= adc[iROI])
                     {
                         std::cout <<"FLIP BIT of " << signal-adc[iROI] << " channel " << chan << " timeTick " << iROI <<std::endl;
@@ -292,15 +299,15 @@ void ExecuteCompression::produce(art::Event & e)
                 //wvform.push_back(adc[iROI]);
        
              }
-	else
+	else //1 tick ROIs are not fun!
            {
                 badROIs++;
            }
         }
 
         if(_debug){std:: cout<< outTicks[waveformROI].first << "," << wvform.size() << "," << wf_ROIs.size() << std::endl;}
-        wf_ROIs.add_range( outTicks[waveformROI].first, std::move(wvform) );
-
+        wf_ROIs.add_range( outTicks[waveformROI].first, std::move(wvform) );//now we add all the ROIs into a lar::sparse vector
+	
 
     }
 
@@ -336,8 +343,10 @@ void ExecuteCompression::produce(art::Event & e)
     if (wf_ROIs.size() == 0) continue;
 
 //resize the sparse vector to have the same nominal length as the Raw::Digit
-    recob::Wire wire(std::move(wf_ROIs), chan, _geom->View(chan) );
+      wf_ROIs.resize(adc.size());
+      recob::Wire wire(std::move(wf_ROIs), chan, _geom->View(chan) );
 
+   
     //wire_v->emplace_back( recob::WireCreator(std::move(wf_ROIs),*rawdigit).move() );
     
     wire_v->emplace_back(wire);
