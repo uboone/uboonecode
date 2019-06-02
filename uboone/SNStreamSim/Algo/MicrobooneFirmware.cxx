@@ -12,12 +12,22 @@ namespace compress {
     : CompressionAlgoBase()
   {
 
-    _thresh = std::vector<int>(3,0.);
+    //_thresh = std::vector<int>(3,0.);
+    _thresh = std::vector<int>(8256,0.);
     _pol    = std::vector<int>(3,0);
     std::vector<std::vector<int> > tmp(3,std::vector<int>(2,0));
     _buffer = tmp;
+    double _plane = 0;
+    double _ts = 0; 
+    int _loop = 0; 
+    double _pedestalBaseline = 0; 
     
-    std::vector<int> fCompressThresholds   = pset.get< std::vector<int> > ("CompressThresholds");
+    //static baseline
+    _baseln = std::vector<int>(8256,0);
+
+
+    
+    std::string fCompressThresholds        = pset.get< std::string > ("CompressThresholds");
     std::vector<int> fPolarity             = pset.get< std::vector<int> > ("Polarity");
     _maxADC                                = pset.get< int >              ("MaxADC");
     std::vector<int> fPlaneBuffers         = pset.get< std::vector<int> > ("PlaneBuffers");
@@ -25,9 +35,28 @@ namespace compress {
     _deltaB                                = pset.get< int >              ("BaselineThreshold");
     _deltaV                                = pset.get< int >              ("VarianceThreshold");
     bool fDebug                            = pset.get< bool >             ("Debug");
+    bool fstatBas			   = pset.get< bool > 		  ("StaticBaseline");
+   // std::vector<int> fBaseLn               = pset.get< std::vector<int> > ("Baselines");
+   //std::vector<int> fFlipProb              = pset.get< std::vector<int> > ("FlipProbability");
+   //std::string flipPDF                     = pset.get< std::string > ("FlipDensityFuntionRoot");
+   //std::string uPlanekey                   = pset.get< std::string > ("RootKeyPlaneU");
+   //std::string vPlanekey                   = pset.get< std::string > ("RootKeyPlaneV");
+   //std::string yPlanekey                   = pset.get< std::string > ("RootKeyPlaneY");
+
 
     // the input for _deltaB is in ADC but the value used in the algorithm is in ADC^2:
     _deltaB *= _deltaB;
+
+
+    if (fstatBas)
+   {
+      //  SetStaticBaseline(fBaseLn[0],fBaseLn[1],fBaseLn[2]);
+        std::cout << "STATIC BASELINE" << std::endl;
+   }
+
+//this converts the input file name to a ifstream data type
+    std::ifstream _stream(fCompressThresholds);
+
 
     if (fPlaneBuffers.size() != 6) {
       throw std::runtime_error("ERROR in MicrobooneFirmware: incorrect size of input for plane-buffer values.");
@@ -42,13 +71,33 @@ namespace compress {
 
     SetPolarity(fPolarity[0], fPolarity[1], fPolarity[2]);
 
+
+/*
     if (fCompressThresholds.size() != 3) {
       throw std::runtime_error("ERROR in MicrobooneFirmware: incorrect size of input for CompressThresholds values.");
     }
 
     SetCompressThresh(fCompressThresholds[0], fCompressThresholds[1], fCompressThresholds[2]);
+*/
+
+   SetCompressThresh(_stream,_plane,_ts,_loop,fstatBas,_pedestalBaseline);
+    if (_thresh.size() != 8256) {
+        std::cout << _thresh.size() << " SHIT" << std::endl;
+      throw std::runtime_error("ERROR in MicrobooneFirmware: incorrect size of input for CompressThresholds values.");
+   }
+
+    //check if static baseline is properly allocated
+    if(fstatBas)
+   {
+        if (_baseln[0] == 0)
+        {
+          throw std::runtime_error("ERROR in MicrobooneFirmware: incorrect allocation of the static baseline values.");
+        }
+   }
 
     SetDebug(fDebug);
+    SetStatBas(fstatBas);
+   std::cout <<" DONE SETTING VALUES" << std::endl;
 
   }
 
@@ -67,8 +116,8 @@ namespace compress {
   void MicrobooneFirmware::ApplyCompression(const std::vector<short> &waveform, const int mode, const unsigned int ch){
     
     // iterator to the beginning and end of the waveform
-    _begin = waveform.begin();
-    _end   = waveform.end();
+    _begin = waveform.cbegin();
+    _end   = waveform.cend();
     
     std::vector<short> outputwf;
     _baselines.clear();
@@ -92,11 +141,12 @@ namespace compress {
     std::pair<tick,tick> thisRange; 
     
     _pl = mode;
-
+    _channel = ch;
     if (_debug) { std::cout << "\t algo operating on wf of size " << waveform.size() << std::endl; }
+    
+    //std::cout << " CURRENTLY  Starting Compression" << std::endl;
 
     for (size_t n = 0; n < waveform.size(); n++) {
-
       _thisTick = _begin + n;
 
       // have we reached the end of a segment?
@@ -198,14 +248,24 @@ namespace compress {
 
 
 	// Determine if the 3 blocks are quiet enough to update the baseline
-	if ( ( (_baseline[2] - _baseline[1]) * (_baseline[2] - _baseline[1]) < _deltaB ) && 
+	//needs to be overriden when we have static baselines
+	if (!( _statBas))
+	{
+	 if ( ( (_baseline[2] - _baseline[1]) * (_baseline[2] - _baseline[1]) < _deltaB ) && 
 	     ( (_baseline[2] - _baseline[0]) * (_baseline[2] - _baseline[0]) < _deltaB ) && 
 	     ( (_baseline[1] - _baseline[0]) * (_baseline[1] - _baseline[0]) < _deltaB ) &&
 	     ( (_variance[2] - _variance[1]) * (_variance[2] - _variance[1]) < _deltaV ) &&
 	     ( (_variance[2] - _variance[0]) * (_variance[2] - _variance[0]) < _deltaV ) &&
-	     ( (_variance[1] - _variance[0]) * (_variance[1] - _variance[0]) < _deltaV ) ){
+	     ( (_variance[1] - _variance[0]) * (_variance[1] - _variance[0]) < _deltaV ) )
+	  {
 	  _baselineMap[ch] = _baseline[1];
 	  if (_debug) std::cout << "Baseline updated to value " << _baselineMap[ch] << std::endl;
+	  
+	  }
+	}
+	if (_statBas)
+	{
+	 _baselineMap[ch] = _baseln[_channel];
 	}
       }// if we hit the end of a new block
 
@@ -220,6 +280,12 @@ namespace compress {
       if ( (_baselineMap.find(ch) != _baselineMap.end()) ){
 	
 	double base = _baselineMap[ch];
+	
+	if (_statBas)
+        {
+            base = _baseln[_channel];
+        }
+
 	
 	// reset maxima
 	_max = 0;
@@ -307,24 +373,24 @@ namespace compress {
 
         //if positive threshold
 	  if (_thresh[_pl] >= 0){
-          if (thisADC > base + _thresh[_pl])
+          if (thisADC > base + _thresh[_channel])
     	return true;
        }
 
 	// if negative threshold
         else{
-          if (thisADC < base + _thresh[_pl])
+          if (thisADC < base + _thresh[_channel])
     	return true;
         }
 
 	  }
 
     else { //bipolar setting set at command line
-	  if  (thisADC >= base + _thresh[_pl]) {
+	  if  (thisADC >= base + _thresh[_channel]) {
 	    return true;
 	  }
 
-	  if (thisADC <= base - _thresh[_pl]) {
+	  if (thisADC <= base - _thresh[_channel]) {
 	      return true;
 	    }
 	  }
