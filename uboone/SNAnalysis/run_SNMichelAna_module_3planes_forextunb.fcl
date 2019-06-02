@@ -86,3 +86,9 @@ physics.analyzers.snmichel0.ADC2MeV: 8.976e-3 # From stopping muon analysis on c
 physics.analyzers.snmichel2.SamplesOverlapPre: 0. # TRIGGER STREAM!
 physics.analyzers.snmichel2.SamplesOverlapPost: 0. # TRIGGER STREAM!
 physics.analyzers.snmichel2.TotalSamplesPerRecord: 6400. # Truncated window
+physics.analyzers.snmichel1.SamplesOverlapPre: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel1.SamplesOverlapPost: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel1.TotalSamplesPerRecord: 6400. # Truncated window
+physics.analyzers.snmichel0.SamplesOverlapPre: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel0.SamplesOverlapPost: 0. # TRIGGER STREAM!
+physics.analyzers.snmichel0.TotalSamplesPerRecord: 6400. # Truncated window
