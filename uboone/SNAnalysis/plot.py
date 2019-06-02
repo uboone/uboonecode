@@ -6,12 +6,12 @@ gROOT.ForceStyle()
 ### User-defined variables ###
 
 # ROOT files with histograms
-snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960files3planes_SNMichelAna_hist_v3.root")
-extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v3.root")
-extunbfile_emu = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/Emulation/my_HitMultiplicity_IntegralCollaborationMeetingAllEvents.root")
-#extunbfile_emu = None
-extunbfile_emumerged = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/Emulation/my_CorrectMergedHitsAlgorithm.root")
-#extunbfile_emumerged = None
+snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960files3planes_SNMichelAna_hist_v5samxrd.root")
+extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v5.root")
+#extunbfile_emu = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/Emulation/my_HitMultiplicity_IntegralCollaborationMeetingAllEvents.root")
+extunbfile_emu = None
+#extunbfile_emumerged = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/Emulation/my_CorrectMergedHitsAlgorithm.root")
+extunbfile_emumerged = None
 
 # Name of histograms to retrieve
 hlistname = [ "heSpectrum",
@@ -23,13 +23,23 @@ hlistname = [ "heSpectrum",
           "heHitSpectrum",
           "hgHitSpectrum",
           "htotHitSpectrum",
+          "heAngle",
+          "heLength",
+          "heLengthW",
+          "heLengthT",
+          "hgClusMult",
+          "hgClusSpectrum",
+          "hgClusHitMult",
           "hEventHitMult",
           "hEventHitSpectrum" ]
 
 # Fraction of canvas for the bottom pad (make it 0 if you do not want one)
 frontierpad = 0.3
+#frontierpad = 0
 logx = False
 #logx = True
+logy = False
+#logy = True
 
 # Event sizes in number of samples
 snevtsize = 3200. # Only unique samples
@@ -64,6 +74,7 @@ for rootdir in snfile.GetListOfKeys():
             # print "%s %i " % (htemp.GetName(), htemp.GetEntries())
             normfactor[int( rootdir.GetName()[-1] )] = htemp.GetEntries()*snevtsize
             snexposure = htemp.GetEntries()*snevtsize*0.5e-6 # in seconds
+            print "SN stream exposure: %i events = %.2f min " % (htemp.GetEntries(), snexposure/60.)
             if normfactor_emu == 0.: # Do it only once (all planes had the same number of events)
                 normfactor_emu = htemp.GetEntries()*snevtsize
             if normfactor_emumerged == 0.: # Do it only once (all planes had the same number of events)
@@ -82,6 +93,7 @@ for rootdir in extunbfile.GetListOfKeys():
             # print "%s %i " % (htemp.GetName(), 2.*htemp.GetEntries())
             normfactor[int( rootdir.GetName()[-1] )] *= 1./(htemp.GetEntries()*extunbevtsize)
             extunbexposure = htemp.GetEntries()*extunbevtsize*0.5e-6 # in seconds
+            print "Trigger stream exposure: %i events = %.2f min " % (htemp.GetEntries(), extunbexposure/60.)
             # For hit multiplicity/event we have to correct for the different event size
             hnew = htemp.Clone()
             hnew.Reset()
@@ -333,6 +345,9 @@ for snh in snhlist:
     if logx: leg.SetFillStyle(0) # Make it transparent to mitigate the change of the distribution
     leg.Draw()
     if logx: gPad.SetLogx()
+    if logy: 
+        extunbh_errors.GetYaxis().SetRangeUser( 0.9, 1.1*extunbh_errors.GetMaximum() )
+        gPad.SetLogy()
     gPad.Modified()
     gPad.Update()
     print "%s: rate %.2f +/- %.2f" % ( snh.GetName(), snh.Integral()/snexposure, math.sqrt(snh.Integral())/snexposure )
@@ -375,7 +390,7 @@ for snh in snhlist:
 
     leglist.append(leg)
     extunbh_errorslist.append(extunbh_errors)
-    c.Print( c.GetName() + ("_logx" if logx else "") + ("_ratio.png" if frontierpad else ".png") )
+    c.Print( c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.png" if frontierpad else ".png") )
     #c.Print( c.GetName() + ("_logx" if logx else "") + ("_bigratio.png" if frontierpad else ".png") )
     #c.Print( "norm_" + c.GetName() + ".png" )
     clist.append(c)

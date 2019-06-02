@@ -23,6 +23,11 @@
 #include "art/Framework/Services/Registry/ServiceHandle.h" 
 #include "art/Framework/Services/Optional/TFileService.h" 
 
+// Services
+#include "larcore/Geometry/Geometry.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+#include "lardata/DetectorInfoServices/LArPropertiesService.h"
+
 //"larsoft" object includes
 #include "lardataobj/RecoBase/Cluster.h"
 #include "lardataobj/RecoBase/Hit.h"
@@ -30,6 +35,7 @@
 // ROOT
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TPrincipal.h"
 
 class SNMichelAna;
 
@@ -81,18 +87,30 @@ private:
   TH1F* fhgHitSpectrum;
   TH1F* fhtotHitSpectrum;
 
-  // Michel cluster vertex
-  TH2F* fheVtx;
+  TH2F* fheVtx; // Michel cluster vertex
 
-  // Event-wide hit multiplicity
-  TH1F* fhEventHitMult;
+  TH1F* fheAngle; // Michel electron-cluster's angle
 
-  // Event-wide hit spectrum
-  TH1F* fhEventHitSpectrum;
+  TH1F* fheLength; // Michel electron-cluster's length
+  TH1F* fheLengthW; // Michel electron-cluster's length (wire projection)
+  TH1F* fheLengthT; // Michel electron-cluster's length (drift projection)
+
+  TH1F* fhgClusMult; // Michel photon-cluster's multiplicity
+
+  TH1F* fhgClusSpectrum; // Michel photon-cluster's spectrum
+
+  TH1F* fhgClusHitMult; // Michel photon-cluster's hit multiplicity
+
+  TH1F* fhEventHitMult; // Event-wide hit multiplicity
+
+  TH1F* fhEventHitSpectrum; // Event-wide hit spectrum
 
   // To do: create a TTree holding: run, event, cluster start_wire, cluster start_time, e cluster charge, e cluster hit mult, vector of g cluster charges, vector for g cluster hit mult, vector of e hit wire, vector of e hit peak time, vector of e hit integral, vector of g hit wire, vector of g hit peak time, vector of g hit integral
 
   geo::View_t fPlane; // Wire plane analyzed
+
+  float fw2cm; // Wire to cm conversion factor
+  float ft2cm; // Tick to cm conversion factor
 };
 
 
@@ -118,24 +136,39 @@ void SNMichelAna::beginJob()
   art::ServiceHandle<art::TFileService> tfs;
 
   // Implementation of optional member function here.
-  fheSpectrum = tfs->make<TH1F>("heSpectrum","e cluster spectrum; Energy (MeV*); Entries/2 MeV", 40, 0, 80);
-  fhgSpectrum = tfs->make<TH1F>("hgSpectrum","#gamma cluster spectrum; Energy (MeV*); Entries/2 MeV", 40, 0, 80);
-  fhtotSpectrum = tfs->make<TH1F>("htotSpectrum","Total clusters spectrum; Energy (MeV*); Entries/2 MeV", 40, 0, 80);
+  fheSpectrum = tfs->make<TH1F>("heSpectrum","e cluster spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
+  fhgSpectrum = tfs->make<TH1F>("hgSpectrum","Total #gamma cluster spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
+  fhtotSpectrum = tfs->make<TH1F>("htotSpectrum","Total clusters spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
 
-  fheHitMult = tfs->make<TH1F>("heHitMult","e cluster hit mult.; Hit mult.; Entries", 100, 0, 100);
-  fhgHitMult = tfs->make<TH1F>("hgHitMult","#gamma cluster hit mult.; Hit mult.; Entries", 100, 0, 100);
-  fhtotHitMult = tfs->make<TH1F>("htotHitMult","Total clusters hit mult.; Hit mult.; Entries", 100, 0, 100);
+  fheHitMult = tfs->make<TH1F>("heHitMult","e cluster hit mult.; Hit mult.; Entries", 100, 0., 100.);
+  fhgHitMult = tfs->make<TH1F>("hgHitMult","Total #gamma cluster hit mult.; Hit mult.; Entries", 100, 0., 100.);
+  fhtotHitMult = tfs->make<TH1F>("htotHitMult","Total clusters hit mult.; Hit mult.; Entries", 100, 0., 100.);
 
-  fheHitSpectrum = tfs->make<TH1F>("heHitSpectrum","e cluster hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000);
-  fhgHitSpectrum = tfs->make<TH1F>("hgHitSpectrum","#gamma cluster hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000);
-  fhtotHitSpectrum = tfs->make<TH1F>("htotHitSpectrum","Total clusters hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000); 
+  //fheHitSpectrum = tfs->make<TH1F>("heHitSpectrum","e cluster hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0., 100.);
+  fheHitSpectrum = tfs->make<TH1F>("heHitSpectrum","e cluster hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
+  fhgHitSpectrum = tfs->make<TH1F>("hgHitSpectrum","#gamma cluster hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
+  fhtotHitSpectrum = tfs->make<TH1F>("htotHitSpectrum","Total clusters hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.); 
   // remove? it is fheHitSpectrum + fhgHitSpectrum
 
   fheVtx = tfs->make<TH2F>("heVtx","e cluster vertex; Wire; Tick; Entries/32 wires/200 ticks", 108, 0., 3456., 32, 0., 6400.);
 
+  fheAngle = tfs->make<TH1F>("heAngle","e cluster hits angle; Angle (#circ); Entries/1#circ", 180, -90., 90.);
+
+  fheLength = tfs->make<TH1F>("heLength","e cluster length; Length (cm); Entries/0.3 cm", 100, 0., 30.);
+
+  fheLengthW = tfs->make<TH1F>("heLengthW","e cluster length (wire proj.); Length (cm); Entries/0.3 cm", 100, 0., 30.);
+
+  fheLengthT = tfs->make<TH1F>("heLengthT","e cluster length (drift proj.); Length (cm); Entries/0.3 cm", 100, 0., 30.);
+
+  fhgClusMult = tfs->make<TH1F>("hgClusMult","#gamma cluster multiplicity; #gamma mult.; Entries", 25, 0., 25.);
+
+  fhgClusSpectrum = tfs->make<TH1F>("hgClusSpectrum","#gamma cluster spectrum; Energy (MeV); Entries/0.5 MeV", 160, 0., 80.);
+
+  fhgClusHitMult = tfs->make<TH1F>("hgClusHitMult","#gamma cluster hit mult.; Hit mult.; Entries", 100, 0., 100.);
+
   fhEventHitMult = tfs->make<TH1F>("hEventHitMult","Event hit mult.; Hit mult.; Entries/200 hits", 100, 0, 2e4);
 
-  fhEventHitSpectrum = tfs->make<TH1F>("hEventHitSpectrum","Event hits spectrum; Hit integral (ADC); Entries/1 ADC", 1000, 0, 1000);
+  fhEventHitSpectrum = tfs->make<TH1F>("hEventHitSpectrum","Event hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
 
   // Guess plane from Michel producer
   if( fMichelProducer.find("0") != std::string::npos) fPlane = (geo::View_t)0;
@@ -143,6 +176,15 @@ void SNMichelAna::beginJob()
   else if( fMichelProducer.find("2") != std::string::npos) fPlane = (geo::View_t)2;
   else fPlane = geo::kUnknown; 
   std::cout << "MichelProducer is " << fMichelProducer << ". Guessed plane is " << fPlane << std::endl;
+
+  // Get detector specific properties
+  auto const* geom = lar::providerFrom<geo::Geometry>();
+  auto const* detp = lar::providerFrom<detinfo::DetectorPropertiesService>();
+  fw2cm = geom->WirePitch( static_cast<geo::View_t>( fPlane ) );
+  ft2cm = detp->SamplingRate()/1000.0 * detp->DriftVelocity( detp->Efield(), detp->Temperature() );
+
+  std::cout << "Wire to cm factor: " << fw2cm << std::endl;
+  std::cout << "Time to cm factor: " << ft2cm << std::endl;
 }
 
 void SNMichelAna::analyze(art::Event const & e)
@@ -160,7 +202,7 @@ void SNMichelAna::analyze(art::Event const & e)
     // Avoid double counting
     if( hit.PeakTime() < fSamplesOverlapPre || 
 	hit.PeakTime() >= fTotalSamplesPerRecord - fSamplesOverlapPost ) continue;
-    fhEventHitSpectrum->Fill( hit.Integral() );
+    fhEventHitSpectrum->Fill( fADC2MeV*hit.Integral() );
     evtHits++;
   }
   // To do: switch to hit density (hits per unit of time) to make it independent of event length?
@@ -203,6 +245,7 @@ void SNMichelAna::analyze(art::Event const & e)
   // Loop over photon clusters
   float radCharge = 0;
   size_t radHits = 0;
+  size_t radClusters = 0;
   // To do: if there are several Michel e in the frame, try to assign their photon clusters?
   //  for( auto const& cluster : *gcluster_handle ){
   for( size_t igc = 0; igc < gcluster_handle->size(); igc++ ){
@@ -221,15 +264,21 @@ void SNMichelAna::analyze(art::Event const & e)
     
     // Loop over photon hits
     for( auto const& hit : ghit_v ){
-      fhgHitSpectrum->Fill( hit->Integral() );
-      fhtotHitSpectrum->Fill( hit->Integral() );
+      fhgHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+      fhtotHitSpectrum->Fill( fADC2MeV*hit->Integral() );
     }
-  
+
+    radClusters++;
+
+    fhgClusSpectrum->Fill( fADC2MeV*cluster.Integral() );
+
+    fhgClusHitMult->Fill( (float)ghit_v.size() );
   }
   std::cout << "Total gamma energy: " << radCharge << " ADC = " << fADC2MeV*radCharge << " MeV" << std::endl;
   // Fill histos only if there were in-time clusters
   if( radCharge != 0.0 ) fhgSpectrum->Fill( fADC2MeV*radCharge );
   if( radHits != 0 ) fhgHitMult->Fill( (float)radHits );
+  fhgClusMult->Fill( (float)radClusters );
 
   // Loop over electron clusters
   // This loop is trivial since we are requiring only one electron cluster
@@ -253,12 +302,36 @@ void SNMichelAna::analyze(art::Event const & e)
     fheHitMult->Fill( (float)ehit_v.size() );
     fhtotHitMult->Fill( (float)(ehit_v.size() + radHits) );
 
+    TPrincipal pca(2, "D");
+    Double_t pcaHit[2] = {0., 0.};
+    Double_t prevHit[2] = {-1., -1.};
+    float eLength = 0.;
+    float eLengthW = 0.;
+    float eLengthT = 0.;
     // Loop over electron hits
     for( auto const& hit : ehit_v ){
-      fheHitSpectrum->Fill( hit->Integral() );
-      fhtotHitSpectrum->Fill( hit->Integral() );
-    }
+      fheHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+      fhtotHitSpectrum->Fill( fADC2MeV*hit->Integral() );
 
+      pcaHit[0] = hit->WireID().Wire * fw2cm;
+      pcaHit[1] = hit->PeakTime() * ft2cm;
+      pca.AddRow(pcaHit);
+
+      //std::cout << "Added hit: ( " << hit->WireID().Wire << " , " << hit->PeakTime() << " ) " << std::endl; 
+      if( prevHit[0] != -1 && prevHit[1] != -1 ){
+	eLength += std::sqrt( std::pow(pcaHit[0] - prevHit[0], 2) + std::pow(pcaHit[1] - prevHit[1], 2) );
+	eLengthW += std::sqrt( std::pow(pcaHit[0] - prevHit[0], 2) );
+	eLengthT += std::sqrt( std::pow(pcaHit[1] - prevHit[1], 2) );
+      }
+
+      prevHit[0] = pcaHit[0];
+      prevHit[1] = pcaHit[1];
+    }
+    pca.MakePrincipals();
+    fheAngle->Fill( TMath::ATan( ((*(pca.GetEigenVectors()))[0][1])/((*(pca.GetEigenVectors()))[0][0]) )*180./TMath::Pi() );
+    fheLength->Fill(eLength);
+    fheLengthW->Fill(eLengthW);
+    fheLengthT->Fill(eLengthT);
   }
 
 }
