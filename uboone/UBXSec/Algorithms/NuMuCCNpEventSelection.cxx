@@ -205,11 +205,14 @@ namespace ubana {
         } else {
           if( !_ubxsec_event->pfp_reco_istrack[ntrk] ) continue;
         }
-        
-	if(_ubxsec_event->pfp_reco_dEdx[ntrk].size()>=_collection_hits && _ubxsec_event->pfp_reco_chi2_proton[ntrk]>_chi2_cut) {
+       
+	if (_ubxsec_event->pfp_reco_dEdx[ntrk].size()>=_collection_hits && _ubxsec_event->pfp_reco_chi2_proton[ntrk]>_chi2_cut) {
 		npcand_fail_chi2++;
 	 	if (_verbose) std::cout << "[NuMuCCNpEventSelection] Chi2 is " << _ubxsec_event->pfp_reco_chi2_proton[ntrk] << std::endl;
 	} //chi2_cut=88
+
+	if (std::abs(_ubxsec_event->pfp_reco_chi2_proton.at(ntrk)+ 999) < DBL_EPSILON) //FIXME: this check is dependent on the default value of chi2 hardcoded in UBXSec_module.cc
+		npcand_fail_chi2++;
     }
     
     if( npcand_fail_chi2>0 ) { 

@@ -2326,9 +2326,6 @@ void UBXSec::produce(art::Event & e) {
 
       /*check if candidate track is a proton according to chi2)*/
 	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut && (std::abs(ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1)+999) > DBL_EPSILON) ) ;
-	std::cout << "FILLO chi2 " << ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) << ". while svm is " << not_muon << std::endl;
-	std::cout << "proton cut " << _chi2_proton_cut << ". while svm is " << not_muon << std::endl;
-	std::cout << "is proton is " << is_proton << std:: endl;
 	ubxsec_event->pfp_is_proton_chi2.emplace_back( is_proton );
 
         bool fully_contained = _fiducial_volume.InFV(track_pfp->Vertex(), track_pfp->End());
@@ -2345,7 +2342,6 @@ void UBXSec::produce(art::Event & e) {
 
 	if (is_proton) {
 		n_chi2_protons++;
-		std::cout << "FILLO n chi2 protons " << std::endl;
 		if (fully_contained)
 			ordered_protons[ ubxsec_event->pfp_reco_chi2_proton.size()-1 ] = ubxsec_event->pfp_reco_Mom_proton.at( ubxsec_event->pfp_reco_chi2_proton.size()-1 );
 		else
