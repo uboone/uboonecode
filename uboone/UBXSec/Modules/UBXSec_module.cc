@@ -2325,7 +2325,10 @@ void UBXSec::produce(art::Event & e) {
 	if (not_muon) n_svm_protons++;
 
       /*check if candidate track is a proton according to chi2)*/
-	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut) ;
+	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut && (std::abs(ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1)+999) > DBL_EPSILON) ) ;
+	std::cout << "FILLO chi2 " << ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) << ". while svm is " << not_muon << std::endl;
+	std::cout << "proton cut " << _chi2_proton_cut << ". while svm is " << not_muon << std::endl;
+	std::cout << "is proton is " << is_proton << std:: endl;
 	ubxsec_event->pfp_is_proton_chi2.emplace_back( is_proton );
 
         bool fully_contained = _fiducial_volume.InFV(track_pfp->Vertex(), track_pfp->End());
@@ -2342,6 +2345,7 @@ void UBXSec::produce(art::Event & e) {
 
 	if (is_proton) {
 		n_chi2_protons++;
+		std::cout << "FILLO n chi2 protons " << std::endl;
 		if (fully_contained)
 			ordered_protons[ ubxsec_event->pfp_reco_chi2_proton.size()-1 ] = ubxsec_event->pfp_reco_Mom_proton.at( ubxsec_event->pfp_reco_chi2_proton.size()-1 );
 		else
@@ -2356,6 +2360,7 @@ void UBXSec::produce(art::Event & e) {
 
 	ubxsec_event->n_svm_protons = n_svm_protons;
 	ubxsec_event->n_chi2_protons = n_chi2_protons;
+	std::cout << " Number of chi2 protons  " << ubxsec_event->n_chi2_protons << std::endl;
 
 	//order the proton map based on the momentum (value rather than key)
 	//create a empty vector of pairs
@@ -2374,7 +2379,7 @@ void UBXSec::produce(art::Event & e) {
 
 	for ( unsigned jj=0; jj<vec.size(); jj++)
 		ubxsec_event->proton_indexes.emplace_back( vec.at(jj).first );
-
+	std::cout << "size of proton indexes " << ubxsec_event->proton_indexes.size() << std::endl;
 
   // *********************
   // Event Selection Np
