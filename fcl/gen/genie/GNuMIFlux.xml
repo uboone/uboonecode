@@ -101,4 +101,23 @@
     <enumax> 18. 1.05 </enumax>
     <reuse> 10 </reuse>
   </param_set>
+
+  <param_set name="microboone-numi-v2-dirt">
+    <verbose> 3 </verbose>
+    <units> m </units>
+    <beamdir type="newxyz">
+      [ 0.92103853804025682       0.0227135048039241207  0.38880857519374290   ]
+      [ 0.0000462540012621546684  0.99829162468141475   -0.0584279894529063024 ]
+      [-0.38947144863934974       0.0538324139386641073  0.91946400794392302   ]
+    </beamdir>
+    <beampos> ( 0.0, 0.0, 0.0 ) = ( 55.02, 72.59,  672.70) </beampos>
+    <window>
+      <point coord="det"> -34.53616846,  21.64010314, -56.51803741 </point>
+      <point coord="det"> -5.887503031, -10.29041579, -72.33150682 </point>
+      <point coord="det"> -20.41730004, -13.57997006, 40.17686941  </point>
+    </window>
+    <enumax> 18. 1.05 </enumax>
+    <reuse> 10 </reuse>
+  </param_set>
+
 </gnumi_config>
