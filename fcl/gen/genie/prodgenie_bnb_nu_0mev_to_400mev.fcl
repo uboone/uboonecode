@@ -2,7 +2,7 @@
 
 process_name: GenieGenFiltered
 
-outputs.out1.fileName: "prodgenie_bnb_intrinsic_nue_filtered_400mev_to_800mev_uboone_%tc_gen.root"
+outputs.out1.fileName: "prodgenie_bnb_nu_filtered_0mev_to_400mev_uboone_%tc_gen.root"
 
 source.maxEvents: 750
 
@@ -11,11 +11,10 @@ physics.producers.generator.EventGeneratorList: "CCinclMEC"
 physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
 physics.producers.generator.TopVolume: "volTPCActive"
-physics.producers.generator.GenFlavors: [12,-12]
 physics.producers.generator.BeamName: "booster"
 
-physics.filters.neutrinofilter.EMin: 0.400
-physics.filters.neutrinofilter.EMax: 0.800
+physics.filters.neutrinofilter.EMin: 0.000
+physics.filters.neutrinofilter.EMax: 0.400
 
 physics.simulate: [ rns, generator, neutrinofilter ]
 physics.trigger_paths: [ simulate ]
