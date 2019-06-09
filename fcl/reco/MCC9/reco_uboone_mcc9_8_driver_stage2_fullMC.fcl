@@ -2,3 +2,7 @@
 
 physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.16
 physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   4.84
+
+# flash-matching score preservation module
+physics.producers.flashmatch.BeamWindowStart:   3.16
+physics.producers.flashmatch.BeamWindowEd:      4.84
