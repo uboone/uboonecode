@@ -23,7 +23,6 @@ fwdir   product_dir scripts
 # table fragment to set FW_SEARCH_PATH
 table_fragment_begin
 pathPrepend(FHICL_FILE_PATH, .:./job)
-pathPrepend(GXMLPATH, ${UBOONECODE_DIR}/source/fcl/gen/genie)
 table_fragment_end
 
 # With "product  version" table below, we now define depdendencies
