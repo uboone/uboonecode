@@ -2,7 +2,7 @@
 
 process_name: GenieGen
 
-outputs.out1.fileName: "prodgenie_dk2nu_numi_intrinsic_nue_uboone_cosmic_%tc_gen.root"
+outputs.out1.fileName: "prodgenie_dk2nu_numi_fhc_intrinsic_nue_uboone_cosmic_%tc_gen.root"
 
 physics.producers.generator:                    @local::standard_genie
 physics.producers.generator.POTPerSpill:        3e13
