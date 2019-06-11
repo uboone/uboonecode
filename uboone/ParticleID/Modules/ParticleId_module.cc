@@ -175,9 +175,9 @@ void UBPID::ParticleId::produce(art::Event & e)
   // reserve space for the particle ID collection
   // this seems to help with seg faults, but it's a little unclear why
   particleIDCollection->reserve(trackCollection.size());
-
+  
   for (auto& track : trackCollection){
-
+	  std::cout << "ENTRO TRACK LOOP" << std::endl;
     // Skip tracks/events with no valid calorimetry object associated to it.
     // In practice this should be 0 tracks (0 hits = 0 tracks), but this is
     // just here for edge cases.
@@ -231,7 +231,9 @@ void UBPID::ParticleId::produce(art::Event & e)
 
     art::Ptr< anab:: Calorimetry > calo;
     int planenum = -1;
+    
     for (auto c : caloFromTrack){
+	  std::cout << "ENTRO CALO LOOP" << std::endl;
       planenum = c->PlaneID().Plane;
       calo = c;
       // Check that caloFromTrack is a valid object
@@ -430,6 +432,8 @@ void UBPID::ParticleId::produce(art::Event & e)
       Chi2_p.at(planenum).fTrackDir = anab::kForward;
       Chi2_p.at(planenum).fValue = chisqValues.at(1);
       Chi2_p.at(planenum).fPlaneID = UBPID::uB_SinglePlaneGetBitset(c->PlaneID().Plane);
+
+      std::cout << "SONO QUI PID " << chisqValues.at(1) << std::endl;
 
       Chi2_pi.at(planenum).fAlgName = "Chi2";
       Chi2_pi.at(planenum).fVariableType = anab::kGOF;

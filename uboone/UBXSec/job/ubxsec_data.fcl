@@ -79,6 +79,10 @@ ubxsec_data_reco:
   pandoraNuMCSMu:                 @local::mcsfitproducer
   pandoraNuMCSPi:                 @local::mcsfitproducer
   pandoraNuMCSP:                  @local::mcsfitproducer
+  
+  #pidcalibration: @local::microboone_calibrationdedx
+  dedxcalibration: @local::data_newboxrecomb
+  pid: @local::particleidconfig
 }
 
 ubxsec_data_flashmatch:
@@ -132,13 +136,17 @@ ubxsec_data_producers: [ #simpleFlashBeam,
                          #pandoraNuStoppingMuonTag,
                          NeutrinoFlashMatch,
                          CandidateConsistency,
+			 dedxcalibration,
+			 pid,
                          UBXSec ] 
 
 ubxsec_data_filters: [ tpcneutrinoidfilternumuccinc 
                      ]
 
-ubxsec_data_producers_anaonly: [ UBXSec
-                               ]
+ubxsec_data_producers_anaonly: [ pandoraNuMCSP,
+			 dedxcalibration,
+			 pid,
+                         UBXSec]
 
 ubxsec_data_analyzers: [ #CosmicTaggerAna 
                        ]

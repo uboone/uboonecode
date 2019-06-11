@@ -633,7 +633,7 @@ void UBXSec::produce(art::Event & e) {
   //Get showers and particle ID fro the CC1mNp analysis variables
   art::FindManyP<recob::Shower> showers_from_pfp(pfp_h, e, _pfp_producer);
 
-  //std::cout << "[UBXSec] Getting Particle ID Summer 2018 vector from this producer label: " << _particle_id_summer_2018_producer << std::endl;
+  std::cout << "[UBXSec] Getting Particle ID Summer 2018 vector from this producer label: " << _particle_id_summer_2018_producer << std::endl;
   art::FindManyP<anab::ParticleID> particleids_summer2018_from_track(track_h, e, _particle_id_summer_2018_producer);
   if (!particleids_summer2018_from_track.isValid()) {
     std::cout << "[UBXSec] anab::ParticleID_summer2018_from_track is not valid." << std::endl;
@@ -2208,28 +2208,28 @@ void UBXSec::produce(art::Event & e) {
 	    //fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
 	    //std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
 	    
-	    float newpid_pida=-999.;
-	    float chi2_proton=-999.;
-	    float chi2_kaon=-999.;
-	    float chi2_muon=-999.;
-	    float chi2_pion=-999.;
-	    float llh_fwd_proton=-999.;
-	    float llh_bwd_proton=-999.;
-	    float llh_fwd_mip=-999.; //mip assumption only has the forward direction option
-	    float final_value=-999.;
+	    float newpid_pida=-9999.;
+	    float chi2_proton=-9999.;
+	    float chi2_kaon=-9999.;
+	    float chi2_muon=-9999.;
+	    float chi2_pion=-9999.;
+	    float llh_fwd_proton=-9999.;
+	    float llh_bwd_proton=-9999.;
+	    float llh_fwd_mip=-9999.; //mip assumption only has the forward direction option
+	    float final_value=-9999.;
 	    
 	    fAlgScoresVec.clear();
 	    fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
 	    std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
 	    for ( size_t i_algscore=0; i_algscore<fAlgScoresVec.size(); i_algscore++) {
-	    //  std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] Looping over the Algs and currently considering index: " << i_algscore << std::endl;
 	      anab::sParticleIDAlgScores fAlgScore = fAlgScoresVec.at(i_algscore);
-	   //   std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
-	    //  std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
-	    //  std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
-	    //  std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
-	    //  std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
-	    //  std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The PlaneID is " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgName is " << fAlgScore.fAlgName << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgVariableType is " << fAlgScore.fVariableType << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
+	      std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
 	      
 	      if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
 		
@@ -2281,7 +2281,7 @@ void UBXSec::produce(art::Event & e) {
 	      }//requirement that this is Plane==2
 	    }//loop over AlgScores
 	    fAlgScoresVec.clear();
-	    
+	   
 	    ubxsec_event->pfp_reco_newpid_pida.emplace_back(newpid_pida);
 	    ubxsec_event->pfp_reco_chi2_proton.emplace_back(chi2_proton);
 	    ubxsec_event->pfp_reco_chi2_muon.emplace_back(chi2_muon);
@@ -2297,7 +2297,7 @@ void UBXSec::produce(art::Event & e) {
 	    } else {
 	      final_value=llh_bwd_proton;
 	    }
-	    if ((final_value!=-999.) and (llh_fwd_mip!=-999.)) {
+	    if ((final_value!=-9999.) and (llh_fwd_mip!=-9999.)) {
 	      if (TMath::Abs(final_value)!=0.0) {
 		std::cout << "[UBXSecCC1mNp] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
 		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
@@ -2325,7 +2325,7 @@ void UBXSec::produce(art::Event & e) {
 	if (not_muon) n_svm_protons++;
 
       /*check if candidate track is a proton according to chi2)*/
-	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut && (std::abs(ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1)+999) > DBL_EPSILON) ) ;
+	bool is_proton = bool( ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1) < _chi2_proton_cut && (std::abs(ubxsec_event->pfp_reco_chi2_proton.at(ubxsec_event->pfp_reco_chi2_proton.size()-1)+9999) > DBL_EPSILON) ) ; //FIXME
 	ubxsec_event->pfp_is_proton_chi2.emplace_back( is_proton );
 
         bool fully_contained = _fiducial_volume.InFV(track_pfp->Vertex(), track_pfp->End());
@@ -2356,7 +2356,6 @@ void UBXSec::produce(art::Event & e) {
 
 	ubxsec_event->n_svm_protons = n_svm_protons;
 	ubxsec_event->n_chi2_protons = n_chi2_protons;
-	std::cout << " Number of chi2 protons  " << ubxsec_event->n_chi2_protons << std::endl;
 
 	//order the proton map based on the momentum (value rather than key)
 	//create a empty vector of pairs
@@ -2375,13 +2374,12 @@ void UBXSec::produce(art::Event & e) {
 
 	for ( unsigned jj=0; jj<vec.size(); jj++)
 		ubxsec_event->proton_indexes.emplace_back( vec.at(jj).first );
-	std::cout << "size of proton indexes " << ubxsec_event->proton_indexes.size() << std::endl;
 
   // *********************
   // Event Selection Np
   // *********************
   
-  int slice_index_np = -9999;
+  int slice_index_np = -1;
   bool is_selected_np = false;
   std::map<std::string,bool> failure_map_np;
   std::string reason_np = "no_failure";
@@ -2400,7 +2398,6 @@ void UBXSec::produce(art::Event & e) {
       } 
     }
   }
-  
 
   std::cout << "[UBXSec] CC1muNp Selection Failed at Cut: " << reason_np << std::endl;
 
