@@ -47,7 +47,7 @@ outputs:
   out1:
   {  
    module_type: RootOutput
-   fileName:    "%ifb_%tc_gen_fhc.root"
+   fileName:    "%ifb_%tc_gen_rhc.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
@@ -68,6 +68,6 @@ physics.producers.generator.TopVolume:          "volCryostat"
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "Default+CCMEC+NCMEC"
 physics.producers.generator.FluxType:           "dk2nu"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"

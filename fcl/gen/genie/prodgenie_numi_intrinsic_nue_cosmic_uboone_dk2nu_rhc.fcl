@@ -2,7 +2,7 @@
 
 process_name: GenieGen
 
-outputs.out1.fileName: "prodgenie_dk2nu_numi_fhc_intrinsic_nue_uboone_cosmic_%tc_gen.root"
+outputs.out1.fileName: "prodgenie_dk2nu_numi_rhc_intrinsic_nue_uboone_cosmic_%tc_gen.root"
 
 physics.producers.generator:                    @local::standard_genie
 physics.producers.generator.POTPerSpill:        3e13
@@ -14,6 +14,6 @@ physics.producers.generator.GenFlavors:         [12,-12]
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "CCinclMEC"
 physics.producers.generator.FluxType:           "dk2nu"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"

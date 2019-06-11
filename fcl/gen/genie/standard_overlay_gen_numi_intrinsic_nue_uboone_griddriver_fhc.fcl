@@ -60,7 +60,7 @@ services.DetectorClocksService.InheritClockConfig: false
 physics.producers.generator:                    @local::standard_genie
 physics.producers.generator.POTPerSpill:        3e13
 physics.producers.generator.EventsPerSpill:     0
-physics.producers.generator.GlobalTimeOffset:   4687.5
+physics.producers.generator.GlobalTimeOffset:   5627.5
 physics.producers.generator.RandomTimeOffset:   9600.
 physics.producers.generator.TopVolume:          "volTPCActive"
 physics.producers.generator.GenFlavors:         [12,-12]
@@ -74,4 +74,4 @@ physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 physics.producers.generator.FluxCopyMethod: "IFDH"
 
 #reduce file name length
-outputs.out1.fileName: "%ifb_gen.root"
+outputs.out1.fileName: "%ifb_gen_fhc.root"
