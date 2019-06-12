@@ -23,7 +23,7 @@ simple_plugin(KalmanFilterTest "module"
 simple_plugin(PropTest "module"
               lardata_RecoObjects
 	      larcorealg_Geometry
-	      nutools_RandomUtils_NuRandomService_service
+	      nurandom_RandomUtils_NuRandomService_service
 	      ${ART_FRAMEWORK_CORE}
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
