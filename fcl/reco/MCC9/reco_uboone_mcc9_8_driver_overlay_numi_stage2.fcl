@@ -42,6 +42,6 @@ physics.producers.crttzero.data_label:                  "mixer"
 # in bnb gen: 3125. + 1600
 # in bnb reco: 3.57 -- 5.25 
 # offsets       445 -- 525
-# in numi gen: 4687.5 + 9600
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.1325
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   14.8125
+# in numi gen: 4687.5+940 + 9600
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.64
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.44
