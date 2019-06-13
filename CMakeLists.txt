@@ -67,6 +67,57 @@ include(ArtDictionary)
 include(ArtMake)
 include(BuildPlugins)
 
+  set (GENIE_LIB_LIST ${GFWMSG}
+                      ${GFWREG}
+                      ${GFWALG}
+                      ${GFWINT}
+                      ${GFWGHEP}
+                      ${GFWNUM}
+                      ${GFWUTL}
+                      ${GFWPARDAT}
+                      ${GFWEG}
+                      ${GFWNTP}
+                      ${GPHXSIG}
+                      ${GPHPDF}
+                      ${GPHNUCLST}
+                      ${GPHCMN}
+                      ${GPHDCY}
+                      ${GPHHADTRANSP}
+                      ${GPHHADNZ}
+                      ${GPHDEEX}
+                      ${GPHAMNGXS}
+                      ${GPHAMNGEG}
+                      ${GPHCHMXS}
+                      ${GPHCOHXS}
+                      ${GPHCOHEG}
+                      ${GPHDISXS}
+                      ${GPHDISEG}
+                      ${GPHDFRCXS}
+                      ${GPHDFRCEG}
+                      ${GPHGLWRESXS}
+                      ${GPHGLWRESEG}
+                      ${GPHIBDXS}
+                      ${GPHIBDEG}
+                      ${GPHMNUCXS}
+                      ${GPHMNUCEG}
+                      ${GPHMEL}
+                      ${GPHNUELXS}
+                      ${GPHNUELEG}
+                      ${GPHQELXS}
+                      ${GPHQELEG}
+                      ${GPHRESXS}
+                      ${GPHRESEG}
+                      ${GPHSTRXS}
+                      ${GPHSTREG}
+                      ${GPHNDCY}
+                      ${GTLGEO}
+                      ${GTLFLX}
+                      ${GRWFWK}
+                      ${GRWIO}
+                      ${GRWCLC}
+		      ${LOG4CPP}
+                      )
+
 # ADD SOURCE CODE SUBDIRECTORIES HERE
 add_subdirectory(fcl)
 add_subdirectory(test)
