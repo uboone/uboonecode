@@ -5,7 +5,7 @@ process_name: GenieGen
 outputs.out1.fileName: "prodgenie_dk2nu_numi_rhc_intrinsic_nue_uboone_cosmic_%tc_gen.root"
 
 physics.producers.generator:                    @local::standard_genie
-physics.producers.generator.POTPerSpill:        3e13
+physics.producers.generator.POTPerSpill:        5e13
 physics.producers.generator.EventsPerSpill:     0
 physics.producers.generator.GlobalTimeOffset:   5627.5
 physics.producers.generator.RandomTimeOffset:   9600.
