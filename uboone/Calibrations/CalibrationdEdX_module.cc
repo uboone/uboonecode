@@ -71,6 +71,8 @@ private:
   double fModBoxA;
   double fModBoxB;
 
+  bool fDoLifetimeCorrection;
+
   //histograms for calibration
   std::vector<TH2F*> hCorr_YZ;
   std::vector<TH1F*> hCorr_X;
@@ -92,7 +94,8 @@ ub::CalibrationdEdX::CalibrationdEdX(fhicl::ParameterSet const & p)
   , fUseRecoTrackDir       (p.get< bool>("UseRecoTrackDir"))
   , caloAlg(p.get< fhicl::ParameterSet >("CaloAlg"))
   , fModBoxA               (p.get< double >("ModBoxA"))
-  , fModBoxB               (p.get< double >("ModBoxB")) 
+  , fModBoxB               (p.get< double >("ModBoxB"))
+  , fDoLifetimeCorrection  (p.get< bool >("CaloDoLifeTimeCorrection"))
 {
   // Call appropriate produces<>() functions here.
   if (fCorr_YZ.size()!=3 || fCorr_X.size()!=3){
@@ -215,6 +218,10 @@ void ub::CalibrationdEdX::produce(art::Event & evt)
           //we will turn off lifetime correction in caloAlg, this is just to be double sure
           vdEdx[j] = caloAlg.dEdx_AREA(vdQdx[j], detprop->TriggerOffset(), planeID.Plane, 0);
           */
+
+          // Apply lifetime correction
+          // T0 is 0 for beam particles because the trigger offset is already subtracted in the correction function
+          if (fDoLifetimeCorrection) vdQdx[j] *= caloAlg.LifetimeCorrection(detprop->ConvertXToTicks(vXYZ[j].X(),planeID), 0);
 
           //Calculate dE/dx using the new recombination constants
           double dQdx_e = caloAlg.ElectronsFromADCArea(vdQdx[j], planeID.Plane);
