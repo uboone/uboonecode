@@ -7,15 +7,23 @@
 #include "BooNENtuple.h"
 #include "BeamNtuple.h"
 
-#include "FluxDrivers/GNuMIFlux.h"
-#include "FluxDrivers/GSimpleNtpFlux.h"
+// GENIE includes
+#ifdef GENIE_PRE_R3
+  // Use these for GENIE v2
+  #include "FluxDrivers/GNuMIFlux.h"
+  #include "FluxDrivers/GSimpleNtpFlux.h"
+#else
+  // Use these for GENIE v3
+  #include "Tools/Flux/GNuMIFlux.h"
+  #include "Tools/Flux/GSimpleNtpFlux.h"
+#endif
 
 
 class TTree;
 class TFile;
 
 class BooNEtoGSimple {
- 
+
  public :
   BooNEtoGSimple();
   virtual ~BooNEtoGSimple();
@@ -31,7 +39,7 @@ class BooNEtoGSimple {
   genie::flux::GSimpleNtpNuMI*  fnumi;
   genie::flux::GSimpleNtpAux*   faux;
   genie::flux::GSimpleNtpMeta*  fmeta;
-  
+
   int fBooneNevents;
 
   //int fNumiNevents;
@@ -39,7 +47,7 @@ class BooNEtoGSimple {
   TFile* fBooNEfile;
   TTree* fBNBtree;
   TTree* fWindowtree;
-  
+
   TFile* fGSimplefile;
 
   TTree* fluxntp;

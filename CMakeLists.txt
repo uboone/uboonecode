@@ -58,7 +58,8 @@ find_ups_product( cetbuildtools v3_10_00 )
 find_ups_boost( v1_53_0 )
 find_ups_product( canvas )
 find_ups_product( nutools )
-find_ups_product( nurandom )
+find_ups_product( genie )
+
 
 cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 
@@ -66,6 +67,126 @@ cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
 include(ArtDictionary)
 include(ArtMake)
 include(BuildPlugins)
+
+# BEGIN GENIE VERSION CHECK
+# Determine the major version number of GENIE based on the GENIE_VERSION
+# variable. Based on this, define the GENIE_PRE_R3 preprocessor
+# macro (needed to set the right GENIE header locations, etc.) if needed.
+#
+# The top-level nutools CMakeLists.txt does this as well, but I don't think that
+# we can access the result of that version check in the uboonecode build.
+
+include_directories ( $ENV{GENIE_INC}/GENIE )
+parse_ups_version( ${GENIE_VERSION} )
+
+# the GENIE libraries are already defined, but we need the lib list
+if( ${VMAJ} LESS 3 )
+
+  add_definitions(-DGENIE_PRE_R3)
+
+  # GENIE v2 library list
+  set(GENIE_LIB_LIST  ${GALGORITHM}
+                    ${GBARYONRESONANCE}
+                    ${GBASE}
+                    ${GBODEKYANG}
+                    ${GCHARM}
+                    ${GCOH}
+                    ${GDFRC}
+                    ${GDIS}
+                    ${GCROSSSECTIONS}
+                    ${GDECAY}
+                    ${GELAS}
+                    ${GELFF}
+                    ${GHEP}
+                    ${GEVGCORE}
+                    ${GEVGMODULES}
+                    ${GEVGDRIVERS}
+                    ${GGIBUU}
+                    ${GHADRONTRANSP}
+                    ${GFRAGMENTATION}
+                    ${GINTERACTION}
+                    ${GLLEWELLYNSMITH}
+                    ${GMEC}
+                    ${GMESSENGER}
+                    ${GNUGAMMA}
+                    ${GNUE}
+                    ${GNTUPLE}
+                    ${GNUCLEAR}
+                    ${GNUMERICAL}
+                    ${GQPM}
+                    ${GPDG}
+                    ${GPDF}
+                    ${GQEL}
+                    ${GRES}
+                    ${GREGISTRY}
+                    ${GREINSEHGAL}
+                    ${GUTILS}
+                    ${GGEO}
+                    ${GFLUXDRIVERS}
+                    ${GMUELOSS}
+                    ${GREWEIGHT}
+                    ${GNUCLEONDECAY} )
+
+  #MESSAGE("--UBOONECODE-- GENIE_VERSION=${VMAJ} ${VMIN} -DGENIE_PRE_R3")
+else()
+
+  # GENIE v3 library list
+  set (GENIE_LIB_LIST ${GFWMSG}
+                      ${GFWREG}
+                      ${GFWALG}
+                      ${GFWINT}
+                      ${GFWGHEP}
+                      ${GFWNUM}
+                      ${GSL}  # FWNUM relies on GSL
+                      ${GFWUTL}
+                      ${GFWPARDAT}
+                      ${GFWEG}
+                      ${GFWNTP}
+                      ${GPHXSIG}
+                      ${GPHPDF}
+                      ${GPHNUCLST}
+                      ${GPHCMN}
+                      ${GPHDCY}
+                      ${GPHHADTRANSP}
+                      ${GPHHADNZ}
+                      ${GPHDEEX}
+                      ${GPHAMNGXS}
+                      ${GPHAMNGEG}
+                      ${GPHCHMXS}
+                      ${GPHCOHXS}
+                      ${GPHCOHEG}
+                      ${GPHDISXS}
+                      ${GPHDISEG}
+                      ${GPHDFRCXS}
+                      ${GPHDFRCEG}
+                      ${GPHGLWRESXS}
+                      ${GPHGLWRESEG}
+                      ${GPHIBDXS}
+                      ${GPHIBDEG}
+                      ${GPHMNUCXS}
+                      ${GPHMNUCEG}
+                      ${GPHMEL}
+                      ${GPHNUELXS}
+                      ${GPHNUELEG}
+                      ${GPHQELXS}
+                      ${GPHQELEG}
+                      ${GPHRESXS}
+                      ${GPHRESEG}
+                      ${GPHSTRXS}
+                      ${GPHSTREG}
+                      ${GPHNDCY}
+                      ${GTLGEO}
+                      ${GTLFLX}
+                      ${GRWFWK}
+                      ${GRWIO}
+                      ${GRWCLC})
+
+  #MESSAGE("--UBOONECODE-- GENIE_VERSION=${VMAJ} ${VMIN} not defining -DGENIE_PRE_R3")
+endif()
+
+#MESSAGE("--UBOONECODE-- GENIE ${VMAJ} GENIE_LIB_LIST=${GENIE_LIB_LIST}")
+# END GENIE VERSION CHECK
+
 
 # ADD SOURCE CODE SUBDIRECTORIES HERE
 add_subdirectory(fcl)

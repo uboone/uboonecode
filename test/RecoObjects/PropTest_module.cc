@@ -18,8 +18,7 @@
 #include "lardata/RecoObjects/SurfYZPlane.h"
 #include "lardata/RecoObjects/SurfXYZPlane.h"
 #include "lardata/RecoObjects/PropAny.h"
-
-#include "nurandom/RandomUtils/NuRandomService.h"
+#include "nutools/RandomUtils/NuRandomService.h"
 #include "CLHEP/Random/RandFlat.h"
 
 #include "TMath.h"

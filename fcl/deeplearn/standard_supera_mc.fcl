@@ -16,7 +16,7 @@ physics.analyzers:  {
 		    }
 
 # Define larcv analyzer sequence.
-physics.larcv: [ reco2d, opreco, mcinfo, superaWholeViewMC ]
+physics.larcv: [ reco2d, opreco, mcinfo, superaMCFullSet ]
 
 # Add larcv sequence to end_paths.
 

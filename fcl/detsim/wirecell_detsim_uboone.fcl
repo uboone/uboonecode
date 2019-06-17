@@ -29,7 +29,7 @@ source:
   module_type: RootInput
   maxEvents:  10        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*" ]
 
 }
 
@@ -59,7 +59,7 @@ physics:
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
  #simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, daq, driftWC, swtrigger ]
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, driftWC, swtrigger, crtdetsim, crthitsim, mcreco ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, crtdetsim, crthitsim, driftWC, swtrigger]#, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
