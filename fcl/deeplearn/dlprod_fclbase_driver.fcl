@@ -18,8 +18,12 @@ services:
 
 services.TimeTracker.printSummary: false
 services.TimeTracker.dbOutput: {}
-services.MemoryTracker.printSummaries: []
+#services.MemoryTracker.printSummaries: []
 services.MemoryTracker.includeMallocInfo: false
+services.MemoryTracker.includeMallocInfo:                    false
+services.MemoryTracker.dbOutput.filename:                    ""
+
+
 
 services.FileCatalogMetadata.applicationVersion: "develop"
 services.FileCatalogMetadata.fileType: "mc"

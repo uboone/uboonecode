@@ -30,7 +30,7 @@ dlprod_services.Geometry.ForceUseFCLOnly: true
 #dlprod_services.SignalShapingServiceMicroBooNE.FilterParamsVec:   [ [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ], [ 1.0, 0.0, 0.1 ] ]
 #dlprod_services.SignalShapingServiceMicroBooNE.FilterWidthCorrectionFactor: [ 0.738, 0.738, 0.738 ]
 
-dlprod_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: [ "v3.11", "v3.11"]
+dlprod_services.SignalShapingServiceMicroBooNE.FieldResponseFVersion: "v3.11"
 dlprod_services.SignalShapingServiceMicroBooNE.YZdependentResponse: true
 dlprod_services.SignalShapingServiceMicroBooNE.datadrivenResponse: true
 dlprod_services.SignalShapingServiceMicroBooNE.DefaultEField: 0.273
