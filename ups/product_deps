@@ -30,9 +30,9 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v08_21_00
+larsoft                 v08_22_00_01
 ubcv                    v08_21_00
-ubcrt                   v08_21_00
+ubcrt                   v08_21_00_01
 ublite			v08_21_00
 ubutil                  v08_21_00
 uboonedata              v01_18_23
@@ -42,12 +42,16 @@ cetbuildtools	        v7_12_01	-	only_for_build
 end_product_list
 
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
+c2:py3:debug   c2:py3:debug   c2:py3:debug   c2:py3:debug   c2:py3:debug   c2:py3:debug   -nq-           DefaultPlusMECWithNC    -nq-
+c2:py3:prof    c2:py3:prof    c2:py3:prof    c2:py3:prof    c2:py3:prof    c2:py3:prof    -nq-           DefaultPlusMECWithNC    -nq-
+c2:py3:prof:fg c2:py3:prof    c2:py3:prof    c2:py3:prof    c2:py3:prof    c2:py3:prof    -nq-           LocalFGNievesQEAndMEC   -nq-
+e17:py3:debug  e17:py3:debug  e17:py3:debug  e17:py3:debug  e17:py3:debug  e17:py3:debug  -nq-           DefaultPlusMECWithNC    -nq-
+e17:py3:prof   e17:py3:prof   e17:py3:prof   e17:py3:prof   e17:py3:prof   e17:py3:prof   -nq-           DefaultPlusMECWithNC    -nq-
+e17:py3:prof:fg e17:py3:prof  e17:py3:prof   e17:py3:prof   e17:py3:prof   e17:py3:prof   -nq-           LocalFGNievesQEAndMEC   -nq-
 c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           DefaultPlusMECWithNC    -nq-
-c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           DefaultPlusMECWithNC    -nq-
 c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           DefaultPlusMECWithNC    -nq-
 c2:prof:fg     c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           LocalFGNievesQEAndMEC   -nq-
 e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           DefaultPlusMECWithNC    -nq-
-e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           DefaultPlusMECWithNC    -nq-
 e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           DefaultPlusMECWithNC    -nq-
 e17:prof:fg    e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           LocalFGNievesQEAndMEC   -nq-
 end_qualifier_list
