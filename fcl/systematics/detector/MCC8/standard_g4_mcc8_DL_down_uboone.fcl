@@ -3,4 +3,4 @@
 process_name: G4DLDOWN
 outputs.out1.fileName: "%ifb_%tc_g4_dldown.root"
 
-#include "sys_var_DL_mcc8_down_uboone.fcl"
+#include "sys_var_mcc8_DL_down_uboone.fcl"
