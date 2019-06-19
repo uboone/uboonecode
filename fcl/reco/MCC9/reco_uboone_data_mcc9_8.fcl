@@ -212,6 +212,9 @@ microboone_reco_data_producers:
     pandoraCrtHitMatch:               @local::t0recocrthit_data
     crttzero:                         @local::crttzero
 
+    # Flash Matching preservation
+    flashmatch:                       @local::FlashMatch
+
 }
 
 microboone_reco_data_analyzers:
@@ -311,7 +314,8 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraKalmanShowercalipid,
                                          shrreco3d,
                                          pandoraGeomVertexFit,
-                                         pandoraCrtHitMatch
+                                         pandoraCrtHitMatch,
+                                         flashmatch
                                          ]
 
 microboone_reco_data:                  [ rns,
