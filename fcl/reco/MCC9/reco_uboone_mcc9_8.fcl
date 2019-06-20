@@ -31,8 +31,8 @@
 #include "calibration_microboone.fcl"
 #include "shrreco3d.fcl"
 #include "microboone_crtreco.fcl"
+#include "microboone_crthitcorr.fcl"  
 
-#include "crtsimhit_corr.fcl"
 #include "mctrutht0matching.fcl"
 #include "mchitmodules.fcl"
 #include "dlprod_fclbase_analyzers.fcl"
@@ -194,9 +194,9 @@ microboone_reco_mcc8_producers:
   shrreco3d:                        @local::ShrReco3DPandora
 
   # CRT reco
-  crthitcorr:                       @local::crthitcorr_filter
-  crttzero:                         @local::crttzero_sim
-  pandoraCrtHitMatch:               @local::t0recocrthit_sim
+  crthitcorr:         @local::crtsimhitcorr
+  crttzero:           @local::crttzero
+  pandoraCrtHitMatch: @local::t0recocrthit_sim
 
   ### MCTruthMatching
 
