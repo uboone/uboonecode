@@ -32,6 +32,8 @@
 #include "shrreco3d.fcl"
 #include "microboone_crtreco.fcl"
 #include "OpNoiseCreateMask.fcl"
+#include "acpttrig.fcl"
+#include "stopmu.fcl"
 
 #include "crtsimhit_corr.fcl"
 #include "mctrutht0matching.fcl"
@@ -195,6 +197,13 @@ microboone_reco_mcc8_producers:
   ### T0 Anode/Cathode piercing track reco using beam-gate-flash
   pmtrackT0RecoBeam:                @local::T0RecoAnodeCathodePiercing_data_beamgate
 
+  ### T0 Anode/Cathode piercing for MCC9.1
+  acpttagger:                       @local::T0RecoAnodeCathodePiercing
+  ### T0 Anode/Cathode piercing for in-time tracks
+  acpttrigtagger:                   @local::ACPTtrig
+  ### Stopping muon tagger
+  stopmutagger:                     @local::StopMu
+
   # Shower Reco module
   shrreco3d:                        @local::ShrReco3DPandora
 
@@ -298,7 +307,11 @@ microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraKalmanShowercalipid,
                                      shrreco3d,
                                      pandoraGeomVertexFit,
-                                     pandoraCrtHitMatch
+                                     pandoraCrtHitMatch,
+                                     flashmatch,
+                                     acpttagger,
+                                     acpttrigtagger,
+                                     stopmutagger
                                      ]
 
 microboone_reco_mcc8: [                  rns,
