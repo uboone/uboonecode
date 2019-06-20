@@ -479,11 +479,11 @@ microboone_reco_data_producers.pandoraKalmanShowercali.CalorimetryModuleLabel:  
 microboone_reco_data_producers.pandoraKalmanShowercalipid.ProducerLabels.TrackLabel:                        "pandoraKalmanShower"
 microboone_reco_data_producers.pandoraKalmanShowercalipid.ProducerLabels.CalorimetryLabel:                  "pandoraKalmanShowercali"
 
-microboone_reco_data_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.26e-3]
-microboone_reco_data_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.26e-3]
-microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.26e-3]
-microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.26e-3]
-microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.26e-3]
+microboone_reco_data_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.04e-3]
+microboone_reco_data_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.04e-3]
+microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.04e-3]
+microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.04e-3]
+microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.04e-3]
 
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.TrackModuleLabel:                               "pandoraKalmanTrack"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.FlashModuleLabel:                               "simpleFlashBeam"
@@ -494,7 +494,7 @@ microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.FlashModuleLabel:  
 microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
 
 microboone_reco_data_producers.shrreco3d.BacktrackTag:                                                        ""
-microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [232,249,238.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [232,249,247.4] # e-/ADC
 microboone_reco_data_producers.shrreco3d.NeutrinoEvent:                                                       false
 
 microboone_reco_data_producers.pmtrack.PfpModuleLabel:                                                        "trajcluster"
