@@ -1,0 +1,9 @@
+#include "wirecell_detsim_uboone.fcl"
+
+process_name: DetsimStretch
+outputs.out1.fileName: "%ifb_%tc_detsim_Stretch.root"
+
+physics.producers.driftWC.wcls_main.structs.sys_resp: true
+physics.producers.driftWC.wcls_main.structs.sys_resp_start: -10e3 // units: nanosecond
+physics.producers.driftWC.wcls_main.structs.sys_resp_magnitude: "[1.0, 1.0, 1.0]" 
+physics.producers.driftWC.wcls_main.structs.sys_resp_time_smear: "[2.0e3, 2.0e3, 2.0e3]" // units:nanosecond
