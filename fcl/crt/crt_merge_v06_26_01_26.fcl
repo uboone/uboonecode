@@ -1,0 +1,97 @@
+#include "services_microboone.fcl"
+#include "microboone_crt_file_manager.fcl"
+#include "microboone_crt_merger.fcl"
+#include "crtflashana.fcl"
+#include "time_memory_tracker_microboone.fcl"
+
+process_name: CRTMerger
+
+services:
+{
+  scheduler:           {defaultExceptions: false }  # Make all uncaught exceptions fatal.        
+  TFileService:        {fileName: "crtmerger.root" }
+  TimeTracker:         @local::microboone_time_tracker
+  MemoryTracker:       @local::microboone_memory_tracker
+  FileCatalogMetadata: @local::art_file_catalog_data
+  CRTFileManager:      @local::microboone_crt_file_manager
+  IFDH:                {}
+}
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          "crtmerger.root.json"
+  GenerateTFileMetadata: true
+  dataTier:              "root-tuple"
+  fileFormat:            "root"
+}
+
+source:
+{
+  module_type: RootInput
+  maxEvents:  10        # Number of events to read
+  saveMemoryObjectThreshold: 0
+  inputCommands: ["keep *_*_*_*",
+                  "drop crt::CRTHits_*_*_*" ]
+}
+
+physics:
+{
+
+  # Modules.
+
+  producers:
+  {
+    merger:      @local::microboone_crt_merger
+  }
+
+  analyzers:
+  {
+    crtflash: @local::crtflashana
+  }
+
+  # Paths.
+
+  merge: [ merger ]
+  trigger_paths: [ merge ]
+
+  ana: [ crtflash ]
+  stream1: [ out1 ]
+  end_paths: [ ana, stream1 ]
+}
+outputs:
+{
+  out1:
+  {
+    module_type  : RootOutput
+    fileName  : "%ifb_%tc_crtmerge.root"
+    dataTier  : "reconstructed"
+    compressionLevel: 1
+  }
+}
+services.message.destinations:
+{
+  STDCOUT:
+  {
+    type:      "cout"      #tells the message service to output this destination to cout
+    threshold: "WARNING"   #tells the message service that this destination applies to WARNING and higher level messages
+#    append:     true       #says to append all messages to the output
+    categories:
+    {
+      ChannelFilter:
+      {
+        limit: 0
+        reportEvery: 0
+      }
+      default:
+      {
+ #don't print anything at the infomsg level except the explicitly named categories
+        limit: -1 
+        reportEvery: 1
+      }
+    }
+  }
+}
+
+services.CRTFileManager.ubversion_CRTHits: prod_v06_26_01_26
+
+physics.producers.merger.debug: false
