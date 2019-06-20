@@ -325,7 +325,7 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          shrreco3d,
                                          pandoraGeomVertexFit,
                                          pandoraCrtHitMatch,
-                                         flashmatch
+                                         flashmatch,
                                          acpttagger,
                                          acpttrigtagger,
                                          stopmutagger
