@@ -308,6 +308,7 @@ microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      shrreco3d,
                                      pandoraGeomVertexFit,
                                      pandoraCrtHitMatch,
+                                     flashmatch,
                                      acpttagger,
                                      acpttrigtagger,
                                      stopmutagger

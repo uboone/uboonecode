@@ -33,6 +33,9 @@
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
 #include "OpNoiseCreateMask.fcl"
+#include "OpNoiseCreateMask.fcl"
+#include "acpttrig.fcl"
+#include "stopmu.fcl"
 
 #include "ophitremapproducer.fcl"
 #include "beamdata_microboone.fcl"
