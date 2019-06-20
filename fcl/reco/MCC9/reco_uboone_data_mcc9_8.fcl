@@ -32,6 +32,7 @@
 #include "microboone_crtreco.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
+#include "OpNoiseCreateMask.fcl"
 
 #include "ophitremapproducer.fcl"
 #include "beamdata_microboone.fcl"
@@ -131,6 +132,9 @@ microboone_reco_data_producers:
     ### hit-finder producers
     gaushit:                          @local::microboone_gaushitfinder
 
+    ### pmt-induced noise tagger
+    opNoiseCreateMask:                @local::opnoisecreatemask
+
     ### cluster-finder producers
     sps3d:                            @local::microboone_spacepointsolver
     dbcluster3d:                      @local::microboone_dbcluster3d
@@ -191,6 +195,7 @@ microboone_reco_data_producers:
 
     ### MCS Momentum
     pandoraMCSMu:                     @local::mcsfitproducer
+    pandoraMCSMuNoSCE:                @local::mcsfitproducer
     pmtrackMCSMu:                     @local::mcsfitproducer
 
     ### T0 Anode/Cathode piercing track reco
@@ -296,6 +301,7 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoratag,
                                          pandoraContTag,
                                          pandoraMCSMu,
+                                         pandoraMCSMuNoSCE,
                                          pandoracalo,
                                          pandorapid,
                                          pandoracali,
@@ -329,6 +335,7 @@ microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
                                          @sequence::microboone_reco_data_crt,
                                          @sequence::microboone_reco_data_signalprocessing,
+                                         opNoiseCreateMask,
                                          @sequence::microboone_reco_data_crt,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
@@ -341,6 +348,7 @@ microboone_reco_data_stage1:           [ rns,
                                        ]
 
 microboone_reco_data_stage2:           [ rns,
+                                         opNoiseCreateMask,
                                          @sequence::microboone_reco_data_crt,
 				       	 wcopflash,
                                          @sequence::microboone_reco_data_pandora,
@@ -534,6 +542,8 @@ microboone_reco_data_producers.pandoraContTag.TrackModuleLabels:                
 microboone_reco_data_producers.pandoraContTag.ApplyTags:                                                      [true]
 
 microboone_reco_data_producers.pandoraMCSMu.inputs.inputLabel:                                                "pandora"
+microboone_reco_data_producers.pandoraMCSMuNoSCE.inputs.inputLabel:                                           "pandora"
+microboone_reco_data_producers.pandoraMCSMuNoSCE.fitter.applySCEcorr:                                         false
 microboone_reco_data_producers.pmtrackMCSMu.inputs.inputLabel:                                                "pmtrack"
 
 microboone_reco_data_producers.pmtrackT0Reco.TrackProducer:                                                   "pmtrack"
