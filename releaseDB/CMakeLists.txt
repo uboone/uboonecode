@@ -19,7 +19,7 @@ create_product_variables( uboonecode ${version} )
 
 # define qualifiers
 set( BASEQUAL e17 )
-set( SQUAL s65 )
+set( SQUAL s78 )
 
 create_product_variables( uboone_photon_propagation v01_00_00  )
 create_product_variables( larbatch                  v01_51_03  )
@@ -41,7 +41,7 @@ create_product_variables( ubraw                     v08_00_00_14  )
 create_product_variables( ubcore                    v08_00_00_14  )
 create_product_variables( ubcrt                     v08_00_00_14  )
 create_product_variables( ubobj                     v08_00_00_14  )
-create_product_variables( larsoft                   v08_05_00_07  )
+create_product_variables( larsoft                   v08_05_00_08  )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
