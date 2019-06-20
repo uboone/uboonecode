@@ -33,7 +33,6 @@
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
 #include "OpNoiseCreateMask.fcl"
-#include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
 
