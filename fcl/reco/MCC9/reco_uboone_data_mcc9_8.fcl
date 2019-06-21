@@ -30,6 +30,8 @@
 #include "calibration_microboone.fcl"
 #include "shrreco3d.fcl"
 #include "microboone_crtreco.fcl"
+#include "microboone_crthitcorr.fcl"
+#include "UBCRTCosmicFilter.fcl"
 #include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
@@ -94,7 +96,6 @@ microboone_flashfilter: { module_type: "OpFlashFilter"
                                           Verbose: false
                                          FlashCuts: [ [ { MinPE:40 MinTime:2.9 MaxTime:5.2 } ] ]
                                   }
-
 
 ### This is the complete list of all producers! ###
 microboone_reco_data_producers:
@@ -220,7 +221,12 @@ microboone_reco_data_producers:
 
     # CRT reco
     pandoraCrtHitMatch:               @local::t0recocrthit_data
+    crthitcorrFirstPass:              @local::crtsimhitcorr
+    crthitcorr:                       @local::crtdatahitcorr
     crttzero:                         @local::crttzero
+    crttrack:                         @local::crttrack
+    crttrackmatch:                    @local::t0recocrthit_data
+    crttrackmatchAll:                 @local::t0recocrthit_data
 
     # Flash Matching preservation
     flashmatch:                       @local::FlashMatch
@@ -248,6 +254,8 @@ microboone_reco_data_filters:
 
     # Beam data quality filter.
     beamdataquality:                  @local::beam_data_quality
+
+    crtveto:                          @local::UBCRTCosmicFilterBNBON
 }
 
 
@@ -291,7 +299,18 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
                                          tcshower
                                        ]
 
-microboone_reco_data_crt: [              crttzero ]
+microboone_reco_data_crt:              [ crthitcorr,
+                                         crttzero,
+                                         crttrack,
+                                         crttrackmatch,
+                                         crtveto ]
+
+microboone_reco_ovrl_crt:              [ crthitcorrFirstPass,
+                                         crthitcorr,
+                                         crttzero,
+                                         crttrack,
+                                         crttrackmatch,
+                                         crtveto ]
 
 microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraPatRec,
@@ -333,12 +352,11 @@ microboone_reco_data_pandora: [          pandoraWriter,
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
-                                         @sequence::microboone_reco_data_crt,
                                          @sequence::microboone_reco_data_signalprocessing,
                                          opNoiseCreateMask,
-                                         @sequence::microboone_reco_data_crt,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt,
                                          @sequence::microboone_reco_data_ccpath 
                                        ]
 
@@ -349,9 +367,17 @@ microboone_reco_data_stage1:           [ rns,
 
 microboone_reco_data_stage2:           [ rns,
                                          opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_crt,
+                                         @sequence::microboone_reco_data_ccpath
+                                       ]
+
+microboone_reco_ovrl_stage2:           [ rns,
+                                         opNoiseCreateMask,
 				       	 wcopflash,
                                          @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_ovrl_crt,
                                          @sequence::microboone_reco_data_ccpath 
                                        ]
 
@@ -569,6 +595,18 @@ microboone_reco_data_analyzers.DQMGoodRuns.OpFlashModuleLabel:                  
 microboone_reco_data_producers.pandoraCrtHitMatch.data_label_TPCtrack:                                        "pandora"
 microboone_reco_data_producers.pandoraCrtHitMatch.data_label_CRThit:                                          "merger"
 microboone_reco_data_producers.pandoraCrtHitMatch.data_label_flash:                                           "simpleFlashCosmic"
-microboone_reco_data_producers.crttzero.data_label:                                                           "merger"
+
+microboone_reco_data_producers.crthitcorrFirstPass.CrtHitsIn_Label:                                           "mixer"
+microboone_reco_data_producers.crthitcorr.CrtHitsIn_Label1:                                                   "merger"
+microboone_reco_data_producers.crthitcorr.HitThreshold:                                                       70.
+microboone_reco_data_producers.crttzero.data_label:                                                           "crthitcorr"
+microboone_reco_data_producers.crttrackmatch.data_label_CRThit:                                               "crthitcorr"
+microboone_reco_data_producers.crttrackmatch.data_label_CRTtzero:                                             "crttzero"
+microboone_reco_data_producers.crttrackmatch.data_label_TPCtrack:                                             "pandora"
+microboone_reco_data_producers.crttrackmatch.data_label_flash:                                                "simpleFlashCosmic"
+microboone_reco_data_producers.crttrackmatchAll.data_label_CRThit:                                            "crthitcorr"
+microboone_reco_data_producers.crttrackmatchAll.data_label_CRTtzero:                                          "crttzero"
+microboone_reco_data_producers.crttrackmatchAll.data_label_TPCtrack:                                          "pandoraAllOutcomesTrack"
+microboone_reco_data_producers.crttrackmatchAll.data_label_flash:                                             "simpleFlashCosmic"
 
 END_PROLOG
