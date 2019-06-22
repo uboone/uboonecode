@@ -24,6 +24,7 @@ source:
   module_type: RootInput
   maxEvents:   -1        # Number of events to create
   #inputCommands: ["keep *_*_*_*","drop *_*_*_DetSim", "drop *_*_*_G4"]#, "keep sim::MCTrack_*_*_*", "keep recob::Track_*_pandoraCosmic_*" ]
+  inputCommands: ["keep *_*_*_*","drop recob::Wire_*_*_*"]
 }
 
 physics:
@@ -80,9 +81,18 @@ physics.analyzers.snmichel0.HitProducer: "gaushit"
 physics.analyzers.snmichel2.MichelProducer: "michel2" # Analyze Michels on collection plane
 physics.analyzers.snmichel1.MichelProducer: "michel1" # Analyze Michels on second induction plane
 physics.analyzers.snmichel0.MichelProducer: "michel0" # Analyze Michels on first induction plane
-physics.analyzers.snmichel2.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
-physics.analyzers.snmichel1.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
-physics.analyzers.snmichel0.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+#physics.analyzers.snmichel2.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+#physics.analyzers.snmichel1.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+#physics.analyzers.snmichel0.ADC2MeV: 8.976e-3 # From stopping muon analysis on collection plane
+physics.analyzers.snmichel2.ADC2MeV: 9.239e-3 # From MicroBooNE-doc-14754-v3
+physics.analyzers.snmichel1.ADC2MeV: 8.710e-3 # From MicroBooNE-doc-14754-v3
+physics.analyzers.snmichel0.ADC2MeV: 8.999e-3 # From MicroBooNE-doc-14754-v3
 physics.analyzers.snmichel2.SamplesOverlapPre: 1600. # From sn swizzler
 physics.analyzers.snmichel2.SamplesOverlapPost: 1600. # From sn swizzler
 physics.analyzers.snmichel2.TotalSamplesPerRecord: 6400. # From sn swizzler
+physics.analyzers.snmichel1.SamplesOverlapPre: 1600. # From sn swizzler
+physics.analyzers.snmichel1.SamplesOverlapPost: 1600. # From sn swizzler
+physics.analyzers.snmichel1.TotalSamplesPerRecord: 6400. # From sn swizzler
+physics.analyzers.snmichel0.SamplesOverlapPre: 1600. # From sn swizzler
+physics.analyzers.snmichel0.SamplesOverlapPost: 1600. # From sn swizzler
+physics.analyzers.snmichel0.TotalSamplesPerRecord: 6400. # From sn swizzler

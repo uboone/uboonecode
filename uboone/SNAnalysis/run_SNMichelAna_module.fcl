@@ -75,3 +75,6 @@ services.DetectorClocksService.TriggerOffsetTPC:                          -0.400
 physics.analyzers.snmichel.HitProducer: "gaushit"
 physics.analyzers.snmichel.MichelProducer: "michel2" # Analyze Michels on collection plane
 physics.analyzers.snmichel.ADC2MeV: 7.69e-3 # From Michel e paper
+physics.analyzers.snmichel.SamplesOverlapPre: 1600. # From sn swizzler
+physics.analyzers.snmichel.SamplesOverlapPost: 1600. # From sn swizzler
+physics.analyzers.snmichel.TotalSamplesPerRecord: 6400. # From sn swizzler

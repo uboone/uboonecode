@@ -6,13 +6,13 @@ gROOT.ForceStyle()
 ### User-defined variables ###
 
 # ROOT files with histograms
-snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960files3planes_SNMichelAna_hist_v5samxrd.root")
+snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960files3planes_SNMichelAna_hist_v6samxrd.root")
 
-#extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v5.root")
+#extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v6.root")
 #extunbname = "Trigger stream"
 #extunbcolor = 2 # Red
 #extunbcolor_errors = 46 # Reddish
-extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v5.root")
+extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v6.root")
 extunbname = "Trigger stream + ZS"
 extunbcolor = 3 # Green
 extunbcolor_errors = 30 # Greenish
@@ -48,8 +48,8 @@ frontierpad = 0.3
 #frontierpad = 0
 logx = False
 #logx = True
-#logy = False
-logy = True
+logy = False
+#logy = True
 
 # Event sizes in number of samples
 snevtsize = 3200. # Only unique samples

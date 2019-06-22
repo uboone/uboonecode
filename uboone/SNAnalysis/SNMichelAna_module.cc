@@ -105,6 +105,8 @@ private:
 
   TH1F* fhEventHitSpectrum; // Event-wide hit spectrum
 
+  TH2F* fhEventHitPos; // Event-wide hit position
+
   // To do: create a TTree holding: run, event, cluster start_wire, cluster start_time, e cluster charge, e cluster hit mult, vector of g cluster charges, vector for g cluster hit mult, vector of e hit wire, vector of e hit peak time, vector of e hit integral, vector of g hit wire, vector of g hit peak time, vector of g hit integral
 
   geo::View_t fPlane; // Wire plane analyzed
@@ -123,9 +125,9 @@ SNMichelAna::SNMichelAna(fhicl::ParameterSet const & p)
   fHitProducer = p.get<std::string>("HitProducer");
   fMichelProducer = p.get<std::string>("MichelProducer");
   fADC2MeV = p.get<float>("ADC2MeV");
-  fSamplesOverlapPre = p.get<float>("SamplesOverlapPre", 1600.);
-  fSamplesOverlapPost = p.get<float>("SamplesOverlapPost", 1600.);
-  fTotalSamplesPerRecord = p.get<float>("TotalSamplesPerRecord", 6400.);
+  fSamplesOverlapPre = p.get<float>("SamplesOverlapPre");
+  fSamplesOverlapPost = p.get<float>("SamplesOverlapPost");
+  fTotalSamplesPerRecord = p.get<float>("TotalSamplesPerRecord");
 
 }
 
@@ -170,6 +172,8 @@ void SNMichelAna::beginJob()
 
   fhEventHitSpectrum = tfs->make<TH1F>("hEventHitSpectrum","Event hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
 
+  fhEventHitPos = tfs->make<TH2F>("hEventHitPos","Event hit pos.; Wire; Tick; Entries/1 wire/1 tick", 3456, 0., 3456., 6400, 0., 6400.);
+
   // Guess plane from Michel producer
   if( fMichelProducer.find("0") != std::string::npos) fPlane = (geo::View_t)0;
   else if( fMichelProducer.find("1") != std::string::npos) fPlane = (geo::View_t)1;
@@ -204,6 +208,7 @@ void SNMichelAna::analyze(art::Event const & e)
 	hit.PeakTime() >= fTotalSamplesPerRecord - fSamplesOverlapPost ) continue;
     fhEventHitSpectrum->Fill( fADC2MeV*hit.Integral() );
     evtHits++;
+    fhEventHitPos->Fill( hit.WireID().Wire, hit.PeakTime() );
   }
   // To do: switch to hit density (hits per unit of time) to make it independent of event length?
   // fhEventHitMult->Fill( (float)evtHits/(fTotalSamplesPerRecord - fSamplesOverlapPost - fSamplesOverlapPre) );
@@ -278,6 +283,7 @@ void SNMichelAna::analyze(art::Event const & e)
   // Fill histos only if there were in-time clusters
   if( radCharge != 0.0 ) fhgSpectrum->Fill( fADC2MeV*radCharge );
   if( radHits != 0 ) fhgHitMult->Fill( (float)radHits );
+  // To do: add bool that is true if cluster was in the central frame to avoid counting out-of-time Michels as 0 multiplicity
   fhgClusMult->Fill( (float)radClusters );
 
   // Loop over electron clusters
