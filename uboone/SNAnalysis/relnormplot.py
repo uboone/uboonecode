@@ -12,7 +12,7 @@ snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960
 #extunbname = "Trigger stream"
 #extunbcolor = 2 # Red
 #extunbcolor_errors = 46 # Reddish
-extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v5.root")
+extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_batch0and1_partial_hist_v5.root")
 extunbname = "Trigger stream + ZS"
 extunbcolor = 3 # Green
 extunbcolor_errors = 30 # Greenish
@@ -40,20 +40,19 @@ hlistname = [ "heSpectrum",
           "hgClusMult",
           "hgClusSpectrum",
           "hgClusHitMult",
-          "hEventHitMult",
           "hEventHitSpectrum" ]
 
 # Fraction of canvas for the bottom pad (make it 0 if you do not want one)
-frontierpad = 0.3
-#frontierpad = 0
+#frontierpad = 0.3
+frontierpad = 0
 logx = False
 #logx = True
-#logy = False
-logy = True
+logy = False
+#logy = True
 
 # Event sizes in number of samples
-snevtsize = 3200. # Only unique samples
-extunbevtsize = 6400.
+snevtsize = 1.
+extunbevtsize = 1.
 extunbevtsize_emu = 9595.
 
 ### End of user-defined variables ###
@@ -80,11 +79,10 @@ for rootdir in snfile.GetListOfKeys():
         htemp.Sumw2()
         snhlist.append( htemp )
         # Get normalization factor numerator
-        if htemp.GetName().startswith("sn_hEventHitMult"):
+        if htemp.GetName().startswith("sn_htotSpectrum"):
             # print "%s %i " % (htemp.GetName(), htemp.GetEntries())
             normfactor[int( rootdir.GetName()[-1] )] = htemp.GetEntries()*snevtsize
             snexposure = htemp.GetEntries()*snevtsize*0.5e-6 # in seconds
-            print "SN stream exposure: %i events = %.2f min " % (htemp.GetEntries(), snexposure/60.)
             if normfactor_emu == 0.: # Do it only once (all planes had the same number of events)
                 normfactor_emu = htemp.GetEntries()*snevtsize
             if normfactor_emumerged == 0.: # Do it only once (all planes had the same number of events)
@@ -99,19 +97,10 @@ for rootdir in extunbfile.GetListOfKeys():
         # Get exposure (number of events) from hEventHitMult
         htemp.SetNameTitle( "extunb_" + htemp.GetName() + "_" + rootdir.GetName()[-1], htemp.GetTitle() + " plane " + rootdir.GetName()[-1] )
         # Get normalization factor denominator
-        if htemp.GetName().startswith("extunb_hEventHitMult"):
+        if htemp.GetName().startswith("extunb_htotSpectrum"):
             # print "%s %i " % (htemp.GetName(), 2.*htemp.GetEntries())
             normfactor[int( rootdir.GetName()[-1] )] *= 1./(htemp.GetEntries()*extunbevtsize)
             extunbexposure = htemp.GetEntries()*extunbevtsize*0.5e-6 # in seconds
-            print "Trigger stream exposure: %i events = %.2f min " % (htemp.GetEntries(), extunbexposure/60.)
-            # For hit multiplicity/event we have to correct for the different event size
-            hnew = htemp.Clone()
-            hnew.Reset()
-            for ibin in xrange( htemp.GetNbinsX() ):
-                # Trigger stream events are twice as long as SN stream ones, so they can have twice as many hits
-                ibinnew = int( math.floor(ibin*snevtsize/extunbevtsize) )
-                hnew.SetBinContent( ibinnew, hnew.GetBinContent(ibinnew) + htemp.GetBinContent(ibin) )
-            htemp = hnew    
         htemp.Sumw2()
         extunbhlist.append( htemp )
 
@@ -180,7 +169,7 @@ extunbh_emumerged_collector = []
 # Loop for making plots
 for snh in snhlist:
 
-    c = TCanvas( "c_" + snh.GetName(), snh.GetTitle(), 800 if frontierpad else 1600, 800 )
+    c = TCanvas( "c_" + snh.GetName(), snh.GetTitle() )
 
     if frontierpad:
         ### Histograms plot ###
@@ -350,8 +339,8 @@ for snh in snhlist:
     snh.Draw("E P0 X0 same") # SN data
     #snh.DrawNormalized("E P0 X0 same") # SN data
     leg = TLegend(0.6, 0.7, 1.0, 1.0)
-    leg.AddEntry( extunbh_errors, "%s (%i entries)" % (extunbname, int( extunbh_integral )), "FLP" )
-    leg.AddEntry( snh, "SN stream (%i entries)" % int( snh.Integral() ), "LEP" )
+    leg.AddEntry( extunbh_errors, "%s" % (extunbname), "FLP" )
+    leg.AddEntry( snh, "SN stream", "LEP" )
     if logx: leg.SetFillStyle(0) # Make it transparent to mitigate the change of the distribution
     leg.Draw()
     if logx: gPad.SetLogx()
@@ -400,7 +389,9 @@ for snh in snhlist:
 
     leglist.append(leg)
     extunbh_errorslist.append(extunbh_errors)
-    c.Print( c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.png" if frontierpad else ".png") )
+    #c.Print( "relnorm_" + c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.png" if frontierpad else ".png") )
+    #c.Print( "relnorm_" + c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.root" if frontierpad else ".root") )
+    c.Print( "relnorm_" + c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.pdf" if frontierpad else ".pdf") )
     #c.Print( c.GetName() + ("_logx" if logx else "") + ("_bigratio.png" if frontierpad else ".png") )
     #c.Print( "norm_" + c.GetName() + ".png" )
     clist.append(c)
