@@ -370,11 +370,11 @@ microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiT
 
 
 # calorimetry constants
-microboone_reco_mcc8_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
-microboone_reco_mcc8_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
-microboone_reco_mcc8_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
-microboone_reco_mcc8_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
-microboone_reco_mcc8_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.08e-3,3.97e-3,4.21e-3]
+microboone_reco_mcc8_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.08e-3,3.97e-3,4.21e-3]
+microboone_reco_mcc8_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.21e-3]
+microboone_reco_mcc8_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                       [4.08e-3,3.97e-3,4.21e-3]
+microboone_reco_mcc8_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.21e-3]
 
 # ClusterCrawler / Track Maker related
 microboone_reco_mcc8_producers.trajcluster.HitModuleLabel:                                                     "gaushit"
@@ -535,7 +535,7 @@ microboone_reco_mcc8_producers.wcopflash.LGHGGainScale:								[10.,10.,10.,10.,
 														10.,10.,10.,10.,10.,10.,10.,10.,10.,10.]
 
 microboone_reco_mcc8_producers.shrreco3d.BacktrackTag:                                                          ""
-microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [245,252,248.2] # e-/ADC
+microboone_reco_mcc8_producers.shrreco3d.ADCtoE:                                                                [245,252,237.6] # e-/ADC
 microboone_reco_mcc8_producers.shrreco3d.NeutrinoEvent:                                                         false
 
 microboone_reco_mcc8_producers.crthitcorr.CrtHitsIn_Label:                                                      "crthitsim"
