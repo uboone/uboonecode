@@ -11,7 +11,7 @@
 #include "crtsimhitproducer.fcl"
 #include "CRTpreOverlay.fcl"
 
-process_name: OverlayDetsim 
+process_name: OverlayDetsimOptical 
 
 services:
 {
@@ -31,7 +31,7 @@ source:
   module_type: RootInput
   maxEvents:  -1        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_OverlayDetsimOptical*" ]
 
 }
 

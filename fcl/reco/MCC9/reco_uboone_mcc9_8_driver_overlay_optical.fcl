@@ -22,7 +22,9 @@ physics.producers.mchitfinder.LArG4ModuleName: "driftWC:simpleSC"
 physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonext
 
 physics.reco:                   [ rns, @sequence::microboone_reco_data_optical, opfiltercommon ]
+physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ ana, stream1 ]
 
 outputs.out1.fileName:          "%ifb_%tc_reco1a.root"
 outputs.out1.dataTier:          "reconstructed"
