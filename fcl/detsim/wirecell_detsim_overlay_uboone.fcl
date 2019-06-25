@@ -93,7 +93,7 @@ outputs:
 
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
-physics.producers.optdigitizer.AbnormalOpCh: 27
+physics.producers.optdigitizer.AbnormalOpCh: 29
 
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
