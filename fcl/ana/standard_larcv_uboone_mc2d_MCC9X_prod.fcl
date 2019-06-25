@@ -1,6 +1,6 @@
 #include "standard_larcv_uboone_mc_prod.fcl"
 
-physics.analyzers.larcv: [ "opreco", "gaushitMCinfoBacktracker" ]
+physics.larcv: [ "opreco", "gaushitMCinfoBacktracker" ]
 
 microboone_tfile_metadata:
 {
