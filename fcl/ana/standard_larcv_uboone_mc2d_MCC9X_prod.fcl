@@ -1,0 +1,13 @@
+#include "standard_larcv_uboone_mc_prod.fcl"
+
+physics.larcv: [ "opreco", "gaushitMCinfoBacktracker" ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName: [ "larlite_opreco.root.json",
+                  "larlite_backtracker.root.json" ]
+  GenerateTFileMetadata: [ true, true ]
+  dataTier:              [ "larlite_opreco", "larlite_backtracker" ]
+  fileFormat:            [ "root", "root" ]
+}
+
