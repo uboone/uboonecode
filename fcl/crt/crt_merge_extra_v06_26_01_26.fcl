@@ -31,7 +31,8 @@ source:
   maxEvents:  10        # Number of events to read
   saveMemoryObjectThreshold: 0
   inputCommands: ["keep *_*_*_*",
-                  "drop crt::CRTHits_*_*_*" ]
+                  "drop crt::CRTHits_merger_*_*",
+                  "drop crt::CRTHits_mergerextra_*_*" ]
 }
 
 physics:
