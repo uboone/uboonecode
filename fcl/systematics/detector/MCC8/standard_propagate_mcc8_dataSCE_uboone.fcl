@@ -1,0 +1,6 @@
+#include "standard_propagate_mcc8_uboone.fcl"
+
+process_name: SimPropagateDataSCE
+outputs.out1.fileName: "%ifb_%tc_prop_dataSCE.root"
+
+#include "sys_var_mcc8_dataSCE_uboone.fcl"

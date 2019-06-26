@@ -20,7 +20,7 @@ physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel: 
 
 physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
 
-physics.reco:                   [ @sequence::microboone_reco_data_stage2,trajclusterTruthMatch ]
+physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
@@ -37,5 +37,9 @@ microboone_tfile_metadata:
   fileFormat:            ["root", "pndr"]
 }
 
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.57
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   5.25
+physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+# flash-matching score preservation module
+physics.producers.flashmatch: @local::FlashMatch_overlay
+
+physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
+physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
