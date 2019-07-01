@@ -15,12 +15,9 @@ services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
 services.FileCatalogMetadata.fileType: "overlay"
 services.TFileService.fileName: "reco_stage_1a_hist.root"
 
-#physics.producers.eventweight:  @local::microboone_eventweight
 physics.producers.mchitfinder:  @local::standard_mchitfinder
 physics.producers.mchitfinder.LArG4ModuleName: "driftWC:simpleSC"
-
 physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonext
-
 physics.reco:                   [ rns, @sequence::microboone_reco_data_optical, opfiltercommon ]
 physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.trigger_paths:          [ reco ]
@@ -42,13 +39,4 @@ services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
 physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
 
-#microboone_tfile_metadata:
-#{
-#    JSONFileName:          "reco_stage_1_hist.root.json"
-#    GenerateTFileMetadata: true
-#    dataTier:              "root-tuple"
-#    fileFormat:            "root"
-#}
-
-#reduce file name length
 outputs.out1.fileName: "%ifb_r1a.root"
