@@ -9,7 +9,7 @@ process_name: CRTMergerExtra
 services:
 {
   scheduler:           {defaultExceptions: false }  # Make all uncaught exceptions fatal.        
-  TFileService:        {fileName: "crtmerger.root" }
+  TFileService:        {fileName: "crtmerger_hist.root" }
   TimeTracker:         @local::microboone_time_tracker
   MemoryTracker:       @local::microboone_memory_tracker
   FileCatalogMetadata: @local::art_file_catalog_data
@@ -19,7 +19,7 @@ services:
 
 microboone_tfile_metadata:
 {
-  JSONFileName:          "crtmerger.root.json"
+  JSONFileName:          "crtmerger_hist.root.json"
   GenerateTFileMetadata: true
   dataTier:              "root-tuple"
   fileFormat:            "root"
@@ -65,7 +65,7 @@ outputs:
   out1:
   {
     module_type  : RootOutput
-    fileName  : "%ifb_%tc_crtmerge.root"
+    fileName  : "reco1_%tc_crtmerge.root"
     dataTier  : "reconstructed"
     compressionLevel: 1
   }
