@@ -35,6 +35,7 @@
 #include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
+#include "ophitcorrection.fcl"
 
 #include "ophitremapproducer.fcl"
 #include "beamdata_microboone.fcl"
@@ -111,6 +112,8 @@ microboone_reco_data_producers:
     ophitCosmicNoRemap:               @local::microboone_ophit_saturation_cosmic
     ophitBeam:                        @local::ophitremap
     ophitCosmic:                      @local::ophitremap
+    ophitBeamCalib:                   @local::ophitcorrection
+    ophitCosmicCalib:                 @local::ophitcorrection
 
     ### Saturation correction module
     saturation:                       @local::correct_saturation
@@ -266,6 +269,8 @@ microboone_reco_data_optical:          [ saturation,
                                          ophitBeamNoRemap,
                                          ophitCosmic,
                                          ophitBeam,
+                                         ophitCosmicCalib,
+                                         ophitBeamCalib,
                                          simpleFlashCosmic,
                                          simpleFlashBeam,
                                          simpleFlashBeamLowPE
@@ -578,9 +583,18 @@ microboone_reco_data_producers.pmtrackT0RecoBeam.TrackProducer:                 
 
 microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                   6
 
+microboone_reco_data_producers.simpleFlashBeam.OpHitProducer: "ophitBeamCalib"
+microboone_reco_data_producers.simpleFlashCosmic.OpHitProducer: "ophitCosmicCalib"
+
 microboone_reco_data_producers.ophitBeam.OpHitsInputTag:                                                      "ophitBeamNoRemap"
 microboone_reco_data_producers.ophitCosmic.OpHitsInputTag:                                                    "ophitCosmicNoRemap"
 microboone_reco_data_producers.ophitCosmic.MapOffset:                                                         200
+
+microboone_reco_data_producers.ophitBeamCalib.OpHitsInputTag: "ophitBeam"
+#microboone_reco_data_producers.ophitBeamCalib.OutputProducer: "calib"
+
+microboone_reco_data_producers.ophitCosmicCalib.OpHitsInputTag: "ophitCosmic"
+#microboone_reco_data_producers.ophitCosmicCalib.OutputProducer: "calib"
 
 microboone_reco_data_producers.wcopflash.usePmtGainDB:                                   		      true
 
