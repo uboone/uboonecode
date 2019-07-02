@@ -1,0 +1,30 @@
+#include "prodsingle_common_uboone.fcl"
+
+process_name: SinglesGen
+
+outputs.out1.fileName: "prod_muminus_0.1-2.0GeV_isotropic_uboone_%tc_gen.root"
+
+physics.producers.generator.PDG: [ 13, 2212 ]            # mu-, p
+physics.producers.generator.PosDist: 0             # Flat position dist.
+physics.producers.generator.SingleVertex: true             # all particles produced in the same location.
+physics.producers.generator.PadOutVectors: true            
+physics.producers.generator.X0: [ 128.0 ]
+physics.producers.generator.Y0: [ 0.0 ]
+physics.producers.generator.Z0: [ 518.5 ]
+physics.producers.generator.T0: [ 3925.0 ]
+physics.producers.generator.SigmaX: [ 128.0 ]      # x = (0, 256)
+physics.producers.generator.SigmaY: [ 116.5 ]      # y = (-116.5, 116.5)
+physics.producers.generator.SigmaZ: [ 518.5 ]      # z = (0, 1037)
+physics.producers.generator.SigmaT: [ 800.0 ]        # In time
+physics.producers.generator.PDist: 2               # select from histogram 
+#physics.producers.generator.P0: [ 1.05, 1.05 ]
+#physics.producers.generator.SigmaP: [ 0.95, 1.05 ]
+physics.producers.generator.AngleDist: 2           # Select from histogram
+#physics.producers.generator.Theta0XZ: [ 0. , 0. ]       # y-azimuth
+#physics.producers.generator.Theta0YZ: [ 0., 0. ]       # y-latitude
+#physics.producers.generator.SigmaThetaXZ: [ 180., 180. ] # Quasi-isotropic
+#physics.producers.generator.SigmaThetaYZ: [ 90., 90. ]
+physics.producers.generator.HistogramFile: "testHist.root"
+physics.producers.generator.PHist: [ "h_mu_p", "h_p_p" ]
+physics.producers.generator.ThetaXzYzHist: [ "h_mu_angle2d", "h_mu_angle2d" ]
+source.maxEvents:   1000
