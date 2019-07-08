@@ -583,7 +583,7 @@ microboone_reco_data_producers.pmtrackT0RecoBeam.TrackProducer:                 
 
 microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                   6
 
-microboone_reco_data_producers.simpleFlashBeam.OpHitProducer: "ophitBeamCalib"
+microboone_reco_data_producers.simpleFlashBeam.OpHitProducer:   "ophitBeamCalib"
 microboone_reco_data_producers.simpleFlashCosmic.OpHitProducer: "ophitCosmicCalib"
 
 microboone_reco_data_producers.ophitBeam.OpHitsInputTag:                                                      "ophitBeamNoRemap"
