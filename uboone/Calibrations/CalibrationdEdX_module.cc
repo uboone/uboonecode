@@ -95,7 +95,7 @@ ub::CalibrationdEdX::CalibrationdEdX(fhicl::ParameterSet const & p)
   , caloAlg(p.get< fhicl::ParameterSet >("CaloAlg"))
   , fModBoxA               (p.get< double >("ModBoxA"))
   , fModBoxB               (p.get< double >("ModBoxB"))
-  , fDoLifetimeCorrection  (p.get< bool >("CaloDoLifeTimeCorrection"))
+  , fDoLifetimeCorrection  (p.get< bool >("CaloDoLifeTimeCorrection",false))
 {
   // Call appropriate produces<>() functions here.
   if (fCorr_YZ.size()!=3 || fCorr_X.size()!=3){
