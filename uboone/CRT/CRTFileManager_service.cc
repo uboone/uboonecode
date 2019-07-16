@@ -70,6 +70,11 @@ std::vector<std::string> crt::CRTFileManager::findMatchingCRTFiles(art::Timestam
   
   unsigned long time_tpc = evt_time_sec*1000000000 + evt_time_nsec;   // Nanoseconds
   unsigned long time_tpc1= time_tpc/1000;                             // Microseconds.
+
+  // Lower bound of earliest possible start time of matching CRT binary file.
+  // One day earlier than even time.
+
+  unsigned long time_tpc0 = time_tpc1 - 86400000000;  // Microseconds.
   
   const char* tz = getenv("TZ");
   std::string tzs(tz);
@@ -119,13 +124,20 @@ std::vector<std::string> crt::CRTFileManager::findMatchingCRTFiles(art::Timestam
 
     // Query CRT binery files.
 
+    boost::posix_time::ptime this_event_time0 = 
+      time_epoch + boost::posix_time::microseconds(time_tpc0);
+    boost::posix_time::ptime this_event_localtime0 = local_adj::utc_to_local(this_event_time0);
+
     std::string stringTime = boost::posix_time::to_iso_extended_string(this_event_localtime);
     stringTime = "'"+stringTime+"'";
     std::ostringstream dim;
     dim << "file_format " << "crt-binaryraw"
 	<<" and file_type " << "data"
 	<<" and start_time < " << stringTime 
-	<< " and end_time > " << stringTime;
+	<< " and end_time > " << stringTime
+	<< " and file_name " 
+	<< "ProdRun" << boost::posix_time::to_iso_string(this_event_localtime0).substr(0,8) << "%,"
+	<< "ProdRun" << boost::posix_time::to_iso_string(this_event_localtime).substr(0,8) << "%";
   
     if (fDebug)
       std::cout<<"dim = "<<dim.str()<<std::endl;
