@@ -60,6 +60,8 @@ add_subdirectory(UBXSec)
 
 add_subdirectory(SNAnalysis)
 
+add_subdirectory(TrigPrim)
+
 # Respect the order specified in lar_build, which is:
 #
 #     "SimpleTypesAndConstants",
