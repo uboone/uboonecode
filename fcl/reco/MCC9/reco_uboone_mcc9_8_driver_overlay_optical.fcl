@@ -6,10 +6,7 @@
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
 process_name: OverlayStage1Optical
-<<<<<<< HEAD
 
-=======
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
 services.DetectorClocksService.TrigModuleName: "daq"  # note that the clock time needed for the flash timing proper reconstruction 
 services.DetectorPropertiesService.NumberTimeSamples:        6400
 services.DetectorPropertiesService.ReadOutWindowSize:        6400
@@ -25,10 +22,7 @@ physics.reco:                   [ rns, @sequence::microboone_reco_data_optical, 
 physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ ana, stream1 ]
-<<<<<<< HEAD
 
-=======
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
 outputs.out1.fileName:          "%ifb_%tc_reco1a.root"
 outputs.out1.dataTier:          "reconstructed"
 source.inputCommands:           ["keep *_*_*_*" ]
@@ -42,14 +36,7 @@ physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
-<<<<<<< HEAD
 
 physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
 
 outputs.out1.fileName: "%ifb_r1a.root"
-=======
-physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
-
-outputs.out1.fileName: "%ifb_r1a.root"
-
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
