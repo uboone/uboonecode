@@ -1,0 +1,42 @@
+#include "mchitmodules.fcl"
+##include "eventweight_microboone_BNBcorrectionOnly.fcl"
+##include "services_microboone.fcl"
+##include "reco_uboone_mcc8.fcl"
+##include "mctrutht0matching.fcl"
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: OverlayStage1Optical
+
+services.DetectorClocksService.TrigModuleName: "daq"  # note that the clock time needed for the flash timing proper reconstruction 
+services.DetectorPropertiesService.NumberTimeSamples:        6400
+services.DetectorPropertiesService.ReadOutWindowSize:        6400
+services.DetectorClocksService.InheritClockConfig:           false
+services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
+services.FileCatalogMetadata.fileType: "overlay"
+services.TFileService.fileName: "reco_stage_1a_hist.root"
+
+physics.producers.mchitfinder:  @local::standard_mchitfinder
+physics.producers.mchitfinder.LArG4ModuleName: "driftWC:simpleSC"
+physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonext
+physics.reco:                   [ rns, @sequence::microboone_reco_data_optical, opfiltercommon ]
+physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ ana, stream1 ]
+
+outputs.out1.fileName:          "%ifb_%tc_reco1a.root"
+outputs.out1.dataTier:          "reconstructed"
+source.inputCommands:           ["keep *_*_*_*" ]
+
+#physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
+physics.producers.saturation.LGProducer: "pmtreadout"
+physics.producers.saturation.HGProducer: "pmtreadout"
+physics.producers.saturation.HGProducerCosmic: "pmtreadout"
+
+#temporary since new RawDigits are baseline corrected
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+
+physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
+
+outputs.out1.fileName: "%ifb_r1a.root"
