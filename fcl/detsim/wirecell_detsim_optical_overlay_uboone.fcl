@@ -44,23 +44,17 @@ physics:
 
  producers:
  {
-<<<<<<< HEAD
    nfbadchannel:        @local::wcls.nfbadchannel
-=======
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
    optdigitizer:   	@local::microboone_optical_adc_sim
    lyscaling:           @local::lyscaling
    optfem:         	@local::microboone_optical_fem_sim
    triggersim:     	@local::ubtrigger_dark_bnb
    pmtreadoutnonoise:	@local::microboone_optical_dram_readout_sim
-<<<<<<< HEAD
    driftWC:        	@local::wcls.driftsim_overlay #no noise
    zeroedoutchannels:   @local::ZeroingOutBadChannels
    crtdetsim:    	@local::microboone_crtdetsim_binary
    crthitsim:    	@local::crtsimhitproducer_binary
    maskedcrthitsim:    	@local::CRTpreOverlay ##MaskingOutUnavailableCRT
-=======
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
    rns:            	{ module_type: "RandomNumberSaver" }
  }
 
@@ -101,11 +95,8 @@ outputs:
 
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
-<<<<<<< HEAD
 physics.producers.optdigitizer.AbnormalOpCh: 29
-=======
-#physics.producers.optdigitizer.AbnormalOpCh: 27
->>>>>>> 28dbfe2de62da5699b46d17449329a58a5272237
+
 physics.producers.optdigitizer.G4ModName: "lyscaling"
 
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
