@@ -64,7 +64,7 @@ private:
   // Declare member data here.
 
   std::string fHitProducer; // Module label that created the hits
-  std::string fHitProducer2; //Claire: Test primitive hit producer
+  std::string fHitProducer2; // Claire: Test primitive hit producer
   // std::string fMichelProcess; // Process name that created the Michel clusters
   std::string fMichelProducer; // Module label that created the Michel clusters
 
@@ -88,8 +88,20 @@ private:
   TH1F* fhgHitSpectrum;
   TH1F* fhtotHitSpectrum;
 
-  TH1F* fshareeSpectrum; // Claire: shared electron spectrum
-  TH1F* fsharegSpectrum; // Claire: shared photon spectrum
+  // Michel cluster's energy spectrum using trigger-primitive hits
+  TH1F* fhePrimSpectrum; // electron
+  TH1F* fhgPrimSpectrum; // photon(s)
+  TH1F* fhtotPrimSpectrum; // electron + photon(s)
+
+  // Michel cluster's hit multiplicity using trigger-primitive hits
+  TH1F* fhePrimHitMult;
+  TH1F* fhgPrimHitMult;
+  TH1F* fhtotPrimHitMult;
+
+  // Michel cluster's hit spectrum using trigger-primitive hits 
+  TH1F* fhePrimHitSpectrum;
+  TH1F* fhgPrimHitSpectrum;
+  TH1F* fhtotPrimHitSpectrum;
 
   TH2F* fheVtx; // Michel cluster vertex
 
@@ -106,9 +118,10 @@ private:
   TH1F* fhgClusHitMult; // Michel photon-cluster's hit multiplicity
 
   TH1F* fhEventHitMult; // Event-wide hit multiplicity
-  TH1F* fhEventSharedHitMulti; // Claire: Event-wide shared hit multiplicity
+  TH1F* fhEventPrimHitMult; // Event-wide trigger-primitive hit multiplicity
 
   TH1F* fhEventHitSpectrum; // Event-wide hit spectrum
+  TH1F* fhEventPrimHitSpectrum; // Event-wide trigger-primitive hit spectrum
 
   TH2F* fhEventHitPos; // Event-wide hit position
 
@@ -148,10 +161,6 @@ void SNMichelAna::beginJob()
   fhgSpectrum = tfs->make<TH1F>("hgSpectrum","Total #gamma cluster spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
   fhtotSpectrum = tfs->make<TH1F>("htotSpectrum","Total clusters spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
 
-  //Claire
-  fshareeSpectrum = tfs->make<TH1F>("shareeSpectrum","Shared E Spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
-  fsharegSpectrum = tfs->make<TH1F>("sharegSpectrum","Shared G Spectrum; Energy (MeV); Entries/2 Mev", 40, 0., 80.);
-
   fheHitMult = tfs->make<TH1F>("heHitMult","e cluster hit mult.; Hit mult.; Entries", 100, 0., 100.);
   fhgHitMult = tfs->make<TH1F>("hgHitMult","Total #gamma cluster hit mult.; Hit mult.; Entries", 100, 0., 100.);
   fhtotHitMult = tfs->make<TH1F>("htotHitMult","Total clusters hit mult.; Hit mult.; Entries", 100, 0., 100.);
@@ -161,6 +170,19 @@ void SNMichelAna::beginJob()
   fhgHitSpectrum = tfs->make<TH1F>("hgHitSpectrum","#gamma cluster hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
   fhtotHitSpectrum = tfs->make<TH1F>("htotHitSpectrum","Total clusters hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.); 
   // remove? it is fheHitSpectrum + fhgHitSpectrum
+
+  fhePrimSpectrum = tfs->make<TH1F>("hePrimSpectrum","e cluster spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
+  fhgPrimSpectrum = tfs->make<TH1F>("hgPrimSpectrum","Total #gamma cluster spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
+  fhtotPrimSpectrum = tfs->make<TH1F>("htotPrimSpectrum","Total clusters spectrum; Energy (MeV); Entries/2 MeV", 40, 0., 80.);
+
+  fhePrimHitMult = tfs->make<TH1F>("hePrimHitMult","e cluster hit mult.; PrimHit mult.; Entries", 100, 0., 100.);
+  fhgPrimHitMult = tfs->make<TH1F>("hgPrimHitMult","Total #gamma cluster hit mult.; PrimHit mult.; Entries", 100, 0., 100.);
+  fhtotPrimHitMult = tfs->make<TH1F>("htotPrimHitMult","Total clusters hit mult.; PrimHit mult.; Entries", 100, 0., 100.);
+
+  //fhePrimHitSpectrum = tfs->make<TH1F>("hePrimHitSpectrum","e cluster hits spectrum; PrimHit integral (ADC); Entries/1 ADC", 1000, 0., 100.);
+  fhePrimHitSpectrum = tfs->make<TH1F>("hePrimHitSpectrum","e cluster hits spectrum; PrimHit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
+  fhgPrimHitSpectrum = tfs->make<TH1F>("hgPrimHitSpectrum","#gamma cluster hits spectrum; PrimHit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
+  fhtotPrimHitSpectrum = tfs->make<TH1F>("htotPrimHitSpectrum","Total clusters hits spectrum; PrimHit integral (MeV); Entries/0.02 MeV", 450, 0., 9.); 
 
   fheVtx = tfs->make<TH2F>("heVtx","e cluster vertex; Wire; Tick; Entries/32 wires/200 ticks", 108, 0., 3456., 32, 0., 6400.);
 
@@ -180,9 +202,11 @@ void SNMichelAna::beginJob()
 
   fhEventHitMult = tfs->make<TH1F>("hEventHitMult","Event hit mult.; Hit mult.; Entries/200 hits", 100, 0, 2e4);
 
-  fhEventSharedHitMulti = tfs->make<TH1F>("hEventSharedHitMulti","Shared Event Multi.; Hit Multi.; Entries/200 hits", 100, 0, 2e4);
-
   fhEventHitSpectrum = tfs->make<TH1F>("hEventHitSpectrum","Event hits spectrum; Hit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
+
+  fhEventPrimHitMult = tfs->make<TH1F>("hEventPrimHitMult","Event hit mult.; PrimHit mult.; Entries/200 hits", 100, 0, 2e4);
+
+  fhEventPrimHitSpectrum = tfs->make<TH1F>("hEventPrimHitSpectrum","Event hits spectrum; PrimHit integral (MeV); Entries/0.02 MeV", 450, 0., 9.);
 
   fhEventHitPos = tfs->make<TH2F>("hEventHitPos","Event hit pos.; Wire; Tick; Entries/1 wire/1 tick", 3456, 0., 3456., 6400, 0., 6400.);
 
@@ -225,14 +249,17 @@ void SNMichelAna::analyze(art::Event const & e)
     evtHits++;
     fhEventHitPos->Fill( hit.WireID().Wire, hit.PeakTime() );
     for ( auto const& hit2 : *hit_handle2 ){
-      if( hit.WireID().Wire == hit2.WireID().Wire &&  hit.PeakTime() <= hit2.PeakTime() + 7 && hit.PeakTime() >= hit2.PeakTime() - 7)
+      // Match trigger-primitive hits to reco1 hits
+      if( hit.WireID().Wire == hit2.WireID().Wire &&  hit.PeakTime() <= hit2.PeakTime() + 7 && hit.PeakTime() >= hit2.PeakTime() - 7){
+	fhEventPrimHitSpectrum->Fill( fADC2MeV*hit.Integral() );
 	sharedHits++;}
+    }
   }
   // To do: switch to hit density (hits per unit of time) to make it independent of event length?
   // fhEventHitMult->Fill( (float)evtHits/(fTotalSamplesPerRecord - fSamplesOverlapPost - fSamplesOverlapPre) );
   // Then change histogram binning too
   fhEventHitMult->Fill( (float)evtHits );
-  fhEventSharedHitMulti->Fill( (float)sharedHits );
+  fhEventPrimHitMult->Fill( (float)sharedHits );
 
   ///// Michel section /////
 
@@ -269,13 +296,15 @@ void SNMichelAna::analyze(art::Event const & e)
   // Loop over photon clusters
   float radCharge = 0;
   size_t radHits = 0;
+  float sharedradCharge = 0;
+  size_t sharedradHits = 0;
   size_t radClusters = 0;
   // To do: if there are several Michel e in the frame, try to assign their photon clusters?
   //  for( auto const& cluster : *gcluster_handle ){
   for( size_t igc = 0; igc < gcluster_handle->size(); igc++ ){
 
     auto const& cluster = (*gcluster_handle)[igc];
-
+    
     //auto const& cluster = gcluster_vec[igc];
     // Just count the Michel e in the central frame
     if( cluster.StartTick() < fSamplesOverlapPre || 
@@ -285,23 +314,21 @@ void SNMichelAna::analyze(art::Event const & e)
 
     const std::vector<art::Ptr<recob::Hit> >& ghit_v = gcluster_hit_assn_v.at(igc);
     radHits += ghit_v.size();
-    
-    size_t sharedphoton = 0;
 
     // Loop over photon hits
     for( auto const& hit : ghit_v ){
       fhgHitSpectrum->Fill( fADC2MeV*hit->Integral() );
       fhtotHitSpectrum->Fill( fADC2MeV*hit->Integral() );
     
-    // Look for shared hits between primitives
-   // for ( auto const& hit : *hit_handle ){
-    for ( auto const& hit2 : *hit_handle2 ){
+      // Look for shared hits between primitives
+      for ( auto const& hit2 : *hit_handle2 ){
 	if ( hit->WireID().Wire == hit2.WireID().Wire && hit->PeakTime() <= hit2.PeakTime() + 7 && hit->PeakTime() >= hit2.PeakTime() - 7){
-	    sharedphoton++;
-	    fsharegSpectrum->Fill( fADC2MeV*hit->Integral() );}
-	
-
-    }
+	  fhgPrimHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+	  fhtotPrimHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+	  sharedradHits++;
+	  sharedradCharge += hit->Integral();
+	}
+      }
     }
     radClusters++;
 
@@ -313,6 +340,9 @@ void SNMichelAna::analyze(art::Event const & e)
   // Fill histos only if there were in-time clusters
   if( radCharge != 0.0 ) fhgSpectrum->Fill( fADC2MeV*radCharge );
   if( radHits != 0 ) fhgHitMult->Fill( (float)radHits );
+  if( sharedradCharge != 0.0 ) fhgPrimSpectrum->Fill( fADC2MeV*sharedradCharge );
+  if( sharedradHits != 0 ) fhgPrimHitMult->Fill( (float)sharedradHits );
+
   // To do: add bool that is true if cluster was in the central frame to avoid counting out-of-time Michels as 0 multiplicity
   fhgClusMult->Fill( (float)radClusters );
 
@@ -345,7 +375,8 @@ void SNMichelAna::analyze(art::Event const & e)
     float eLengthW = 0.;
     float eLengthT = 0.;
 
-    size_t sharedelectron = 0;
+    size_t sharedeHits = 0;
+    float sharedeCharge = 0;
 
     // Loop over electron hits
     for( auto const& hit : ehit_v ){
@@ -366,20 +397,29 @@ void SNMichelAna::analyze(art::Event const & e)
       prevHit[0] = pcaHit[0];
       prevHit[1] = pcaHit[1];
 
-  // Find number of shared electron hits with primitives
-	for ( auto const& hit2 : *hit_handle2){
-	    if ( hit->WireID().Wire == hit2.WireID().Wire && hit->PeakTime() <= hit2.PeakTime() + 7 && hit->PeakTime() >= hit2.PeakTime() - 7){
-		sharedelectron++;
-		fshareeSpectrum->Fill( fADC2MeV*hit->Integral() );}
-	    
-
-    }
+      // Find number of shared electron hits with primitives
+      for( auto const& hit2 : *hit_handle2){
+	if( hit->WireID().Wire == hit2.WireID().Wire && hit->PeakTime() <= hit2.PeakTime() + 7 && hit->PeakTime() >= hit2.PeakTime() - 7){
+	  fhePrimHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+	  fhtotPrimHitSpectrum->Fill( fADC2MeV*hit->Integral() );
+	  sharedeHits++;
+	  sharedeCharge += hit->Integral();
+	}
+      }
     }
     pca.MakePrincipals();
     fheAngle->Fill( TMath::ATan( ((*(pca.GetEigenVectors()))[0][1])/((*(pca.GetEigenVectors()))[0][0]) )*180./TMath::Pi() );
     fheLength->Fill(eLength);
     fheLengthW->Fill(eLengthW);
     fheLengthT->Fill(eLengthT);
+    if( sharedeCharge != 0.0 ){
+      fhePrimSpectrum->Fill( fADC2MeV*sharedeCharge );
+      fhtotPrimSpectrum->Fill( fADC2MeV*sharedeCharge + fADC2MeV*sharedradCharge );
+    }
+    if( sharedeHits != 0 ){
+      fhePrimHitMult->Fill( (float)sharedeHits );
+      fhtotPrimHitMult->Fill( (float)(sharedeHits + sharedradHits) );
+    }
   }
 
 }
