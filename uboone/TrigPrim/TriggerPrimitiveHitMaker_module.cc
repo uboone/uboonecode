@@ -51,7 +51,7 @@ class TriggerPrimitiveHitMaker;
 
 class TriggerPrimitiveHitMaker : public art::EDProducer {
 public:
-  explicit TriggerPrimitiveHitMaker(fhicl::ParameterSet const & p);
+  explicit TriggerPrimitiveHitMaker(fhicl::ParameterSet const & pset);
   // The compiler-generated destructor is fine for non-base
   // classes without bare pointers or other resource use.
 
@@ -74,8 +74,10 @@ private:
   // Declare member data here.
 
 int fPrimMode;
-std::unique_ptr<HitFilterAlg>fHitFilterAlg;
+std::string fAllHitsInstanceName;
 void reconfigure(fhicl::ParameterSet const& p) ;
+
+/*
 TH2D* fInthist;
 TH2D* fMaxhist;
 TH2D* fTothist;
@@ -99,30 +101,44 @@ TH2D* fIntMaxhist_y;
 TH2D* fMaxTothist_u;
 TH2D* fMaxTothist_v;
 TH2D* fMaxTothist_y;
-
-
-std::vector<recob::Hit>   filteredHitVec;
-
+*/
 
 };
 
 
-TriggerPrimitiveHitMaker::TriggerPrimitiveHitMaker(fhicl::ParameterSet const & p)
+TriggerPrimitiveHitMaker::TriggerPrimitiveHitMaker(fhicl::ParameterSet const & pset)
 // :
 // Initialize member data here.
 {
   // Call appropriate produces<>() functions here.
-	this->reconfigure(p);
+	this->reconfigure(pset);
+	recob::HitCollectionCreator::declare_products(*this,fAllHitsInstanceName);
+std::cout<<"reconfig" << std::endl;
 
 	return;
 }
 
+
+void TriggerPrimitiveHitMaker::reconfigure(fhicl::ParameterSet const& p){
+	fPrimMode = p.get<int>("PrimMode");
+	fAllHitsInstanceName = "";
+
+std::cout<<"Get PrimMode" <<std::endl;
+
+	return;
+
+}
+
+
+
 void TriggerPrimitiveHitMaker::beginJob()
 {
 
+std::cout<<"Being Job" << std::endl;
+
 art::ServiceHandle<art::TFileService const> tfs;
 
-
+ /*
  fInthist               = tfs->make<TH2D>("IntegralAll", "Integral All;Channel;Integral", 8256, 0, 8256, 100, 0, 1000);
  fTothist               = tfs->make<TH2D>("TimeOverThresholdAll", "Time Over Threshold All;Channel;Tot",8256, 0, 8256, 100, 0, 100);
  fMaxhist               = tfs->make<TH2D>("MaxValueAll", "Max Value All;Channel;Max Value",8256, 0, 8256, 100, 0, 200);
@@ -144,189 +160,184 @@ art::ServiceHandle<art::TFileService const> tfs;
  fMaxTothist_u          = tfs->make<TH2D>("MaxTotU", "Tot vs. Max U Plane;Tot;Max", 100, 0, 100, 100, 0, 200);
  fMaxTothist_v          = tfs->make<TH2D>("MaxTotV", "Tot vs. Max V Plane;Tot;Max", 100, 0, 100, 100, 0, 200);
  fMaxTothist_y          = tfs->make<TH2D>("MaxTotY", "Tot vs. Max Y Plane;Tot;Max", 100, 0, 100, 100, 0, 200);
-
+ */
 
  }
 
 
-void TriggerPrimitiveHitMaker::reconfigure(fhicl::ParameterSet const& p){
-	fPrimMode = p.get<int>("PrimMode");
-
-
-       if (fHitFilterAlg) {
-         fHitFilterAlg->reconfigure(p.get<fhicl::ParameterSet>("HitFilterAlg"));
-       }
-       else {
-         fHitFilterAlg = std::make_unique<HitFilterAlg>(p.get<fhicl::ParameterSet>("HitFilterAlg"));
-       }
-
-	return;
-}
-
-
 void TriggerPrimitiveHitMaker::produce(art::Event & e)
 {
- 
  // Implementation of required member function here.
+    recob::HitCollectionCreator allHitCol(*this, e, fAllHitsInstanceName);
+    //recob::HitCollectionCreator* filteredHitCol = 0;  
+    int numHits = 0;
 
-recob::HitCollectionCreator allHitCol(*this, evt, fAllHitsInstanceName);
-recob::HitCollectionCreator* filteredHitCol = 0;  
-art::Handle<std::vector<recob::Wire>> wiredata;
-   e.getByLabel("snnodeco",wiredata);
+    art::Handle<std::vector<recob::Wire>> wiredata;
+    e.getByLabel("snnodeco",wiredata);
 
-   for(size_t rdIter = 0; rdIter < wiredata->size(); ++rdIter){
-     // get the reference to the current non-deconvolved recob::Wire                                                                                               
-     art::Ptr<recob::Wire> wireVec(wiredata, rdIter);
-     //art::Ptr<raw::RawDigit> rawdigits = RawDigits.at(rdIter);
-     auto channel = wireVec->Channel();
-     auto zsROIs = wireVec->SignalROI();
-     art::ServiceHandle<geo::Geometry const> geom;
-     std::vector<geo::WireID> wids = geom->ChannelToWire(channel);
-     geo::WireID wid  = wids[0];
-     //geo::PlaneID::PlaneID_t plane = wid.Plane;
+    for(size_t rdIter = 0; rdIter < wiredata->size(); ++rdIter){
+	// get the reference to the current non-deconvolved recob::Wire                                                                                               
+	art::Ptr<recob::Wire> wireVec(wiredata, rdIter);
+	//art::Ptr<raw::RawDigit> rawdigits = RawDigits.at(rdIter);
+	auto channel = wireVec->Channel();
+	auto zsROIs = wireVec->SignalROI();
+	art::ServiceHandle<geo::Geometry const> geom;
+	std::vector<geo::WireID> wids = geom->ChannelToWire(channel);
+	geo::WireID wid  = wids[0];
+	//geo::PlaneID::PlaneID_t plane = wid.Plane;
 
+	std::vector<recob::Hit>  filteredHitVec;
 
+	for (auto iROI = zsROIs.begin_range(); iROI != zsROIs.end_range(); ++iROI) {
+	    auto ROI = *iROI;
+	    const size_t firstTick = ROI.begin_index();
+	    const size_t endTick = ROI.end_index();
 
-     for (auto iROI = zsROIs.begin_range(); iROI != zsROIs.end_range(); ++iROI) {
-         auto ROI = *iROI;
-         const size_t firstTick = ROI.begin_index();
-         const size_t endTick = ROI.end_index();
+	    //std::string titlestring = "roi_original"+ std::to_string(channel);
+	    //TH1D horig(titlestring.c_str(), "roi_original;Tick;ADC", endTick + 1 - firstTick, firstTick, endTick + 1);
+	    //horig.SetLineColor(kBlack);
 
-         std::string titlestring = "roi_original"+ std::to_string(channel);
-	 TH1D horig(titlestring.c_str(), "roi_original;Tick;ADC", endTick + 1 - firstTick, firstTick, endTick + 1);
-         horig.SetLineColor(kBlack);
-
-	 float integralsum = 0; 
-	 float maxpeak = 0;
-	 float  tot = 0;
-	 float peaktime = 0;
+	    float integralsum = 0; 
+	    float maxpeak = 0;
+	    float  tot = 0;
+	    float peaktime = 0;
  
 
-           for (size_t iTick = ROI.begin_index(); iTick < ROI.end_index(); iTick++ ){
-              horig.Fill((int)iTick,ROI[iTick]);
-              integralsum +=  std::abs(ROI[iTick]);
-              if (std::abs(ROI[iTick]) > maxpeak){
-		maxpeak = std::abs(ROI[iTick]);
-		peaktime = iTick;
-}
-	      }
-            tot = endTick - firstTick;
-            float widthtot = tot/2;
- 	  
-	float ucut = -1;
-	float vcut = -1;
-	float ycut = -1;
-	float primitive = -1;
+	    for (size_t iTick = ROI.begin_index(); iTick < ROI.end_index(); iTick++ ){
+		if (channel > 5500 && channel < 5505){
+		std::string titlestring = "roi_original" + std::to_string(channel);
+		TH1D horig(titlestring.c_str(), "roi_original;Tick:ADC", endTick+1 - firstTick, firstTick, endTick + 1);
+		horig.SetLineColor(kBlack);
+		horig.Fill((int)iTick,ROI[iTick]);
+		TCanvas c ("c", "c");
+		horig.Draw("hist ][");
+		c.Modified();
+		c.Update();
+		c.Print(".png");}//This Line
+		integralsum +=  std::abs(ROI[iTick]);
+		if (std::abs(ROI[iTick]) > maxpeak){
+		    maxpeak = std::abs(ROI[iTick]);
+		    peaktime = iTick;
+		}
+	    }
 
 
- 	 if (fPrimMode == 0){
-           primitive = integralsum;
-	   ucut = 200;
-	   vcut = 120;
-	   ycut = 200;
-         } else if (fPrimMode == 1 ) {
-           primitive = maxpeak;
-	   ucut = 20;
-	   vcut = 13;
-	   ycut = 25;
-         } else if (fPrimMode == 2 ){
-           primitive = tot;
-	   ucut = 21;
-	   vcut = 20;
-	   ycut = 24;
-         }
+	    //TCanvas c ("c", "c");
+	    //horig.Draw("hist ][");
+	    //c.Modified();
+	    //c.Update();
+	    //c.Print(".png");
 
 
 
-	int pass  = 0;   //If the waveform passes the cut, pass =1, if not pass = 0
+	    tot = endTick - firstTick;
+	    float widthtot = tot/2;
 
-	if (channel <= 2399 && primitive >= ucut){
+	    float ucut = -1;
+	    float vcut = -1;
+	    float ycut = -1;
+	    float primitive = -1;
+
+	    if (fPrimMode == 0){
+		primitive = integralsum;
+		ucut = 200;
+		vcut = 120;
+		ycut = 200;
+	    } else if (fPrimMode == 1 ) {
+		primitive = maxpeak;
+		ucut = 20;
+		vcut = 13;
+		ycut = 25;
+	    } else if (fPrimMode == 2 ){
+		primitive = tot;
+		ucut = 21;
+		vcut = 20;
+		ycut = 24;
+	    }
+
+
+	std::cout<< fPrimMode <<std::endl;
+	std::cout<<"Before Applying Channel specific cuts" <<std::endl;
+
+	    int pass  = 0;   //If the waveform passes the cut, pass = 1, if not pass = 0
+	    if (channel <= 2399 && primitive >= ucut){
 		pass = 1;
-	} else if (channel > 2399 && channel <= 4799 && primitive >= vcut){
+	    } else if (channel > 2399 && channel <= 4799 && primitive >= vcut){
 		pass = 1; 
-	} else if (channel >= 4800 && primitive >= ycut){
+	    } else if (channel >= 4800 && primitive >= ycut){
 		pass = 1;
-	}
+	    }
 
-	if (pass == 1){
+	std::cout<< "Before creating hits" <<std::endl;
 
-	recob::HitCreator hitcreator((recob::Wire)*wireVec,
-				      (geo::WireID)wid,
-				      (float)widthtot,
-				      (float)peaktime, 
-				      (float)1,
-				      (float)primitive,
-				      (float)1,
-				      (float)primitive,
-				      (float)1.0,
-				      (float)primitive,
-				      (short int)1,
-				      (short int)0,
-				      (float)1.0,
-				      (int)1,
-				      (size_t)firstTick
-				      );
+	    if (pass == 1){
+		recob::HitCreator hitcreator(
+					(recob::Wire)*wireVec,
+					(geo::WireID)wid,
+					(float)widthtot,
+					(float)peaktime, 
+					(float)1,
+					(float)primitive,
+					(float)1,
+					(float)primitive,
+					(float)1.0,
+					(float)primitive,
+					(short int)1,
+					(short int)0,
+					(float)1.0,
+					(int)1,
+					(size_t)firstTick
+					);
+		filteredHitVec.push_back(hitcreator.copy());
+	    
+		art::Ptr<raw::RawDigit> dummyRawDigits;
 
-	filteredHitVec.push_back(hitcreator.copy());
+		const recob::Hit hit(hitcreator.move()); 
+		allHitCol.emplace_back(std::move(hit), wireVec, dummyRawDigits);
 
-	const recob::Hit hit(hitcreator.move()); 
-	allHitCol.emplace_back(std::move(hit), wire, rawdigits);
-	numHits++;
+		numHits++;
 
+		//for(const auto& filteredHit : filteredHitVec)
+		//    filteredHitCol->emplace_back(filteredHit, wireVec, dummyRawDigits);
+	    }
+             
+	std::cout<< "After Creating Hits" <<std::endl;
 
-}
-                           
-
-
-
-
-	 if (channel <=  2399){
-
-	 fInthist_u->Fill(integralsum);
-	 fMaxhist_u->Fill(maxpeak);
-	 fTothist_u->Fill(tot);
-         fIntTothist_u->Fill(tot,integralsum);
-	 fIntMaxhist_u->Fill(maxpeak,integralsum);
-	 fMaxTothist_u->Fill(tot,maxpeak);
-
-}
-
-
-
-  	 if (channel > 2399 && channel <= 4799){
-
-         fInthist_v->Fill(integralsum);
-         fMaxhist_v->Fill(maxpeak);
-         fTothist_v->Fill(tot);
-	 fIntTothist_v->Fill(tot,integralsum);  
-         fIntMaxhist_v->Fill(maxpeak,integralsum);
-         fMaxTothist_v->Fill(tot,maxpeak);
-
-
-}
-
-
-  	 if (channel >= 4800){
-
-
-         fInthist_y->Fill(integralsum);
-         fMaxhist_y->Fill(maxpeak);
-         fTothist_y->Fill(tot);
-         fIntTothist_y->Fill(tot,integralsum);
-         fIntMaxhist_y->Fill(maxpeak,integralsum);
-         fMaxTothist_y->Fill(tot,maxpeak);
-
-}
+	    /* 
+	    if (channel <=  2399){
+		fInthist_u->Fill(integralsum);
+		fMaxhist_u->Fill(maxpeak);
+		fTothist_u->Fill(tot);
+		fIntTothist_u->Fill(tot,integralsum);
+		fIntMaxhist_u->Fill(maxpeak,integralsum);
+		fMaxTothist_u->Fill(tot,maxpeak);
+	    }
+	    if (channel > 2399 && channel <= 4799){
+		fInthist_v->Fill(integralsum);
+		fMaxhist_v->Fill(maxpeak);
+		fTothist_v->Fill(tot);
+		fIntTothist_v->Fill(tot,integralsum);  
+		fIntMaxhist_v->Fill(maxpeak,integralsum);
+		fMaxTothist_v->Fill(tot,maxpeak);
+	    }
+	    if (channel >= 4800){
+		fInthist_y->Fill(integralsum);
+		fMaxhist_y->Fill(maxpeak);
+		fTothist_y->Fill(tot);
+		fIntTothist_y->Fill(tot,integralsum);
+		fIntMaxhist_y->Fill(maxpeak,integralsum);
+		fMaxTothist_y->Fill(tot,maxpeak);
+	    }
 
 	   fInthist->Fill(channel,integralsum); 
 
            fMaxhist->Fill(channel,maxpeak);
 
            fTothist->Fill(channel,tot);
-     } 
-
-
-}
+	   */
+	} // end of roi loop
+    
+    } // end of channel loop
          
 /*
 	 fIntTothist_u->Fit("pol1");
@@ -340,9 +351,10 @@ art::Handle<std::vector<recob::Wire>> wiredata;
          fMaxTothist_y->Fit("pol1");
 */
 
-
+    allHitCol.put_into(e);
+std::cout<<"After Whole Code" <<std::endl;
 }
- 
+
 
 void TriggerPrimitiveHitMaker::endJob()
 {

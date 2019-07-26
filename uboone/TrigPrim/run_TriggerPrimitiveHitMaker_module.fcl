@@ -69,7 +69,7 @@ outputs:
     out1:
         {
         module_type: RootOutput
-        fileName:    "TriggerPrimitiveHitMaker_candidates.root" # For Claire: LArSoft output file
+        fileName:    "TriggerPrimitiveHitMaker_candidates_tot.root" # For Claire: LArSoft output file
         dataTier:    "reco"
         compressionLevel: 1
         }
@@ -81,6 +81,6 @@ services.DetectorClocksService.InheritClockConfig:                         false
 services.DetectorClocksService.TriggerOffsetTPC:                          -0.400e3
 
 # For Claire: examples of how to define configuration variables for your module
-physics.producers.tpm.PrimMode: 0
+physics.producers.tpm.PrimMode: 2
 #physics.producers.tpm.YourStringVariable: "blob"
 
