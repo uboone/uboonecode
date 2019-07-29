@@ -113,7 +113,6 @@ TriggerPrimitiveHitMaker::TriggerPrimitiveHitMaker(fhicl::ParameterSet const & p
   // Call appropriate produces<>() functions here.
 	this->reconfigure(pset);
 	recob::HitCollectionCreator::declare_products(*this,fAllHitsInstanceName);
-std::cout<<"reconfig" << std::endl;
 
 	return;
 }
@@ -123,8 +122,6 @@ void TriggerPrimitiveHitMaker::reconfigure(fhicl::ParameterSet const& p){
 	fPrimMode = p.get<int>("PrimMode");
 	fAllHitsInstanceName = "";
 
-std::cout<<"Get PrimMode" <<std::endl;
-
 	return;
 
 }
@@ -133,8 +130,6 @@ std::cout<<"Get PrimMode" <<std::endl;
 
 void TriggerPrimitiveHitMaker::beginJob()
 {
-
-std::cout<<"Being Job" << std::endl;
 
 art::ServiceHandle<art::TFileService const> tfs;
 
@@ -204,16 +199,16 @@ void TriggerPrimitiveHitMaker::produce(art::Event & e)
  
 
 	    for (size_t iTick = ROI.begin_index(); iTick < ROI.end_index(); iTick++ ){
-		if (channel > 5500 && channel < 5505){
-		std::string titlestring = "roi_original" + std::to_string(channel);
-		TH1D horig(titlestring.c_str(), "roi_original;Tick:ADC", endTick+1 - firstTick, firstTick, endTick + 1);
-		horig.SetLineColor(kBlack);
-		horig.Fill((int)iTick,ROI[iTick]);
-		TCanvas c ("c", "c");
-		horig.Draw("hist ][");
-		c.Modified();
-		c.Update();
-		c.Print(".png");}//This Line
+		//if (channel > 5500 && channel < 5505){
+		//std::string titlestring = "roi_original" + std::to_string(channel);
+		//TH1D horig(titlestring.c_str(), "roi_original;Tick:ADC", endTick+1 - firstTick, firstTick, endTick + 1);
+		//horig.SetLineColor(kBlack);
+		//horig.Fill((int)iTick,ROI[iTick]);
+		//TCanvas c ("c", "c");
+		//horig.Draw("hist ][");
+		//c.Modified();
+		//c.Update();
+		//c.Print(".png");}//This Line
 		integralsum +=  std::abs(ROI[iTick]);
 		if (std::abs(ROI[iTick]) > maxpeak){
 		    maxpeak = std::abs(ROI[iTick]);
@@ -255,10 +250,6 @@ void TriggerPrimitiveHitMaker::produce(art::Event & e)
 		ycut = 24;
 	    }
 
-
-	std::cout<< fPrimMode <<std::endl;
-	std::cout<<"Before Applying Channel specific cuts" <<std::endl;
-
 	    int pass  = 0;   //If the waveform passes the cut, pass = 1, if not pass = 0
 	    if (channel <= 2399 && primitive >= ucut){
 		pass = 1;
@@ -267,8 +258,6 @@ void TriggerPrimitiveHitMaker::produce(art::Event & e)
 	    } else if (channel >= 4800 && primitive >= ycut){
 		pass = 1;
 	    }
-
-	std::cout<< "Before creating hits" <<std::endl;
 
 	    if (pass == 1){
 		recob::HitCreator hitcreator(
@@ -300,8 +289,7 @@ void TriggerPrimitiveHitMaker::produce(art::Event & e)
 		//for(const auto& filteredHit : filteredHitVec)
 		//    filteredHitCol->emplace_back(filteredHit, wireVec, dummyRawDigits);
 	    }
-             
-	std::cout<< "After Creating Hits" <<std::endl;
+            
 
 	    /* 
 	    if (channel <=  2399){
@@ -352,7 +340,6 @@ void TriggerPrimitiveHitMaker::produce(art::Event & e)
 */
 
     allHitCol.put_into(e);
-std::cout<<"After Whole Code" <<std::endl;
 }
 
 
