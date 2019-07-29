@@ -15,7 +15,7 @@ physics.producers.generator.Z0: [350.0]#[ 518.5 ] #central z position per PDG ID
 physics.producers.generator.T0: [ 3925.0] #central time per PDG
 physics.producers.generator.SigmaX: [ 128.0 ] # variation in x per pdg, uboone x = (0, 256)
 physics.producers.generator.SigmaY: [ 116.5 ] # variation in y per pdg, uboone y = (-116.5, 116.5)
-physics.producers.generator.SigmaZ: [350.0]#[ 518.5] # variation in z per pdg, uboone z = (0, 1037)
+physics.producers.generator.SigmaZ: [ 518.5] # variation in z per pdg, uboone z = (0, 1037)
 physics.producers.generator.SigmaT: [ 800.0 ] # In time
 physics.producers.generator.PDist: 2 # Flat momentum dist. (0.1-2.0 GeV)
 #physics.producers.generator.P0: [1.05, 1.05, 1.05] # bleh
@@ -27,6 +27,6 @@ physics.producers.generator.AngleDist: 2 # Flat angle dist.
 #physics.producers.generator.SigmaThetaYZ: [90., 90., 90.] #
 #physics.producers.generator.HistFileName: "genie_hist.root"
 physics.producers.generator.HistogramFile: "genie_hist.root"
-physics.producers.generator.PHist: ["h_muon_p", "h_src_p_1", "h_src_p_2"]
-physics.producers.generator.ThetaXzYzHist: ["h_muon_thetayzxz", "h_p1_thetayzxz", "h_p2_thetayzxz"]
+physics.producers.generator.PHist: ["h_src_muon_mom", "h_src_p1_mom", "h_src_p2_mom"]
+physics.producers.generator.ThetaXzYzHist: ["h_src_muon_thetayzxz", "h_src_p1_thetayzxz", "h_src_p2_thetayzxz"]
 #source.maxEvents: 1000
