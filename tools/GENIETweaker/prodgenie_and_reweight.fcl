@@ -1,0 +1,46 @@
+#include "prodgenie_common_uboone.fcl"
+
+process_name: GenieGen
+
+outputs.out1.fileName: "prodgenie_bnb_nu_uboone_and_reweight_%tc_gen.root"
+
+# Configure GENIE
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName: "booster"
+
+# For GENIE v3, we can get MEC from the tune, so just
+# use the default event generator list
+physics.producers.generator.EventGeneratorList: "Default"
+
+# Now configure reweighting
+physics.producers.weighttweak:
+{
+  module_type: "EventWeight"
+
+  # Throw exception if weight outside limits
+  min_weight: 0
+  max_weight: 100
+
+  # Get GENIE events produced with this label
+  genie_module_label: generator
+
+  # Pick one parameter, calculate a weight for changing
+  # it by the given sigma
+  my_tweak: {
+    type: Genie
+    mode: unisim
+    number_of_multisims: 1
+   
+    # These values are the only ones that are likely to change
+    parameter_list: [ "QEMA" ]
+    parameter_sigma: [ 1 ]
+    random_seed: 38493
+  }
+
+  weight_functions: [ my_tweak ]
+}
+
+physics.simulate: [ rns, generator, weighttweak ]
