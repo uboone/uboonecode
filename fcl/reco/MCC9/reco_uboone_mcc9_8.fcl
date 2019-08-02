@@ -139,6 +139,11 @@ microboone_reco_mcc8_producers:
   pandoraAllOutcomesShower:         @local::microboone_pandoraShowerCreation
   pandora:                          @local::pandora_event_building
 
+  #pandora microboone reprocess
+  pandoraReprocessSlices:           @local::microboone_pandoraReprocessSlices
+  pandoraReprocessSlicesTrack:      @local::microboone_pandoraTrackCreation
+  pandoraReprocessSlicesShower:     @local::microboone_pandoraShowerCreation
+
   ### kalman track stuff on pandora consolidated pass
   pandoraKalmanTrack:               @local::trackproducerfrompfparticle
   pandoraKalmanShower:              @local::trackproducerfrompfparticle
@@ -287,6 +292,44 @@ microboone_reco_mcc8_crt: [ crthitcorr,
                             crtveto ]
 
 microboone_reco_mcc8_pandora: [      pandoraWriter,
+                                     pandoraPatRec,
+                                     pandoraAllOutcomesTrack,
+                                     pandoraAllOutcomesShower,
+                                     pandora,
+                                     pandoratag,
+                                     pandoraContTag,
+                                     pandoraMCSMu,
+                                     pandoraMCSMuNoSCE,
+                                     pandoracalo,
+                                     pandorapid,
+                                     pandoracali,
+                                     pandoracalipid,
+                                     pandoracaloSCE,
+                                     pandorapidSCE,
+                                     pandoracaliSCE,
+                                     pandoracalipidSCE,
+                                     pandoraKalmanTrack,
+                                     pandoraKalmanShower,
+                                     pandoraKalmanTracktag,
+                                     pandoraKalmanTrackcalo,
+                                     pandoraKalmanTrackpid,
+                                     pandoraKalmanTrackcali,
+                                     pandoraKalmanTrackcalipid,
+                                     pandoraKalmanShowertag,
+                                     pandoraKalmanShowercalo,
+                                     pandoraKalmanShowerpid,
+                                     pandoraKalmanShowercali,
+                                     pandoraKalmanShowercalipid,
+                                     shrreco3d,
+                                     pandoraGeomVertexFit,
+                                     pandoraCrtHitMatch,
+                                     flashmatch,
+                                     acpttagger,
+                                     acpttrigtagger,
+                                     stopmutagger
+                                     ]
+
+microboone_reco_mcc8_pandora_reprocess: [      pandoraWriter,
                                      pandoraPatRec,
                                      pandoraAllOutcomesTrack,
                                      pandoraAllOutcomesShower,

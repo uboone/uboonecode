@@ -152,6 +152,11 @@ microboone_reco_data_producers:
     pandoraAllOutcomesShower:         @local::microboone_pandoraShowerCreation
     pandora:                          @local::pandora_event_building
 
+    ### pandora microboone reprocess
+    pandoraReprocessSlices:           @local::microboone_pandoraReprocessSlices
+    pandoraReprocessSlicesTrack:      @local::microboone_pandoraTrackCreation
+    pandoraReprocessSlicesShower:     @local::microboone_pandoraShowerCreation
+
     ### kalman track stuff on pandora consolidated pass
     pandoraKalmanTrack:               @local::trackproducerfrompfparticle
     pandoraKalmanShower:              @local::trackproducerfrompfparticle
