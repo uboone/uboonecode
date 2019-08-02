@@ -349,11 +349,10 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          shrreco3d,
                                          pandoraGeomVertexFit,
                                          pandoraCrtHitMatch,
-                                         flashmatch,
                                          acpttagger,
                                          acpttrigtagger,
-                                         stopmutagger
-                                         ]
+                                         flashmatch]
+
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
@@ -445,7 +444,7 @@ microboone_reco_data_producers.pandora.ShowerProducerLabel:                     
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
 microboone_reco_data_producers.pandora.ShouldProduceT0s:                                                       false
 microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
-microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          false
+microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          true
 
 microboone_reco_data_producers.pandora.SliceIdTool.HasMCNeutrino:                                              false
 microboone_reco_data_producers.pandoraWriter.EnableMCParticles:                                                false
