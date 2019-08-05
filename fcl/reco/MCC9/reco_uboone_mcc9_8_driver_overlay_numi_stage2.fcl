@@ -1,6 +1,7 @@
 #include "mchitmodules.fcl"
 #include "mctrutht0matching.fcl"
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
 
 process_name: OverlayRecoStage2
 
@@ -17,16 +18,16 @@ physics.producers.trajclusterTruthMatch.HitParticleAssociations:                
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
 physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
 
-physics.reco:                   [ @sequence::microboone_reco_data_stage2,trajclusterTruthMatch ]
+physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
+
+physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2_numi.root"
 outputs.out1.dataTier:          "reconstructed"
-outputs.out1.outputCommands:    [ "keep *_*_*_*",
-                                  "drop *_*_pandoraAllOutcomesTrack_*",
-                                  "drop *_*_pandoraAllOutcomesShower_*" ]
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
+outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
 
 microboone_tfile_metadata:
 {
@@ -36,12 +37,16 @@ microboone_tfile_metadata:
   fileFormat:            ["root", "pndr"]
 }
 
-physics.producers.pandoraCrtHitMatch.data_label_CRThit: "mixer"
-physics.producers.crttzero.data_label:                  "mixer"
-
 # in bnb gen: 3125. + 1600
 # in bnb reco: 3.57 -- 5.25 
 # offsets       445 -- 525
 # in numi gen: 4687.5+940 + 9600
 physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.64
 physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.44
+
+physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+
+# flash-matching score preservation module
+physics.producers.flashmatch: @local::FlashMatch_overlay
+# physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
+physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"

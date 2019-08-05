@@ -1,0 +1,63 @@
+#include "services_microboone.fcl"
+#include "singles_microboone.fcl"
+
+BEGIN_PROLOG
+
+uboone_radiogen: {
+  module_type: "RadioGen"
+  # list of nuclides to simulate, supported so far: 39Ar, 60Co, 85Kr, 40K, 232Th, 238U
+  Nuclide: [ "40K" ]
+  Material: [ "LAr" ]
+  BqPercc: [ 0.00141 ]
+  X0: [ 0.0 ]
+  Y0: [ -116.5 ]
+  Z0: [ 0.0 ]
+  T0: [ -3200000. ]
+  X1: [ 256.0 ]
+  Y1: [ 116.5 ]
+  Z1: [ 1036.5 ]
+  T1: [ 3200000. ]
+}
+
+END_PROLOG
+
+process_name: RadGen
+
+services: {
+  scheduler: { defaultExceptions: false }
+  TFileService: { fileName: "single_hist_uboone.root" }
+  TimeTracker: {}
+  MemoryTracker: {}
+  RandomNumberGenerator: {}
+  FileCatalogMetadata: @local::art_file_catalog_mc
+  @table::microboone_gen_services
+}
+
+source: {
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents: 10000
+  firstRun: 1
+  firstEvent: 1
+}
+
+physics: {
+  producers: {
+    generator: @local::uboone_radiogen
+    rns: { module_type: "RandomNumberSaver" }
+  }
+  simulate: [ rns, generator ]
+  stream1:  [ out1 ]
+  trigger_paths: [ simulate ]
+  end_paths: [ stream1 ]
+}
+
+outputs: {
+  out1: {
+    module_type: RootOutput
+    fileName: "prodar39_uboone_%tc_gen.root"
+    dataTier: "generated"
+    compressionLevel: 1
+  }
+}
+

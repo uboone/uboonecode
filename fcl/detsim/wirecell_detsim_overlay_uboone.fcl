@@ -93,6 +93,8 @@ outputs:
 
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
+physics.producers.optdigitizer.AbnormalOpCh: 29
+
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
