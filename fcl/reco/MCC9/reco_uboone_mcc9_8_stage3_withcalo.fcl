@@ -1,0 +1,4 @@
+#include "reco_uboone_mcc9_8_driver_stage2_fullMC_withcalo.fcl"
+
+process_name: Reco2WithCalo
+source.inputCommands: [ "keep *", "drop *_*_*_McRecoStage2" ]
