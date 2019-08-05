@@ -28,8 +28,8 @@ outputs.out1.dataTier:          "reconstructed"
 source.inputCommands:           ["keep *_*_*_*" ]
 
 #physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
-physics.producers.saturation.LGProducer: "mixer"
-physics.producers.saturation.HGProducer: "mixer"
+physics.producers.saturation.LGProducer: "pmtreadout"
+physics.producers.saturation.HGProducer: "pmtreadout"
 physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 
 #temporary since new RawDigits are baseline corrected
