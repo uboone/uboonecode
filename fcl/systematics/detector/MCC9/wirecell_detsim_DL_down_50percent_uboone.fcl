@@ -3,4 +3,4 @@
 process_name: DetsimDLdown
 outputs.out1.fileName: "%ifb_%tc_detsim_DLdown.root"
 
-physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 7.36
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.260e-9 
