@@ -9,22 +9,22 @@ find_library(XML2LIB NAMES xml2 PATHS $ENV{LIBXML2_FQ_DIR}/lib)
 cet_make_exec(ConvertNtuple SOURCE ConvertNtuple.cxx BooNEtoGSimple.cxx 
 			    LIBRARIES ${ROOT_BASIC_LIB_LIST} 
 			    	      ${XML2LIB}
-				      ${GPDG}
+				      ${GFWPARDAT}
 				      ${LOG4CPP} 
-				      ${GALGORITHM}
-				      ${GBARYONRESONANCE}
-				      ${GBASE}
-				      ${GEVGCORE}
-				      ${GEVGDRIVERS}
-	                              ${GFLUXDRIVERS}
-				      ${GHEP}
-				      ${GINTERACTION}
-				      ${GMESSENGER}
-				      ${GNUCLEAR}
-				      ${GNUMERICAL}
-				      ${GPDG}
-				      ${GREGISTRY}
-				      ${GUTILS}
+				      ${GFWALG}
+				      ${GFWPARDAT}
+				      ${GPHDISXS}
+				      ${GFWEG}
+				      ${GFWEG}
+	                              ${GTLFLX}
+				      ${GFWGHEP}
+				      ${GFWINT}
+				      ${GFWMSG}
+				      ${GPHNUCLST}
+				      ${GFWNUM}
+				      ${GFWPARDAT}
+				      ${GFWREG}
+				      ${GFWUTL}
 				      #more root stuff
 				      ${ROOT_EG}
 				      ${ROOT_EGPYTHIA6}
