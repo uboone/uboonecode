@@ -5,14 +5,14 @@
 ##include "mctrutht0matching.fcl"
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
-process_name: OverlayStage1Optical
+process_name: DataStage1Optical
 
 services.DetectorClocksService.TrigModuleName: "daq"  # note that the clock time needed for the flash timing proper reconstruction 
 services.DetectorPropertiesService.NumberTimeSamples:        6400
 services.DetectorPropertiesService.ReadOutWindowSize:        6400
 services.DetectorClocksService.InheritClockConfig:           false
 services.DetectorClocksService.TriggerOffsetTPC:             -0.400e3
-services.FileCatalogMetadata.fileType: "overlay"
+services.FileCatalogMetadata.fileType: "data"
 services.TFileService.fileName: "reco_stage_1a_hist.root"
 
 physics.producers.mchitfinder:  @local::standard_mchitfinder
@@ -37,6 +37,6 @@ services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
 services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
 
-physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer" 
+physics.producers.nfspl1.wcls_main.params.raw_input_label: "pmtreadout" 
 
 outputs.out1.fileName: "%ifb_r1a.root"
