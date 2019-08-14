@@ -4,11 +4,15 @@ process_name: GenieGen
 
 outputs.out1.fileName: "prodgenie_bnb_nu_uboone_tweaked_%tc_gen.root"
 
-physics.producers.generator: @local::microboone_genie_simple
+# Configure GENIE
+physics.producers.generator: @local::microboone_genie_hist
 physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
 physics.producers.generator.TopVolume: "volTPCActive"
 physics.producers.generator.BeamName: "booster"
+physics.producers.generator.EventsPerSpill: 1
+physics.producers.generator.POTPerSpill: 0.0
+physics.producers.generator.FluxFiles: ["./FluxHist_volAVTPC.root"]
 
 # For GENIE v3, we can get MEC from the tune, so just
 # use the default event generator list
