@@ -1,5 +1,17 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_keep_reco1.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOn.fcl"
 
-physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_beamOn
-# flash-matching score preservation module
-physics.producers.flashmatch: @local::FlashMatch_beamOn
+outputs.out1.streamName: "reco2"
+
+outputs.out2: 
+{
+  module_type:               RootOutput
+  dataTier:                  "reconstructed"
+  streamName: "reco1"
+  fileName: "%ifb_%tc.root"
+  compressionLevel:          1
+  saveMemoryObjectThreshold: 0
+  outputCommands: [ "keep *_*_*_*",
+                    "drop *_*_*_DataRecoStage2"  ]
+}
+
+physics.stream1: [ out1, out2 ]

@@ -1,4 +1,17 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_keep_reco1.fcl"
-#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
 
-outputs.out1.outputCommands: @local::stage2ReducedOutputCommands
+outputs.out1.streamName: "reco2"
+
+outputs.out2: 
+{
+  module_type:               RootOutput
+  dataTier:                  "reconstructed"
+  streamName: "reco1"
+  fileName: "%ifb_%tc.root"
+  compressionLevel:          1
+  saveMemoryObjectThreshold: 0
+  outputCommands: [ "keep *_*_*_*",
+                    "drop *_*_*_DataRecoStage2"  ]
+}
+
+physics.stream1: [ out1, out2 ]

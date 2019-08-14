@@ -1,22 +1,17 @@
-#include "reco_uboone_data_mcc9_8_driver_common_keep_reco1.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2.fcl"
 
-process_name: DataRecoStage2
+outputs.out1.streamName: "reco2"
 
-services.TFileService.fileName: "reco_stage_2_hist.root"
-physics.reco:                   [ @sequence::microboone_reco_data_stage2 ]
-physics.ana:                    [ ]
-physics.trigger_paths:          [ reco ]
-physics.end_paths:              [ stream1 ]
-outputs.out1.fileName:          "%ifb_%tc_reco2.root"
-outputs.out1.dataTier:          "reconstructed"
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
-
-microboone_tfile_metadata:
+outputs.out2: 
 {
-  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
-  GenerateTFileMetadata: [true, true]
-  dataTier:              ["root-tuple", "pandora_debug"]
-  fileFormat:            ["root", "pndr"]
+  module_type:               RootOutput
+  dataTier:                  "reconstructed"
+  streamName: "reco1"
+  fileName: "%ifb_%tc.root"
+  compressionLevel:          1
+  saveMemoryObjectThreshold: 0
+  outputCommands: [ "keep *_*_*_*",
+                    "drop *_*_*_DataRecoStage2"  ]
 }
 
-outputs.out2.outputCommands: ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
+physics.stream1: [ out1, out2 ]
