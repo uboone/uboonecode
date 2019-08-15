@@ -46,6 +46,10 @@ namespace larcv {
 
     void finalize();
 
+    //Particles with same PDG have different segment values
+    //for example, 1st muon be 13x100+0=1300, 2nd muon be 13x100+1=1301
+    void PdgCode2ROIType(int & input_pdg, std::vector<int> & pdg_counter);
+
   private:
 
     unsigned short _origin;

@@ -26,6 +26,26 @@ namespace larcv {
   void SuperaSimCh::initialize()
   {}
 
+  void SuperaSimCh::PdgCode2ROIType(int & this_pdg, std::vector<int> & pdg_counter){
+    
+    if (this_pdg < 0 ) this_pdg=this_pdg*(-1);
+    
+    std::cout<<"this pdg is"<<this_pdg<<std::endl;
+
+    if (!(this_pdg == 11   ||
+	  this_pdg == 13   ||
+	  this_pdg == 22   ||
+	  this_pdg == 111  ||//Pi0
+	  this_pdg == 211  ||
+	  this_pdg == 321  ||//Kaon
+	  this_pdg == 2212 )) this_pdg=2213; //other set to 2213 (1st prime number after 2212)
+    
+    if ((unsigned)this_pdg > pdg_counter.size())
+      pdg_counter.resize(this_pdg + 1, 0);
+    else 
+      pdg_counter[this_pdg]++;
+  }
+  
   bool SuperaSimCh::process(IOManager& mgr)
   {
     SuperaBase::process(mgr);
@@ -53,47 +73,133 @@ namespace larcv {
       throw larbys();
     }
 
-    std::vector<larcv::ROIType_t> track2type_v;
+    //std::vector<larcv::ROIType_t> track2type_v;
+    std::vector<int> track2type_v;
+    std::vector<int> pdg_counter;
+
+    std::cout<<"starting with track2type_v size of "<<track2type_v.size()<<std::endl;
+
+    //Loop over track particles
     for(auto const& mctrack : LArData<supera::LArMCTrack_t>()) {
 
       if(_origin && ((unsigned short)(mctrack.Origin())) != _origin) continue;
       
+      std::cout<<"mctrack.TrackID()          "<<mctrack.TrackID()<<std::endl;
+      std::cout<<"mctrack.PdgCode()          "<<mctrack.PdgCode()<<std::endl;
+      std::cout<<"mctrack.MotherTrackID()    "<<mctrack.MotherTrackID()<<std::endl;
+      std::cout<<"mctrack.MotherPdgCode()    "<<mctrack.MotherPdgCode()<<std::endl;
+      std::cout<<"mctrack.AncestorTrackID()  "<<mctrack.AncestorTrackID()<<std::endl;
+      std::cout<<"mctrack.AncestorPdgCode()  "<<mctrack.AncestorPdgCode()<<std::endl;
+
       if(mctrack.TrackID() >= track2type_v.size())
-	track2type_v.resize(mctrack.TrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mctrack.TrackID()] = larcv::PdgCode2ROIType(mctrack.PdgCode());
+	track2type_v.resize(mctrack.TrackID()+1, 0);
+	//track2type_v.resize(mctrack.TrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mctrack.PdgCode()==11 or mctrack.PdgCode()==22)
+	track2type_v[mctrack.TrackID()] = larcv::PdgCode2ROIType(mctrack.PdgCode());
+      else {
+	int mctrack_pdgcode = mctrack.PdgCode();
+	PdgCode2ROIType(mctrack_pdgcode, pdg_counter);
+	track2type_v[mctrack.TrackID()]=abs(mctrack_pdgcode)*100 + pdg_counter[abs(mctrack_pdgcode)];
+	std::cout<<"track2type_v[mctrack.TrackID()] is "<<track2type_v[mctrack.TrackID()]<<std::endl;
+	std::cout<<"mctrack_pdgcode "<<mctrack_pdgcode<<std::endl;
+      }
+      
+      //track2type_v[mctrack.TrackID()] = larcv::PdgCode2ROIType(mctrack_pdgcode);
+      //std::cout<<"mctrack Pdgcode is "<<larcv::PdgCode2ROIType(mctrack_pdgcode)<<std::endl;
 
       if(mctrack.MotherTrackID() >= track2type_v.size())
-	track2type_v.resize(mctrack.MotherTrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mctrack.MotherTrackID()] = larcv::PdgCode2ROIType(mctrack.MotherPdgCode());
+	track2type_v.resize(mctrack.MotherTrackID()+1,0);
+      //track2type_v.resize(mctrack.MotherTrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mctrack.MotherPdgCode()==11 or mctrack.MotherPdgCode()==22)
+	track2type_v[mctrack.MotherTrackID()] = larcv::PdgCode2ROIType(mctrack.MotherPdgCode());
+      else {
+	int mctrack_motherpdgcode = mctrack.MotherPdgCode();
+	PdgCode2ROIType(mctrack_motherpdgcode, pdg_counter);
+	track2type_v[mctrack.MotherTrackID()]=abs(mctrack_motherpdgcode)*100 + pdg_counter[abs(mctrack_motherpdgcode)];
+	std::cout<<"track2type_v[mctrack.MotherTrackID()] is "<<track2type_v[mctrack.MotherTrackID()]<<std::endl;
+	std::cout<<"mctrack_motherpdgcode "<<mctrack_motherpdgcode<<std::endl;
+      }
+      //track2type_v[mctrack.MotherTrackID()] = larcv::PdgCode2ROIType(mctrack_motherpdgcode);
+      //std::cout<<"mctrack MotherPdgcode is "<<larcv::PdgCode2ROIType(mctrack_motherpdgcode)<<std::endl;
+      
 
       if(mctrack.AncestorTrackID() >= track2type_v.size())
-	track2type_v.resize(mctrack.AncestorTrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mctrack.AncestorTrackID()] = larcv::PdgCode2ROIType(mctrack.AncestorPdgCode());
+	track2type_v.resize(mctrack.AncestorTrackID()+1,0);
+      //track2type_v.resize(mctrack.AncestorTrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mctrack.AncestorPdgCode()==11 or mctrack.AncestorPdgCode()==22)
+	track2type_v[mctrack.AncestorTrackID()] = larcv::PdgCode2ROIType(mctrack.AncestorPdgCode());
+      else {
+	int mctrack_ancestorpdgcode = mctrack.AncestorPdgCode();
+	PdgCode2ROIType(mctrack_ancestorpdgcode, pdg_counter);
+	track2type_v[mctrack.AncestorTrackID()]=abs(mctrack_ancestorpdgcode)*100 + pdg_counter[abs(mctrack_ancestorpdgcode)];
+	std::cout<<"track2type_v[mctrack.AncestorTrackID()] is "<<track2type_v[mctrack.AncestorTrackID()]<<std::endl;
+	std::cout<<"mctrack_ancestorpdgcode "<<mctrack_ancestorpdgcode<<std::endl;
+      }
+      //track2type_v[mctrack.AncestorTrackID()] = larcv::PdgCode2ROIType(mctrack_ancestorpdgcode);
+      //std::cout<<"mctrack AncestorPdgcode is "<<larcv::PdgCode2ROIType(mctrack_ancestorpdgcode)<<std::endl;
     }
+    
+    //Loop over shower particles
     for(auto const& mcshower : LArData<supera::LArMCShower_t>()) {
 
       if(_origin && ((unsigned short)(mcshower.Origin())) != _origin) continue;
       
-      if(mcshower.TrackID() >= track2type_v.size())
-	track2type_v.resize(mcshower.TrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mcshower.TrackID()] = larcv::PdgCode2ROIType(mcshower.PdgCode());
+      std::cout<<"mcshower.TrackID()          "<<mcshower.TrackID()<<std::endl;
+      std::cout<<"mcshower.PdgCode()          "<<mcshower.PdgCode()<<std::endl;
+      std::cout<<"mcshower.MotherTrackID()    "<<mcshower.MotherTrackID()<<std::endl;
+      std::cout<<"mcshower.MotherPdgCode()    "<<mcshower.MotherPdgCode()<<std::endl;
+      std::cout<<"mcshower.AncestorTrackID()  "<<mcshower.AncestorTrackID()<<std::endl;
+      std::cout<<"mcshower.AncestorPdgCode()  "<<mcshower.AncestorPdgCode()<<std::endl;
 
-      if(mcshower.MotherTrackID() >= track2type_v.size())
-	track2type_v.resize(mcshower.MotherTrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mcshower.MotherTrackID()] = larcv::PdgCode2ROIType(mcshower.MotherPdgCode());
+      if(mcshower.TrackID() >= track2type_v.size())
+	track2type_v.resize(mcshower.TrackID()+1, 0 );
+        //track2type_v.resize(mcshower.TrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mcshower.PdgCode()==11 or mcshower.PdgCode()==22)
+	track2type_v[mcshower.TrackID()] = larcv::PdgCode2ROIType(mcshower.PdgCode());
+      else{
+	int mcshower_pdgcode = mcshower.PdgCode();
+	PdgCode2ROIType(mcshower_pdgcode, pdg_counter);
+	track2type_v[mcshower.TrackID()]=abs(mcshower_pdgcode)*100 + pdg_counter[abs(mcshower_pdgcode)];
+      }
       
+      //std::cout<<"track2type_v[mcshower.TrackID()] is "<<track2type_v[mcshower.TrackID()]<<std::endl;
+      
+      if(mcshower.MotherTrackID() >= track2type_v.size())
+	track2type_v.resize(mcshower.MotherTrackID()+1,0);
+        //track2type_v.resize(mcshower.MotherTrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mcshower.MotherPdgCode()==11 or mcshower.MotherPdgCode()==22)
+	track2type_v[mcshower.MotherTrackID()] = larcv::PdgCode2ROIType(mcshower.MotherPdgCode());
+      else{
+	int mcshower_motherpdgcode = mcshower.MotherPdgCode();
+	PdgCode2ROIType(mcshower_motherpdgcode, pdg_counter);
+	track2type_v[mcshower.MotherTrackID()]=abs(mcshower_motherpdgcode)*100 + pdg_counter[abs(mcshower_motherpdgcode)];
+      }	
+      std::cout<<"track2type_v[mcshower.MotherTrackID()] is "<<track2type_v[mcshower.MotherTrackID()]<<std::endl;
+
       if(mcshower.AncestorTrackID() >= track2type_v.size())
-	track2type_v.resize(mcshower.AncestorTrackID()+1,larcv::ROIType_t::kROIUnknown);
-      track2type_v[mcshower.AncestorTrackID()] = larcv::PdgCode2ROIType(mcshower.AncestorPdgCode());
+	track2type_v.resize(mcshower.AncestorTrackID()+1,0);
+        //track2type_v.resize(mcshower.AncestorTrackID()+1,larcv::ROIType_t::kROIUnknown);
+      if (mcshower.AncestorPdgCode()==11 or mcshower.AncestorPdgCode()==22)
+	track2type_v[mcshower.AncestorTrackID()] = larcv::PdgCode2ROIType(mcshower.AncestorPdgCode());
+      else{
+      	int mcshower_ancestorpdgcode = mcshower.AncestorPdgCode();
+	PdgCode2ROIType(mcshower_ancestorpdgcode, pdg_counter);
+	track2type_v[mcshower.AncestorTrackID()]=abs(mcshower_ancestorpdgcode)*100 + pdg_counter[abs(mcshower_ancestorpdgcode)];
+      }
+      std::cout<<"track2type_v[mcshower.AncestorTrackID()] is "<<track2type_v[mcshower.AncestorTrackID()]<<std::endl;
 
       for(auto const& daughter_track_id : mcshower.DaughterTrackID()) {
 	if(daughter_track_id == larcv::kINVALID_UINT)
 	  continue;
 	if(daughter_track_id >= track2type_v.size())
 	  track2type_v.resize(daughter_track_id+1,larcv::ROIType_t::kROIUnknown);
+	//std::cout<<"in daughter, track2type_v[mcshower.TrackID()]"<<track2type_v[mcshower.TrackID()]<<std::endl;
 	track2type_v[daughter_track_id] = track2type_v[mcshower.TrackID()];
       }
     }
+    
+    //std::cout<<"size of track2type_v is "<<track2type_v.size()<<std::endl;
+    //for (auto shit:track2type_v) std::cout<<"fuck, roi"<<shit<<std::endl;
 
     auto image_v = supera::SimCh2Image2D(meta_v, track2type_v, LArData<supera::LArSimCh_t>(), TimeOffset());
 

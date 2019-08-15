@@ -41,8 +41,13 @@ namespace supera {
   //
   // SimChannel => Image2D
   //
+  /*
   std::vector<larcv::Image2D> SimCh2Image2D(const std::vector<larcv::ImageMeta>& meta_v,
 					    const std::vector<larcv::ROIType_t>& track2type_v,
+					    const std::vector<supera::LArSimCh_t>& sch_v,
+					    const int time_offset);*/
+  std::vector<larcv::Image2D> SimCh2Image2D(const std::vector<larcv::ImageMeta>& meta_v,
+					    const std::vector<int>& track2type_v,
 					    const std::vector<supera::LArSimCh_t>& sch_v,
 					    const int time_offset);
 

@@ -3,9 +3,11 @@
 
 #include "SuperaInstanceImage.h"
 #include "Instance2Image.h"
+#include "Instance2ROI.h"
 #include "ImageMetaMakerFactory.h"
 #include "PulledPork3DSlicer.h"
 #include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventROI.h"
 #include "DataFormat/DataFormatUtil.h"
 namespace larcv {
 
@@ -62,6 +64,16 @@ namespace larcv {
     }
     if(!(ev_ancestor->Image2DArray().empty())) {
       LARCV_CRITICAL() << "Ancestor image array not empty!" << std::endl;
+      throw larbys();
+    }
+
+    auto roi_ancestor = (EventROI*)(mgr.get_data(kProductROI,m_ancestor_label));
+    if(!roi_ancestor) {
+      LARCV_CRITICAL() << "Ancestor ROI could not be created!" << std::endl;
+      throw larbys();
+    }
+    if(!(roi_ancestor->ROIArray().empty())) {
+      LARCV_CRITICAL() << "Ancestor ROI array not empty!" << std::endl;
       throw larbys();
     }
 
@@ -123,6 +135,15 @@ namespace larcv {
     ev_image->Emplace(std::move(idimg_v));
     ev_ancestor->Emplace(std::move(ancestor_v));
     
+    std::vector<int> pdg_v;
+    
+    std::vector<larcv::ROI> ancestor_roi_v;
+    supera::Instance2ROI(meta_v, trackid2ancestorid, LArData<supera::LArSimCh_t>(),
+			 row_compression_factor, col_compression_factor, TimeOffset(), pdg_v,
+			 idimg_v, ancestor_v, ancestor_roi_v );
+    
+
+    roi_ancestor->Emplace(std::move(ancestor_roi_v));
     return true;
   }
 

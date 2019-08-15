@@ -18,6 +18,7 @@
 #include "ImageMetaMaker.h"
 #include "ParamsImage2D.h"
 #include "DataFormat/Image2D.h"
+#include "DataFormat/ROI.h"
 #include <string>
 
 namespace larcv {
@@ -52,7 +53,7 @@ namespace larcv {
     unsigned short _origin;
     std::string m_ancestor_label;
   };
-
+  
   /**
      \class larcv::SuperaInstanceImageFactory
      \brief A concrete factory class for larcv::SuperaInstanceImage

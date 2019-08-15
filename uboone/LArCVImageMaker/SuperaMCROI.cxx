@@ -101,7 +101,9 @@ namespace larcv {
 		   LArData<supera::LArMCShower_t>());
 
     auto primary_v = _mcpt.PrimaryArray();
-    LARCV_INFO() << "Found " << primary_v.size() << " primary particles" << std::endl;
+    //LARCV_INFO() << "Found " << primary_v.size() << " primary particles" << std::endl;
+    std::cout << ">>>>>>>>>>>>>>>>>>>>>>>"<<std::endl;
+    std::cout << "Found " << primary_v.size() << " primary particles" << std::endl;
 
     std::vector<supera::LArSimCh_t> empty_sch_v;
 
@@ -111,6 +113,20 @@ namespace larcv {
     for(size_t primary_idx = 0; primary_idx < primary_v.size(); ++primary_idx) {
       
       auto& primary = primary_v[primary_idx];
+
+      std::cout << "Analyzing primary " << primary_idx << " PDG " << primary.roi.PdgCode()
+		<< " Origin " << primary.origin
+		<< " PDG << " << primary.pdg
+		<< " with " << primary.daughter_v.size() << " children" 
+		<< std::endl;
+      for (auto kid : primary.daughter_v) {
+	std::cout<<"each is "<<kid.pdg<<std::endl;
+	std::cout<<"begin x is  "<<kid.start.X()
+		 <<"begin y is  "<<kid.start.Y()
+		 <<"begin z is  "<<kid.start.Z()
+		 <<"begin t is  "<<kid.start.T()
+		 <<std::endl;
+      }
 
       // filter out primary of certain origin, if specified
       if(_pass_origin && primary.origin != _pass_origin) {
@@ -197,7 +213,9 @@ namespace larcv {
       }
 
       LARCV_INFO() << "Updating primary ROI with " << sec_roi_v.size() << " children" << std::endl;
-      UpdatePrimaryROI(primary.roi, sec_roi_v);
+      bool _update_primary_roi=true;
+      if (_update_primary_roi)
+	UpdatePrimaryROI(primary.roi, sec_roi_v);
 
       if( (_filter_min_rows>0 || _filter_min_cols>0) && primary.roi.BB().empty() )
 	continue;
@@ -216,12 +234,14 @@ namespace larcv {
       //
       // Register primary ROI
       //
-      LARCV_INFO() << "Storing primary ROI (PDG " << primary.roi.PdgCode()
-		   << " Shape " << primary.roi.Shape()
-		   << " MCTIndex " << primary.roi.MCTIndex()
-		   << " MCSTIndex) " << primary.roi.MCSTIndex()
-		   << std::endl;
-	
+      std::cout<<">>>>>>>>>>>>>>>>>>>>>>"<<std::endl;
+      //LARCV_INFO() << "Storing primary ROI (PDG " << primary.roi.PdgCode()
+      std::cout << "Storing primary ROI (PDG " << primary.roi.PdgCode()
+		<< " Shape " << primary.roi.Shape()
+		<< " MCTIndex " << primary.roi.MCTIndex()
+		<< " MCSTIndex) " << primary.roi.MCSTIndex()
+		<< std::endl;
+      
       _roi_v.push_back(primary.roi);
 
       // Record incorporated mcnode
@@ -237,11 +257,13 @@ namespace larcv {
       }
       for(size_t daughter_idx=0; daughter_idx<sec_roi_v.size(); ++daughter_idx) {
 	auto const& daughter_roi = sec_roi_v[daughter_idx];
-	LARCV_INFO() << "    Associated secondary (PDG " << daughter_roi.PdgCode()
-		     << " Shape " << daughter_roi.Shape()
-		     << " MCTIndex " << daughter_roi.MCTIndex()
-		     << " MCSTIndex) " << daughter_roi.MCSTIndex()
-		     << std::endl;	
+	std::cout<<">>>>>>>>>>>>>>>>>>>>>>"<<std::endl;
+	//LARCV_INFO() << "    Associated secondary (PDG " << daughter_roi.PdgCode()
+	std::cout << "    Associated secondary (PDG " << daughter_roi.PdgCode()
+		  << " Shape " << daughter_roi.Shape()
+		  << " MCTIndex " << daughter_roi.MCTIndex()
+		  << " MCSTIndex) " << daughter_roi.MCSTIndex()
+		  << std::endl;	
       }
       _roi2mcnode_vv.emplace_back(std::move(roi2mcnode_v));
       
@@ -257,7 +279,9 @@ namespace larcv {
 	    (_store_g4_secondary_roi && secondary_roi.TrackID() != secondary_roi.ParentTrackID())
 	    )
 	  {
-	    LARCV_INFO() << "Storing secondary ROI (PDG " << secondary_roi.PdgCode()
+	    std::cout<<">>>>>>>>>>>>>>>>>>>>>>"<<std::endl;
+	    //LARCV_INFO() << " Storing secondary ROI (PDG " << secondary_roi.PdgCode()
+	    std::cout << " Storing secondary ROI (PDG " << secondary_roi.PdgCode()
 			 << " Shape " << secondary_roi.Shape()
 			 << " MCTIndex " << secondary_roi.MCTIndex()
 			 << " MCSTIndex) " << secondary_roi.MCSTIndex()

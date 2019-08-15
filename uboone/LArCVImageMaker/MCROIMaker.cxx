@@ -73,6 +73,7 @@ namespace supera {
   
   WTRangeArray_t MCROIMaker::WireTimeBoundary(const LArMCTrack_t& mct) const
   {
+    
     LARCV_DEBUG() << "start" << std::endl;
     const double drift_velocity = ::supera::DriftVelocity() * 1.0e-3; // make it cm/ns
     //const int tick_max = ::supera::NumberTimeSamples();
@@ -253,6 +254,7 @@ namespace supera {
     
     bb_v.reserve(wtrange_v.size() - 1);
     bool invalid = false;
+    
     for (size_t i = 0; i < wtrange_v.size() - 1; ++i) {
       auto const& wrange = wtrange_v[i];
       auto const& trange = wtrange_v.back();
@@ -309,6 +311,16 @@ namespace supera {
   
   ::larcv::ROI MCROIMaker::ParticleROI( const LArMCTrack_t& mct, const int time_offset) const
   {
+
+    std::cout<<"fuck>>>>>>>>>>>>>>>>>>\n"
+	     <<"Track ID is "<<mct.TrackID()<<"\n"
+	     <<"PDG is "<<mct.PdgCode()<<"\n"
+	     <<"daughter track trackid is ";
+    
+    //for (auto id : mct.DaughterTrackID()) std::cout<<id<<", "<<std::endl;
+
+
+    
     LARCV_DEBUG() << "start" << std::endl;
     LARCV_INFO() << "Assessing MCTrack G4Track ID = " << mct.TrackID() << " PdgCode " << mct.PdgCode() << std::endl;
     auto wtrange_v = WireTimeBoundary(mct);
@@ -385,6 +397,13 @@ namespace supera {
 					const std::vector<supera::LArSimCh_t>& sch_v,
 					const int time_offset ) const
   {
+
+    std::cout<<"fuck>>>>>>>>>>>>>>>>>>\n"
+	     <<"Track ID is "<<mct.TrackID()<<"\n"
+	     <<"PDG is "<<mct.PdgCode()<<"\n"
+	     <<"daughter track trackid is ";
+    //for (auto id : mct.DaughterTrackID()) std::cout<<id<<", "<<std::endl;
+    
     LARCV_DEBUG() << "start" << std::endl;
     LARCV_INFO() << "Assessing MCTrack G4Track ID = " << mct.TrackID() << " PdgCode " << mct.PdgCode() << std::endl;
     auto wtrange_v = WireTimeBoundary(mct, sch_v);
@@ -456,7 +475,14 @@ namespace supera {
   
   ::larcv::ROI MCROIMaker::ParticleROI( const LArMCShower_t& mcs, const int time_offset ) const
   {
-    LARCV_DEBUG() << "start" << std::endl;
+    std::cout<<"fuck>>>>>>>>>>>>>>>>>>\n"
+	     <<"Track ID is "<<mcs.TrackID()<<"\n"
+	     <<"PDG is "<<mcs.PdgCode()<<"\n"
+	     <<"daughter track trackid is ";
+    //for (auto id : mcs.DaughterTrackID()) std::cout<<id<<", "<<std::endl;
+
+
+    LARCV_DEBUG() << "start=" << std::endl;
     LARCV_INFO() << "Assessing MCShower G4Track ID = " << mcs.TrackID() << " PdgCode " << mcs.PdgCode() << std::endl;
     auto wtrange_v = WireTimeBoundary(mcs);
     wtrange_v.back().Set(wtrange_v.back().Start()+time_offset, wtrange_v.back().End()+time_offset);
@@ -516,6 +542,13 @@ namespace supera {
 					const std::vector<LArSimCh_t>& sch_v,
 					const int time_offset ) const
   {
+    std::cout<<"fuck>>>>>>>>>>>>>>>>>>\n"
+	     <<"Track ID is "<<mcs.TrackID()<<"\n"
+	     <<"PDG is "<<mcs.PdgCode()<<"\n"
+	     <<"daughter track trackid is ";
+    //for (auto id : mcs.DaughterTrackID()) std::cout<<id<<", "<<std::endl;
+
+
     LARCV_DEBUG() << "start" << std::endl;
     LARCV_INFO() << "Assessing MCShower G4Track ID = " << mcs.TrackID() << " PdgCode " << mcs.PdgCode() << std::endl;
     auto wtrange_v = WireTimeBoundary(mcs, sch_v);

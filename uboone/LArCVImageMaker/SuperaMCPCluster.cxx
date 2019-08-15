@@ -34,6 +34,8 @@ namespace larcv {
     }
 
     auto ev_roi = (EventROI*)(mgr.get_data(kProductROI,OutROILabel()));
+    std::cout<<">>>>>>>>>>>"<<std::endl;
+    std::cout<<"ev_roi size"<<ev_roi->ROIArray().size()<<std::endl;
     if(!ev_roi) {
       LARCV_CRITICAL() << "Failed to fetch ROI (needs to be created) by " << OutROILabel() << std::endl;
       throw larbys();

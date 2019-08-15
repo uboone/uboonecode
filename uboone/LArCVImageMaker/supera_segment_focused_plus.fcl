@@ -24,7 +24,7 @@ ProcessDriver: {
       LArSimChProducer: "largeant"
       LArMCTruthProducer: "generator"
       PulledPork: {
-        Verbosity: 1
+        Verbosity: 2
         Origin: 0
         WidthArray:    [171.16552,88.681001347526518,153.6]
         MinCoordinate: [0.,-116.5,0.]
@@ -62,14 +62,14 @@ ProcessDriver: {
       OutChStatusLabel: "wire"
     }
     SuperaWire: {
-      Verbosity: 1
+      Verbosity: 2
       OutImageLabel:    "wire"
       LArWireProducer:  "caldata"
       TimeOffset:       2400
     }
     SuperaSimCh: {
       Verbosity: 2
-      OutImageLabel:       "segment"
+      OutImageLabel:       "segment_rui"
       OutROILabel:         "segment"
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
@@ -93,16 +93,16 @@ ProcessDriver: {
       UseScattering:     false
     }
     SuperaMCROI: {
-      Verbosity: 1
-      OutROILabel:         "segment"
+      Verbosity: 2
+      OutROILabel:         "rui"
       LArMCTruthProducer:  "generator"
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "largeant"
       TimeOffset:       2400
       Origin: 0
+      StoreG4PrimaryROI:    false
       StoreG4SecondaryROI:  false
-      StoreG4PrimaryROI:    true
       FilterTargetPDG:      []
       FilterTargetInitEMin: []
       FilterTargetDepEMin:  []
@@ -126,13 +126,13 @@ ProcessDriver: {
 	DTMax:        10000
       }
       MCROIMaker: {
-        Verbosity:    1
+        Verbosity:    2
    	MaxTimeTick:  8448
-        TimePadding:  10
-        WirePadding:  10
+        TimePadding:  0
+        WirePadding:  0
         MinWidth:     2
         MinHeight:    2
-	ApplySCE:     true
+	ApplySCE:     false
       }
     }
     SuperaMCPCluster: {
@@ -143,7 +143,7 @@ ProcessDriver: {
       LArMCTrackProducer:  "mcreco"
       LArMCShowerProducer: "mcreco"
       LArSimChProducer:    "largeant"
-
+      TimeOffset:       2400
       Origin: 0
       StoreG4PrimaryROI:    true
       StoreG4SecondaryROI:  true
@@ -156,8 +156,6 @@ ProcessDriver: {
       TrackDepEMin:   10
       FilterROIMinRows: 0
       FilterROIMinCols: 0
-
-      TimeOffset:       2400
 #      MetaConfig: {
 #        MinTime:          2400
 #        MinWire:          0
@@ -172,13 +170,13 @@ ProcessDriver: {
         DTMax:        10000
       }
       MCROIMaker: {
-        Verbosity:    1
+        Verbosity:    2
    	MaxTimeTick:  8448
-        TimePadding:  10
-        WirePadding:  10
+        TimePadding:  0
+        WirePadding:  0
         MinWidth:     2
         MinHeight:    2
-	ApplySCE:     true
+	ApplySCE:     false
       }
     }
     ImagePCluster: {

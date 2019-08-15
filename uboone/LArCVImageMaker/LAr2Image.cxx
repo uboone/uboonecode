@@ -186,9 +186,14 @@ namespace supera {
     return img;
   }
 
-  std::vector<larcv::Image2D>
+  /*std::vector<larcv::Image2D>
   SimCh2Image2D(const std::vector<larcv::ImageMeta>& meta_v,
 		const std::vector<larcv::ROIType_t>& track2type_v,
+		const std::vector<supera::LArSimCh_t>& sch_v,
+		const int time_offset)*/
+  std::vector<larcv::Image2D>
+  SimCh2Image2D(const std::vector<larcv::ImageMeta>& meta_v,
+		const std::vector<int>& track2type_v,
 		const std::vector<supera::LArSimCh_t>& sch_v,
 		const int time_offset)
   {
@@ -236,7 +241,8 @@ namespace supera {
 	  if (edep.energy < energy) continue;
 	  if (std::abs(edep.trackID) >= (int)(track2type_v.size())) continue;
 	  auto temp_roi_type = track2type_v[std::abs(edep.trackID)];
-	  if (temp_roi_type ==::larcv::kROIUnknown) continue;
+	  //if (temp_roi_type ==::larcv::kROIUnknown) continue;
+	  if (temp_roi_type == 0 ) continue;
 	  energy = edep.energy;
 	  roi_type = (::larcv::ROIType_t)temp_roi_type;
 	}
