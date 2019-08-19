@@ -1,0 +1,27 @@
+process_name: GenieExtract
+
+source:
+{
+  module_type: RootInput
+  maxEvents:  -1 # Number of events to create
+}
+
+services:
+{
+}
+
+physics:
+{
+  analyzers:
+  {
+    extractor:
+    {
+      module_type: "GENIEExtractor"
+      genie_label: "generator"
+      output_filename: "my_dumped_events.ghep.root"
+    }
+  }
+
+  ana: [ extractor ]
+  end_paths: [ ana ]
+}
