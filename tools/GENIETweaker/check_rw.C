@@ -131,12 +131,13 @@ void check_rw(const std::string& tweaked_file, const std::string& rw_file)
       std::cout << "Ev = " << Ev << " GeV, weight = " << weight << '\n';
 
       rw_histogram->Fill(Ev, weight);
-      untweaked_histogram->Fill( Ev );
+      untweaked_histogram->Fill(Ev, 1.0);
     }
   }
 
   chi2_test(tweak_histogram, rw_histogram, true);
-  tweak_histogram->Chi2Test(rw_histogram, "uw p");
+  //chi2_test(tweak_histogram, untweaked_histogram, true);
+  //tweak_histogram->Chi2Test(rw_histogram, "uw p");
 
   // For plotting, normalize the untweaked and reweighted histograms to the
   // same number of events as the tweaked histogram
@@ -150,7 +151,7 @@ void check_rw(const std::string& tweaked_file, const std::string& rw_file)
 
   // Draw the histograms on the same plot
   TCanvas* c = new TCanvas;
-  tweak_histogram->Draw("hist");
-  untweaked_histogram->Draw("same hist");
-  rw_histogram->Draw("same hist");
+  tweak_histogram->Draw("hist e");
+  untweaked_histogram->Draw("same hist e");
+  rw_histogram->Draw("same hist e");
 }
