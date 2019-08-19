@@ -1,5 +1,5 @@
 #include "services_microboone.fcl"
-#include "StopMuMCGen_module.fcl"
+#include "ACPTtrigMCGen_module.fcl"
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
@@ -35,7 +35,7 @@ physics:
 
  producers:
  {
-   generator: @local::microboone_StopMuMCGen
+   generator: @local::microboone_ACPTtrigMCGen
 
    # same as wirecell_g4_uboone.fcl [START]
    largeant: @local::microboone_largeant
@@ -59,7 +59,9 @@ filters:
 acptfilter: {
            module_type: "ACPTtrigMCFilter"
            MCPproducer: "largeant"
-           TrkLen:      10.
+           #TrkLen:      10. # this isn't configured to work
+           CheckAnode:   true
+           CheckCathode: true
            }
 }
 
@@ -90,8 +92,8 @@ services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 # Switching to the "drift" for SimChannels
 #physics.producers.mcreco.G4ModName:                   "drift"
 
-physics.producers.generator.TopLayerDims:    [-30,480,200,200,-40,1100] # top box edges [cm]
-physics.producers.generator.BottomLayerDims: [-25,475,130,130,-50,1075] # bottom box edges [cm]
+physics.producers.generator.TopLayerDims:    [-230,480,200,200,-50,1100] # top box edges [cm]
+physics.producers.generator.BottomLayerDims: [-225,475,130,130,-50,1100] # bottom box edges [cm]
 
 physics.producers.generator.EnergyThresholdHigh: 100.0
 
