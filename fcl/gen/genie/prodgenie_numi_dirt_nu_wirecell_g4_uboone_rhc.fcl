@@ -126,7 +126,7 @@ outputs:
 
 # dk2nu flux generation config
 physics.producers.generator:                    @local::standard_genie
-physics.producers.generator.POTPerSpill:        5e13
+physics.producers.generator.POTPerSpill:        6e13
 physics.producers.generator.EventsPerSpill:     0
 physics.producers.generator.GlobalTimeOffset:   5627.5
 physics.producers.generator.RandomTimeOffset:   9600.
