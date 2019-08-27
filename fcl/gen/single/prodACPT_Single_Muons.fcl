@@ -92,8 +92,9 @@ services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 # Switching to the "drift" for SimChannels
 #physics.producers.mcreco.G4ModName:                   "drift"
 
-physics.producers.generator.TopLayerDims:    [-230,480,200,200,-50,1100] # top box edges [cm]
-physics.producers.generator.BottomLayerDims: [-225,475,130,130,-50,1100] # bottom box edges [cm]
+physics.producers.generator.TopLayerDims:    [-2100,2356,300,300,-2550,3586] # top box edges [cm]
+physics.producers.generator.BottomLayerDims: [-2075,2331,230,230,-2525,3561] # bottom box edges [cm]
+physics.producers.generator.CRYConfigStr: "date 1-1-2016 returnGammas 0 returnElectrons 0 returnMuons 1 returnPions 0 returnNeutrons 0 returnProtons 0 latitude 41.8 subboxLength 40.8 altitude 0"
 
 physics.producers.generator.EnergyThresholdHigh: 100.0
 
