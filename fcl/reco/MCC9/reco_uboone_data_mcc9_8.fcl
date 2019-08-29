@@ -35,6 +35,7 @@
 #include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
+#include "ophitcorrection.fcl"
 
 #include "ophitremapproducer.fcl"
 #include "beamdata_microboone.fcl"
@@ -111,6 +112,8 @@ microboone_reco_data_producers:
     ophitCosmicNoRemap:               @local::microboone_ophit_saturation_cosmic
     ophitBeam:                        @local::ophitremap
     ophitCosmic:                      @local::ophitremap
+    ophitBeamCalib:                   @local::ophitcorrection
+    ophitCosmicCalib:                 @local::ophitcorrection
 
     ### Saturation correction module
     saturation:                       @local::correct_saturation
@@ -266,6 +269,8 @@ microboone_reco_data_optical:          [ saturation,
                                          ophitBeamNoRemap,
                                          ophitCosmic,
                                          ophitBeam,
+                                         ophitCosmicCalib,
+                                         ophitBeamCalib,
                                          simpleFlashCosmic,
                                          simpleFlashBeam,
                                          simpleFlashBeamLowPE
@@ -344,11 +349,10 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          shrreco3d,
                                          pandoraGeomVertexFit,
                                          pandoraCrtHitMatch,
-                                         flashmatch,
                                          acpttagger,
                                          acpttrigtagger,
-                                         stopmutagger
-                                         ]
+                                         flashmatch]
+
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
@@ -440,7 +444,7 @@ microboone_reco_data_producers.pandora.ShowerProducerLabel:                     
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
 microboone_reco_data_producers.pandora.ShouldProduceT0s:                                                       false
 microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
-microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          false
+microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          true
 
 microboone_reco_data_producers.pandora.SliceIdTool.HasMCNeutrino:                                              false
 microboone_reco_data_producers.pandoraWriter.EnableMCParticles:                                                false
@@ -530,11 +534,11 @@ microboone_reco_data_producers.pandoraKalmanShowercali.CalorimetryModuleLabel:  
 microboone_reco_data_producers.pandoraKalmanShowercalipid.ProducerLabels.TrackLabel:                        "pandoraKalmanShower"
 microboone_reco_data_producers.pandoraKalmanShowercalipid.ProducerLabels.CalorimetryLabel:                  "pandoraKalmanShowercali"
 
-microboone_reco_data_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.04e-3]
-microboone_reco_data_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.04e-3]
-microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.04e-3]
-microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.04e-3]
-microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.04e-3]
+microboone_reco_data_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.TrackModuleLabel:                               "pandoraKalmanTrack"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.FlashModuleLabel:                               "simpleFlashBeam"
@@ -545,7 +549,7 @@ microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.FlashModuleLabel:  
 microboone_reco_data_producers.pandoraKalmanShowerFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
 
 microboone_reco_data_producers.shrreco3d.BacktrackTag:                                                        ""
-microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [232,249,247.4] # e-/ADC
+microboone_reco_data_producers.shrreco3d.ADCtoE:                                                              [232,249,243.7] # e-/ADC
 microboone_reco_data_producers.shrreco3d.NeutrinoEvent:                                                       false
 
 microboone_reco_data_producers.pmtrack.PfpModuleLabel:                                                        "trajcluster"
@@ -578,9 +582,21 @@ microboone_reco_data_producers.pmtrackT0RecoBeam.TrackProducer:                 
 
 microboone_reco_data_producers.simpleFlashBeamLowPE.AlgoConfig.PEThreshold:                                   6
 
+#microboone_reco_data_producers.simpleFlashBeam.OpHitProducer:   "ophitBeamCalib"
+#microboone_reco_data_producers.simpleFlashCosmic.OpHitProducer: "ophitCosmicCalib"
+
+microboone_reco_data_producers.simpleFlashBeam.DoCalibration:   true
+microboone_reco_data_producers.simpleFlashCosmic.DoCalibration: true
+
 microboone_reco_data_producers.ophitBeam.OpHitsInputTag:                                                      "ophitBeamNoRemap"
 microboone_reco_data_producers.ophitCosmic.OpHitsInputTag:                                                    "ophitCosmicNoRemap"
 microboone_reco_data_producers.ophitCosmic.MapOffset:                                                         200
+
+microboone_reco_data_producers.ophitBeamCalib.OpHitsInputTag: "ophitBeam"
+#microboone_reco_data_producers.ophitBeamCalib.OutputProducer: "calib"
+
+microboone_reco_data_producers.ophitCosmicCalib.OpHitsInputTag: "ophitCosmic"
+#microboone_reco_data_producers.ophitCosmicCalib.OutputProducer: "calib"
 
 microboone_reco_data_producers.wcopflash.usePmtGainDB:                                   		      true
 

@@ -1,0 +1,12 @@
+#include "standard_larcv_uboone_mc_prod.fcl"
+
+physics.larcv: [ "opreco" ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName: [ "larlite_opreco.root.json" ]
+  GenerateTFileMetadata: [ true ]
+  dataTier:              [ "larlite_opreco" ]
+  fileFormat:            [ "root" ]
+}
+

@@ -96,6 +96,8 @@ services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
 
+physics.producers.optdigitizer.AbnormalOpCh: 28
+
 physics.producers.mcreco.MCParticleLabel: "largeant"
 physics.producers.mcreco.SimChannelLabel: "driftWC:simpleSC"
 physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,

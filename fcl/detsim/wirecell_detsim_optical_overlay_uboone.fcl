@@ -10,8 +10,9 @@
 #include "microboone_crt_detsim.fcl"
 #include "crtsimhitproducer.fcl"
 #include "CRTpreOverlay.fcl"
+#include "lysimphotonscaling.fcl"
 
-process_name: OverlayDetsim 
+process_name: OverlayDetsimOptical 
 
 services:
 {
@@ -31,7 +32,7 @@ source:
   module_type: RootInput
   maxEvents:  -1        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_OverlayDetsimOptical*" ]
 
 }
 
@@ -45,6 +46,7 @@ physics:
  {
    nfbadchannel:        @local::wcls.nfbadchannel
    optdigitizer:   	@local::microboone_optical_adc_sim
+   lyscaling:           @local::lyscaling
    optfem:         	@local::microboone_optical_fem_sim
    triggersim:     	@local::ubtrigger_dark_bnb
    pmtreadoutnonoise:	@local::microboone_optical_dram_readout_sim
@@ -60,7 +62,7 @@ physics:
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, nfbadchannel, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, crtdetsim, crthitsim, maskedcrthitsim, swtriggernonoise ]
+ simulate: [ rns, lyscaling, optdigitizer, optfem, triggersim, pmtreadoutnonoise, swtriggernonoise ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -94,6 +96,8 @@ outputs:
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
 physics.producers.optdigitizer.AbnormalOpCh: 29
+
+physics.producers.optdigitizer.G4ModName: "lyscaling"
 
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
