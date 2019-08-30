@@ -33,6 +33,7 @@
 #include "microboone_crthitcorr.fcl"
 #include "UBCRTCosmicFilter.fcl"
 #include "CRTDistanceFilter.fcl"
+#include "CRTTriggerCorr.fcl" 
 #include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
@@ -227,6 +228,7 @@ microboone_reco_data_producers:
 
     # CRT reco
     pandoraCrtHitMatch:               @local::t0recocrthit_data
+    crtt0Correction:                  @local::crttrigger
     crthitcorrFirstPass:              @local::crtsimhitcorr
     crthitcorr:                       @local::crtdatahitcorr
     crttzero:                         @local::crttzero
@@ -315,7 +317,8 @@ microboone_reco_data_crt:              [ crthitcorr,
                                          crtveto,
                                          crtdistance]
 
-microboone_reco_ovrl_crt:              [ crthitcorrFirstPass,
+microboone_reco_ovrl_crt:              [ crtt0Correction,
+                                         crthitcorrFirstPass,
                                          crthitcorr,
                                          crttzero,
                                          crttrack,
