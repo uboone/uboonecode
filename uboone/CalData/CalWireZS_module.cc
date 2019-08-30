@@ -17,7 +17,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TProfile.h"
-//#include "TCanvas.h"
+#include "TCanvas.h"
 
 // framework libraries
 #include "fhiclcpp/ParameterSet.h" 
@@ -423,28 +423,31 @@ void CalWireZS::extractZSROIs( const recob::Wire::RegionsOfInterest_t & zsROIs, 
       }
 
       // Low-level plot of each ROI before and after background subtraction
-      // if(fSaveWireWF){ 
-      // 	TH1D* hOrigROI = tfs->make<TH1D>(Form("ROI_Evt%06zu_Ch%04u_origroi%04zu", fEventID, channel, ctrROI),
-      // 				       ";Tick;ADC", pastEndTick - firstTick, firstTick, pastEndTick);
-      // 	TH1D* hSubROI = tfs->make<TH1D>(Form("ROI_Evt%06zu_Ch%04u_bgsubroi%04zu", fEventID, channel, ctrROI),
-      // 				       ";Tick;ADC", pastEndTick - firstTick, firstTick, pastEndTick);
-      // 	hOrigROI->SetLineColor(kBlack);
-      // 	hSubROI->SetLineColor(kRed);	
-      // 	for (size_t iTick = firstTick; iTick < pastEndTick; iTick++ ){
-      // 	  hOrigROI->Fill((int)iTick, ROI[iTick] - slope*firstTick - intercept); // Shift original waveform to compare to baseline subtracted
-      // 	  hSubROI->Fill((int)iTick, waveform[iTick]);
-      // 	}
-      // 	// Uncomment this block to print ROIs to png files	
-      // 	// TCanvas canvas(Form("c_Evt%06zu_Ch%04u_zsroi%04zu", fEventID, channel, ctrROI),
-      // 	// 	       Form("c_Evt%06zu_Ch%04u_zsroi%04zu", fEventID, channel, ctrROI));
-      // 	// hOrigROI->Draw("hist ][");
-      // 	// hOrigROI->SetMaximum(150);
-      // 	// hOrigROI->SetMinimum(-150);
-      // 	// hSubROI->Draw("hist ][ same");
-      // 	// canvas.Modified();
-      // 	// canvas.Update();
-      // 	// canvas.Print(".png");
-      // }
+      if(fSaveWireWF){ 
+      	TH1D* hOrigROI = tfs->make<TH1D>(Form("ROI_Evt%06zu_Ch%04u_origroi%04zu", fEventID, channel, ctrROI),
+      				       ";Tick;ADC", pastEndTick - firstTick, firstTick, pastEndTick);
+      	TH1D* hSubROI = tfs->make<TH1D>(Form("ROI_Evt%06zu_Ch%04u_bgsubroi%04zu", fEventID, channel, ctrROI),
+      				       ";Tick;ADC", pastEndTick - firstTick, firstTick, pastEndTick);
+      	hOrigROI->SetLineColor(kBlack);
+      	hSubROI->SetLineColor(kRed);	
+      	for (size_t iTick = firstTick; iTick < pastEndTick; iTick++ ){
+      	  //hOrigROI->Fill((int)iTick, ROI[iTick] - slope*firstTick - intercept); // Shift original waveform to compare to baseline subtracted
+	  // Shift original waveform by the average baseline to compare to baseline subtracted
+      	  hOrigROI->Fill((int)iTick, ROI[iTick] - slope*(firstTick + pastEndTick - 1)/2. - intercept); 
+      	  hSubROI->Fill((int)iTick, waveform[iTick]);
+      	}
+      	// Uncomment this block to print ROIs to png files	
+      	TCanvas canvas(Form("c_Evt%06zu_Ch%04u_zsroi%04zu", fEventID, channel, ctrROI), Form("c_Evt%06zu_Ch%04u_zsroi%04zu", fEventID, channel, ctrROI));
+      	hOrigROI->Draw("hist ][");
+      	hSubROI->Draw("hist ][ same");
+	double ymax = (fabs(hSubROI->GetMaximum()) > fabs(hSubROI->GetMinimum()))? 1.1*hSubROI->GetMaximum() : 1.1*fabs(hSubROI->GetMinimum());
+      	hOrigROI->SetMaximum( ymax );
+      	hOrigROI->SetMinimum( -ymax );
+      	canvas.Modified();
+      	canvas.Update();
+      	canvas.Print(".png");
+      	canvas.Print(".root");
+      }
       
       ctrROI++;
     } // End of loop over zero-suppressed ROIs within a wire
