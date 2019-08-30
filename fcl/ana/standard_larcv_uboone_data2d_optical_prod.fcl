@@ -1,9 +1,9 @@
-#include "standard_larcv_uboone_mc_prod.fcl"
+#include "standard_larcv_uboone_data_prod.fcl"
 
 physics.analyzers.opreco.DataLookUpMap.ophit: ["ophitBeam","ophitCosmic","ophitBeamCalib","ophitCosmicCalib"]
-physics.analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic","simpleFlashBeam::OverlayStage1a","simpleFlashCosmic::OverlayStage1a"]
+physics.analyzers.opreco.DataLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic","simpleFlashBeam::DataRecoStage1Test","simpleFlashCosmic::DataRecoStage1Test"]
 physics.analyzers.opreco.AssociationLookUpMap.ophit: ["ophitBeam","ophitCosmic","ophitBeamCalib","ophitCosmicCalib"]
-physics.analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic","simpleFlashBeam::OverlayStage1a","simpleFlashCosmic::OverlayStage1a"]
+physics.analyzers.opreco.AssociationLookUpMap.opflash: ["simpleFlashBeam","simpleFlashCosmic","opflashBeam","opflashCosmic","simpleFlashBeam::DataRecoStage1Test","simpleFlashCosmic::DataRecoStage1Test"]
 
 physics.larcv: [ "opreco" ]
 
