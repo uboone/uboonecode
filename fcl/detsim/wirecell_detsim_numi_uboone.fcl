@@ -5,6 +5,9 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "swtrigger_microboone.fcl"
 #include "wcls.fcl"
+#include "mcreco.fcl" 
+#include "microboone_crt_detsim.fcl"
+#include "crtsimhitproducer.fcl"
 
 process_name: Detsim
 
@@ -26,7 +29,7 @@ source:
   module_type: RootInput
   maxEvents:  10        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*" ]
 
 }
 
@@ -40,19 +43,23 @@ physics:
  {
    optdigitizer:   @local::microboone_optical_adc_sim
    optfem:         @local::microboone_optical_fem_sim
-   triggersim:     @local::ubtrigger_dark_bnb
+   triggersim:     @local::ubtrigger_dark_numi
    pmtreadout:     @local::microboone_optical_dram_readout_sim
    #daq:            @local::microboone_simwire
    driftWC:        @local::wcls.driftsim
+   crtdetsim:    @local::microboone_crtdetsim_binary
+   crthitsim:    @local::crtsimhitproducer_binary
    rns:            { module_type: "RandomNumberSaver" }
+   mcreco:    @local::standard_mcreco
+
  }
 
- filters: { swtrigger: @local::microboone_swtrigger_mc_bnb }
+ filters: { swtrigger: @local::microboone_swtrigger_mc_numi }
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
  #simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, daq, driftWC, swtrigger ]
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, driftWC, swtrigger ]
+ simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadout, crtdetsim, crthitsim, driftWC, swtrigger]#, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -89,8 +96,15 @@ services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
 
+physics.producers.optdigitizer.AbnormalOpCh: 28
+
 # Add the lines necessary for a NuMI analysis.
 physics.producers.triggersim:    @local::ubtrigger_dark_numi
 physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi
+
+physics.producers.mcreco.MCParticleLabel: "largeant"
+physics.producers.mcreco.SimChannelLabel: "driftWC:simpleSC"
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
+                                                      1000010020,1000010030,1000020030,1000020040]
 
 outputs.out1.fileName: "%ifb_%tc_detsim_numi.root"
