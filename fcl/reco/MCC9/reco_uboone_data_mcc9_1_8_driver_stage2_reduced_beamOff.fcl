@@ -1,0 +1,7 @@
+#include "reco_uboone_data_mcc9_1_8_driver_stage2_reduced.fcl"
+
+physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_beamOff
+# flash-matching score preservation module
+physics.producers.flashmatch: @local::FlashMatch_beamOff
+
+physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF

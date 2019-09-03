@@ -1,0 +1,57 @@
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: DataFiltersPostStage2
+
+services.TFileService.fileName: "reco_stage_2_filters_hist.root"
+
+#beam quality
+physics.beam_good: [ rns, beamdataquality ]
+
+#common pi0 filter
+physics.pi0:          [ rns, beamdataquality, mcc9pi0filter ]
+
+#cc inclusive filter
+physics.NuCC: [ rns, beamdataquality, NuCCproducer, NuCCfilter ]
+
+physics.ncpi0:        [ rns, beamdataquality, ncpi0filter ]
+
+physics.ana:                    [ ]
+physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0 ]
+physics.stream1:                [ out_beamOK, out_beamNOK, out_pi0, out_NuCC, out_ncpi0 ]
+physics.end_paths:              [ stream1 ]
+
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
+
+outputs.out_beamOK:              @local::outputs.out1
+outputs.out_beamOK.fileName:     "%ifb_%tc_beamOK.root"
+outputs.out_beamOK.dataTier:     "reconstructed"
+outputs.out_beamOK.SelectEvents: [ beam_good ]
+
+outputs.out_beamNOK:              @local::outputs.out1
+outputs.out_beamNOK.fileName:     "%ifb_%tc_beamNOK.root"
+outputs.out_beamNOK.dataTier:     "reconstructed"
+outputs.out_beamNOK.SelectEvents: [ "!beam_good" ]
+
+outputs.out_pi0:              @local::outputs.out1
+outputs.out_pi0.fileName:     "%ifb_%tc_pi0.root"
+outputs.out_pi0.dataTier:     "reconstructed"
+outputs.out_pi0.SelectEvents: [ pi0 ]
+
+outputs.out_NuCC:              @local::outputs.out1
+outputs.out_NuCC.fileName:     "%ifb_%tc_NuCC.root"
+outputs.out_NuCC.dataTier:     "reconstructed"
+outputs.out_NuCC.SelectEvents: [ NuCC ]
+
+outputs.out_ncpi0:              @local::outputs.out1
+outputs.out_ncpi0.fileName:     "%ifb_%tc_ncpi0.root"
+outputs.out_ncpi0.dataTier:     "reconstructed"
+outputs.out_ncpi0.SelectEvents: [ ncpi0 ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_stage_2_filters_hist.root.json"]
+  GenerateTFileMetadata: [true]
+  dataTier:              ["root-tuple"]
+  fileFormat:            ["root"]
+}
+
