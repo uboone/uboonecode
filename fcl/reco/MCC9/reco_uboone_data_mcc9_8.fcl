@@ -623,7 +623,7 @@ microboone_reco_data_producers.pandoraCrtHitMatch.data_label_flash:             
 
 microboone_reco_data_producers.crthitcorrFirstPass.CrtHitsIn_Label:                                           "mixer"
 microboone_reco_data_producers.crthitcorr.CrtHitsIn_Label1:                                                   "merger"
-microboone_reco_data_producers.crthitcorr.HitThreshold:                                                       70.
+microboone_reco_data_producers.crthitcorr.HitThreshold:                                                       0.
 microboone_reco_data_producers.crttzero.data_label:                                                           "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRThit:                                               "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRTtzero:                                             "crttzero"
