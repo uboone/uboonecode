@@ -43,6 +43,7 @@
 #include "microboone_crtreco.fcl"
 #include "microboone_crthitcorr.fcl"  
 #include "UBCRTCosmicFilter.fcl"
+#include "CRTDistanceFilter.fcl"  
 
 BEGIN_PROLOG
 
@@ -243,7 +244,8 @@ microboone_reco_mcc8_filters:
   opfiltercommonbnb: @local::microboone_common_op_precut_bnb
   opfiltercommonext: @local::microboone_common_op_precut_ext
 
-  crtveto : @local::UBCRTCosmicFilterBNBMC
+  crtveto:     @local::UBCRTCosmicFilterBNBMC
+  crtdistance: @local::CRTDistanceFilter  
 }
 
 
@@ -287,7 +289,8 @@ microboone_reco_mcc8_crt: [ crthitcorr,
                             crttrack,
                             crttrackmatch,
                             crttrackmatchAll,
-                            crtveto ]
+                            crtveto,
+                            crtdistance]
 
 microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraPatRec,
