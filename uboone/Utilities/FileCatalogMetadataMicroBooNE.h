@@ -11,6 +11,7 @@
 //           ProjectName    - Project name.
 //           ProjectStage   - Project stage.
 //           ProjectVersion - Project version.
+//           Merge          - Merge flag (0 or 1).
 //
 //           Above values will be added in internal metadata of artroot
 //           output files whenever this service is included in job
@@ -47,6 +48,7 @@ namespace util {
     const std::string& ProjectName() const {return fProjectName;}
     const std::string& ProjectStage() const {return fProjectStage;}
     const std::string& ProjectVersion() const {return fProjectVersion;}
+    int Merge() const {return fMerge;}
 
   private:
 
@@ -62,6 +64,7 @@ namespace util {
     std::string fProjectName;
     std::string fProjectStage;
     std::string fProjectVersion;
+    int fMerge;
 
     double fTotPOT = 0;
     

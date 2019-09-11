@@ -28,6 +28,7 @@ FileCatalogMetadataMicroBooNE(fhicl::ParameterSet const& pset, art::ActivityRegi
   fProjectName = pset.get<std::string>("ProjectName");
   fProjectStage = pset.get<std::string>("ProjectStage");
   fProjectVersion = pset.get<std::string>("ProjectVersion");    
+  fMerge = pset.get<int>("Merge", 0);
 
   // Register for callbacks.
 
@@ -52,6 +53,10 @@ void util::FileCatalogMetadataMicroBooNE::postBeginJob()
   mds->addMetadata("ubProjectName", fProjectName);
   mds->addMetadata("ubProjectStage", fProjectStage);
   mds->addMetadata("ubProjectVersion", fProjectVersion);
+  std::ostringstream ostr;
+  ostr << fMerge;
+  mds->addMetadata("merge", ostr.str());
+  mds->addMetadata("merged", "0");
 }
 
 //--------------------------------------------------------------------
