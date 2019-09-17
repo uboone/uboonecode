@@ -1,6 +1,6 @@
 #include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimOverlayDLdown50
-outputs.out1.fileName: "detsim_overlay_DLdown50.root"
+outputs.out1.fileName: "%ifb_%tc_overaly_DLdown50.root"
 
 physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.260e-9 
