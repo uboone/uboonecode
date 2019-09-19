@@ -1,6 +1,6 @@
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
-process_name: OverlayFiltersPosStage2
+process_name: OverlayFiltersPostStage2
 
 services.TFileService.fileName: "reco_stage_2_filters_hist.root"
 services.DetectorClocksService.InheritClockConfig:  false

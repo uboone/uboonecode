@@ -27,33 +27,38 @@ physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0 ]
 physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0 ]
 physics.end_paths:              [ stream1 ]
 
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2" ]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]
 
 outputs.outbeamOK:              @local::outputs.out1
 outputs.outbeamOK.fileName:     "%ifb_%tc_beamOK.root"
 outputs.outbeamOK.dataTier:     "reconstructed"
+outputs.outbeamOK.streamName:   "beam_good"
 outputs.outbeamOK.SelectEvents: [ beam_good ]
 outputs.outbeamOK.outputCommands: @local::stage2ReducedOutputCommands
 
 outputs.outbeamNOK:              @local::outputs.out1
 outputs.outbeamNOK.fileName:     "%ifb_%tc_beamNOK.root"
 outputs.outbeamNOK.dataTier:     "reconstructed"
+outputs.outbeamNOK.streamName:   "beam_bad"
 outputs.outbeamNOK.SelectEvents: [ "!beam_good" ]
 outputs.outbeamNOK.outputCommands: @local::stage2ReducedOutputCommands
 
 outputs.outpi0:              @local::outputs.out1
 outputs.outpi0.fileName:     "%ifb_%tc_pi0.root"
 outputs.outpi0.dataTier:     "reconstructed"
+outputs.outpi0.streamName:   "pi0"
 outputs.outpi0.SelectEvents: [ pi0 ]
 
 outputs.outNuCC:              @local::outputs.out1
 outputs.outNuCC.fileName:     "%ifb_%tc_NuCC.root"
 outputs.outNuCC.dataTier:     "reconstructed"
+outputs.outNuCC.streamName:   "NuCC"
 outputs.outNuCC.SelectEvents: [ NuCC ]
 
 outputs.outncpi0:              @local::outputs.out1
 outputs.outncpi0.fileName:     "%ifb_%tc_ncpi0.root"
 outputs.outncpi0.dataTier:     "reconstructed"
+outputs.outncpi0.streamName:   "ncpi0"
 outputs.outncpi0.SelectEvents: [ ncpi0 ]
 
 microboone_tfile_metadata:

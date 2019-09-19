@@ -14,24 +14,31 @@ physics.ncpi0:        [ rns, ncpi0filter ]
 
 physics.ana:                    [ ]
 physics.trigger_paths:          [ pi0, NuCC, ncpi0 ]
-physics.stream1:                [ outpi0, outNuCC, outncpi0 ]
+physics.stream1:                [ out1, outpi0, outNuCC, outncpi0 ]
 physics.end_paths:              [ stream1 ]
 
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]
 
+outputs.out1.fileName:       "%ifb_%tc.root"
+outputs.out1.dataTier:       "reconstructed"
+outputs.out1.streamName:     "all"
+
 outputs.outpi0:              @local::outputs.out1
 outputs.outpi0.fileName:     "%ifb_%tc_pi0.root"
 outputs.outpi0.dataTier:     "reconstructed"
+outputs.outpi0.streamName:   "pi0"
 outputs.outpi0.SelectEvents: [ pi0 ]
 
 outputs.outNuCC:              @local::outputs.out1
 outputs.outNuCC.fileName:     "%ifb_%tc_NuCC.root"
 outputs.outNuCC.dataTier:     "reconstructed"
+outputs.outNuCC.streamName:   "NuCC"
 outputs.outNuCC.SelectEvents: [ NuCC ]
 
 outputs.outncpi0:              @local::outputs.out1
 outputs.outncpi0.fileName:     "%ifb_%tc_ncpi0.root"
 outputs.outncpi0.dataTier:     "reconstructed"
+outputs.outncpi0.streamName:   "ncpi0"
 outputs.outncpi0.SelectEvents: [ ncpi0 ]
 
 microboone_tfile_metadata:
@@ -41,7 +48,6 @@ microboone_tfile_metadata:
   dataTier:              ["root-tuple"]
   fileFormat:            ["root"]
 }
-
 
 physics.filters.ncpi0filter.isData: "true"
 physics.filters.ncpi0filter.POTLabel: "beamdata"
