@@ -1,3 +1,4 @@
+#include "beamspilltimings.fcl"
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
 #include "largeantmodules_microboone.fcl"
@@ -138,6 +139,8 @@ physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/ubooneb
 physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
+# Add beam timing structure to the generation of events
+physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
 services.LArG4Parameters.FillSimEnergyDeposits:       true
 #services.LArG4Parameters.NoElectronPropagation:       true

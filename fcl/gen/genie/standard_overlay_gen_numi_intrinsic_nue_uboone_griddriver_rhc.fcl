@@ -1,3 +1,4 @@
+#include "beamspilltimings.fcl"
 #include "time_memory_tracker_microboone.fcl"
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
@@ -70,6 +71,9 @@ physics.producers.generator.FluxType:           "dk2nu"
 physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
+
+# Add beam timing structure to the generation of events
+physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
 physics.producers.generator.FluxCopyMethod: "IFDH"
 

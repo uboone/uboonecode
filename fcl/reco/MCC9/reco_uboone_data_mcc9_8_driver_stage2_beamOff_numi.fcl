@@ -7,5 +7,5 @@ physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
 physics.producers.flashmatch.BeamWindowStart:   6.00
 physics.producers.flashmatch.BeamWindowEd:      15.80
 
-## BNB CRT VETO PLACEHOLDER, NEEDS UPDATING TO NUMI ##
-# +physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
+# NuMI CRT Veto
+physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOFF

@@ -108,3 +108,6 @@ physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,31
                                                       1000010020,1000010030,1000020030,1000020040]
 
 outputs.out1.fileName: "%ifb_%tc_detsim_numi.root"
+
+# Update the Longitudinal Diffusion Constant
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.8

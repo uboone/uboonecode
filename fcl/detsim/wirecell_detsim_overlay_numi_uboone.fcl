@@ -168,3 +168,6 @@ physics.producers.optdigitizer.AbnormalOpCh: 29
 
 #reduce file name length
 outputs.out1.fileName: "%ifb_detsim_numi.root"
+
+# Update the Longitudinal Diffusion Constant
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.8
