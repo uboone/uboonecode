@@ -10,5 +10,4 @@ stage2ReducedOutputCommands: [ "keep *_*_*_*"
                               ,"drop *_pmtrack*_*_*"
                               ,"drop recob::SpacePoints_*Kalman*_*_*","drop *recob::SpacePoint*_*pmtrack*_*_*"
                               ,"drop *_sps3d_noreg_*","drop *_sps3d_pre_*"
-                              ,"drop *_*calo*_*_*"
                              ]

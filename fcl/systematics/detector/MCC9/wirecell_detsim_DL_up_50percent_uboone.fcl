@@ -3,5 +3,5 @@
 process_name: DetsimDLup
 outputs.out1.fileName: "%ifb_%tc_detsim_DLup.root"
 
-services.LArG4Parameters.LongitudinalDiffusion:7.13e-9
+services.LArG4Parameters.LongitudinalDiffusion: 9.3e-9
 

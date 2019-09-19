@@ -43,6 +43,7 @@
 #include "microboone_crtreco.fcl"
 #include "microboone_crthitcorr.fcl"  
 #include "UBCRTCosmicFilter.fcl"
+#include "CRTDistanceFilter.fcl"  
 
 BEGIN_PROLOG
 
@@ -216,6 +217,9 @@ microboone_reco_mcc8_producers:
   crttrackmatch:      @local::t0recocrthit_sim
   crttrackmatchAll:   @local::t0recocrthit_sim
 
+  # Flash Matching preservation
+  flashmatch:                       @local::FlashMatch
+
   ### MCTruthMatching
 
   # PFParticles
@@ -244,7 +248,8 @@ microboone_reco_mcc8_filters:
   opfiltercommonnumi:    @local::microboone_common_op_precut_numi
   opfiltercommonextnumi: @local::microboone_common_op_precut_numi_ext
   
-  crtveto : @local::UBCRTCosmicFilterBNBMC
+  crtveto:     @local::UBCRTCosmicFilterBNBMC
+  crtdistance: @local::CRTDistanceFilter  
 }
 
 
@@ -288,7 +293,8 @@ microboone_reco_mcc8_crt: [ crthitcorr,
                             crttrack,
                             crttrackmatch,
                             crttrackmatchAll,
-                            crtveto ]
+                            crtveto,
+                            crtdistance]
 
 microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraPatRec,
@@ -322,11 +328,9 @@ microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      shrreco3d,
                                      pandoraGeomVertexFit,
                                      pandoraCrtHitMatch,
-                                     flashmatch,
                                      acpttagger,
                                      acpttrigtagger,
-                                     stopmutagger
-                                     ]
+                                     flashmatch ]
 
 microboone_reco_mcc8: [                  rns,
                                          @sequence::microboone_reco_mcc8_optical,
@@ -404,7 +408,7 @@ microboone_reco_mcc8_producers.pandora.ShowerProducerLabel:                     
 microboone_reco_mcc8_producers.pandora.HitProducerLabel:                                                       "gaushit"
 microboone_reco_mcc8_producers.pandora.ShouldProduceT0s:                                                       false
 microboone_reco_mcc8_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
-microboone_reco_mcc8_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          false
+microboone_reco_mcc8_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          true
 microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowStartTime:                                        3.16
 microboone_reco_mcc8_producers.pandora.SliceIdTool.BeamWindowEndTime:                                          4.84
 microboone_reco_mcc8_producers.pandoraWriter.EnableMCParticles:                                                true

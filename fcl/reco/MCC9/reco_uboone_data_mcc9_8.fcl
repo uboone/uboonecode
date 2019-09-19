@@ -32,6 +32,8 @@
 #include "microboone_crtreco.fcl"
 #include "microboone_crthitcorr.fcl"
 #include "UBCRTCosmicFilter.fcl"
+#include "CRTDistanceFilter.fcl"
+#include "CRTTriggerCorr.fcl" 
 #include "OpNoiseCreateMask.fcl"
 #include "acpttrig.fcl"
 #include "stopmu.fcl"
@@ -46,10 +48,12 @@
 #include "microboone_dqmtpcbursts.fcl"
 #include "microboone_dqmgoodruns.fcl"
 
+
 BEGIN_PROLOG
 
 microboone_reco_data_services:
 {
+
   PhotonVisibilityService:    @local::microboone_photonvisibilityservice
   OpDigiProperties:           @local::microboone_opdigiproperties
                               @table::microboone_services_reco
@@ -224,6 +228,7 @@ microboone_reco_data_producers:
 
     # CRT reco
     pandoraCrtHitMatch:               @local::t0recocrthit_data
+    crtt0Correction:                  @local::crttrigger
     crthitcorrFirstPass:              @local::crtsimhitcorr
     crthitcorr:                       @local::crtdatahitcorr
     crttzero:                         @local::crttzero
@@ -264,6 +269,7 @@ microboone_reco_data_filters:
     beamdataquality:                  @local::beam_data_quality
 
     crtveto:                          @local::UBCRTCosmicFilterBNBON
+    crtdistance:                      @local::CRTDistanceFilter 
 }
 
 
@@ -313,14 +319,17 @@ microboone_reco_data_crt:              [ crthitcorr,
                                          crttzero,
                                          crttrack,
                                          crttrackmatch,
-                                         crtveto ]
+                                         crtveto,
+                                         crtdistance]
 
-microboone_reco_ovrl_crt:              [ crthitcorrFirstPass,
+microboone_reco_ovrl_crt:              [ crtt0Correction,
+                                         crthitcorrFirstPass,
                                          crthitcorr,
                                          crttzero,
                                          crttrack,
                                          crttrackmatch,
-                                         crtveto ]
+                                         crtveto,
+                                         crtdistance]
 
 microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraPatRec,
@@ -354,11 +363,10 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          shrreco3d,
                                          pandoraGeomVertexFit,
                                          pandoraCrtHitMatch,
-                                         flashmatch,
                                          acpttagger,
                                          acpttrigtagger,
-                                         stopmutagger
-                                         ]
+                                         flashmatch]
+
 
 microboone_reco_data:                  [ rns,
                                          @sequence::microboone_reco_data_optical,
@@ -450,7 +458,7 @@ microboone_reco_data_producers.pandora.ShowerProducerLabel:                     
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
 microboone_reco_data_producers.pandora.ShouldProduceT0s:                                                       false
 microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
-microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          false
+microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          true
 
 microboone_reco_data_producers.pandora.SliceIdTool.HasMCNeutrino:                                              false
 microboone_reco_data_producers.pandoraWriter.EnableMCParticles:                                                false
@@ -620,7 +628,7 @@ microboone_reco_data_producers.pandoraCrtHitMatch.data_label_flash:             
 
 microboone_reco_data_producers.crthitcorrFirstPass.CrtHitsIn_Label:                                           "mixer"
 microboone_reco_data_producers.crthitcorr.CrtHitsIn_Label1:                                                   "merger"
-microboone_reco_data_producers.crthitcorr.HitThreshold:                                                       70.
+microboone_reco_data_producers.crthitcorr.HitThreshold:                                                       0.
 microboone_reco_data_producers.crttzero.data_label:                                                           "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRThit:                                               "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRTtzero:                                             "crttzero"
