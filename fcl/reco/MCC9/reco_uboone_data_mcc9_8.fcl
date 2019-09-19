@@ -671,12 +671,12 @@ microboone_reco_data_filters.mcc9pi0filter.MCTproducer:                         
 microboone_reco_data_filters.mcc9pi0filter.MCPproducer:                                                     "largeant"
 microboone_reco_data_filters.mcc9pi0filter.IsData:                                                          True
 
-#microboone_reco_data_producer.ncpi0filter: @local::microboone_reco_data_producer.mcc9pi0filter
-microboone_reco_data_producers.ncpi0filter.PANDORAproducer:                                                 "pandora"
-microboone_reco_data_producers.ncpi0filter.SHRproducer:                                                     "shrreco3d"
-microboone_reco_data_producers.ncpi0filter.MCTproducer:                                                     "generator"
-microboone_reco_data_producers.ncpi0filter.MCPproducer:                                                     "largeant"
-microboone_reco_data_producers.ncpi0filter.IsData:                                                          True
+#microboone_reco_data_filters.ncpi0filter: @local::microboone_reco_data_filters.mcc9pi0filter
+microboone_reco_data_filters.ncpi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.ncpi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.ncpi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.ncpi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.ncpi0filter.IsData:                                                          True
 
 microboone_reco_data_filters.ncpi0filter.isData: "true"
 microboone_reco_data_filters.ncpi0filter.POTLabel: "beamdata"
