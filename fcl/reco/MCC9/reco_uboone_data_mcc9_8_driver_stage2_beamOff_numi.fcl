@@ -1,11 +1,11 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOff.fcl"
 
 physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
 physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
 
 # flash-matching score preservation module
-physics.producers.flashmatch.BeamWindowStart:   6.00
-physics.producers.flashmatch.BeamWindowEd:      15.80
+physics.producers.flashmatch.BeamWindowStart: 6.00
+physics.producers.flashmatch.BeamWindowEnd:   15.80
 
 # NuMI CRT Veto
 physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOFF
