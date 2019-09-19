@@ -1,0 +1,8 @@
+#include "reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl"
+
+physics.filters.ncpi0filter.isData: "true"
+physics.filters.ncpi0filter.POTLabel: "beamdata"
+physics.filters.ncpi0filter.beamgateStartTime: 3.65
+physics.filters.ncpi0filter.beamgateEndTime: 5.25
+physics.filters.ncpi0filter.BadChannelProducer: "nfspl1"
+

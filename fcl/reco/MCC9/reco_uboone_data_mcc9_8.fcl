@@ -50,6 +50,7 @@
 
 #include "microboone_pi0filter.fcl"
 #include "microboone_nucc_mcc9.fcl"
+#include "microboone_singlephoton.fcl"
 
 BEGIN_PROLOG
 
@@ -282,7 +283,7 @@ microboone_reco_data_filters:
     NuCCfilter: @local::microboone_nucc_filter
     
     #ncpi0 filter
-    ncpi0filter: @local::mcc9pi0selection
+    ncpi0filter: @local::singlephoton_filter
 
 }
 
@@ -661,14 +662,14 @@ microboone_reco_data_producers.crttrackmatchAll.data_label_flash:               
 
 microboone_reco_data_producers.NuCCproducer.pfp_producer:                                                     "pandora"
 microboone_reco_data_producers.NuCCproducer.hitfinder_producer:                                               "gaushit"
-microboone_reco_data_producers.NuCCfilter.pfp_producer:                                                       "pandora"
-microboone_reco_data_producers.NuCCfilter.muon_producer:                                                      "NuCCproducer"
+microboone_reco_data_filters.NuCCfilter.pfp_producer:                                                       "pandora"
+microboone_reco_data_filters.NuCCfilter.muon_producer:                                                      "NuCCproducer"
 
-microboone_reco_data_producers.mcc9pi0filter.PANDORAproducer:                                                 "pandora"
-microboone_reco_data_producers.mcc9pi0filter.SHRproducer:                                                     "shrreco3d"
-microboone_reco_data_producers.mcc9pi0filter.MCTproducer:                                                     "generator"
-microboone_reco_data_producers.mcc9pi0filter.MCPproducer:                                                     "largeant"
-microboone_reco_data_producers.mcc9pi0filter.IsData:                                                          True
+microboone_reco_data_filters.mcc9pi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.mcc9pi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.mcc9pi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.mcc9pi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.mcc9pi0filter.IsData:                                                          True
 
 #microboone_reco_data_producer.ncpi0filter: @local::microboone_reco_data_producer.mcc9pi0filter
 microboone_reco_data_producers.ncpi0filter.PANDORAproducer:                                                 "pandora"
@@ -676,5 +677,12 @@ microboone_reco_data_producers.ncpi0filter.SHRproducer:                         
 microboone_reco_data_producers.ncpi0filter.MCTproducer:                                                     "generator"
 microboone_reco_data_producers.ncpi0filter.MCPproducer:                                                     "largeant"
 microboone_reco_data_producers.ncpi0filter.IsData:                                                          True
+
+microboone_reco_data_filters.ncpi0filter.isData: "true"
+microboone_reco_data_filters.ncpi0filter.POTLabel: "beamdata"
+microboone_reco_data_filters.ncpi0filter.beamgateStartTime: 3.3
+microboone_reco_data_filters.ncpi0filter.beamgateEndTime: 4.9
+microboone_reco_data_filters.ncpi0filter.BadChannelProducer: "nfspl1"
+
 
 END_PROLOG

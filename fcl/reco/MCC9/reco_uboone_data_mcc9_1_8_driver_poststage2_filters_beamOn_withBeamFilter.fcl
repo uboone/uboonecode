@@ -1,19 +1,26 @@
+###
+### Optional path for running all filters together in one job, and 
+### keeping reco1 with the smaller set of unblinding filters.
+###
+
+
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
 
 process_name: DataFiltersPostStage2
 
 services.TFileService.fileName: "reco_stage_2_filters_hist.root"
 
 #beam quality
-physics.beam_good: [ rns, beamdataquality ]
+physics.beam_good: [ rns, beamdata, beamdataquality ]
 
 #common pi0 filter
-physics.pi0:          [ rns, beamdataquality, mcc9pi0filter ]
+physics.pi0:          [ rns, beamdata, beamdataquality, mcc9pi0filter ]
 
 #cc inclusive filter
-physics.NuCC: [ rns, beamdataquality, NuCCproducer, NuCCfilter ]
+physics.NuCC: [ rns, beamdata, beamdataquality, NuCCproducer, NuCCfilter ]
 
-physics.ncpi0:        [ rns, beamdataquality, ncpi0filter ]
+physics.ncpi0:        [ rns, beamdata, beamdataquality, ncpi0filter ]
 
 physics.ana:                    [ ]
 physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0 ]
@@ -26,11 +33,13 @@ outputs.out_beamOK:              @local::outputs.out1
 outputs.out_beamOK.fileName:     "%ifb_%tc_beamOK.root"
 outputs.out_beamOK.dataTier:     "reconstructed"
 outputs.out_beamOK.SelectEvents: [ beam_good ]
+outputs.out_beamOK.outputCommands: @local::stage2ReducedOutputCommands
 
 outputs.out_beamNOK:              @local::outputs.out1
 outputs.out_beamNOK.fileName:     "%ifb_%tc_beamNOK.root"
 outputs.out_beamNOK.dataTier:     "reconstructed"
 outputs.out_beamNOK.SelectEvents: [ "!beam_good" ]
+outputs.out_beamNOK.outputCommands: @local::stage2ReducedOutputCommands
 
 outputs.out_pi0:              @local::outputs.out1
 outputs.out_pi0.fileName:     "%ifb_%tc_pi0.root"
@@ -55,3 +64,8 @@ microboone_tfile_metadata:
   fileFormat:            ["root"]
 }
 
+physics.filters.ncpi0filter.isData: "true"
+physics.filters.ncpi0filter.POTLabel: "beamdata"
+physics.filters.ncpi0filter.beamgateStartTime: 3.3
+physics.filters.ncpi0filter.beamgateEndTime: 4.9
+physics.filters.ncpi0filter.BadChannelProducer: "nfspl1"
