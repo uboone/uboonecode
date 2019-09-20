@@ -3,5 +3,6 @@
 process_name: DetsimOverlayDLup50
 outputs.out1.fileName: "%r_%s_%tc_overlay_DLup50.root"
 
-services.LArG4Parameters.LongitudinalDiffusion: 9.3e-9
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal:  9.6
+services.LArG4Parameters.LongitudinalDiffusion: 9.6e-9
 
