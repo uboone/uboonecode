@@ -1,7 +1,7 @@
 #include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimOverlayStretch
-outputs.out1.fileName: "%ifb_%tc_detsim_Stretch.root"
+outputs.out1.fileName: "%ifb_%tc_detsim_overlay_Stretch.root"
 
 physics.producers.driftWC.wcls_main.structs.sys_resp: true
 physics.producers.driftWC.wcls_main.structs.sys_resp_start: -10e3 // units: nanosecond

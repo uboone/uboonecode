@@ -3,4 +3,4 @@
 process_name: DetsimLifetime20ms
 outputs.out1.fileName: "%ifb_%tc_detsim_Lt20ms.root"
 
-physics.producers.driftWC.wcls_main.structs.ElectronLifetime: 20
+#include "sys_var_mcc9_lifetime_20ms_uboone.fcl"
