@@ -3,25 +3,38 @@
 process_name: DataFiltersPostStage2
 
 services.TFileService.fileName: "reco_stage_2_filters_hist.root"
+services.IFDH: {}
 
-#common pi0 filter
-physics.pi0:          [ rns, mcc9pi0filter ]
+#beam quality path
+physics.beam_good: [ rns, beamdataquality ]
 
-#cc inclusive filter
-physics.NuCC: [ rns, NuCCproducer, NuCCfilter ]
+#common pi0 filter path
+physics.pi0:          [ rns, beamdataquality, mcc9pi0filter ]
 
-physics.ncpi0:        [ rns, ncpi0filter ]
+#cc inclusive filter path
+physics.NuCC: [ rns, beamdataquality, NuCCproducer, NuCCfilter ]
+
+#nc pi0 filter path
+physics.ncpi0:        [ rns, beamdataquality, ncpi0filter ]
 
 physics.ana:                    [ ]
-physics.trigger_paths:          [ pi0, NuCC, ncpi0 ]
-physics.stream1:                [ out1, outpi0, outNuCC, outncpi0 ]
+physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0 ]
+physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0 ]
 physics.end_paths:              [ stream1 ]
 
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]
 
-outputs.out1.fileName:       "%ifb_%tc.root"
-outputs.out1.dataTier:       "reconstructed"
-outputs.out1.streamName:     "all"
+outputs.outbeamOK:              @local::outputs.out1
+outputs.outbeamOK.fileName:     "%ifb_%tc_beam_good.root"
+outputs.outbeamOK.dataTier:     "reconstructed"
+outputs.outbeamOK.streamName:   "beam_good"
+outputs.outbeamOK.SelectEvents: [ beam_good ]
+
+outputs.outbeamNOK:              @local::outputs.out1
+outputs.outbeamNOK.fileName:     "%ifb_%tc_beam_bad.root"
+outputs.outbeamNOK.dataTier:     "reconstructed"
+outputs.outbeamNOK.streamName:   "beam_bad"
+outputs.outbeamNOK.SelectEvents: [ "!beam_good" ]
 
 outputs.outpi0:              @local::outputs.out1
 outputs.outpi0.fileName:     "%ifb_%tc_pi0.root"
