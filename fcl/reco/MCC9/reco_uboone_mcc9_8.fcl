@@ -350,6 +350,12 @@ microboone_reco_mcc8_stage2: [           rns,
                                          @sequence::microboone_reco_mcc8_crt,
                                          @sequence::microboone_reco_mcc8_ccpath ]
 
+microboone_reco_mcc8_stage2_nocc: [      rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_mcc8_pandora,
+                                         @sequence::microboone_reco_mcc8_crt ]
+
 #microboone_dlprod_ana: [                 dlprodMcinfo ]
 microboone_dlprod_ana: [ ]
 

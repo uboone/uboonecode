@@ -20,7 +20,8 @@ physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel: 
 
 physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
 
-physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
+#physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
+physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2_nocc ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
