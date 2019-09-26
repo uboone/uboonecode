@@ -1,4 +1,4 @@
-from ROOT import TFile, TH1F, TCanvas, gDirectory, gROOT, gPad, TLegend, TPad, TLine, TH1D
+from ROOT import TFile, TH1F, TCanvas, gDirectory, gROOT, gPad, TLegend, TPad, TLine, TH1D, TLatex
 import math
 
 gROOT.ForceStyle()
@@ -12,7 +12,7 @@ snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960
 #extunbname = "Trigger stream"
 #extunbcolor = 2 # Red
 #extunbcolor_errors = 46 # Reddish
-extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v6.root")
+extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v6a.root")
 extunbname = "Trigger stream + ZS"
 extunbcolor = 3 # Green
 extunbcolor_errors = 30 # Greenish
@@ -43,6 +43,9 @@ hlistname = [ "heSpectrum",
           "hEventHitMult",
           "hEventHitSpectrum" ]
 
+# Print number of entries in legend
+printentries = False
+
 # Fraction of canvas for the bottom pad (make it 0 if you do not want one)
 frontierpad = 0.3
 #frontierpad = 0
@@ -50,6 +53,13 @@ logx = False
 #logx = True
 logy = False
 #logy = True
+
+# Plot extrension
+printext = ".pdf" # e.g. ".png"
+
+# Print "MicroBooNE Preliminary" or similar
+plotlabel = "MicroBooNE INTERNAL"
+#plotlabel = "MicroBooNE Preliminary"
 
 # Event sizes in number of samples
 snevtsize = 3200. # Only unique samples
@@ -350,14 +360,21 @@ for snh in snhlist:
     snh.Draw("E P0 X0 same") # SN data
     #snh.DrawNormalized("E P0 X0 same") # SN data
     leg = TLegend(0.6, 0.7, 1.0, 1.0)
-    leg.AddEntry( extunbh_errors, "%s (%i entries)" % (extunbname, int( extunbh_integral )), "FLP" )
-    leg.AddEntry( snh, "SN stream (%i entries)" % int( snh.Integral() ), "LEP" )
+    leg.AddEntry( extunbh_errors, ("%s (%i entries)" % (extunbname, int( extunbh_integral ))) if printentries else "%s" % extunbname, "FLP" )
+    leg.AddEntry( snh, ("SN stream (%i entries)" % int( snh.Integral() )) if printentries else "SN stream", "LEP" )
     if logx: leg.SetFillStyle(0) # Make it transparent to mitigate the change of the distribution
     leg.Draw()
     if logx: gPad.SetLogx()
     if logy: 
         extunbh_errors.GetYaxis().SetRangeUser( 0.9, 1.1*extunbh_errors.GetMaximum() )
         gPad.SetLogy()
+
+    if plotlabel:
+        tx = TLatex()
+        tx.SetTextSize(0.04)
+        tx.SetTextAlign(11) # Bottom left adjusted
+        tx.DrawTextNDC( 0.15, 0.95, "%s" % plotlabel );
+
     gPad.Modified()
     gPad.Update()
     print "%s: rate %.2f +/- %.2f" % ( snh.GetName(), snh.Integral()/snexposure, math.sqrt(snh.Integral())/snexposure )
@@ -381,7 +398,7 @@ for snh in snhlist:
         hratio.GetYaxis().SetNdivisions(505)
         hratio.GetYaxis().SetLabelSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetYaxis().GetLabelSize() )
         hratio.GetYaxis().SetTitleSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetYaxis().GetTitleSize() )
-        hratio.GetYaxis().SetTitleOffset( frontierpad/(1. - frontierpad)*extunbh_errors.GetYaxis().GetTitleOffset() )
+        hratio.GetYaxis().SetTitleOffset( 1.10*(frontierpad/(1. - frontierpad)*extunbh_errors.GetYaxis().GetTitleOffset()) )
         hratio.GetYaxis().CenterTitle()
         hratio.GetXaxis().SetLabelSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetXaxis().GetLabelSize() )
         hratio.GetXaxis().SetTitleSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetXaxis().GetTitleSize() )
@@ -400,9 +417,9 @@ for snh in snhlist:
 
     leglist.append(leg)
     extunbh_errorslist.append(extunbh_errors)
-    c.Print( c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio.png" if frontierpad else ".png") )
-    #c.Print( c.GetName() + ("_logx" if logx else "") + ("_bigratio.png" if frontierpad else ".png") )
-    #c.Print( "norm_" + c.GetName() + ".png" )
+    c.Print( c.GetName() + ("_logx" if logx else "") + ("_logy" if logy else "") + ("_ratio" if frontierpad else "") + printext ) 
+    #c.Print( c.GetName() + ("_logx" if logx else "") + ("_bigratio" if frontierpad else "") + printext)
+    #c.Print( "norm_" + c.GetName() + printext )
     clist.append(c)
 
 raw_input("Press the <ENTER> key to continue...")
