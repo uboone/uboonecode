@@ -244,6 +244,10 @@ microboone_reco_mcc8_filters:
   opfiltercommonbnb: @local::microboone_common_op_precut_bnb
   opfiltercommonext: @local::microboone_common_op_precut_ext
 
+  #here are the numi common filters
+  opfiltercommonnumi:    @local::microboone_common_op_precut_numi
+  opfiltercommonextnumi: @local::microboone_common_op_precut_numi_ext
+  
   crtveto:     @local::UBCRTCosmicFilterBNBMC
   crtdistance: @local::CRTDistanceFilter  
 }

@@ -48,6 +48,9 @@
 #include "microboone_dqmtpcbursts.fcl"
 #include "microboone_dqmgoodruns.fcl"
 
+#include "microboone_pi0filter.fcl"
+#include "microboone_nucc_mcc9.fcl"
+#include "microboone_singlephoton.fcl"
 
 BEGIN_PROLOG
 
@@ -239,6 +242,8 @@ microboone_reco_data_producers:
     # Flash Matching preservation
     flashmatch:                       @local::FlashMatch
 
+    # mcc9 cc inclusive filters
+    NuCCproducer: @local::microboone_nucc_producer
 }
 
 microboone_reco_data_analyzers:
@@ -260,11 +265,26 @@ microboone_reco_data_filters:
     opfiltercommonbnb:                @local::microboone_common_op_precut_bnb
     opfiltercommonext:                @local::microboone_common_op_precut_ext
 
+    #here are the numi common filters
+    dlpmtprecutsnumi:                  @local::microboone_common_op_precut_numi_mc
+    opfiltercommonnumi:                @local::microboone_common_op_precut_numi
+    opfiltercommonextnumi:             @local::microboone_common_op_precut_numi_ext
+
     # Beam data quality filter.
     beamdataquality:                  @local::beam_data_quality
 
     crtveto:                          @local::UBCRTCosmicFilterBNBON
     crtdistance:                      @local::CRTDistanceFilter 
+
+    #pi0 filter
+    mcc9pi0filter: @local::mcc9pi0selection
+
+    # mcc9 cc inclusive filters
+    NuCCfilter: @local::microboone_nucc_filter
+    
+    #ncpi0 filter
+    ncpi0filter: @local::singlephoton_filter
+
 }
 
 
@@ -378,19 +398,25 @@ microboone_reco_data_stage1:           [ rns,
                                          @sequence::microboone_reco_data_signalprocessing 
                                        ]
 
-microboone_reco_data_stage2:           [ rns,
+microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_data_stage2:           [ @sequence::microboone_reco_data_mcc9_1_stage2,
                                          @sequence::microboone_reco_data_ccpath
                                        ]
 
-microboone_reco_ovrl_stage2:           [ rns,
+microboone_reco_ovrl_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
-				       	 wcopflash,
+                                         wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_ovrl_crt,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_ovrl_stage2:           [ @sequence::microboone_reco_ovrl_mcc9_1_stage2,
                                          @sequence::microboone_reco_data_ccpath 
                                        ]
 
@@ -633,5 +659,30 @@ microboone_reco_data_producers.crttrackmatchAll.data_label_CRThit:              
 microboone_reco_data_producers.crttrackmatchAll.data_label_CRTtzero:                                          "crttzero"
 microboone_reco_data_producers.crttrackmatchAll.data_label_TPCtrack:                                          "pandoraAllOutcomesTrack"
 microboone_reco_data_producers.crttrackmatchAll.data_label_flash:                                             "simpleFlashCosmic"
+
+microboone_reco_data_producers.NuCCproducer.pfp_producer:                                                     "pandora"
+microboone_reco_data_producers.NuCCproducer.hitfinder_producer:                                               "gaushit"
+microboone_reco_data_filters.NuCCfilter.pfp_producer:                                                       "pandora"
+microboone_reco_data_filters.NuCCfilter.muon_producer:                                                      "NuCCproducer"
+
+microboone_reco_data_filters.mcc9pi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.mcc9pi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.mcc9pi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.mcc9pi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.mcc9pi0filter.IsData:                                                          true
+
+#microboone_reco_data_filters.ncpi0filter: @local::microboone_reco_data_filters.mcc9pi0filter
+microboone_reco_data_filters.ncpi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.ncpi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.ncpi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.ncpi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.ncpi0filter.IsData:                                                          true
+
+microboone_reco_data_filters.ncpi0filter.isData: "true"
+microboone_reco_data_filters.ncpi0filter.POTLabel: "beamdata"
+microboone_reco_data_filters.ncpi0filter.beamgateStartTime: 3.3
+microboone_reco_data_filters.ncpi0filter.beamgateEndTime: 4.9
+microboone_reco_data_filters.ncpi0filter.BadChannelProducer: "nfspl1"
+
 
 END_PROLOG

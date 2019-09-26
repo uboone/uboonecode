@@ -75,10 +75,18 @@ outputs:
 }
 
 
-outputs.out1.fileName: "prodgenie_simple_numi_nu_uboone_%tc_gen.root"
+outputs.out1.fileName: "prodgenie_dk2nu_numi_nu_uboone_%tc_gen_fhc.root"
 
-physics.producers.generator: @local::microboone_genie_simple_numi
-physics.producers.generator.GlobalTimeOffset: 4687.5
-physics.producers.generator.RandomTimeOffset: 9600.
-physics.producers.generator.TopVolume: "volCryostat"
-physics.producers.generator.BeamName: "numi"
+# dk2nu flux generation config
+physics.producers.generator:                    @local::standard_genie
+physics.producers.generator.POTPerSpill:        5e13
+physics.producers.generator.EventsPerSpill:     0
+physics.producers.generator.GlobalTimeOffset:   5627.5
+physics.producers.generator.RandomTimeOffset:   9600.
+physics.producers.generator.TopVolume:          "volCryostat"
+physics.producers.generator.BeamName:           "numi"
+physics.producers.generator.EventGeneratorList: "Default"
+physics.producers.generator.FluxType:           "dk2nu"
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
+physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
+physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
