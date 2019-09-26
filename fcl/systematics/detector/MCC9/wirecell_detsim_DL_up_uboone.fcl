@@ -3,5 +3,5 @@
 process_name: DetsimDLup
 outputs.out1.fileName: "%ifb_%tc_detsim_DLup.root"
 
-services.LArG4Parameters.LongitudinalDiffusion:7.13e-9
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 7.36
 

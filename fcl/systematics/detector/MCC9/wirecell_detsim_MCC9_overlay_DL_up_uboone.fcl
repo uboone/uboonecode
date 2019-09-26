@@ -1,7 +1,7 @@
 #include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimOverlayDLup
-outputs.out1.fileName: "detsim_overaly_DLup.root"
+outputs.out1.fileName: "%r_%s_%tc_overlay_DLup.root"
 
-services.LArG4Parameters.LongitudinalDiffusion:7.13e-9
-
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal:7.36
+services.LArG4Parameters.LongitudinalDiffusion:7.36e-9
