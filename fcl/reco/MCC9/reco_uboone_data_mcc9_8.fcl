@@ -420,6 +420,20 @@ microboone_reco_ovrl_stage2:           [ @sequence::microboone_reco_ovrl_mcc9_1_
                                          @sequence::microboone_reco_data_ccpath 
                                        ]
 
+microboone_reco_data_stage2_nocc:      [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_ovrl_stage2_nocc:      [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_ovrl_crt
+                                       ]
+
 microboone_dqm_ana_stage1:             [ DQMHits,
                                          DQMFlashes,
                                          DQMChannels,
