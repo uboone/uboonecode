@@ -17,9 +17,12 @@ physics.NuCC: [ rns, beamdataquality, NuCCproducer, NuCCfilter ]
 #nc pi0 filter path
 physics.ncpi0:        [ rns, beamdataquality, ncpi0filter ]
 
+#antibdt filter path
+physics.antibdt:      [ rns, beamdataquality, shrreco3dKalmanShower, shrreco3dKalmanShowercalo, shrreco3dKalmanShowercali, antibdtfilter ]
+
 physics.ana:                    [ ]
-physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0 ]
-physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0 ]
+physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0, antibdt ]
+physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0, outantibdt ]
 physics.end_paths:              [ stream1 ]
 
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]
@@ -53,6 +56,12 @@ outputs.outncpi0.fileName:     "%ifb_%tc_ncpi0.root"
 outputs.outncpi0.dataTier:     "reconstructed"
 outputs.outncpi0.streamName:   "ncpi0"
 outputs.outncpi0.SelectEvents: [ ncpi0 ]
+
+outputs.outantibdt:              @local::outputs.out1
+outputs.outantibdt.fileName:     "%ifb_%tc_antibdt.root"
+outputs.outantibdt.dataTier:     "reconstructed"
+outputs.outantibdt.streamName:   "antibdt"
+outputs.outantibdt.SelectEvents: [ antibdt ]
 
 microboone_tfile_metadata:
 {

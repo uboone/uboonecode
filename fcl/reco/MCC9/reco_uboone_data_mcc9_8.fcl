@@ -51,6 +51,7 @@
 #include "microboone_pi0filter.fcl"
 #include "microboone_nucc_mcc9.fcl"
 #include "microboone_singlephoton.fcl"
+#include "microboone_antibdt_filter.fcl"
 
 BEGIN_PROLOG
 
@@ -229,6 +230,11 @@ microboone_reco_data_producers:
     # Shower Reco module
     shrreco3d:                        @local::ShrReco3DPandora
 
+    # KalmanShower track fits and calorimetry on shrreco3d
+    shrreco3dKalmanShower:            @local::trackproducerfrompfparticle
+    shrreco3dKalmanShowercalo:        @local::microboone_calodata
+    shrreco3dKalmanShowercali:        @local::microboone_calibrationdedx_data
+
     # CRT reco
     pandoraCrtHitMatch:               @local::t0recocrthit_data
     crtt0Correction:                  @local::crttrigger
@@ -284,6 +290,9 @@ microboone_reco_data_filters:
     
     #ncpi0 filter
     ncpi0filter: @local::singlephoton_filter
+
+    # anti-bdt filter
+    antibdtfilter: @local::microboone_antibdtfilter
 
 }
 
@@ -698,5 +707,26 @@ microboone_reco_data_filters.ncpi0filter.beamgateStartTime: 3.3
 microboone_reco_data_filters.ncpi0filter.beamgateEndTime: 4.9
 microboone_reco_data_filters.ncpi0filter.BadChannelProducer: "nfspl1"
 
+microboone_reco_data_producers.shrreco3dKalmanShower.inputCollection:                       "pandora"
+microboone_reco_data_producers.shrreco3dKalmanShower.trackFromPF:                           false
+microboone_reco_data_producers.shrreco3dKalmanShower.showerFromPF:                          true
+microboone_reco_data_producers.shrreco3dKalmanShower.showerInputTag:                        "shrreco3d"
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.options.defaultPdgId:       11
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.skipNegProp:         true
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxChi2:             10
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxDist:             5.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidue:          3.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidueFirstHit:  6.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.sortHitsByWire:      true
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.tryNoSkipWhenFails:  false
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.negDistTolerance:    -0.01
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.pickBestHitOnWire:   true
+
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstants:          [4.31e-3, 4.02e-3, 4.26e-3]
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.SpacePointModuleLabel:             "shrreco3dKalmanShower"
+
+microboone_reco_data_producers.shrreco3dKalmanShowercali.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_data_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:            "shrreco3dKalmanShowercalo"
 
 END_PROLOG
