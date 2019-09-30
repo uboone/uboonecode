@@ -613,7 +613,7 @@ microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.tryNoSkip
 microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.negDistTolerance:    -0.01
 microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.pickBestHitOnWire:   true
 
-microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstants:          [4.08e-3,3.97e-3,4.08e-3]
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstants:          [4.08e-3,3.97e-3,4.21e-3]
 microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.TrackModuleLabel:                  "shrreco3dKalmanShower"
 microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.SpacePointModuleLabel:             "shrreco3dKalmanShower"
 
