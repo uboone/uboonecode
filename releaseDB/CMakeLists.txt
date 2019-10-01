@@ -23,7 +23,7 @@ set( SQUAL s78 )
 
 create_product_variables( uboone_photon_propagation v01_00_00  )
 create_product_variables( larbatch                  v01_51_07  )
-create_product_variables( cetbuildtools             v7_12_01  )
+create_product_variables( cetbuildtools             v7_11_00  )
 create_product_variables( swtrigger                 v02_02_05i )
 create_product_variables( larlite                   v06_70_00c )
 create_product_variables( larcv                     v06_70_00c )
