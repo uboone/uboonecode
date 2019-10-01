@@ -598,6 +598,12 @@ microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants: 
 microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 
+microboone_reco_data_producers.pandoracali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoracaliSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanTrackcali.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanShowercali.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pmtrackcali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
+
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.TrackModuleLabel:                               "pandoraKalmanTrack"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.FlashModuleLabel:                               "simpleFlashBeam"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
