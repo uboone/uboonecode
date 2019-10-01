@@ -732,6 +732,7 @@ microboone_reco_data_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstant
 microboone_reco_data_producers.shrreco3dKalmanShowercalo.TrackModuleLabel:                  "shrreco3dKalmanShower"
 microboone_reco_data_producers.shrreco3dKalmanShowercalo.SpacePointModuleLabel:             "shrreco3dKalmanShower"
 
+microboone_reco_data_producers.shrreco3dKalmanShowercali.CaloAlg.CalAreaConstants:          [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.shrreco3dKalmanShowercali.TrackModuleLabel:                  "shrreco3dKalmanShower"
 microboone_reco_data_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:            "shrreco3dKalmanShowercalo"
 
