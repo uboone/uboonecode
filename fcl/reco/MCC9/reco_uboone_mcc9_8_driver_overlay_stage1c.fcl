@@ -22,7 +22,8 @@ physics.reco: [ opfiltercommon ]
 physics.trigger_paths: [ reco ]
 physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.end_paths:              [ ana, stream1 ]
-source.inputCommands:           ["keep *_*_*_*" ]
+#source.inputCommands:           ["keep *_*_*_*" ]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*RecoStage1c"]
 outputs.out1.fileName: "%ifb_%tc_reco1c.root"
 outputs.out1.dataTier: "reconstructed-2d"
 

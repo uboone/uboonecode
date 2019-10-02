@@ -25,7 +25,8 @@ physics.trigger_paths: [ reco ]
 outputs.out1.fileName: "%ifb_%tc_reco1b.root"
 outputs.out1.dataTier: "reconstructed-2d"
 #physics.end_paths:              [ ana, stream1 ]
-source.inputCommands:           ["keep *_*_*_*" ]
+#source.inputCommands:           ["keep *_*_*_*" ]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*RecoStage1b"]
 
 #temporary since new RawDigits are baseline corrected
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
