@@ -5,7 +5,7 @@
 ##include "mctrutht0matching.fcl"
 #include "reco_uboone_data_mcc9_8_driver_common.fcl"
 
-process_name: WireModStage1a
+process_name: OverlayWireModRecoStage1a
 
 services.DetectorClocksService.TrigModuleName: "daq"  # note that the clock time needed for the flash timing proper reconstruction 
 services.DetectorPropertiesService.NumberTimeSamples:        6400
@@ -31,7 +31,8 @@ physics.trigger_paths:          [ reco ]
 #physics.end_paths:              [ ana, stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco1a.root"
 outputs.out1.dataTier:          "reconstructed"
-source.inputCommands:           ["keep *_*_*_*" ]
+#source.inputCommands:           ["keep *_*_*_*" ]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*Reco*" ]
 
 #physics.producers.wcNoiseFilter.DigitModuleLabel: "mixer"
 physics.producers.saturation.LGProducer: "mixer"
@@ -54,5 +55,5 @@ physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer"
 #}
 
 #reduce file name length
-outputs.out1.fileName: "%ifb_r1a.root"
+outputs.out1.fileName: "%ifb_wmd.root"
 
