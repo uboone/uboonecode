@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 // Class:       UBXSec
-// Plugin Type: producer 
+// Plugin Type: producer
 // File:        UBXSec_module.cc
 //
 // Generated at Fri Jan  27 09:44:39 2017 by Marco Del Tutto using cetskelgen
@@ -13,18 +13,18 @@
  * \ingroup UBXSec
  *
  * \brief Art producer module
- * 
+ *
  *
  * \author Marco Del Tutto <marco.deltutto@physics.ox.ac.uk>
  *
- * \version producer 
+ * \version producer
  *
  * \date 2017/03/10
  *
  * Contact: marco.deltutto@physics.ox.ac.uk
  *
  * Created on: Friday, March 10, 2017 at 12:32:31
- * 
+ *
  * Modification for proton ID: kirby@fnal.gov
  *
  * Modified on: Fri Oct 26, 2018
@@ -220,8 +220,8 @@ private:
   int _minimumHitRequirement;           ///< Minimum number of hits in at least a plane for a track
   double _minimumDistDeadReg;           ///< Minimum distance the track end points can have to a dead region
   bool _use_genie_info;                 ///< Turn this off if looking at cosmic only files
-  double _beam_spill_start;             ///< Start time of the beam spill (us) 
-  double _beam_spill_end;               ///< Start time of the beam spill (us) 
+  double _beam_spill_start;             ///< Start time of the beam spill (us)
+  double _beam_spill_end;               ///< Start time of the beam spill (us)
   double _total_pe_cut;                 ///< PE cut to be applied to beam flash
   double _geo_cosmic_score_cut;         ///< Cut on the score of the pandoraNu geo cosmic tagger
   double _tolerance_track_multiplicity; ///< Tolerance to consider a track coming from the nu reco vertex
@@ -255,8 +255,8 @@ private:
   // Outputs trees
   TTree* _tree1;
   UBXSecEvent *ubxsec_event = new UBXSecEvent();
- 
-  /* 
+
+  /*
   TTree* _tree2;
   int _total_matches, _nmatch;
   std::vector<double> _hypo_spec, _beam_spec, _fixx_spec;
@@ -266,7 +266,7 @@ private:
 
   TH2F * _deadRegion2P;
   TH2F * _deadRegion3P;
-  
+
   // PIDA related variables
   TH1D * _h_pida_proton,     * _h_pida_muon,     * _h_pida_pion,     * _h_pida_kaon;
   TH2D * _h_pida_len_proton, * _h_pida_len_muon, * _h_pida_len_pion, * _h_pida_len_kaon;
@@ -300,7 +300,7 @@ private:
   bool _np_selection;
 
   TTree* _sr_tree;
-  int _sr_run, _sr_subrun; 
+  int _sr_run, _sr_subrun;
   double _sr_begintime, _sr_endtime;
   double _sr_pot;
 
@@ -361,10 +361,10 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 
   //run CC1muNp selection
   _np_selection                   = p.get<bool>("CC1muNpSelection", false);
-  
+
   _pecalib.Configure(p.get<fhicl::ParameterSet>("PECalib"));
 
-  _fiducial_volume.Configure(p.get<fhicl::ParameterSet>("FiducialVolumeSettings"), 
+  _fiducial_volume.Configure(p.get<fhicl::ParameterSet>("FiducialVolumeSettings"),
                              geo->DetHalfHeight(),
                              2.*geo->DetHalfWidth(),
                              geo->DetLength());
@@ -397,7 +397,7 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
   _particle_id_summer_2018_producer    = p.get<std::string>("ParticleIDSummer2018Producer","pid::UBXSecAnaOnly");
   _chi2_proton_cut                     = p.get<double>("Chi2ProtonCut", 88);
 
-  _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>(); 
+  _detector_properties = lar::providerFrom<detinfo::DetectorPropertiesService>();
   _detector_clocks = lar::providerFrom<detinfo::DetectorClocksService>();
   _SCE = lar::providerFrom<spacecharge::SpaceChargeService>();
 
@@ -499,13 +499,13 @@ UBXSec::UBXSec(fhicl::ParameterSet const & p) {
 void UBXSec::produce(art::Event & e) {
 
   if(_debug) std::cout << "********** UBXSec starts" << std::endl;
-  if(_debug) std::cout << "[UBXSec] Run: " << e.id().run() << 
+  if(_debug) std::cout << "[UBXSec] Run: " << e.id().run() <<
                           ", subRun: " << e.id().subRun() <<
                           ", event: " << e.id().event()  << std::endl;
 
   if (_do_opdet_swap && e.isRealData()) {
     std::cout << "[UBXSec] WARNING!!! Swapping OpDets. I hope you know what you are doing." << std::endl;
-  } 
+  }
 
 
   // Instantiate the output
@@ -522,7 +522,7 @@ void UBXSec::produce(art::Event & e) {
   _subrun = ubxsec_event->subrun = e.id().subRun();
   _event = ubxsec_event->event  = e.id().event();
 
-  ubxsec_event->file_type = _file_type; 
+  ubxsec_event->file_type = _file_type;
 
   _is_data = e.isRealData();
   _is_mc   = !_is_data;
@@ -599,8 +599,8 @@ void UBXSec::produce(art::Event & e) {
   if(t0_h->empty()) {
     std::cout << "[UBXSec] t0 is empty." << std::endl;
   }
-  
-  art::FindManyP<recob::Track> track_ptr_coll_v(t0_h, e, _acpt_producer); 
+
+  art::FindManyP<recob::Track> track_ptr_coll_v(t0_h, e, _acpt_producer);
 
   // Get Tracks
   art::Handle<std::vector<recob::Track>> track_h;
@@ -639,7 +639,7 @@ void UBXSec::produce(art::Event & e) {
     std::cout << "[UBXSec] anab::ParticleID_summer2018_from_track is not valid." << std::endl;
   }
   std::cout << "[UBXSec] Number of particleids_summer2018_from_track " << particleids_summer2018_from_track.size() << std::endl;
-  
+
   ubxsec_event->n_pfp = ubxsec_event->n_pfp_primary = 0;
   for (size_t i = 0; i < pfp_h->size(); i++) {
     ubxsec_event->n_pfp++;
@@ -662,7 +662,7 @@ void UBXSec::produce(art::Event & e) {
   for (auto track : track_p_v) {
     std::vector<art::Ptr<anab::ParticleID>> pids = particleids_from_track.at(track.key());
 
-    if(pids.size() == 0) 
+    if(pids.size() == 0)
       continue;
 
     for (auto pid : pids) {
@@ -682,7 +682,7 @@ void UBXSec::produce(art::Event & e) {
     //throw std::exception();
   }
   art::FindManyP<ubana::MCGhost>   mcghost_from_pfp   (pfp_h,   e, _mc_ghost_producer);
-  art::FindManyP<simb::MCParticle> mcpar_from_mcghost (ghost_h, e, _mc_ghost_producer); 
+  art::FindManyP<simb::MCParticle> mcpar_from_mcghost (ghost_h, e, _mc_ghost_producer);
 
   // Get MCSFitResult - Muon
   art::Handle<std::vector<recob::MCSFitResult> > mcsfitresult_mu_h;
@@ -690,7 +690,7 @@ void UBXSec::produce(art::Event & e) {
   if(!mcsfitresult_mu_h.isValid()){
     std::cout << "[UBXSec] MCSFitResult product " << _mcsfitresult_mu_producer << " not found..." << std::endl;
     //throw std::exception();
-  } 
+  }
   std::vector<art::Ptr<recob::MCSFitResult>> mcsfitresult_mu_v;
   art::fill_ptr_vector(mcsfitresult_mu_v, mcsfitresult_mu_h);
 
@@ -711,7 +711,7 @@ void UBXSec::produce(art::Event & e) {
            std::cout << "[UBXSec] MCSFitResult product " << _mcsfitresult_p_producer << " not found..." << std::endl;
           //throw std::exception();
            }
-                 
+
    std::vector<art::Ptr<recob::MCSFitResult>> mcsfitresult_p_v;
    art::fill_ptr_vector(mcsfitresult_p_v, mcsfitresult_p_h);
 
@@ -722,7 +722,7 @@ void UBXSec::produce(art::Event & e) {
   std::cout << "mcsfitresult_mu_v.at(0)->bwdMomentum(): " << mcsfitresult_mu_v.at(0)->bwdMomentum() << std::endl;
   std::cout << "mcsfitresult_mu_v.at(0)->bestMomentum(): " << mcsfitresult_mu_v.at(0)->bestMomentum() << std::endl;
   std::cout << "mcsfitresult_mu_v.at(0)->bestLogLikelihood(): " << mcsfitresult_mu_v.at(0)->bestLogLikelihood() << std::endl;
-  std::cout << "mcsfitresult_mu_v.at(0)->deltaLogLikelihood(): " << mcsfitresult_mu_v.at(0)->deltaLogLikelihood() << std::endl;  
+  std::cout << "mcsfitresult_mu_v.at(0)->deltaLogLikelihood(): " << mcsfitresult_mu_v.at(0)->deltaLogLikelihood() << std::endl;
   */
 
   // Get the BNB Correction Weights
@@ -767,7 +767,7 @@ void UBXSec::produce(art::Event & e) {
         // loop over the map and save the name of the function and the vector of weights for each function
         for(auto it : evtwgt_map) {
           std::string func_name = it.first;
-          std::vector<double> weight_v = it.second; 
+          std::vector<double> weight_v = it.second;
           //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
           ubxsec_event->evtwgt_genie_pm1_funcname.push_back(func_name);
           ubxsec_event->evtwgt_genie_pm1_weight.push_back(weight_v);
@@ -797,7 +797,7 @@ void UBXSec::produce(art::Event & e) {
         // loop over the map and save the name of the function and the vector of weights for each function
         for(auto it : evtwgt_map) {
           std::string func_name = it.first;
-          std::vector<double> weight_v = it.second; 
+          std::vector<double> weight_v = it.second;
           //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
           ubxsec_event->evtwgt_genie_multisim_funcname.push_back(func_name);
           ubxsec_event->evtwgt_genie_multisim_weight.push_back(weight_v);
@@ -828,7 +828,7 @@ void UBXSec::produce(art::Event & e) {
           // loop over the map and save the name of the function and the vector of weights for each function
           for(auto it : evtwgt_map) {
             std::string func_name = it.first;
-            std::vector<double> weight_v = it.second; 
+            std::vector<double> weight_v = it.second;
             //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
             ubxsec_event->evtwgt_extra_syst_multisim_funcname.push_back(func_name);
             ubxsec_event->evtwgt_extra_syst_multisim_weight.push_back(weight_v);
@@ -859,7 +859,7 @@ void UBXSec::produce(art::Event & e) {
         // loop over the map and save the name of the function and the vector of weights for each function
         for(auto it : evtwgt_map) {
           std::string func_name = it.first;
-          std::vector<double> weight_v = it.second; 
+          std::vector<double> weight_v = it.second;
           //std::vector<float> weight_v_float (weight_v.begin(), weight_v.end());
           ubxsec_event->evtwgt_flux_multisim_funcname.push_back(func_name);
           ubxsec_event->evtwgt_flux_multisim_weight.push_back(weight_v);
@@ -870,8 +870,8 @@ void UBXSec::produce(art::Event & e) {
       }
     }
   }
-  
-  
+
+
   // pandoraCosmic PFPs (for cosmic removal studies)
   art::Handle<std::vector<recob::PFParticle>> pfp_cosmic_h;
   e.getByLabel("pandoraCosmic",pfp_cosmic_h);
@@ -916,12 +916,12 @@ void UBXSec::produce(art::Event & e) {
       if (_do_opdet_swap && e.isRealData()) {
         opdet = _opdet_swap_map.at(opdet);
       }
- 
+
       ubxsec_event->beamfls_spec[n][opdet] = flash.PE(i);
 
       if (ubxsec_event->beamfls_time[n] > _beam_spill_start && ubxsec_event->beamfls_time[n] < _beam_spill_end) {
         // Find largest flash above threshold
-        if (flash.TotalPE() > _total_pe_cut && flash.TotalPE() > min_pe) { 
+        if (flash.TotalPE() > _total_pe_cut && flash.TotalPE() > min_pe) {
           ubxsec_event->candidate_flash_time = flash.Time();
           ubxsec_event->candidate_flash_z = flash.ZCenter();
           min_pe = flash.TotalPE();
@@ -950,7 +950,7 @@ void UBXSec::produce(art::Event & e) {
 
     // int iList = 0; // 1 nu int per spill
 
-    if (_debug) this->PrintMC(mclist); 
+    if (_debug) this->PrintMC(mclist);
 
     ubxsec_event->fv = 0;
     ubxsec_event->fv_sce = 0;
@@ -987,8 +987,8 @@ void UBXSec::produce(art::Event & e) {
                                                          mclist[iList]->GetNeutrino().Nu().Vy(),
                                                          mclist[iList]->GetNeutrino().Nu().Vz());
 
-      double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T()) 
-                       + _detector_properties->GetXTicksOffset(0,0,0) 
+      double g4Ticks = _detector_clocks->TPCG4Time2Tick(mclist[iList]->GetNeutrino().Nu().T())
+                       + _detector_properties->GetXTicksOffset(0,0,0)
                        - _detector_properties->TriggerOffset();
 
       // The following offsets to be summed to the original true vertex
@@ -1000,11 +1000,11 @@ void UBXSec::produce(art::Event & e) {
       ubxsec_event->sce_corr_y = yOffset;
       ubxsec_event->sce_corr_z = zOffset;
 
-      if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset, 
-                                mclist[iList]->GetNeutrino().Nu().Vy() + yOffset, 
+      if (_fiducial_volume.InFV(mclist[iList]->GetNeutrino().Nu().Vx() + xOffset,
+                                mclist[iList]->GetNeutrino().Nu().Vy() + yOffset,
                                 mclist[iList]->GetNeutrino().Nu().Vz() + zOffset)) {
         ubxsec_event->fv_sce = 1;
-      } 
+      }
 
       int n_genie_particles = 0;
       int n_genie_particles_charged = 0;
@@ -1055,9 +1055,9 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->nupdg           = mclist[iList]->GetNeutrino().Nu().PdgCode();
         ubxsec_event->nu_e            = mclist[iList]->GetNeutrino().Nu().E();
         ubxsec_event->lep_costheta    = mclist[iList]->GetNeutrino().Lepton().Pz() / mclist[iList]->GetNeutrino().Lepton().P();
-        ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(), 
+        ubxsec_event->lep_phi         = UBXSecHelper::GetPhi(mclist[iList]->GetNeutrino().Lepton().Px(),
                                                            mclist[iList]->GetNeutrino().Lepton().Py(),
-                                                           mclist[iList]->GetNeutrino().Lepton().Pz()); 
+                                                           mclist[iList]->GetNeutrino().Lepton().Pz());
 
         ubxsec_event->genie_mcpar_W   = mclist[iList]->GetNeutrino().W();
         ubxsec_event->genie_mcpar_QSqr= mclist[iList]->GetNeutrino().QSqr();
@@ -1077,10 +1077,10 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->ngenie_protons_400=n_genie_protons_400;
 
       }
-      
+
 
       ubxsec_event->nsignal = 0;
-      if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1; 
+      if(ubxsec_event->nupdg==14 && ubxsec_event->ccnc==0 && ubxsec_event->fv==1) ubxsec_event->nsignal=1;
 
       // Also save muon momentum if is CC interaction
       ubxsec_event->true_muon_mom = -9999.;
@@ -1093,14 +1093,14 @@ void UBXSec::produce(art::Event & e) {
         }
       }
       //======================================================================
-      // now begin parsing the largeant4 objects.  
+      // now begin parsing the largeant4 objects.
       art::Handle<std::vector<simb::MCParticle>> mcparticleListHandle;
       std::vector<art::Ptr<simb::MCParticle>> mcparticlelist;
 
       if (e.getByLabel("largeant", mcparticleListHandle))
         art::fill_ptr_vector(mcparticlelist, mcparticleListHandle);
       std::string parpri("primary");
-   
+
       for ( auto mc_geant : mcparticlelist ) {
         if ( (mc_geant) && (mc_geant->Process()==parpri) && (mc_geant->StatusCode()==1) && (mc_geant->Mother()==0) ) {
           const auto mc_truth = UBXSecHelper::TrackIDToMCTruth(e, "largeant", mc_geant->TrackId());
@@ -1160,14 +1160,14 @@ void UBXSec::produce(art::Event & e) {
       const auto mc_truth = UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpar->TrackId());
       //const auto mc_truth = bt->TrackIDToMCTruth(mcpar->TrackId());
       if (mc_truth) {
-        if (mc_truth->Origin() == simb::kBeamNeutrino 
+        if (mc_truth->Origin() == simb::kBeamNeutrino
             && mcpar->PdgCode() == 13 && mcpar->Mother() == 0) {
           ubxsec_event->muon_is_reco = true;
         }
       }
     }
   }
- 
+
   std::vector<lar_pandora::TrackVector     > track_v_v;
   std::vector<lar_pandora::ShowerVector    > shower_v_v;
   std::vector<lar_pandora::PFParticleVector> pfp_v_v;
@@ -1188,7 +1188,7 @@ void UBXSec::produce(art::Event & e) {
   ubxsec_event->n_tpcobj_nu_origin = 0;
   ubxsec_event->n_tpcobj_cosmic_origin = 0;
 
-  std::vector<art::Ptr<recob::Track>> muon_candidate_track_per_slice_v; 
+  std::vector<art::Ptr<recob::Track>> muon_candidate_track_per_slice_v;
   std::vector<art::Ptr<recob::PFParticle>> muon_candidate_pfparticle_per_slice_v;
   std::vector<art::Ptr<recob::Vertex>> neutrino_candidate_vertex_per_slice_v;
   muon_candidate_track_per_slice_v.resize(ubxsec_event->nslices);
@@ -1197,7 +1197,7 @@ void UBXSec::produce(art::Event & e) {
 
 
   //
-  // THIS IS THE MAIN LOOP OVER THE 
+  // THIS IS THE MAIN LOOP OVER THE
   // TPCOBJECTS CANDIDATES IN THIS EVENT
   //
 
@@ -1211,13 +1211,13 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->slc_ntrack[slice]  = tpcobj.GetNTracks();
     ubxsec_event->slc_nshower[slice] = tpcobj.GetNShowers();
 
-    // Slice origin 
+    // Slice origin
     ubxsec_event->slc_origin[slice] = tpcobj.GetOrigin();
     std::cout << "[UBXSec] \t Origin is " << ubxsec_event->slc_origin[slice] << std::endl;
 
     if (tpcobj.GetOrigin() == ubana::kBeamNeutrino || tpcobj.GetOrigin() == ubana::kMixed)
       ubxsec_event->n_tpcobj_nu_origin ++;
-    else 
+    else
       ubxsec_event->n_tpcobj_cosmic_origin ++;
 
     // Slice origin extra
@@ -1248,8 +1248,8 @@ void UBXSec::produce(art::Event & e) {
     std::vector<double> sce_corr = SCE->GetPosOffsets(reco_nu_vtx[0],
                                                       reco_nu_vtx[1],
                                                       reco_nu_vtx[2]);
-    std::cout << "[UBXSec] \t SCE correction in x, y, z = " << sce_corr.at(0) 
-                                                    << ", " << sce_corr.at(1) 
+    std::cout << "[UBXSec] \t SCE correction in x, y, z = " << sce_corr.at(0)
+                                                    << ", " << sce_corr.at(1)
                                                     << ", " << sce_corr.at(2) << std::endl;
     //reco_nu_vtx[0] += sce_corr.at(0);
     //reco_nu_vtx[1] -= sce_corr.at(1);
@@ -1260,10 +1260,10 @@ void UBXSec::produce(art::Event & e) {
     ubxsec_event->slc_nuvtx_y[slice] = reco_nu_vtx[1];
     ubxsec_event->slc_nuvtx_z[slice] = reco_nu_vtx[2];
     ubxsec_event->slc_nuvtx_fv[slice] = (_fiducial_volume.InFV(reco_nu_vtx) ? 1 : 0);
-    std::cout << "[UBXSec] \t Reco vertex is " << ubxsec_event->slc_nuvtx_x[slice] << ", " << ubxsec_event->slc_nuvtx_y[slice] << ", " << ubxsec_event->slc_nuvtx_z[slice] << std::endl; 
+    std::cout << "[UBXSec] \t Reco vertex is " << ubxsec_event->slc_nuvtx_x[slice] << ", " << ubxsec_event->slc_nuvtx_y[slice] << ", " << ubxsec_event->slc_nuvtx_z[slice] << std::endl;
     std::cout << "[UBXSec] \t Reco vertex is " << (ubxsec_event->slc_nuvtx_fv[slice]==1 ? "in" : "ouside") << " the FV." << std::endl;
 
-    
+
 
     // Through-going?
     ubxsec_event->slc_geocosmictag[slice] = false;
@@ -1277,11 +1277,11 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_geocosmictag[slice] = true;
       }
     }
-    
+
     // Vertex resolution
     if (ubxsec_event->slc_origin[slice] == ubana::kBeamNeutrino) {
       ubxsec_event->vtx_resolution = sqrt( pow(ubxsec_event->slc_nuvtx_y[slice]-ubxsec_event->tvtx_y[0], 2) + pow(ubxsec_event->slc_nuvtx_z[slice]-ubxsec_event->tvtx_z[0], 2) );
-    } 
+    }
 
     // Multiplicity
     int p, t, s;
@@ -1300,7 +1300,7 @@ void UBXSec::produce(art::Event & e) {
       auto ct = consistency_tags.at(0);
       std::cout << "[UBXSec] \t Candidate Consistency Score: " << ct->CosmicScore() << std::endl;
       if (ct->CosmicType() != anab::CosmicTagID_t::kNotTagged) {
-        std::cout << "[UBXSec] \t This slice has been tagged as not consistent. Type " << ct->CosmicType() 
+        std::cout << "[UBXSec] \t This slice has been tagged as not consistent. Type " << ct->CosmicType()
                   << ", score: " << ct->CosmicScore() << std::endl;
         ubxsec_event->slc_consistency[slice] = false;
       }
@@ -1316,7 +1316,7 @@ void UBXSec::produce(art::Event & e) {
     } else if (pfpToFlashMatch_v.size() == 0){
       std::cout << "[UBXSec] \t No Flash-Match for this TPCObject" << std::endl;
     } else {
-      ubxsec_event->slc_flsmatch_score[slice]       = pfpToFlashMatch_v[0]->GetScore(); 
+      ubxsec_event->slc_flsmatch_score[slice]       = pfpToFlashMatch_v[0]->GetScore();
       ubxsec_event->slc_flsmatch_qllx[slice]        = pfpToFlashMatch_v[0]->GetEstimatedX();
       ubxsec_event->slc_flsmatch_tpcx[slice]        = pfpToFlashMatch_v[0]->GetTPCX();
       ubxsec_event->slc_flsmatch_t0[slice]          = pfpToFlashMatch_v[0]->GetT0();
@@ -1402,12 +1402,12 @@ void UBXSec::produce(art::Event & e) {
         goodTrack = false;
         break;
       }
-    } 
+    }
 
     if (goodTrack) ubxsec_event->slc_passed_min_track_quality[slice] = true;
     else ubxsec_event->slc_passed_min_track_quality[slice] = false;
 
-    std::cout << "[UBXSec] \t " << (goodTrack ? "Passed" : "Did not pass") 
+    std::cout << "[UBXSec] \t " << (goodTrack ? "Passed" : "Did not pass")
               << " minimum track quality." << std::endl;
 
     // Vertex quality
@@ -1426,7 +1426,7 @@ void UBXSec::produce(art::Event & e) {
     // Vertex check
     ubxsec::VertexCheck vtxCheck(track_v_v[slice], slice_vtx);
     ubxsec_event->slc_vtxcheck_angle[slice] = vtxCheck.AngleBetweenLongestTracks();
-    
+
     // OpHits
     std::vector<ubxsec::Hit3D_t> hit3d_v;
     hit3d_v.clear();
@@ -1438,7 +1438,7 @@ void UBXSec::produce(art::Event & e) {
         std::cout << "[UBXSec] \t Can't find spacepoints for pfp with pdg " << pfp->PdgCode() << std::endl;
         continue;
       }
-      // Loop through the hits associated 
+      // Loop through the hits associated
       for (auto sp_pt : (iter->second)) {
         auto iter2 = spacept_to_hits.find(sp_pt);
         if (iter2 != spacept_to_hits.end()) {
@@ -1446,7 +1446,7 @@ void UBXSec::produce(art::Event & e) {
         } else {
           std::cout << "[UBXSec] \t Can't find hits ass to this sp_pt" << std::endl;
           continue;
-        }   
+        }
         // Save sp_pt position and hit charge for all the sp_pt you have
         auto hit = iter2->second;
         ubxsec::Hit3D_t thishit;
@@ -1466,8 +1466,8 @@ void UBXSec::produce(art::Event & e) {
       sumx += hit3d.q * hit3d.x;
       sumy += hit3d.q * hit3d.y;
       sumz += hit3d.q * hit3d.z;
-      
-      totq += hit3d.q; 
+
+      totq += hit3d.q;
     }
     double charge_center[3] = {sumx / totq, sumy / totq, sumz / totq};
 
@@ -1487,7 +1487,7 @@ void UBXSec::produce(art::Event & e) {
       if (ophit.PeakTime() > _beam_spill_start && ophit.PeakTime() < _beam_spill_end) {
         n_intime_ophits ++;
         n_intime_pe += _pecalib.BeamPE(opdet,ophit.Area(),ophit.Amplitude());
-      }     
+      }
     } // end loop ophit
 
     ubxsec_event->slc_n_intime_pe_closestpmt[slice] = n_intime_pe;
@@ -1508,7 +1508,7 @@ void UBXSec::produce(art::Event & e) {
       ubxsec_event->slc_muoncandidate_exists[slice]    = true;
       ubxsec_event->slc_muoncandidate_contained[slice] = fully_contained;
       ubxsec_event->slc_muoncandidate_length[slice]    = candidate_track->Length();
-      ubxsec_event->slc_muoncandidate_phi[slice]       = candidate_track->Phi(); //UBXSecHelper::GetCorrectedPhi((*candidate_track), tpcobj_nu_vtx); 
+      ubxsec_event->slc_muoncandidate_phi[slice]       = candidate_track->Phi(); //UBXSecHelper::GetCorrectedPhi((*candidate_track), tpcobj_nu_vtx);
       ubxsec_event->slc_muoncandidate_theta[slice]     = candidate_track->Theta(); //UBXSecHelper::GetCorrectedCosTheta((*candidate_track), tpcobj_nu_vtx);
       ubxsec_event->slc_muoncandidate_mom_range[slice] = _trk_mom_calculator.GetTrackMomentum(candidate_track->Length(), 13);
       //ubxsec_event->slc_muoncandidate_mom_mcs[slice]   = _trk_mom_calculator.GetMomentumMultiScatterLLHD(candidate_track);
@@ -1586,8 +1586,8 @@ void UBXSec::produce(art::Event & e) {
           if (mc_truth->Origin() == simb::kCosmicRay && (mcpar->PdgCode() == 13 || mcpar->PdgCode() == -13)) {
             _mom_cosmic_true = mcpar->P();
             _mom_cosmic_mcs = ubxsec_event->slc_muoncandidate_mom_mcs[slice];
-            _mom_cosmic_mcs_downforced = track_going_down ?   mcsfitresult_mu_v.at(candidate_track.key())->fwdMomentum() 
-                                                            : mcsfitresult_mu_v.at(candidate_track.key())->bwdMomentum(); 
+            _mom_cosmic_mcs_downforced = track_going_down ?   mcsfitresult_mu_v.at(candidate_track.key())->fwdMomentum()
+                                                            : mcsfitresult_mu_v.at(candidate_track.key())->bwdMomentum();
             _mom_cosmic_range = ubxsec_event->slc_muoncandidate_mom_range[slice];
             _mom_cosmic_down = track_going_down;
             _mom_cosmic_tree->Fill();
@@ -1595,7 +1595,7 @@ void UBXSec::produce(art::Event & e) {
         }
         //std::cout << ">>>>>>>>>>>>>>>>>>>>> MCP has pdg " << mcpar->PdgCode() << std::endl;
       }
- 
+
 
       if (_debug) std::cout << "[UBXSec] \t Muon Candidate Found" << std::endl;
       if (_debug) std::cout << "[UBXSec] \t \t Length:          " << ubxsec_event->slc_muoncandidate_length[slice] << std::endl;
@@ -1646,7 +1646,7 @@ void UBXSec::produce(art::Event & e) {
           continue;
         }
       }
-      
+
       if (_debug) std::cout << "[UBXSec] \t \t Hit points: " << hit_v.size() << ", track points: " << track_v.size() << std::endl;
       ubana::TrackQuality _track_quality;
       _track_quality.SetTrackPoints(track_v);
@@ -1658,7 +1658,7 @@ void UBXSec::produce(art::Event & e) {
       int start_wire = dist_wire_pair.second;
       int end_wire = dist_wire_pair.second + dist_wire_pair.first;
 
-      if (start_wire > end_wire) 
+      if (start_wire > end_wire)
         std::swap(start_wire, end_wire);
 
       // Create a channel to wire map
@@ -1764,7 +1764,7 @@ void UBXSec::produce(art::Event & e) {
       pdg = mcpars[0]->PdgCode();
       std::cout << "[UBXSec] \t\t MCPar has pdg " << pdg << std::endl;
       const auto mc_truth = UBXSecHelper::TrackIDToMCTruth(e, "largeant", mcpars[0]->TrackId());
-      //const auto mc_truth = bt->TrackIDToMCTruth(mcpars[0]->TrackId()); 
+      //const auto mc_truth = bt->TrackIDToMCTruth(mcpars[0]->TrackId());
       if (!mc_truth) {
         std::cerr << "[UBXSec] Problem with MCTruth pointer." << std::endl;
         continue;
@@ -1787,7 +1787,7 @@ void UBXSec::produce(art::Event & e) {
         ubxsec_event->slc_muoncandidate_truth_px[slice]     = mcpars[0]->Px();
         ubxsec_event->slc_muoncandidate_truth_py[slice]     = mcpars[0]->Py();
         ubxsec_event->slc_muoncandidate_truth_pz[slice]     = mcpars[0]->Pz();
-      } 
+      }
 
       if (mc_truth->Origin() == simb::kBeamNeutrino &&
           mcpars[0]->PdgCode() == 13 && mcpars[0]->Mother() == 0) {
@@ -1800,12 +1800,12 @@ void UBXSec::produce(art::Event & e) {
         }
         ubxsec_event->true_muon_mom_matched = mcpars[0]->P();
 
-        if (_fiducial_volume.InFV(mcpars[0]->Vx(), mcpars[0]->Vy(), mcpars[0]->Vz()) && 
+        if (_fiducial_volume.InFV(mcpars[0]->Vx(), mcpars[0]->Vy(), mcpars[0]->Vz()) &&
           _fiducial_volume.InFV(mcpars[0]->EndX(), mcpars[0]->EndY(), mcpars[0]->EndZ())) {
           ubxsec_event->mc_muon_contained = true;
         }
-      } 
-      
+      }
+
 
       std::vector<art::Ptr<recob::Track>> tracks = tracks_from_pfp.at(pfp.key());
       std::cout << "[UBXSec] \t\t n tracks ass to this pfp: " << tracks.size() << std::endl;
@@ -1841,7 +1841,7 @@ void UBXSec::produce(art::Event & e) {
         }
       }
     }
- 
+
 
 
     // MCS - Track direction, study cosmic direction
@@ -1852,7 +1852,7 @@ void UBXSec::produce(art::Event & e) {
       bool best_fwd = mcsfitresult_mu_v.at(candidate_track.key())->isBestFwd();
       bool down_track = candidate_track->Vertex().Y() > candidate_track->End().Y();
       //double deltall = mcsfitresult_mu_v.at(candidate_track.key())->deltaLogLikelihood();
-      //double ratioll = _mcs_cosmic_track_fwdll / _mcs_cosmic_track_bwdll;  
+      //double ratioll = _mcs_cosmic_track_fwdll / _mcs_cosmic_track_bwdll;
       if (down_track && best_fwd) {               // Track is reco going down and mcs agrees (true for cosmic)
         _h_mcs_cosmic_track_direction->Fill(0);
         //_h_mcs_cosmic_track_direction_deltall->Fill(0., deltall);
@@ -1907,7 +1907,7 @@ void UBXSec::produce(art::Event & e) {
     art::Handle<raw::ubdaqSoftwareTriggerData> softwareTriggerHandle;
     e.getByLabel("swtrigger", softwareTriggerHandle);
 
-    if (softwareTriggerHandle.isValid()){ 
+    if (softwareTriggerHandle.isValid()){
       if (softwareTriggerHandle->getNumberOfAlgorithms() == 1) {
         std::vector<std::string> algoNames = softwareTriggerHandle->getListOfAlgorithms();
         std::cout << "SW trigger name: " << algoNames[0] << std::endl;
@@ -1940,7 +1940,7 @@ void UBXSec::produce(art::Event & e) {
        }
     }
     if (nuMcflash_h->size() > 0) {
-      std::cout << "We have a neutrino MCFlash, and its time is: " << (*nuMcflash_h)[0].Time() << std::endl;    
+      std::cout << "We have a neutrino MCFlash, and its time is: " << (*nuMcflash_h)[0].Time() << std::endl;
     } else if (nuMcflash_h->size() == 0) {
       if(opActivityInBeamSpill) {
         std::cout << "No MCFlash but optical activity in the beam spill." << std::endl;
@@ -1958,7 +1958,7 @@ void UBXSec::produce(art::Event & e) {
   else
     ubxsec_event->pot = 0.;
 
- 
+
   // *********************
   // Event Selection
   // *********************
@@ -1977,7 +1977,7 @@ void UBXSec::produce(art::Event & e) {
       if (first && !iter.second) {
         reason = "fail_" + iter.first;
         first = false;
-      } 
+      }
     }
   }
 
@@ -2020,7 +2020,7 @@ void UBXSec::produce(art::Event & e) {
     art::Ptr<ubana::TPCObject> tpcobj = tpcobj_v.at(slice_index);
 
     if (_debug) std::cout << "[UBXSec] >>>>>>>>>>>>>>>>>>>>>> Selected TPCObject with index " << slice_index << std::endl;
- 
+
     // Prepare the tpcobj output
     std::vector<art::Ptr<ubana::TPCObject>>  out_tpcobj_v;
     out_tpcobj_v.resize(1);
@@ -2033,22 +2033,22 @@ void UBXSec::produce(art::Event & e) {
     util::CreateAssn(*this, e, muon_candidate_track_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexTrackAssociations);
     util::CreateAssn(*this, e, muon_candidate_pfparticle_per_slice_v.at(slice_index), neutrino_candidate_vertex_per_slice_v.at(slice_index), *vertexPFParticleAssociations);
 
-    //At this point, a NuMuCCEvent has been selected and the TPCObject slice has been determined. From this point, we can start filling the CC1mNp variables....
-    //First we get the pfparticles associated with that slice set to *tpcobj
-    
-
+    // At this point, a NuMuCCEvent has been selected and the TPCObject slice has
+    // been determined. From this point, we can start filling the CC1mNp
+    // variables.... First we get the pfparticles associated with that slice set
+    // to *tpcobj
     ubxsec_event->num_pfp=0;
     ubxsec_event->num_pfp_tracks=0;
     ubxsec_event->num_pfp_showers=0;
-      
+
     int n_svm_protons = 0;
     int n_chi2_protons = 0;
     std::map<int,double> ordered_protons;
     ordered_protons.clear();
-    
+
     for (auto pfp : pfp_v_v[slice_index]) {
 
-      std::cout << "[UBXSecCC1mNp] \t This is PFP " << pfp->Self()  << std::endl;      
+      std::cout << "[UBXSecCC1mNp] \t This is PFP " << pfp->Self()  << std::endl;
       bool pfp_is_muon_candidate=false;
       if (muon_candidate_pfparticle_per_slice_v.at(slice_index).key()==pfp.key()) {
 	//std::cout<<"[UBXSecCC1mNp] This pfp is the muon candidate!!!"<<std::endl;
@@ -2076,7 +2076,7 @@ void UBXSec::produce(art::Event & e) {
 
       if(_is_mc){
 	std::vector<art::Ptr<ubana::MCGhost>> mcghosts=mcghost_from_pfp.at(pfp.key());
-	std::vector<art::Ptr<simb::MCParticle>> mcpars;	
+	std::vector<art::Ptr<simb::MCParticle>> mcpars;
 	if(mcghosts.size()==0 || mcghosts.size()>1){
 	  std::cout<<"[UBXSecCC1mNp] \t\t mcghosts is either 0 or >1 so filling pfp truth with defaults!"<<std::endl;
 	  //FillPFPTruthDefaults(ubxsec_event);
@@ -2097,7 +2097,7 @@ void UBXSec::produce(art::Event & e) {
 	    ubxsec_event->pfp_truth_theta.emplace_back(mcpars[0]->Momentum().Theta());
 	    ubxsec_event->pfp_truth_costheta.emplace_back(TMath::Cos(mcpars[0]->Momentum().Theta()));
 	    ubxsec_event->pfp_truth_phi.emplace_back(mcpars[0]->Momentum().Phi());
-	    ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());   
+	    ubxsec_event->pfp_truth_mom.emplace_back(mcpars[0]->P());
 	    ubxsec_event->pfp_truth_startx.emplace_back(mcpars[0]->Vx());
 	    ubxsec_event->pfp_truth_starty.emplace_back(mcpars[0]->Vy());
 	    ubxsec_event->pfp_truth_startz.emplace_back(mcpars[0]->Vz());
@@ -2122,7 +2122,7 @@ void UBXSec::produce(art::Event & e) {
 	FillPFPRecoTrackDefaults();
 	FillPFPRecoDefaults();
       }
-          
+
       if (lar_pandora::LArPandoraHelper::IsTrack(pfp) && lar_pandora::LArPandoraHelper::IsShower(pfp)) { //check if the PFParticle is considered both a track and a shower
 	std::cout<<"[UBXSecCC1mNp] PFP: " << pfp->Self() << " is considered both a track and a shower. WTF???" <<std::endl;
 	throw std::exception();
@@ -2152,7 +2152,7 @@ void UBXSec::produce(art::Event & e) {
 	  ubxsec_event->pfp_reco_endz.emplace_back(showerPos_pfp.Z()+TMath::Cos(showerDirection_pfp.Theta())*shower_pfp->Length());
 	}
       }
-     
+
 
       if (lar_pandora::LArPandoraHelper::IsTrack(pfp)) { //if the Pandora thinks this is a track, then fill the track variables
 
@@ -2178,7 +2178,7 @@ void UBXSec::produce(art::Event & e) {
 	  ubxsec_event->pfp_reco_endx.emplace_back(trackEnd_pfp.X());
 	  ubxsec_event->pfp_reco_endy.emplace_back(trackEnd_pfp.Y());
 	  ubxsec_event->pfp_reco_endz.emplace_back(trackEnd_pfp.Z());
-	  
+
 	  ubxsec_event->pfp_reco_Id.emplace_back(track_pfp->ID());
 	  ubxsec_event->pfp_reco_Mom.emplace_back(track_pfp->VertexMomentum());
 	  trkf::TrackMomentumCalculator trkm_pfp;
@@ -2188,13 +2188,13 @@ void UBXSec::produce(art::Event & e) {
 	  std::vector<art::Ptr<anab::Calorimetry>> calos_track_pfp=calos_from_track.at(track_pfp.key());
 	  ubxsec_event->pfp_reco_trunmeandqdx.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp));
 	  ubxsec_event->pfp_reco_trunmeandqdx_U.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 0));
-	  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));  
+	  ubxsec_event->pfp_reco_trunmeandqdx_V.emplace_back(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp, 1));
 	  ubxsec_event->pfp_reco_upflag.emplace_back(_muon_finder.MIPConsistency(UBXSecHelper::GetDqDxTruncatedMean(calos_track_pfp), track_pfp->Length()));
 	  ubxsec_event->pfp_reco_dEdx.emplace_back(GetdEdx(calos_track_pfp));
 	  ubxsec_event->pfp_reco_dQdx.emplace_back(GetdQdx(calos_track_pfp));
 	  ubxsec_event->pfp_reco_RR.emplace_back(GetRR(calos_track_pfp));
 	  std::vector<art::Ptr<recob::Hit>> allKHits_pfp = hits_from_tracks.at(track_pfp.key());
-	  ubxsec_event->pfp_reco_nhits.emplace_back(allKHits_pfp.size()); 
+	  ubxsec_event->pfp_reco_nhits.emplace_back(allKHits_pfp.size());
 	  std::vector<art::Ptr<anab::ParticleID>> pids_summer2018 = particleids_summer2018_from_track.at(track_pfp.key());
 	  std::cout << "[UBXSecCC1mNp] The size of the vector of ParticleID is " << pids_summer2018.size() << " taken from particleids_summer2018_from_track for track pfp key " << track_pfp.key() << std::endl;
 	  if (pids_summer2018.size()==0) std::cout << "[UBXSecCC1mNp] No track-PID association found for trackID " << track_pfp.key() << ". Skipping track." << std::endl;
@@ -2207,7 +2207,7 @@ void UBXSec::produce(art::Event & e) {
 	    //std::cout << "[UBXSecCC1mNp] Particle ID Summer 2018 name is " << pid_summer2018->Name() << "." << std::endl;
 	    //fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
 	    //std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
-	    
+
 	    float newpid_pida=-9999.;
 	    float chi2_proton=-9999.;
 	    float chi2_kaon=-9999.;
@@ -2217,7 +2217,7 @@ void UBXSec::produce(art::Event & e) {
 	    float llh_bwd_proton=-9999.;
 	    float llh_fwd_mip=-9999.; //mip assumption only has the forward direction option
 	    float final_value=-9999.;
-	    
+
 	    fAlgScoresVec.clear();
 	    fAlgScoresVec = pid_summer2018->ParticleIDAlgScores();
 	    std::cout << "[UBXSecCC1mNp] Vector of ParticleIDAlgScores is " <<fAlgScoresVec.size() << " entries long." << std::endl;
@@ -2230,9 +2230,9 @@ void UBXSec::produce(art::Event & e) {
 	      std::cout << "[UBXSecCC1mNp] The TrackDir is " << fAlgScore.fTrackDir << " for index: " << i_algscore << std::endl;
 	      std::cout << "[UBXSecCC1mNp] The AssumedPdg is " << fAlgScore.fAssumedPdg << " for index: " << i_algscore << std::endl;
 	      std::cout << "[UBXSecCC1mNp] The AlgScore is " << fAlgScore.fValue << " for index: " << i_algscore << std::endl;
-	      
+
 	      if (UBPID::uB_getSinglePlane(fAlgScore.fPlaneID)==2) {
-		
+
 		if(fAlgScore.fAlgName == "Chi2"){
 		  if((anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
 		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
@@ -2250,14 +2250,14 @@ void UBXSec::produce(art::Event & e) {
 		    }
 		  }//requirement that it's forward
 		}//algorithm is chi2
-		
+
 		if(fAlgScore.fAlgName == "PIDA_median"){
 		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kPIDA) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
 		    //std::cout << "[UBXSecCC1mNp] \t Found the " << fAlgScore.fAlgName << " Alg on plane: " << UBPID::uB_getSinglePlane(fAlgScore.fPlaneID) << " assuming PDG code " << fAlgScore.fAssumedPdg << " with variable type " << fAlgScore.fVariableType << " and score: " << fAlgScore.fValue << std::endl;
 		    newpid_pida=fAlgScore.fValue;
 		  }
 		}
-		
+
 		if(fAlgScore.fAlgName == "BraggPeakLLH"){
 		  if((anab::kVariableType(fAlgScore.fVariableType) == anab::kLikelihood) && (anab::kTrackDir(fAlgScore.fTrackDir)== anab::kForward ) ){
 		    if(TMath::Abs(fAlgScore.fAssumedPdg) == 2212) {
@@ -2281,7 +2281,7 @@ void UBXSec::produce(art::Event & e) {
 	      }//requirement that this is Plane==2
 	    }//loop over AlgScores
 	    fAlgScoresVec.clear();
-	   
+
 	    ubxsec_event->pfp_reco_newpid_pida.emplace_back(newpid_pida);
 	    ubxsec_event->pfp_reco_chi2_proton.emplace_back(chi2_proton);
 	    ubxsec_event->pfp_reco_chi2_muon.emplace_back(chi2_muon);
@@ -2291,7 +2291,7 @@ void UBXSec::produce(art::Event & e) {
 	    ubxsec_event->pfp_reco_bragg_bwd_proton.emplace_back(llh_bwd_proton);
 	    ubxsec_event->pfp_reco_bragg_proton.emplace_back(llh_fwd_proton>llh_bwd_proton ? llh_fwd_proton : llh_bwd_proton);
 	    ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(llh_fwd_mip);
-	    
+
 	    if (llh_fwd_proton>llh_bwd_proton) {
 	      final_value=llh_fwd_proton;
 	    } else {
@@ -2301,7 +2301,7 @@ void UBXSec::produce(art::Event & e) {
 	      if (TMath::Abs(final_value)!=0.0) {
 		std::cout << "[UBXSecCC1mNp] Making the ratio of (BraggPeakLLH MIP)/max(BraggPeakLLH fwd|bwd) " << std::endl;
 		std::cout << "[UBXSecCC1mNp] ParticleID Bragg final value is " << TMath::Log(llh_fwd_mip/final_value) << std::endl;
-		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip/final_value)); 
+		ubxsec_event->pfp_reco_bragg_ratio.emplace_back(TMath::Log(llh_fwd_mip/final_value));
 	      } else {
 		std::cout << "[UBXSecCC1mNp] Crap, we're about to divide by zero ( max(BraggPeakLLH fwd|bwd)==0 ).... Do not do that!" << std::endl;
 		std::cout << "[UBXSecCC1mNp] Pushing back llh_fwd_mip value." << std::endl;
@@ -2311,14 +2311,14 @@ void UBXSec::produce(art::Event & e) {
 	    } else {
 	      ubxsec_event->pfp_reco_bragg_ratio.emplace_back(final_value);
 	    }
-	    
+
 	  } //end loop over pids_summer2018
 
       /*check if candidate track is a proton according to SVM)*/
- 	// Get the calorimetry for the second track     
+ 	// Get the calorimetry for the second track
         std::vector<art::Ptr<anab::Calorimetry>> calos = calos_from_track.at(track_pfp.key());
         double dqdx_mean_secondtrack = UBXSecHelper::GetDqDxTruncatedMean(calos);
-      
+
 	// Now check the dQdx values are compatible with the proton hypothesis
         bool not_muon = !_muon_finder.MIPConsistency(dqdx_mean_secondtrack, track_pfp->Length());
 	ubxsec_event->pfp_is_proton_svm.emplace_back( not_muon );
@@ -2347,12 +2347,12 @@ void UBXSec::produce(art::Event & e) {
 		else
 			ordered_protons[ ubxsec_event->pfp_reco_chi2_proton.size()-1 ] = ubxsec_event->pfp_reco_Mom_MCS_dir_corrected.at ( ubxsec_event->pfp_reco_chi2_proton.size()-1 );
 	}
-	
+
 	} //end loop over tracks from pfp
 
       } //end conditional of iftrack
-	
-    } //end loop over pfparticles  
+
+    } //end loop over pfparticles
 
 	ubxsec_event->n_svm_protons = n_svm_protons;
 	ubxsec_event->n_chi2_protons = n_chi2_protons;
@@ -2362,7 +2362,7 @@ void UBXSec::produce(art::Event & e) {
 	std::vector<::ubxsec::proton_pair> vec;
 	// copy key-value pairs from the map to the vector
 	std::copy( ordered_protons.begin(), ordered_protons.end(), std::back_inserter<std::vector<::ubxsec::proton_pair>>(vec));
-	
+
 	// sort the vector by decreasing order of its pair's second value
 	// if second value are equal, order by the pair's first value
 	std::sort(vec.begin(), vec.end(), [](const ::ubxsec::proton_pair& l, const ::ubxsec::proton_pair& r) {
@@ -2378,7 +2378,7 @@ void UBXSec::produce(art::Event & e) {
   // *********************
   // Event Selection Np
   // *********************
-  
+
   int slice_index_np = -1;
   bool is_selected_np = false;
   std::map<std::string,bool> failure_map_np;
@@ -2395,7 +2395,7 @@ void UBXSec::produce(art::Event & e) {
       if (first && !iter.second) {
         reason_np = "fail_" + iter.first;
         first = false;
-      } 
+      }
     }
   }
 
@@ -2405,7 +2405,7 @@ void UBXSec::produce(art::Event & e) {
   selection_result_np.SetSelectionType("numu_cc_np");
   selection_result_np.SetFailureReason(reason_np);
   selection_result_np.SetCutFlowStatus(failure_map_np);
-    
+
   //save selection output
   selection_result_np.SetSelectionStatus(is_selected_np);
   ubxsec_event->is_selected_np = is_selected_np;
@@ -2413,9 +2413,9 @@ void UBXSec::produce(art::Event & e) {
 
   selectionResultVector->emplace_back(std::move(selection_result_np));
   } //end if _np_selection
-  
+
   } // end conditional over muon selection
-  
+
   if(_debug) std::cout << "[UBXSec] Filling tree now." << std::endl;
   _tree1->Fill();
 
@@ -2497,8 +2497,8 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
     std::vector<double> sce_corr = SCE->GetPosOffsets(mclist[iList]->GetNeutrino().Nu().Vx(),
                                                       mclist[iList]->GetNeutrino().Nu().Vy(),
                                                       mclist[iList]->GetNeutrino().Nu().Vz());
-    std::cout << "\t\t SCE correction in x, y, z = " << sce_corr.at(0) 
-                                                     << ", " << sce_corr.at(1) 
+    std::cout << "\t\t SCE correction in x, y, z = " << sce_corr.at(0)
+                                                     << ", " << sce_corr.at(1)
                                                      << ", " << sce_corr.at(2) << std::endl;
   } else
     std::cout << "\t---No Neutrino information---" << std::endl;
@@ -2522,7 +2522,7 @@ void UBXSec::PrintMC(std::vector<art::Ptr<simb::MCTruth>> mclist) {
 
 //_______________________________________________________________________________________
 void UBXSec::FillPFPRecoDefaults()
-{ 
+{
   ubxsec_event->pfp_reco_length.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_theta.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_costheta.emplace_back(ubxsec_event->_default_value);
@@ -2537,7 +2537,7 @@ void UBXSec::FillPFPRecoDefaults()
 
 //_______________________________________________________________________________________
 void UBXSec::FillPFPRecoTrackDefaults()
-{ 
+{
   ubxsec_event->pfp_reco_Id.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_Mom.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_Mom_proton.emplace_back(ubxsec_event->_default_value);
@@ -2563,7 +2563,7 @@ void UBXSec::FillPFPRecoTrackDefaults()
   ubxsec_event->pfp_reco_bragg_proton.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_bragg_fwd_mip.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_bragg_ratio.emplace_back(ubxsec_event->_default_value);
-  
+
   ubxsec_event->pfp_is_proton_svm.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_is_proton_chi2.emplace_back(ubxsec_event->_default_value);
   ubxsec_event->pfp_reco_contained.emplace_back(ubxsec_event->_default_value);
@@ -2596,10 +2596,10 @@ void UBXSec::FillPFPTruthDefaults()
 }
 
 //_______________________________________________________________________________________
-void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet, 
-                              double& Ycenter, 
-                              double& Zcenter, 
-                              double& Ywidth, 
+void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet,
+                              double& Ycenter,
+                              double& Zcenter,
+                              double& Ywidth,
                               double& Zwidth)
 {
 
@@ -2629,10 +2629,10 @@ void UBXSec::GetFlashLocation(std::vector<double> pePerOpDet,
   Zcenter = sumz/totalPE;
 
   // This is just sqrt(<x^2> - <x>^2)
-  if ( (sumy2*totalPE - sumy*sumy) > 0. ) 
+  if ( (sumy2*totalPE - sumy*sumy) > 0. )
     Ywidth = std::sqrt(sumy2*totalPE - sumy*sumy)/totalPE;
-  
-  if ( (sumz2*totalPE - sumz*sumz) > 0. ) 
+
+  if ( (sumz2*totalPE - sumz*sumz) > 0. )
     Zwidth = std::sqrt(sumz2*totalPE - sumz*sumz)/totalPE;
 }
 
@@ -2643,8 +2643,8 @@ std::vector<double> UBXSec::GetdQdx(std::vector<art::Ptr<anab::Calorimetry>> cal
     if (!c->PlaneID().isValid) continue;
     int planenum = c->PlaneID().Plane;
     if (planenum != 2) continue;
-   
-    std::vector<double> dQdx_v = c->dQdx(); 
+
+    std::vector<double> dQdx_v = c->dQdx();
     return dQdx_v;
   }
   return result;
@@ -2658,8 +2658,8 @@ std::vector<double> UBXSec::GetRR(std::vector<art::Ptr<anab::Calorimetry>> calos
     if (!c->PlaneID().isValid) continue;
     int planenum = c->PlaneID().Plane;
     if (planenum != 2) continue;
-   
-    std::vector<double> RR_v = c->ResidualRange(); 
+
+    std::vector<double> RR_v = c->ResidualRange();
     return RR_v;
   }
   return result;
@@ -2673,8 +2673,8 @@ std::vector<double> UBXSec::GetdEdx(std::vector<art::Ptr<anab::Calorimetry>> cal
     if (!c->PlaneID().isValid) continue;
     int planenum = c->PlaneID().Plane;
     if (planenum != 2) continue;
-   
-    std::vector<double> dEdx_v = c->dEdx(); 
+
+    std::vector<double> dEdx_v = c->dEdx();
 //    if (dEdx_v.size() == 0){
 //      return 0;
 //    }

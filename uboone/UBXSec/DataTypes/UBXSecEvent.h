@@ -4,7 +4,7 @@
  * \ingroup UBXSec
  *
  * \brief Data product to store a UBXSec Event
- * 
+ *
  *
  * \author Marco Del Tutto <marco.deltutto@physics.ox.ac.uk>
  *
@@ -35,7 +35,7 @@ using namespace std;
 
 class UBXSecEvent /*: public TObject*/{
   public :
-  
+
   // Declaration of leaf types
   Int_t           run; ///< Run number
   Int_t           subrun; ///< Subrun number
@@ -97,7 +97,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<double> geant_mcpar_startz;
   vector<std::string> geant_mcpar_end_process;
 
-  
+
   Double_t        bnb_weight; ///< BNB correction weight to correct nue flux
   Bool_t          is_selected; ///< True if event passed numu cc inclusive selection
   Int_t           selected_slice; ///< The index of the selected slice for the numu cc inclusive selection
@@ -222,7 +222,7 @@ class UBXSecEvent /*: public TObject*/{
   vector<double>   tvtx_x; ///< True neutrino vertex X (cm)
   vector<double>   tvtx_y; ///< True neutrino vertex Y (cm)
   vector<double>   tvtx_z; ///< True neutrino vertex Z (cm)
-  
+
   Double_t        pot; ///< Not used
 
   Int_t evtwgt_genie_pm1_nfunc; ///< Number of functions used for GENIE reweighting (pm1sigma)
@@ -239,12 +239,12 @@ class UBXSecEvent /*: public TObject*/{
   vector<std::string> evtwgt_extra_syst_multisim_funcname; ///< Names of the functions used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
   vector<int> evtwgt_extra_syst_multisim_nweight; ///< Number of weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
   vector<vector<double>> evtwgt_extra_syst_multisim_weight; ///< Weights per function name used for extra syst reweighting (mec, qe, reinteraction, or others) (multisim)
- 
+
   Int_t evtwgt_flux_multisim_nfunc; ///< Number of functions used for FLUX reweighting (multisim)
   vector<std::string> evtwgt_flux_multisim_funcname; ///< Names of the functions used for FLUX reweighting (multisim)
   vector<int> evtwgt_flux_multisim_nweight; ///< Number of weights per function name used for FLUX reweighting (multisim)
   vector<vector<double>> evtwgt_flux_multisim_weight; ///< Weights per function name used for FLUX reweighting (multisim)
- 
+
 
   //Init area for CC1mNp/CC1m2p variables
 
@@ -272,16 +272,16 @@ class UBXSecEvent /*: public TObject*/{
   std::vector<float> pfp_truth_endE;
   std::vector<string> pfp_truth_endProcess;
   std::vector<float> pfp_truth_KE;
-  std::vector<float> pfp_truth_Mass;  
+  std::vector<float> pfp_truth_Mass;
 
   //Tracks from PFP variables
   std::vector<bool> pfp_reco_isprimary; //1 is true, 0 is false
   std::vector<int> pfp_reco_ndaughters;
   vector<bool> pfp_reco_ismuoncandidate; //1 is true, 0 is false
   vector<bool> pfp_reco_istrack; //int of whether Pandora thought it was a track 1 is true, 0 is false
-  vector<int> pfp_reco_numtracks; //int of associated tracks from Pandora 
+  vector<int> pfp_reco_numtracks; //int of associated tracks from Pandora
   vector<bool> pfp_reco_isshower; //int of whether Pandora thought it was a shower 1 is true, 0 is false
-  vector<int> pfp_reco_numshowers; //int of associated showers from Pandora 
+  vector<int> pfp_reco_numshowers; //int of associated showers from Pandora
   vector<int> pfp_reco_upflag; //value returned by MIPConsistency() function for the track
   vector<int> pfp_reco_Id; //the index of the track in the list of PFPs
   vector<float> pfp_reco_length; //length (cm) of the track associated with the PFP in the collection
@@ -323,18 +323,18 @@ class UBXSecEvent /*: public TObject*/{
   vector<bool> pfp_reco_contained; // is the track fully containted in the FV?
   vector<double> pfp_reco_Mom_MCS_dir_corrected; // MCS evaluation of the momentum after the track direction is checked for correctness
   vector<int> proton_indexes; //ordered indexes of the protons based on their measured momentum (0=leading proton, 1=second leading proton, 2=third leading proton...)
-  
+
   int n_svm_protons; //number of protons identified in the event based on the SVM cut
   int n_chi2_protons; //number of protons identified in the event based on the chi2 cut
 
-  int _default_value = -9999; ///< Default value 
+  int _default_value = -9999; ///< Default value
 
   UBXSecEvent();
   virtual ~UBXSecEvent();
   void Init();
-  void ResizeVectors(int); 
-  void ResizeCC1mNpPFPTrackVectors(int); 
-  void ResizeGenieTruthVectors(int); 
+  void ResizeVectors(int);
+  void ResizeGenieTruthVectors(int);
+  void ResizeCC1mNpPFPTrackVectors(int);
   void ResetGenieEventWeightVectorsPM1();
   void ResetGenieEventWeightVectorsMultisim();
   void ResetExtraSystEventWeightVectorsMultisim();
