@@ -1,9 +1,9 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
-#include "mcreco.fcl"
 
 #include "microboone_siminfomixer.fcl"
+#include "local_gen_include.fcl"
 //========================================
 
 services:
@@ -39,7 +39,6 @@ outputs: {
 physics: {
 
   producers : {
-    mcreco:    @local::standard_mcreco
   }
 
   analyzers: {
@@ -51,7 +50,7 @@ physics: {
     ionization: @local::microboone_siminfomixer
   }
 
-  mixer_path : [ generator, largeant, ionization, mcreco ]
+  mixer_path : [ generator, largeant, ionization ]
   trigger_paths : [ mixer_path ]
 
   output : [ out ]
@@ -60,12 +59,12 @@ physics: {
 }
 
 physics.filters.generator.SimInputFileNames : [ "genfile.root.local" ]
-physics.filters.generator.MCTruthInputModuleLabels: ["generator::DirtStage1"]
-physics.filters.generator.MCFluxInputModuleLabels: ["generator::DirtStage1"]
-physics.filters.generator.GTruthInputModuleLabels: ["generator::DirtStage1"]
-physics.filters.generator.BeamGateInputModuleLabels: ["generator::DirtStage1"]
-physics.filters.generator.MCTruthMCFluxAssnsInputModuleLabels: ["generator::DirtStage1"]
-physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::DirtStage1"]
+physics.filters.generator.MCTruthInputModuleLabels: ["generator::StopMuMCGen"]
+physics.filters.generator.MCFluxInputModuleLabels: ["generator::StopMuMCGen"]
+physics.filters.generator.GTruthInputModuleLabels: ["generator::StopMuMCGen"]
+physics.filters.generator.BeamGateInputModuleLabels: ["generator::StopMuMCGen"]
+physics.filters.generator.MCTruthMCFluxAssnsInputModuleLabels: ["generator::StopMuMCGen"]
+physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::StopMuMCGen"]
 physics.filters.generator.POTSummaryTag: "potinevent:SubRunPOT"
 
 physics.filters.largeant.SimInputFileNames : [ "genfile.root.local" ]
@@ -75,12 +74,12 @@ physics.filters.largeant.GTruthInputModuleLabels: []
 physics.filters.largeant.BeamGateInputModuleLabels: []
 physics.filters.largeant.MCTruthMCFluxAssnsInputModuleLabels: []
 physics.filters.largeant.MCTruthGTruthAssnsInputModuleLabels: []
-physics.filters.largeant.MCParticleInputModuleLabels: ["largeant::DirtStage1"]
-physics.filters.largeant.SimEnergyDepositInputModuleLabels: ["largeant:TPCActive:DirtStage1","largeant:Other:DirtStage1"]
-physics.filters.largeant.AuxDetSimChannelInputModuleLabels: ["largeant::DirtStage1"]
-physics.filters.largeant.SimChannelInputModuleLabels: ["largeant::DirtStage1"]
-physics.filters.largeant.SimPhotonsInputModuleLabels: ["largeant::DirtStage1"]
-physics.filters.largeant.MCTruthMCParticleAssnsInputModuleLabels: ["largeant::DirtStage1"]
+physics.filters.largeant.MCParticleInputModuleLabels: ["largeant::StopMuMCGen"]
+physics.filters.largeant.SimEnergyDepositInputModuleLabels: ["largeant:TPCActive:StopMuMCGen","largeant:Other:StopMuMCGen"]
+physics.filters.largeant.AuxDetSimChannelInputModuleLabels: ["largeant::StopMuMCGen"]
+physics.filters.largeant.SimChannelInputModuleLabels: ["largeant::StopMuMCGen"]
+physics.filters.largeant.SimPhotonsInputModuleLabels: ["largeant::StopMuMCGen"]
+physics.filters.largeant.MCTruthMCParticleAssnsInputModuleLabels: ["largeant::StopMuMCGen"]
 physics.filters.largeant.FillPOTInfo: false
 
 physics.filters.ionization.SimInputFileNames : [ "genfile.root.local" ]
@@ -90,10 +89,5 @@ physics.filters.ionization.GTruthInputModuleLabels: []
 physics.filters.ionization.BeamGateInputModuleLabels: []
 physics.filters.ionization.MCTruthMCFluxAssnsInputModuleLabels: []
 physics.filters.ionization.MCTruthGTruthAssnsInputModuleLabels: []
-physics.filters.ionization.SimEnergyDepositInputModuleLabels: ["ionization::DirtStage1"]
+physics.filters.ionization.SimEnergyDepositInputModuleLabels: ["ionization::StopMuMCGen"]
 physics.filters.ionization.FillPOTInfo: false
-
-physics.producers.mcreco.MCParticleLabel: "largeant"
-physics.producers.mcreco.SimChannelLabel: "ionization" # "driftWC:simpleSC"
-physics.producers.mcreco.UseSimEnergyDeposit: true
-physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040]
