@@ -42,4 +42,5 @@ physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
 physics.producers.flashmatch: @local::FlashMatch_overlay
 
 physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
+physics.producers.crthitcorrFirstPass.IsOverlay: true
 physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
