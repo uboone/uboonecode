@@ -1,7 +1,0 @@
-#include "standard_detsim_mcc8_CV_prop_uboone.fcl"
-
-process_name: DetsimNoPENoise
-
-outputs.out1.fileName: "%ifb_%tc_detsim_noPEnoise.root"
-
-#include "sys_var_mcc8_noPEnoise_uboone.fcl"

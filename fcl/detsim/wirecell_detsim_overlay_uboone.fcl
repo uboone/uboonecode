@@ -91,8 +91,6 @@ outputs:
  }
 }
 
-physics.producers.driftWC.wcls_main.structs.ELifetimeCorrection: false  # true: using lifetime from database; false: using default life
-
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
 
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true

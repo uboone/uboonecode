@@ -9,7 +9,7 @@ source.maxEvents: 750
 physics.producers.generator: @local::microboone_genie_simple
 physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
-physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.TopVolume: "volCryostat"
 physics.producers.generator.BeamName: "booster"
 
 physics.filters.finalstatefilter.IsVerbose: false

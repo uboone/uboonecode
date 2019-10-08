@@ -1,6 +1,0 @@
-#include "standard_propagate_mcc8_uboone.fcl"
-
-process_name: SimPropagateDLDOWN
-outputs.out1.fileName: "%ifb_%tc_prop_DLDOWN.root"
-
-#include "sys_var_mcc8_DL_down_uboone.fcl"
