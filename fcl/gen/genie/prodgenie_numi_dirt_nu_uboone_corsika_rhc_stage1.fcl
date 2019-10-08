@@ -2,9 +2,13 @@
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
 #include "largeantmodules_microboone.fcl"
+#include "mcreco.fcl"
+#include "time_memory_tracker_microboone.fcl"
 
+# This is adapted from prodgenie_bnb_dirt_nu_uboone_corsika_stage1.fcl but also incuding wirecell_g4_uboone.fcl to do G4 simulation
+# also override the generation parameters to use NuMI
 
-process_name: DirtNumiCorsikaStage1
+process_name: DirtStage1
 
 services:
 {
@@ -58,32 +62,42 @@ physics:
 
    generator: @local::microboone_genie_uniform_flux_cc
    largeant:   @local::microboone_largeant
+   drift:    {
+                 module_type: SimDriftElectrons
+                 SimulationLabel: "largeant:TPCActive"
+             }
+   ionization: {
+                 module_type: "larsim/ElectronDrift/ShiftEdepSCE"
+                 EDepTag:     "largeant:TPCActive"
+                 MakeAnaTree: false
+               }
+    mcreco:    @local::standard_mcreco
  }
 
  filters:       {
 
    FilterNoMCParticles:{
-           LArG4ModuleLabel: "largeant"
-           module_type: "FilterNoMCParticles"
+          LArG4ModuleLabel: "largeant"
+          module_type: "FilterNoMCParticles"
   }
 
   FilterCryostatNus:{
           KeepNusInCryostat: false
           module_type: "FilterCryostatNus"
- }
-
-   TimeFilter: { module_type: "FilterSimPhotonTime"
-                          SimPhotonsCollectionLabel: largeant
-                          TimeWindows: [ [4462.5,14487.5] ]
-                          MinPhotonEnergy: -1
-                          MinTotalEnergy: 9.7e-5 #10 photons...
-               }
+  }
+ 
+  TimeFilter: { module_type: "FilterSimPhotonTime"
+            SimPhotonsCollectionLabel: largeant
+            TimeWindows: [ [4462.5,14487.5] ]
+            MinPhotonEnergy: -1
+            MinTotalEnergy: 9.7e-5 #10 photons...
+  }
 
 }
 
  #define the producer and filter modules for this path, order matters,
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, generator, FilterCryostatNus, largeant, FilterNoMCParticles, TimeFilter  ]
+ simulate: [ rns, generator, FilterCryostatNus, largeant, FilterNoMCParticles, TimeFilter ]
 
  #define the output stream, there could be more than one if using filters
  stream1:  [ out1 ]
@@ -105,12 +119,28 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "genie_gen_numi_dirt_rhc.root" #default file name, can override from command line with -o or --output
+   fileName:    "genie_gen_dirt_rhc.root" #default file name, can override from command line with -o or --output
    dataTier:    "generated"
    compressionLevel: 1
    SelectEvents: [simulate]
  }
 }
+
+
+services.LArG4Parameters.FillSimEnergyDeposits:       true
+#services.LArG4Parameters.NoElectronPropagation:       true
+services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
+
+physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"]
+
+physics.producers.mcreco.MCParticleLabel: "largeant"
+physics.producers.mcreco.SimChannelLabel: "ionization" # "driftWC:simpleSC"
+physics.producers.mcreco.UseSimEnergyDeposit: true
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040]
+
+services.SpaceCharge.EnableSimSpatialSCE:          true
+services.SpaceCharge.EnableSimEfieldSCE:           true
+services.DetectorClocksService.InheritClockConfig: false
 
 # dk2nu flux generation config
 physics.producers.generator:                    @local::standard_genie
