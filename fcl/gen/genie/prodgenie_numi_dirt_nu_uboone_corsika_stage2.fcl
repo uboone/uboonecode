@@ -61,6 +61,12 @@ physics:
    }
 
    rns:       { module_type: "RandomNumberSaver" }
+   ionization: {
+                 module_type: "larsim/ElectronDrift/ShiftEdepSCE"
+                 EDepTag:     "largeant:TPCActive"
+                 MakeAnaTree: false
+               }
+    mcreco:    @local::standard_mcreco
  }
 
 
