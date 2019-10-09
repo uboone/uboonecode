@@ -1,0 +1,27 @@
+#include "reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl"
+
+#common pi0 filter path
+physics.pi0: [ rns, mcc9pi0filter ]
+
+#cc inclusive filter path
+physics.NuCC: [ rns, NuCCproducer, NuCCfilter ]
+
+#nc pi0 filter path
+physics.ncpi0: [ rns, ncpi0filter ]
+
+#antibdt filter path
+physics.antibdt:      [ rns, shrreco3dKalmanShower, shrreco3dKalmanShowercalo, shrreco3dKalmanShowercali, antibdtfilter ]
+
+physics.trigger_paths:          [ pi0, NuCC, ncpi0, antibdt ]
+physics.stream1:                [ out1, outpi0, outNuCC, outncpi0, outantibdt ]
+
+outputs.out1.fileName:     "%ifb_%tc_all.root"
+outputs.out1.dataTier:     "reconstructed"
+outputs.out1.streamName:   "all"
+
+physics.filters.ncpi0filter.isData: "true"
+physics.filters.ncpi0filter.POTLabel: "beamdata"
+physics.filters.ncpi0filter.beamgateStartTime: 3.65
+physics.filters.ncpi0filter.beamgateEndTime: 5.25
+physics.filters.ncpi0filter.BadChannelProducer: "nfspl1"
+

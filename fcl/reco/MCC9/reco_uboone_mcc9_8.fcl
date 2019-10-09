@@ -43,6 +43,7 @@
 #include "microboone_crtreco.fcl"
 #include "microboone_crthitcorr.fcl"  
 #include "UBCRTCosmicFilter.fcl"
+#include "CRTDistanceFilter.fcl"  
 
 BEGIN_PROLOG
 
@@ -208,6 +209,11 @@ microboone_reco_mcc8_producers:
   # Shower Reco module
   shrreco3d:                        @local::ShrReco3DPandora
 
+  # KalmanShower track fits and calorimetry on shrreco3d
+  shrreco3dKalmanShower:            @local::trackproducerfrompfparticle
+  shrreco3dKalmanShowercalo:        @local::microboone_calomc
+  shrreco3dKalmanShowercali:        @local::microboone_calibrationdedx
+
   # CRT reco
   pandoraCrtHitMatch: @local::t0recocrthit_sim
   crthitcorr:         @local::crtsimhitcorr
@@ -243,7 +249,12 @@ microboone_reco_mcc8_filters:
   opfiltercommonbnb: @local::microboone_common_op_precut_bnb
   opfiltercommonext: @local::microboone_common_op_precut_ext
 
-  crtveto : @local::UBCRTCosmicFilterBNBMC
+  #here are the numi common filters
+  opfiltercommonnumi:    @local::microboone_common_op_precut_numi
+  opfiltercommonextnumi: @local::microboone_common_op_precut_numi_ext
+  
+  crtveto:     @local::UBCRTCosmicFilterBNBMC
+  crtdistance: @local::CRTDistanceFilter  
 }
 
 
@@ -287,7 +298,8 @@ microboone_reco_mcc8_crt: [ crthitcorr,
                             crttrack,
                             crttrackmatch,
                             crttrackmatchAll,
-                            crtveto ]
+                            crtveto,
+                            crtdistance]
 
 microboone_reco_mcc8_pandora: [      pandoraWriter,
                                      pandoraPatRec,
@@ -346,6 +358,12 @@ microboone_reco_mcc8_stage2: [           rns,
                                          @sequence::microboone_reco_mcc8_pandora,
                                          @sequence::microboone_reco_mcc8_crt,
                                          @sequence::microboone_reco_mcc8_ccpath ]
+
+microboone_reco_mcc8_stage2_nocc: [      rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_mcc8_pandora,
+                                         @sequence::microboone_reco_mcc8_crt ]
 
 #microboone_dlprod_ana: [                 dlprodMcinfo ]
 microboone_dlprod_ana: [ ]
@@ -579,5 +597,27 @@ microboone_reco_mcc8_producers.trajclusterTruthMatch.HitParticleAssociations.Hit
 #filters
 microboone_reco_mcc8_filters.opfiltercommonbnb.OpHitProducer: "ophitBeam"
 microboone_reco_mcc8_filters.opfiltercommonext.OpHitProducer: "ophitBeam"
+
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.inputCollection:                       "pandora"
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackFromPF:                           false
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.showerFromPF:                          true
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.showerInputTag:                        "shrreco3d"
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.options.defaultPdgId:       11
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.skipNegProp:         true
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.maxChi2:             10
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.maxDist:             5.0
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidue:          3.0
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidueFirstHit:  6.0
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.sortHitsByWire:      true
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.tryNoSkipWhenFails:  false
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.negDistTolerance:    -0.01
+microboone_reco_mcc8_producers.shrreco3dKalmanShower.trackMaker.fitter.pickBestHitOnWire:   true
+
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstants:          [4.08e-3,3.97e-3,4.21e-3]
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercalo.SpacePointModuleLabel:             "shrreco3dKalmanShower"
+
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercali.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_mcc8_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:            "shrreco3dKalmanShowercalo"
 
 END_PROLOG
