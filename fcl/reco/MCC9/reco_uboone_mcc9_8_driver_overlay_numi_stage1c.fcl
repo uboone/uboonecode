@@ -1,13 +1,4 @@
 #include "reco_uboone_mcc9_8_driver_overlay_stage1c.fcl"
 
 physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonextnumi
-
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.64
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.44
-
-# flash-matching score preservation module
-physics.producers.flashmatch.BeamWindowStart: 5.64  
-physics.producers.flashmatch.BeamWindowEnd:   15.44
-
-# NuMI CRT Veto
-physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOn
+physics.filters.opfiltercommon.OpHitProducer: "ophitBeam"

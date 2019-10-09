@@ -4,5 +4,3 @@
 physics.producers.triggersim:    @local::ubtrigger_dark_numi
 physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi
 
-# Update the Longitudinal Diffusion Constant
-physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.8
