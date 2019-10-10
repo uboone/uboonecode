@@ -8,4 +8,4 @@ physics.producers.flashmatch.BeamWindowStart: 5.64
 physics.producers.flashmatch.BeamWindowEnd:   15.44
 
 # NuMI CRT Veto
-physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOn
+physics.filters.crtveto: @local::UBCRTCosmicFilterNuMION
