@@ -48,6 +48,10 @@
 #include "microboone_dqmtpcbursts.fcl"
 #include "microboone_dqmgoodruns.fcl"
 
+#include "microboone_pi0filter.fcl"
+#include "microboone_nucc_mcc9.fcl"
+#include "microboone_singlephoton.fcl"
+#include "microboone_antibdt_filter.fcl"
 
 BEGIN_PROLOG
 
@@ -226,6 +230,11 @@ microboone_reco_data_producers:
     # Shower Reco module
     shrreco3d:                        @local::ShrReco3DPandora
 
+    # KalmanShower track fits and calorimetry on shrreco3d
+    shrreco3dKalmanShower:            @local::trackproducerfrompfparticle
+    shrreco3dKalmanShowercalo:        @local::microboone_calodata
+    shrreco3dKalmanShowercali:        @local::microboone_calibrationdedx_data
+
     # CRT reco
     pandoraCrtHitMatch:               @local::t0recocrthit_data
     crtt0Correction:                  @local::crttrigger
@@ -239,6 +248,8 @@ microboone_reco_data_producers:
     # Flash Matching preservation
     flashmatch:                       @local::FlashMatch
 
+    # mcc9 cc inclusive filters
+    NuCCproducer: @local::microboone_nucc_producer
 }
 
 microboone_reco_data_analyzers:
@@ -270,6 +281,19 @@ microboone_reco_data_filters:
 
     crtveto:                          @local::UBCRTCosmicFilterBNBON
     crtdistance:                      @local::CRTDistanceFilter 
+
+    #pi0 filter
+    mcc9pi0filter: @local::mcc9pi0selection
+
+    # mcc9 cc inclusive filters
+    NuCCfilter: @local::microboone_nucc_filter
+    
+    #ncpi0 filter
+    ncpi0filter: @local::singlephoton_filter
+
+    # anti-bdt filter
+    antibdtfilter: @local::microboone_antibdtfilter
+
 }
 
 
@@ -383,20 +407,40 @@ microboone_reco_data_stage1:           [ rns,
                                          @sequence::microboone_reco_data_signalprocessing 
                                        ]
 
-microboone_reco_data_stage2:           [ rns,
+microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_data_stage2:           [ @sequence::microboone_reco_data_mcc9_1_stage2,
                                          @sequence::microboone_reco_data_ccpath
                                        ]
 
-microboone_reco_ovrl_stage2:           [ rns,
+microboone_reco_ovrl_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
-				       	 wcopflash,
+                                         wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_ovrl_crt,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_ovrl_stage2:           [ @sequence::microboone_reco_ovrl_mcc9_1_stage2,
                                          @sequence::microboone_reco_data_ccpath 
+                                       ]
+
+microboone_reco_data_stage2_nocc:      [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_ovrl_stage2_nocc:      [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_ovrl_crt
                                        ]
 
 microboone_dqm_ana_stage1:             [ DQMHits,
@@ -554,6 +598,12 @@ microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants: 
 microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 
+microboone_reco_data_producers.pandoracali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoracaliSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanTrackcali.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoraKalmanShowercali.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pmtrackcali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
+
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.TrackModuleLabel:                               "pandoraKalmanTrack"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.FlashModuleLabel:                               "simpleFlashBeam"
 microboone_reco_data_producers.pandoraKalmanTrackFlashMatch.BeamFlashTrackMatchAlgParams.MakeOutsideDriftTags: "true"
@@ -638,5 +688,52 @@ microboone_reco_data_producers.crttrackmatchAll.data_label_CRThit:              
 microboone_reco_data_producers.crttrackmatchAll.data_label_CRTtzero:                                          "crttzero"
 microboone_reco_data_producers.crttrackmatchAll.data_label_TPCtrack:                                          "pandoraAllOutcomesTrack"
 microboone_reco_data_producers.crttrackmatchAll.data_label_flash:                                             "simpleFlashCosmic"
+
+microboone_reco_data_producers.NuCCproducer.pfp_producer:                                                     "pandora"
+microboone_reco_data_producers.NuCCproducer.hitfinder_producer:                                               "gaushit"
+microboone_reco_data_filters.NuCCfilter.pfp_producer:                                                       "pandora"
+microboone_reco_data_filters.NuCCfilter.muon_producer:                                                      "NuCCproducer"
+
+microboone_reco_data_filters.mcc9pi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.mcc9pi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.mcc9pi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.mcc9pi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.mcc9pi0filter.IsData:                                                          true
+
+#microboone_reco_data_filters.ncpi0filter: @local::microboone_reco_data_filters.mcc9pi0filter
+microboone_reco_data_filters.ncpi0filter.PANDORAproducer:                                                 "pandora"
+microboone_reco_data_filters.ncpi0filter.SHRproducer:                                                     "shrreco3d"
+microboone_reco_data_filters.ncpi0filter.MCTproducer:                                                     "generator"
+microboone_reco_data_filters.ncpi0filter.MCPproducer:                                                     "largeant"
+microboone_reco_data_filters.ncpi0filter.IsData:                                                          true
+
+microboone_reco_data_filters.ncpi0filter.isData: "true"
+microboone_reco_data_filters.ncpi0filter.POTLabel: "beamdata"
+microboone_reco_data_filters.ncpi0filter.beamgateStartTime: 3.3
+microboone_reco_data_filters.ncpi0filter.beamgateEndTime: 4.9
+microboone_reco_data_filters.ncpi0filter.BadChannelProducer: "nfspl1"
+
+microboone_reco_data_producers.shrreco3dKalmanShower.inputCollection:                       "pandora"
+microboone_reco_data_producers.shrreco3dKalmanShower.trackFromPF:                           false
+microboone_reco_data_producers.shrreco3dKalmanShower.showerFromPF:                          true
+microboone_reco_data_producers.shrreco3dKalmanShower.showerInputTag:                        "shrreco3d"
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.options.defaultPdgId:       11
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.skipNegProp:         true
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxChi2:             10
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxDist:             5.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidue:          3.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.maxResidueFirstHit:  6.0
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.sortHitsByWire:      true
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.tryNoSkipWhenFails:  false
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.negDistTolerance:    -0.01
+microboone_reco_data_producers.shrreco3dKalmanShower.trackMaker.fitter.pickBestHitOnWire:   true
+
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.CaloAlg.CalAreaConstants:          [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_data_producers.shrreco3dKalmanShowercalo.SpacePointModuleLabel:             "shrreco3dKalmanShower"
+
+microboone_reco_data_producers.shrreco3dKalmanShowercali.CaloAlg.CalAreaConstants:          [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.shrreco3dKalmanShowercali.TrackModuleLabel:                  "shrreco3dKalmanShower"
+microboone_reco_data_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:            "shrreco3dKalmanShowercalo"
 
 END_PROLOG

@@ -65,7 +65,7 @@ outputs:
   out1:
   {
     module_type  : RootOutput
-    fileName  : "reco1_%tc_crtmerge.root"
+    fileName  : "%ifb_%tc_crtmerge.root"
     dataTier  : "reconstructed"
     compressionLevel: 1
   }

@@ -1,7 +1,6 @@
 #include "wirecell_detsim_overlay_uboone.fcl"
 
 process_name: DetsimOverlayDLup50
-outputs.out1.fileName: "detsim_overaly_DLup50.root"
+outputs.out1.fileName: "%r_%s_%tc_detsim_overlay_DLup50.root"
 
-services.LArG4Parameters.LongitudinalDiffusion: 9.3e-9
-
+#include "sys_var_mcc9_DL_up_50percent_uboone.fcl"
