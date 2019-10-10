@@ -1,0 +1,6 @@
+#include "standard_propagate_overlay_uboone.fcl"
+
+process_name: SimPropagateOverlayDLDOWN
+outputs.out1.fileName: "%ifb_prop_DLDOWN.root"
+
+#include "sys_var_DL_down_uboone.fcl"

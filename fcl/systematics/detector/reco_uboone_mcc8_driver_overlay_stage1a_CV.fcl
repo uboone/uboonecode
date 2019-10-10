@@ -1,0 +1,6 @@
+#include "reco_uboone_mcc8_driver_overlay_stage1a.fcl"
+
+process_name: OverlayStage1aCV
+
+outputs.out1.fileName: "%ifb_reco1a_CV.root"
+source.inputCommands: ["keep *_*_*_*", "drop *_*_*_OverlayStage1a*", "drop sumdata::RunData_*_*_*" ]

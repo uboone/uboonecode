@@ -1,0 +1,6 @@
+#include "standard_propagate_overlay_uboone.fcl"
+
+process_name: SimPropagateDataSCE
+outputs.out1.fileName: "%ifb_prop_dataSCE.root"
+
+#include "sys_var_dataSCE_uboone.fcl"
