@@ -1,4 +1,4 @@
-from ROOT import TFile, TH1F, TCanvas, gDirectory, gROOT, gPad, TLegend, TPad, TLine, TH1D, TLatex
+from ROOT import TFile, TH1F, TCanvas, gDirectory, gROOT, gPad, TLegend, TPad, TLine, TH1D, TLatex, TGaxis
 import math
 
 gROOT.ForceStyle()
@@ -56,10 +56,15 @@ logy = False
 
 # Plot extrension
 printext = ".pdf" # e.g. ".png"
+#printext = ".png" # e.g. ".png"
 
 # Print "MicroBooNE Preliminary" or similar
-plotlabel = "MicroBooNE INTERNAL"
-#plotlabel = "MicroBooNE Preliminary"
+#plotlabel = "MicroBooNE INTERNAL"
+plotlabel = "MicroBooNE Preliminary"
+#plotlabel = ""
+
+gAxis = TGaxis()
+gAxis.SetMaxDigits(3) # Force exponential notation for numbers > 999
 
 # Event sizes in number of samples
 snevtsize = 3200. # Only unique samples
@@ -357,7 +362,8 @@ for snh in snhlist:
 
     snh.SetMarkerStyle(21)
     snh.SetMarkerSize(0.5)
-    snh.Draw("E P0 X0 same") # SN data
+    #snh.Draw("E P0 X0 same") # SN data
+    snh.Draw("E P0 same") # SN data
     #snh.DrawNormalized("E P0 X0 same") # SN data
     leg = TLegend(0.6, 0.7, 1.0, 1.0)
     leg.AddEntry( extunbh_errors, ("%s (%i entries)" % (extunbname, int( extunbh_integral ))) if printentries else "%s" % extunbname, "FLP" )
@@ -373,7 +379,20 @@ for snh in snhlist:
         tx = TLatex()
         tx.SetTextSize(0.04)
         tx.SetTextAlign(11) # Bottom left adjusted
-        tx.DrawTextNDC( 0.15, 0.95, "%s" % plotlabel );
+        tx.DrawTextNDC( 0.15, 0.95, "%s" % plotlabel )
+
+    if (extunbh.GetName().startswith("extunb_hgSpectrum") 
+        or extunbh.GetName().startswith("extunb_heHitMult") or extunbh.GetName().startswith("extunb_hgHitMult") 
+        or extunbh.GetName().startswith("extunb_hgClusSpectrum") or extunbh.GetName().startswith("extunb_hgClusHitMult")):
+        extunbh.GetXaxis().SetRangeUser(0., 60.) # Change axis range
+        extunbh_errors.GetXaxis().SetRangeUser(0., 60.) # Change axis range
+        snh.GetXaxis().SetRangeUser(0., 60.) # Change axis range
+
+    if (extunbh.GetName().startswith("extunb_heHitSpectrum") or extunbh.GetName().startswith("extunb_hgHitSpectrum") 
+        or extunbh.GetName().startswith("extunb_htotHitSpectrum")):
+        extunbh.GetXaxis().SetRangeUser(0., 3.) # Change axis range
+        extunbh_errors.GetXaxis().SetRangeUser(0., 3.) # Change axis range
+        snh.GetXaxis().SetRangeUser(0., 3.) # Change axis range
 
     gPad.Modified()
     gPad.Update()
@@ -404,12 +423,17 @@ for snh in snhlist:
         hratio.GetXaxis().SetTitleSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetXaxis().GetTitleSize() )
         hratio.SetMarkerStyle(21)
         hratio.SetMarkerSize(0.5)
-        hratio.Draw("E P0 X0")
-        line1 = TLine( extunbh_errors.GetXaxis().GetXmin(), 1., extunbh_errors.GetXaxis().GetXmax(), 1. )
+        #hratio.Draw("E P0 X0")
+        hratio.Draw("E P0")
+        #line1 = TLine( extunbh_errors.GetXaxis().GetXmin(), 1., extunbh_errors.GetXaxis().GetXmax(), 1. )
+        line1 = hratio.Clone() # 
+        for ibin in xrange( line1.GetNbinsX() + 1 ):
+            line1.SetBinContent(ibin, 1.0)
         line1.SetLineWidth(1)
         line1.SetLineColor(extunbcolor)
-        line1.Draw()
-        hratio.Draw("E P0 X0 same") # Draw again over line
+        line1.Draw("][hist same")
+        #hratio.Draw("E P0 X0 same") # Draw again over line
+        hratio.Draw("E P0 same") # Draw again over line
         if logx: gPad.SetLogx()        
         # Keep the objects in memory
         line1list.append(line1)
