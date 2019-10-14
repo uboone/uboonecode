@@ -28,7 +28,7 @@ physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
 outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2", "drop *_*_*_Overlay*RecoStage2"]
 
 microboone_tfile_metadata:
 {
