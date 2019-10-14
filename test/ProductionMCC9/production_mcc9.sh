@@ -11,7 +11,7 @@ export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wir
 # This script runs the full mc+reco chain using standard released fcl files.
 
 input=''
-for fcl in prod_muminus_0.5-5.0GeV_25degf_uboone.fcl wirecell_g4_uboone.fcl wirecell_detsim_uboone.fcl reco_uboone_mcc9_8_driver_stage1.fcl reco_uboone_mcc9_8_driver_stage2_fullMC.fcl standard_ana_uboone.fcl
+for fcl in prod_muminus_0.5-5.0GeV_25degf_uboone.fcl wirecell_g4_uboone.fcl wirecell_detsim_uboone.fcl reco_uboone_mcc9_8_driver_stage1.fcl reco_uboone_mcc9_8_driver_stage2_fullMC.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
