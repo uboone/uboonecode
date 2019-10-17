@@ -1,0 +1,4 @@
+<lcgdict>
+  <class name="GENIEinteraction"/>
+  <class name="std::vector<GENIEinteraction>"/>
+</lcgdict>

@@ -1,0 +1,9 @@
+/**
+  \defgroup crt All things Cosmic Ray Tagger related
+**/
+
+#include "uboone/ErezCCQEana/PandoraNuTrack/PandoraNuTrack.h"
+#include <vector>
+
+template class std::vector<PandoraNuTrack>;
+
