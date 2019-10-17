@@ -23,3 +23,5 @@ physics.producers.generator.FluxCopyMethod: "IFDH"
 
 #reduce file name length
 outputs.out1.fileName: "%ifb_gen_fhc.root"
+
+services.IFDH: {}
