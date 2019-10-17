@@ -18,12 +18,12 @@ services:
 #Start each new event with an empty event.
 source:
 {
-  module_type: EmptyEvent
-  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  module_type: RootInput
   maxEvents:   10          # Number of events to create
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
+
 
 # Define and configure some modules to do work on each event.
 # First modules are defined; they are scheduled later.
