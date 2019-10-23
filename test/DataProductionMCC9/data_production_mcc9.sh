@@ -16,15 +16,24 @@ fi
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Set experiment environment variables (not set by mrbsetenv, but needed by IFDH).
+
+export EXPERIMENT=uboone
+export SAM_EXPERIMENT=uboone
+
 # This script runs the full mc+reco chain using standard released fcl files.
 
-input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2016_3_14_9_22_21-0005432-00021_20160322T065603_ext_bnb_20160323T041757_merged.root
-for fcl in reco_uboone_data_mcc9_8_driver_stage1.fcl reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOn.fcl standard_ana_uboone_data.fcl
+input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2019_5_9_15_17_29-0022417-00198_20190620T162349_bnb_2_20190620122031_merged.root
+for fcl in run_merge_beamdata.fcl reco_uboone_data_mcc9_8_driver_stage1.fcl reco_uboone_mcc9_8_driver_data_bnb_optical.fcl reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOn.fcl reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
   err=`basename $fcl .fcl`.err
-  cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 5"
+  if [ $fcl = reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl ]; then
+    cmd="lar --rethrow-all -c $fcl -s $input -n 5"
+  else
+    cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 5"
+  fi
   echo $cmd
   $cmd > $out 2> $err
   stat=$?

@@ -1,0 +1,6 @@
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOff.fcl"
+#include "reco_uboone_mcc9_8_reducer_stage2_withcalo.fcl"
+
+process_name: Reco2WithCalo
+source.inputCommands: [ "keep *", "drop *_*_*_DataRecoStage2" ]
+outputs.out1.outputCommands: @local::stage2ReducedOutputCommands

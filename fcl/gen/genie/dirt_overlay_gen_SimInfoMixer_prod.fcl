@@ -1,6 +1,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "services_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
+#include "mcreco.fcl"
 
 #include "microboone_siminfomixer.fcl"
 #include "local_gen_include.fcl"
@@ -39,6 +40,7 @@ outputs: {
 physics: {
 
   producers : {
+    mcreco:    @local::standard_mcreco
   }
 
   analyzers: {
@@ -50,7 +52,7 @@ physics: {
     ionization: @local::microboone_siminfomixer
   }
 
-  mixer_path : [ generator, largeant, ionization ]
+  mixer_path : [ generator, largeant, ionization, mcreco ]
   trigger_paths : [ mixer_path ]
 
   output : [ out ]
@@ -91,3 +93,8 @@ physics.filters.ionization.MCTruthMCFluxAssnsInputModuleLabels: []
 physics.filters.ionization.MCTruthGTruthAssnsInputModuleLabels: []
 physics.filters.ionization.SimEnergyDepositInputModuleLabels: ["ionization::DirtStage1"]
 physics.filters.ionization.FillPOTInfo: false
+
+physics.producers.mcreco.MCParticleLabel: "largeant"
+physics.producers.mcreco.SimChannelLabel: "ionization" # "driftWC:simpleSC"
+physics.producers.mcreco.UseSimEnergyDeposit: true
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040]

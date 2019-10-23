@@ -1,0 +1,78 @@
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: DataFiltersPostStage2
+
+services.TFileService.fileName: "reco_stage_2_filters_hist.root"
+services.IFDH: {}
+
+#beam quality path
+physics.beam_good: [ rns, beamdataquality ]
+
+#common pi0 filter path
+physics.pi0:          [ rns, beamdataquality, mcc9pi0filter ]
+
+#cc inclusive filter path
+physics.NuCC: [ rns, beamdataquality, NuCCproducer, NuCCfilter ]
+
+#nc pi0 filter path
+physics.ncpi0:        [ rns, beamdataquality, ncpi0filter ]
+
+#antibdt filter path
+physics.antibdt:      [ rns, beamdataquality, shrreco3dKalmanShower, shrreco3dKalmanShowercalo, shrreco3dKalmanShowercali, antibdtfilter ]
+
+physics.ana:                    [ ]
+physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0, antibdt ]
+physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0, outantibdt ]
+physics.end_paths:              [ stream1 ]
+
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]
+
+outputs.outbeamOK:              @local::outputs.out1
+outputs.outbeamOK.fileName:     "%ifb_%tc_beam_good.root"
+outputs.outbeamOK.dataTier:     "reconstructed"
+outputs.outbeamOK.streamName:   "beam_good"
+outputs.outbeamOK.SelectEvents: [ beam_good ]
+
+outputs.outbeamNOK:              @local::outputs.out1
+outputs.outbeamNOK.fileName:     "%ifb_%tc_beam_bad.root"
+outputs.outbeamNOK.dataTier:     "reconstructed"
+outputs.outbeamNOK.streamName:   "beam_bad"
+outputs.outbeamNOK.SelectEvents: [ "!beam_good" ]
+
+outputs.outpi0:              @local::outputs.out1
+outputs.outpi0.fileName:     "%ifb_%tc_pi0.root"
+outputs.outpi0.dataTier:     "reconstructed"
+outputs.outpi0.streamName:   "pi0"
+outputs.outpi0.SelectEvents: [ pi0 ]
+
+outputs.outNuCC:              @local::outputs.out1
+outputs.outNuCC.fileName:     "%ifb_%tc_NuCC.root"
+outputs.outNuCC.dataTier:     "reconstructed"
+outputs.outNuCC.streamName:   "NuCC"
+outputs.outNuCC.SelectEvents: [ NuCC ]
+
+outputs.outncpi0:              @local::outputs.out1
+outputs.outncpi0.fileName:     "%ifb_%tc_ncpi0.root"
+outputs.outncpi0.dataTier:     "reconstructed"
+outputs.outncpi0.streamName:   "ncpi0"
+outputs.outncpi0.SelectEvents: [ ncpi0 ]
+
+outputs.outantibdt:              @local::outputs.out1
+outputs.outantibdt.fileName:     "%ifb_%tc_antibdt.root"
+outputs.outantibdt.dataTier:     "reconstructed"
+outputs.outantibdt.streamName:   "antibdt"
+outputs.outantibdt.SelectEvents: [ antibdt ]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_stage_2_filters_hist.root.json"]
+  GenerateTFileMetadata: [true]
+  dataTier:              ["root-tuple"]
+  fileFormat:            ["root"]
+}
+
+physics.filters.ncpi0filter.isData: "true"
+physics.filters.ncpi0filter.POTLabel: "beamdata"
+physics.filters.ncpi0filter.beamgateStartTime: 3.3
+physics.filters.ncpi0filter.beamgateEndTime: 4.9
+physics.filters.ncpi0filter.BadChannelProducer: "nfspl1"
