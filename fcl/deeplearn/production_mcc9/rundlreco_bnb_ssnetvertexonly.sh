@@ -34,7 +34,7 @@ TAGGER_CONFIG=$DLLEE_UNIFIED_DIR/dlreco_scripts/tagger_configs/tagger_bnbdata_v2
 VERTEX_CONFIG=$DLLEE_UNIFIED_DIR/dlreco_scripts/vertex_configs/prod_fullchain_mcc9ssnet_combined_newtag_extbnb_c10_union.cfg
 #VERTEX_CONFIG=prod_fullchain_mcc9ssnet_combined_newtag_extbnb_c10_union.cfg # for debug
 TRACKER_CONFIG=$DLLEE_UNIFIED_DIR/dlreco_scripts/tracker_configs/tracker_read_cosmo.cfg
-NUEID_INTER_CONFIG=${NUEID_INTER_DIR}/inter_nue_mc_pl2.cfg
+NUEID_INTER_CONFIG=${NUEID_INTER_DIR}/inter_nue_data_mcc9.cfg
 SHOWER_RECO_CONFIG=$SHOWER_MAC_DIR/config_nueid.cfg
 SHOWER_RECO_DQDS=$SHOWER_MAC_DIR/dqds_mc_xyz.txt
 
