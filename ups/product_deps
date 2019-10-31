@@ -38,7 +38,7 @@ ubutil                  v08_32_00
 uboonedata              v01_18_23
 genie_xsec              v3_00_04a
 uboone_oslibs           v1_0_0
-cetbuildtools	        v7_12_01	-	only_for_build
+cetbuildtools	        v7_14_00	-	only_for_build
 end_product_list
 
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
