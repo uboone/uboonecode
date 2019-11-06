@@ -34,3 +34,16 @@ Contact Taritree (twongj01@tufts.edu or better on slack), if a data type is miss
 
 **WARNING** scripts still need to be finished.
 
+## Example `project.py` xml
+
+See `example_project.xml` in this folder.  The key tags are here:
+
+```
+  <stage name="ssnet">
+    <fcl>mcc9_dlreco_driver_data.fcl</fcl>
+    <fcl>standard_dlreco_uboone_metadata.fcl</fcl>
+    <endscript>rundlreco_bnb_ssnetvertexonly.sh</endscript>
+```
+
+One needs to select a driver fcl file and endscript using the table above.  
+One also needs to include `standard_dlreco_uboone_metadata.fcl`. Note, this lives in `ubcv/ubcv/ubdlintegration/`.
