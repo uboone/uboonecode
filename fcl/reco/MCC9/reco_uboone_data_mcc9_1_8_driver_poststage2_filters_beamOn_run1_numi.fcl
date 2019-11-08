@@ -2,3 +2,6 @@
 
 # Override the beam quality cut for Run 1 since this uses neutrino mode
 physics.filters.beamdataquality.numi.horn_current_range: [ +198, +202 ]
+
+physics.filters.ncpi0filter.beamgateStartTime: 5.64
+physics.filters.ncpi0filter.beamgateEndTime:   15.44
