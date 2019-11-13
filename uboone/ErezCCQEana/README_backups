@@ -1,0 +1,13 @@
+
+from CMakeLists.txt
+— - - — — — - - - — - - 
+add_subdirectory(PandoraNuTrack)
+add_subdirectory(Hit)
+add_subdirectory(Box)
+add_subdirectory(GENIEinteraction)
+
+
+	  	   	uboone_ErezCCQEana_PandoraNuTrack
+			uboone_ErezCCQEana_Hit
+			uboone_ErezCCQEana_Box
+			uboone_ErezCCQEana_GENIEinteraction

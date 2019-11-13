@@ -1,0 +1,4 @@
+<lcgdict>
+  <class name="PandoraNuTrack"/>
+  <class name="std::vector<PandoraNuTrack>"/>
+</lcgdict>
