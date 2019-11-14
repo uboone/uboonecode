@@ -43,4 +43,11 @@ do
     exit 1
   fi
   
+  # Check for connections to development conditions database.
+
+  if egrep -q uboonecon_dev $fclout; then
+    echo "Found connection to development conditions database."
+    exit 1
+  fi
+
 done
