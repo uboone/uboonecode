@@ -81,7 +81,7 @@ microboone_electronlifetime_provider:
     DefaultTimeConstantErr: 0.1e-5
 }
 microboone_electronlifetime_provider.DatabaseRetrievalAlg.DBFolderName: "elifetime_data_tmp"
-microboone_electronlifetime_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
+microboone_electronlifetime_provider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8186/uboonecon_prod/app/"
 microboone_electronlifetime_provider.DatabaseRetrievalAlg.DBTag: "v1r0"
 
 microboone_electronlifetime_service:
@@ -187,7 +187,7 @@ microboone_tpcenergycalib_provider_mc:
 }
 
 #set values that are identical in data and mc
-microboone_tpcenergycalib_provider_mc.dEdxCorrectionProvider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8086/uboonecon_dev/app/"
+microboone_tpcenergycalib_provider_mc.dEdxCorrectionProvider.DatabaseRetrievalAlg.DBUrl: "http://dbdata0vm.fnal.gov:8186/uboonecon_prod/app/"
 
 microboone_tpcenergycalib_provider_mc.XShapeCorrectionProvider.DatabaseRetrievalAlg.DBTag: "v1r0"
 microboone_tpcenergycalib_provider_mc.YZCorrectionProvider.DatabaseRetrievalAlg.DBTag: "v1r0"
