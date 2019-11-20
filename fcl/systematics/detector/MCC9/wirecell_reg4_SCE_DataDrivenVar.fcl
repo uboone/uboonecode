@@ -49,8 +49,8 @@ outputs: {
 
 services.SpaceCharge:  @local::standard_spacecharge
 services.SpaceCharge.RepresentationType: Voxelized_TH3
-services.SpaceCharge.InputFilename:  "SpaceCharge/SCEoffsets_dataDriven_fwd_MikeSyst.root"
-services.SpaceCharge.CalibrationInputFilename: "SpaceCharge/SCEoffsets_dataDriven_bkwd_MikeSyst.root"
+services.SpaceCharge.InputFilename:  "SpaceCharge/SCEoffsets_dataDriven_fwd_Nov19.root"
+services.SpaceCharge.CalibrationInputFilename: "SpaceCharge/SCEoffsets_dataDriven_bkwd_Nov19.root"
 services.SpaceCharge.service_provider:  SpaceChargeServiceMicroBooNE
 
 #enable correction by default
