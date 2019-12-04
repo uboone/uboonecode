@@ -1,0 +1,4 @@
+#include "reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl"
+
+# Override the beam quality cut for Run 1 since this uses neutrino mode
+physics.filters.beamdataquality.numi.horn_current_range: [ +198, +202 ]

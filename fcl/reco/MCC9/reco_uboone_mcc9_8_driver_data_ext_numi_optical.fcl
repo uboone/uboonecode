@@ -1,0 +1,4 @@
+#include "reco_uboone_mcc9_8_driver_data_ext_optical.fcl"
+
+physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonextnumi
+physics.filters.opfiltercommon.OpHitProducer: "ophitBeam"

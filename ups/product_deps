@@ -2,7 +2,7 @@
 
 # The *parent* line must the first non-commented line and defines this product and version
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
-parent uboonecode v08_00_00_26_dl
+parent uboonecode v08_00_00_29_dl
 
 defaultqual e17
 
@@ -31,24 +31,25 @@ table_fragment_end
 
 product                 version
 larsoft                 v08_05_00_10
-ubcv                    v08_00_00_26_dl
-ubcrt                   v08_00_00_23
-ublite			v08_00_00_26_dl
-ubutil                  v08_00_00_23
-uboonedata              v08_00_00_23
+ubcv                    v08_00_00_29_dl
+ubcrt                   v08_00_00_28
+ublite			v08_00_00_29_dl
+ubutil                  v08_00_00_27
+uboonedata              v08_00_00_27
 genie_xsec              v3_00_04a
 genie_phyopt            v3_00_04
 uboone_oslibs           v1_0_0
+wcp			v00_13_00
 cetbuildtools	        v7_11_00	-	only_for_build
 end_product_list
 
-qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec                      genie_phyopt    uboone_oslibs
-c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
+qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec                      genie_phyopt    uboone_oslibs   wcp
+c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c2:debug
+c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c2:opt
+c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c2:prof
+e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e17:debug
+e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e17:opt
+e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e17:prof
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

@@ -53,6 +53,8 @@
 #include "microboone_singlephoton.fcl"
 #include "microboone_antibdt_filter.fcl"
 
+#include "microboone_wiremod.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_data_services:
@@ -250,6 +252,10 @@ microboone_reco_data_producers:
 
     # mcc9 cc inclusive filters
     NuCCproducer: @local::microboone_nucc_producer
+
+    #Wire Modification
+    wiremod: @local::microboone_wiremod
+
 }
 
 microboone_reco_data_analyzers:
