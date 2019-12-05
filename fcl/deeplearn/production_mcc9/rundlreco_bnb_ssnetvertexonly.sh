@@ -17,7 +17,7 @@ RECO2D=larlite_reco2d.root
 unsetup ubdl
 
 echo "<<< SETUP DLLEE_UNIFIED >>>"
-setup dllee_unified v1_0_1 -q e17:prof
+setup dllee_unified v1_0_2 -q e17:prof
 
 # SETUP ENV FOR TAGGER BIN
 export PATH=$LARLITECV_BASEDIR/app/TaggerCROI/bin:$PATH
