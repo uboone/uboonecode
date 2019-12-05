@@ -34,15 +34,31 @@ Contact Taritree (twongj01@tufts.edu or better on slack), if a data type is miss
 
 **WARNING** scripts still need to be finished.
 
-## Example `project.py` xml
+## fcl chain
 
-See `example_project.xml` in this folder.  The key tags are here:
+For data jobs `EXTBNB` and `BNB` data, one can run on Reco 2 files. 
+The fcl chain is:
 
 ```
   <stage name="ssnet">
     <fcl>mcc9_dlreco_driver_data.fcl</fcl>
     <fcl>standard_dlreco_uboone_metadata.fcl</fcl>
     <endscript>rundlreco_bnb_ssnetvertexonly.sh</endscript>
+```
+
+For mc jobs, we want access to simchannels so we can have truth images in the same file.
+However, this means we have to run some `reco2` processes.
+
+The fcl chain for `OVERLAY` and `PURE-MC` samples are:
+
+```
+  <fcl>run_eventweight_microboone_justSplines.fcl</fcl>
+  <fcl>wirecell_detsim_optical_overlay_uboone.fcl</fcl>
+  <fcl>standard_overlay_optical_uboone.fcl</fcl>
+  <fcl>reco_uboone_mcc9_8_driver_overlay_optical.fcl</fcl>
+  <fcl>dlreco2.fcl</fcl>
+  <fcl>dl_driver_overlay.fcl</fcl>
+  <fcl>standard_dlreco_uboone_metadata.fcl</fcl>
 ```
 
 One needs to select a driver fcl file and endscript using the table above.  
