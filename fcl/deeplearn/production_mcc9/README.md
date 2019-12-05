@@ -24,13 +24,13 @@ and then the bash script for running the second stage.
 We specify the driver fcl files and DL reco. script for each type of data.
 Contact Taritree (twongj01@tufts.edu or better on slack), if a data type is missing.
 
-| Data Type    | input stage required     | larsoft driver fcl file       | DL reco. script                           |
-| ------------ | ------------------------ | ----------------------------- | ----------------------------------------- |
-| Overlay MC   | reco1 (needs simchannel) |  mcc9_dlreco_driver_mc.fcl    |  rundlreco_mcoverlay_ssnetvertexonly.sh   |
-| Full MC      | reco1 (needs simchannel) |  mcc9_dlreco_driver_mc.fcl    |  rundlreco_fullmc_ssnetvertexonly.sh      |
-| BNB data     | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl  |  rundlreco_bnb_ssnetvertexonly.sh         |
-| EXT-BNB data | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl  |  rundlreco_extbnb_ssnetvertexonly.sh      |
-| EXT-unbiased | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl  |  rundlreco_extunbiased_ssnetvertexonly.sh |
+| Data Type    | input stage required     | larsoft driver fcl file                   | DL reco. script                           |
+| ------------ | ------------------------ | ----------------------------------------- | ----------------------------------------- |
+| Overlay MC   | reco1 (needs simchannel) |  mcc9_dlreco_driver_overlay_and_mc.fcl    |  rundlreco_mcoverlay_ssnetvertexonly.sh   |
+| Full MC      | reco1 (needs simchannel) |  mcc9_dlreco_driver_overlay_and_mc.fcl    |  rundlreco_fullmc_ssnetvertexonly.sh      |
+| BNB data     | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl              |  rundlreco_bnb_ssnetvertexonly.sh         |
+| EXT-BNB data | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl              |  rundlreco_extbnb_ssnetvertexonly.sh      |
+| EXT-unbiased | reco1 or reco2           |  mcc9_dlreco_driver_data.fcl              |  rundlreco_extunbiased_ssnetvertexonly.sh |
 
 **WARNING** scripts still need to be finished.
 
@@ -57,7 +57,7 @@ The fcl chain for `OVERLAY` and `PURE-MC` samples are:
   <fcl>standard_overlay_optical_uboone.fcl</fcl>
   <fcl>reco_uboone_mcc9_8_driver_overlay_optical.fcl</fcl>
   <fcl>dlreco2.fcl</fcl>
-  <fcl>dl_driver_overlay.fcl</fcl>
+  <fcl>mcc9_dlreco_driver_overlay_and_mc.fcl</fcl>
   <fcl>standard_dlreco_uboone_metadata.fcl</fcl>
 ```
 
