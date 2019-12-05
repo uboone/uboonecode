@@ -1,0 +1,3 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.producers.wiremod: @local::microboone_wiremod_ScaleAngleYZ
