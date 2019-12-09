@@ -21,6 +21,6 @@ physics.producers.generator.FluxCopyMethod: "IFDH"
 outputs.out1.fileName: "%ifb_gen_rhc.root"
 
 # Add beam timing structure to the generation of events
-physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
+#physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
 services.IFDH: {}
