@@ -47,7 +47,7 @@ SHOWER_RECO_DQDS=$SHOWER_MAC_DIR/dqds_mc_xyz.txt
 
 # LARLITE FILES TO MERGE
 # -----------------------
-LARLITE_FILE_LIST="larlite_dlmerged.root larlite_opreco.root larlite_reco2d.root tagger_anaout_larlite.root tracker_reco.root nueid_ll_out_0.root shower_reco_out_0.root"
+LARLITE_FILE_LIST="larlite_dlmerged.root larlite_opreco.root larlite_mcinfo.root larlite_reco2d.root tagger_anaout_larlite.root tracker_reco.root nueid_ll_out_0.root shower_reco_out_0.root"
 #LARLITE_FILE_LIST+=" larlite_wctagger.root"
 
 echo "<<< CONFIGS >>>"
@@ -138,7 +138,7 @@ echo "<<< cleanup excess root files >>>"
 #-rw-r--r-- 1 tmw microboone  14M Oct 24 14:33 out_larsoft.root
 #-rw-r--r-- 1 tmw microboone 173K Oct 24 14:37 shower_reco_out_0.root
 
-rm -f larlite_dlmerged.root larlite_larflow.root larlite_opreco.root larlite_reco2d.root out_larcv_test.root
+rm -f larlite_dlmerged.root larlite_larflow.root larlite_opreco.root larlite_reco2d.root larlite_mcinfo.root out_larcv_test.root
 #rm -f larlite_wctagger.root
 rm -f tagger_anaout_larcv.root tagger_anaout_larlite.root tracker_anaout.root tracker_reco.root vertexana.root vertexout.root
 rm -f shower_reco_out_0.root nueid_lcv_out_0.root nueid_ll_out_0.root lcv_trash.root nueid_ana_0.root
