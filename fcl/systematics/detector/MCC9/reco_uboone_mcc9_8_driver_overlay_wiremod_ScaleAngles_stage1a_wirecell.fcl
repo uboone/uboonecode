@@ -1,0 +1,10 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.reco: [ rns, mchitfinder, @sequence::microboone_reco_data_optical, gaushit, wiremod ]
+
+# run gaushit over nfspl1:gauss wires (before wiremod)
+physics.producers.gaushit.CalDataModuleLabel: "nfspl1:gauss"
+# modify nfspl1:gauss wires
+physics.producers.wiremod.WireInputTag: "nfspl1:gauss"
+
+physics.producers.wiremod: @local::microboone_wiremod_ScaleAngles
