@@ -1,0 +1,2 @@
+#!/bin/sh
+init_gen_common_twostep.sh prodgenie_bnb_nu_uboone.fcl prodgenie_bnb_nu_wirecell_g4_uboone_filtered_CCmuCPiNoPi0.fcl 2000
