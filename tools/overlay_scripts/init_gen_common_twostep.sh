@@ -25,6 +25,6 @@ else
     lar -c local_gen.fcl -T ./first_hist.root -o first.root.temp -n $MY_N_EVENTS
     lar -c $MY_SCND_FCL_FILE -T ./second_hist.root -s first.root.temp -o second.root.temp -n -1
     lar -c standard_overlay_gen_SubRunPOTInEvent.fcl -s second.root.temp -T ./genfile_pot_hist.root -o $MY_OUTPUT_FILE -n -1
-    rm first.root.temp second.root.temp genfile.root.temp
+    rm first.root.temp second.root.temp
 fi
 
