@@ -21,7 +21,7 @@ create_product_variables( uboonecode ${version} )
 set( BASEQUAL e17 )
 set( SQUAL s78 )
 
-create_product_variables( uboone_photon_propagation v01_00_00  )
+create_product_variables( uboone_photon_propagation v01_01_00  )
 create_product_variables( larbatch                  v01_51_12  )
 create_product_variables( cetbuildtools             v7_11_00  )
 create_product_variables( swtrigger                 v02_02_05i )
