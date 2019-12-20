@@ -70,7 +70,7 @@ physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::Geni
 physics.filters.generator.POTSummaryTag: "potinevent:SubRunPOT"
 
 physics.filters.largeant.SimInputFileNames : [ "genfile.root.local" ]
-physics.filters.largeant.MCTruthInputModuleLabels: []
+physics.filters.largeant.MCTruthInputModuleLabels: ["generator::GenieGen"] #not sure this is correct, but otherwise it fails...
 physics.filters.largeant.MCFluxInputModuleLabels: []
 physics.filters.largeant.GTruthInputModuleLabels: []
 physics.filters.largeant.BeamGateInputModuleLabels: []
