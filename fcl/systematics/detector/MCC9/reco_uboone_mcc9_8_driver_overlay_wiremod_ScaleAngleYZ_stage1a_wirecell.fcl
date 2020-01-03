@@ -8,7 +8,9 @@ physics.producers.butcher.nkeep: 9600
 physics.producers.butcher.inRawTag: "dummyrawdigit"
 physics.producers.gaushit.CalDataModuleLabel: "butcher"
 # modify nfspl1:gauss wires
-physics.producers.wiremod.WireInputTag: "nfspl1:gauss"
-physics.producers.wiremod.TickOffset: 2400.
-
 physics.producers.wiremod: @local::microboone_wiremod_ScaleAngleYZ
+physics.producers.wiremod.WireInputTag: "butcher"
+physics.producers.wiremod.TickOffset: 2400.
+physics.producers.wiremod.ApplyOverallScale: true
+physics.producers.wiremod.OverallScale: [200.,200.,200.]
+
