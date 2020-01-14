@@ -16,6 +16,10 @@ fi
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Set up python path.
+
+export PYTHONPATH=$UBUTIL_DIR/python:$PYTHONPATH
+
 # Set experiment environment variables (not set by mrbsetenv, but needed by IFDH).
 
 export EXPERIMENT=uboone
@@ -61,4 +65,8 @@ done
 
 # Done (success).
 
-rm *.root   # Clean up.
+for root in *.root
+do
+  rootstat.py $root > ${root}.rootstat
+  rm $root   # Clean up.
+done
