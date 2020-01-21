@@ -31,9 +31,9 @@ table_fragment_end
 
 product                 version
 larsoft                 v08_41_00
-#ubcv                    v08_40_00
+ubcv                    v08_40_00
 ubcrt                   v08_40_00
-#ublite			v08_40_00
+ublite			v08_40_00
 ubutil                  v08_39_00
 uboonedata              v08_36_01
 genie_xsec              v3_00_04a
@@ -41,33 +41,18 @@ uboone_oslibs           v1_0_0
 cetbuildtools	        v7_14_00	-	only_for_build
 end_product_list
 
-# without ubcv
-qualifier      larsoft        ubcrt          ubutil         uboonedata     genie_xsec              uboone_oslibs
-c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   -nq-           G1810a0211a:k250:e1000  -nq-
-c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    -nq-           G1810a0211a:k250:e1000  -nq-
-c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000  -nq-
-c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000  -nq-
-c7:prof:fg     c7:prof        c7:prof        c7:prof        -nq-           LocalFGNievesQEAndMEC   -nq-
-e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  -nq-           G1810a0211a:k250:e1000  -nq-
-e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   -nq-           G1810a0211a:k250:e1000  -nq-
-e19:debug      e19:debug      e19:debug      e19:debug      -nq-           G1810a0211a:k250:e1000  -nq-
-e19:prof       e19:prof       e19:prof       e19:prof       -nq-           G1810a0211a:k250:e1000  -nq-
-e19:prof:fg    e19:prof       e19:prof       e19:prof       -nq-           LocalFGNievesQEAndMEC   -nq-
+qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
+c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   -nq-           G1810a0211a:k250:e1000  -nq-
+c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    -nq-           G1810a0211a:k250:e1000  -nq-
+c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000  -nq-
+c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000  -nq-
+c7:prof:fg     c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           LocalFGNievesQEAndMEC   -nq-
+e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  -nq-           G1810a0211a:k250:e1000  -nq-
+e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   -nq-           G1810a0211a:k250:e1000  -nq-
+e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      -nq-           G1810a0211a:k250:e1000  -nq-
+e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           G1810a0211a:k250:e1000  -nq-
+e19:prof:fg    e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           LocalFGNievesQEAndMEC   -nq-
 end_qualifier_list
-
-# with ubcv
-#qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
-#c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   c7:py2:debug   -nq-           G1810a0211a:k250:e1000  -nq-
-#c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    c7:py2:prof    -nq-           G1810a0211a:k250:e1000  -nq-
-#c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000  -nq-
-#c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000  -nq-
-#c7:prof:fg     c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           LocalFGNievesQEAndMEC   -nq-
-#e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  e19:py2:debug  -nq-           G1810a0211a:k250:e1000  -nq-
-#e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   e19:py2:prof   -nq-           G1810a0211a:k250:e1000  -nq-
-#e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      -nq-           G1810a0211a:k250:e1000  -nq-
-#e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           G1810a0211a:k250:e1000  -nq-
-#e19:prof:fg    e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           LocalFGNievesQEAndMEC   -nq-
-#end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
 
