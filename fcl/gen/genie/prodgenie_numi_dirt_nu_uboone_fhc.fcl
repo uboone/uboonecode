@@ -1,3 +1,4 @@
+#include "beamspilltimings.fcl"
 #include "prodgenie_common_uboone.fcl"
 
 process_name: GenieGen
@@ -17,6 +18,9 @@ physics.producers.generator.FluxType:           "simple_flux"
 physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/dirt/FHC/" # path to test dirt gsimple files
 physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
+
+# Add beam timing structure to the generation of events
+physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
 #services.Geometry.Name: "microboonev10"
 #services.Geometry.GDML: "microboonev10.gdml"

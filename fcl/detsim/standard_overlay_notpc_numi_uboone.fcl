@@ -1,0 +1,3 @@
+#include "standard_overlay_notpc_uboone.fcl"
+
+physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi

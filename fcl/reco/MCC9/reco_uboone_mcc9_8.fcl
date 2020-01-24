@@ -45,6 +45,8 @@
 #include "UBCRTCosmicFilter.fcl"
 #include "CRTDistanceFilter.fcl"  
 
+#include "microboone_wiremod.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_mcc8_services:
@@ -232,6 +234,10 @@ microboone_reco_mcc8_producers:
   # Hits only
   gaushitTruthMatch:                      @local::standard_mcparticlehitmatching
   trajclusterTruthMatch:                  @local::standard_mcparticlehitmatching
+
+  #Wire Modification
+  wiremod: @local::microboone_wiremod
+
 }
 
 microboone_reco_mcc8_analyzers:

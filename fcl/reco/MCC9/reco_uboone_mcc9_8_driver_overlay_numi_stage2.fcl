@@ -1,52 +1,24 @@
-#include "mchitmodules.fcl"
-#include "mctrutht0matching.fcl"
-#include "reco_uboone_data_mcc9_8_driver_common.fcl"
-#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
+#include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
 
-process_name: OverlayRecoStage2
-
-services.DetectorClocksService.InheritClockConfig:  false
-services.TFileService.fileName: "reco_stage_2_hist.root"
-services.FileCatalogMetadata.fileType: "overlay"
-
-physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
-physics.producers.trajcluster.DoRawDigitAssns: false
-
-physics.producers.trajclusterTruthMatch: @local::standard_mcparticlehitmatching
-physics.producers.trajclusterTruthMatch.OverrideRealData: true
-physics.producers.trajclusterTruthMatch.HitParticleAssociations:                    @local::IndirectHitParticleAssnsTool
-physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
-physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
-
-physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
-
-physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
-physics.ana:                    [ ]
-physics.trigger_paths:          [ reco ]
-physics.end_paths:              [ stream1 ]
-outputs.out1.fileName:          "%ifb_%tc_reco2_numi.root"
-outputs.out1.dataTier:          "reconstructed"
-outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
-
-microboone_tfile_metadata:
-{
-  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
-  GenerateTFileMetadata: [true, true]
-  dataTier:              ["root-tuple", "pandora_debug"]
-  fileFormat:            ["root", "pndr"]
-}
-
-# in bnb gen: 3125. + 1600
-# in bnb reco: 3.57 -- 5.25 
-# offsets       445 -- 525
-# in numi gen: 4687.5+940 + 9600
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.64
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.44
-
-physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+# We use the beam off pandora slice vetos for overlay since everything is in EXT time
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
 
 # flash-matching score preservation module
-physics.producers.flashmatch: @local::FlashMatch_overlay
-# physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
-physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
+physics.producers.flashmatch.BeamWindowStart: 6.00
+physics.producers.flashmatch.BeamWindowEnd:   15.80
+
+# NuMI CRT Veto
+physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOFF
+
+# Overwite PID file location to uboonedata for running on Argonne Machines
+physics.producers.pandoracalipidSCE.BraggAlgo.LikelihoodMapsFile:          '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoracalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandorapidSCE.BraggAlgo.LikelihoodMapsFile:              '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandorapid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pmtrackpid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pmtrackcalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanTrackpid.BraggAlgo.LikelihoodMapsFile:      '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanTrackcalipid.BraggAlgo.LikelihoodMapsFile:  '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanShowerpid.BraggAlgo.LikelihoodMapsFile:     '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanShowercalipid.BraggAlgo.LikelihoodMapsFile: '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'

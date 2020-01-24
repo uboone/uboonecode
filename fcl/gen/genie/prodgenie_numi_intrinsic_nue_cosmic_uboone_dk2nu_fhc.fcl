@@ -1,3 +1,4 @@
+#include "beamspilltimings.fcl"
 #include "prodgenie_common_cosmic_uboone.fcl"
 
 process_name: GenieGen
@@ -12,8 +13,11 @@ physics.producers.generator.RandomTimeOffset:   9600.
 physics.producers.generator.TopVolume:          "volTPCActive"
 physics.producers.generator.GenFlavors:         [12,-12]
 physics.producers.generator.BeamName:           "numi"
-physics.producers.generator.EventGeneratorList: "Default"
+physics.producers.generator.EventGeneratorList: "CCinclMEC"
 physics.producers.generator.FluxType:           "dk2nu"
 physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
+
+# Add beam timing structure to the generation of events
+physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
