@@ -16,6 +16,10 @@ fi
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Set up python path.
+
+export PYTHONPATH=$UBUTIL_DIR/python:$PYTHONPATH
+
 # This script runs the full overlay chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2016_3_14_9_22_21-0005432-00021_20160322T065603_ext_bnb_20160323T041757_merged.root
@@ -37,4 +41,8 @@ done
 
 # Done (success).
 
-rm *.root   # Clean up.
+for root in *.root
+do
+  rootstat.py $root > ${root}.rootstat
+  rm $root   # Clean up.
+done
