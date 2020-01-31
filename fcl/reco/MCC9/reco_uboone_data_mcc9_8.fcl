@@ -490,10 +490,10 @@ microboone_reco_data_producers.trajcluster.HitModuleLabel:                      
 microboone_reco_data_producers.trajcluster.SliceModuleLabel:                                                  "dbcluster3d"
 microboone_reco_data_producers.trajcluster.HitTruthModuleLabel:                                               "NA"
 microboone_reco_data_producers.trajcluster.CalorimetryModuleLabel:                                            "pmtrackcalo"
-microboone_reco_data_producers.trajcluster.TrajClusterAlg.CaloAlg:                                            @local::microboone_calorimetryalgdata
+microboone_reco_data_producers.trajcluster.TrajClusterAlg.CaloAlg:                                            @local::microboone_calorimetryalgmcc84data
 microboone_reco_data_producers.tcshower.CalorimetryModuleLabel:                                               "pmtrackcalo"
 microboone_reco_data_producers.tcshower.TrackModuleLabel:                                                     "trajclusterKalmanTrack"
-microboone_reco_data_producers.tcshower.TCAlg.CalorimetryAlg:                                                 @local::microboone_calorimetryalgdata
+microboone_reco_data_producers.tcshower.TCAlg.CalorimetryAlg:                                                 @local::microboone_calorimetryalgmcc84data
 microboone_reco_data_producers.trajclusterKalmanTrack.inputCollection:                                         "trajcluster"
 microboone_reco_data_producers.trajclusterKalmanTrack.trackFromPF:                                             false
 microboone_reco_data_producers.trajclusterKalmanTrack.showerFromPF:                                            false
