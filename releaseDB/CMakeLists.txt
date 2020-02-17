@@ -15,7 +15,7 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-
+create_product_variables( uboonecode ${version} )
 
 # define qualifiers
 set( BASEQUAL e17 )
@@ -28,6 +28,7 @@ create_product_variables( swtrigger                 v02_02_05i )
 create_product_variables( larlite                   v06_70_00c )
 create_product_variables( larcv                     v06_70_00c )
 create_product_variables( glpk                      v4_65     )
+create_product_variables( geant4reweight            v01_00_03 )
 create_product_variables( wcp                       v00_13_03 )
 create_product_variables( uboone_oslibs             v1_0_0     )
 create_product_variables( uboonedaq_datatypes       v6_22_05a  )
