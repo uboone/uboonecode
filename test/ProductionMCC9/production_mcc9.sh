@@ -8,6 +8,10 @@ env > env.txt
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Set sqlite path.
+
+export FW_SEARCH_PATH=/cvmfs/uboone.osgstorage.org/stash/calibration_databases:$FW_SEARCH_PATH
+
 # Set up python path.
 
 export PYTHONPATH=$UBUTIL_DIR/python:$PYTHONPATH

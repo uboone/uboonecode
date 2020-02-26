@@ -83,6 +83,18 @@ outputs:
  }
 }
 
+services.DetPedestalService.DetPedestalRetrievalAlg.DatabaseRetrievalAlg.UseSQLite: false
+services.ElectronicsCalibService.ElectronicsCalibProvider.DatabaseRetrievalAlg.UseSQLite: false
+services.LightYieldService.LightYieldProvider.DatabaseRetrievalAlg.UseSQLite: false
+services.PmtGainService.PmtGainProvider.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane0.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane1.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane2.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane0.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane1.DatabaseRetrievalAlg.UseSQLite: false
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.UseSQLite: false
+services.UBElectronLifetimeService.ElectronLifetimeProvider.DatabaseRetrievalAlg.UseSQLite: false
+
 physics.producers.generator.SigmaThetaXZ: [ 5.0 ]
 physics.producers.generator.SigmaThetaYZ: [ 5.0 ]
 physics.producers.generator.X0: [ 100.0 ]
