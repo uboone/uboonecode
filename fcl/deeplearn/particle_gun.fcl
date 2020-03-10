@@ -1,0 +1,27 @@
+#include "prodsingle_common_uboone.fcl"
+
+process_name: SinglesGen
+
+outputs.out1.fileName: "prod_1mu_2p_uboone_%tc_gen.root"
+
+physics.producers.generator.PDG: [ 13, 2212, 2212 ] # mu, p, p
+physics.producers.generator.PosDist: 0 # Flat position dist.
+physics.producers.generator.SingleVertex: true #makes sure that all particles produced are at the same vertex
+physics.producers.generator.PadOutVectors: true #make sure that all the vectors are the same length
+physics.producers.generator.ParticleSelectionMode: 0 # ensures that multiple particles are produced
+physics.producers.generator.X0: [ 128.0 ] #central x position per PDG ID
+physics.producers.generator.Y0: [ 0.0 ] #cental y position per PDG ID
+physics.producers.generator.Z0: [ 518.5 ] #central z position per PDG ID
+physics.producers.generator.T0: [ 3925.0] #central time per PDG
+physics.producers.generator.SigmaX: [128.0 ] # variation in x per pdg, uboone x = (0, 256)
+physics.producers.generator.SigmaY: [ 116.5 ] # variation in y per pdg, uboone y = (-116.5, 116.5)
+physics.producers.generator.SigmaZ: [ 518.5] # variation in z per pdg, uboone z = (0, 1037)
+physics.producers.generator.SigmaT: [ 800.0 ] # In time
+physics.producers.generator.PDist: 0 # Flat momentum dist. (0.1-2.0 GeV)
+physics.producers.generator.P0: [2.0, 1.05, 1.05] # bleh
+physics.producers.generator.SigmaP: [2.0, 0.95, 0.95] # bleh
+physics.producers.generator.AngleDist: 0 # Flat angle dist.
+physics.producers.generator.Theta0XZ: [0., 0., 0.] # y-azimuth
+physics.producers.generator.Theta0YZ: [0., 0., 0.] # y-latitude
+physics.producers.generator.SigmaThetaXZ: [180., 180., 180.] #Quasi-isotropic
+physics.producers.generator.SigmaThetaYZ: [90., 90., 90.] #
