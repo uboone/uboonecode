@@ -49,6 +49,12 @@ c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        c2:pr
 e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
+gbf:c2:debug   c2:debug       c2:debug       c2:debug       c2:debug       c2:debug       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+gbf:c2:opt     c2:opt         c2:opt         c2:opt         c2:opt         c2:opt         -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+gbf:c2:prof    c2:prof        c2:prof        c2:prof        c2:prof        c2:prof        -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+gbf:e17:debug  e17:debug      e17:debug      e17:debug      e17:debug      e17:debug      -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+gbf:e17:opt    e17:opt        e17:opt        e17:opt        e17:opt        e17:opt        -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+gbf:e17:prof   e17:prof       e17:prof       e17:prof       e17:prof       e17:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
