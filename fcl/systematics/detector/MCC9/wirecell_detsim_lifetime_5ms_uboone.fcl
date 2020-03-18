@@ -1,0 +1,6 @@
+#include "wirecell_detsim_uboone.fcl"
+
+process_name: DetsimLifetime5ms
+outputs.out1.fileName: "%ifb_%tc_detsim_Lt5ms.root"
+
+physics.producers.driftWC.wcls_main.structs.ElectronLifetime: 5 
