@@ -18,6 +18,7 @@ services.TFileService.fileName: "reco_stage_1a_hist.root"
 #physics.producers.eventweight:  @local::microboone_eventweight
 physics.producers.mchitfinder:  @local::standard_mchitfinder
 physics.producers.mchitfinder.LArG4ModuleName: "driftWC:simpleSC"
+physics.producers.dummyrawdigit: @local::microboone_dummyrawdigit
 
 #overwrite the input wires ...
 physics.producers.gaushit.CalDataModuleLabel: "wiremod"
