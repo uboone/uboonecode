@@ -1,0 +1,44 @@
+#include "time_memory_tracker_microboone.fcl"
+#include "microboone_pmtdoublereadoutfilter.fcl"
+
+process_name: DropDoublePMT
+
+services:
+{ 
+  TimeTracker: @local::microboone_time_tracker
+  MemoryTracker: @local::microboone_memory_tracker
+}
+
+physics:
+{
+
+  producers:
+  {
+    pmtreadout: @local::microboone_pmtdoublereadoutfilter
+  }
+
+  reco:          [ pmtreadout ]
+  trigger_paths: [ reco ]
+  stream1:       [ out1 ]
+  end_paths:     [ stream1 ]
+
+}
+
+outputs:
+{
+  out1:
+  {
+    module_type: RootOutput
+    dataTier: "reconstructed"
+    compressionLevel: 1
+    saveMemoryObjectThreshold: 0
+    fileName: "%ifb_drop_double_pmt.root"
+
+    # drop the double-pmt readout dataproduct, to not confuse downstream code
+    outputCommands: [ 
+        "keep *",
+        "drop raw::OpDetWaveforms_pmtreadout_OpdetBeamHighGain_Swizzler"
+    ]
+  }
+}
+
