@@ -2,5 +2,5 @@
 
 process_name: OverlayWireModRecoStage1aDLreco
 
-physics.producers.wiremod: @local::microboone_wiremod_ScaledEdx
+physics.producers.wiremod: @local::microboone_wiremod_ScaledEdX
 physics.producers.wiremod.WireInputTag: "butcher::OverlayStage1a"
