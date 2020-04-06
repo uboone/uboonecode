@@ -44,7 +44,7 @@ ProcessDriver: {
       LArSimChProducer:    "driftWC simpleSC"
       Origin: 1
       TimeOffset: 2400
-      TickBackward: true
+      TickBackward: false
     }
     SuperaInstanceImage: {
       Verbosity: 0
@@ -58,6 +58,7 @@ ProcessDriver: {
       ChStatusProducer:     "wiremc"
       Origin: 0
       TimeOffset: 2400
+      TickBackward: false
     }
     SuperaMCROI: {
       Verbosity: 2
@@ -79,6 +80,7 @@ ProcessDriver: {
       TrackDepEMin:   20
       FilterROIMinRows: 0
       FilterROIMinCols: 0
+      TickBackward: false
       MCParticleTree: {
         Verbosity:    2
         UseG4Primary: false
@@ -99,7 +101,7 @@ ProcessDriver: {
       OutImageLabel:    "wiremc"
       LArWireProducer:  "butcher"
       TimeOffset: 2400
-      TickBackward: true
+      TickBackward: false
     }
     SuperaChStatus: {
       Verbosity: 2
@@ -116,7 +118,7 @@ ProcessDriver: {
       ChStatusProducer:    "wiremc"
       LArSimChProducer:    "driftWC simpleSC"
       EdepAtAnode: true
-      TickBackward: true
+      TickBackward: false
     }
   }
 }
