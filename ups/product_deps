@@ -30,12 +30,12 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v08_05_00_11
-ubcv                    v08_00_00_38
-ubcrt                   v08_00_00_38
-ublite			v08_00_00_38
-ubutil                  v08_00_00_38
-uboonedata              v08_00_00_38
+larsoft                 v08_05_00_12
+ubcv                    v08_00_00_39
+ubcrt                   v08_00_00_39
+ublite			v08_00_00_39
+ubutil                  v08_00_00_39
+uboonedata              v08_00_00_39
 genie_xsec              v3_00_04a
 genie_phyopt            v3_00_04
 uboone_oslibs           v1_0_0
