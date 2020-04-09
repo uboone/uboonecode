@@ -9,5 +9,6 @@ add_subdirectory(filter)
 add_subdirectory(systematics)
 add_subdirectory(deeplearn)
 add_subdirectory(crt)
+add_subdirectory(cv)
 
 install_fhicl()
