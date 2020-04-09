@@ -1,0 +1,6 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+process_name: OverlayWireModRecoStage1aDLreco
+
+physics.producers.wiremod: @local::microboone_wiremod_ScaleAngleXZ
+physics.producers.wiremod.WireInputTag: "butcher::OverlayStage1a"
