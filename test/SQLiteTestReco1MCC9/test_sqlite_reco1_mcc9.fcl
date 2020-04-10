@@ -4,15 +4,11 @@ process_name: DataRecoStage1Test
 
 services.PmtGainService.PmtGainProvider.DatabaseRetrievalAlg.TestMode: true
 
-services.CRTChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.TestMode: true
-
 services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.TestMode: true
 
 services.DetPedestalService.DetPedestalRetrievalAlg.DatabaseRetrievalAlg.TestMode: true
 
 services.ElectronicsCalibService.ElectronicsCalibProvider.DatabaseRetrievalAlg.TestMode: true
-
-services.LightYieldService.LightYieldProvider.DatabaseRetrievalAlg.TestMode: true
 
 services.TPCEnergyCalibService.TPCEnergyCalibProvider.XNormCorrectionProvider.DatabaseRetrievalAlg.TestMode: true
 
