@@ -11,13 +11,13 @@ physics.producers.flashmatch.BeamWindowEnd:   15.44
 physics.filters.crtveto: @local::UBCRTCosmicFilterNuMION
 
 # Overwite PID file location to uboonedata for running on Argonne Machines
-physics.producers.pandoracalipidSCE.BraggAlgo.LikelihoodMapsFile:          '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandoracalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandorapidSCE.BraggAlgo.LikelihoodMapsFile:              '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandorapid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pmtrackpid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pmtrackcalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandoraKalmanTrackpid.BraggAlgo.LikelihoodMapsFile:      '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandoraKalmanTrackcalipid.BraggAlgo.LikelihoodMapsFile:  '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandoraKalmanShowerpid.BraggAlgo.LikelihoodMapsFile:     '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
-physics.producers.pandoraKalmanShowercalipid.BraggAlgo.LikelihoodMapsFile: '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoracalipidSCE.BraggAlgo.LikelihoodMapsFile:          '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoracalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandorapidSCE.BraggAlgo.LikelihoodMapsFile:              '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandorapid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pmtrackpid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pmtrackcalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoraKalmanTrackpid.BraggAlgo.LikelihoodMapsFile:      '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoraKalmanTrackcalipid.BraggAlgo.LikelihoodMapsFile:  '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoraKalmanShowerpid.BraggAlgo.LikelihoodMapsFile:     '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+#physics.producers.pandoraKalmanShowercalipid.BraggAlgo.LikelihoodMapsFile: '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'

@@ -16,4 +16,4 @@ physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
 # Add beam timing structure to the generation of events
-physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
+#physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default

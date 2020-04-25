@@ -4,3 +4,6 @@
 
 # Add the lines necessary for a NuMI analysis.
 physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi
+
+physics.filters.swtrigger.OpDataModule: "mixer"
+physics.filters.swtrigger.DAQHeaderModule: "mixer"
