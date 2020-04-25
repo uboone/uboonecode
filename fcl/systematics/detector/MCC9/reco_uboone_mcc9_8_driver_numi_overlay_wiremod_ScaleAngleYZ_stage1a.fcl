@@ -1,0 +1,4 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.producers.wiremod: @local::microboone_wiremod_ScaleAngleYZ
+physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]

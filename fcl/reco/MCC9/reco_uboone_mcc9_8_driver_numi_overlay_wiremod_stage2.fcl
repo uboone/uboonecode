@@ -1,0 +1,14 @@
+#include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
+
+process_name: OverlayWireModRecoStage2
+
+physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+physics.producers.pandora.SliceIdTool.HasMCNeutrino: false
+
+# We use the beam off pandora slice vetos for overlay since everything is in EXT time
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
+
+# flash-matching score preservation module
+physics.producers.flashmatch.BeamWindowStart: 6.00
+physics.producers.flashmatch.BeamWindowEnd:   15.80
