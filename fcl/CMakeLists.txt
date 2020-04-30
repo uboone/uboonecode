@@ -10,5 +10,6 @@ add_subdirectory(systematics)
 add_subdirectory(deeplearn)
 add_subdirectory(crt)
 add_subdirectory(cv)
+add_subdirectory(fake_data)
 
 install_fhicl()
