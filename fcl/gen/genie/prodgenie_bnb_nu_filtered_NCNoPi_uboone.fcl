@@ -1,0 +1,23 @@
+#include "prodgenie_common_uboone_Filtered.fcl"
+
+process_name: GenieGenFiltered
+
+outputs.out1.fileName: "prodgenie_bnb_nu_filtered_NCNoPi_uboone_%tc_gen.root"
+
+source.maxEvents: 900
+
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName: "booster"
+
+physics.filters.finalstatefilter.IsVerbose: false
+physics.filters.finalstatefilter.isInclusive: true
+physics.filters.finalstatefilter.PDG: [13, -13, 11, -11, 111, 211, -211]
+physics.filters.finalstatefilter.PDGCount: [0, 0, 0, 0, 0, 0, 0]
+physics.filters.finalstatefilter.PDGCountExclusivity: [true, true, true, true, true, true, true]
+
+physics.filters.neutrinofilter.EMin: 0.9
+
+physics.simulate: [ @sequence::physics.simulate, "neutrinofilter" ]
