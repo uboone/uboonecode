@@ -44,7 +44,7 @@ create_product_variables( ubraw                     v08_00_00_42  )
 create_product_variables( ubcore                    v08_00_00_42  )
 create_product_variables( ubcrt                     v08_00_00_42  )
 create_product_variables( ubobj                     v08_00_00_36  )
-create_product_variables( larsoft                   v08_05_00_13  )
+create_product_variables( larsoft                   v08_05_00_14  )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
