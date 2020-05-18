@@ -1,0 +1,39 @@
+#include "prodgenie_common_uboone_Filtered.fcl"
+
+process_name: GenieGenFiltered
+
+outputs.out1.fileName: "prodgenie_bnb_nu_filtered_NCcPiNoPi0_uboone_%tc_gen.root"
+
+source.maxEvents: 900
+
+physics.producers.generator: @local::microboone_genie_simple
+physics.producers.generator.GlobalTimeOffset: 3125.
+physics.producers.generator.RandomTimeOffset: 1600.
+physics.producers.generator.TopVolume: "volTPCActive"
+physics.producers.generator.BeamName: "booster"
+
+physics.filters.finalstatefilterNCpip: @local::microboone_finalstateselectfilter
+physics.filters.finalstatefilterNCpim: @local::microboone_finalstateselectfilter
+
+physics.filters.finalstatefilterNCpip.IsVerbose: false
+physics.filters.finalstatefilterNCpip.isInclusive: true
+physics.filters.finalstatefilterNCpip.PDG: [13, -13, 11, -11, 111, 211]
+physics.filters.finalstatefilterNCpip.PDGCount: [0, 0, 0, 0, 0, 1]
+physics.filters.finalstatefilterNCpip.PDGCountExclusivity: [true, true, true, true, true, true]
+
+physics.filters.finalstatefilterNCpim.IsVerbose: false
+physics.filters.finalstatefilterNCpim.isInclusive: true
+physics.filters.finalstatefilterNCpim.PDG: [13, -13, 11, -11, 111, -211]
+physics.filters.finalstatefilterNCpim.PDGCount: [0, 0, 0, 0, 0, 1]
+physics.filters.finalstatefilterNCpim.PDGCountExclusivity: [true, true, true, true, true, true]
+
+physics.pathfilterNCpip: [ rns, generator, finalstatefilterNCpip ]
+physics.pathfilterNCpim: [ rns, generator, finalstatefilterNCpim ] # art is smart and won't run the generator twice!
+
+physics.trigger_paths: [ pathfilterNCpip, pathfilterNCpim ]
+
+outputs.out1.SelectEvents: [ pathfilterNCpip, pathfilterNCpim ]
+
+physics.simulate: @erase
+physics.filters.finalstatefilter: @erase
+physics.filters.neutrinofilter: @erase
