@@ -17,6 +17,7 @@
 #include "lardata/RecoObjects/SurfXYZPlane.h"
 #include "lardata/RecoObjects/InteractPlane.h"
 #include "lardata/RecoObjects/InteractGeneral.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "TMath.h"
 
@@ -56,9 +57,9 @@ namespace trkf
     }
 
     // Make InteractPlane and InteractGenreal interactors to compare.
-
-    const trkf::Interactor* int1 = new trkf::InteractPlane(10.);
-    const trkf::Interactor* int2 = new trkf::InteractGeneral(10.);
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService>()->DataForJob();
+    const trkf::Interactor* int1 = new trkf::InteractPlane(detProp, 10.);
+    const trkf::Interactor* int2 = new trkf::InteractGeneral(detProp, 10.);
 
     // Make some random surfaces and tracks.
 

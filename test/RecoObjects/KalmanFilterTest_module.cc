@@ -13,6 +13,7 @@
 
 #include "larcore/Geometry/Geometry.h"
 
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/RecoObjects/KHitWireX.h"
 #include "lardata/RecoObjects/SurfYZPlane.h"
 #include "lardata/RecoObjects/PropYZPlane.h"
@@ -79,7 +80,8 @@ namespace trkf
     err(4, 4) = 10.;
     KETrack tre(psurf, vec, err, trkf::Surface::FORWARD, 13);
 
-    PropYZPlane prop(100., true);
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService>()->DataForJob();
+    PropYZPlane prop(detProp, 100., true);
 
     // Make some test measurements.
 
@@ -101,8 +103,8 @@ namespace trkf
       // Propagate track to measurement surface.
 
       KETrack treprop(tre);
-      boost::optional<double> ok = prop.vec_prop(treprop, hit.getMeasSurface(), trkf::Propagator::UNKNOWN, false);
-      assert(!!ok);
+      auto ok = prop.vec_prop(treprop, hit.getMeasSurface(), trkf::Propagator::UNKNOWN, false);
+      assert(ok);
       double x = treprop.getVector()(0);
       phits.push_back(std::shared_ptr<const trkf::KHitBase>(new KHitWireX(wireid, x, 0.1)));
     }
@@ -131,7 +133,7 @@ namespace trkf
       std::cout << "\nMeasurement " << i << std::endl;
       std::cout << "Original track:" << std::endl;
       std::cout << tre2;
-      hit.predict(tre2, &prop);
+      hit.predict(tre2, prop);
       std::cout << "Hit after prediction:" << std::endl;
       std::cout << hit << std::endl;
       hit.update(tre2);
@@ -151,7 +153,7 @@ namespace trkf
       std::shared_ptr<const KHitBase>& phit = phits[i];
       mhit.addMeas(phit);
     }
-    mhit.predict(tre3, &prop);
+    mhit.predict(tre3, prop);
     mhit.update(tre3);
     std::cout << "Track after update:" << std::endl;
     std::cout << tre3 << std::endl;
@@ -159,7 +161,7 @@ namespace trkf
     // Try again.
 
     tre3.setError(err2);
-    mhit.predict(tre3, &prop);
+    mhit.predict(tre3, prop);
     mhit.update(tre3);
     std::cout << "Track after second update:" << std::endl;
     std::cout << tre3 << std::endl;
@@ -167,7 +169,7 @@ namespace trkf
     // Try again.
 
     tre3.setError(err2);
-    mhit.predict(tre3, &prop);
+    mhit.predict(tre3, prop);
     mhit.update(tre3);
     std::cout << "Track after third update:" << std::endl;
     std::cout << tre3 << std::endl;
