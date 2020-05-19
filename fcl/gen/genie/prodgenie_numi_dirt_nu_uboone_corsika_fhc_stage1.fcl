@@ -158,3 +158,6 @@ physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
 # Add beam timing structure to the generation of events
 #physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
+
+# Update the cut on the simphoton time. Use conservative time equal to the software trigger window.
+physics.filters.TimeFilter.TimeWindows: [ [4687.5, 16406.25] ]
