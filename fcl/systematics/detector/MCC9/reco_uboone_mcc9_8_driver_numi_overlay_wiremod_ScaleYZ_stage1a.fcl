@@ -2,3 +2,11 @@
 
 physics.producers.wiremod: @local::microboone_wiremod_ScaleYZ
 physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]
+
+physics.producers.wiremod.SplinesFileName: "out_splines_Run3_CVMC_YZ2D_nhitsplanebins_nowgt.root"
+physics.producers.wiremod.Graph2DNames_Charge_YZ: ["hit_Q_trk_yz_spline_Plane0_Run3CVMCRatio",
+                         "hit_Q_trk_yz_spline_Plane1_Run3CVMCRatio",
+                         "hit_Q_trk_yz_spline_Plane2_Run3CVMCRatio"]
+physics.producers.wiremod.Graph2DNames_Sigma_YZ:  ["hit_sigma_trk_yz_spline_Plane0_Run3CVMCRatio",
+                         "hit_sigma_trk_yz_spline_Plane1_Run3CVMCRatio",
+                         "hit_sigma_trk_yz_spline_Plane2_Run3CVMCRatio"]
