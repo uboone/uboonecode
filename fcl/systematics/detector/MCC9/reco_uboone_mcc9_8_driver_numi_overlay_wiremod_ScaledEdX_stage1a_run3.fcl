@@ -3,7 +3,7 @@
 physics.producers.wiremod: @local::microboone_wiremod_ScaledEdX
 physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]
 
-physics.producers.wiremod.SplinesFileName: "dEdx_splines_extrapolated_to_one.root"
+physics.producers.wiremod.SplinesFileName: "dEdx_splines_for_Run3_numi.root"
 physics.producers.wiremod.SplineNames_Charge_dEdX: ["spline_dEdx_hit_Q_plane_0",
                          "spline_dEdx_hit_Q_plane_1",
                          "spline_dEdx_hit_Q_plane_2"]
