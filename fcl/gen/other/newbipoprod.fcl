@@ -39,15 +39,16 @@ outputs: {
 physics: {
 
   producers : {
+    generator: @local::microboone_singlep
+    largeant: @local::microboone_largeant
+    ionization: @local::microboone_siminfomixer
   }
 
   analyzers: {
   }
 
   filters : {
-    generator: @local::microboone_singlep
-    largeant: @local::microboone_largeant
-    ionization: @local::microboone_siminfomixer
+
   }
 
   mixer_path : [ generator, largeant, ionization ]

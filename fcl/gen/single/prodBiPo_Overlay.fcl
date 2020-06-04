@@ -1,10 +1,10 @@
 #include "services_microboone.fcl"
-#include "newbipoprod.fcl"
+#include "singles_microboone.fcl"
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
-process_name: MuCSMCGen
+process_name: BiPoMCGen
 
 services:
 {
@@ -35,7 +35,7 @@ physics:
 
  producers:
  {
-   generator: @local::microboone_ACPTtrigMCGen
+   generator: @local::microboone_singlep
 
    # same as wirecell_g4_uboone.fcl [START]
    largeant: @local::microboone_largeant
@@ -56,16 +56,10 @@ physics:
 
 filters:
 {
-acptfilter: {
-           module_type: "ACPTtrigMCFilter"
-           MCPproducer: "largeant"
-           #TrkLen:      10. # this isn't configured to work
-           CheckAnode:   true
-           CheckCathode: true
-           }
+
 }
 
- simulate: [ rns, generator, largeant, acptfilter, ionization, mcreco ]#, stopmufilter ] 
+ simulate: [ rns, generator, largeant, ionization, mcreco ]#, stopmufilter ] 
  stream1:  [ out1 ]
  trigger_paths: [simulate] 
  end_paths:     [stream1]  
@@ -81,7 +75,7 @@ outputs:
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
    fastCloning: false
-   SelectEvents: [simulate]
+   SelectEvents: []
  }
 }
 
@@ -91,12 +85,6 @@ services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 
 # Switching to the "drift" for SimChannels
 #physics.producers.mcreco.G4ModName:                   "drift"
-
-physics.producers.generator.TopLayerDims:    [-2100,2356,300,300,-2550,3586] # top box edges [cm]
-physics.producers.generator.BottomLayerDims: [-2075,2331,230,230,-2525,3561] # bottom box edges [cm]
-physics.producers.generator.CRYConfigStr: "date 1-1-2016 returnGammas 0 returnElectrons 0 returnMuons 1 returnPions 0 returnNeutrons 0 returnProtons 0 latitude 41.8 subboxLength 40.8 altitude 0"
-
-physics.producers.generator.EnergyThresholdHigh: 100.0
 
 physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
 
@@ -109,3 +97,32 @@ services.SpaceCharge.EnableSimSpatialSCE:          true
 services.SpaceCharge.EnableSimEfieldSCE:           true
 services.DetectorClocksService.InheritClockConfig: false
 
+physics.producers.generator.PDG: [11, 1000020040]
+#physics.producers.generator.PDG: [2212, 2212]
+#physics.producers.generator.P0: [  0.310, 0.310 ]
+physics.producers.generator.P0: [  0.003746, 0.2396 ]
+physics.producers.generator.SigmaP: [ 0, 0 ]
+physics.producers.generator.PDist: 0
+physics.producers.generator.X0: [128.0, 128.0]
+physics.producers.generator.Y0: [0, 0]
+physics.producers.generator.Z0: [600, 600]
+physics.producers.generator.T0: [3925, 168225]
+#physics.producers.generator.T0: [0, 0]
+physics.producers.generator.SigmaX: [0, 0]
+physics.producers.generator.SigmaY: [0, 0]
+physics.producers.generator.SigmaZ: [0, 0]
+physics.producers.generator.SigmaT: [0, 0]
+physics.producers.generator.PosDist: 0
+physics.producers.generator.Theta0XZ: [0, 0]
+physics.producers.generator.Theta0YZ: [0, 0]
+physics.producers.generator.SigmaThetaXZ: [0, 0]
+physics.producers.generator.SigmaThetaYZ: [0, 0]
+physics.producers.generator.AngleDist: 0
+#physics.producers.daq.NoiseFact: 0
+#services.LArG4Parameters.EnabledPhysics: [ "Em", "Ion", "NeutronHP", "Decay", "Stopping" ]
+#services.LArG4Parameters.EnabledPhysics: [ "Em", "Ion", "Decay", "Stopping" ]
+#services.LArG4Parameters.UseCustomPhysics: true
+#services.LArG4Parameters.KeepEMShowerDaughters: true
+#services.LArG4Parameters.ParticleKineticEnergyCut: 0.00001
+#services.LArG4Parameters.VisualizeNeutrals: true
+#services.LArG4Parameters.VisualizationEnergyCut: 0.00001
