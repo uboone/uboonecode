@@ -18,6 +18,7 @@
 #include "lardata/RecoObjects/SurfYZPlane.h"
 #include "lardata/RecoObjects/SurfXYZPlane.h"
 #include "lardata/RecoObjects/PropAny.h"
+#include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 
 #include "nurandom/RandomUtils/NuRandomService.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -57,8 +58,8 @@ namespace trkf
     }
     
     // Make a PropAny propagate to test.
-
-    const trkf::Propagator* prop = new trkf::PropAny(10., true);
+    auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService>()->DataForJob();
+    const trkf::Propagator* prop = new trkf::PropAny(detProp, 10., true);
 
     // Make some random surfaces.
     // Also make initial tracks.
@@ -171,8 +172,7 @@ namespace trkf
 	// destination surface.
 
 	trkf::KETrack trk2 = trk1;
-	boost::optional<double> dist12 = prop->err_prop(trk2, psurf2,
-							trkf::Propagator::UNKNOWN, false);
+        auto dist12 = prop->err_prop(trk2, psurf2, trkf::Propagator::UNKNOWN, false);
 	if(!!dist12)
 	  std::cout << "Propagation distance = " << *dist12 << std::endl;
 	else
@@ -234,9 +234,9 @@ namespace trkf
 
 	trkf::TrackMatrix pm(vec1.size(), vec1.size());
 	trkf::KTrack trk10 = trk1;
-	boost::optional<double> stat =
+        auto stat =
 	  prop->vec_prop(trk10, psurf2, trkf::Propagator::UNKNOWN, false, &pm, 0);
-	assert(!!stat);
+        assert(stat);
 
 	double small = 1.e-5;
 
@@ -249,19 +249,19 @@ namespace trkf
 	    trkf::TrackVector vec1a = vec1;
 	    vec1a(j) = vec1(j) - small;
 	    trk1a.setVector(vec1a);
-	    boost::optional<double> stata = prop->vec_prop(trk1a, psurf2,
+            auto stata = prop->vec_prop(trk1a, psurf2,
 							   trkf::Propagator::UNKNOWN,
 							   false, 0, 0);
-	    assert(!!stata);
+            assert(stata);
 
 	    trkf::KTrack trk1b = trk1;
 	    trkf::TrackVector vec1b = vec1;
 	    vec1b(j) = vec1(j) + small;
 	    trk1b.setVector(vec1b);
-	    boost::optional<double> statb = prop->vec_prop(trk1b, psurf2,
+            auto statb = prop->vec_prop(trk1b, psurf2,
 							   trkf::Propagator::UNKNOWN,
 							   false, 0, 0);
-	    assert(!!statb);
+            assert(statb);
 
 	    // Compare numerical and analytic partial derivative.
 
@@ -273,9 +273,9 @@ namespace trkf
 
 	// Now propagate back to the original surface.
 
-	boost::optional<double> dist21 = prop->err_prop(trk2, psurf1, trkf::Propagator::UNKNOWN,
+        auto dist21 = prop->err_prop(trk2, psurf1, trkf::Propagator::UNKNOWN,
 							false);
-	assert(!!dist21);
+        assert(dist21);
 	assert(std::abs(dist - std::abs(*dist21)) <= 1.e-10 * std::max(1., dist));
 
 	// Check that state vector and error matrix returned to the original.
