@@ -84,9 +84,7 @@ if( ${VMAJ} LESS 3 )
   add_definitions(-DGENIE_PRE_R3)
 
   # GENIE v2 library list
-  set(GENIE_LIB_LIST  ${GALGORITHM}
-                    ${GBARYONRESONANCE}
-                    ${GBASE}
+  set(GENIE_LIB_LIST  ${GBARYONRESONANCE}
                     ${GBODEKYANG}
                     ${GCHARM}
                     ${GCOH}
@@ -96,20 +94,14 @@ if( ${VMAJ} LESS 3 )
                     ${GDECAY}
                     ${GELAS}
                     ${GELFF}
-                    ${GHEP}
-                    ${GEVGCORE}
                     ${GEVGMODULES}
-                    ${GEVGDRIVERS}
                     ${GGIBUU}
                     ${GHADRONTRANSP}
                     ${GFRAGMENTATION}
-                    ${GINTERACTION}
                     ${GLLEWELLYNSMITH}
                     ${GMEC}
-                    ${GMESSENGER}
                     ${GNUGAMMA}
                     ${GNUE}
-                    ${GNTUPLE}
                     ${GNUCLEAR}
                     ${GNUMERICAL}
                     ${GQPM}
@@ -119,9 +111,7 @@ if( ${VMAJ} LESS 3 )
                     ${GRES}
                     ${GREGISTRY}
                     ${GREINSEHGAL}
-                    ${GUTILS}
                     ${GGEO}
-                    ${GFLUXDRIVERS}
                     ${GMUELOSS}
                     ${GREWEIGHT}
                     ${GNUCLEONDECAY} )
