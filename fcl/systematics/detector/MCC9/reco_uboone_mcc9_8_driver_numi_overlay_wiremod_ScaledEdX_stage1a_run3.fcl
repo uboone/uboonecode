@@ -1,0 +1,12 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.producers.wiremod: @local::microboone_wiremod_ScaledEdX
+physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]
+
+physics.producers.wiremod.SplinesFileName: "dEdx_splines_for_Run3_numi.root"
+physics.producers.wiremod.SplineNames_Charge_dEdX: ["spline_dEdx_hit_Q_plane_0",
+                         "spline_dEdx_hit_Q_plane_1",
+                         "spline_dEdx_hit_Q_plane_2"]
+physics.producers.wiremod.SplineNames_Sigma_dEdX:  ["spline_dEdx_hit_sigma_plane_0",
+                         "spline_dEdx_hit_sigma_plane_1",
+                         "spline_dEdx_hit_sigma_plane_2"]

@@ -345,7 +345,8 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
                                          tcshower
                                        ]
 
-microboone_reco_data_crt:              [ crthitcorr,
+microboone_reco_data_crt:              [ crtt0Correction,
+                                         crthitcorr,
                                          crttzero,
                                          crttrack,
                                          crttrackmatch,

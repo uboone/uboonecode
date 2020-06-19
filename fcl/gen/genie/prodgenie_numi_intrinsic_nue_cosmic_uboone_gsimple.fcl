@@ -14,4 +14,4 @@ physics.producers.generator.GenFlavors: [12,-12]
 physics.producers.generator.BeamName: "numi"
 
 # Add beam timing structure to the generation of events
-physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
+#physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default

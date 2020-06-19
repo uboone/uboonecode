@@ -2,3 +2,6 @@
 
 physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonnumi
 physics.filters.opfiltercommon.OpHitProducer: "ophitBeam"
+
+physics.filters.opfiltercommon.VetoStartTick: 170
+physics.filters.opfiltercommon.VetoEndTick: 300

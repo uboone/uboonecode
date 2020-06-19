@@ -1,3 +1,8 @@
 #include "reco_uboone_mcc9_8_driver_overlay_optical.fcl"
 
-physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonext
+physics.filters.opfiltercommon: @local::physics.filters.opfiltercommonextnumi
+physics.filters.opfiltercommon.OpHitProducer: "ophitBeam"
+
+# This is only for numi production (which uses wrongly configured values for the michel veto)
+physics.filters.opfiltercommon.VetoStartTick: 193
+physics.filters.opfiltercommon.VetoEndTick: 323
