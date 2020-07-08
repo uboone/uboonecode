@@ -87,7 +87,8 @@ outputs:
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
    fastCloning: false
-   outputCommands: [ "keep *_*_*_*", "drop optdata::ChannelDataGroup_*_*_*", "drop raw::RawDigits_driftWC_orig_*" ]
+   outputCommands: [ "keep *_*_*_*", "drop optdata::ChannelDataGroup_*_*_*" ]
+   # "drop raw::RawDigits_driftWC_orig_*"
  }
 }
 

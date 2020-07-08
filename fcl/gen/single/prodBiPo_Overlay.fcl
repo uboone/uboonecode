@@ -98,8 +98,6 @@ services.SpaceCharge.EnableSimEfieldSCE:           true
 services.DetectorClocksService.InheritClockConfig: false
 
 physics.producers.generator.PDG: [11, 1000020040]
-#physics.producers.generator.PDG: [2212, 2212]
-#physics.producers.generator.P0: [  0.310, 0.310 ]
 physics.producers.generator.P0: [  0.003746, 0.2396 ]
 physics.producers.generator.SigmaP: [ 0, 0 ]
 physics.producers.generator.PDist: 0
