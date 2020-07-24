@@ -8,14 +8,20 @@ gROOT.ForceStyle()
 # ROOT files with histograms
 snfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/19021/spectra/SNRun19021_960files3planes_SNMichelAna_hist_v6samxrd.root")
 
-#extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v6.root")
-#extunbname = "Trigger stream"
-#extunbcolor = 2 # Red
-#extunbcolor_errors = 46 # Reddish
-extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v6a.root")
-extunbname = "Trigger stream + ZS"
-extunbcolor = 3 # Green
-extunbcolor_errors = 30 # Greenish
+# Choose files with ZS emulation
+doZS = True 
+#doZS = False
+
+if not doZS:
+    extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_hist_v6.root")
+    extunbname = "Trigger stream     " # Extra blankspace to match the "+ ZS" below
+    extunbcolor = 2 # Red
+    extunbcolor_errors = 46 # Reddish
+else:
+    extunbfile = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/EXTUNB/spectra/Run3_25kfiles3planes_SNMichelAna_ZS_hist_v6a.root")
+    extunbname = "Trigger stream + ZS"
+    extunbcolor = 3 # Green
+    extunbcolor_errors = 30 # Greenish
 
 #extunbfile_emu = TFile("/home/jcrespo/MicroBooNE/SNAnalysis/Emulation/my_HitMultiplicity_IntegralCollaborationMeetingAllEvents.root")
 extunbfile_emu = None
@@ -221,6 +227,9 @@ for snh in snhlist:
     extunbh_errors.GetYaxis().SetRangeUser( 0.001, 
         1.1*extunbh_errors.GetMaximum() if ( extunbh_errors.GetMaximum() > snh.GetMaximum() ) else 1.1*snh.GetMaximum()  )
     #extunbh_errors.GetYaxis().SetLabelSize( (1. - frontierpad)*extunbh_errors.GetYaxis().GetLabelSize() )
+    extunbh_errors.GetYaxis().SetLabelSize( 1.25*extunbh_errors.GetYaxis().GetLabelSize() ) # 25% bigger font
+    extunbh_errors.GetXaxis().SetLabelSize( 1.25*extunbh_errors.GetXaxis().GetLabelSize() ) # 25% bigger font
+    extunbh_errors.GetYaxis().SetTitleOffset( 1.10*extunbh_errors.GetYaxis().GetTitleOffset() )
     extunbh.Draw("hist same") # Central value line
     #extunbh.DrawNormalized("hist same") # Central value line
 
@@ -379,7 +388,7 @@ for snh in snhlist:
         tx = TLatex()
         tx.SetTextSize(0.04)
         tx.SetTextAlign(11) # Bottom left adjusted
-        tx.DrawTextNDC( 0.15, 0.95, "%s" % plotlabel )
+        tx.DrawTextNDC( 0.15, 0.97, "%s" % plotlabel )
 
     if (extunbh.GetName().startswith("extunb_hgSpectrum") 
         or extunbh.GetName().startswith("extunb_heHitMult") or extunbh.GetName().startswith("extunb_hgHitMult") 
@@ -413,7 +422,12 @@ for snh in snhlist:
         hratio.Divide(extunbh)
             
         hratio.GetYaxis().SetTitle("SN/Trigger")
-        hratio.GetYaxis().SetRangeUser(0., 1.999)
+        hratio.GetYaxis().SetRangeUser(0.0, 1.999)
+        # if (extunbh.GetName().startswith("extunb_heHitSpectrum") or extunbh.GetName().startswith("extunb_hgHitSpectrum") 
+        #     or extunbh.GetName().startswith("extunb_htotHitSpectrum")):
+        #     hratio.GetYaxis().SetRangeUser(0.0, 1.499)
+        # else:
+        #     hratio.GetYaxis().SetRangeUser(0.5, 1.499)
         hratio.GetYaxis().SetNdivisions(505)
         hratio.GetYaxis().SetLabelSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetYaxis().GetLabelSize() )
         hratio.GetYaxis().SetTitleSize( ((1. - frontierpad)/frontierpad)*extunbh_errors.GetYaxis().GetTitleSize() )
