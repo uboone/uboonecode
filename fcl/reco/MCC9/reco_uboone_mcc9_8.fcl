@@ -333,10 +333,10 @@ microboone_reco_mcc8_producers.gaushit.MaxMultiHit:                             
 microboone_reco_mcc8_producers.gaushit.TryNplus1Fits:                                                          false
 microboone_reco_mcc8_producers.gaushit.Chi2NDF:                                                                50.
 
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                      2.9
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                      2.6
-microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      3.5
-
+microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                      0.84
+microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                      0.75
+microboone_reco_mcc8_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                      1.01
+#Standard thresholds: 2.9, 2.6, 3.5
 
 # calorimetry constants
 microboone_reco_mcc8_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                                          [4.08e-3,3.97e-3,4.08e-3]
