@@ -3,7 +3,6 @@
 physics.producers.wiremod: @local::microboone_wiremod_ScaleYZ
 physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]
 physics.producers.wiremod.ApplyAdditionalTickOffset: true
-physics.producers.wiremod.UseTruthInfo: true
 
 physics.producers.wiremod.SplinesFileName: "out_splines_Run1_CVMC_YZ2D_nhitsplanebins_nowgt_numi.root"
 physics.producers.wiremod.Graph2DNames_Charge_YZ: ["hit_Q_trk_yz_spline_Plane0_Run1CVMCRatio",
