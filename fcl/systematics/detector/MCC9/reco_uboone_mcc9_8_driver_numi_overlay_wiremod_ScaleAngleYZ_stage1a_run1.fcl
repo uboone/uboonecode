@@ -3,6 +3,7 @@
 physics.producers.wiremod: @local::microboone_wiremod_ScaleAngleYZ
 physics.reco: [ rns, @sequence::microboone_reco_data_optical, wiremod, gaushit ]
 physics.producers.wiremod.ApplyAdditionalTickOffset: true
+physics.producers.wiremod.UseTruthInfo: true
 
 physics.producers.wiremod.SplinesFileName: "out_Run1_splinesThetaYZ_numi.root"
 physics.producers.wiremod.SplineNames_Charge_YZAngle: ["trk_ThetaYZ_hit_Q_spline_Plane0_CV",
