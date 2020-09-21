@@ -2,7 +2,7 @@
 #include "genie_microboone_default+MEC.fcl"
 #include "etafilter.fcl" 
 
-process_name: GenieEtaFiltered
+process_name: GenieGenFiltered
 
 services:
 {
