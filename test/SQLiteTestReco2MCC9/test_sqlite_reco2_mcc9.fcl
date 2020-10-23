@@ -1,18 +1,14 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOn.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
 
 process_name: DataRecoStage2Test
 
 services.PmtGainService.PmtGainProvider.DatabaseRetrievalAlg.TestMode: true
-
-services.CRTChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.TestMode: true
 
 services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.TestMode: true
 
 services.DetPedestalService.DetPedestalRetrievalAlg.DatabaseRetrievalAlg.TestMode: true
 
 services.ElectronicsCalibService.ElectronicsCalibProvider.DatabaseRetrievalAlg.TestMode: true
-
-services.LightYieldService.LightYieldProvider.DatabaseRetrievalAlg.TestMode: true
 
 services.TPCEnergyCalibService.TPCEnergyCalibProvider.XNormCorrectionProvider.DatabaseRetrievalAlg.TestMode: true
 
@@ -30,8 +26,6 @@ services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane
 
 services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.TestMode: true
 #services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.DBTag: v2r3
-
-services.UBElectronLifetimeService.ElectronLifetimeProvider.DatabaseRetrievalAlg.TestMode: true
 
 
 
