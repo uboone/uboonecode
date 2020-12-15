@@ -77,7 +77,6 @@ outputs:
  } 
 }
 
-services.Geometry.ForceUseFCLOnly: true
 
 ## Adjust the window/offset for the reduced total frame size (9600 -> 6400 ticks)
 services.DetectorPropertiesService.NumberTimeSamples:                  6400

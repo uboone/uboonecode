@@ -47,6 +47,7 @@ services: {
   } # messages
   
   ExptGeoHelperInterface:    @local::microboone_geometry_helper
+  GeometryConfigurationWriter: {}
   Geometry:                  @local::microboone_geo
   LArPropertiesService:      @local::microboone_properties
   DetectorClocksService:     @local::microboone_detectorclocks

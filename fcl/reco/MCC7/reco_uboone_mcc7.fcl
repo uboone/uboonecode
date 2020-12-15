@@ -26,6 +26,7 @@ BEGIN_PROLOG
 microboone_reco_mcc7_services:
 {
   ExptGeoHelperInterface:     @local::microboone_geometry_helper
+  GeometryConfigurationWriter: {}
   Geometry:                   @local::microboone_geo
   PhotonVisibilityService:    @local::microboone_photonvisibilityservice
   OpDigiProperties:           @local::microboone_opdigiproperties

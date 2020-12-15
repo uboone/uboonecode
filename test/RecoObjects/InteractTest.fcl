@@ -8,6 +8,7 @@ process_name: InteractTest
 services:
 {
   ExptGeoHelperInterface:    @local::standard_geometry_helper
+  GeometryConfigurationWriter: {}
   Geometry:                  @local::standard_geo
   LArPropertiesService:      @local::standard_properties
   DetectorClocksService:     @local::standard_detectorclocks
