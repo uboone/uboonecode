@@ -9,6 +9,7 @@ services:
 {
   ExptGeoHelperInterface:    @local::standard_geometry_helper
   Geometry:                  @local::standard_geo
+  GeometryConfigurationWriter: {}
   LArPropertiesService:      @local::standard_properties
   DetectorClocksService:     @local::standard_detectorclocks
   DetectorPropertiesService: @local::standard_detproperties
