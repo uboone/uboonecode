@@ -12,6 +12,7 @@ services: {
   
   Geometry:               @local::microboone_geo
   ExptGeoHelperInterface: @local::microboone_geometry_helper
+  GeometryConfigurationWriter: {}
   
   message: {
     destinations: {

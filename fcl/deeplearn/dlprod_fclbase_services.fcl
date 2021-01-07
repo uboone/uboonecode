@@ -22,7 +22,6 @@ dlprod_services.FileCatalogMetadataMicroBooNE: {
   ProjectVersion: "develop"
 }
 
-dlprod_services.Geometry.ForceUseFCLOnly: true
 
 #dlprod_services.SignalShapingServiceMicroBooNE.StretchFullResponse: true
 #dlprod_services.SignalShapingServiceMicroBooNE.NConfigs:            2
