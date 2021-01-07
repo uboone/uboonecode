@@ -28,37 +28,23 @@ export SAM_EXPERIMENT=uboone
 # This script runs the full mc+reco chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2019_5_9_15_17_29-0022417-00198_20190620T162349_bnb_2_20190620122031_merged.root
-for fcl in reco_uboone_data_mcc9_8_driver_stage1.fcl reco_uboone_data_mcc9_8_driver_stage2.fcl standard_ana_uboone_data.fcl
-do
-  output=`basename $fcl .fcl`.root
-  out=`basename $fcl .fcl`.out
-  err=`basename $fcl .fcl`.err
-  cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 5"
-  echo $cmd
-  $cmd > $out 2> $err
-  stat=$?
-  echo "Command finished with status $stat"
-  if [ $stat -ne 0 ]; then
-    exit $stat
-  fi
-  input=$output
-done
-
-#for fcl in standard_larcv_uboone_data.fcl
-#do
-#  out=`basename $fcl .fcl`.out
-#  err=`basename $fcl .fcl`.err
-#  input=reco_uboone_data_mcc9_8_driver_stage2.root
-#  cmd="lar --rethrow-all -c $fcl -s $input -n 5"
-#  echo $cmd
-#  $cmd > $out 2> $err
-#  stat=$?
-#  echo "Command finished with status $stat"
-#  if [ $stat -ne 0 ]; then
-#    exit $stat
-#  fi
-#done
+fcl=test_sqlite_reco1_mcc9.fcl
+output=`basename $fcl .fcl`.root
+out=`basename $fcl .fcl`.out
+err=`basename $fcl .fcl`.err
+cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 5"
+echo $cmd
+$cmd > $out 2> $err
+stat=$?
+echo "Command finished with status $stat"
+if [ $stat -ne 0 ]; then
+  exit $stat
+fi
 
 # Done (success).
 
-rm *.root   # Clean up.
+for root in *.root
+do
+  rootstat.py $root > ${root}.rootstat
+  rm $root   # Clean up.
+done

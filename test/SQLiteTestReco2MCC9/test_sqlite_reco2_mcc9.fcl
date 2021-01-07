@@ -1,0 +1,32 @@
+#include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
+
+process_name: DataRecoStage2Test
+
+services.PmtGainService.PmtGainProvider.DatabaseRetrievalAlg.TestMode: true
+
+services.ChannelStatusService.ChannelStatusProvider.DatabaseRetrievalAlg.TestMode: true
+
+services.DetPedestalService.DetPedestalRetrievalAlg.DatabaseRetrievalAlg.TestMode: true
+
+services.ElectronicsCalibService.ElectronicsCalibProvider.DatabaseRetrievalAlg.TestMode: true
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XNormCorrectionProvider.DatabaseRetrievalAlg.TestMode: true
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane0.DatabaseRetrievalAlg.TestMode: true
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane1.DatabaseRetrievalAlg.TestMode: true
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.XShapeCorrectionProvider_Plane2.DatabaseRetrievalAlg.TestMode: true
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane0.DatabaseRetrievalAlg.TestMode: true
+#services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane0.DatabaseRetrievalAlg.DBTag: v2r3
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane1.DatabaseRetrievalAlg.TestMode: true
+#services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane1.DatabaseRetrievalAlg.DBTag: v2r3
+
+services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.TestMode: true
+#services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.DBTag: v2r3
+
+
+
+
