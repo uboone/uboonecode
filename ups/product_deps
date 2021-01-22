@@ -2,7 +2,7 @@
 
 # The *parent* line must the first non-commented line and defines this product and version
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
-parent uboonecode v09_13_00
+parent uboonecode v09_14_00
 
 defaultqual e19
 
@@ -30,10 +30,10 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v09_13_00
-ubcv                    v09_12_00
-ubcrt                   v09_13_00
-ublite			v09_13_00
+larsoft                 v09_14_00
+ubcv                    v09_14_00
+ubcrt                   v09_14_00
+ublite			v09_14_00
 ubutil                  v09_09_01
 uboonedata              v09_12_00
 genie_xsec              v3_00_04a
