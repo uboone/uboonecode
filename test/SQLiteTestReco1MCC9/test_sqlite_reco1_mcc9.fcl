@@ -23,3 +23,6 @@ services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane
 services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane1.DatabaseRetrievalAlg.TestMode: true
 
 services.TPCEnergyCalibService.TPCEnergyCalibProvider.YZCorrectionProvider_Plane2.DatabaseRetrievalAlg.TestMode: true
+
+services.UBElectronLifetimeService.ElectronLifetimeProvider.DatabaseRetrievalAlg.TestMode: true
+
