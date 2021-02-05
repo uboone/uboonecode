@@ -31,13 +31,13 @@ physics.producers.saturation.LGProducer: "mixer"
 physics.producers.saturation.HGProducer: "mixer"
 physics.producers.saturation.HGProducerCosmic: "pmtreadout"
 
-physics.producers.caldata.NumSigma: [4,4,4]
-physics.producers.caldata.ROIFinder.NumSigma: [4,4,4]
+#physics.producers.caldata.NumSigma: [4,4,4]
+#physics.producers.caldata.ROIFinder.NumSigma: [4,4,4]
 
 outputs.out1.outputCommands: [ "keep *_*_*_*",
                                #"drop sim::SimChannels_*_*_*",
                                #"drop sim::SimEnergyDeposits_*_*_*",
-                               #"drop raw::RawDigits_*_*_*",
+                               "drop raw::RawDigits_*_*_*",
                                "drop optdata::ChannelDataGroup_*_*_*" ]
 
 #temporary since new RawDigits are baseline corrected

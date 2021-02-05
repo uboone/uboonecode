@@ -349,9 +349,9 @@ microboone_dqm_ana:                    [ @sequence::microboone_dqm_ana_stage1,
 # Cal data is no longer used, below is historic
 microboone_reco_data_producers.caldata.DigitModuleLabel:                                                      "butcher"
 microboone_reco_data_producers.caldata.Threshold:                                                             [0, 0, 0]  # Not what you think...
-microboone_reco_data_producers.caldata.NumSigma:                                                              [6, 6, 6]  # Closer to what you think... I changed from [9, 9, 9]
+microboone_reco_data_producers.caldata.NumSigma:                                                              [9, 9, 9]  # Closer to what you think... I changed from [9, 9, 9]
 microboone_reco_data_producers.caldata.ROIFinder.Threshold:                                                   [0, 0, 0]
-microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                                                    [4, 4, 4] # were [9, 9, 9]. I changed it from [6, 6, 6]
+microboone_reco_data_producers.caldata.ROIFinder.NumSigma:                                                    [6, 6, 6] # were [9, 9, 9]. I changed it from [6, 6, 6]
 microboone_reco_data_producers.caldata.Deconvolution:                                                         @local::microboone_mcc7deconvolution
 microboone_reco_data_producers.caldata.DodQdxCalib:                                                           false
 microboone_reco_data_producers.caldata.MakeSparseRawDigits:                                                   true #originally true

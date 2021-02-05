@@ -20,8 +20,8 @@ physics.producers.gaushitTruthMatch.HitParticleAssociations:                    
 physics.producers.gaushitTruthMatch.HitParticleAssociations.HitModuleLabel:         "gaushit"
 physics.producers.gaushitTruthMatch.HitParticleAssociations.MCParticleModuleLabel:  "largeant"
 
-physics.producers.caldata.NumSigma: [4,4,4]
-physics.producers.caldata.ROIFinder.NumSigma: [4,4,4]
+#physics.producers.caldata.NumSigma: [4,4,4]
+#physics.producers.caldata.ROIFinder.NumSigma: [4,4,4]
 
 physics.reco: [ gaushitTruthMatch ]
 physics.trigger_paths: [ reco ]
