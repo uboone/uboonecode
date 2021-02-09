@@ -21,9 +21,9 @@ services:
 #source is now a root file
 source:
 {
-  module_type: RootInput
+  module_type: EmptyEvent # RootInput
   maxEvents:  10        # Number of events to create
-  saveMemoryObjectThreshold: 0
+  #saveMemoryObjectThreshold: 0
 }
 
 # Define and configure some modules to do work on each event.
