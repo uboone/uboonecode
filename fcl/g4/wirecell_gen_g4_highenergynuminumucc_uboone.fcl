@@ -2,6 +2,7 @@
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "genie_microboone_default+MEC.fcl"
 
 process_name: G4EDep
 
@@ -33,6 +34,9 @@ physics:
 
  producers:
  {
+    
+   generator: @local::microboone_genie_simple
+    
    largeant: @local::microboone_largeant
    drift:    {
                  module_type: SimDriftElectrons
@@ -54,7 +58,7 @@ physics:
 
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, largeant, ionization, mcreco, highenergynuminumucc ] #drift, mcreco ]
+ simulate: [ rns, generator, largeant, ionization, mcreco, highenergynuminumucc ] #drift, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
