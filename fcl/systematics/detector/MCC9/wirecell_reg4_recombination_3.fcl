@@ -3,7 +3,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "photpropservices.fcl"
 
-process_name: DetSysBirkRecombination 
+process_name: DetSysRecombBox3 
 
 services: {
   scheduler: { defaultExceptions: false }
@@ -46,13 +46,6 @@ outputs: {
     fastCloning: false
   }
 }
-
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
-
-physics.producers.mcreco.MCParticleLabel: "largeant"
-physics.producers.mcreco.SimChannelLabel: "ionization" # "driftWC:simpleSC"
-physics.producers.mcreco.UseSimEnergyDeposit: true
-physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040]
 
 services.LArG4Parameters.ModBoxA: 9.3e-1
 services.LArG4Parameters.ModBoxB: 2.4e-1
