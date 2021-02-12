@@ -4,7 +4,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "genie_microboone_default+MEC.fcl"
 
-process_name: G4EDep
+process_name: OverlayGenAndG4EDep
 
 services:
 {
@@ -18,12 +18,11 @@ services:
   @table::microboone_g4_services
 }
 
-#source is now a root file
+#source is an empty file.
 source:
 {
-  module_type: EmptyEvent # RootInput
+  module_type: EmptyEvent 
   maxEvents:  10        # Number of events to create
-  #saveMemoryObjectThreshold: 0
 }
 
 # Define and configure some modules to do work on each event.
@@ -58,7 +57,7 @@ physics:
 
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, generator, largeant, ionization, mcreco, highenergynuminumucc ] #drift, mcreco ]
+ simulate: [ rns, generator, largeant, ionization, mcreco, highenergynuminumucc ] 
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -80,7 +79,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "%ifb_%tc_g4.root"
+   fileName:    "%ifb_%tc_gen_g4_filtered.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1

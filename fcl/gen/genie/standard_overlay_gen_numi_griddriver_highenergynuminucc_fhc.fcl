@@ -17,9 +17,6 @@ physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 
 physics.producers.generator.FluxCopyMethod: "IFDH"
 
-#reduce file name length
-#outputs.out1.fileName: "%ifb_gen_fhc.root"
-
 # Add beam timing structure to the generation of events
 #physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
