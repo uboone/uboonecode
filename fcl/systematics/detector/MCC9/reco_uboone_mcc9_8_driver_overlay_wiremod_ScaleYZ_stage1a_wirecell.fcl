@@ -1,0 +1,16 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.reco: [ rns, mchitfinder, @sequence::microboone_reco_data_optical, dummyrawdigit, butcher, gaushit, wiremod ]
+
+# run gaushit over nfspl1:gauss wires (before wiremod...except throw in a fake butcher because ... well, because)
+physics.producers.butcher.ndrop: 0
+physics.producers.butcher.nkeep: 9600
+physics.producers.butcher.inRawTag: "dummyrawdigit"
+physics.producers.gaushit.CalDataModuleLabel: "butcher"
+# modify nfspl1:gauss wires
+physics.producers.wiremod: @local::microboone_wiremod_ScaleYZ
+physics.producers.wiremod.WireInputTag: "butcher"
+physics.producers.wiremod.TickOffset: 2400.
+physics.producers.wiremod.ApplyOverallScale: true
+physics.producers.wiremod.OverallScale: [200.,200.,200.]
+

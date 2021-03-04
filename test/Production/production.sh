@@ -31,24 +31,24 @@ do
   input=$output
 done
 
-for fcl in standard_larcv_uboone_mctruth.fcl standard_larcv_uboone.fcl
-do
-  out=`basename $fcl .fcl`.out
-  err=`basename $fcl .fcl`.err
-  if [ $fcl = standard_larcv_uboone_mctruth.fcl ]; then
-    input=standard_detsim_uboone.root
-  elif [ $fcl = standard_larcv_uboone.fcl ]; then
-    input=reco_uboone_mcc8_driver_stage2_reduced.root
-  fi
-  cmd="lar --rethrow-all -c $fcl -s $input -n 5"
-  echo $cmd
-  $cmd > $out 2> $err
-  stat=$?
-  echo "Command finished with status $stat"
-  if [ $stat -ne 0 ]; then
-    exit $stat
-  fi
-done
+#for fcl in standard_larcv_uboone_mctruth.fcl standard_larcv_uboone.fcl
+#do
+#  out=`basename $fcl .fcl`.out
+#  err=`basename $fcl .fcl`.err
+#  if [ $fcl = standard_larcv_uboone_mctruth.fcl ]; then
+#    input=standard_detsim_uboone.root
+#  elif [ $fcl = standard_larcv_uboone.fcl ]; then
+#    input=reco_uboone_mcc8_driver_stage2_reduced.root
+#  fi
+#  cmd="lar --rethrow-all -c $fcl -s $input -n 5"
+#  echo $cmd
+#  $cmd > $out 2> $err
+#  stat=$?
+#  echo "Command finished with status $stat"
+#  if [ $stat -ne 0 ]; then
+#    exit $stat
+#  fi
+#done
 
 # Done (success).
 

@@ -19,6 +19,10 @@ if [ -f swizzle.skip ]; then
   exit
 fi
 
+# Set certificate path.
+
+export SSL_CERT_DIR=/cvmfs/oasis.opensciencegrid.org/mis/certificates
+
 # Exit if stash cache isn't mounted.
 
 UBOONE_EXAMPLE_DATA_DIR=/cvmfs/uboone.osgstorage.org/stash/uboone_example_data

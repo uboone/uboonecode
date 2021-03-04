@@ -1,0 +1,11 @@
+#include "reco_uboone_data_mcc9_1_8_driver_poststage2_filters_beamOn.fcl"
+
+outputs.outbeamOK.fileName:  "%ifb_beam_good.root"
+outputs.outbeamNOK.fileName: "%ifb_beam_bad.root"
+outputs.outpi0.fileName:     "%ifb_pi0.root"
+outputs.outNuCC.fileName:    "%ifb_NuCC.root"
+outputs.outncpi0.fileName:   "%ifb_ncpi0.root"
+outputs.outantibdt.fileName: "%ifb_antibdt.root"
+
+physics.filters.ncpi0filter.beamgateStartTime: 5.64
+physics.filters.ncpi0filter.beamgateEndTime:   15.44

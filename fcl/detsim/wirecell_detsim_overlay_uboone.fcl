@@ -7,6 +7,9 @@
 #include "wcls.fcl"
 #include "ZeroingOutBadChannels.fcl"
 #include "mcreco.fcl"
+#include "microboone_crt_detsim.fcl"
+#include "crtsimhitproducer.fcl"
+#include "CRTpreOverlay.fcl"
 
 process_name: OverlayDetsim 
 
@@ -28,7 +31,7 @@ source:
   module_type: RootInput
   maxEvents:  -1        # Number of events to create
   saveMemoryObjectThreshold: 0
-  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*","drop *_*_*_McReco*" ]
+  inputCommands: ["keep *_*_*_*", "drop *_*_*_Detsim*" ]
 
 }
 
@@ -40,23 +43,24 @@ physics:
 
  producers:
  {
+   nfbadchannel:        @local::wcls.nfbadchannel
    optdigitizer:   	@local::microboone_optical_adc_sim
    optfem:         	@local::microboone_optical_fem_sim
    triggersim:     	@local::ubtrigger_dark_bnb
    pmtreadoutnonoise:	@local::microboone_optical_dram_readout_sim
    driftWC:        	@local::wcls.driftsim_overlay #no noise
    zeroedoutchannels:   @local::ZeroingOutBadChannels
+   crtdetsim:    	@local::microboone_crtdetsim_binary
+   crthitsim:    	@local::crtsimhitproducer_binary
+   maskedcrthitsim:    	@local::CRTpreOverlay ##MaskingOutUnavailableCRT
    rns:            	{ module_type: "RandomNumberSaver" }
-   mcreco:              @local::standard_mcreco
-
-
  }
 
  filters: { swtriggernonoise: @local::microboone_swtrigger_mc_bnb }
  
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, swtriggernonoise, mcreco ]
+ simulate: [ rns, nfbadchannel, optdigitizer, optfem, triggersim, pmtreadoutnonoise, driftWC, zeroedoutchannels, crtdetsim, crthitsim, maskedcrthitsim, swtriggernonoise ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -87,7 +91,11 @@ outputs:
  }
 }
 
+physics.producers.driftWC.wcls_main.structs.ELifetimeCorrection: true  # true: using lifetime from database; false: using default life
+
 physics.filters.swtriggernonoise.OpDataModule: "pmtreadoutnonoise"
+
+physics.producers.optdigitizer.AbnormalOpCh: 29
 
 #services.SignalShapingServiceMicroBooNE.IncludeMisconfiguredU: true
 
@@ -154,10 +162,10 @@ services.DetectorPropertiesService.ReadOutWindowSize: 9600
 services.DetectorClocksService.InheritClockConfig:    false
 services.DetectorClocksService.TriggerOffsetTPC:      -1600
 
-physics.producers.mcreco.MCParticleLabel: "largeant"
-physics.producers.mcreco.SimChannelLabel: "driftWC:simpleSC"
-physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
-                                                      1000010020,1000010030,1000020030,1000020040]
+#physics.producers.mcreco.MCParticleLabel: "largeant"
+#physics.producers.mcreco.SimChannelLabel: "driftWC:simpleSC"
+#physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
+#                                                      1000010020,1000010030,1000020030,1000020040]
 
 
 

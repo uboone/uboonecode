@@ -1,0 +1,6 @@
+#include "reco_uboone_data_mcc9_1_8_driver_poststage2_filters_Overlay.fcl"
+
+outputs.out1.fileName:     "%ifb_ps2fil.root"
+
+physics.filters.ncpi0filter.beamgateStartTime: 6.00
+physics.filters.ncpi0filter.beamgateEndTime: 15.80

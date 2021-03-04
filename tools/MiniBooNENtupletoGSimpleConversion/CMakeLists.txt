@@ -1,8 +1,7 @@
 # project name
 project(ConvertNtuple)
 
-include_directories( $ENV{ROOT_INC}
-		     $ENV{GENIE_INC}/GENIE )
+include_directories( $ENV{ROOT_INC} )
 
 find_library(XML2LIB NAMES xml2 PATHS $ENV{LIBXML2_FQ_DIR}/lib)
 
@@ -36,5 +35,5 @@ cet_make_exec(ConvertNtuple SOURCE ConvertNtuple.cxx BooNEtoGSimple.cxx
 				      #more root stuff
 				      ${ROOT_EG}
 				      ${ROOT_EGPYTHIA6}
+				      ${ROOT_GENVECTOR}
 				      )
-

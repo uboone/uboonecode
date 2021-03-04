@@ -1,0 +1,8 @@
+#include "wirecell_detsim_overlay_uboone.fcl"
+
+# Add the lines necessary for a NuMI analysis.
+physics.producers.triggersim:    @local::ubtrigger_dark_numi
+physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi
+
+# Update the Longitudinal Diffusion Constant
+physics.producers.driftWC.wcls_main.structs.DiffusionLongitudinal: 3.8

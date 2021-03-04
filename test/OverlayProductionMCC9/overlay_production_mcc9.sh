@@ -16,10 +16,14 @@ fi
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Set up python path.
+
+export PYTHONPATH=$UBUTIL_DIR/python:$PYTHONPATH
+
 # This script runs the full overlay chain using standard released fcl files.
 
-input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2016_3_14_9_22_21-0005432-00021_20160322T065603_ext_bnb_20160323T041757_merged.root
-for fcl in standard_overlay_single_mu_driver.fcl wirecell_g4_uboone.fcl wirecell_nfForBadChannels_overlay_uboone.fcl wirecell_detsim_overlay_uboone.fcl standard_overlay_uboone.fcl reco_uboone_mcc9_8_driver_overlay_stage1a.fcl reco_uboone_mcc9_8_driver_overlay_stage1b.fcl reco_uboone_mcc9_8_driver_overlay_stage1c.fcl reco_uboone_mcc9_8_driver_overlay_stage2.fcl
+input=$UBOONE_EXAMPLE_DATA_DIR/swizzled/PhysicsRun-2019_5_9_15_17_29-0022417-00341_20190528T225255_ext_bnb_8_20190528230111_merged.root
+for fcl in standard_overlay_single_mu_driver.fcl wirecell_g4_uboone.fcl wirecell_detsim_overlay_uboone.fcl standard_overlay_uboone.fcl reco_uboone_mcc9_8_driver_overlay_stage1a.fcl reco_uboone_mcc9_8_driver_overlay_stage1b.fcl reco_uboone_mcc9_8_driver_overlay_stage1c.fcl wirecell_detsim_optical_overlay_uboone.fcl standard_overlay_optical_uboone.fcl reco_uboone_mcc9_8_driver_overlay_optical.fcl reco_uboone_mcc9_8_driver_overlay_stage2.fcl reco_uboone_data_mcc9_1_8_driver_poststage2_filters_Overlay.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
@@ -37,4 +41,9 @@ done
 
 # Done (success).
 
-rm *.root   # Clean up.
+for root in *.root
+do
+  rootstat.py $root > ${root}.rootstat
+  rm $root   # Clean up.
+done
+
