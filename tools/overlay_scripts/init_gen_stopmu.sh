@@ -1,2 +1,2 @@
-#!bin/bash
-init_gen_common.sh prodStopMu_Single_Muons.fcl 1500
+#!/bin/bash
+init_gen_common.sh prodStopMuFilter.fcl 1000
