@@ -1,0 +1,67 @@
+#include "mchitmodules.fcl"
+#include "mctrutht0matching.fcl"
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+#include "reco_uboone_mcc9_8_reducer_stage2.fcl"
+
+process_name: OverlayRecoStage2
+
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     1.5
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     1.5
+microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     1.0
+
+physics.producers.nfspl1.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp_lowthreshold.jsonnet" ]
+
+
+outputs.out1.outputCommands: [
+         "keep *_*_*_*",
+         "drop raw::RawDigit*_*_*_*",
+         "drop optdata::ChannelDataGroup_*_*_*",
+         "drop recob::Wires_*nfspl1_*_*",
+         "drop sim::MCHitCollections_*_*_*",
+	 "keep sim::SimChannels_*_*_*",
+         "drop sim::SimEnergyDeposits_largeant_*_*",
+         "drop *_pandoraAllOutcomesTrack_*_*",
+         "drop *_pandoraAllOutcomesShower_*_*",
+         "drop *_pandoraPatRec__*",
+         "drop *_pmtrack*_*_*",
+         "drop recob::SpacePoints_*Kalman*_*_*",
+         "drop *recob::SpacePoint*_*pmtrack*_*_*",
+         "drop *_sps3d_noreg_*",
+         "drop *_sps3d_pre_*",
+         "drop *_*calo*_*_*"
+      ]
+
+services.DetectorClocksService.InheritClockConfig:  false
+services.TFileService.fileName: "reco_stage_2_hist.root"
+services.DetectorClocksService.InheritClockConfig:  false
+
+physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
+physics.producers.trajcluster.DoRawDigitAssns: false
+
+physics.producers.trajclusterTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.trajclusterTruthMatch.OverrideRealData: true
+physics.producers.trajclusterTruthMatch.HitParticleAssociations:                    @local::IndirectHitParticleAssnsTool
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
+
+physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
+
+physics.reco:                   [ @sequence::microboone_reco_data_stage2,trajclusterTruthMatch ]
+physics.ana:                    [ ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ stream1 ]
+outputs.out1.fileName:          "%ifb_%tc_reco2.root"
+outputs.out1.dataTier:          "reconstructed"
+outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
+  GenerateTFileMetadata: [true, true]
+  dataTier:              ["root-tuple", "pandora_debug"]
+  fileFormat:            ["root", "pndr"]
+}
+
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.57
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   5.25
