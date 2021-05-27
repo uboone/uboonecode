@@ -30,7 +30,7 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v09_23_01
+larsoft                 v09_23_01_01
 ubcv                    v09_23_00
 ubcrt                   v09_23_01
 ublite			v09_23_01
