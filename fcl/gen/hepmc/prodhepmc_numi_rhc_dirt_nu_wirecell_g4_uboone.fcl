@@ -1,0 +1,8 @@
+#include "prodhepmc_bnb_dirt_nu_wirecell_g4_uboone.fcl"
+
+# NuMI RHC POT per spill
+physics.producers.generator.POTPerSpill: 6e13
+physics.producers.generator.MaxEvents: 75000
+
+# Update the cut on the simphoton time. Use conservative time equal to the software trigger window.
+physics.filters.TimeFilter.TimeWindows: [ [4687.5, 16406.25] ]
