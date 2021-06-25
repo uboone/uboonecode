@@ -2,9 +2,9 @@
 
 # The *parent* line must the first non-commented line and defines this product and version
 # The version must be of the form vxx_yy_zz (e.g. v01_02_03)
-parent uboonecode v09_17_01
+parent uboonecode v09_25_00
 
-defaultqual e19
+defaultqual e20
 
 # These optional lines define where headers, libraries, and executables go and should
 # be used only if your product does not conform to the defaults.
@@ -30,11 +30,11 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v09_17_01
-ubcv                    v09_17_01
-ubcrt                   v09_17_01
-ublite			v09_17_01
-ubutil                  v09_16_00
+larsoft                 v09_25_00
+ubcv                    v09_24_02
+ubcrt                   v09_25_00
+ublite			v09_25_00
+ubutil                  v09_23_00
 uboonedata              v09_12_00
 genie_xsec              v3_00_04_ub2
 genie_phyopt            v3_00_04
@@ -45,23 +45,17 @@ end_product_list
 
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec                      genie_phyopt    uboone_oslibs   wcp
 c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:debug
-c7:opt         c7:opt         c7:opt         c7:opt         c7:opt         c7:opt         -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:opt
 c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:prof
-e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:debug
-e19:opt        e19:opt        e19:opt        e19:opt        e19:opt        e19:opt        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:opt
-e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:prof
+e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e20:debug
+e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-            e20:prof
 be:c7:debug    c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:debug
-be:c7:opt      c7:opt         c7:opt         c7:opt         c7:opt         c7:opt         -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:opt
 be:c7:prof     c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            c7:prof
-be:e19:debug   e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:debug
-be:e19:opt     e19:opt        e19:opt        e19:opt        e19:opt        e19:opt        -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:opt
-be:e19:prof    e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            e19:prof
+be:e20:debug   e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            e20:debug
+be:e20:prof    e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-            e20:prof
 gbf:c7:debug   c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            c7:debug
-gbf:c7:opt     c7:opt         c7:opt         c7:opt         c7:opt         c7:opt         -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            c7:opt
 gbf:c7:prof    c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            c7:prof
-gbf:e19:debug  e19:debug      e19:debug      e19:debug      e19:debug      e19:debug      -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e19:debug
-gbf:e19:opt    e19:opt        e19:opt        e19:opt        e19:opt        e19:opt        -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e19:opt
-gbf:e19:prof   e19:prof       e19:prof       e19:prof       e19:prof       e19:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e19:prof
+gbf:e20:debug  e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e20:debug
+gbf:e20:prof   e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e20:prof
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
