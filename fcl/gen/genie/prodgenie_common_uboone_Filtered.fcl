@@ -40,7 +40,15 @@ physics:
  }
  filters:
  {
+  
   finalstatefilter: @local::microboone_finalstateselectfilter
+  neutrinofilter: {
+    module_type: "NeutrinoTruthFilter"
+    EMin: -1.0
+    EMax: 1e9
+    MCTruthLabel: "generator"
+  }
+
  }
 
  #define the producer and filter modules for this path, order matters, 

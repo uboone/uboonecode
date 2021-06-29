@@ -1,0 +1,48 @@
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: OverlayFiltersPostStage2
+
+services.TFileService.fileName: "reco_stage_2_filters_hist.root"
+services.DetectorClocksService.InheritClockConfig:  false
+
+#common pi0 filter
+physics.pi0:          [ rns, mcc9pi0filter ]
+
+#cc inclusive filter
+physics.NuCC: [ rns, NuCCproducer, NuCCfilter ]
+
+physics.ncpi0:        [ rns, ncpi0filter ]
+
+#antibdt filter path
+physics.antibdt:      [ rns, shrreco3dKalmanShower, shrreco3dKalmanShowercalo, shrreco3dKalmanShowercali, antibdtfilter ]
+
+physics.ana:                    [ ]
+physics.trigger_paths:          [ pi0, NuCC, ncpi0, antibdt ]
+physics.stream1:                [ out1 ]
+physics.end_paths:              [ stream1 ]
+
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*FiltersPostStage2" ]
+
+outputs.out1.fileName:     "%ifb_%tc_ps2fil.root"
+outputs.out1.dataTier:     "reconstructed"
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_stage_2_filters_hist.root.json"]
+  GenerateTFileMetadata: [true]
+  dataTier:              ["root-tuple"]
+  fileFormat:            ["root"]
+}
+
+
+physics.filters.mcc9pi0filter.IsData: false
+
+physics.filters.ncpi0filter.isData: "false"
+physics.filters.ncpi0filter.BadChannelProducer: "nfspl1"
+physics.filters.ncpi0filter.isOverlayed: "true"
+physics.filters.ncpi0filter.beamgateStartTime: 3.6
+physics.filters.ncpi0filter.beamgateEndTime: 5.2
+physics.filters.ncpi0filter.TruncMeanFraction: 10.0
+
+services.DetectorClocksService.TrigModuleName:               "triggersim"
+services.DetectorClocksService.TriggerOffsetTPC: -0.400e3

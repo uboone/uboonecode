@@ -1,0 +1,6 @@
+#include "triggersim_microboone.fcl"
+#include "standard_overlay_uboone.fcl"
+
+# Add the lines necessary for a NuMI analysis.
+physics.producers.triggersim:    @local::ubtrigger_dark_numi
+physics.filters.swtrigger:       @local::microboone_swtrigger_mc_numi

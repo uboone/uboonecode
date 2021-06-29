@@ -51,11 +51,15 @@ physics: {
 
 }
 
+services.PmtGainService.PmtGainProvider.UseDB:               true
+
 physics.producers.mixer.RawDigitDataModuleLabel: "daq"
-physics.producers.mixer.RawDigitMCModuleLabel:   "zeroedoutchannels"
+physics.producers.mixer.RawDigitMCModuleLabel:   "zeroedoutchannels" # after masking out the signal in the bad channels
 physics.producers.mixer.OpDetDataModuleLabel:    "pmtreadout"
 physics.producers.mixer.OpDetMCModuleLabel:      "pmtreadoutnonoise"
 physics.producers.mixer.TriggerDataModuleLabel:  "daq"
+physics.producers.mixer.CRTMCModuleLabel:       "maskedcrthitsim"   # after masking out the CRT panels unavailable in the input data file
+physics.producers.mixer.CRTDataModuleLabel:     "merger"
 physics.producers.mixer.TriggerMCModuleLabel:  "triggersim"
 
 physics.filters.swtrigger.OpDataModule: "mixer"

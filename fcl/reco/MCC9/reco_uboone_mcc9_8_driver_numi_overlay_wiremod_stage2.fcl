@@ -1,0 +1,29 @@
+#include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
+
+process_name: OverlayWireModRecoStage2
+
+physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+physics.producers.pandora.SliceIdTool.HasMCNeutrino: false
+
+# We use the beam off pandora slice vetos for overlay since everything is in EXT time
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
+
+# flash-matching score preservation module
+physics.producers.flashmatch.BeamWindowStart: 6.00
+physics.producers.flashmatch.BeamWindowEnd:   15.80
+
+# NuMI CRT Veto
+physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOFF
+
+# Overwite PID file location to uboonedata for running on Argonne Machines
+physics.producers.pandoracalipidSCE.BraggAlgo.LikelihoodMapsFile:          '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoracalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandorapidSCE.BraggAlgo.LikelihoodMapsFile:              '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandorapid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pmtrackpid.BraggAlgo.LikelihoodMapsFile:                 '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pmtrackcalipid.BraggAlgo.LikelihoodMapsFile:             '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanTrackpid.BraggAlgo.LikelihoodMapsFile:      '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanTrackcalipid.BraggAlgo.LikelihoodMapsFile:  '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanShowerpid.BraggAlgo.LikelihoodMapsFile:     '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'
+physics.producers.pandoraKalmanShowercalipid.BraggAlgo.LikelihoodMapsFile: '${UBOONEDATA_DIR}/ParticleID/BraggLikelihoodMaps_mcc8_20190215.root'

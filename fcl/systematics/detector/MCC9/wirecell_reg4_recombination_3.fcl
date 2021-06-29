@@ -1,0 +1,56 @@
+#include "services_microboone.fcl"
+#include "largeantmodules_microboone.fcl"
+#include "time_memory_tracker_microboone.fcl"
+#include "photpropservices.fcl"
+
+process_name: DetSysRecombBox3 
+
+services: {
+  scheduler: { defaultExceptions: false }
+  TimeTracker: @local::microboone_time_tracker
+  MemoryTracker: @local::microboone_memory_tracker
+  RandomNumberGenerator: {}
+  FileCatalogMetadata:  @local::art_file_catalog_mc
+  @table::microboone_g4_services
+}
+
+source: {
+  module_type: RootInput
+  maxEvents: 10
+  saveMemoryObjectThreshold: 0
+}
+
+physics: {
+  producers: {
+    ionization: {
+      module_type: "larsim/ElectronDrift/ShiftEdepSCE"
+      EDepTag:     "largeant:TPCActive"
+      MakeAnaTree: false
+    }
+    rns: { module_type: "RandomNumberSaver" }
+  }
+
+  simulate: [ rns, ionization ]
+  stream1: [ out1 ]
+  trigger_paths: [ simulate ]
+  end_paths: [ stream1 ]
+}
+
+outputs: {
+  out1: {
+    module_type: RootOutput
+    fileName:    "%ifb_%tc_photprop.root"
+    dataTier:    "simulated"
+    saveMemoryObjectThreshold: 0
+    compressionLevel: 1
+    fastCloning: false
+  }
+}
+
+services.LArG4Parameters.ModBoxA: 9.3e-1
+services.LArG4Parameters.ModBoxB: 2.4e-1
+
+services.SpaceCharge.EnableSimSpatialSCE:          true
+services.SpaceCharge.EnableSimEfieldSCE:           true
+services.DetectorClocksService.InheritClockConfig: false
+
