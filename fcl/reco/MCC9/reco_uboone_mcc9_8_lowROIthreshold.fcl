@@ -3,3 +3,5 @@
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     1.62
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     1.56
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     0.95
+
+physics.producers.simnfspl1.wcls_main.configs: [ "pgrapher/experiment/uboone/wcls-nf-sp_lowROIthreshold.jsonnet" ]
