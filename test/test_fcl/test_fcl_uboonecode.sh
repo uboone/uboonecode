@@ -29,4 +29,18 @@ do
     exit 1
   fi
 
+  # Check for connections to development conditions database.
+
+  if egrep -q uboonecon_dev $fclout; then
+    echo "Found connection to development conditions database."
+    exit 1
+  fi
+
+  # Check for connections to non-secure conditions database.
+
+  if egrep -q 'http:.*uboonecon' $fclout; then
+    echo "Found connection to non-secure conditions database server."
+    exit 1
+  fi
+
 done

@@ -1,0 +1,33 @@
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: DataRecoStage1LowThreshold
+
+services.TFileService.fileName: "reco_stage_1_hist.root"
+physics.reco:                   [ @sequence::microboone_reco_data_stage1 ]
+physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ ana, stream1 ]
+outputs.out1.fileName:          "%ifb_%tc_reco1.root"
+outputs.out1.dataTier:          "reconstructed"
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*Reco*" ]
+
+
+#temporary since new RawDigits are baseline corrected
+services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultCollMean: 0
+services.DetPedestalService.DetPedestalRetrievalAlg.DefaultIndMean:  0
+
+microboone_tfile_metadata:
+{
+    JSONFileName:          "reco_stage_1_hist.root.json"
+    GenerateTFileMetadata: true
+    dataTier:              "root-tuple"
+    fileFormat:            "root"
+}
+
+#low threshold reconstruction
+physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     1.5
+physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     1.5
+physics.producers.gaushit.HitFinderToolVec.CandidateHitsPlane2.RoiThreshold:                     1.0
+
+physics.producers.nfspl1.wcls_main.configs: ["pgrapher/experiment/uboone/wcls-nf-sp_lowthreshold.jsonnet"]

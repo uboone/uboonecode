@@ -3,7 +3,7 @@
 basequal=${1}
 
 # specify version to bootstrap and setup ups
-check_ups v6_0_7
+check_ups v6_0_8
 
 build_bundle larsoft-@LARSOFT_DOT_VERSION@ ${basequal}
 status=$?
@@ -31,7 +31,7 @@ build_cet ubobj @UBOBJ_VERSION@ ${basequal}
 build_cet ubcrt @UBCRT_VERSION@ ${basequal}
 build_cet ubcore @UBCORE_VERSION@ ${basequal}
 build_cet ubraw @UBRAW_VERSION@ ${basequal}
-build_cet ubevt @UBEVT_VERSION@ ${basequal}
+build_cet -n ubevt @UBEVT_VERSION@ ${basequal}
 build_cet ubcv @UBCV_VERSION@ ${basequal}
 build_cet ubsim @UBSIM_VERSION@ ${basequal}
 build_cet ubreco @UBRECO_VERSION@ ${basequal}
