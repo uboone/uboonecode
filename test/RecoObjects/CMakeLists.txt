@@ -6,7 +6,6 @@ simple_plugin(KalmanFilterTest "module"
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
               art_Persistency_Common
               art_Persistency_Provenance
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
 	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
 	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
@@ -45,7 +44,6 @@ simple_plugin(InteractTest "module"
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
               art_Persistency_Common
               art_Persistency_Provenance
-	      ${ART_FRAMEWORK_SERVICES_BASIC}
 	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
 	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
@@ -58,17 +56,17 @@ simple_plugin(InteractTest "module"
               BASENAME_ONLY
              )
 
-#cet_test( PropTest HANDBUILT 
+#cet_test( PropTest HANDBUILT
 #  	  TEST_EXEC lar
 #	  TEST_ARGS -c PropTest.fcl
 #	  DATAFILES PropTest.fcl )
 
-cet_test( InteractTest HANDBUILT 
+cet_test( InteractTest HANDBUILT
   	  TEST_EXEC lar
 	  TEST_ARGS -c InteractTest.fcl
 	  DATAFILES PropTest.fcl )
 
-cet_test( KalmanFilterTest HANDBUILT 
+cet_test( KalmanFilterTest HANDBUILT
   	  TEST_EXEC lar
 	  TEST_ARGS -c KalmanFilterTest.fcl
 	  DATAFILES KalmanFilterTest.fcl )
