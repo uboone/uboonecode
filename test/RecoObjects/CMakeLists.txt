@@ -15,7 +15,7 @@ simple_plugin(KalmanFilterTest "module"
 	      ${FHICLCPP}
               cetlib
               cetlib_except
-	      ${PQ}
+	      PQ
               BASENAME_ONLY
              )
 
@@ -32,7 +32,7 @@ simple_plugin(PropTest "module"
 	      ${FHICLCPP}
               cetlib
               cetlib_except
-	      ${PQ}
+	      PQ
               BASENAME_ONLY
              )
 
@@ -52,7 +52,7 @@ simple_plugin(InteractTest "module"
 	      ${FHICLCPP}
               cetlib
               cetlib_except
-	      ${PQ}
+	      PQ
               BASENAME_ONLY
              )
 

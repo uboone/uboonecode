@@ -13,7 +13,7 @@ simple_plugin(SparseRawDigitTest "module"
 
               ${FHICLCPP}
               cetlib cetlib_except
-              ${PQ}
+              PQ
               BASENAME_ONLY
              )
 
