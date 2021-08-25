@@ -15,7 +15,7 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-create_product_variables( uboonecode v09_27_00_01 )
+create_product_variables( uboonecode v09_28_02 )
 
 # define qualifiers
 set( BASEQUAL e20 )
