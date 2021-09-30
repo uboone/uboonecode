@@ -19,7 +19,7 @@ create_product_variables( uboonecode v09_31_00 )
 
 # define qualifiers
 set( BASEQUAL e20 )
-set( SQUAL s110 )
+set( SQUAL s112 )
 
 create_product_variables( uboone_photon_propagation v01_00_00  )
 create_product_variables( swtrigger v02_03_00d )
