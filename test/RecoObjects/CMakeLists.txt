@@ -27,7 +27,7 @@ simple_plugin(PropTest "module"
 	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
 	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
 	      ${MF_MESSAGELOGGER}
-	      ${CLHEP}
+	      CLHEP::CLHEP
               art_Persistency_Provenance
 	      ${FHICLCPP}
               cetlib
