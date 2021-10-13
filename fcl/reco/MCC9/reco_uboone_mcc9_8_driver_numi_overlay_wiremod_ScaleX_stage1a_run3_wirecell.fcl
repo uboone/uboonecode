@@ -1,0 +1,25 @@
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage1a.fcl"
+
+physics.reco: [ rns, mchitfinder, @sequence::microboone_reco_data_optical, dummyrawdigit, butcher, gaushit, wiremod ]
+
+# run gaushit over nfspl1:gauss wires (before wiremod...except throw in a fake butcher because ... well, because)
+physics.producers.butcher.ndrop: 0
+physics.producers.butcher.nkeep: 9600
+physics.producers.butcher.inRawTag: "dummyrawdigit"
+physics.producers.gaushit.CalDataModuleLabel: "butcher"
+# # modify nfspl1:gauss wires
+physics.producers.wiremod: @local::microboone_wiremod_ScaleX
+physics.producers.wiremod.ApplyAdditionalTickOffset: true
+physics.producers.wiremod.WireInputTag: "butcher"
+physics.producers.wiremod.TickOffset: 2400.
+physics.producers.wiremod.ApplyOverallScale: true
+physics.producers.wiremod.OverallScale: [200.,200.,200.]
+
+
+physics.producers.wiremod.SplinesFileName: "ScaleX_splines_for_Run3_numi.root"
+physics.producers.wiremod.SplineNames_Charge_X: ["trk_x_hit_Q_spline_Plane0_Run3_CVMC",
+                         "trk_x_hit_Q_spline_Plane1_Run3_CVMC",
+                         "trk_x_hit_Q_spline_Plane2_Run3_CVMC"]
+physics.producers.wiremod.SplineNames_Sigma_X:  ["trk_x_hit_sigma_spline_Plane0_Run3_CVMC",
+                         "trk_x_hit_sigma_spline_Plane1_Run3_CVMC",
+                         "trk_x_hit_sigma_spline_Plane2_Run3_CVMC"]
