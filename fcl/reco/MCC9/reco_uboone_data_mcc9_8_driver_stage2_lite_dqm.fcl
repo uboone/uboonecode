@@ -6,24 +6,24 @@ process_name: DataRecoStage2Lite
 services.TFileService.fileName: "reco_stage_2_hist.root"
 
 ### Module definitions
-pandoraCosmicPatRec:              @local::microboone_pandoraAllHitsCR
-pandoraCosmicTrack:               @local::microboone_pandoraTrackCreation
-pandoraCosmicShower:              @local::microboone_pandoraShowerCreation
-pandoraCosmic:                    @local::microboone_pandoraSplitting
-pandoraCosmicKalmanTrack:         @local::trackproducerfrompfparticle
-pandoraCosmicPFPart:              @local::microboone_cosmicpfparticletagger
-pandoraCosmicFlashTag:            @local::microboone_cosmicpfpflashtagger
-pandoraCosmicHitRemoval:          @local::microboone_crhitremoval # Remove hits, based on PFP geometry and flashes
-pandoraCosmicT0Reco:              @local::T0RecoAnodeCathodePiercing_data
-pandoraNuPatRec:                  @local::microboone_pandoraAllHitsSliceNu
-pandoraNuTrack:                   @local::microboone_pandoraTrackCreation
-pandoraNuShower:                  @local::microboone_pandoraShowerCreation
-pandoraNu:                        @local::microboone_pandoraSplitting
-pandoraNuPMA:                     @local::microboone_pmalgtrajfitter
-trajcluster:                      @local::microboone_trajcluster
-pmtrack:                          @local::microboone_pmalgtrajfitter
-pandoraTrack:                     @local::microboone_pandoraTrackCreation
-pandoraShower:                    @local::microboone_pandoraShowerCreation
+physics.producers.pandoraCosmicPatRec:              @local::microboone_pandoraAllHitsCR
+physics.producers.pandoraCosmicTrack:               @local::microboone_pandoraTrackCreation
+physics.producers.pandoraCosmicShower:              @local::microboone_pandoraShowerCreation
+physics.producers.pandoraCosmic:                    @local::microboone_pandoraSplitting
+physics.producers.pandoraCosmicKalmanTrack:         @local::trackproducerfrompfparticle
+physics.producers.pandoraCosmicPFPart:              @local::microboone_cosmicpfparticletagger
+physics.producers.pandoraCosmicFlashTag:            @local::microboone_cosmicpfpflashtagger
+physics.producers.pandoraCosmicHitRemoval:          @local::microboone_crhitremoval # Remove hits, based on PFP geometry and flashes
+physics.producers.pandoraCosmicT0Reco:              @local::T0RecoAnodeCathodePiercing_data
+physics.producers.pandoraNuPatRec:                  @local::microboone_pandoraAllHitsSliceNu
+physics.producers.pandoraNuTrack:                   @local::microboone_pandoraTrackCreation
+physics.producers.pandoraNuShower:                  @local::microboone_pandoraShowerCreation
+physics.producers.pandoraNu:                        @local::microboone_pandoraSplitting
+physics.producers.pandoraNuPMA:                     @local::microboone_pmalgtrajfitter
+physics.producers.trajcluster:                      @local::microboone_trajcluster
+physics.producers.pmtrack:                          @local::microboone_pmalgtrajfitter
+physics.producers.pandoraTrack:                     @local::microboone_pandoraTrackCreation
+physics.producers.pandoraShower:                    @local::microboone_pandoraShowerCreation
 
 physics.reco: [ 
                 pandoraCosmicPatRec,
