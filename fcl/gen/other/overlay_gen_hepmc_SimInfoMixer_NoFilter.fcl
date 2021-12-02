@@ -63,12 +63,12 @@ physics: {
 physics.filters.generator.module_type: "SimInfoOverlayFilterGenG4"
 physics.filters.generator.Verbosity: 2
 physics.filters.generator.SimInputFileNames : [ "genfile_filtered.root.local" ]
-physics.filters.generator.MCTruthInputModuleLabels: ["generator::GenieGen"]
-physics.filters.generator.MCFluxInputModuleLabels: ["generator::GenieGen"]
-physics.filters.generator.GTruthInputModuleLabels: ["generator::GenieGen"]
-physics.filters.generator.BeamGateInputModuleLabels: ["generator::GenieGen"]
-physics.filters.generator.MCTruthMCFluxAssnsInputModuleLabels: ["generator::GenieGen"]
-physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::GenieGen"]
+physics.filters.generator.MCTruthInputModuleLabels: ["generator::HepMCNuWro"]
+physics.filters.generator.MCFluxInputModuleLabels: ["generator::HepMCNuWro"]
+physics.filters.generator.GTruthInputModuleLabels: ["generator::HepMCNuWro"]
+physics.filters.generator.BeamGateInputModuleLabels: ["generator::HepMCNuWro"]
+physics.filters.generator.MCTruthMCFluxAssnsInputModuleLabels: ["generator::HepMCNuWro"]
+physics.filters.generator.MCTruthGTruthAssnsInputModuleLabels: ["generator::HepMCNuWro"]
 physics.filters.generator.MCTruthMCParticleAssnsMCTruthLookupLabel: []
 physics.filters.generator.POTSummaryTag: "potinevent:SubRunPOT"
 physics.filters.generator.FillPOTInfo: true
@@ -88,7 +88,7 @@ physics.filters.largeant.AuxDetSimChannelInputModuleLabels: ["largeant::G4EDep"]
 physics.filters.largeant.SimChannelInputModuleLabels: ["largeant::G4EDep"]
 physics.filters.largeant.SimPhotonsInputModuleLabels: ["largeant::G4EDep"]
 physics.filters.largeant.MCTruthMCParticleAssnsInputModuleLabels: ["largeant::G4EDep"]
-physics.filters.largeant.MCTruthMCParticleAssnsMCTruthLookupLabel: ["generator::GenieGen"]
+physics.filters.largeant.MCTruthMCParticleAssnsMCTruthLookupLabel: ["generator::HepMCNuWro"]
 physics.filters.largeant.FillPOTInfo: false
 
 physics.filters.ionization.module_type: "SimInfoOverlayFilterGenG4"
