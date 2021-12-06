@@ -15,7 +15,7 @@ simple_plugin(KalmanFilterTest "module"
 	      fhiclcpp::fhiclcpp
               cetlib::cetlib
               cetlib_except::cetlib_except
-	      PQ
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
@@ -32,7 +32,7 @@ simple_plugin(PropTest "module"
 	      fhiclcpp::fhiclcpp
               cetlib::cetlib
               cetlib_except::cetlib_except
-	      PQ
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
@@ -52,7 +52,7 @@ simple_plugin(InteractTest "module"
 	      fhiclcpp::fhiclcpp
               cetlib::cetlib
               cetlib_except::cetlib_except
-	      PQ
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 

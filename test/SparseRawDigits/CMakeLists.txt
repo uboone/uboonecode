@@ -5,7 +5,6 @@ simple_plugin(SparseRawDigitTest "module"
               art::Framework_Services_Registry
               art_root_io::tfile_support ROOT::Core
               art_root_io::TFileService_service
-              ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
               art::Persistency_Common canvas::canvas
               art::Persistency_Provenance canvas::canvas
               art::Utilities canvas::canvas
@@ -13,7 +12,7 @@ simple_plugin(SparseRawDigitTest "module"
               fhiclcpp::fhiclcpp
               cetlib::cetlib
               cetlib_except::cetlib_except
-              PQ
+              PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
