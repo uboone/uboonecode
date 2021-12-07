@@ -1,9 +1,9 @@
 # project name
 project(ConvertNtuple)
 
-find_package(nugen REQUIRED)
-find_package(GENIE REQUIRED PUBLIC) # find module in nugen
-find_package(log4cpp REQUIRED PUBLIC) # find module in nugen
+#find_package(nugen REQUIRED)
+#find_package(GENIE REQUIRED PUBLIC) # find module in nugen
+#find_package(log4cpp REQUIRED PUBLIC) # find module in nugen
 
 #include_directories( $ENV{GENIE_INC}/GENIE )
 
