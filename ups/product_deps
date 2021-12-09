@@ -31,14 +31,14 @@ table_fragment_end
 
 product                 version
 larsoft                 v09_38_00
-ubcv                    v09_38_00
-ubcrt                   v09_38_00
-ublite			v09_38_00
+ubcv                    v09_37_00
+ubcrt                   v09_37_00
+ublite			v09_37_00
 ubutil                  v09_32_00
 uboonedata              v09_32_00
 genie_xsec              v3_00_04a
 uboone_oslibs           v1_0_0
-cetbuildtools           v8_18_04	-	only_for_build
+cetbuildtools           v8_18_09	-	only_for_build
 end_product_list
 
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec              uboone_oslibs
