@@ -5,10 +5,10 @@
 #     larcorealg_Geometry
 #     mf_MessageLogger
 #     fhiclcpp
-#     cetlib cetlib_except
+#     cetlib::cetlib cetlib_except::cetlib_except
 #     ${ROOT_GENVECTOR}
 #
-#     ${GSL} ${GSLCBLAS}
+#     GSL ${GSLCBLAS}
 #   DATAFILES spacechargetest_uboone.fcl
 #   TEST_ARGS ./spacechargetest_uboone.fcl
 # )

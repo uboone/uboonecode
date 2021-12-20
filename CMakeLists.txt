@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
-project(uboonecode VERSION 09.35.01 LANGUAGES CXX)
+project(uboonecode VERSION 09.40.00 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
@@ -32,6 +32,7 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags()
 
+find_package(PostgreSQL REQUIRED PUBLIC)
 # these are minimum required versions, not the actual product versions
 find_ups_product( ubevt )
 find_ups_product( ubobj )

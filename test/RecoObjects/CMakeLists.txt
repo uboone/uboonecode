@@ -1,58 +1,58 @@
 simple_plugin(KalmanFilterTest "module"
               lardata_RecoObjects
 	      larcorealg_Geometry
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-              art_Persistency_Common
-              art_Persistency_Provenance
-	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+	      art::Framework_Core
+	      art::Framework_Principal
+	      art::Framework_Services_Registry
+              art::Persistency_Common
+              art::Persistency_Provenance
+	      art_root_io::tfile_support ROOT::Core
+	      art_root_io::TFileService_service
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-              art_Utilities
-              canvas
-	      ${MF_MESSAGELOGGER}
-	      ${FHICLCPP}
-              cetlib
-              cetlib_except
-	      PQ
+              art::Utilities
+              canvas::canvas
+	      messagefacility::MF_MessageLogger
+	      fhiclcpp::fhiclcpp
+              cetlib::cetlib
+              cetlib_except::cetlib_except
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
 simple_plugin(PropTest "module"
               lardata_RecoObjects
 	      larcorealg_Geometry
-	      nurandom_RandomUtils_NuRandomService_service
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-	      ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
-	      ${MF_MESSAGELOGGER}
+	      nurandom::RandomUtils_NuRandomService_service
+	      art::Framework_Core
+	      art::Framework_Services_Registry
+	      art::Framework_Services_Optional_RandomNumberGenerator_service
+	      messagefacility::MF_MessageLogger
 	      CLHEP::CLHEP
-              art_Persistency_Provenance
-	      ${FHICLCPP}
-              cetlib
-              cetlib_except
-	      PQ
+              art::Persistency_Provenance
+	      fhiclcpp::fhiclcpp
+              cetlib::cetlib
+              cetlib_except::cetlib_except
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
 simple_plugin(InteractTest "module"
               lardata_RecoObjects
 	      larcorealg_Geometry
-	      ${ART_FRAMEWORK_CORE}
-	      ${ART_FRAMEWORK_PRINCIPAL}
-	      ${ART_FRAMEWORK_SERVICES_REGISTRY}
-              art_Persistency_Common
-              art_Persistency_Provenance
-	      ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
-	      ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+	      art::Framework_Core
+	      art::Framework_Principal
+	      art::Framework_Services_Registry
+              art::Persistency_Common
+              art::Persistency_Provenance
+	      art_root_io::tfile_support ROOT::Core
+	      art_root_io::TFileService_service
 	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
-	      art_Utilities canvas
-	      ${MF_MESSAGELOGGER}
-	      ${FHICLCPP}
-              cetlib
-              cetlib_except
-	      PQ
+	      art::Utilities canvas::canvas
+	      messagefacility::MF_MessageLogger
+	      fhiclcpp::fhiclcpp
+              cetlib::cetlib
+              cetlib_except::cetlib_except
+	      PostgreSQL::PostgreSQL
               BASENAME_ONLY
              )
 
