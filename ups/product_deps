@@ -30,14 +30,14 @@ table_fragment_end
 # Add the dependent product and version
 
 product                 version
-larsoft                 v09_40_00
+larsoft                 v09_41_00
 ubcv                    v09_40_00
 ubcrt                   v09_40_00
 ublite			v09_40_00
 ubutil                  v09_39_00
 uboonedata              v09_32_00
 genie_xsec              v3_00_04a
-genie_phyopt            v3_00_04
+genie_phyopt            v3_00_06
 uboone_oslibs           v1_0_0
 cetbuildtools           v8_18_09	-	only_for_build
 end_product_list
@@ -57,18 +57,18 @@ end_product_list
 #gbf:e20:prof   e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e20:prof
 #end_qualifier_list
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec                      genie_phyopt    uboone_oslibs
-c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
-be:c7:debug    c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-
-be:c7:prof     c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-
-be:e20:debug   e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-
-be:e20:prof    e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-
-gbf:c7:debug   c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
-gbf:c7:prof    c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
-gbf:e20:debug  e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
-gbf:e20:prof   e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-
+c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+be:c7:debug    c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           U1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+be:c7:prof     c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           U1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+be:e20:debug   e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           U1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+be:e20:prof    e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           U1810a0211a:k250:e1000          dkstandard:resfixfix      -nq-
+gbf:c7:debug   c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a99999:k250:e1000          dkstandard:resfixfix      -nq-
+gbf:c7:prof    c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a99999:k250:e1000          dkstandard:resfixfix      -nq-
+gbf:e20:debug  e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a99999:k250:e1000          dkstandard:resfixfix      -nq-
+gbf:e20:prof   e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a99999:k250:e1000          dkstandard:resfixfix      -nq-
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
