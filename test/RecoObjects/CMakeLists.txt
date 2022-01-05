@@ -8,7 +8,6 @@ simple_plugin(KalmanFilterTest "module"
               art::Persistency_Provenance
 	      art_root_io::tfile_support ROOT::Core
 	      art_root_io::TFileService_service
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
               art::Utilities
               canvas::canvas
 	      messagefacility::MF_MessageLogger
@@ -46,7 +45,6 @@ simple_plugin(InteractTest "module"
               art::Persistency_Provenance
 	      art_root_io::tfile_support ROOT::Core
 	      art_root_io::TFileService_service
-	      ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
 	      art::Utilities canvas::canvas
 	      messagefacility::MF_MessageLogger
 	      fhiclcpp::fhiclcpp
