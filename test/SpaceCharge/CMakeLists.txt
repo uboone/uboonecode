@@ -7,7 +7,6 @@
 #     fhiclcpp
 #     cetlib::cetlib
 #     cetlib_except::cetlib_except
-#     ${ROOT_GENVECTOR}
 #
 #     GSL ${GSLCBLAS}
 #   DATAFILES spacechargetest_uboone.fcl
