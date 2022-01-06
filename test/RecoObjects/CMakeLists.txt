@@ -45,7 +45,8 @@ simple_plugin(InteractTest "module"
               art::Persistency_Provenance
 	      art_root_io::tfile_support ROOT::Core
 	      art_root_io::TFileService_service
-	      art::Utilities canvas::canvas
+	      art::Utilities
+              canvas::canvas
 	      messagefacility::MF_MessageLogger
 	      fhiclcpp::fhiclcpp
               cetlib::cetlib
