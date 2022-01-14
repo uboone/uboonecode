@@ -1,0 +1,28 @@
+#include "beamspilltimings.fcl"
+#include "standard_overlay_gen_bnb_intrinsic_nue_uboone_griddriver.fcl"
+
+# dk2nu flux generation config
+physics.producers.generator:                    @local::standard_genie
+physics.producers.generator.POTPerSpill:        6e13
+physics.producers.generator.EventsPerSpill:     0
+physics.producers.generator.GlobalTimeOffset:   5627.5
+physics.producers.generator.RandomTimeOffset:   9600.
+physics.producers.generator.TopVolume:          "volTPCActive"
+physics.producers.generator.GenFlavors:         [14,-14]
+physics.producers.generator.BeamName:           "numi"
+physics.producers.generator.EventGeneratorList: "CCinclMEC"
+physics.producers.generator.MixerConfig: "map 14:12 -14:-12" # example flavor swapping
+physics.producers.generator.FluxType:           "dk2nu"
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
+physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
+physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
+
+# Add beam timing structure to the generation of events
+#physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
+
+physics.producers.generator.FluxCopyMethod: "IFDH"
+
+#reduce file name length
+outputs.out1.fileName: "%ifb_gen_rhc.root"
+
+services.IFDH: {}
