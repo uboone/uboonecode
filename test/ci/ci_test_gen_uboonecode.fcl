@@ -1,5 +1,6 @@
 #include "prodgenie_bnb_nu_cosmic_uboone.fcl"
 
+physics.producers.generator.FluxFiles: [ "converted_beammc_*.root" ]
 physics.producers.generator.FluxSearchPaths: "./"
 
 services.NuRandomService.policy: "preDefinedSeed"
