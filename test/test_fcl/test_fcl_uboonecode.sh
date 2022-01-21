@@ -1,5 +1,12 @@
 #! /bin/bash
 
+# Skip for debug build.
+
+if [[ x$MRB_QUALS =~ x.*debug.* ]]; then
+  echo "Skipping for debug build."
+  exit 0
+fi
+
 # Loop over all installed fcl files.
 
 find $MRB_BUILDDIR/uboonecode/job -name \*.fcl -print | while read fcl

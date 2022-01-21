@@ -18,6 +18,12 @@ if [ ! -d /pnfs/uboone/persistent ]; then
   exit
 fi
 
+# Exit if ups product wcp isn't set up.
+
+if [ x$WCP_DIR = x ]; then
+  exit
+fi
+
 # Set wire cell path.
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
