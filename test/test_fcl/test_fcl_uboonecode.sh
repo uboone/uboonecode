@@ -6,6 +6,10 @@ if [[ x$MRB_QUALS =~ x.*debug.* ]]; then
   echo "Skipping for debug build."
   exit 0
 fi
+if [[ x`which lar` =~ x.*debug.* ]]; then
+  echo "Skipping for debug build."
+  exit 0
+fi
 
 # Loop over all installed fcl files.
 
