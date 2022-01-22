@@ -175,12 +175,16 @@ microboone_reco_data_producers:
     ### pandora analysis
     pandoratag:                       @local::microboone_cosmictracktagger
     pandoracalo:                      @local::microboone_calodata
+    pandoracaloT0:                    @local::microboone_calodata
     pandorapid:                       @local::particleidconfig
     pandoracali:                      @local::microboone_calibrationdedx_data
+    pandoracaliT0:                    @local::microboone_calibrationdedx_data
     pandoracalipid:                   @local::particleidconfig
     pandoracaloSCE:                   @local::microboone_calodata
+    pandoracaloSCET0:                 @local::microboone_calodata
     pandorapidSCE:                    @local::particleidconfig
     pandoracaliSCE:                   @local::microboone_calibrationdedx_data
+    pandoracaliSCET0:                 @local::microboone_calibrationdedx_data
     pandoracalipidSCE:                @local::particleidconfig
     pandoraKalmanTracktag:            @local::microboone_cosmictracktagger
     pandoraKalmanTrackcalo:           @local::microboone_calodata
@@ -345,8 +349,7 @@ microboone_reco_data_ccpath:           [ @sequence::microboone_reco_data_cluster
                                          tcshower
                                        ]
 
-microboone_reco_data_crt:              [ crtt0Correction,
-                                         crthitcorr,
+microboone_reco_data_crt:              [ crthitcorr,
                                          crttzero,
                                          crttrack,
                                          crttrackmatch,
@@ -372,12 +375,16 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraMCSMu,
                                          pandoraMCSMuNoSCE,
                                          pandoracalo,
+                                         pandoracaloT0,
                                          pandorapid,
                                          pandoracali,
+                                         pandoracaliT0,
                                          pandoracalipid,
                                          pandoracaloSCE,
+                                         pandoracaloSCET0,
                                          pandorapidSCE,
                                          pandoracaliSCE,
+                                         pandoracaliSCET0,
                                          pandoracalipidSCE,
                                          pandoraKalmanTrack,
                                          pandoraKalmanShower,
@@ -548,11 +555,19 @@ microboone_reco_data_producers.pandoratag.TrackModuleLabel:                     
 microboone_reco_data_producers.pandoracalo.TrackModuleLabel:                                                "pandora"
 microboone_reco_data_producers.pandoracalo.SpacePointModuleLabel:                                           "pandora"
 
+microboone_reco_data_producers.pandoracaloT0.TrackModuleLabel:                                                "pandora"
+microboone_reco_data_producers.pandoracaloT0.SpacePointModuleLabel:                                           "pandora"
+microboone_reco_data_producers.pandoracaloT0.CorrectT0:                                                       true
+
 microboone_reco_data_producers.pandorapid.ProducerLabels.TrackLabel:                                        "pandora"
 microboone_reco_data_producers.pandorapid.ProducerLabels.CalorimetryLabel:                                  "pandoracalo"
 
 microboone_reco_data_producers.pandoracali.TrackModuleLabel:                                                "pandora"
 microboone_reco_data_producers.pandoracali.CalorimetryModuleLabel:                                          "pandoracalo"
+
+microboone_reco_data_producers.pandoracaliT0.TrackModuleLabel:                                                "pandora"
+microboone_reco_data_producers.pandoracaliT0.CalorimetryModuleLabel:                                           "pandoracaloT0"
+microboone_reco_data_producers.pandoracaliT0.CorrectT0:                                                       true
 
 microboone_reco_data_producers.pandoracalipid.ProducerLabels.TrackLabel:                                    "pandora"
 microboone_reco_data_producers.pandoracalipid.ProducerLabels.CalorimetryLabel:                              "pandoracali"
@@ -561,12 +576,22 @@ microboone_reco_data_producers.pandoracaloSCE.TrackModuleLabel:                 
 microboone_reco_data_producers.pandoracaloSCE.SpacePointModuleLabel:                                           "pandora"
 microboone_reco_data_producers.pandoracaloSCE.CorrectSCE:                                                      true
 
+microboone_reco_data_producers.pandoracaloSCET0.TrackModuleLabel:                                                "pandora"
+microboone_reco_data_producers.pandoracaloSCET0.SpacePointModuleLabel:                                           "pandora"
+microboone_reco_data_producers.pandoracaloSCET0.CorrectSCE:                                                      true
+microboone_reco_data_producers.pandoracaloSCET0.CorrectT0:                                                      true
+
 microboone_reco_data_producers.pandorapidSCE.ProducerLabels.TrackLabel:                                        "pandora"
 microboone_reco_data_producers.pandorapidSCE.ProducerLabels.CalorimetryLabel:                                  "pandoracaloSCE"
 
 microboone_reco_data_producers.pandoracaliSCE.TrackModuleLabel:                                                "pandora"
 microboone_reco_data_producers.pandoracaliSCE.CalorimetryModuleLabel:                                          "pandoracaloSCE"
 microboone_reco_data_producers.pandoracaliSCE.CorrectSCE:                                                      true
+
+microboone_reco_data_producers.pandoracaliSCET0.TrackModuleLabel:                                                "pandora"
+microboone_reco_data_producers.pandoracaliSCET0.CalorimetryModuleLabel:                                          "pandoracaloSCET0"
+microboone_reco_data_producers.pandoracaliSCET0.CorrectSCE:                                                      true
+microboone_reco_data_producers.pandoracaliSCET0.CorrectT0:                                                      true
 
 microboone_reco_data_producers.pandoracalipidSCE.ProducerLabels.TrackLabel:                                    "pandora"
 microboone_reco_data_producers.pandoracalipidSCE.ProducerLabels.CalorimetryLabel:                              "pandoracaliSCE"
@@ -601,12 +626,14 @@ microboone_reco_data_producers.pandoraKalmanShowercalipid.ProducerLabels.Calorim
 
 microboone_reco_data_producers.pandoracalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoracaloSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoracaloSCET0.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoraKalmanTrackcalo.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoraKalmanShowercalo.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pmtrackcalo.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 
 microboone_reco_data_producers.pandoracali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoracaliSCE.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
+microboone_reco_data_producers.pandoracaliSCET0.CaloAlg.CalAreaConstants:                                       [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoraKalmanTrackcali.CaloAlg.CalAreaConstants:                               [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pandoraKalmanShowercali.CaloAlg.CalAreaConstants:                              [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.pmtrackcali.CaloAlg.CalAreaConstants:                                          [4.31e-3, 4.02e-3, 4.10e-3]
