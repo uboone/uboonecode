@@ -28,7 +28,7 @@ do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
   err=`basename $fcl .fcl`.err
-  cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 2"
+  cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 1"
   echo $cmd
   $cmd > $out 2> $err
   stat=$?
