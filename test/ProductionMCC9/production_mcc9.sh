@@ -21,9 +21,9 @@ do
   out=`basename $fcl .fcl`.out
   err=`basename $fcl .fcl`.err
   if [ x$input = x ]; then
-    cmd="lar --rethrow-all -c $fcl -o $output -n 5"
+    cmd="lar --rethrow-all -c $fcl -o $output -n 2"
   else
-    cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 5"
+    cmd="lar --rethrow-all -c $fcl -s $input -o $output -n 2"
   fi
   echo $cmd
   $cmd > $out 2> $err
