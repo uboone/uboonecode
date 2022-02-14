@@ -95,9 +95,9 @@ do
   # Run lar.
 
   if [ x$input = x ]; then
-    cmd="lar --rethrow-all -c $FCL -n 5"
+    cmd="lar --rethrow-all -c $FCL -n 2"
   else
-    cmd="lar --rethrow-all -c $FCL -s $input -n 5"
+    cmd="lar --rethrow-all -c $FCL -s $input -n 2"
   fi
   echo $cmd
   $cmd > $out 2> $err
