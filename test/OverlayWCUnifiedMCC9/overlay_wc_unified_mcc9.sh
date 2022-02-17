@@ -129,7 +129,7 @@ do
 
     cat <<EOF > celltreeOVERLAY.root.json
 {
-  "event_count": 2,
+  "event_count": 1,
 }
 EOF
 
