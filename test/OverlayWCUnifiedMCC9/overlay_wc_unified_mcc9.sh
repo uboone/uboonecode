@@ -113,9 +113,9 @@ do
   # Run lar.
 
   if [ x$input = x ]; then
-    cmd="lar --rethrow-all -c $FCL -n 2"
+    cmd="lar --rethrow-all -c $FCL -n 1"
   else
-    cmd="lar --rethrow-all -c $FCL -s $input -n 2"
+    cmd="lar --rethrow-all -c $FCL -s $input -n 1"
   fi
   echo $cmd
   $cmd > $out 2> $err
@@ -135,7 +135,7 @@ do
 
     cat <<EOF > celltreeOVERLAY.root.json
 {
-  "event_count": 2,
+  "event_count": 1,
 }
 EOF
 
