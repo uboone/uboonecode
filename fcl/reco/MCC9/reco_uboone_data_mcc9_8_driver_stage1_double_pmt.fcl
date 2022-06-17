@@ -12,7 +12,8 @@ outputs.out1.dataTier:          "reconstructed"
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*Reco*" ]
 
 
-physics.producers.saturation: @local::microboone_reco_data_producers.saturationDoublePMT
+physics.producers.saturation.HGProducer: "doublePMTFilterHG"
+physics.producers.saturation.LGProducer: "doublePMTFilterLG"
 
 #temporary since new RawDigits are baseline corrected
 services.DetPedestalService.DetPedestalRetrievalAlg.UseDB:           false

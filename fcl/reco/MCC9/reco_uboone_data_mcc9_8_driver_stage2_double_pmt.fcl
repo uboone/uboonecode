@@ -15,8 +15,11 @@ source.inputCommands:           ["keep *_*_*_*",
                                  "drop recob::OpHits_*_*_Data*",
                                  "drop recob::OpFlashs_*_*_Data*" ]
 
-physics.producers.saturation: @local::microboone_reco_data_producers.saturationDoublePMT
-physics.producers.wcopflash:  @local::microboone_reco_data_producers.wcopflashDoublePMT
+physics.producers.saturation.HGProducer: "doublePMTFilterHG"
+physics.producers.saturation.LGProducer: "doublePMTFilterLG"
+physics.producers.wcopflash.OpDataHGProducerBeam: "doublePMTFilterHG"
+physics.producers.wcopflash.OpDataLGProducerBeam: "doublePMTFilterLG"
+physics.producers.acpttrigtagger.OpDetWfmProducer: "doublePMTFilterHG:OpdetBeamHighGain"
 
 microboone_tfile_metadata:
 {

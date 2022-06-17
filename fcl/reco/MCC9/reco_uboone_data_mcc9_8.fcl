@@ -127,11 +127,11 @@ microboone_reco_data_producers:
     ophitCosmicCalib:                 @local::ophitcorrection
 
     ### Double PMT waveform filter
-    doublePMTFilter:                  @local::microboone_pmtdoublereadoutfilter
+    doublePMTFilterHG:                @local::microboone_pmtdoublereadoutfilter
+    doublePMTFilterLG:                @local::microboone_pmtdoublereadoutfilter
 
     ### Saturation correction module
     saturation:                       @local::correct_saturation
-    saturationDoublePMT:              @local::correct_saturation
 
     ### flash finders
     simpleFlashBeam:                  @local::UBFlashBeam
@@ -140,7 +140,6 @@ microboone_reco_data_producers:
     opflashBeam:                      @local::microboone_opflash_saturation_beam
     opflashCosmic:                    @local::microboone_opflash_saturation_cosmic
     wcopflash:                        @local::UBWCFlashFinder
-    wcopflashDoublePMT:               @local::UBWCFlashFinder
 
     ### noise filtering and signal processing from the wirecell toolkit
     nfspl1:                           @local::wcls.nfspl1
@@ -324,7 +323,8 @@ microboone_reco_data_optical:          [ saturation,
                                        ]
 
 microboone_reco_data_optical_double_pmt: [
-                                         doublePMTFilter,
+                                         doublePMTFilterHG,
+                                         doublePMTFilterLG,
                                          @sequence::microboone_reco_data_optical
                                        ]
 
@@ -506,8 +506,9 @@ microboone_dqm_ana:                    [ @sequence::microboone_dqm_ana_stage1,
 ### These are for MCC 9
 ###        Variable to override                                                                                    Values overriding defaults ###
 
-# SaturationDoublePMT getting input from double pmt filter.
-microboone_reco_data_producers.saturationDoublePMT.HGProducer: "doublePMTFilter"
+# Double PMT filters.
+microboone_reco_data_producers.doublePMTFilterHG.waveformLabel: "pmtreadout:OpdetBeamHighGain"
+microboone_reco_data_producers.doublePMTFilterLG.waveformLabel: "pmtreadout:OpdetBeamLowGain"
 
 # Cal data is no longer used, below is historic
 microboone_reco_data_producers.caldata.DigitModuleLabel:                                                      "butcher"
@@ -713,9 +714,6 @@ microboone_reco_data_producers.ophitCosmicCalib.OpHitsInputTag: "ophitCosmic"
 #microboone_reco_data_producers.ophitCosmicCalib.OutputProducer: "calib"
 
 microboone_reco_data_producers.wcopflash.usePmtGainDB:                                   		      true
-
-microboone_reco_data_producers.wcopflashDoublePMT.usePmtGainDB:                                 	      true
-microboone_reco_data_producers.wcopflashDoublePMT.OpDataHGProducerBeam:                                       "doublePMTFilter"
 
 microboone_reco_data_filters.flashfilter.OpFlashTag:                                                          "simpleFlashBeam"
 microboone_reco_data_filters.dlpmtprecuts.OpHitProducer:                                                      "ophitBeam"
