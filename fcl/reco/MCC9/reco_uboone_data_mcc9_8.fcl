@@ -20,6 +20,7 @@
 #include "flash_neutrino_id.fcl"
 #include "photpropservices_microboone.fcl"
 #include "correct_saturation.fcl"
+#include "microboone_pmtdoublereadoutfilter.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "SpacePointSolver_microboone.fcl"
 #include "ubflashfinder.fcl"
@@ -124,6 +125,9 @@ microboone_reco_data_producers:
     ophitCosmic:                      @local::ophitremap
     ophitBeamCalib:                   @local::ophitcorrection
     ophitCosmicCalib:                 @local::ophitcorrection
+
+    ### Double PMT waveform filter
+    doublePMTFilter:                  @local::microboone_pmtdoublereadoutfilter
 
     ### Saturation correction module
     saturation:                       @local::correct_saturation
@@ -317,6 +321,11 @@ microboone_reco_data_optical:          [ saturation,
                                          simpleFlashBeamLowPE
                                        ]
 
+microboone_reco_data_optical_double_pmt: [
+                                         doublePMTFilter,
+                                         @sequence::microboone_reco_data_optical
+                                       ]
+
 microboone_reco_data_signalprocessing: [ nfspl1,
                                          butcher,
                                          gaushit 
@@ -414,6 +423,12 @@ microboone_reco_data_stage1:           [ rns,
                                          @sequence::microboone_reco_data_signalprocessing 
                                        ]
 
+microboone_reco_data_stage1_double_pmt: [
+                                         rns,
+                                         @sequence::microboone_reco_data_optical_double_pmt,
+                                         @sequence::microboone_reco_data_signalprocessing 
+                                       ]
+
 microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
@@ -421,7 +436,21 @@ microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          @sequence::microboone_reco_data_crt
                                        ]
 
+microboone_reco_data_mcc9_1_stage2_double_pmt: [
+                                         rns,
+                                         @sequence::microboone_reco_data_optical_double_pmt,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
 microboone_reco_data_stage2:           [ @sequence::microboone_reco_data_mcc9_1_stage2,
+                                         @sequence::microboone_reco_data_ccpath
+                                       ]
+
+microboone_reco_data_stage2_double_pmt: [
+                                         @sequence::microboone_reco_data_mcc9_1_stage2_double_pmt,
                                          @sequence::microboone_reco_data_ccpath
                                        ]
 
@@ -437,6 +466,15 @@ microboone_reco_ovrl_stage2:           [ @sequence::microboone_reco_ovrl_mcc9_1_
                                        ]
 
 microboone_reco_data_stage2_nocc:      [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_data_stage2_nocc_double_pmt: [
+                                         rns,
+                                         @sequence::microboone_reco_data_optical_double_pmt,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,

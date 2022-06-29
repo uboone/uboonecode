@@ -1,0 +1,27 @@
+#include "reco_uboone_data_mcc9_8_driver_common.fcl"
+
+process_name: DataRecoStage2DoublePMT
+
+services.TFileService.fileName: "reco_stage_2_hist.root"
+physics.reco:                   [ @sequence::microboone_reco_data_stage2_double_pmt ]
+physics.ana:                    [ ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ stream1 ]
+outputs.out1.fileName:          "%ifb_%tc_reco2.root"
+outputs.out1.dataTier:          "reconstructed"
+source.inputCommands:           ["keep *_*_*_*",
+                                 "drop *_*_*_Data*RecoStage2*",
+                                 "drop raw::OpDetWaveforms_*_*_Data*",
+                                 "drop recob::OpHits_*_*_Data*",
+                                 "drop recob::OpFlashs_*_*_Data*" ]
+
+physics.producers.saturation.HGProducer: "doublePMTFilter"
+physics.producers.acpttrigtagger.OpDetWfmProducer: "doublePMTFilter:OpdetBeamHighGain"
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
+  GenerateTFileMetadata: [true, true]
+  dataTier:              ["root-tuple", "pandora_debug"]
+  fileFormat:            ["root", "pndr"]
+}
