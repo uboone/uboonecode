@@ -57,6 +57,7 @@ services.SpaceCharge.service_provider:  SpaceChargeServiceMicroBooNE
 services.SpaceCharge.EnableCalEfieldSCE: true
 services.SpaceCharge.EnableCalSpatialSCE: true
 services.SpaceCharge.EnableCorrSCE: true
+services.SpaceCharge.EfieldOffsetScale: 3.65096750639
 
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true
