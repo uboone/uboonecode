@@ -50,13 +50,14 @@ outputs: {
 services.SpaceCharge:  @local::standard_spacecharge
 services.SpaceCharge.RepresentationType: Voxelized_TH3
 services.SpaceCharge.InputFilename:  "SpaceCharge/SCEoffsets_dataDriven_fwd_varied_50.root"
-services.SpaceCharge.CalibrationInputFilename: "SpaceCharge/SCEoffsets_dataDriven_bkwd_varied_50.root" 
+services.SpaceCharge.CalibrationInputFilename: "SpaceCharge/SCEoffsets_dataDriven_bkwd_varied_50.root"
 services.SpaceCharge.service_provider:  SpaceChargeServiceMicroBooNE
 
 #enable correction by default
 services.SpaceCharge.EnableCalEfieldSCE: true
 services.SpaceCharge.EnableCalSpatialSCE: true
 services.SpaceCharge.EnableCorrSCE: true
+services.SpaceCharge.EfieldOffsetScale: 3.65096750639
 
 services.SpaceCharge.EnableSimSpatialSCE: true
 services.SpaceCharge.EnableSimEfieldSCE: true
