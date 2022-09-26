@@ -15,7 +15,7 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-create_product_variables( uboonecode v09_58_02 )
+create_product_variables( uboonecode v09_59_00 )
 
 # define qualifiers
 set( BASEQUAL e20 )
@@ -43,7 +43,7 @@ create_product_variables( ubraw v09_58_00 )
 create_product_variables( ubcore v09_58_00 )
 create_product_variables( ubcrt v09_58_02 )
 create_product_variables( ubobj v09_58_00 )
-create_product_variables( larsoft v09_58_02 )
+create_product_variables( larsoft v09_59_00 )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
