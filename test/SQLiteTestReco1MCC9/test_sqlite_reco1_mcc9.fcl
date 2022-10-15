@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_8_driver_stage1_reduced.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage1_double_pmt_reduced.fcl"
 
 process_name: DataRecoStage1Test
 
