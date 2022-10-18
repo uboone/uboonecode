@@ -17,6 +17,9 @@ physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/ubooneb
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 
+# dk2nu flux format not supported in GFluxBlender
+physics.producers.generator.BlenderDist:        false
+
 # Add beam timing structure to the generation of events
 #physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
