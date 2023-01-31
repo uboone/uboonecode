@@ -15,11 +15,11 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-create_product_variables( uboonecode v09_65_03 )
+create_product_variables( uboonecode v09_66_00 )
 
 # define qualifiers
 set( BASEQUAL e20 )
-set( SQUAL s117 )
+set( SQUAL s112 )
 
 create_product_variables( uboone_photon_propagation v01_01_00  )
 create_product_variables( larbatch v01_57_01 )
