@@ -15,7 +15,7 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-create_product_variables( uboonecode v09_66_01 )
+create_product_variables( uboonecode v09_66_02 )
 
 # define qualifiers
 set( BASEQUAL e20 )
@@ -33,8 +33,8 @@ create_product_variables( uboone_oslibs             v1_0_0     )
 create_product_variables( uboonedaq_datatypes v6_22_05g )
 create_product_variables( uboonedata v09_61_00 )
 create_product_variables( ubutil v09_66_01 )
-create_product_variables( ublite v09_66_01 )
-create_product_variables( ubana v09_66_01 )
+create_product_variables( ublite v09_66_02 )
+create_product_variables( ubana v09_66_02 )
 create_product_variables( ubreco v09_66_01 )
 create_product_variables( ubsim v09_66_01 )
 create_product_variables( ubcv v09_66_01 )
@@ -43,7 +43,7 @@ create_product_variables( ubraw v09_66_01 )
 create_product_variables( ubcore v09_65_03 )
 create_product_variables( ubcrt v09_66_01 )
 create_product_variables( ubobj v09_65_03 )
-create_product_variables( larsoft v09_66_01 )
+create_product_variables( larsoft v09_66_02 )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
