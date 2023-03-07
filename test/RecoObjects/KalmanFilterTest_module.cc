@@ -11,7 +11,7 @@
 #include "art/Framework/Core/ModuleMacros.h" 
 #include "art/Framework/Core/EDAnalyzer.h"
 
-#include "larcore/Geometry/Geometry.h"
+#include "larcore/Geometry/WireReadout.h"
 
 #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
 #include "lardata/RecoObjects/KHitWireX.h"
@@ -60,7 +60,7 @@ namespace trkf
 
     // Get services.
 
-    art::ServiceHandle<geo::Geometry> geom;
+    auto const& channelMap = art::ServiceHandle<geo::WireReadout const>()->Get();
 
     // Make a test track.
 
@@ -95,7 +95,7 @@ namespace trkf
 	channel = 4000 + 100*i;
       else
 	channel = 6000 + 100*i;
-      std::vector<geo::WireID> wireids = geom->ChannelToWire(channel);
+      std::vector<geo::WireID> wireids = channelMap.ChannelToWire(channel);
       assert(wireids.size() != 0);
       geo::WireID wireid = wireids[0];
       trkf::KHitWireX hit(wireid, 0., 0.);
