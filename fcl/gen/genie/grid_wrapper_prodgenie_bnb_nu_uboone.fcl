@@ -6,5 +6,4 @@
 #
 ###############################################################################
 #include "prodgenie_bnb_nu_uboone.fcl"
-physics.producers.generator.FluxCopyMethod: "IFDH"
-physics.producers.generator.MaxFluxFileMB: 500
+physics.producers.generator.FluxCopyMethod: "DIRECT"

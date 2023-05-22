@@ -11,7 +11,7 @@ physics.producers.generator.TopVolume:          "volCryostat"
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "Default"
 physics.producers.generator.FluxType:           "dk2nu"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 

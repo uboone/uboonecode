@@ -62,7 +62,7 @@ physics.producers.generator.RandomTimeOffset: 1600.
 physics.producers.generator.TopVolume: "volCryostat"
 physics.producers.generator.BeamName: "booster"
 
-physics.producers.generator.FluxCopyMethod: "IFDH"
+physics.producers.generator.FluxCopyMethod: "DIRECT"
 
 #reduce file name length
 outputs.out1.fileName: "%ifb_gen.root"

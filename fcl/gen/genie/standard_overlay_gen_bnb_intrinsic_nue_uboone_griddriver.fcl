@@ -64,7 +64,7 @@ physics.producers.generator.TopVolume: "volTPCActive"
 physics.producers.generator.GenFlavors: [12,-12]
 physics.producers.generator.BeamName: "booster"
 
-physics.producers.generator.FluxCopyMethod: "IFDH"
+physics.producers.generator.FluxCopyMethod: "DIRECT"
 
 #reduce file name length
 outputs.out1.fileName: "%ifb_gen.root"
