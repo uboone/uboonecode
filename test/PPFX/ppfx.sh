@@ -6,6 +6,9 @@
 if [ -d $PPFX_DIR/scripts ]; then
   export FW_SEARCH_PATH=$PPFX_DIR/scripts:$FW_SEARCH_PATH
 fi
+if [ -d $PPFX_DIR/xml ]; then
+  export FW_SEARCH_PATH=$PPFX_DIR/xml:$FW_SEARCH_PATH
+fi
 
 # Update GXMLPATH
 
