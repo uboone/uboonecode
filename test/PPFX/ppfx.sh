@@ -1,10 +1,15 @@
 #! /bin/bash
 
-# Make sure we can find config file in mrbsetenv environment.
+# Make sure we can find ppfx config file in mrbsetenv environment, since the install
+# subdirectory is different than the source subdirectory.
 
 if [ -d $PPFX_DIR/scripts ]; then
   export FW_SEARCH_PATH=$PPFX_DIR/scripts:$FW_SEARCH_PATH
 fi
+
+# Update GXMLPATH
+
+export GXMLPATH=$UBOONEDATA_DIR/genie:$GXMLPATH
 
 # Set up python path.
 
