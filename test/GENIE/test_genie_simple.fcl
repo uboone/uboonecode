@@ -4,7 +4,7 @@
 
 //========================================
 
-process_name: Dk2nuGen
+process_name: GENIEGen
 
 services:
 {
@@ -48,7 +48,7 @@ outputs:
   out1:
   {  
    module_type: RootOutput
-   fileName:    "genie_dk2nu.root"
+   fileName:    "genie_simple.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1

@@ -70,5 +70,5 @@ physics.producers.generator.EventGeneratorList: "Default"
 physics.producers.generator.FluxType:           "dk2nu"
 physics.producers.generator.FluxFiles:          [ "g4numiv6_*.root" ]
 physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/FHC/"
-physics.producers.generator.DetectorLocation:   "microboone-numi"
+physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 physics.producers.generator.FluxCopyMethod:     "DIRECT"
