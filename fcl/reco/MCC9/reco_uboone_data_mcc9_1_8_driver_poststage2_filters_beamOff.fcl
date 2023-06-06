@@ -13,7 +13,8 @@ physics.ncpi0: [ rns, ncpi0filter ]
 physics.antibdt:      [ rns, shrreco3dKalmanShower, shrreco3dKalmanShowercalo, shrreco3dKalmanShowercali, antibdtfilter ]
 
 physics.trigger_paths:          [ pi0, NuCC, ncpi0, antibdt ]
-physics.stream1:                [ out1, outpi0, outNuCC, outncpi0, outantibdt ]
+#physics.stream1:                [ out1, outpi0, outNuCC, outncpi0, outantibdt ]
+physics.stream1:                [ out1 ]
 
 outputs.out1.fileName:     "%ifb_%tc_all.root"
 outputs.out1.dataTier:     "reconstructed"
