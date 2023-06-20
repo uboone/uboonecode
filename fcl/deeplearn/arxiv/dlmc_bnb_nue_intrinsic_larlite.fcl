@@ -31,8 +31,7 @@ physics.producers.generator.RandomTimeOffset: 1600.
 physics.producers.generator.TopVolume:        "volTPCActive"
 physics.producers.generator.BeamName:         "booster"
 physics.producers.generator.GenFlavors:       [12,-12]
-physics.producers.generator.FluxCopyMethod:   "IFDH"
-physics.producers.generator.MaxFluxFileMB:    2000
+physics.producers.generator.FluxCopyMethod:   "DIRECT"
 
 services.UBOpticalChConfig.PedestalSpread: [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 

@@ -22,8 +22,7 @@ physics.producers.generator.GlobalTimeOffset: 3125.
 physics.producers.generator.RandomTimeOffset: 1600.
 physics.producers.generator.TopVolume: "volTPCActive"
 physics.producers.generator.BeamName:  "booster"
-physics.producers.generator.FluxCopyMethod:   "IFDH"
-physics.producers.generator.MaxFluxFileMB:    2000
+physics.producers.generator.FluxCopyMethod:   "DIRECT"
 
 # Filter output
 physics.analyzers.mcinfo.SelectEvents:  [ sim ]

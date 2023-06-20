@@ -22,7 +22,8 @@ physics.antibdt:      [ rns, beamdataquality, shrreco3dKalmanShower, shrreco3dKa
 
 physics.ana:                    [ ]
 physics.trigger_paths:          [ beam_good, pi0, NuCC, ncpi0, antibdt ]
-physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0, outantibdt ]
+#physics.stream1:                [ outbeamOK, outbeamNOK, outpi0, outNuCC, outncpi0, outantibdt ]
+physics.stream1:                [ outbeamOK, outbeamNOK ]
 physics.end_paths:              [ stream1 ]
 
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*FiltersPostStage2" ]

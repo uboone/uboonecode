@@ -13,5 +13,4 @@ physics.producers.generator.MixerConfig:      "map 14:12 -14:-12" # example flav
 physics.producers.generator.TopVolume:        "volTPCActive"
 physics.producers.generator.BeamName:         "booster"
 physics.producers.generator.GenFlavors:       [14,-14]
-physics.producers.generator.FluxCopyMethod:   "IFDH"
-physics.producers.generator.MaxFluxFileMB:    2000
+physics.producers.generator.FluxCopyMethod:   "DIRECT"

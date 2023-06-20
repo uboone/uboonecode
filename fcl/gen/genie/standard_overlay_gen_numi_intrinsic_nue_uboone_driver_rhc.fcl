@@ -12,7 +12,7 @@ physics.producers.generator.GenFlavors:         [12,-12]
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "CCinclMEC"
 physics.producers.generator.FluxType:           "dk2nu"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
 
