@@ -27,7 +27,8 @@ export SAM_EXPERIMENT=uboone
 
 # This script runs the full mc+reco chain using standard released fcl files.
 
-input=$UBOONE_EXAMPLE_DATA_DIR/reco1/PhysicsRun-2018_7_2_21_23_1-0017505-00141_20180714T132533_ext_bnb_3_20181207T001756_optfilter_20181224T035203_reco1_postwcct_postdl_20181224T035451.root
+#input=$UBOONE_EXAMPLE_DATA_DIR/reco1/PhysicsRun-2018_10_11_9_59_56-0019527-00063_20181016T152442_ext_bnb_1_20190108T142430_optfilter_20190614T003502_reco1_postwcct_postdl_20190614T010503.root
+input=$UBOONE_EXAMPLE_DATA_DIR/reco1/PhysicsRun-2018_10_11_9_59_56-0019527-00063_20181016T152442_ext_bnb_1_20190108T142430_optfilter_20190614T003502_reco1_postwcct_postdl_20190614T010503.root
 fcl=test_sqlite_reco2_mcc9.fcl
 output=`basename $fcl .fcl`.root
 out=`basename $fcl .fcl`.out
