@@ -112,8 +112,7 @@ dlprod_producers.generator.GlobalTimeOffset: 3125.
 dlprod_producers.generator.RandomTimeOffset: 1600.
 dlprod_producers.generator.TopVolume: "volTPCActive"
 dlprod_producers.generator.BeamName:  "booster"
-dlprod_producers.generator.FluxCopyMethod:   "IFDH"
-dlprod_producers.generator.MaxFluxFileMB:    2000
+dlprod_producers.generator.FluxCopyMethod:   "DIRECT"
 
 # G4 step
 dlprod_producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,

@@ -4,7 +4,7 @@
 
 //========================================
 
-process_name: OverlayGen
+process_name: GENIEGen
 
 services:
 {
@@ -16,13 +16,16 @@ services:
   RandomNumberGenerator: {} #ART native random number generator
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::microboone_g4_services
+  IFDH: {}
 }
 
 source:
 {
-  module_type: RootInput
-  saveMemoryObjectThreshold: 0
-  maxEvents: 10
+  module_type: EmptyEvent
+  timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+  maxEvents:   10          # Number of events to create
+  firstRun:    1           # Run number to use for this file
+  firstEvent:  1           # number of first event in the file
 }
 
 physics:
@@ -45,7 +48,7 @@ outputs:
   out1:
   {  
    module_type: RootOutput
-   fileName:    "%ifb_%tc_gen.root"
+   fileName:    "genie_simple.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
@@ -53,18 +56,15 @@ outputs:
  }
 }
 
-#do not inherit clock configuration from the data
+# Do not inherit clock configuration from the data
 services.DetectorClocksService.InheritClockConfig: false
 
-#use generator settings from prodgenie_bnb_intrinsic_nue_uboone.fcl
-physics.producers.generator.EventGeneratorList: "CCinclMEC"
-physics.producers.generator.GlobalTimeOffset: 3125.
-physics.producers.generator.RandomTimeOffset: 1600.
-physics.producers.generator.TopVolume: "volTPCActive"
-physics.producers.generator.GenFlavors: [12,-12]
-physics.producers.generator.BeamName: "booster"
-
-physics.producers.generator.FluxCopyMethod: "DIRECT"
-
-#reduce file name length
-outputs.out1.fileName: "%ifb_gen.root"
+# Generator settings
+physics.producers.generator.GlobalTimeOffset:   3125.
+physics.producers.generator.RandomTimeOffset:   1600.
+physics.producers.generator.TopVolume:          "volCryostat"
+physics.producers.generator.BeamName:           "booster"
+physics.producers.generator.FluxType:           "simple_flux"
+physics.producers.generator.FluxFiles:          [ "converted_beammc_wincorr*.root" ]
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_01.09.2019_463/"
+physics.producers.generator.FluxCopyMethod:     "DIRECT"

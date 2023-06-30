@@ -63,7 +63,7 @@ physics.producers.generator.TopVolume: "volTPCActive"
 physics.producers.generator.MixerConfig:     "map 12:14 -12:-14 14:12 -14:-12" # example flavor swapping
 physics.producers.generator.BeamName: "booster"
 
-physics.producers.generator.FluxCopyMethod: "IFDH"
+physics.producers.generator.FluxCopyMethod: "DIRECT"
 
 #reduce file name length
 outputs.out1.fileName: "%ifb_gen.root"

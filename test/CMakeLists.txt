@@ -26,5 +26,7 @@ add_subdirectory(SparseRawDigits)
 add_subdirectory(Swizzle)
 add_subdirectory(CRTSwizzle)
 #add_subdirectory(CRTMerge)
+add_subdirectory(PPFX)
+add_subdirectory(GENIE)
 
 add_subdirectory(ci)
