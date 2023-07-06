@@ -31,7 +31,11 @@ export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wir
 
 export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
 rm -rf project_modules
-cp -r $LARBATCH_DIR/python project_modules
+if [ -d $LARBATCH_DIR/python/project_modules ]; then
+  cp -r $LARBATCH_DIR/python/project_modules project_modules
+else
+  cp -r $LARBATCH_DIR/python project_modules
+fi
 touch project_modules/__init__.py
 
 # Set experiment environment variables (not set by mrbsetenv, but needed by IFDH).
