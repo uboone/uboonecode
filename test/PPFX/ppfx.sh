@@ -18,7 +18,11 @@ export GXMLPATH=$UBOONEDATA_DIR/genie:$GXMLPATH
 
 export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
 rm -rf project_modules
-cp -r $LARBATCH_DIR/python project_modules
+if [ -d $LARBATCH_DIR/python/project_modules ]; then
+  cp -r $LARBATCH_DIR/python/project_modules project_modules
+else
+  cp -r $LARBATCH_DIR/python project_modules
+fi
 touch project_modules/__init__.py
 
 # Save a copy of the environment (for debugging).
