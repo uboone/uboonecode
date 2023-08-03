@@ -4,7 +4,7 @@
 #include "crtflashana.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
-process_name: CRTMerger
+process_name: CRTMerger2
 
 services:
 {
