@@ -1,59 +1,29 @@
-simple_plugin(KalmanFilterTest "module"
-              lardata_RecoObjects
-	      larcorealg_Geometry
-	      art::Framework_Core
-	      art::Framework_Principal
-	      art::Framework_Services_Registry
-              art::Persistency_Common
-              art::Persistency_Provenance
-	      art_root_io::tfile_support ROOT::Core
-	      art_root_io::TFileService_service
-              art::Utilities
-              canvas::canvas
-	      messagefacility::MF_MessageLogger
-	      fhiclcpp::fhiclcpp
-              cetlib::cetlib
-              cetlib_except::cetlib_except
-	      PostgreSQL::PostgreSQL
-              BASENAME_ONLY
-             )
+cet_build_plugin(
+  InteractTest art::EDAnalyzer
+  LIBRARIES
+  PRIVATE
+  lardata::DetectorPropertiesService
+  lardata::RecoObjects
+)
 
-simple_plugin(PropTest "module"
-              lardata_RecoObjects
-	      larcorealg_Geometry
-	      nurandom::RandomUtils_NuRandomService_service
-	      art::Framework_Core
-	      art::Framework_Services_Registry
-	      art::Framework_Services_Optional_RandomNumberGenerator_service
-	      messagefacility::MF_MessageLogger
-	      CLHEP::CLHEP
-              art::Persistency_Provenance
-	      fhiclcpp::fhiclcpp
-              cetlib::cetlib
-              cetlib_except::cetlib_except
-	      PostgreSQL::PostgreSQL
-              BASENAME_ONLY
-             )
+cet_build_plugin(
+  KalmanFilterTest art::EDAnalyzer
+  LIBRARIES
+  PRIVATE
+  lardata::DetectorPropertiesService
+  lardata::RecoObjects
+  larcore::Geometry_Geometry_service
+)
 
-simple_plugin(InteractTest "module"
-              lardata_RecoObjects
-	      larcorealg_Geometry
-	      art::Framework_Core
-	      art::Framework_Principal
-	      art::Framework_Services_Registry
-              art::Persistency_Common
-              art::Persistency_Provenance
-	      art_root_io::tfile_support ROOT::Core
-	      art_root_io::TFileService_service
-	      art::Utilities
-              canvas::canvas
-	      messagefacility::MF_MessageLogger
-	      fhiclcpp::fhiclcpp
-              cetlib::cetlib
-              cetlib_except::cetlib_except
-	      PostgreSQL::PostgreSQL
-              BASENAME_ONLY
-             )
+cet_build_plugin(
+  PropTest art::EDAnalyzer
+  LIBRARIES
+  PRIVATE
+  lardata::DetectorPropertiesService
+  lardata::RecoObjects
+  nurandom::RandomUtils_NuRandomService_service
+)
+
 
 #cet_test( PropTest HANDBUILT
 #  	  TEST_EXEC lar

@@ -52,7 +52,7 @@ create_product_variables( cetpkgsupport v1_14_01 )
 CONFIGURE_FILE ( ${CMAKE_CURRENT_SOURCE_DIR}/uboone-cfg.in
   ${CMAKE_CURRENT_BINARY_DIR}/uboone-cfg-${UBOONECODE_DOT_VERSION} @ONLY )
 CONFIGURE_FILE ( ${CMAKE_CURRENT_SOURCE_DIR}/uboone.html.in
-  ${CMAKE_CURRENT_BINARY_DIR}/uboone-${version}.html @ONLY )
+  ${CMAKE_CURRENT_BINARY_DIR}/uboone-${${CETMODULES_CURRENT_PROJECT_NAME}_UPS_PRODUCT_VERSION}.html @ONLY )
 
 INSTALL( FILES base_dependency_database README
          DESTINATION "releaseDB" )
