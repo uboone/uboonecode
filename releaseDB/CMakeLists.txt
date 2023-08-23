@@ -15,11 +15,7 @@ macro( create_product_variables productname productversion )
    message(STATUS "${PRODUCTNAME_UC} version is ${${PRODUCTNAME_UC}_VERSION}")
 endmacro( create_product_variables)
 
-<<<<<<< HEAD
 create_product_variables( uboonecode v09_78_01 )
-=======
-create_product_variables( uboonecode v08_00_00_72 )
->>>>>>> origin/v08_00_00_br
 
 # define qualifiers
 set( BASEQUAL e20 )
@@ -34,7 +30,6 @@ create_product_variables( glpk                      v4_65     )
 create_product_variables( geant4reweight v01_18_01 )
 create_product_variables( wcp                       v00_16_00 )
 create_product_variables( uboone_oslibs             v1_0_0     )
-<<<<<<< HEAD
 create_product_variables( uboonedaq_datatypes v6_22_05h )
 create_product_variables( uboonedata v09_76_00 )
 create_product_variables( ubutil v09_76_00 )
@@ -49,22 +44,6 @@ create_product_variables( ubcore v09_78_01 )
 create_product_variables( ubcrt v09_78_01 mrbse )
 create_product_variables( ubobj v09_78_01 )
 create_product_variables( larsoft v09_78_01 )
-=======
-create_product_variables( uboonedaq_datatypes       v6_22_05a  )
-create_product_variables( uboonedata                v08_00_00_69  )
-create_product_variables( ubutil                    v08_00_00_70  )
-create_product_variables( ublite                    v08_00_00_72  )
-create_product_variables( ubana                     v08_00_00_72  )
-create_product_variables( ubreco                    v08_00_00_72  )
-create_product_variables( ubsim                     v08_00_00_72  )
-create_product_variables( ubcv                      v08_00_00_72  )
-create_product_variables( ubevt                     v08_00_00_72  )
-create_product_variables( ubraw                     v08_00_00_70  )
-create_product_variables( ubcore                    v08_00_00_70  )
-create_product_variables( ubcrt                     v08_00_00_72  )
-create_product_variables( ubobj                     v08_00_00_70  )
-create_product_variables( larsoft v08_05_00_22  )
->>>>>>> origin/v08_00_00_br
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
