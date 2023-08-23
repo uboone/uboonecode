@@ -1,0 +1,28 @@
+#include "beamspilltimings.fcl"
+#include "prodgenie_common_uboone_Filtered.fcl"
+
+process_name: GenieGenFiltered
+
+outputs.out1.fileName: "prodgenie_numi_nu_filtered_fhc_CCNCPiZero_uboone_%tc_gen.root"
+
+source.maxEvents: 400
+
+physics.producers.generator:                    @local::standard_genie
+physics.producers.generator.POTPerSpill:        5e13
+physics.producers.generator.EventsPerSpill:     0
+physics.producers.generator.GlobalTimeOffset:   5627.5
+physics.producers.generator.RandomTimeOffset:   9600.
+physics.producers.generator.TopVolume:          "volTPCActive"
+physics.producers.generator.BeamName:           "numi"
+physics.producers.generator.EventGeneratorList: "Default"
+physics.producers.generator.FluxType:           "dk2nu"
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/FHC/" # path to the production files
+physics.producers.generator.FluxFiles:          ["g4numiv6_*.root"]
+physics.producers.generator.FluxCopyMethod:     "DIRECT"
+physics.producers.generator.DetectorLocation:   "microboone-numi-v2"
+
+physics.filters.finalstatefilter.IsVerbose: false
+physics.filters.finalstatefilter.isInclusive: true
+physics.filters.finalstatefilter.PDG: [111] # CC and NC PiZero
+physics.filters.finalstatefilter.PDGCount: [1]
+physics.filters.finalstatefilter.PDGCountExclusivity: [true]
