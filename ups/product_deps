@@ -57,8 +57,12 @@ end_product_list
 #gbf:e20:prof   e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a99999:k250:e1000          dkcharmtau      -nq-            e20:prof
 #end_qualifier_list
 qualifier      larsoft        ubcv           ubcrt          ublite         ubutil         uboonedata     genie_xsec                      genie_phyopt    uboone_oslibs
+c14:debug      c14:debug      c14:debug      c14:debug      c14:debug      c14:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
+c14:prof       c14:prof       c14:prof       c14:prof       c14:prof       c14:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        c7:prof        -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
+e26:debug      e26:debug      e26:debug      e26:debug      e26:debug      e26:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
+e26:prof       e26:prof       e26:prof       e26:prof       e26:prof       e26:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      e20:debug      -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       e20:prof       -nq-           G1810a0211a:k250:e1000          dkcharmtau      -nq-
 be:c7:debug    c7:debug       c7:debug       c7:debug       c7:debug       c7:debug       -nq-           U1810a0211a:k250:e1000          dkcharmtau      -nq-
