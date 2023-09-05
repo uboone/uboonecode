@@ -3,6 +3,7 @@
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "IsolatedProton_filter.fcl"
 
 process_name: MuCSMCGen
 
@@ -25,7 +26,7 @@ source:
 {
   module_type: EmptyEvent #RootInput
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
-  maxEvents:   50          # Number of events to create
+  maxEvents:   -1          # Number of events to create
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -55,7 +56,11 @@ physics:
    rns:       { module_type: "RandomNumberSaver" }
  }
 
- simulate: [ rns, generator, largeant, ionization, mcreco ]#, stopmufilter ] 
+  filters:  {   
+    IsolatedProtonFilter: @local::IsolatedProtonFilter
+  }
+
+ simulate: [ rns, generator, largeant, ionization, mcreco, IsolatedProtonFilter ]#, stopmufilter ] 
  stream1:  [ out1 ]
  trigger_paths: [simulate] 
  end_paths:     [stream1]  
