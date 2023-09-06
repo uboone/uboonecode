@@ -313,12 +313,24 @@ end_product_list
 #
 ####################################
 qualifier	larsoft		ubcv		ubcrt		ublite		ubutil		uboonedata	genie_xsec		genie_phyopt	uboone_oslibs
+c14:be:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
+c14:be:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
+c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
+c14:gbf:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
+c14:gbf:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
+c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
 c7:be:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
 c7:be:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
 c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
 c7:gbf:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
 c7:gbf:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
 c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
+e26:be:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
+e26:be:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
+e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
+e26:gbf:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
+e26:gbf:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
+e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
 e20:be:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
 e20:be:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
 e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
