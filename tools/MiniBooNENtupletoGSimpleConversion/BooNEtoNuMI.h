@@ -25,7 +25,7 @@ class BooNEtoNuMI {
   BooNENtuple fBooneNtp;
 
   int fBooneNevents;
-  int fNumiNevents;
+  //int fNumiNevents;
 
   TFile* fBooNEfile;
   TTree* fBNBtree;
