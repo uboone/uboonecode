@@ -27,7 +27,7 @@ do_pull geant4reweight @GEANT4REWEIGHT_VERSION@ ${basequal}-@SQUAL@
 do_build glpk @GLPK_VERSION@
 #do_build wcp @WCP_VERSION@ ${basequal}
 build_noarch uboone_oslibs @UBOONE_OSLIBS_VERSION@
-build_cet -G uboone uboonedaq_datatypes @UBOONEDAQ_DATATYPES_VERSION@ ${basequal}
+build_cet -G uboone uboonedaq_datatypes @UBOONEDAQ_DATATYPES_VERSION@ ${basequal}:offline
 build_cet_null uboonedata @UBOONEDATA_VERSION@
 build_cet_null larbatch   @LARBATCH_VERSION@
 build_cet ubutil @UBUTIL_VERSION@ ${basequal}${pyqual}
