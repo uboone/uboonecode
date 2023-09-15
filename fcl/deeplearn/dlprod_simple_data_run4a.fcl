@@ -1,0 +1,6 @@
+#include "dlprod_simple_data.fcl"
+
+process_name: Data2LArCVRun4a
+
+physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463"
+physics.producers.generator.FluxFiles: [ "gsimple_beammc_run4a_wincorr_*.root" ]
