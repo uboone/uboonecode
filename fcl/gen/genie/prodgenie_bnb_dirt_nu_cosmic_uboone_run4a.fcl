@@ -1,6 +1,6 @@
-#include "prodgenie_bnb_dirt_nu_uboone_corsika_hsnWindow_stage1.fcl"
+#include "prodgenie_bnb_dirt_nu_cosmic_uboone.fcl"
 
-process_name: DirtCorsikaStage1Run4a
+process_name: GenieGenRun4a
 
 physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463_dirt/"
 physics.producers.generator.FluxFiles: [ "converted_beammc_dirt_wincorr_run4apotcorr_*.root" ]

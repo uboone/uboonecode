@@ -1,6 +1,6 @@
-#include "standard_overlay_gen_bnb_fullosc_nue_uboone_driver.fcl"
+#include "prodgenie_bnb_nue_uboone.fcl"
 
-process_name: OverlayGenRun4a
+process_name: GenieGenRun4a
 
 physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463/"
 physics.producers.generator.FluxFiles: [ "gsimple_beammc_run4a_wincorr_*.root" ]
