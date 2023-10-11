@@ -1,25 +1,15 @@
 # ======================================================================
-#  larsoft main build file
+#  uboonecode main build file
 #
 #  cd .../path/to/build/directory
-#  source .../path/to/larsoft/ups/setup_for_development <-d|-p>
-#  cmake [-DCMAKE_INSTALL_PREFIX=/install/path]
-#        -DCMAKE_BUILD_TYPE=$CETPKG_TYPE
-#        $CETPKG_SOURCE
-#  make
-#  make test
-#  make install
-#  make package (builds distribution tarfile)
+#  source .../path/to/lardataobj/ups/setup_for_development <-d|-p>
+#  buildtool [-I /install/path] -bt[i] -jN
 # ======================================================================
 
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-project(uboonecode VERSION 09.78.03 LANGUAGES CXX)
-
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules)
+find_package(cetmodules REQUIRED)
+project(uboonecode VERSION 09.78.06 LANGUAGES CXX)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -30,47 +20,18 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
   EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
-cet_report_compiler_flags()
+cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-find_package(PostgreSQL REQUIRED PUBLIC)
-# these are minimum required versions, not the actual product versions
-find_ups_product( ubevt )
-find_ups_product( ubobj )
-find_ups_product( larcorealg )
-find_ups_product( larcoreobj )
-find_ups_product( lardataobj )
-find_ups_product( lardataalg )
-find_ups_product( art )
-find_ups_product(art_root_io)
-find_ups_product( larcore )
-find_ups_product( lardata )
-find_ups_product( larevt )
-find_ups_product( larsim )
-find_ups_product( larreco )
-find_ups_product( gsl )
-find_ups_boost( )
-find_ups_product( canvas )
-find_ups_product( nutools )
-find_ups_product( nurandom )
-find_ups_product( genie )
-
-cet_find_library( GSLCBLAS NAMES gslcblas PATHS ENV GSL_LIB NO_DEFAULT_PATH )
+find_package( ubobj REQUIRED EXPORT )
+find_package( lardata REQUIRED EXPORT )
+find_package( nurandom REQUIRED EXPORT )
+find_package( nugen REQUIRED EXPORT )
+find_package( GENIE REQUIRED EXPORT )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
 include(ArtMake)
 include(BuildPlugins)
-
-# BEGIN GENIE VERSION CHECK
-# Determine the major version number of GENIE based on the GENIE_VERSION
-# variable. Based on this, define the GENIE_PRE_R3 preprocessor
-# macro (needed to set the right GENIE header locations, etc.) if needed.
-#
-# The top-level nutools CMakeLists.txt does this as well, but I don't think that
-# we can access the result of that version check in the uboonecode build.
-
-include_directories ( $ENV{GENIE_INC}/GENIE )
-parse_ups_version( ${GENIE_VERSION} )
 
 # ADD SOURCE CODE SUBDIRECTORIES HERE
 add_subdirectory(fcl)
@@ -79,7 +40,6 @@ add_subdirectory(tools)
 add_subdirectory(releaseDB)
 
 # ups - table and config files
-add_subdirectory(ups)
 
 # packaging utility
-include(UseCPack)
+cet_cmake_config() ### MIGRATE-ADDED (migrate-3.21.01) - required cmd
