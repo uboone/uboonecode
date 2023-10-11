@@ -1,0 +1,6 @@
+#include "prodgenie_bnb_nu_400mev_to_800mev.fcl"
+
+process_name: GenieGenFilteredRun4a
+
+physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463/"
+physics.producers.generator.FluxFiles: [ "gsimple_beammc_run4a_wincorr_*.root" ]

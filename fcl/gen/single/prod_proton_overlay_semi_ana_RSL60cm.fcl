@@ -3,6 +3,7 @@
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "IsolatedProton_filter.fcl"
 
 process_name: MuCSMCGen
 
@@ -25,7 +26,7 @@ source:
 {
   module_type: EmptyEvent #RootInput
   timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
-  maxEvents:   50          # Number of events to create
+  maxEvents:   -1          # Number of events to create
   firstRun:    1           # Run number to use for this file
   firstEvent:  1           # number of first event in the file
 }
@@ -55,7 +56,11 @@ physics:
    rns:       { module_type: "RandomNumberSaver" }
  }
 
- simulate: [ rns, generator, largeant, ionization, mcreco ]#, stopmufilter ] 
+filters:  {   
+  IsolatedProtonFilter: @local::IsolatedProtonFilter
+}
+  
+ simulate: [ rns, generator, largeant, ionization, mcreco, IsolatedProtonFilter]#,  stopmufilter ] 
  stream1:  [ out1 ]
  trigger_paths: [simulate] 
  end_paths:     [stream1]  
@@ -84,17 +89,17 @@ services.LArG4Parameters.InitialSimEnergyDepositSize:  100000
 
 physics.producers.generator.PDG: [ 2212 ]          # p
 physics.producers.generator.PosDist: 0             # Flat position dist.
-physics.producers.generator.X0: [ 128.175 ]
+physics.producers.generator.X0: [ 127.5 ]
 physics.producers.generator.Y0: [ 0.0 ]
 physics.producers.generator.Z0: [ 518.5 ]
 physics.producers.generator.T0: [ 3925.0 ]
-physics.producers.generator.SigmaX: [ 115.8 ]      # x = (12.375, 243.975)
-physics.producers.generator.SigmaY: [ 105.51 ]     # y = (-105.51, 105.51)
-physics.producers.generator.SigmaZ: [ 506.9059 ]   # z = (11.5941, 1025.4059)
+physics.producers.generator.SigmaX: [ 117.5 ]      # x = (10, 245)
+physics.producers.generator.SigmaY: [ 105. ]       # y = (-105, 105)
+physics.producers.generator.SigmaZ: [ 518.5 ]      # z = (0, 1037)
 physics.producers.generator.SigmaT: [ 800.0 ]      # In time
 physics.producers.generator.PDist: 0               # Flat momentum dist. (0.1-2.0 GeV)
-physics.producers.generator.P0: [ 0.58 ]           # in GeV
-physics.producers.generator.SigmaP: [ 0.15 ]       # in GeV
+physics.producers.generator.P0: [ 0.59 ]
+physics.producers.generator.SigmaP: [ 0.20 ]
 physics.producers.generator.AngleDist: 0           # Flat angle dist.
 physics.producers.generator.Theta0XZ: [ 0. ]       # y-azimuth
 physics.producers.generator.Theta0YZ: [ 0. ]       # y-latitude
