@@ -250,7 +250,7 @@ fwdir	product_dir	scripts
 product		version		qual	flags		<table_format=2>
 genie_phyopt	v3_04_00	-
 genie_xsec	v3_04_00	-
-larsoft		v09_78_06	-
+larsoft		v09_79_00	-
 ubcrt		v09_78_05	-
 ubcv		v09_78_05	-
 ublite		v09_78_06	-
