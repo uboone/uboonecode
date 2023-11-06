@@ -250,6 +250,7 @@ fwdir	product_dir	scripts
 product		version		qual	flags		<table_format=2>
 genie_phyopt	v3_04_00	-
 genie_xsec	v3_04_00	-
+wcp             v00_17_01       -
 larsoft		v09_81_00	-
 ubcrt		v09_81_00	-
 ubcv		v09_81_00	-
@@ -312,31 +313,31 @@ end_product_list
 #   case it is optional.
 #
 ####################################
-qualifier	larsoft		ubcv		ubcrt		ublite		ubutil		uboonedata	genie_xsec		genie_phyopt	uboone_oslibs
-c14:be:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-c14:be:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-c14:gbf:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-c14:gbf:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-c7:be:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-c7:be:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-c7:gbf:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-c7:gbf:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-e26:be:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-e26:be:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-e26:gbf:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-e26:gbf:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-e20:be:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-e20:be:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	-nq-
-e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
-e20:gbf:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-e20:gbf:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	-nq-
-e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	-nq-
+qualifier	larsoft		ubcv		ubcrt		ublite		ubutil		uboonedata	genie_xsec		genie_phyopt	wcp         uboone_oslibs
+c14:be:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	c14:debug  -nq-
+c14:be:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	c14:prof   -nq-
+c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	c14:debug  -nq-
+c14:gbf:debug	c14:debug	c14:debug	c14:debug	c14:debug	c14:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	c14:debug  -nq-
+c14:gbf:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	c14:prof   -nq-
+c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	c14:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	c14:prof   -nq-
+c7:be:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	c7:debug   -nq-
+c7:be:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:U1810a0211a:k250	dkcharmtau	c7:prof    -nq-
+c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	c7:debug   -nq-
+c7:gbf:debug	c7:debug	c7:debug	c7:debug	c7:debug	c7:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	c7:debug   -nq-
+c7:gbf:prof	c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a99999:k250	dkcharmtau	c7:prof    -nq-
+c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		c7:prof		-nq-		e1000:G1810a0211a:k250	dkcharmtau	c7:prof    -nq-
+e26:be:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e26:debug  -nq-
+e26:be:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e26:prof   -nq-
+e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e26:debug  -nq-
+e26:gbf:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	e26:debug  -nq-
+e26:gbf:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	e26:prof   -nq-
+e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e26:prof   -nq-
+e20:be:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e20:debug  -nq-
+e20:be:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e20:prof   -nq-
+e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e20:debug  -nq-
+e20:gbf:debug	e20:debug	e20:debug	e20:debug	e20:debug	e20:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	e20:debug  -nq-
+e20:gbf:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	e20:prof   -nq-
+e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	e20:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e20:prof   -nq-
 end_qualifier_list
 ####################################
 
