@@ -1,6 +1,5 @@
-#include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
+#include "wirecell_reg4_SCE_DataDrivenVar.fcl"
 
 services.PhotonVisibilityService: @local::microboone_photonvisibilityservice_semi_analytical_60cm
 services.LArPropertiesService.ScintYield:    29000  # 29000 ph/MeV @ 70 kV DocDB 4914, @MToups
 services.LArPropertiesService.ScintPreScale: 0.0055 # (https://arxiv.org/pdf/1711.01230.pdf) 
-services.LArPropertiesService.ScintYieldRatio: 2.3e-1

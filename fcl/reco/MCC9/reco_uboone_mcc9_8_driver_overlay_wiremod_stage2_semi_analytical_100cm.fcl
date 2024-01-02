@@ -1,4 +1,4 @@
-#include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
+#include "reco_uboone_mcc9_8_driver_overlay_wiremod_stage2.fcl"
 
 services.PhotonVisibilityService: @local::microboone_photonvisibilityservice_semi_analytical_100cm
 services.LArPropertiesService.ScintYield:    29000  # 29000 ph/MeV @ 70 kV DocDB 4914, @MToups
