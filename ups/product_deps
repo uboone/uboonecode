@@ -254,10 +254,10 @@ wcp             v00_17_01       -
 larsoft		v09_83_01	-
 ubcrt		v09_83_00	-
 ubcv		v09_83_00	-
-ublite		v09_83_01	-
+ublite		v09_84_00	-
 uboone_oslibs	v1_0_0		-
-uboonedata	v09_82_01	-
-ubutil		v09_82_02	-
+uboonedata	v09_84_00	-
+ubutil		v09_84_00	-
 cetmodules	v3_21_01	-	only_for_build
 end_product_list
 ####################################
