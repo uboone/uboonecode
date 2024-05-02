@@ -436,6 +436,12 @@ microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          @sequence::microboone_reco_data_crt
                                        ]
 
+microboone_reco_data_mcc9_1_stage2_nocrt: [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora
+                                       ]
+
 microboone_reco_data_mcc9_1_stage2_double_pmt: [
                                          rns,
                                          @sequence::microboone_reco_data_optical_double_pmt,
@@ -446,6 +452,10 @@ microboone_reco_data_mcc9_1_stage2_double_pmt: [
                                        ]
 
 microboone_reco_data_stage2:           [ @sequence::microboone_reco_data_mcc9_1_stage2,
+                                         @sequence::microboone_reco_data_ccpath
+                                       ]
+
+microboone_reco_data_stage2_nocrt:     [ @sequence::microboone_reco_data_mcc9_1_stage2_nocrt,
                                          @sequence::microboone_reco_data_ccpath
                                        ]
 
@@ -470,6 +480,12 @@ microboone_reco_data_stage2_nocc:      [ rns,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_crt
+                                       ]
+
+microboone_reco_data_stage2_nocc_nocrt: [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora
                                        ]
 
 microboone_reco_data_stage2_nocc_double_pmt: [
