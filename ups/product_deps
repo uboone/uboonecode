@@ -250,14 +250,14 @@ fwdir	product_dir	scripts
 product		version		qual	flags		<table_format=2>
 genie_phyopt	v3_04_00	-
 genie_xsec	v3_04_00	-
-wcp             v00_17_02       -
-larsoft		v09_87_00	-
-ubcrt		v09_87_00	-
-ubcv		v09_87_00	-
-ublite		v09_87_00	-
+wcp             v00_17_03       -
+larsoft		v09_89_01	-
+ubcrt		v09_89_01	-
+ubcv		v09_89_01	-
+ublite		v09_89_01	-
 uboone_oslibs	v1_0_0		-
-uboonedata	v09_84_00	-
-ubutil		v09_87_00	-
+uboonedata	v09_89_01	-
+ubutil		v09_89_01	-
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
 ####################################
