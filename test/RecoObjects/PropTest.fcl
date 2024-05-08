@@ -8,7 +8,7 @@ process_name: PropTest
 
 services:
 {
-  ExptGeoHelperInterface:    @local::standard_geometry_helper
+  WireReadout:    @local::standard_wire_readout
   GeometryConfigurationWriter: {}
   Geometry:                  @local::standard_geo
   LArPropertiesService:      @local::standard_properties
