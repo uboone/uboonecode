@@ -2,5 +2,5 @@
 
 process_name: DirtCorsikaStage1Run4a
 
-physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463"
-physics.producers.generator.FluxFiles: [ "gsimple_beammc_run4a_wincorr_*.root" ]
+physics.producers.generator.FluxSearchPaths: "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_run4a_08.02.2023_463_dirt/"
+physics.producers.generator.FluxFiles: [ "converted_beammc_dirt_wincorr_run4apotcorr_*.root" ]

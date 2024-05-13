@@ -1,6 +1,6 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "services_microboone.fcl"
-#include "genie_microboone_default+MEC.fcl"
+#include "genie_microboone.fcl"
 
 //========================================
 
