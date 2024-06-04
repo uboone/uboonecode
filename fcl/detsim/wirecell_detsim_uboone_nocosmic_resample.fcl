@@ -1,0 +1,3 @@
+#include "wirecell_detsim_uboone.fcl"
+
+source.fileNames: ["g4.root"]
