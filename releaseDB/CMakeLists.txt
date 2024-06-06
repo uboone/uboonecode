@@ -19,7 +19,7 @@ create_product_variables( uboonecode v09_90_00 )
 
 # define qualifiers
 set( BASEQUAL e26 )
-set( SQUAL s130 )
+set( SQUAL s131 )
 
 create_product_variables( uboone_photon_propagation v01_01_00  )
 create_product_variables( larbatch v01_59_04 )
@@ -27,7 +27,7 @@ create_product_variables( swtrigger v02_03_00i )
 create_product_variables( larlite v06_71_00i )
 create_product_variables( larcv v06_71_00i )
 create_product_variables( glpk                      v4_65     )
-create_product_variables( geant4reweight v01_20_07 )
+create_product_variables( geant4reweight v01_20_08 )
 create_product_variables( wcp v00_17_03 )
 create_product_variables( uboone_oslibs             v1_0_0     )
 create_product_variables( uboonedaq_datatypes v6_22_07 )
@@ -43,7 +43,7 @@ create_product_variables( ubraw v09_90_00 )
 create_product_variables( ubcore v09_89_01 )
 create_product_variables( ubcrt v09_89_01 )
 create_product_variables( ubobj v09_89_01 )
-create_product_variables( larsoft v09_89_01 )
+create_product_variables( larsoft v09_90_02 )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
