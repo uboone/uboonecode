@@ -1,0 +1,7 @@
+#include "reco_uboone_mcc9_8_driver_data_ext_numi_optical.fcl"
+
+process_name: "DataStage1OpticalDoublePMT"
+
+physics.reco: [ rns, @sequence::microboone_reco_data_optical_double_pmt, opfiltercommon ]
+
+physics.producers.saturation.HGProducer: "doublePMTFilter"
