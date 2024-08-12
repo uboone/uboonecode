@@ -1,0 +1,8 @@
+#include "reco_uboone_mcc9_8_driver_data_ext_numi_optical.fcl"
+
+process_name: "DataStage1Optical2FEM"
+
+physics.reco: [ rns, @sequence::microboone_reco_data_optical_2fem, opfiltercommon ]
+
+physics.producers.saturation.HGProducer: "doublePMTFilter"
+physics.producers.saturation.HGProducerCosmic: "cosmicPMTFilter"
