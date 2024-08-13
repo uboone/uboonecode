@@ -4,4 +4,5 @@ process_name: "OverlayStage1OpticalDoublePMT"
 
 physics.reco: [ rns, @sequence::microboone_reco_data_optical_double_pmt, opfiltercommon ]
 
+physics.producers.doublePMTFilter.numberOfChannelsToExpect: 32
 physics.producers.saturation.HGProducer: "doublePMTFilter"
