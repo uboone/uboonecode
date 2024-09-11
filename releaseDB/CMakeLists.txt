@@ -22,7 +22,7 @@ set( BASEQUAL e26 )
 set( SQUAL s131 )
 
 create_product_variables( uboone_photon_propagation v01_01_00  )
-create_product_variables( larbatch v01_59_04 )
+create_product_variables( larbatch v01_60_00 )
 create_product_variables( swtrigger v02_03_00i )
 create_product_variables( larlite v06_71_00i )
 create_product_variables( larcv v06_71_00i )
@@ -43,7 +43,7 @@ create_product_variables( ubraw v09_91_00 )
 create_product_variables( ubcore v09_91_00 )
 create_product_variables( ubcrt v09_91_01 )
 create_product_variables( ubobj v09_91_00 )
-create_product_variables( larsoft v09_91_01 )
+create_product_variables( larsoft v09_91_05 )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
