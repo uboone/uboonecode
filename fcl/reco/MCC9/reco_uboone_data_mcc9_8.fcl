@@ -21,6 +21,7 @@
 #include "photpropservices_microboone.fcl"
 #include "correct_saturation.fcl"
 #include "microboone_pmtdoublereadoutfilter.fcl"
+#include "microboone_pmtcosmicfilter.fcl"
 #include "T0RecoAnodeCathodePiercing.fcl"
 #include "SpacePointSolver_microboone.fcl"
 #include "ubflashfinder.fcl"
@@ -126,8 +127,9 @@ microboone_reco_data_producers:
     ophitBeamCalib:                   @local::ophitcorrection
     ophitCosmicCalib:                 @local::ophitcorrection
 
-    ### Double PMT waveform filter
+    ### Double PMT waveform and cosmic waveform filters
     doublePMTFilter:                  @local::microboone_pmtdoublereadoutfilter
+    cosmicPMTFilter:                  @local::microboone_pmtcosmicfilter
 
     ### Saturation correction module
     saturation:                       @local::correct_saturation
@@ -322,6 +324,12 @@ microboone_reco_data_optical:          [ saturation,
                                        ]
 
 microboone_reco_data_optical_double_pmt: [
+                                         doublePMTFilter,
+                                         @sequence::microboone_reco_data_optical
+                                       ]
+
+microboone_reco_data_optical_2fem: [
+                                         cosmicPMTFilter,
                                          doublePMTFilter,
                                          @sequence::microboone_reco_data_optical
                                        ]
