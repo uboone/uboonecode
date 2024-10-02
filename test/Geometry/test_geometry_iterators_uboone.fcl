@@ -11,7 +11,7 @@ process_name: testGeoIter
 services: {
   
   Geometry:               @local::microboone_geo
-  ExptGeoHelperInterface: @local::microboone_geometry_helper
+  WireReadout: @local::microboone_wire_readout
   GeometryConfigurationWriter: {}
   
   message: {
