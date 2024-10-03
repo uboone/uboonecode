@@ -9,9 +9,10 @@
 process_name: testGeo
 
 services: {
-  
-  Geometry:               @local::microboone_geo
-  ExptGeoHelperInterface: @local::microboone_geometry_helper
+
+  AuxDetGeometry: @local::microboone_crt_geometry
+  Geometry:       @local::microboone_geo
+  WireReadout:    @local::microboone_wire_readout
   GeometryConfigurationWriter: {}
   
   message: {
