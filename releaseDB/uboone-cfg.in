@@ -28,19 +28,19 @@ do_build glpk @GLPK_VERSION@
 do_build wcp @WCP_VERSION@ ${basequal}
 build_noarch uboone_oslibs @UBOONE_OSLIBS_VERSION@
 build_cet -G uboone uboonedaq_datatypes @UBOONEDAQ_DATATYPES_VERSION@ ${basequal}:offline
-build_cet_null uboonedata @UBOONEDATA_VERSION@
-build_cet_null larbatch   @LARBATCH_VERSION@
-build_cet ubutil @UBUTIL_VERSION@ ${basequal}${pyqual}
-build_cet ubobj @UBOBJ_VERSION@ ${basequal}${pyqual}
-build_cet ubcore @UBCORE_VERSION@ ${basequal}${pyqual}
-build_cet ubraw @UBRAW_VERSION@ ${basequal}${pyqual}
-build_cet -n ubevt @UBEVT_VERSION@ ${basequal}${pyqual}
-build_cet ubcrt @UBCRT_VERSION@ ${basequal}${pyqual}
-build_cet ubcv @UBCV_VERSION@ ${basequal}${pyqual}
-build_cet ubsim @UBSIM_VERSION@ ${basequal}${pyqual}
-build_cet ubreco @UBRECO_VERSION@ ${basequal}${pyqual}
-build_cet ubana @UBANA_VERSION@ ${basequal}${pyqual}
-build_cet ublite @UBLITE_VERSION@ ${basequal}${pyqual}
-build_cet -n uboonecode @UBOONECODE_VERSION@ ${basequal}${pyqual}
+build_cet_null -G uboone uboonedata @UBOONEDATA_VERSION@
+build_cet_null -G uboone larbatch   @LARBATCH_VERSION@
+build_cet -G uboone ubutil @UBUTIL_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubobj @UBOBJ_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubcore @UBCORE_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubraw @UBRAW_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone -n ubevt @UBEVT_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubcrt @UBCRT_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubcv @UBCV_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubsim @UBSIM_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubreco @UBRECO_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ubana @UBANA_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone ublite @UBLITE_VERSION@ ${basequal}${pyqual}
+build_cet -G uboone -n uboonecode @UBOONECODE_VERSION@ ${basequal}${pyqual}
 
 return 0
