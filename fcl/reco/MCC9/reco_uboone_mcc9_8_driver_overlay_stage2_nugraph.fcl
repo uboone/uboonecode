@@ -2,6 +2,7 @@
 #include "nuslicehits.fcl"
 #include "nugraph.fcl"
 #include "SpacePointSolver.fcl"
+#include "simple_neutrino_id.fcl"
 #include "reco_uboone_mcc9_8_driver_overlay_stage2.fcl"
 
 process_name: "OverlayRecoStage2NuGraph"
@@ -27,6 +28,11 @@ physics.producers.sps.MaxNTriplets: 100000
 physics.producers.sps.HitLabel: "nuslhits"
 physics.producers.sps.WireIntersectThreshold: 0.3
 physics.producers.sps.WireIntersectThresholdDriftDir: 0.3
+
+# updates to use slices that did not pass the flash cuts
+physics.producers.nuslhits.RecoverHighestNuScoreSlice: true
+physics.producers.pandora.SliceIdTool: @local::simple_neutrino_id_tool
+# note: would flash cuts based on sps be better?
 
 physics.reco: [nuslhits, sps, NuGraph, gaushit, gaushitTruthMatch, @sequence::physics.reco ]
 
