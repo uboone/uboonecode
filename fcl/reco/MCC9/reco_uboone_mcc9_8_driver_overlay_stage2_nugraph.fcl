@@ -31,6 +31,7 @@ physics.producers.sps.WireIntersectThresholdDriftDir: 0.3
 
 # updates to use slices that did not pass the flash cuts
 physics.producers.nuslhits.RecoverHighestNuScoreSlice: true
+#physics.producers.nuslhits.Recover2ndShower: true
 physics.producers.pandora.SliceIdTool: @local::simple_neutrino_id_tool
 # note: would flash cuts based on sps be better?
 
