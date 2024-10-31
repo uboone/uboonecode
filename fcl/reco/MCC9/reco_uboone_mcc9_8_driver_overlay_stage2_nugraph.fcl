@@ -30,10 +30,15 @@ physics.producers.sps.WireIntersectThreshold: 0.3
 physics.producers.sps.WireIntersectThresholdDriftDir: 0.3
 
 # updates to use slices that did not pass the flash cuts
-physics.producers.nuslhits.RecoverHighestNuScoreSlice: true
+#physics.producers.nuslhits.RecoverHighestNuScoreSlice: true
+#physics.producers.pandora.SliceIdTool: @local::simple_neutrino_id_tool
+# note to self: would flash cuts based on sps be better?
+
+# attempt to recover pi0 showers in other slices
 #physics.producers.nuslhits.Recover2ndShower: true
-physics.producers.pandora.SliceIdTool: @local::simple_neutrino_id_tool
-# note: would flash cuts based on sps be better?
+
+# use DL vertexing
+#physics.producers.pandoraPatRec.ConfigFile: "PandoraSettings_Master_MicroBooNE_Default_MCC10_DL.xml"
 
 physics.reco: [nuslhits, sps, NuGraph, gaushit, gaushitTruthMatch, @sequence::physics.reco ]
 
