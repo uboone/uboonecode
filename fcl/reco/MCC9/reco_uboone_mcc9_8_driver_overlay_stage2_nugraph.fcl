@@ -10,7 +10,7 @@ process_name: "OverlayRecoStage2NuGraph"
 physics.producers.nuslhits: @local::nuslhits_mc
 physics.producers.sps: @local::standard_spacepointsolver
 physics.producers.NuGraph: @local::NuGraph
-physics.producers.gaushit: @local::gaushit_ng
+physics.producers.gaushit: @local::gaushit_ngbypfp
 physics.producers.gaushitTruthMatch: @local::gaushitTruth_ng
 
 physics.producers.NuGraph.modelFileName: "NuGraph/model-numiallwr2.pt"
