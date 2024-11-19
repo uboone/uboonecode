@@ -12,7 +12,7 @@ process_name: "BeamOnRecoStage2NuGraph"
 physics.producers.nuslhits: @local::nuslhits_data
 physics.producers.sps: @local::standard_spacepointsolver
 physics.producers.NuGraph: @local::NuGraph
-physics.producers.gaushit: @local::gaushit_ng
+physics.producers.gaushit: @local::gaushit_ngbypfp
 
 physics.producers.NuGraph.modelFileName: "NuGraph/model-numiallwr2.pt"
 physics.producers.NuGraph.avgs_u: [395.23712, 180.31087, 156.4287  , 4.6503887]
