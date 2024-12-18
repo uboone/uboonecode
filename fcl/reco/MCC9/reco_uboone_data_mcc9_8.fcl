@@ -57,6 +57,9 @@
 
 #include "microboone_wiremod.fcl"
 
+#include "microboone_blipreco.fcl"
+#include "particleinventoryservice.fcl"
+
 BEGIN_PROLOG
 
 microboone_reco_data_services:
@@ -64,6 +67,7 @@ microboone_reco_data_services:
 
   PhotonVisibilityService:    @local::microboone_photonvisibilityservice
   OpDigiProperties:           @local::microboone_opdigiproperties
+  ParticleInventoryService:   @local::standard_particleinventoryservice
                               @table::microboone_services_reco
 }
 
@@ -261,6 +265,9 @@ microboone_reco_data_producers:
 
     #Wire Modification
     wiremod: @local::microboone_wiremod
+    
+    # Blip reco producer
+    blipreco: @local::microboone_blipreco
 
 }
 
@@ -413,7 +420,8 @@ microboone_reco_data_pandora: [          pandoraWriter,
                                          pandoraCrtHitMatch,
                                          acpttagger,
                                          acpttrigtagger,
-                                         flashmatch]
+                                         flashmatch
+                                         ]
 
 
 microboone_reco_data:                  [ rns,
@@ -423,7 +431,8 @@ microboone_reco_data:                  [ rns,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_crt,
-                                         @sequence::microboone_reco_data_ccpath 
+                                         @sequence::microboone_reco_data_ccpath, 
+                                         blipreco
                                        ]
 
 microboone_reco_data_stage1:           [ rns,
@@ -441,13 +450,15 @@ microboone_reco_data_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
                                        ]
 
 microboone_reco_data_mcc9_1_stage2_nocrt: [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
-                                         @sequence::microboone_reco_data_pandora
+                                         @sequence::microboone_reco_data_pandora,
+                                         blipreco
                                        ]
 
 microboone_reco_data_mcc9_1_stage2_double_pmt: [
@@ -456,7 +467,8 @@ microboone_reco_data_mcc9_1_stage2_double_pmt: [
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
                                        ]
 
 microboone_reco_data_stage2:           [ @sequence::microboone_reco_data_mcc9_1_stage2,
@@ -476,7 +488,8 @@ microboone_reco_ovrl_mcc9_1_stage2:    [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
                                        ]
 
 microboone_reco_ovrl_stage2:           [ @sequence::microboone_reco_ovrl_mcc9_1_stage2,
@@ -487,13 +500,22 @@ microboone_reco_data_stage2_nocc:      [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
+                                       ]
+
+microboone_reco_data_stage2_nocc_noblips: [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_data_crt
                                        ]
 
 microboone_reco_data_stage2_nocc_nocrt: [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
-                                         @sequence::microboone_reco_data_pandora
+                                         @sequence::microboone_reco_data_pandora,
+                                         blipreco
                                        ]
 
 microboone_reco_data_stage2_nocc_double_pmt: [
@@ -502,14 +524,16 @@ microboone_reco_data_stage2_nocc_double_pmt: [
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_data_crt
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
                                        ]
 
 microboone_reco_ovrl_stage2_nocc:      [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora,
-                                         @sequence::microboone_reco_ovrl_crt
+                                         @sequence::microboone_reco_ovrl_crt,
+                                         blipreco
                                        ]
 
 microboone_dqm_ana_stage1:             [ DQMHits,
