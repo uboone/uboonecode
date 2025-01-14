@@ -22,6 +22,12 @@ fi
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
 
+# Maybe update excute path.
+
+if [ -d $UBANA_DIR/ubana/MicroBooNEWireCell/utils ]; then
+  export PATH=$UBANA_DIR/ubana/MicroBooNEWireCell/utils:$PATH
+fi
+
 # Set up python path.
 
 export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
@@ -75,19 +81,14 @@ do
 
   inits=''
   if [ $FCL = run_slimmed_port_data.fcl ]; then
-    inits=/pnfs/uboone/persistent/users/wgu/update_slimmed_port_data.sh
+    inits=update_slimmed_port_data.sh
   elif [ $FCL = run_wcpf_port.fcl ]; then
-    inits=/pnfs/uboone/persistent/users/wgu/update_wcpf_port.sh
+    inits=update_wcpf_port.sh
   fi
   if [ x$inits != x ]; then
-    if [ ! -f $inits ]; then
-      echo "Init source script $inits not found."
-      exit 1
-    fi
-    inits_local=`basename $inits`
-    echo "Sourcing $inits_local"
-    cp $inits $inits_local
-    . $inits_local
+    inits_p=`which $inits`
+    echo "Sourcing $inits_p"
+    . $inits_p
     stat=$?
     echo "Source script finished with status $stat"
     if [ $stat -ne 0 ]; then
@@ -114,7 +115,7 @@ do
 
   ends=''
   if [ $FCL = run_celltreeub_port_prod.fcl ]; then
-    ends=/pnfs/uboone/persistent/users/wgu/unified_reco2_wirecell.sh
+    ends=unified_reco2_wirecell.sh
 
     # Generate fake metadata.
 
@@ -126,11 +127,8 @@ EOF
 
   fi
   if [ x$ends != x ]; then
-    ends_local=`basename $ends`    
-    echo "Running end script $ends_local"
-    cp $ends $ends_local
-    chmod +x $ends_local
-    ./$ends_local > $end_out 2> $end_err
+    echo "Running end script $ends"
+    $ends > $end_out 2> $end_err
     stat=$?
     echo "End script finished with status $stat"
     if [ $stat -ne 0 ]; then
