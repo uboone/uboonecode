@@ -150,11 +150,11 @@ done
 
 # Done (success).
 
-for root in *.root
-do
-  rootstat.py $root > ${root}.rootstat
+#for root in *.root
+#do
+  #rootstat.py $root > ${root}.rootstat
   #rm $root   # Clean up.
-done
+#done
 
 exit 0
 
