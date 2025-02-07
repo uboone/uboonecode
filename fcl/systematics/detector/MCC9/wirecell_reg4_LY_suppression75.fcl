@@ -1,7 +1,7 @@
-#include "services_microboone.fcl"
+#Include "services_microboone.fcl"
 #include "largeantmodules_microboone.fcl"
 #include "time_memory_tracker_microboone.fcl"
-#include "photpropservices.fcl"
+#include "photpropservices_microboone.fcl"
 
 process_name: PLPvarLYsuppression75 
 
@@ -12,6 +12,7 @@ services: {
   RandomNumberGenerator: {}
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::microboone_g4_services
+  PhotonVisibilityService: @local::microboone_photonvisibilityservice
 }
 
 source: {
@@ -25,9 +26,13 @@ physics: {
     largeant: {
       module_type: "UBPhotonLibraryPropagation"
       EDepModuleLabels: [ "largeant:Other", "largeant:TPCActive" ]
+      PhotonScale: [ 1.6, 1. ] #[outside TPC, inside TPC]
       DoSlowComponent: true
       RiseTimeFast: -1.0
       RiseTimeSlow: -1.0
+      UsingScaleFactor: false #this to use the outside the TPC photon scaling using "PhotonScale". False by default
+      IncludePhotPropTimeUBSim: true #to have the UBPhotonLibraryPropagation transport time included. Can be turned off if need be.
+      VUVTiming: @local::common_vuv_timing_parameterization
     }
     rns: { module_type: "RandomNumberSaver" }
   }
@@ -56,4 +61,3 @@ services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 services.DetectorClocksService.InheritClockConfig: false
 
 services.PhotonVisibilityService.LibraryFile: "PhotonPropagation/LibraryData/uboone_photon_library_variation_Suppression75percent.root"
-
