@@ -1,7 +1,7 @@
-## 
-##  Shared art job configuartions for MCC9 uboone reco
 ##
-#include "reco_uboone_data_mcc9_8.fcl"
+##  Shared art job configuartions for MCC10 uboone reco
+##
+#include "reco_uboone_data_mcc9_10.fcl"
 #include "time_memory_tracker_microboone.fcl"
 
 services:
@@ -43,7 +43,7 @@ physics:
    }
 
    filters:
-   { 
+   {
        @table::microboone_reco_data_filters
    }
 
@@ -54,7 +54,7 @@ physics:
 
    #reco sequence and trigger_paths to be defined elsewhere
    stream1:       [ out1    ]
-   end_paths:     [ stream1 ]  
+   end_paths:     [ stream1 ]
 }
 
 #block to define where the output goes.  if you defined a filter in the physics
@@ -74,7 +74,7 @@ outputs:
 ### Here we try to suppress known and pointless messages
 services.message.destinations :
 {
-    STDCOUT: 
+    STDCOUT:
     {
         type:      "cout"      #tells the message service to output this destination to cout
         threshold: "WARNING"   #tells the message service that this destination applies to WARNING and higher level messages
