@@ -1,7 +1,7 @@
 #include "services_microboone.fcl"
 #include "largeantmodules_microboone.fcl"
 #include "time_memory_tracker_microboone.fcl"
-#include "photpropservices.fcl"
+#include "photpropservices_microboone.fcl"
 
 process_name: PhotonLibraryPropagationInactive
 
@@ -12,6 +12,7 @@ services: {
   RandomNumberGenerator: {}
   FileCatalogMetadata:  @local::art_file_catalog_mc
   @table::microboone_g4_services
+  PhotonVisibilityService: @local::microboone_photonvisibilityservice
 }
 
 source: {
@@ -29,6 +30,9 @@ physics: {
       DoSlowComponent: true
       RiseTimeFast: -1.0
       RiseTimeSlow: -1.0
+      UsingScaleFactor: false #this to use the outside the TPC photon scaling using "PhotonScale". False by default
+      IncludePhotPropTimeUBSim: true #to have the UBPhotonLibraryPropagation transport time included. Can be turned off if need be.
+      VUVTiming: @local::common_vuv_timing_parameterization
     }
     rns: { module_type: "RandomNumberSaver" }
   }

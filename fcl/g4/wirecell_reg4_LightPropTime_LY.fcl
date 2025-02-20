@@ -3,7 +3,7 @@
 #include "time_memory_tracker_microboone.fcl"
 #include "photpropservices_microboone.fcl"
 
-process_name: PLPvarLYsuppression75attenuation8m 
+process_name: PhotonLibraryPropagationAndTiming
 
 services: {
   scheduler: { defaultExceptions: false }
@@ -59,5 +59,3 @@ services.SpaceCharge.EnableSimEfieldSCE: true
 services.LArG4Parameters.FillSimEnergyDeposits: true
 services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
 services.DetectorClocksService.InheritClockConfig: false
-
-services.PhotonVisibilityService.LibraryFile: "PhotonPropagation/LibraryData/uboone_photon_library_variation_Attenuation8m_Suppression75percent.root"
