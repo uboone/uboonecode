@@ -1,9 +1,0 @@
-#include "reco_uboone_mcc9_10_includes.fcl"
-#include "reco_uboone_data_mcc9_8_driver_stage2_reduced.fcl"
-
-#include "reco_uboone_mcc9_10_replaces.fcl"
-
-process_name: "BeamOffRecoStage2MCC910"
-
-physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_beamOff
-physics.producers.nuslhits: @local::nuslhits_data

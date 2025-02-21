@@ -1,5 +1,0 @@
-#include "gaushit_ngfilter.fcl"
-#include "nuslicehits.fcl"
-#include "nugraph.fcl"
-#include "SpacePointSolver.fcl"
-#include "simple_neutrino_id.fcl"

@@ -184,7 +184,7 @@ microboone_reco_data_producers:
     pandora:                          @local::pandora_event_building
 
     ### NuGraph2
-    nuslhits:                         @local::nuslhits_mc
+    nuslhits:                         @local::nuslhits_data
     sps:                              @local::standard_spacepointsolver
     NuGraph:                          @local::NuGraph
     gaushit:                          @local::gaushit_ng
@@ -659,7 +659,7 @@ microboone_reco_data_producers.trajclusterKalmanTrack.seedFromPF:               
 
 # Pandora consolidated reconstruction (pre-NuGraph2)
 microboone_reco_data_producers.pandoraPatRecInit.HitFinderModuleLabel:                                        "gaushit"
-microboone_reco_data_producers.pandoraPatRec.ConfigFile:                                                      "PandoraSettings_Master_MicroBooNE_Default_MCC10.xml"
+microboone_reco_data_producers.pandoraPatRecInit.ConfigFile:                                                  "PandoraSettings_Master_MicroBooNE_DL.xml"
 microboone_reco_data_producers.pandoraAllOutcomesTrackInit.PFParticleLabel:                                   "pandoraPatRecInit:allOutcomes"
 microboone_reco_data_producers.pandoraAllOutcomesShowerInit.PFParticleLabel:                                  "pandoraPatRecInit:allOutcomes"
 
