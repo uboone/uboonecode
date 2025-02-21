@@ -40,7 +40,8 @@ microboone_tfile_metadata:
   fileFormat:            ["root", "pndr"]
 }
 
-physics.producers.pandora.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+physics.producers.pandora.SliceIdTool.HasMCNeutrino: true
+physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_overlay
 # flash-matching score preservation module
 physics.producers.flashmatch: @local::FlashMatch_overlay
 
