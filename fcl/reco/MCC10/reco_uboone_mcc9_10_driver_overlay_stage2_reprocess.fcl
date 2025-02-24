@@ -6,4 +6,4 @@ physics.producers.nuslhits.PfpLabel: "pandora"
 physics.producers.nuslhits.SliceLabel: "pandora"
 physics.producers.nuslhits.AllOutcomesLabel: "pandoraPatRec:allOutcomes"
 
-physics.reco: [ @sequence::microboone_reco_data_mcc9_10_stage2_reprocess ]
+physics.reco: [ @sequence::microboone_reco_ovrl_mcc9_10_stage2_reprocess ]
