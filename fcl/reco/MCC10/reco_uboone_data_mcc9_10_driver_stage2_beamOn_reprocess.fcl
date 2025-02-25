@@ -1,5 +1,8 @@
 #include "reco_uboone_data_mcc9_10_driver_stage2_reprocess.fcl"
 
+# updating this one for consistency, but it's not used
+physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_beamOn
+
 # flash-matching score preservation module
-physics.producers.flashmatch.BeamWindowStart: 3.19
-physics.producers.flashmatch.BeamWindowEnd:   4.87
+physics.producers.flashmatch.BeamWindowStart: @local::flash_neutrino_id_tool_beamOn.BeamWindowStartTime
+physics.producers.flashmatch.BeamWindowEnd:   @local::flash_neutrino_id_tool_beamOn.BeamWindowEndTime
