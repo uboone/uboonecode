@@ -1,0 +1,17 @@
+#include "services_microboone.fcl"
+
+process_name: CopyNonArtroot
+
+services:
+{
+  scheduler:    { defaultExceptions: false }    # Make all uncaught exceptions fatal.
+  message:      @local::standard_warning
+  FileCatalogMetadata:  @local::art_file_catalog_mc  # So we can read from sam.
+                                                     # Metadata doesn't matter.
+}
+
+source:
+{
+  module_type: DummySource
+  CopyInput: true
+}
