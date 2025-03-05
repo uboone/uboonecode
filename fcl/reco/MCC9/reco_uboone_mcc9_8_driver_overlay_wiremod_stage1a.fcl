@@ -30,7 +30,7 @@ physics.reco:                   [ rns, mchitfinder, @sequence::microboone_reco_d
 #physics.ana:                    [ @sequence::microboone_dqm_ana_stage1 ]
 physics.trigger_paths:          [ reco ]
 #physics.end_paths:              [ ana, stream1 ]
-outputs.out1.fileName:          "%ifb_%tc_wmd_reco1a.root"
+outputs.out1.fileName:          "%ifb_%tc_reco1a.root"
 outputs.out1.dataTier:          "reconstructed"
 #source.inputCommands:           ["keep *_*_*_*" ]
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*Reco*" ]
@@ -56,4 +56,4 @@ physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer"
 #}
 
 #reduce file name length
-#outputs.out1.fileName: "%r_%s_%tc_wmd.root"
+outputs.out1.fileName: "%ifb_%tc_wmd_r1a.root"
