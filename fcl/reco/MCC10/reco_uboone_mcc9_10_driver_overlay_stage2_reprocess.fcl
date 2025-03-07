@@ -6,4 +6,6 @@ physics.producers.nuslhits.PfpLabel: "pandora"
 physics.producers.nuslhits.SliceLabel: "pandora"
 physics.producers.nuslhits.AllOutcomesLabel: "pandoraPatRec:allOutcomes"
 
+physics.producers.flashmatch: @local::FlashMatch_overlay
+
 physics.reco: [ @sequence::microboone_reco_ovrl_mcc9_10_stage2_reprocess ]
