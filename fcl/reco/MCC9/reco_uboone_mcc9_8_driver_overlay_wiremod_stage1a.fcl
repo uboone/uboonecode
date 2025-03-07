@@ -56,4 +56,4 @@ physics.producers.nfspl1.wcls_main.params.raw_input_label: "mixer"
 #}
 
 #reduce file name length
-outputs.out1.fileName: "%r_%s_%tc_wmd.root"
+outputs.out1.fileName: "%ifb_%tc_wmd_r1a.root"
