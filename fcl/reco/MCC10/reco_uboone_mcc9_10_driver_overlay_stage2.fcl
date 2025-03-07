@@ -42,8 +42,15 @@ microboone_tfile_metadata:
 
 physics.producers.pandora.SliceIdTool.HasMCNeutrino: true
 physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+physics.producers.pandoraInit.SliceIdTool.PandoraAllOutcomesLabel: "pandoraPatRecInit:allOutcomes"
+physics.producers.pandoraInit.SliceIdTool.PandoraTrackLabel:       "pandoraAllOutcomesTrackInit"
+physics.producers.pandoraInit.SliceIdTool.ShouldWriteToFile:       true
+
 # flash-matching score preservation module
 physics.producers.flashmatch: @local::FlashMatch_overlay
+physics.producers.flashmatch.PandoraProducer:    "pandoraInit"
+physics.producers.flashmatch.SpacePointProducer: "pandoraInit"
+physics.producers.flashmatch.T0Producer:         "acpttrigtaggerInit"
 
 physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
 physics.producers.crthitcorrFirstPass.IsOverlay: true
