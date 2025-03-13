@@ -1,0 +1,8 @@
+#include "reco_uboone_mcc9_10_driver_overlay_numi_stage2_reprocess.fcl"
+
+# flash-matching score preservation module
+physics.producers.flashmatch.BeamWindowStart: 6.00
+physics.producers.flashmatch.BeamWindowEnd:   15.80
+
+# NuMI CRT Veto
+physics.filters.crtveto: @local::UBCRTCosmicFilterNuMIOFF
