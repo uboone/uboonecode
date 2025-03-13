@@ -7,4 +7,4 @@ physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_beamOn
 physics.producers.flashmatch.BeamWindowStart: @local::flash_neutrino_id_tool_beamOn.BeamWindowStartTime
 physics.producers.flashmatch.BeamWindowEnd:   @local::flash_neutrino_id_tool_beamOn.BeamWindowEndTime
 
-physics.producers.flashmatch: @local::FlashMatch_overlay
+#physics.producers.flashmatch: @local::FlashMatch_overlay
