@@ -1,8 +1,8 @@
 #include "reco_uboone_data_mcc9_8_driver_stage2.fcl"
 
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.19
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   4.87
+physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 3.195
+physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   4.875
 
 # flash-matching score preservation module
-physics.producers.flashmatch.BeamWindowStart: 3.19  
-physics.producers.flashmatch.BeamWindowEnd:   4.87
+physics.producers.flashmatch.BeamWindowStart: 3.195
+physics.producers.flashmatch.BeamWindowEnd:   4.875
