@@ -3,7 +3,7 @@
 process_name: DataRecoStage2DoublePMT
 
 services.TFileService.fileName: "reco_stage_2_hist.root"
-physics.reco:                   [ @sequence::microboone_reco_data_stage2_double_pmt ]
+physics.reco:                   [ @sequence::microboone_reco_data_stage2_nocc ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
