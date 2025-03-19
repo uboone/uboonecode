@@ -5,6 +5,7 @@
 
 process_name: OverlayRecoStage2
 
+services.FileCatalogMetadata.fileType: "overlay"
 services.DetectorClocksService.InheritClockConfig:  false
 services.TFileService.fileName: "reco_stage_2_hist.root"
 services.DetectorClocksService.InheritClockConfig:  false
