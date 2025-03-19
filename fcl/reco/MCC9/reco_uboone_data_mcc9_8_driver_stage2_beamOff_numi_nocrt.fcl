@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOff_nocrt.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_beamOff_nocrt.fcl"
 
 physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
 physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
