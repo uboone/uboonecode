@@ -258,7 +258,7 @@ microboone_reco_data_producers:
     crttrackmatchAll:                 @local::t0recocrthit_data
 
     # Flash Matching preservation
-    flashmatch:                       @local::FlashMatch
+    flashmatch:                       @local::FlashMatch_data
 
     # mcc9 cc inclusive filters
     NuCCproducer: @local::microboone_nucc_producer
@@ -594,7 +594,7 @@ microboone_reco_data_producers.pandora.TrackProducerLabel:                      
 microboone_reco_data_producers.pandora.ShowerProducerLabel:                                                   "pandoraAllOutcomesShower"
 microboone_reco_data_producers.pandora.HitProducerLabel:                                                      "gaushit"
 microboone_reco_data_producers.pandora.ShouldProduceT0s:                                                       false
-microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool
+microboone_reco_data_producers.pandora.SliceIdTool:                                                            @local::flash_neutrino_id_tool_data
 microboone_reco_data_producers.pandora.SliceIdTool.ShouldWriteToFile:                                          true
 
 microboone_reco_data_producers.pandora.SliceIdTool.HasMCNeutrino:                                              false
