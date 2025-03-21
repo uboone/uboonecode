@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_reduced_beamOff.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_beamOff.fcl"
 
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane0.RoiThreshold:                     1.5
 microboone_reco_data_producers.gaushit.HitFinderToolVec.CandidateHitsPlane1.RoiThreshold:                     1.5
