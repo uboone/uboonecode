@@ -1,3 +1,0 @@
-#include "reco_uboone_data_mcc9_10_driver_stage2.fcl"
-
-physics.reco: [ @sequence::microboone_reco_data_stage2_nocc_nocrt ]

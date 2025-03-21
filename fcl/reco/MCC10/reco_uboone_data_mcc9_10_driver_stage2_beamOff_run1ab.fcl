@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_10_driver_stage2_beamOff_nocrt.fcl"
+#include "reco_uboone_data_mcc9_10_driver_stage2_beamOff.fcl"
 
 physics.producers.wcopflash.OpDataProducerBeam:      "doublePMTFilter"
 physics.producers.wcopflash.OpDataProducerBeamLG:    "pmtreadout"
