@@ -1,4 +1,5 @@
 #include "reco_uboone_data_mcc9_10_driver_common.fcl"
+#include "reco_uboone_mcc9_10_reducer_stage2.fcl"
 
 process_name: DataRecoStage2DoublePMT
 
@@ -9,6 +10,7 @@ physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
+outputs.out1.dataTier:          @local::stage2ReducedOutputCommands
 source.inputCommands:           ["keep *_*_*_*",
                                  "drop *_*_*_Data*RecoStage2*",
                                  "drop raw::OpDetWaveforms_*_*_Data*",

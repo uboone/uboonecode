@@ -1,6 +1,0 @@
-#include "reco_uboone_data_mcc9_10_driver_stage2_reduced_beamOn_nocrt.fcl"
-
-physics.producers.wcopflash.OpDataProducerBeam:      "doublePMTFilter"
-physics.producers.wcopflash.OpDataProducerBeamLG:    "pmtreadout"
-physics.producers.wcopflash.OpDataProducerCosmic:    "cosmicPMTFilter"
-physics.producers.wcopflash.OpDataProducerCosmicLG:  "pmtreadout"
