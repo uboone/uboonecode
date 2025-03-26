@@ -272,7 +272,7 @@ if [ $deletefiles -eq 1 ]; then
     rm $newsamdef*.list 
     rm *split*.txt
     rm run_EventFilter.fcl
-    #rm master_filelist.txt
+    rm master_filelist.txt
     rm $nmaxevents # have no idea why a file of this name gets made... but lets delete it!
 fi
 
