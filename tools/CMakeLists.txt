@@ -7,3 +7,4 @@ cet_make_exec(
 
 add_subdirectory(MiniBooNENtupletoGSimpleConversion)
 add_subdirectory(overlay_scripts)
+add_subdirectory(EventFilter)
