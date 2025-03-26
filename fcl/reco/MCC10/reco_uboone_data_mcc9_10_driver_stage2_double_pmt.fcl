@@ -10,7 +10,7 @@ physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
-outputs.out1.dataTier:          @local::stage2ReducedOutputCommands
+outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
 source.inputCommands:           ["keep *_*_*_*",
                                  "drop *_*_*_Data*RecoStage2*" ]
 
