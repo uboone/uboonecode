@@ -1,6 +1,8 @@
 #include "reco_uboone_data_mcc9_10_driver_stage2.fcl"
 
 physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_beamOn
+physics.producers.pandoraInit.SliceIdTool.PandoraAllOutcomesLabel: "pandoraPatRecInit:allOutcomes"
+physics.producers.pandoraInit.SliceIdTool.PandoraTrackLabel:       "pandoraAllOutcomesTrackInit"
 
 # flash-matching score preservation module
 physics.producers.flashmatch.BeamWindowStart: @local::flash_neutrino_id_tool_beamOn.BeamWindowStartTime

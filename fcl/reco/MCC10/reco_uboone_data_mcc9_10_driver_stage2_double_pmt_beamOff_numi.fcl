@@ -1,7 +1,7 @@
-#include "reco_uboone_data_mcc9_10_driver_stage2_double_pmt_reduced_beamOff.fcl"
+#include "reco_uboone_data_mcc9_10_driver_stage2_double_pmt_beamOff.fcl"
 
-physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 6.00
-physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.80
+physics.producers.pandoraInit.SliceIdTool.BeamWindowStartTime: 6.00
+physics.producers.pandoraInit.SliceIdTool.BeamWindowEndTime:   15.80
 
 # flash-matching score preservation module
 physics.producers.flashmatch.BeamWindowStart: 6.00
