@@ -45,7 +45,7 @@ newsamdef=$2_tmp
 nmaxevents=200
 
 # keep the auxiliary files created during the process? 0=keep, 1=delete
-deletefiles=1
+deletefiles=0
 
 # ---------------------------------------------------------------------------------
 
@@ -193,19 +193,32 @@ for def in ${newsamdef_arr[@]}; do
 
     # locate the file
     newfile=`samweb locate-file "${files}"`
+    #echo "Newfile:"
+    #echo "$newfile"
 
-    # get rid of enstore in the name
-    modnewfile=${newfile#"enstore:"}
+    good_location=""
 
-    # get rid of anything after the bracket
-    modnewfile=${modnewfile%(*}
-    
-    # create the full path
-    modnewfile="${modnewfile}/${files}"
-    echo $modnewfile
+    # If file has more than one location, check which is online
+    while IFS= read -r line; do
 
-        # Put into the new file                                                     
-    echo ${modnewfile} >> ${def}_file.list
+      # get rid of enstore/dcache in the name
+      line=${line#"enstore:"}
+      line=${line#"dcache:"}
+
+      # get rid of anything after the bracket
+      line=${line%(*}
+     
+      # Check which location is staged 
+      location=$(cat $line/."(get)(${files})(locality)")
+      location=$(echo "$location" | head -n 1)
+      if [ "ONLINE" = "$location" ] || [ "$location" = "ONLINE_AND_NEARLINE" ]; then
+        good_location=$line
+      fi
+
+    done <<< "$newfile" 
+
+    # Put into the new file                                                     
+    echo ${good_location}/${files} >> ${def}_file.list
 
     done
 
