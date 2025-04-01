@@ -45,7 +45,7 @@ newsamdef=$2_tmp
 nmaxevents=200
 
 # keep the auxiliary files created during the process? 0=keep, 1=delete
-deletefiles=0
+deletefiles=1
 
 # ---------------------------------------------------------------------------------
 
