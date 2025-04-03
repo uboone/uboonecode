@@ -24,6 +24,10 @@ if [ x$WCP_DIR = x ]; then
   exit
 fi
 
+# LD_LIBRARY_PATH kluge
+
+export LD_LIBRARY_PATH=`dropit -p $LD_LIBRARY_PATH ublarcvapp`
+
 # Set wire cell path.
 
 export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wirecell
