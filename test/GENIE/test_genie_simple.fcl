@@ -66,5 +66,5 @@ physics.producers.generator.TopVolume:          "volCryostat"
 physics.producers.generator.BeamName:           "booster"
 physics.producers.generator.FluxType:           "simple_flux"
 physics.producers.generator.FluxFiles:          [ "converted_beammc_wincorr*.root" ]
-physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_01.09.2019_463/"
+physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/stash/uboonebeam/bnb_gsimple/bnb_gsimple_fluxes_01.09.2019_463/"
 physics.producers.generator.FluxCopyMethod:     "DIRECT"
