@@ -6,7 +6,7 @@ env > env.txt
 
 # Exit if stash cache isn't mounted.
 
-UBOONE_EXAMPLE_DATA_DIR=/cvmfs/uboone.osgstorage.org/stash/uboone_example_data
+UBOONE_EXAMPLE_DATA_DIR=/pnfs/uboone/persistent/stash/uboone_example_data
 if [ ! -d $UBOONE_EXAMPLE_DATA_DIR ]; then
   echo "Quittig because stash cache isn't available."
   exit
