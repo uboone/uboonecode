@@ -24,7 +24,8 @@ physics.producers.wcopflash.OpDataProducerBeam:                                 
 physics.producers.nuslhits.HitTruthLabel: "gaushitTruthMatch"
 
 #physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
-physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2_nocc ]
+physics.reco:                   [ @sequence::microboone_reco_data_optical,
+                                  @sequence::microboone_reco_ovrl_stage2_nocc ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
@@ -56,3 +57,6 @@ physics.producers.flashmatch.T0Producer:         "acpttrigtaggerInit"
 physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
 physics.producers.crthitcorrFirstPass.IsOverlay: true
 physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
+
+physics.producers.saturation.LGProducer: "mixer"
+physics.producers.saturation.HGProducer: "mixer"
