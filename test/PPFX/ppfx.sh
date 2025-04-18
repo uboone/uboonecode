@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# Exit if pnfs persistent isn't mounted.
+
+if [ ! -d /pnfs/uboone/persistent ]; then
+  exit
+fi
+
 # Make sure we can find ppfx config file in mrbsetenv environment, since the install
 # subdirectory is different than the source subdirectory.
 

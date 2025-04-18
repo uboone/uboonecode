@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# Exit if pnfs persistent isn't mounted.
+
+if [ ! -d /pnfs/uboone/persistent ]; then
+  exit
+fi
+
 # Set up python path.
 
 export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
