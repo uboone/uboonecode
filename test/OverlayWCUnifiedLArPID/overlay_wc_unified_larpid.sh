@@ -159,6 +159,19 @@ EOF
   #  input=$output
   #fi
   input=`ls -t1 *.root | egrep -v 'celltree|hist|larlite|larcv|Supplemental|TGraphs|merged_dlreco' | head -n1`
+
+  # Maybe shorten input file name.
+
+  nc=`echo $input | wc -c`
+  if [ $nc -gt 200 ]; then
+    base=`basename $input`
+    ext=${base##*.}
+    stem=${base%.*}
+    newstem=`echo $stem | cut -c1-150`_`uuidgen`
+    echo "mv $input ${newstem}.${ext}"
+    mv $input ${newstem}.${ext}
+    input=${newstem}.${ext}
+  fi
 done
 
 # Done (success).
