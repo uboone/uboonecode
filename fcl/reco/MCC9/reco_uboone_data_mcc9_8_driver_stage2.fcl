@@ -4,7 +4,8 @@
 process_name: DataRecoStage2
 
 services.TFileService.fileName: "reco_stage_2_hist.root"
-physics.reco:                   [ @sequence::microboone_reco_data_stage2_nocc ]
+physics.reco:                   [ @sequence::microboone_reco_data_optical,
+                                  @sequence::microboone_reco_data_stage2_nocc ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]

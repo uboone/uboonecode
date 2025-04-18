@@ -1,4 +1,4 @@
-#include "reco_uboone_data_mcc9_8_driver_stage2_double_pmt_reduced_beamOn.fcl"
+#include "reco_uboone_data_mcc9_8_driver_stage2_double_pmt_beamOn.fcl"
 
 physics.producers.pandora.SliceIdTool.BeamWindowStartTime: 5.64
 physics.producers.pandora.SliceIdTool.BeamWindowEndTime:   15.44
