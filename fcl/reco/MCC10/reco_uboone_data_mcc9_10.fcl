@@ -209,9 +209,11 @@ microboone_reco_data_producers:
     pandorapid:                       @local::particleidconfig
     pandoracali:                      @local::microboone_calibrationdedx_data
     pandoracalipid:                   @local::particleidconfig
+    pandoracaloInit:                  @local::microboone_calodata
     pandoracaloSCEInit:               @local::microboone_calodata
     pandoracaloSCE:                   @local::microboone_calodata
     pandorapidSCE:                    @local::particleidconfig
+    pandoracaliInit:                  @local::microboone_calibrationdedx_data
     pandoracaliSCEInit:               @local::microboone_calibrationdedx_data
     pandoracaliSCE:                   @local::microboone_calibrationdedx_data
     pandoracalipidSCE:                @local::particleidconfig
@@ -415,6 +417,8 @@ microboone_reco_data_pandora_init: [     pandoraWriterInit,
                                          pandoraAllOutcomesTrackInit,
                                          pandoraAllOutcomesShowerInit,
                                          pandoraInit,
+                                         pandoracaloInit,
+                                         pandoracaliInit,
                                          pandoracaloSCEInit,
                                          pandoracaliSCEInit,
                                          acpttrigtaggerInit,
@@ -687,6 +691,14 @@ microboone_reco_data_producers.pandoraInit.SliceIdTool:                         
 microboone_reco_data_producers.pandoraInit.SliceIdTool.PandoraAllOutcomesLabel:                               "pandoraPatRecInit:allOutcomes"
 microboone_reco_data_producers.pandoraInit.SliceIdTool.PandoraTrackLabel:                                     "pandoraAllOutcomesTrackInit"
 microboone_reco_data_producers.pandoraInit.SliceIdTool.ShouldWriteToFile:                                     true
+
+microboone_reco_data_producers.pandoracaloInit.TrackModuleLabel:                                              "pandoraInit"
+microboone_reco_data_producers.pandoracaloInit.SpacePointModuleLabel:                                         "pandoraInit"
+microboone_reco_data_producers.pandoracaloInit.CorrectSCE:                                                    false
+
+microboone_reco_data_producers.pandoracaliInit.TrackModuleLabel:                                              "pandoraInit"
+microboone_reco_data_producers.pandoracaliInit.CalorimetryModuleLabel:                                        "pandoracaloInit"
+microboone_reco_data_producers.pandoracaliInit.CorrectSCE:                                                    false
 
 microboone_reco_data_producers.pandoracaloSCEInit.TrackModuleLabel:                                           "pandoraInit"
 microboone_reco_data_producers.pandoracaloSCEInit.SpacePointModuleLabel:                                      "pandoraInit"
@@ -973,8 +985,11 @@ microboone_reco_data_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:
 
 # Blip reconstruction settings - for more details and a complete list of parameters
 # that can be configured, see 'ubreco/BlipReco/microboone_blipreco.fcl'
-microboone_reco_data_producers.blipreco.BlipAlg.HitProducer:          "gaushit"
-microboone_reco_data_producers.blipreco.BlipAlg.TrkProducer:          "pandora"
+# Note that the right hit collection (MC or data) will be determined automatically
+# by the code (based on presence of truth info); no need to edit these.
+#microboone_reco_data_producers.blipreco.BlipAlg.HitProducerData:      "gaushit::DataRecoStage1Test"
+#microboone_reco_data_producers.blipreco.BlipAlg.HitProducerOverlay:   "gaushit::OverlayStage1a"
+microboone_reco_data_producers.blipreco.BlipAlg.TrkProducer:          "pandoraInit"
 microboone_reco_data_producers.blipreco.BlipAlg.GeantProducer:        "largeant"
 microboone_reco_data_producers.blipreco.BlipAlg.SimEDepProducer:      "ionization"
 microboone_reco_data_producers.blipreco.BlipAlg.SimChanProducer:      "driftWC:simpleSC"
@@ -990,6 +1005,7 @@ microboone_reco_data_producers.blipreco.BlipAlg.MinMatchedPlanes:     2         
 microboone_reco_data_producers.blipreco.BlipAlg.CaloPlane:            2         #// plane used for calorimetry (2=collection)
 microboone_reco_data_producers.blipreco.BlipAlg.CalodEdx:             2.8       #// assumed dE/dx for MeV-scale recombination corrections
 microboone_reco_data_producers.blipreco.BlipAlg.CaloAlg:              @local::microboone_calo_mcc9_data
+microboone_reco_data_producers.blipreco.BlipAlg.CaloAlg.CalAreaConstants: [4.31e-3, 4.02e-3, 4.10e-3]
 microboone_reco_data_producers.blipreco.BlipAlg.BadChanProducer:      "nfspl1:badchannels" #// label for vector of bad channel IDs from signal processing
 microboone_reco_data_producers.blipreco.BlipAlg.MinDeadWireGap:       0         #// min wire gap size separating cluster from a dead region
 
