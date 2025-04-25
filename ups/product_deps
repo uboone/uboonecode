@@ -252,12 +252,12 @@ genie_phyopt	v3_04_00a	-
 genie_xsec	v3_04_00	-
 wcp             v00_18_01       -
 larsoft		v10_04_07	-
-ubcrt		v10_04_07	-
-ubcv		v10_04_07_04	-
-ublite		v10_04_07_04	-
+ubcrt		v10_04_07_05	-
+ubcv		v10_04_07_05	-
+ublite		v10_04_07_05	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_04_04	-
-ubutil		v10_04_07_02	-
+ubutil		v10_04_07_05	-
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
 ####################################
