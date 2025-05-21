@@ -70,7 +70,7 @@ for FCL in wirecell_reg4_LightPropTime_LY.fcl \
   standard_overlay_notpc_uboone.fcl \
   run_celltreeub_overlay_port_prod.fcl \
   run_slimmed_port_overlay_sp.fcl \
-  mcc10_dlreco_w_wirecell_driver_overlay_and_mc_gen2.fcl \
+  mcc10_dlreco_w_wirecell_driver_overlay_lantern.fcl \
   run_wcpplus_port.fcl \
   run_wcpf_port.fcl
 do
@@ -142,8 +142,8 @@ do
 }
 EOF
 
-  elif [ $FCL = mcc10_dlreco_w_wirecell_driver_overlay_and_mc_gen2.fcl ]; then
-    ends=merge_dlreco_fnal_overlay_and_mc_gen2.sh
+  elif [ $FCL = mcc10_dlreco_w_wirecell_driver_overlay_lantern.fcl ]; then
+    ends=merge_dlreco_fnal_overlay_and_mc_lantern.sh
   fi
   if [ x$ends != x ]; then
     echo "Running end script $ends"
