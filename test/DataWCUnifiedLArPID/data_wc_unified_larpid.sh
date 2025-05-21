@@ -67,7 +67,7 @@ rm -rf WCPwork
 input=$UBOONE_EXAMPLE_DATA_DIR/reco1/PhysicsRun-2018_7_2_21_23_1-0017505-00141_20180714T132533_ext_bnb_3_20181207T001756_optfilter_20181224T035203_reco1_postwcct_postdl_20181224T035451.root
 for FCL in run_celltreeub_port_prod.fcl \
   run_slimmed_port_data_sp.fcl \
-  mcc10_dlreco_w_wirecell_driver_data_gen2.fcl \
+  mcc10_dlreco_w_wirecell_driver_data_lantern.fcl \
   run_wcpplus_port.fcl \
   run_wcpf_port.fcl
 do
@@ -139,8 +139,8 @@ do
 }
 EOF
 
-  elif [ $FCL = mcc10_dlreco_w_wirecell_driver_data_gen2.fcl ]; then
-    ends=merge_dlreco_fnal_data_gen2.sh
+  elif [ $FCL = mcc10_dlreco_w_wirecell_driver_data_lantern.fcl ]; then
+    ends=merge_dlreco_fnal_data_lantern.sh
   fi
   if [ x$ends != x ]; then
     echo "Running end script $ends"
