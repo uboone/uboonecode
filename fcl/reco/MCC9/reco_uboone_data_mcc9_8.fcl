@@ -831,8 +831,8 @@ microboone_reco_data_producers.shrreco3dKalmanShowercali.CalorimetryModuleLabel:
 
 # Blip reconstruction settings - for more details and a complete list of parameters
 # that can be configured, see 'ubreco/BlipReco/microboone_blipreco.fcl'
-microboone_reco_data_producers.blipreco.BlipAlg.HitProducer:          "gaushit"
-microboone_reco_data_producers.blipreco.BlipAlg.TrkProducer:          "pandora"
+#microboone_reco_data_producers.blipreco.BlipAlg.HitProducer:          "gaushit"
+#microboone_reco_data_producers.blipreco.BlipAlg.TrkProducer:          "pandora"
 microboone_reco_data_producers.blipreco.BlipAlg.GeantProducer:        "largeant"
 microboone_reco_data_producers.blipreco.BlipAlg.SimEDepProducer:      "ionization"
 microboone_reco_data_producers.blipreco.BlipAlg.SimChanProducer:      "driftWC:simpleSC"
