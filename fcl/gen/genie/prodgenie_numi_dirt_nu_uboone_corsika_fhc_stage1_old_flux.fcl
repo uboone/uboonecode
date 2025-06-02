@@ -119,7 +119,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "genie_gen_dirt_rhc.root" #default file name, can override from command line with -o or --output
+   fileName:    "genie_gen_dirt_fhc.root" #default file name, can override from command line with -o or --output
    dataTier:    "generated"
    compressionLevel: 1
    SelectEvents: [simulate]
@@ -144,7 +144,7 @@ services.DetectorClocksService.InheritClockConfig: false
 
 # dk2nu flux generation config
 physics.producers.generator:                    @local::standard_genie
-physics.producers.generator.POTPerSpill:        6e13
+physics.producers.generator.POTPerSpill:        5e13
 physics.producers.generator.EventsPerSpill:     0
 physics.producers.generator.GlobalTimeOffset:   5627.5
 physics.producers.generator.RandomTimeOffset:   9600.
@@ -152,16 +152,12 @@ physics.producers.generator.TopVolume:          "volWorld"
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "Default"
 physics.producers.generator.FluxType:           "simple_flux"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/stash/uboonebeam/dirt_gsimple/numi_g4_10_4_04.17.2025/RHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/dirt/FHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
 # Add beam timing structure to the generation of events
 #physics.producers.generator.SpillTimeConfig: @local::FNAL_NuMI_default
 
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"]
-
 # Update the cut on the simphoton time. Use conservative time equal to the software trigger window.
 physics.filters.TimeFilter.TimeWindows: [ [4687.5, 16406.25] ]
-
-
