@@ -152,7 +152,7 @@ physics.producers.generator.TopVolume:          "volWorld"
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "Default"
 physics.producers.generator.FluxType:           "simple_flux"
-physics.producers.generator.FluxSearchPaths:    "/pnfs/uboone/persistent/stash/uboonebeam/dirt_gsimple/numi_g4_10_4_04.17.2025/RHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/dirt_gsimple/numi_g4_10_4_04.17.2025/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
