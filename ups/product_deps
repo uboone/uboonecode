@@ -258,7 +258,7 @@ ublite		v10_04_07_07	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_04_07_06	-
 ubutil		v10_04_07_06	-
-lantern_container v2_me_06_03_prod -
+lantern_container v2_me_06_03_prod -    optional
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
 ####################################
