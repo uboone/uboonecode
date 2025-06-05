@@ -1,9 +1,5 @@
 #include "beamspilltimings.fcl"
-#include "prodgenie_common_uboone.fcl"
-
-process_name: GenieGen
-
-outputs.out1.fileName: "prodgenie_numi_dirt_nu_uboone_%tc_gen_rhc.root"
+#include "prodgenie_bnb_dirt_nu_wirecell_g4_uboone.fcl"
 
 # dk2nu flux generation config
 physics.producers.generator:                    @local::standard_genie
@@ -15,7 +11,7 @@ physics.producers.generator.TopVolume:          "volWorld"
 physics.producers.generator.BeamName:           "numi"
 physics.producers.generator.EventGeneratorList: "Default"
 physics.producers.generator.FluxType:           "simple_flux"
-physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/dirt_gsimple/numi_g4_10_4_04.17.2025/RHC/" # path to the production files
+physics.producers.generator.FluxSearchPaths:    "/cvmfs/uboone.osgstorage.org/stash/uboonebeam/numi_dk2nu_zero_threshold/dirt/RHC/" # path to the production files
 physics.producers.generator.FluxFiles:          ["gsimple*.root"]
 physics.producers.generator.DetectorLocation:   "microboone-numi-v2-dirt"
 
