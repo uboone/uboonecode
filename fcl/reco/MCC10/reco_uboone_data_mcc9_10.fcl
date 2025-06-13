@@ -716,7 +716,7 @@ microboone_reco_data_producers.flashmatch.SpacePointProducer:                   
 microboone_reco_data_producers.flashmatch.T0Producer:                                                         "acpttrigtaggerInit"
 
 # NuGraph 2 config
-microboone_reco_data_producers.NuGraph.modelFileName: "NuGraph/model-numiallwr2.pt"
+microboone_reco_data_producers.NuGraph.modelFileName: "NuGraph/model-numiallwr2_no-rms.pt"
 microboone_reco_data_producers.NuGraph.avgs_u: [395.23712, 180.31087, 156.4287  , 4.6503887]
 microboone_reco_data_producers.NuGraph.avgs_v: [374.18634, 180.33629, 152.55469 , 4.465103 ]
 microboone_reco_data_producers.NuGraph.avgs_y: [552.84753, 181.09207, 125.493675, 4.223127 ]
