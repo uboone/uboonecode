@@ -251,10 +251,10 @@ product		version		qual	flags		<table_format=2>
 genie_phyopt	v3_04_00a	-
 genie_xsec	v3_04_00	-
 wcp             v00_18_01       -
-larsoft		v10_08_00	-
-ubcrt		v10_08_00	-
-ubcv		v10_08_01	-
-ublite		v10_08_01	-
+larsoft		v10_08_02	-
+ubcrt		v10_08_02	-
+ubcv		v10_08_02	-
+ublite		v10_08_02	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_08_01	-
 ubutil		v10_08_01	-
