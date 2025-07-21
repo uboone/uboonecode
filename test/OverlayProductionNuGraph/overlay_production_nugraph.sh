@@ -42,7 +42,7 @@ export SAM_EXPERIMENT=uboone
 # This script runs the nugraph chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/mcreco1/PhysicsRun-2020_2_24_2_35_6-0025487-00006_20200419T164054_ext_unbiased_1_20200422T181434_merged_gen_fhc_20241110T063112_g4_detsim_mix_r1a_r1b_20241110T065513_reco1c_20241111T074036_merged.root
-for fcl in run_reboone.fcl wirecell_reg4_LightPropTime_LY.fcl wirecell_detsim_optical_overlay_uboone.fcl standard_overlay_notpc_uboone.fcl reco_uboone_mcc9_8_driver_overlay_optical.fcl reco_uboone_mcc9_10_driver_overlay_stage2.fcl run_fullshowerreco.fcl
+for fcl in run_reboone.fcl wirecell_reg4_LightPropTime_LY.fcl wirecell_detsim_optical_overlay_uboone.fcl standard_overlay_notpc_uboone.fcl reco_uboone_mcc9_8_driver_overlay_optical.fcl reco_uboone_mcc9_10_driver_overlay_stage2.fcl run_fullshowerreco_overlay.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out

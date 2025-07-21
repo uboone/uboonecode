@@ -42,7 +42,7 @@ export SAM_EXPERIMENT=uboone
 # This script runs the nugraph chain using standard released fcl files.
 
 input=$UBOONE_EXAMPLE_DATA_DIR/reco1/PhysicsRun-2018_10_11_9_59_56-0019527-00063_20181016T152442_ext_bnb_1_20190108T142430_optfilter_20190614T003502_reco1_postwcct_postdl_20190614T010503.root
-for fcl in reco_uboone_mcc9_8_driver_data_bnb_optical.fcl reco_uboone_data_mcc9_10_driver_stage2_beamOff.fcl run_fullshowerreco.fcl
+for fcl in reco_uboone_mcc9_8_driver_data_bnb_optical.fcl reco_uboone_data_mcc9_10_driver_stage2_beamOff.fcl run_fullshowerreco_data_beamOff.fcl
 do
   output=`basename $fcl .fcl`.root
   out=`basename $fcl .fcl`.out
