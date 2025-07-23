@@ -16,6 +16,7 @@ source.inputCommands:           ["keep *_*_*_*",
                                  "drop *_*_*_Data*RecoStage2*" ]
 
 physics.producers.acpttrigtagger.OpDetWfmProducer: "doublePMTFilter:OpdetBeamHighGain"
+physics.producers.saturation.HGProducer: "doublePMTFilter"
 
 microboone_tfile_metadata:
 {
