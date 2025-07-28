@@ -7,7 +7,7 @@ process_name: OverlayRecoStage2n
 
 services.FileCatalogMetadata.fileType: "overlay"
 services.DetectorClocksService.InheritClockConfig:  false
-services.DetectorClocksService.InheritClockConfig:  false
+services.TFileService.fileName: "reco_stage_2n_hist.root"
 
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
@@ -50,3 +50,11 @@ physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
 
 physics.producers.saturation.LGProducer: "mixer"
 physics.producers.saturation.HGProducer: "mixer"
+
+#microboone_tfile_metadata:
+#{
+#  JSONFileName:          ["reco_stage_2n_hist.root.json"]
+#  GenerateTFileMetadata: [true]
+#  dataTier:              ["root-tuple"]
+#  fileFormat:            ["root"]
+#}

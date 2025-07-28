@@ -3,6 +3,8 @@
 
 process_name: DataRecoStage2n
 
+services.TFileService.fileName: "reco_stage_2n_hist.root"
+
 physics.reco:                   [ @sequence::microboone_reco_data_nugraph2 ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
@@ -11,3 +13,11 @@ outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
 outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
 source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2n" ]
+
+#microboone_tfile_metadata:
+#{
+#  JSONFileName:          ["reco_stage_2n_hist.root.json"]
+#  GenerateTFileMetadata: [true]
+#  dataTier:              ["root-tuple"]
+#  fileFormat:            ["root"]
+#}
