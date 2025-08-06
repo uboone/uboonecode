@@ -1,0 +1,12 @@
+#include "reco_uboone_data_mcc9_10_driver_stage2b_beamOff_numi.fcl"
+
+physics.reco: [ @sequence::microboone_reco_data_stage2b_nocc ]
+
+physics.producers.wcopflash.OpDataProducerBeam:      "doublePMTFilter"
+physics.producers.wcopflash.OpDataProducerBeamLG:    "pmtreadout"
+physics.producers.wcopflash.OpDataProducerCosmic:    "cosmicPMTFilter"
+physics.producers.wcopflash.OpDataProducerCosmicLG:  "pmtreadout"
+physics.producers.saturation.HGProducer:             "doublePMTFilter"
+physics.producers.saturation.HGProducerCosmic:       "cosmicPMTFilter"
+physics.producers.acpttrigtagger.OpDetWfmProducer:   "doublePMTFilter:OpdetBeamHighGain"
+physics.producers.acpttrigtaggerInit.OpDetWfmProducer: "doublePMTFilter:OpdetBeamHighGain"

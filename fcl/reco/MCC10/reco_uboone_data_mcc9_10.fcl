@@ -588,6 +588,18 @@ microboone_reco_data_stage2_nocc:      [ rns,
                                          blipreco
                                        ]
 
+microboone_reco_data_stage2a_nocc:     [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora_init
+                                       ]
+
+microboone_reco_data_stage2b_nocc:     [ rns,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_data_crt,
+                                         blipreco
+                                       ]
+
 microboone_reco_data_stage2_nocc_noblips: [ rns,
                                          opNoiseCreateMask,
                                          wcopflash,
@@ -623,6 +635,18 @@ microboone_reco_ovrl_stage2_nocc:      [ rns,
                                          wcopflash,
                                          @sequence::microboone_reco_data_pandora_init,
                                          @sequence::microboone_reco_ovrl_nugraph2,
+                                         @sequence::microboone_reco_data_pandora,
+                                         @sequence::microboone_reco_ovrl_crt,
+                                         blipreco
+                                       ]
+
+microboone_reco_ovrl_stage2a_nocc:     [ rns,
+                                         opNoiseCreateMask,
+                                         wcopflash,
+                                         @sequence::microboone_reco_data_pandora_init
+                                       ]
+
+microboone_reco_ovrl_stage2b_nocc:     [ rns,
                                          @sequence::microboone_reco_data_pandora,
                                          @sequence::microboone_reco_ovrl_crt,
                                          blipreco
