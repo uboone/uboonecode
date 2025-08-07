@@ -253,8 +253,8 @@ genie_xsec	v3_04_00	-
 wcp             v00_18_01       -
 larsoft		v10_04_07_01	-
 ubcrt		v10_04_07_11	-
-ubcv		v10_04_07_11	-
-ublite		v10_04_07_11	-
+ubcv		v10_04_07_12	-
+ublite		v10_04_07_12	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_04_07_06	-
 ubutil		v10_04_07_11	-
