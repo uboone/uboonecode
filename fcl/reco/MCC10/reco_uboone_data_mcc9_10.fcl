@@ -929,7 +929,7 @@ microboone_reco_data_producers.crthitcorr.HitThreshold:                         
 microboone_reco_data_producers.crttzero.data_label:                                                           "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRThit:                                               "crthitcorr"
 microboone_reco_data_producers.crttrackmatch.data_label_CRTtzero:                                             "crttzero"
-microboone_reco_data_producers.crttrackmatch.data_label_TPCtrack:                                             "pandora"
+microboone_reco_data_producers.crttrackmatch.data_label_TPCtrack:                                             "pandoraInit"
 microboone_reco_data_producers.crttrackmatch.data_label_flash:                                                "simpleFlashCosmic"
 microboone_reco_data_producers.crttrackmatchAll.data_label_CRThit:                                            "crthitcorr"
 microboone_reco_data_producers.crttrackmatchAll.data_label_CRTtzero:                                          "crttzero"
