@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 find_package(cetmodules REQUIRED)
-project(uboonecode VERSION 10.10.05 LANGUAGES CXX)
+project(uboonecode VERSION 10.11.01 LANGUAGES CXX)
 
 include(CetCMakeEnv)
 cet_cmake_env()
