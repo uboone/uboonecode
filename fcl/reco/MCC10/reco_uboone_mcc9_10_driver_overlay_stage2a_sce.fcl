@@ -1,0 +1,63 @@
+#include "mchitmodules.fcl"
+#include "mctrutht0matching.fcl"
+#include "reco_uboone_data_mcc9_10_driver_common.fcl"
+#include "reco_uboone_mcc9_10_reducer_stage2.fcl"
+
+process_name: OverlayRecoStage2a
+
+services.FileCatalogMetadata.fileType: "overlay"
+services.DetectorClocksService.InheritClockConfig:  false
+services.TFileService.fileName: "reco_stage_2a_hist.root"
+services.DetectorClocksService.InheritClockConfig:  false
+services.SpaceCharge.EfieldOffsetScale: 1.0
+
+physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
+physics.producers.trajcluster.DoRawDigitAssns: false
+
+physics.producers.trajclusterTruthMatch: @local::standard_mcparticlehitmatching
+physics.producers.trajclusterTruthMatch.OverrideRealData: true
+physics.producers.trajclusterTruthMatch.HitParticleAssociations:                    @local::IndirectHitParticleAssnsTool
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitPartAssnsLabel:  "gaushitTruthMatch"
+physics.producers.trajclusterTruthMatch.HitParticleAssociations.HitModuleLabel:     "trajcluster"
+
+physics.producers.wcopflash.OpDataProducerBeam:                                     "mixer"
+
+physics.producers.nuslhits.HitTruthLabel: "gaushitTruthMatch"
+
+#physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
+physics.reco:                   [ @sequence::microboone_reco_data_optical,
+                                  @sequence::microboone_reco_ovrl_stage2a_nocc ]
+physics.ana:                    [ ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ stream1 ]
+outputs.out1.fileName:          "%ifb_%tc_reco2.root"
+outputs.out1.dataTier:          "reconstructed"
+outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*RecoStage2*" ]
+
+#microboone_tfile_metadata:
+#{
+#  JSONFileName:          ["reco_stage_2a_hist.root.json", "Pandora_Events.pndr.json"]
+#  GenerateTFileMetadata: [true, true]
+#  dataTier:              ["root-tuple", "pandora_debug"]
+#  fileFormat:            ["root", "pndr"]
+#}
+
+physics.producers.pandora.SliceIdTool.HasMCNeutrino: true
+physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_overlay
+physics.producers.pandoraInit.SliceIdTool.PandoraAllOutcomesLabel: "pandoraPatRecInit:allOutcomes"
+physics.producers.pandoraInit.SliceIdTool.PandoraTrackLabel:       "pandoraAllOutcomesTrackInit"
+physics.producers.pandoraInit.SliceIdTool.ShouldWriteToFile:       true
+
+# flash-matching score preservation module
+physics.producers.flashmatch: @local::FlashMatch_overlay
+physics.producers.flashmatch.PandoraProducer:    "pandoraInit"
+physics.producers.flashmatch.SpacePointProducer: "pandoraInit"
+physics.producers.flashmatch.T0Producer:         "acpttrigtaggerInit"
+
+physics.filters.crtveto: @local::UBCRTCosmicFilterBNBOFF
+physics.producers.crthitcorrFirstPass.IsOverlay: true
+physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
+
+physics.producers.saturation.LGProducer: "mixer"
+physics.producers.saturation.HGProducer: "mixer"
