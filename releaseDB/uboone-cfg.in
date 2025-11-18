@@ -29,6 +29,7 @@ if [[ $basequal == e* ]]; then
   do_pull ubdl @UBDL_VERSION@ ${basequal}${pyqual}
 fi
 do_pull geant4reweight @GEANT4REWEIGHT_VERSION@ ${basequal}-@SQUAL@
+build_noarch genie_xsec @GENIE_XSEC_VERSION@ @GENIE_XSEC_QUAL@
 do_build glpk @GLPK_VERSION@
 do_build wcp @WCP_VERSION@ ${basequal}
 do_build scn @SCN_VERSION@
