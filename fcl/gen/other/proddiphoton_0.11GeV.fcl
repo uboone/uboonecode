@@ -1,0 +1,3 @@
+#include "proddiphoton_0.03GeV_base.fcl"
+
+physics.producers.generator.MotherMass: [0.11]

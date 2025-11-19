@@ -3,14 +3,12 @@
 #include "reco_uboone_data_mcc9_10_driver_common.fcl"
 #include "reco_uboone_mcc9_10_reducer_stage2.fcl"
 
-process_name: OverlayRecoStage2
+process_name: OverlayRecoStage2n
 
 services.FileCatalogMetadata.fileType: "overlay"
 services.DetectorClocksService.InheritClockConfig:  false
-services.TFileService.fileName: "reco_stage_2_hist.root"
-services.DetectorClocksService.InheritClockConfig:  false
-
-services.NuRandomService.policy: "perEvent"
+services.TFileService.fileName: "reco_stage_2n_hist.root"
+services.SpaceCharge.EfieldOffsetScale: 1.0
 
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
@@ -26,23 +24,14 @@ physics.producers.wcopflash.OpDataProducerBeam:                                 
 physics.producers.nuslhits.HitTruthLabel: "gaushitTruthMatch"
 
 #physics.reco:                   [ @sequence::microboone_reco_ovrl_stage2,trajclusterTruthMatch ]
-physics.reco:                   [ @sequence::microboone_reco_data_optical,
-                                  @sequence::microboone_reco_ovrl_stage2_nocc ]
+physics.reco:                   [ @sequence::microboone_reco_ovrl_nugraph2 ]
 physics.ana:                    [ ]
 physics.trigger_paths:          [ reco ]
 physics.end_paths:              [ stream1 ]
 outputs.out1.fileName:          "%ifb_%tc_reco2.root"
 outputs.out1.dataTier:          "reconstructed"
 outputs.out1.outputCommands:    @local::stage2ReducedOutputCommands
-source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Data*RecoStage2", "drop *_*_*_MC*RecoStage2"]
-
-microboone_tfile_metadata:
-{
-  JSONFileName:          ["reco_stage_2_hist.root.json", "Pandora_Events.pndr.json"]
-  GenerateTFileMetadata: [true, true]
-  dataTier:              ["root-tuple", "pandora_debug"]
-  fileFormat:            ["root", "pndr"]
-}
+source.inputCommands:           ["keep *_*_*_*", "drop *_*_*_Overlay*RecoStage2n" ]
 
 physics.producers.pandora.SliceIdTool.HasMCNeutrino: true
 physics.producers.pandoraInit.SliceIdTool: @local::flash_neutrino_id_tool_overlay
@@ -62,3 +51,11 @@ physics.producers.crthitcorr.CrtHitsIn_Label1: "crthitcorrFirstPass"
 
 physics.producers.saturation.LGProducer: "mixer"
 physics.producers.saturation.HGProducer: "mixer"
+
+#microboone_tfile_metadata:
+#{
+#  JSONFileName:          ["reco_stage_2n_hist.root.json"]
+#  GenerateTFileMetadata: [true]
+#  dataTier:              ["root-tuple"]
+#  fileFormat:            ["root"]
+#}
