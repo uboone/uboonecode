@@ -4,6 +4,7 @@ process_name: OverlayRecoCRT
 
 services.TFileService.fileName: "reco_crt_hist.root"
 services.FileCatalogMetadata.fileType: "overlay"
+services.NuRandomService.policy: "perEvent"
 
 physics.reco:                   [ @sequence::microboone_reco_ovrl_crt ]
 physics.ana:                    [ ]
