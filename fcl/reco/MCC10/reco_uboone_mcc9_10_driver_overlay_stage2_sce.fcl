@@ -10,6 +10,7 @@ services.DetectorClocksService.InheritClockConfig:  false
 services.TFileService.fileName: "reco_stage_2_hist.root"
 services.DetectorClocksService.InheritClockConfig:  false
 services.SpaceCharge.EfieldOffsetScale: 1.0
+services.NuRandomService.policy: "perEvent"
 
 physics.producers.trajcluster.TrajClusterAlg.MatchTruth: [ -1, -1, -1, -1 ]
 physics.producers.trajcluster.DoRawDigitAssns: false
