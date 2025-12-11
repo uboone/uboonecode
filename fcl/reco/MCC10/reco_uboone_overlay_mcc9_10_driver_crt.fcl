@@ -1,0 +1,34 @@
+#include "reco_uboone_data_mcc9_10_driver_common.fcl"
+
+process_name: OverlayRecoCRT
+
+services.TFileService.fileName: "reco_crt_hist.root"
+services.FileCatalogMetadata.fileType: "overlay"
+services.NuRandomService.policy: "perEvent"
+
+physics.reco:                   [ @sequence::microboone_reco_ovrl_crt ]
+physics.ana:                    [ ]
+physics.trigger_paths:          [ reco ]
+physics.end_paths:              [ stream1 ]
+outputs.out1.fileName:          "%ifb_%tc_crt.root"
+outputs.out1.dataTier:          "reconstructed"
+source.inputCommands:           ["keep *_*_*_*",
+                                 "drop *_crtt0Correction_*_*",
+                                 "drop *_crthitcorrFirstPass_*_*",
+                                 "drop *_crthitcorr_*_*",
+                                 "drop *_crttzero_*_*",
+                                 "drop *_crttrack_*_*",
+                                 "drop *_crttrackmatch_*_*",
+                                 "drop *_crtveto_*_*",
+                                 "drop *_crtdistance_*_*"]
+
+microboone_tfile_metadata:
+{
+  JSONFileName:          ["reco_crt_hist.root.json"]
+  GenerateTFileMetadata: [true]
+  dataTier:              ["root-tuple"]
+  fileFormat:            ["root"]
+}
+
+physics.producers.pandoraCrtHitMatch.data_label_CRThit: "mixer"
+physics.producers.crttzero.data_label:                  "mixer"
