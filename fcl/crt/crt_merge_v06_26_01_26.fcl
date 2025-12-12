@@ -92,6 +92,8 @@ services.message.destinations:
   }
 }
 
+source.dropDescendantsOfDroppedBranches: false
+
 services.CRTFileManager.ubversion_CRTHits: prod_v06_26_01_26
 
 physics.producers.merger.debug: false
