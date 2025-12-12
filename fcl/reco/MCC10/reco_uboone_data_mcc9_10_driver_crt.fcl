@@ -18,6 +18,7 @@ source.inputCommands:           ["keep *_*_*_*",
                                  "drop *_crttrackmatch_*_*",
                                  "drop *_crtveto_*_*",
                                  "drop *_crtdistance_*_*"]
+source.dropDescendantsOfDroppedBranches: false
 
 microboone_tfile_metadata:
 {
