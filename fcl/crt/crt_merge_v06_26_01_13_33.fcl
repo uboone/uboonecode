@@ -92,6 +92,8 @@ services.message.destinations:
   }
 }
 
+source.dropDescendantsOfDroppedBranches: false
+
 services.CRTFileManager.ubversion_CRTHits: prod_v06_26_01_13
 services.CRTFileManager.ubversion_CRTHits_top: prod_v06_26_01_33
 
