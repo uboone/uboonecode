@@ -84,8 +84,8 @@ physics.producers.generator.SigmaY: [ 116.5 ]      # y = (-116.5, 116.5)
 physics.producers.generator.SigmaZ: [ 518.5 ]      # z = (0, 1037)
 physics.producers.generator.PDist:  "histograms"     # Read a histogram
 #physics.producers.generator.HistogramFile:  "./g4numi_histOutput_zlt40m.root"     # Read a histogram
-physics.producers.generator.HistogramFile:  "/pnfs/uboone/resilient/users/klin/heavyQCDaxion_sim/fluxhist/g4numiFHCnm_histOutput_zlt40m.root"
-physics.producers.generator.PHist:  ["EAtub"]     # Read a histogram, unit in GeV
+physics.producers.generator.HistogramFile:  "g4numiFHCnm_histOutput_zlt40m.root" # This file can be found at /pnfs/uboone/persistent/resilient/users/klin/heavyQCDaxion_sim/fluxhist
+physics.producers.generator.PHist:  ["EAtub"]     # Read a histogram, unit in GeV note that value is referred to energy
 #physics.producers.generator.P0: [ 1.0  ]           # 0.53+-0.52 GeV
 #physics.producers.generator.SigmaP: [ 9.87 ]
 physics.producers.generator.AngleDist: "histograms"          # Flat angle dist.
@@ -103,3 +103,5 @@ physics.producers.generator.Theta0XZEXT:                  [180]
 physics.producers.generator.SigmaTheta0XZEXT:             [180]
 physics.producers.generator.Theta0YZEXT:            [0]
 physics.producers.generator.SigmaTheta0YZEXT:       [90]
+
+#physics.producers.generator.MaxFluxFileMB:0 # This line don't work now; a configuration useful to add.
