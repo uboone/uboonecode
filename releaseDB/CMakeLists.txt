@@ -23,7 +23,7 @@ set( SQUAL s131 )
 
 create_product_variables( uboone_photon_propagation v01_01_00  )
 create_product_variables( lantern_container  v2_me_06_03_prod )
-create_product_variables( larbatch v01_61_04 )
+create_product_variables( larbatch v01_60_02 )
 create_product_variables( swtrigger v02_03_00i )
 #create_product_variables( larlite v06_71_00i )
 #create_product_variables( larcv v06_71_00i )
@@ -46,7 +46,7 @@ create_product_variables( ubraw v10_04_07_17 )
 create_product_variables( ubcore v10_04_07_17 )
 create_product_variables( ubcrt v10_04_07_21 )
 create_product_variables( ubobj v10_04_07_17 )
-create_product_variables( larsoft v10_04_07_01 )
+create_product_variables( larsoft v10_04_07_02 )
 
 # temporary
 create_product_variables( cetpkgsupport v1_14_01 )
