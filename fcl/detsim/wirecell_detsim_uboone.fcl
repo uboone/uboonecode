@@ -23,6 +23,8 @@ services:
   @table::microboone_detsim_services
 }
 
+services.SpaceCharge: @erase    # Don't confuse configuration checking.
+
 #source is now a root file
 source:
 {

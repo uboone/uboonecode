@@ -1,0 +1,6 @@
+#include "wirecell_reg4_SCE_DataDrivenVar.fcl"
+
+services.SpaceCharge.EfieldOffsetScale:         1.0
+services.SpaceCharge.InputFilename:             "SpaceCharge/SCEoffsets_dataDriven_fwd_Nov19_expanded.root"
+services.SpaceCharge.CalibrationInputFilename:  "SpaceCharge/SCEoffsets_dataDriven_bkwd_Nov19_expanded.root"
+
