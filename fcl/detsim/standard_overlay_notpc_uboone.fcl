@@ -22,6 +22,8 @@ services : {
   message:      @local::standard_info
 }
 
+services.SpaceCharge: @erase    # Don't confuse configuration checking.
+
 outputs: {
   out: { module_type: RootOutput
   	         fileName: "%ifb_%tc_overlaid.root"
