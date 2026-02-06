@@ -1,0 +1,3 @@
+#include "wirecell_reg4_SCE_DataDrivenVar.fcl"
+
+services.SpaceCharge.EfieldOffsetScale: 1.0

@@ -1,0 +1,3 @@
+#include "wirecell_reg4_recombination_2.fcl"
+
+services.SpaceCharge.EfieldOffsetScale: 1.0

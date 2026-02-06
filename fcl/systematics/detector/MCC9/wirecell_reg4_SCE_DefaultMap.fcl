@@ -1,0 +1,7 @@
+#include "wirecell_reg4_SCE_DataDrivenVar.fcl"
+
+process_name: DetSysSCEDefaultMap
+
+services.SpaceCharge.InputFilename:             "SpaceCharge/SCEoffsets_dataDriven_combined_fwd_Jan18.root"
+services.SpaceCharge.CalibrationInputFilename:  "SpaceCharge/SCEoffsets_dataDriven_combined_bkwd_Jan18.root"
+
