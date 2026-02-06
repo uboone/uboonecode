@@ -256,8 +256,8 @@ ubcrt		v10_04_07_21	-
 ubcv		v10_04_07_21	-
 ublite		v10_04_07_21	-
 uboone_oslibs	v1_0_0		-
-uboonedata	v10_04_07_21	-
-ubutil		v10_04_07_21	-
+uboonedata	v10_04_07_22	-
+ubutil		v10_04_07_22	-
 lantern_container v2_me_06_03_prod -
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
