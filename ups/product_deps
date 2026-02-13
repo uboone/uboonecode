@@ -252,9 +252,9 @@ genie_phyopt	v3_06_00	-
 genie_xsec	v3_06_00	-
 wcp             v00_18_01       -
 larsoft		v10_20_00	-
-ubcrt		v10_17_02	-
-ubcv		v10_17_02	-
-ublite		v10_17_02	-
+ubcrt		v10_20_00	-
+ubcv		v10_20_00	-
+ublite		v10_20_00	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_17_01	-
 ubutil		v10_17_01	-
