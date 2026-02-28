@@ -1,6 +1,7 @@
 #include "services_microboone.fcl"
 #include "time_memory_tracker_microboone.fcl"
 #include "photpropservices_microboone.fcl"
+#include "largeantmodules_microboone.fcl"
 
 process_name: PLPvarLYreyliegh 
 
@@ -22,21 +23,11 @@ source: {
 
 physics: {
   producers: {
-    largeant: {
-      module_type: "UBPhotonLibraryPropagation"
-      EDepModuleLabels: [ "largeant:Other", "largeant:TPCActive" ]
-      PhotonScale: [ 1.6, 1. ] #[outside TPC, inside TPC]
-      DoSlowComponent: true
-      RiseTimeFast: -1.0
-      RiseTimeSlow: -1.0
-      UsingScaleFactor: false #this to use the outside the TPC photon scaling using "PhotonScale". False by default
-      IncludePhotPropTimeUBSim: true #to have the UBPhotonLibraryPropagation transport time included. Can be turned off if need be.
-      VUVTiming: @local::common_vuv_timing_parameterization
-    }
+    fastop: @local::microboone_fastop
     rns: { module_type: "RandomNumberSaver" }
   }
 
-  simulate: [ rns, largeant ]
+  simulate: [ rns, fastop ]
   stream1: [ out1 ]
   trigger_paths: [ simulate ]
   end_paths: [ stream1 ]

@@ -23,7 +23,7 @@ physics: {
   producers: {
     ionization: {
       module_type: "larsim/ElectronDrift/ShiftEdepSCE"
-      EDepTag:     "largeant:TPCActive"
+      EDepTag:     "largeant:LArG4DetectorServicevolTPCActive"
       MakeAnaTree: false
     }
     rns: { module_type: "RandomNumberSaver" }
@@ -45,8 +45,6 @@ outputs: {
     fastCloning: false
   }
 }
-
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
 
 physics.producers.mcreco.MCParticleLabel: "largeant"
 physics.producers.mcreco.SimChannelLabel: "ionization" # "driftWC:simpleSC"
