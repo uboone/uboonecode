@@ -35,11 +35,18 @@ physics:
    rns:      { module_type: "RandomNumberSaver" }
    largeant: {
              module_type: SimDriftElectrons
-             SimulationLabel: "largeant:TPCActive"
+             SimulationLabel: "largeant:LArG4DetectorServicevolTPCActive"
           }
    phprop: {
              module_type: PhotonLibraryPropagation
-             EDepModuleLabels: ["largeant:Other","largeant:TPCActive"]
+             EDepModuleLabels: [ "largeant:LArG4DetectorServicevolTPCActive",
+                                 "largeant:LArG4DetectorServicevolCryostat",
+                                 "largeant:LArG4DetectorServicevolTPC",
+                                 "largeant:LArG4DetectorServicevolTPCPlane",
+                                 "largeant:LArG4DetectorServicevolTPCPlaneVert",
+                                 "largeant:LArG4DetectorServicevolOpDetSensitive",
+                                 "largeant:LArG4DetectorServicevolPMT",
+                                 "largeant:LArG4DetectorServicevolPMTLens" ]
              DoSlowComponent: true
              RiseTimeFast: -1.0
              RiseTimeSlow: -1.0
@@ -80,7 +87,6 @@ outputs:
 
 }
 
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
 #physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
 #                                                      1000010020,1000010030,1000020030,1000020040]
 

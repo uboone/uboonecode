@@ -2,8 +2,9 @@
 #include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "time_memory_tracker_microboone.fcl"
+#include "genie_microboone_default+MEC.fcl"
 
-process_name: G4EDep
+process_name: OverlayGenAndG4EDep
 
 services:
 {
@@ -17,12 +18,11 @@ services:
   @table::microboone_g4_services
 }
 
-#source is now a root file
+#source is an empty file.
 source:
 {
-  module_type: RootInput
+  module_type: EmptyEvent 
   maxEvents:  10        # Number of events to create
-  saveMemoryObjectThreshold: 0
 }
 
 # Define and configure some modules to do work on each event.
@@ -33,23 +33,31 @@ physics:
 
  producers:
  {
+    
+   generator: @local::microboone_genie_simple
+    
    largeant: @local::microboone_largeant
    drift:    {
                  module_type: SimDriftElectrons
-                 SimulationLabel: "largeant:TPCActive"
+                 SimulationLabel: "largeant:LArG4DetectorServicevolTPCActive"
              }
    ionization: {
                  module_type: "larsim/ElectronDrift/ShiftEdepSCE"
-                 EDepTag:     "largeant:TPCActive"
+                 EDepTag:     "largeant:LArG4DetectorServicevolTPCActive"
                  MakeAnaTree: false
                }
     mcreco:    @local::standard_mcreco
     rns:       { module_type: "RandomNumberSaver" }
  }
 
+ filters:
+ {
+ highenergynuminumucc: { module_type: HighEnergyNuMINuMuCCFilter }
+ }
+
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, largeant, ionization, mcreco ] #drift, mcreco ]
+ simulate: [ rns, generator, largeant, ionization, mcreco, highenergynuminumucc ] 
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]
@@ -71,29 +79,18 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName:    "%ifb_%tc_g4.root"
+   fileName:    "%ifb_%tc_gen_g4_filtered.root"
    dataTier:    "simulated"
    saveMemoryObjectThreshold: 0
    compressionLevel: 1
    fastCloning: false
+   SelectEvents: [ simulate ]
  }
 }
 
 services.LArG4Parameters.FillSimEnergyDeposits:       true
 #services.LArG4Parameters.NoElectronPropagation:       true
 services.LArG4Parameters.InitialSimEnergyDepositSize: 100000
-
-# Geant4 physics lists
-services.LArG4Parameters.EnabledPhysics:    [ "LowEnergyEm",
-                                              "FastOptical",
-                                              "SynchrotronAndGN",
-                                              "Ion",
-                                              "Hadron",
-                                              "Decay",
-                                              "HadronElastic",
-                                              "Stopping"]
-# Save neutrons  #"NeutronTrackingCut" ]
-
 
 # Switching to the "drift" for SimChannels
 #physics.producers.mcreco.G4ModName:                   "drift"

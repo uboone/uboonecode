@@ -1,5 +1,5 @@
 #include "genie_microboone.fcl"
-##include "largeantmodules_microboone.fcl"
+#include "largeantmodules_microboone.fcl"
 #include "mcreco.fcl"
 #include "detsimmodules_microboone.fcl"
 #include "triggersim_microboone.fcl"
@@ -32,7 +32,7 @@ RSEFilter: {
 dlprod_producers:
  {
    generator: @local::microboone_genie_uniform_flux_cc
-   #largeant: @local::microboone_largeant
+   largeant: @local::microboone_largeant
    mcreco:   @local::standard_mcreco
    optdigitizer:   @local::microboone_optical_adc_sim
    optfem:         @local::microboone_optical_fem_sim
@@ -64,7 +64,7 @@ dlprod_filters: {
     rsefilter: @local::RSEFilter
 }
 
-#dlprod_simpart: [ generator, largeant, mcreco ]
+dlprod_simpart: [ generator, largeant, mcreco ]
 
 dlprod_simpmt: [ optdigitizer, optfem, triggersim, pmtreadout ]
 
@@ -117,7 +117,7 @@ dlprod_producers.generator.FluxCopyMethod:   "DIRECT"
 # G4 step
 dlprod_producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
                                                       1000010020,1000010030,1000020030,1000020040]
-#dlprod_producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
+dlprod_producers.largeant.KeepParticlesInVolumes: ["volCryostat"] #only keep MCParticles that cross the cryostat
 dlprod_producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,
                                                       1000010020,1000010030,1000020030,1000020040]
 
