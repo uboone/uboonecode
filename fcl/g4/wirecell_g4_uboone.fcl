@@ -43,7 +43,7 @@ physics:
                  EDepTag:     "largeant:LArG4DetectorServicevolTPCActive"
                  MakeAnaTree: false
                }
-    fastop:    @local::microboone_fastop
+    phprop:    @local::microboone_phprop
     genericcrt: @local::microboone_genericcrt
     mcreco:    @local::standard_mcreco
     rns:       { module_type: "RandomNumberSaver" }
@@ -51,7 +51,7 @@ physics:
 
  #define the producer and filter modules for this path, order matters, 
  #filters reject all following items.  see lines starting physics.producers below
- simulate: [ rns, largeant, fastop, ionization, genericcrt, mcreco ] #drift, mcreco ]
+ simulate: [ rns, largeant, phprop, ionization, genericcrt, mcreco ] #drift, mcreco ]
  
  #define the output stream, there could be more than one if using filters 
  stream1:  [ out1 ]

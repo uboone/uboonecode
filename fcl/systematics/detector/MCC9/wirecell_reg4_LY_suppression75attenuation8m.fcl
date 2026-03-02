@@ -23,11 +23,11 @@ source: {
 
 physics: {
   producers: {
-    fastop: @local::microboone_fastop
+    phprop: @local::microboone_phprop
     rns: { module_type: "RandomNumberSaver" }
   }
 
-  simulate: [ rns, fastop ]
+  simulate: [ rns, phprop ]
   stream1: [ out1 ]
   trigger_paths: [ simulate ]
   end_paths: [ stream1 ]

@@ -35,11 +35,18 @@ physics:
    rns:      { module_type: "RandomNumberSaver" }
    largeant: {
              module_type: SimDriftElectrons
-             SimulationLabel: "largeant:TPCActive"
+             SimulationLabel: "largeant:LArG4DetectorServicevolTPCActive"
           }
    phprop: {
              module_type: PhotonLibraryPropagation
-             EDepModuleLabels: ["largeant:Other","largeant:TPCActive"]
+             EDepModuleLabels: [ "largeant:LArG4DetectorServicevolTPCActive",
+                                 "largeant:LArG4DetectorServicevolCryostat",
+                                 "largeant:LArG4DetectorServicevolTPC",
+                                 "largeant:LArG4DetectorServicevolTPCPlane",
+                                 "largeant:LArG4DetectorServicevolTPCPlaneVert",
+                                 "largeant:LArG4DetectorServicevolOpDetSensitive",
+                                 "largeant:LArG4DetectorServicevolPMT",
+                                 "largeant:LArG4DetectorServicevolPMTLens" ]
              DoSlowComponent: true
              RiseTimeFast: -1.0
              RiseTimeSlow: -1.0
