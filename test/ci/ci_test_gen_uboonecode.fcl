@@ -2,6 +2,8 @@
 
 physics.producers.generator.FluxFiles: [ "converted_beammc_*.root" ]
 physics.producers.generator.FluxSearchPaths: "./"
+physics.producers.generator.EventGeneratorList: "Default"
+physics.producers.generator.FluxCopyMethod: "DIRECT"
 
 services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234

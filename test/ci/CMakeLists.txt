@@ -1,3 +1,3 @@
-install_scripts(AS_TEST)
+install_scripts()
 
 install_fhicl()

@@ -2,8 +2,9 @@
 
 services.NuRandomService.policy: "preDefinedSeed"
 services.NuRandomService.baseSeed: 1234
-services.NuRandomService.largeant.GEANT: 1234
-services.NuRandomService.largeant.propagation: 1234
+services.NuRandomService.largeant: 1234
+services.NuRandomService.phprop.photon: 1234
+services.NuRandomService.phprop.scinttime: 1234
 
-services.RandomNumberGenerator.restoreFrom: "G4RandomSeeds_Ref.dat"
+#services.RandomNumberGenerator.restoreFrom: "G4RandomSeeds_Ref.dat"
 services.RandomNumberGenerator.saveTo: "G4RandomSeeds.dat"
