@@ -7,4 +7,4 @@ services.NuRandomService.phprop.photon: 1234
 services.NuRandomService.phprop.scinttime: 1234
 
 #services.RandomNumberGenerator.restoreFrom: "G4RandomSeeds_Ref.dat"
-services.RandomNumberGenerator.saveTo: "G4RandomSeeds.dat"
+#services.RandomNumberGenerator.saveTo: "G4RandomSeeds.dat"
