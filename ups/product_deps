@@ -336,6 +336,7 @@ end_qualifier_list
 ####################################
 table_fragment_begin
 pathPrepend(FHICL_FILE_PATH, .:./job)
+pathPrepend(PATH, "${UPS_PROD_DIR}/test")
 table_fragment_end
 ####################################
 
