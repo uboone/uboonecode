@@ -257,7 +257,7 @@ ubcv		v10_20_04	-
 ublite		v10_20_04	-
 uboone_oslibs	v1_0_0		-
 uboonedata	v10_20_04	-
-ubutil		v10_17_01	-
+ubutil		v10_20_04	-
 lantern_container v2_me_06_03_prod -
 cetmodules	v3_24_01	-	only_for_build
 end_product_list
