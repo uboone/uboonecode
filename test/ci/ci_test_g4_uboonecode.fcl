@@ -6,5 +6,5 @@ services.NuRandomService.largeant: 1234
 services.NuRandomService.phprop.photon: 1234
 services.NuRandomService.phprop.scinttime: 1234
 
-#services.RandomNumberGenerator.restoreFrom: "G4RandomSeeds_Ref.dat"
-#services.RandomNumberGenerator.saveTo: "G4RandomSeeds.dat"
+services.RandomNumberGenerator.restoreFrom: "/cvmfs/uboone.osgstorage.org/stash/ContinuousIntegration/g4/G4RandomSeeds_Ref.dat"
+services.RandomNumberGenerator.saveTo: "G4RandomSeeds.dat"
