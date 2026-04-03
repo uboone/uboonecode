@@ -11,6 +11,14 @@ if [[ x`which lar` =~ x.*debug.* ]]; then
   exit 0
 fi
 
+# Exit if stash cache isn't mounted.
+
+UBOONE_EXAMPLE_DATA_DIR=/pnfs/uboone/persistent/stash/uboone_example_data
+if [ ! -d $UBOONE_EXAMPLE_DATA_DIR ]; then
+  echo "Quittig because stash cache isn't available."
+  exit
+fi
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt
