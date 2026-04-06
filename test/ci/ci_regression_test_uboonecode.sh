@@ -422,7 +422,7 @@ do
     echo "current_file: ${current_file}"
 
     reference_file=""
-    if [[ "${REFERENCE_FILES}" = *"xroot"* ]]; then
+    if [[ "${REFERENCE_FILES}" = *"xroot"* -o "${REFERENCE_FILES}" = "/cvmfs/"* ]]; then
         for temp_file in ${REFERENCE_FILES//,/ }
         do
             if [[ "${temp_file}" = *"${current_file//Current/Reference}"* ]]; then
