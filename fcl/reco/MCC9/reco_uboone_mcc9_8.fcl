@@ -38,7 +38,6 @@
 
 #include "mctrutht0matching.fcl"
 #include "mchitmodules.fcl"
-#include "dlprod_fclbase_analyzers.fcl"
 
 #include "microboone_crtreco.fcl"
 #include "microboone_crthitcorr.fcl"  

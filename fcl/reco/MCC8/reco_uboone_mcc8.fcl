@@ -31,7 +31,6 @@
 #include "mcreco.fcl"
 
 #include "microboone_dlpmtprecuts.fcl"
-#include "dlprod_fclbase_analyzers.fcl"
 #include "calibration_microboone.fcl"
 
 BEGIN_PROLOG

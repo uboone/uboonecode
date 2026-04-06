@@ -11,16 +11,35 @@ if [[ x`which lar` =~ x.*debug.* ]]; then
   exit 0
 fi
 
-# Skip this test if libtorch is not set up.
-
-if [ x$LIBTORCH_DIR = x ]; then
-  exit 0
-fi
-
 # Loop over all installed fcl files.
 
 find $MRB_BUILDDIR/uboonecode/job -name \*.fcl -print | while read fcl
 do
+  fclbase=`basename ${fcl}`
+
+  # Skip some fcls if libtorch is not set up.
+
+  if [ x$LIBTORCH_DIR = x ]; then
+    if [[ $fclbase == dlprod*.fcl ]]; then
+      continue
+    fi
+    if [[ $fclbase == *larcv*.fcl ]]; then
+      continue
+    fi
+    if [[ $fclbase == *supera*.fcl ]]; then
+      continue
+    fi
+    if [[ $fclbase == uboone_sys_var_SlimAndFilterDLCCPi0_mcc8.fcl ]]; then
+      continue
+    fi
+    if [[ $fclbase == kazu.fcl ]]; then
+      continue
+    fi
+    if [[ $fclbase == litedatamin_reco3d_kalmanhit_whits.fcl ]]; then
+      continue
+    fi
+  fi
+
   echo "Testing fcl file $fcl"
 
   # Parse this fcl file.
