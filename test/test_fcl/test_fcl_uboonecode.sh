@@ -38,6 +38,19 @@ do
     if [[ $fclbase == litedatamin_reco3d_kalmanhit_whits.fcl ]]; then
       continue
     fi
+
+    # Make a dummy nugraph.fcl in the current directory.
+    # Also make sure current directory in on fcl path.
+
+    export FHICL_FILE_PATH=.:$FHICL_FILE_PATH
+    cat <<EOF > nugraph.fcl
+BEGIN_PROLOG
+
+NuGraph: {}
+
+END_PROLOG
+EOF
+
   fi
 
   echo "Testing fcl file $fcl"
