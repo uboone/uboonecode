@@ -87,7 +87,7 @@
 #>  define_pythonpath
 ####################################
 parent		uboonecode
-defaultqual	e20
+defaultqual	e26
 ####################################
 
 ####################################
@@ -251,7 +251,7 @@ product		version		qual	flags		<table_format=2>
 genie_phyopt	v3_06_00	-
 genie_xsec	v3_06_00	-
 wcp             v00_18_01       -
-larsoft		v10_23_00	-
+larsoft		v10_24_00	-
 ubcrt		v10_23_00	-
 ubcv		v10_23_00	-
 ublite		v10_23_00	-
@@ -327,6 +327,12 @@ e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a02
 e26:gbf:debug	e26:debug	e26:debug	e26:debug	e26:debug	e26:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	e26:debug  -nq-            -nq-
 e26:gbf:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	e26:prof   -nq-            -nq-
 e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	e26:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e26:prof   -nq-            -nq-
+e28:be:debug	e28:debug	e28:debug	e28:debug	e28:debug	e28:debug	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e28:debug  -nq-            -nq-
+e28:be:prof	e28:prof	e28:prof	e28:prof	e28:prof	e28:prof	-nq-		e1000:U1810a0211a:k250	dkcharmtau	e28:prof   -nq-            -nq-
+e28:debug	e28:debug	e28:debug	e28:debug	e28:debug	e28:debug	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e28:debug  -nq-            -nq-
+e28:gbf:debug	e28:debug	e28:debug	e28:debug	e28:debug	e28:debug	-nq-		e1000:G1810a99999:k250	dkcharmtau	e28:debug  -nq-            -nq-
+e28:gbf:prof	e28:prof	e28:prof	e28:prof	e28:prof	e28:prof	-nq-		e1000:G1810a99999:k250	dkcharmtau	e28:prof   -nq-            -nq-
+e28:prof	e28:prof	e28:prof	e28:prof	e28:prof	e28:prof	-nq-		e1000:G1810a0211a:k250	dkcharmtau	e28:prof   -nq-            -nq-
 end_qualifier_list
 ####################################
 
