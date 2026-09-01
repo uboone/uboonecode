@@ -1,6 +1,9 @@
 #include "reco_uboone_data_mcc9_10_driver_stage2b_beamOn_numi.fcl"
 
-physics.reco: [ @sequence::microboone_reco_data_stage2b_nocc ]
+physics.reco: [ rns,
+                @sequence::microboone_reco_data_pandora,
+                blipreco
+              ]
 
 physics.producers.wcopflash.OpDataProducerBeam:      "doublePMTFilter"
 physics.producers.wcopflash.OpDataProducerBeamLG:    "pmtreadout"
