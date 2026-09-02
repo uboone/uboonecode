@@ -25,9 +25,9 @@ do_build swtrigger @SWTRIGGER_VERSION@ ${basequal}${pyqual}
 #do_build larlite @LARLITE_VERSION@ ${basequal}${pyqual}
 #do_build larcv @LARCV_VERSION@ ${basequal}${pyqual}
 #do_build larcv  ${basequal}${pyqual}
-if [[ $basequal == e26 ]]; then
-  do_pull ubdl @UBDL_VERSION@ ${basequal}${pyqual}
-fi
+#if [[ $basequal == e26 ]]; then
+#  do_pull ubdl @UBDL_VERSION@ ${basequal}${pyqual}
+#fi
 do_pull geant4reweight @GEANT4REWEIGHT_VERSION@ ${basequal}-@SQUAL@
 build_noarch genie_xsec @GENIE_XSEC_VERSION@ @GENIE_XSEC_QUAL@
 do_build glpk @GLPK_VERSION@
