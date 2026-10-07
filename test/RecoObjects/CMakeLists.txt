@@ -30,15 +30,9 @@ cet_build_plugin(
 #	  TEST_ARGS -c PropTest.fcl
 #	  DATAFILES PropTest.fcl )
 
-cet_test( InteractTest HANDBUILT
-  	  TEST_EXEC lar
-	  TEST_ARGS -c InteractTest.fcl
-	  DATAFILES PropTest.fcl )
+cet_test( InteractTest.sh PREBUILT )
 
-cet_test( KalmanFilterTest HANDBUILT
-  	  TEST_EXEC lar
-	  TEST_ARGS -c KalmanFilterTest.fcl
-	  DATAFILES KalmanFilterTest.fcl )
+cet_test( KalmanFilterTest.sh PREBUILT )
 
 install_headers()
 install_fhicl()

@@ -1,18 +1,22 @@
 #! /bin/bash
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt
 
 # Skip this test of the database password file isn't available on FW_SEARCH_PATH
 
-touch swizzle.skip
-echo $FW_SEARCH_PATH | tr : '\n' | while read dir
-do
-  if [ -f $dir/uboonedb_passwd ]; then
-    rm swizzle.skip
-  fi
-done
+#touch swizzle.skip
+#echo $FW_SEARCH_PATH | tr : '\n' | while read dir
+#do
+#  if [ -f $dir/uboonedb_passwd ]; then
+#    rm swizzle.skip
+#  fi
+#done
 
 if [ -f swizzle.skip ]; then
   echo "Skipping swizzle integration test because of unavailability of database password file."

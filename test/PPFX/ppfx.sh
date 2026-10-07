@@ -6,6 +6,10 @@ if [ ! -d /pnfs/uboone/persistent ]; then
   exit
 fi
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Make sure we can find ppfx config file in mrbsetenv environment, since the install
 # subdirectory is different than the source subdirectory.
 

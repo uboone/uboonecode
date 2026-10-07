@@ -19,6 +19,10 @@ if [ ! -d $UBOONE_EXAMPLE_DATA_DIR ]; then
   exit
 fi
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt

@@ -6,6 +6,10 @@ if [ ! -d /pnfs/uboone/persistent ]; then
   exit
 fi
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Set up python path.
 
 export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH

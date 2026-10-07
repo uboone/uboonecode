@@ -11,6 +11,10 @@ if [[ x`which lar` =~ x.*debug.* ]]; then
   exit 0
 fi
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Loop over all installed fcl files.
 
 find $MRB_BUILDDIR/uboonecode/job -name \*.fcl -print | while read fcl

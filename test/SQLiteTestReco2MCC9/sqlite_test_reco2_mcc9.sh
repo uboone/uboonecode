@@ -11,6 +11,10 @@ if [[ x`which lar` =~ x.*debug.* ]]; then
   exit 0
 fi
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt
