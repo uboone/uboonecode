@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt

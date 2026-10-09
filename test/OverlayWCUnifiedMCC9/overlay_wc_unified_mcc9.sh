@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# Spack / mpd
+
+source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
+
 # Save a copy of the environment (for debugging).
 
 env > env.txt
@@ -26,7 +30,9 @@ fi
 
 # LD_LIBRARY_PATH kluge
 
-export LD_LIBRARY_PATH=`dropit -p $LD_LIBRARY_PATH ublarcvapp`
+if echo $LD_LIBRARY_PATH | grep -q ublarcvapp; then
+  export LD_LIBRARY_PATH=`dropit -p $LD_LIBRARY_PATH ublarcvapp`
+fi
 
 # Set wire cell path.
 
@@ -40,10 +46,12 @@ fi
 
 # Set up python path.
 
-export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
-rm -rf project_modules
-cp -r $LARBATCH_DIR/python project_modules
-touch project_modules/__init__.py
+if [ x$LARBATCH_DIR != x ]; then
+  export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
+  rm -rf project_modules
+  cp -r $LARBATCH_DIR/python project_modules
+  touch project_modules/__init__.py
+fi
 
 # Set experiment environment variables (not set by mrbsetenv, but needed by IFDH).
 
