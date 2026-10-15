@@ -27,6 +27,7 @@ find_package( lardata REQUIRED EXPORT )
 find_package( nurandom REQUIRED EXPORT )
 find_package( nugen REQUIRED EXPORT )
 find_package( GENIE REQUIRED EXPORT )
+find_package( Torch QUIET EXPORT )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
