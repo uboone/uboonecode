@@ -47,7 +47,7 @@ fi
 
 # Set up python path.
 
-if [ x$LARBATCH_DIR != x ]; then
+if [ x$SPACK_ROOT = x -a x$LARBATCH_DIR != x ]; then
   export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
   rm -rf project_modules
   cp -r $LARBATCH_DIR/python project_modules

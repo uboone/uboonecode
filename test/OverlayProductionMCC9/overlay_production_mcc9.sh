@@ -33,10 +33,12 @@ export WIRECELL_PATH=${UBOONEDATA_DIR}/WireCellData:${WIRECELL_FQ_DIR}/share/wir
 
 # Set up python path.
 
-export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
-rm -rf project_modules
-cp -r $LARBATCH_DIR/python project_modules
-touch project_modules/__init__.py
+if [ x$SPACK_ROOT = x ]; then
+  export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
+  rm -rf project_modules
+  cp -r $LARBATCH_DIR/python project_modules
+  touch project_modules/__init__.py
+fi
 
 # This script runs the full overlay chain using standard released fcl files.
 

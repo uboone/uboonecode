@@ -12,14 +12,16 @@ source /cvmfs/uboone.opensciencegrid.org/bin/mpdsetenv.sh
 
 # Set up python path.
 
-export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
-rm -rf project_modules
-if [ -d $LARBATCH_DIR/python/project_modules ]; then
-  cp -r $LARBATCH_DIR/python/project_modules project_modules
-else
-  cp -r $LARBATCH_DIR/python project_modules
+if [ x$SPACK_ROOT = x ]; then
+  export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
+  rm -rf project_modules
+  if [ -d $LARBATCH_DIR/python/project_modules ]; then
+    cp -r $LARBATCH_DIR/python/project_modules project_modules
+  else
+    cp -r $LARBATCH_DIR/python project_modules
+  fi
+  touch project_modules/__init__.py
 fi
-touch project_modules/__init__.py
 
 # Save a copy of the environment (for debugging).
 

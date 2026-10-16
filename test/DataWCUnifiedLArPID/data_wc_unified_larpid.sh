@@ -47,10 +47,12 @@ fi
 
 # Set up python path.
 
-export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
-rm -rf project_modules
-cp -r $LARBATCH_DIR/python project_modules
-touch project_modules/__init__.py
+if [ x$SPACK_ROOT = x ]; then
+  export PYTHONPATH=`pwd`:$UBUTIL_DIR/python:$LARBATCH_DIR/python:$PYTHONPATH
+  rm -rf project_modules
+  cp -r $LARBATCH_DIR/python project_modules
+  touch project_modules/__init__.py
+fi
 
 # Set experiment environment variables (not set by mrbsetenv, but needed by IFDH).
 
